@@ -5,49 +5,38 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Doctrine\ORM\Mapping as ORM;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity(repositoryClass: ContactExportSchedulerRepository::class)]
+#[ORM\Table(name: 'contact_export_scheduler')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ContactExportScheduler
 {
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', onDelete: 'CASCADE')]
     private ?User $user = null; // Created by
 
     #[Assert\NotBlank()]
+    #[ORM\Column(name: 'scheduled_datetime', type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $scheduledDateTime;
 
     /**
      * @var array<mixed>
      */
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private array $data = [];
 
     /**
      * @var array<mixed>
      */
     private array $changes = [];
-
-    /**
-     * @template T of ClassMetadata
-     *
-     * @param T $metadata
-     */
-    public static function loadMetadata(ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('contact_export_scheduler');
-        $builder->setCustomRepositoryClass(ContactExportSchedulerRepository::class);
-        $builder->addId();
-        $builder->createManyToOne('user', User::class)
-            ->addJoinColumn('user_id', 'id', true, false, 'CASCADE')
-            ->build();
-        $builder->createField('scheduledDateTime', Types::DATETIME_IMMUTABLE)
-            ->columnName('scheduled_datetime')
-            ->build();
-        $builder->addNullableField('data', Types::ARRAY);
-    }
 
     public function getId(): ?int
     {

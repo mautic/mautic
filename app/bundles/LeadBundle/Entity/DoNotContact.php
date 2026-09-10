@@ -6,9 +6,14 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 
+#[ORM\Entity(repositoryClass: DoNotContactRepository::class)]
+#[ORM\Table(name: 'lead_donotcontact')]
+#[ORM\Index(columns: ['lead_id', 'channel', 'reason'], name: 'leadid_reason_channel')]
+#[ORM\Index(columns: ['reason'], name: 'dnc_reason_search')]
+#[ORM\Index(columns: ['date_added'], name: 'dnc_date_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class DoNotContact
 {
     /**
@@ -34,63 +39,35 @@ class DoNotContact
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Lead|null
-     */
-    private $lead;
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class, inversedBy: 'doNotContact')]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'CASCADE')]
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateAdded;
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
+    private ?\DateTime $dateAdded = null;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $reason = 0;
 
-    /**
-     * @var string|null
-     */
-    private $comments;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $comments = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
+    #[ORM\Column(name: 'channel_id', type: 'integer', nullable: true)]
     private $channelId;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('lead_donotcontact')
-            ->setCustomRepositoryClass(DoNotContactRepository::class)
-            ->addIndex(['lead_id', 'channel', 'reason'], 'leadid_reason_channel')
-            ->addIndex(['reason'], 'dnc_reason_search')
-            ->addIndex(['date_added'], 'dnc_date_added');
-
-        $builder->addId();
-
-        $builder->addLead(true, 'CASCADE', false, 'doNotContact');
-
-        $builder->addDateAdded();
-
-        $builder->createField('reason', 'smallint')
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->build();
-
-        $builder->addNamedField('channelId', 'integer', 'channel_id', true);
-
-        $builder->createField('comments', 'text')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -124,10 +101,7 @@ class DoNotContact
         return $this->id;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -139,10 +113,7 @@ class DoNotContact
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;
     }
@@ -172,10 +143,7 @@ class DoNotContact
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getComments()
+    public function getComments(): ?string
     {
         return $this->comments;
     }

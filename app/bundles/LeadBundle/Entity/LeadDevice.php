@@ -6,134 +6,91 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: LeadDeviceRepository::class)]
+#[ORM\Table(name: 'lead_devices')]
+#[ORM\Index(columns: ['date_added'], name: 'date_added_search')]
+#[ORM\Index(columns: ['device'], name: 'device_search')]
+#[ORM\Index(columns: ['device_os_name'], name: 'device_os_name_search')]
+#[ORM\Index(columns: ['device_os_shortname'], name: 'device_os_shortname_search')]
+#[ORM\Index(columns: ['device_os_version'], name: 'device_os_version_search')]
+#[ORM\Index(columns: ['device_os_platform'], name: 'device_os_platform_search')]
+#[ORM\Index(columns: ['device_brand'], name: 'device_brand_search')]
+#[ORM\Index(columns: ['device_model'], name: 'device_model_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadDevice
 {
     /**
      * @var string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Lead
-     */
-    private $lead;
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'client_info', type: 'array', nullable: true)]
     private $clientInfo = [];
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $device;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_os_name', type: 'string', length: 191, nullable: true)]
     private $deviceOsName;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_os_shortname', type: 'string', length: 191, nullable: true)]
     private $deviceOsShortName;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_os_version', type: 'string', length: 191, nullable: true)]
     private $deviceOsVersion;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_os_platform', type: 'string', length: 191, nullable: true)]
     private $deviceOsPlatform;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_brand', type: 'string', length: 191, nullable: true)]
     private $deviceBrand;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_model', type: 'string', length: 191, nullable: true)]
     private $deviceModel;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191, unique: true, nullable: true)]
     private $trackingId;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('lead_devices')
-            ->setCustomRepositoryClass(LeadDeviceRepository::class)
-            ->addIndex(['date_added'], 'date_added_search')
-            ->addIndex(['device'], 'device_search')
-            ->addIndex(['device_os_name'], 'device_os_name_search')
-            ->addIndex(['device_os_shortname'], 'device_os_shortname_search')
-            ->addIndex(['device_os_version'], 'device_os_version_search')
-            ->addIndex(['device_os_platform'], 'device_os_platform_search')
-            ->addIndex(['device_brand'], 'device_brand_search')
-            ->addIndex(['device_model'], 'device_model_search');
-
-        $builder->addBigIntIdField();
-
-        $builder->addLead(false, 'CASCADE', false);
-
-        $builder->addDateAdded();
-
-        $builder->createField('clientInfo', 'array')
-            ->columnName('client_info')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('device', 'string');
-
-        $builder->createField('deviceOsName', 'string')
-            ->columnName('device_os_name')
-            ->nullable()
-            ->build();
-
-        $builder->createField('deviceOsShortName', 'string')
-            ->columnName('device_os_shortname')
-            ->nullable()
-            ->build();
-
-        $builder->createField('deviceOsVersion', 'string')
-            ->columnName('device_os_version')
-            ->nullable()
-            ->build();
-
-        $builder->createField('deviceOsPlatform', 'string')
-            ->columnName('device_os_platform')
-            ->nullable()
-            ->build();
-
-        $builder->createField('deviceBrand', 'string')
-            ->columnName('device_brand')
-            ->nullable()
-            ->build();
-
-        $builder->createField('deviceModel', 'string')
-            ->columnName('device_model')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->unique()
-            ->nullable()
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -346,10 +303,7 @@ class LeadDevice
         return $this;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

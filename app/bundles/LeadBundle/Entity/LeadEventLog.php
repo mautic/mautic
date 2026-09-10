@@ -7,11 +7,19 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Store here contact events.
  */
+#[ORM\Entity(repositoryClass: LeadEventLogRepository::class)]
+#[ORM\Table(name: 'lead_event_log')]
+#[ORM\Index(columns: ['lead_id'], name: 'lead_id_index')]
+#[ORM\Index(columns: ['object', 'object_id'], name: 'lead_object_index')]
+#[ORM\Index(columns: ['bundle', 'object', 'action', 'object_id'], name: 'lead_timeline_index')]
+#[ORM\Index(columns: ['bundle', 'object', 'action', 'object_id', 'date_added'], name: self::INDEX_SEARCH)]
+#[ORM\Index(columns: ['action'], name: 'lead_timeline_action_index')]
+#[ORM\Index(columns: ['date_added'], name: 'lead_date_added_index')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog
 {
     /**
@@ -22,83 +30,69 @@ class LeadEventLog
     /**
      * @var string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     protected $id;
 
     /**
      * @var Lead|null
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'eventLog')]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'CASCADE')]
     protected $lead;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'user_id', type: Types::INTEGER, nullable: true)]
     protected $userId;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'user_name', type: Types::STRING, length: 191, nullable: true)]
     protected $userName;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     protected $bundle;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     protected $object;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'object_id', type: Types::INTEGER, nullable: true)]
     protected $objectId;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     protected $action;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: Types::DATETIME_MUTABLE)]
     protected $dateAdded;
 
     /**
      * @var array|null
      */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private $properties = [];
 
     public function __construct()
     {
         $this->setDateAdded(new \DateTime());
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('lead_event_log')
-            ->setCustomRepositoryClass(LeadEventLogRepository::class)
-            ->addIndex(['lead_id'], 'lead_id_index')
-            ->addIndex(['object', 'object_id'], 'lead_object_index')
-            ->addIndex(['bundle', 'object', 'action', 'object_id'], 'lead_timeline_index')
-            ->addIndex(['bundle', 'object', 'action', 'object_id', 'date_added'], self::INDEX_SEARCH)
-            ->addIndex(['action'], 'lead_timeline_action_index')
-            ->addIndex(['date_added'], 'lead_date_added_index')
-            ->addBigIntIdField()
-            ->addNullableField('userId', Types::INTEGER, 'user_id')
-            ->addNullableField('userName', Types::STRING, 'user_name')
-            ->addNullableField('bundle', Types::STRING)
-            ->addNullableField('object', Types::STRING)
-            ->addNullableField('action', Types::STRING)
-            ->addNullableField('objectId', Types::INTEGER, 'object_id')
-            ->addNamedField('dateAdded', Types::DATETIME_MUTABLE, 'date_added')
-            ->addNullableField('properties', Types::JSON);
-
-        $builder->createManyToOne('lead', Lead::class)
-            ->addJoinColumn('lead_id', 'id', true, false, 'CASCADE')
-            ->inversedBy('eventLog')
-            ->build();
     }
 
     /**

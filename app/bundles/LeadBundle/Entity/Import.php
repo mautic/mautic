@@ -5,12 +5,17 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity(repositoryClass: ImportRepository::class)]
+#[ORM\Table(name: 'imports')]
+#[ORM\Index(columns: ['object'], name: 'import_object')]
+#[ORM\Index(columns: ['status'], name: 'import_status')]
+#[ORM\Index(columns: ['priority'], name: 'import_priority')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Import extends FormEntity
 {
     /** ===== Statuses: ===== */
@@ -61,6 +66,9 @@ class Import extends FormEntity
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -69,6 +77,7 @@ class Import extends FormEntity
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.lead.import.dir.notblank')]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $dir;
 
     /**
@@ -77,6 +86,7 @@ class Import extends FormEntity
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.lead.import.file.notblank')]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $file = 'import.csv';
 
     /**
@@ -84,47 +94,58 @@ class Import extends FormEntity
      *
      * @var string|null
      */
+    #[ORM\Column(name: 'original_file', type: Types::STRING, length: 191, nullable: true)]
     private $originalFile;
 
     /**
      * Tolal line count of the CSV file.
      */
+    #[ORM\Column(name: 'line_count', type: Types::INTEGER)]
     private int $lineCount = 0;
 
     /**
      * Count of entities which were newly created.
      */
+    #[ORM\Column(name: 'inserted_count', type: Types::INTEGER)]
     private int $insertedCount = 0;
 
     /**
      * Count of entities which were updated.
      */
+    #[ORM\Column(name: 'updated_count', type: Types::INTEGER)]
     private int $updatedCount = 0;
 
     /**
      * Count of ignored items.
      */
+    #[ORM\Column(name: 'ignored_count', type: Types::INTEGER)]
     private int $ignoredCount = 0;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: Types::INTEGER)]
     private $priority = self::LOW;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: Types::INTEGER)]
     private $status = self::QUEUED;
 
+    #[ORM\Column(name: 'date_started', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateStarted = null;
 
+    #[ORM\Column(name: 'date_ended', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateEnded = null;
 
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private string $object = 'lead';
 
     /**
      * @var array<mixed>|null
      */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private $properties = [];
 
     public function __clone()
@@ -132,30 +153,6 @@ class Import extends FormEntity
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('imports')
-            ->setCustomRepositoryClass(ImportRepository::class)
-            ->addIndex(['object'], 'import_object')
-            ->addIndex(['status'], 'import_status')
-            ->addIndex(['priority'], 'import_priority')
-            ->addId()
-            ->addField('dir', Types::STRING)
-            ->addField('file', Types::STRING)
-            ->addNullableField('originalFile', Types::STRING, 'original_file')
-            ->addNamedField('lineCount', Types::INTEGER, 'line_count')
-            ->addNamedField('insertedCount', Types::INTEGER, 'inserted_count')
-            ->addNamedField('updatedCount', Types::INTEGER, 'updated_count')
-            ->addNamedField('ignoredCount', Types::INTEGER, 'ignored_count')
-            ->addField('priority', Types::INTEGER)
-            ->addField('status', Types::INTEGER)
-            ->addNullableField('dateStarted', Types::DATETIME_MUTABLE, 'date_started')
-            ->addNullableField('dateEnded', Types::DATETIME_MUTABLE, 'date_ended')
-            ->addField('object', Types::STRING)
-            ->addNullableField('properties', Types::JSON);
     }
 
     /**

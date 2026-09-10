@@ -6,9 +6,13 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
+#[ORM\Entity(repositoryClass: FrequencyRuleRepository::class)]
+#[ORM\Table(name: 'lead_frequencyrules')]
+#[ORM\Index(columns: ['channel'], name: 'channel_frequency')]
+#[ORM\Index(columns: ['lead_id', 'date_added'], name: 'idx_frequency_date_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FrequencyRule extends CommonEntity
 {
     public const TIME_DAY   = 'DAY';
@@ -20,85 +24,50 @@ class FrequencyRule extends CommonEntity
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class, inversedBy: 'frequencyRules')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'frequency_number', type: 'smallint', nullable: true)]
     private $frequencyNumber;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'frequency_time', type: 'string', length: 25, nullable: true)]
     private $frequencyTime;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
+    #[ORM\Column(name: 'preferred_channel', type: 'boolean')]
     private bool $preferredChannel = false;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $pauseFromDate;
+    #[ORM\Column(name: 'pause_from_date', type: 'datetime', nullable: true)]
+    private ?\DateTime $pauseFromDate = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $pauseToDate;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('lead_frequencyrules')
-            ->setCustomRepositoryClass(FrequencyRuleRepository::class)
-            ->addIndex(['channel'], 'channel_frequency')
-            ->addIndex(['lead_id', 'date_added'], 'idx_frequency_date_added');
-
-        $builder->addId();
-
-        $builder->addLead(false, 'CASCADE', false, 'frequencyRules');
-
-        $builder->addDateAdded();
-
-        $builder->addNamedField('frequencyNumber', 'smallint', 'frequency_number', true);
-
-        $builder->createField('frequencyTime', 'string')
-            ->columnName('frequency_time')
-            ->nullable()
-            ->length(25)
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->build();
-
-        $builder->createField('preferredChannel', 'boolean')
-            ->columnName('preferred_channel')
-            ->build();
-
-        $builder->createField('pauseFromDate', 'datetime')
-            ->columnName('pause_from_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('pauseToDate', 'datetime')
-            ->columnName('pause_to_date')
-            ->nullable()
-            ->build();
-    }
+    #[ORM\Column(name: 'pause_to_date', type: 'datetime', nullable: true)]
+    private ?\DateTime $pauseToDate = null;
 
     /**
      * Prepares the metadata for API usage.
@@ -250,10 +219,7 @@ class FrequencyRule extends CommonEntity
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getPauseFromDate()
+    public function getPauseFromDate(): ?\DateTime
     {
         return $this->pauseFromDate;
     }
@@ -267,10 +233,7 @@ class FrequencyRule extends CommonEntity
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getPauseToDate()
+    public function getPauseToDate(): ?\DateTime
     {
         return $this->pauseToDate;
     }
