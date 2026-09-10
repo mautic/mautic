@@ -57,16 +57,14 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     /**
      * @var string[]
      */
-    private const array CLASS_LEVEL_METHODS = ['setTable', 'setCustomRepositoryClass', 'addIndex', 'addFulltextIndex', 'addIndexWithOptions', 'addUniqueConstraint'];
+    private const array CLASS_LEVEL_METHODS = ['setTable', 'setCustomRepositoryClass', 'addIndex', 'addUniqueConstraint'];
 
     /**
      * @var string[]
      */
     private const array FIELD_CREATOR_METHODS = [
-        'createField', 'addBigIntIdField', 'addDateAdded', 'addId', 'addIdColumns',
-        'addNullableField', 'addNamedField', 'addField', 'addPublishDates',
+        'createField', 'addField',
         'createManyToOne', 'createOneToMany', 'createOneToOne', 'createManyToMany',
-        'addLead', 'addContact', 'addCategory', 'addIpAddress',
     ];
 
     /**
@@ -492,8 +490,7 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                     break;
 
                 case 'addIndex':
-                case 'addFulltextIndex':
-                    if (2 !== count($call->args) || !$call->args[0] instanceof Arg || !$call->args[1] instanceof Arg) {
+                    if (count($call->args) < 2 || !$call->args[0] instanceof Arg || !$call->args[1] instanceof Arg) {
                         return null;
                     }
 
@@ -506,27 +503,17 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
                         $this->namedArg('name', $call->args[1]->value),
                     ];
 
-                    if ('addFulltextIndex' === $this->methodName($call)) {
-                        $indexArgs[] = $this->namedArg('flags', new Array_([new ArrayItem(new String_('fulltext'))]));
+                    // Optional flags array (addIndex(cols, name, ['fulltext'])).
+                    if (isset($call->args[2]) && $call->args[2] instanceof Arg && $call->args[2]->value instanceof Array_) {
+                        $indexArgs[] = $this->namedArg('flags', $call->args[2]->value);
+                    }
+
+                    // Optional options array (addIndex(cols, name, null, ['lengths' => ...])).
+                    if (isset($call->args[3]) && $call->args[3] instanceof Arg && $call->args[3]->value instanceof Array_) {
+                        $indexArgs[] = $this->namedArg('options', $call->args[3]->value);
                     }
 
                     $attributes[] = $this->attribute('Index', $indexArgs);
-                    break;
-
-                case 'addIndexWithOptions':
-                    if (3 !== count($call->args) || !$call->args[0] instanceof Arg || !$call->args[1] instanceof Arg || !$call->args[2] instanceof Arg) {
-                        return null;
-                    }
-
-                    if (!$call->args[0]->value instanceof Array_ || !$call->args[2]->value instanceof Array_) {
-                        return null;
-                    }
-
-                    $attributes[] = $this->attribute('Index', [
-                        $this->namedArg('columns', $call->args[0]->value),
-                        $this->namedArg('name', $call->args[1]->value),
-                        $this->namedArg('options', $call->args[2]->value),
-                    ]);
                     break;
 
                 case 'addUniqueConstraint':
@@ -617,22 +604,11 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     {
         return match ($this->methodName($calls[0])) {
             'createField'      => $this->handleCreateField($calls),
-            'addBigIntIdField' => $this->handleBigIntIdField($calls),
-            'addDateAdded'     => $this->handleDateAdded($calls),
-            'addId'            => $this->handleAddId($calls),
-            'addIdColumns'     => $this->handleAddIdColumns($calls),
-            'addNullableField' => $this->handleAddNullableField($calls),
-            'addNamedField'    => $this->handleAddNamedField($calls),
             'addField'         => $this->handleAddField($calls),
-            'addPublishDates'  => $this->handleAddPublishDates($calls),
             'createManyToOne'  => $this->handleAssociation($calls, 'ManyToOne'),
             'createOneToMany'  => $this->handleAssociation($calls, 'OneToMany'),
             'createOneToOne'   => $this->handleAssociation($calls, 'OneToOne'),
             'createManyToMany' => $this->handleManyToMany($calls),
-            'addLead'          => $this->handleContactHelper($calls, 'lead', 'lead_id', 'Mautic\\LeadBundle\\Entity\\Lead'),
-            'addContact'       => $this->handleContactHelper($calls, 'contact', 'contact_id', 'Mautic\\LeadBundle\\Entity\\Lead'),
-            'addCategory'      => $this->handleAddCategory($calls),
-            'addIpAddress'     => $this->handleAddIpAddress($calls),
             default            => null,
         };
     }
@@ -734,155 +710,6 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
      *
      * @return array<string, list<AttributeGroup>>|null
      */
-    private function handleBigIntIdField(array $calls): ?array
-    {
-        if (1 !== count($calls)) {
-            return null;
-        }
-
-        $call       = $calls[0];
-        $fieldName  = $this->stringArg($call, 0) ?? 'id';
-        $columnName = $this->stringArg($call, 1) ?? 'id';
-        $isPrimary  = $this->boolArg($call, 2, true);
-        $isNullable = $this->boolArg($call, 3, false);
-
-        $options = [new ArrayItem(new ConstFetch(new Name('true')), new String_('unsigned'))];
-
-        return [$fieldName => $this->columnAttributes(
-            $fieldName,
-            $columnName,
-            new String_('bigint'),
-            null,
-            !$isPrimary && $isNullable,
-            false,
-            $options,
-            $isPrimary,
-            $isPrimary,
-            null,
-        )];
-    }
-
-    /**
-     * @param list<MethodCall> $calls
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
-    private function handleAddId(array $calls): ?array
-    {
-        if (1 !== count($calls) || [] !== $calls[0]->args) {
-            return null;
-        }
-
-        $options = [new ArrayItem(new ConstFetch(new Name('true')), new String_('unsigned'))];
-
-        return ['id' => $this->columnAttributes(
-            'id',
-            null,
-            new String_('integer'),
-            null,
-            false,
-            false,
-            $options,
-            true,
-            true,
-            null,
-        )];
-    }
-
-    /**
-     * @param list<MethodCall> $calls
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
-    private function handleAddIdColumns(array $calls): ?array
-    {
-        if (1 !== count($calls)) {
-            return null;
-        }
-
-        $call       = $calls[0];
-        $nameColumn = $this->stringOrFalseArg($call, 0, 'name');
-        $descColumn = $this->stringOrFalseArg($call, 1, 'description');
-
-        $result = ['id' => $this->columnAttributes(
-            'id',
-            null,
-            new String_('integer'),
-            null,
-            false,
-            false,
-            [new ArrayItem(new ConstFetch(new Name('true')), new String_('unsigned'))],
-            true,
-            true,
-            null,
-        )];
-
-        if (is_string($nameColumn)) {
-            $result[$nameColumn] = $this->columnAttributes($nameColumn, null, new String_('string'), null, false, false, [], false, false, null);
-        }
-
-        if (is_string($descColumn)) {
-            $result[$descColumn] = $this->columnAttributes($descColumn, null, new String_('text'), null, true, false, [], false, false, null);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param list<MethodCall> $calls
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
-    private function handleAddNullableField(array $calls): ?array
-    {
-        if (1 !== count($calls)) {
-            return null;
-        }
-
-        $call      = $calls[0];
-        $fieldName = $this->stringArg($call, 0);
-        if (null === $fieldName) {
-            return null;
-        }
-
-        $typeExpr   = isset($call->args[1]) ? $this->typeExpr($call, 1) : new String_('string');
-        $columnName = $this->stringArg($call, 2);
-        if (null === $typeExpr) {
-            return null;
-        }
-
-        return [$fieldName => $this->columnAttributes($fieldName, $columnName, $typeExpr, null, true, false, [], false, false, null)];
-    }
-
-    /**
-     * @param list<MethodCall> $calls
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
-    private function handleAddNamedField(array $calls): ?array
-    {
-        if (1 !== count($calls)) {
-            return null;
-        }
-
-        $call       = $calls[0];
-        $fieldName  = $this->stringArg($call, 0);
-        $typeExpr   = $this->typeExpr($call, 1);
-        $columnName = $this->stringArg($call, 2);
-        if (null === $fieldName || null === $typeExpr || null === $columnName) {
-            return null;
-        }
-
-        $nullable = $this->boolArg($call, 3, false);
-
-        return [$fieldName => $this->columnAttributes($fieldName, $columnName, $typeExpr, null, $nullable, false, [], false, false, null)];
-    }
-
-    /**
-     * @param list<MethodCall> $calls
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
     private function handleAddField(array $calls): ?array
     {
         if (1 !== count($calls)) {
@@ -941,39 +768,6 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         }
 
         return [$fieldName => $this->columnAttributes($fieldName, $columnName, $typeExpr, $length, $nullable, $unique, [], false, false, null)];
-    }
-
-    /**
-     * @param list<MethodCall> $calls
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
-    private function handleDateAdded(array $calls): ?array
-    {
-        if (1 !== count($calls)) {
-            return null;
-        }
-
-        $nullable = $this->boolArg($calls[0], 0, false);
-
-        return ['dateAdded' => $this->columnAttributes('dateAdded', 'date_added', new String_('datetime'), null, $nullable, false, [], false, false, null)];
-    }
-
-    /**
-     * @param list<MethodCall> $calls
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
-    private function handleAddPublishDates(array $calls): ?array
-    {
-        if (1 !== count($calls) || [] !== $calls[0]->args) {
-            return null;
-        }
-
-        return [
-            'publishUp'   => $this->columnAttributes('publishUp', 'publish_up', new String_('datetime'), null, true, false, [], false, false, null),
-            'publishDown' => $this->columnAttributes('publishDown', 'publish_down', new String_('datetime'), null, true, false, [], false, false, null),
-        ];
     }
 
     /**
@@ -1297,99 +1091,6 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
     }
 
     /**
-     * addLead($nullable, $onDelete, $isPrimaryKey, $inversedBy) and addContact(...).
-     *
-     * @param list<MethodCall> $calls
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
-    private function handleContactHelper(array $calls, string $fieldName, string $joinColumnName, string $targetFqn): ?array
-    {
-        if (1 !== count($calls)) {
-            return null;
-        }
-
-        $call       = $calls[0];
-        $nullable   = $this->boolArg($call, 0, false);
-        $onDelete   = $this->stringArg($call, 1) ?? 'CASCADE';
-        $isPrimary  = $this->boolArg($call, 2, false);
-        $inversedBy = $this->stringArg($call, 3);
-
-        $target = new ClassConstFetch(new FullyQualified($targetFqn), new Identifier('class'));
-
-        return [$fieldName => $this->associationAttributes(
-            'ManyToOne',
-            $target,
-            null,
-            $inversedBy,
-            [],
-            null,
-            false,
-            $isPrimary,
-            null,
-            null,
-            [$this->joinColumn($joinColumnName, 'id', $nullable, false, $onDelete)],
-        )];
-    }
-
-    /**
-     * @param list<MethodCall> $calls
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
-    private function handleAddCategory(array $calls): ?array
-    {
-        if (1 !== count($calls) || [] !== $calls[0]->args) {
-            return null;
-        }
-
-        $target = new ClassConstFetch(new FullyQualified('Mautic\\CategoryBundle\\Entity\\Category'), new Identifier('class'));
-
-        return ['category' => $this->associationAttributes(
-            'ManyToOne',
-            $target,
-            null,
-            null,
-            ['merge', 'detach'],
-            null,
-            false,
-            false,
-            null,
-            null,
-            [$this->joinColumn('category_id', 'id', true, false, 'SET NULL')],
-        )];
-    }
-
-    /**
-     * @param list<MethodCall> $calls
-     *
-     * @return array<string, list<AttributeGroup>>|null
-     */
-    private function handleAddIpAddress(array $calls): ?array
-    {
-        if (1 !== count($calls)) {
-            return null;
-        }
-
-        $nullable = $this->boolArg($calls[0], 0, false);
-        $target   = new ClassConstFetch(new FullyQualified('Mautic\\CoreBundle\\Entity\\IpAddress'), new Identifier('class'));
-
-        return ['ipAddress' => $this->associationAttributes(
-            'ManyToOne',
-            $target,
-            null,
-            null,
-            ['persist', 'merge', 'detach'],
-            null,
-            false,
-            false,
-            null,
-            null,
-            [$this->joinColumn('ip_id', 'id', $nullable, false, 'SET NULL')],
-        )];
-    }
-
-    /**
      * @return array{name: string, ref: string, nullable: bool, unique: bool, onDelete: ?string}
      */
     private function joinColumn(string $name, string $ref, bool $nullable, bool $unique, ?string $onDelete): array
@@ -1700,28 +1401,6 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
         $value = $call->args[$index]->value;
 
         return $value instanceof String_ ? $value->value : null;
-    }
-
-    /**
-     * Returns the string value, false when the argument is literal false, or $default when absent.
-     */
-    private function stringOrFalseArg(MethodCall $call, int $index, string $default): string|false
-    {
-        if (!isset($call->args[$index]) || !$call->args[$index] instanceof Arg) {
-            return $default;
-        }
-
-        $value = $call->args[$index]->value;
-
-        if ($value instanceof String_) {
-            return $value->value;
-        }
-
-        if ($value instanceof ConstFetch && $this->isName($value, 'false')) {
-            return false;
-        }
-
-        return $default;
     }
 
     private function intArg(MethodCall $call, int $index): ?int
