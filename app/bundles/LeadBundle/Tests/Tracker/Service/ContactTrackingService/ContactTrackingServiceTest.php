@@ -91,7 +91,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetTrackedLeadNoLeadId(): void
     {
-        $requestMock = $this->createMock(Request::class);
+        $requestMock = new Request();
         $trackingId  = 'randomTrackingId';
 
         $this->requestStackMock->expects($this->once())
@@ -116,11 +116,6 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                 return null;
             });
-
-        $requestMock->expects($this->once())
-            ->method('get')
-            ->with('mtc_id', null)
-            ->willReturn(null);
 
         $contactTrackingService = $this->getContactTrackingService();
         $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
@@ -131,9 +126,9 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetTrackedLeadRequestLeadIdAndNoLeadFound(): void
     {
-        $requestMock = $this->createMock(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
+        $requestMock = new Request(['mtc_id' => $leadId]);
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -157,11 +152,6 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                 return null;
             });
-
-        $requestMock->expects($this->once())
-            ->method('get')
-            ->with('mtc_id', null)
-            ->willReturn($leadId);
 
         $this->leadRepositoryMock->expects($this->once())
             ->method('getEntity')
@@ -177,9 +167,9 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetTrackedLeadRequestLeadIdAndAnotherDeviceAlreadyTracked(): void
     {
-        $requestMock = $this->createMock(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
+        $requestMock = new Request(['mtc_id' => $leadId]);
         $leadMock    = $this->createStub(Lead::class);
 
         $this->requestStackMock->expects($this->once())
@@ -204,11 +194,6 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                 return null;
             });
-
-        $requestMock->expects($this->once())
-            ->method('get')
-            ->with('mtc_id', null)
-            ->willReturn($leadId);
 
         $this->leadRepositoryMock->expects($this->once())
             ->method('getEntity')
@@ -229,9 +214,9 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetTrackedLeadRequestLeadIdAndAnotherDeviceNotTracked(): void
     {
-        $requestMock = $this->createMock(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
+        $requestMock = new Request(['mtc_id' => $leadId]);
         $leadMock    = $this->createStub(Lead::class);
 
         $this->requestStackMock->expects($this->once())
@@ -256,11 +241,6 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
                 return null;
             });
-
-        $requestMock->expects($this->once())
-            ->method('get')
-            ->with('mtc_id', null)
-            ->willReturn($leadId);
 
         $this->leadRepositoryMock->expects($this->once())
             ->method('getEntity')

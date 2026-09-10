@@ -32,16 +32,11 @@ final class ClientTypeTest extends TestCase
     {
         $requestStack       = $this->createMock(RequestStack::class);
         $this->builder      = $this->createMock(FormBuilderInterface::class);
-        $request            = $this->createMock(Request::class);
+        $request            = new Request(['api_mode' => null]);
         $this->client       = new Client();
 
-        $requestStack->expects($this->once())
-            ->method('getCurrentRequest')
+        $requestStack->method('getCurrentRequest')
             ->willReturn($request);
-
-        $request->expects($this->once())
-            ->method('get')
-            ->with('api_mode', null);
 
         $this->clientType = new ClientType(
             $requestStack,
