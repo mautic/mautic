@@ -8,9 +8,11 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\DashboardBundle\Controller\DashboardController;
 use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Model\DashboardModel;
@@ -19,10 +21,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
@@ -67,6 +71,11 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->translatorMock     = $this->createMock(Translator::class);
         $requestStack             = new RequestStack([$this->requestMock]);
 
+        // The mock does not run the Request constructor, so initialize the bags manually.
+        $this->requestMock->attributes = new InputBag();
+        $this->requestMock->query      = new InputBag();
+        $this->requestMock->request    = new InputBag();
+
         $this->controller = new DashboardController(
             $this->createStub(ManagerRegistry::class),
             $this->createStub(ModelFactory::class),
@@ -79,8 +88,18 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             $this->createStub(CorePermissions::class)
         );
 
+        $notificationModel = $this->createStub(NotificationModel::class);
+        $notificationModel->method('getNotificationContent')->willReturn([[], false, null]);
+
         $this->controller->setContainer($this->containerMock);
         $this->controller->autowireDashboardController($this->dashboardModelMock);
+        $this->controller->autowireCommonController(
+            $this->createStub(PageModel::class),
+            $notificationModel,
+            $this->routerMock,
+            $this->createStub(HttpKernelInterface::class),
+            $this->createStub(Environment::class)
+        );
     }
 
     public function testSaveWithGetWillCallAccessDenied(): void
@@ -121,13 +140,18 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')->willReturn(true);
-        $this->requestMock->method('get')->willReturn('mockName');
+        $this->requestMock->query = new InputBag(['name' => 'mockName']);
 
-        $this->containerMock->expects($this->exactly(2))
-            ->method('get')->willReturnCallback(function (...$parameters): MockObject {
-                $this->assertSame('router', $parameters[0]);
+        $twig = $this->createStub(Environment::class);
+        $twig->method('render')->willReturn('');
 
-                return $this->routerMock;
+        $this->containerMock->method('has')->willReturnCallback(fn (string $id) => 'twig' === $id);
+        $this->containerMock
+            ->method('get')
+            ->willReturnCallback(fn (string $id) => match ($id) {
+                'router' => $this->routerMock,
+                'twig'   => $twig,
+                default  => throw new \LogicException("Unexpected service {$id}"),
             });
 
         $this->routerMock
@@ -158,12 +182,19 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('generate')
             ->willReturn('https://some.url');
 
-        $this->requestMock->method('get')->willReturn('mockName');
+        $this->requestMock->query = new InputBag(['name' => 'mockName']);
 
-        $this->containerMock->expects($this->once())
+        $twig = $this->createStub(Environment::class);
+        $twig->method('render')->willReturn('');
+
+        $this->containerMock->method('has')->willReturnCallback(fn (string $id) => 'twig' === $id);
+        $this->containerMock
             ->method('get')
-            ->with('router')
-            ->willReturn($this->routerMock);
+            ->willReturnCallback(fn (string $id) => match ($id) {
+                'router' => $this->routerMock,
+                'twig'   => $twig,
+                default  => throw new \LogicException("Unexpected service {$id}"),
+            });
 
         $this->dashboardModelMock->expects($this->once())
             ->method('saveSnapshot')
