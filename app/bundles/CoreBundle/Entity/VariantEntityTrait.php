@@ -369,7 +369,7 @@ trait VariantEntityTrait
         /** @var TranslationEntityInterface $parentTranslation */
         /** @var ArrayCollection $childrenTranslations */
         [$parentTranslation, $childrenTranslations] = $entity->getTranslations();
-        if ($entity->getId() && $parentTranslation != $entity) {
+        if ($entity->getId() && $parentTranslation !== $entity) {
             if (!$publishedOnly || $parentTranslation->isPublished()) {
                 $ids[] = $parentTranslation->getId();
             }
