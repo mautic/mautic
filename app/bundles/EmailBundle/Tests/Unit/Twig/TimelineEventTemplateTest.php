@@ -31,9 +31,7 @@ final class TimelineEventTemplateTest extends TestCase
         $this->twig  = new Environment(new FilesystemLoader($templateDir));
 
         // Minimal stand-ins for the real Twig extensions Mautic wires into the container.
-        $this->twig->addFunction(new TwigFunction('dateToFull', static function ($datetime): string {
-            return $datetime instanceof \DateTimeInterface ? $datetime->format('F j, Y g:i a') : (string) $datetime;
-        }));
+        $this->twig->addFunction(new TwigFunction('dateToFull', static fn ($datetime): string => $datetime instanceof \DateTimeInterface ? $datetime->format('F j, Y g:i a') : (string) $datetime));
 
         $this->twig->addFunction(new TwigFunction('dateFormatRange', static function (\DateInterval $interval): string {
             $units    = ['y' => 'year', 'm' => 'month', 'd' => 'day', 'h' => 'hour', 'i' => 'minute', 's' => 'second'];
@@ -56,9 +54,7 @@ final class TimelineEventTemplateTest extends TestCase
         // Fake translator: returns the translation key followed by the interpolated
         // parameter values, so assertions can check both which key was chosen and
         // the interpolated values (real messages.ini strings aren't loaded here).
-        $this->twig->addFilter(new TwigFilter('trans', static function (string $key, array $params = []): string {
-            return $key.([] === $params ? '' : ' '.implode(' ', $params));
-        }));
+        $this->twig->addFilter(new TwigFilter('trans', static fn (string $key, array $params = []): string => $key.([] === $params ? '' : ' '.implode(' ', $params))));
     }
 
     public function testSentEntryDoesNotShowAnyReadStatusText(): void
