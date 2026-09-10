@@ -6,63 +6,42 @@ namespace Mautic\UserBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: UserInviteRepository::class)]
+#[ORM\Table(name: 'user_invites')]
+#[ORM\Index(columns: ['email'], name: 'IDX_USER_INVITES_EMAIL')]
+#[ORM\Index(columns: ['expiration'], name: 'IDX_USER_INVITES_EXPIRATION')]
+#[ORM\Index(columns: ['role_id'], name: 'IDX_USER_INVITES_ROLE')]
+#[ORM\Index(columns: ['used'], name: 'IDX_USER_INVITES_USED')]
+#[ORM\UniqueConstraint(name: 'UNIQ_USER_INVITES_TOKEN_SELECTOR', columns: ['token_selector'])]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class UserInvite
 {
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private ?string $email = null;
 
+    #[ORM\Column(name: 'token_selector', type: Types::STRING, length: 32)]
     private ?string $tokenSelector = null;
 
+    #[ORM\Column(name: 'token_verifier_hash', type: Types::STRING, length: 255)]
     private ?string $tokenVerifierHash = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $expiration = null;
 
+    #[ORM\Column(type: Types::BOOLEAN)]
     private bool $used = false;
 
     public function __construct(
+        #[ORM\ManyToOne(targetEntity: Role::class)]
+        #[ORM\JoinColumn(name: 'role_id', nullable: false, onDelete: 'CASCADE')]
         private Role $role,
     ) {
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('user_invites')
-            ->setCustomRepositoryClass(UserInviteRepository::class)
-            ->addIndex(['email'], 'IDX_USER_INVITES_EMAIL')
-            ->addIndex(['expiration'], 'IDX_USER_INVITES_EXPIRATION')
-            ->addIndex(['role_id'], 'IDX_USER_INVITES_ROLE')
-            ->addIndex(['used'], 'IDX_USER_INVITES_USED')
-            ->addUniqueConstraint(['token_selector'], 'UNIQ_USER_INVITES_TOKEN_SELECTOR');
-        $builder->addId();
-
-        $builder->createField('email', Types::STRING)
-            ->length(191)
-            ->build();
-
-        $builder->createField('tokenSelector', Types::STRING)
-            ->columnName('token_selector')
-            ->length(32)
-            ->build();
-
-        $builder->createField('tokenVerifierHash', Types::STRING)
-            ->columnName('token_verifier_hash')
-            ->length(255)
-            ->build();
-
-        $builder->createField('expiration', Types::DATETIME_MUTABLE)
-            ->build();
-
-        $builder->createField('used', Types::BOOLEAN)
-            ->build();
-
-        $builder->createManyToOne('role', Role::class)
-            ->addJoinColumn('role_id', 'id', false, false, 'CASCADE')
-            ->build();
     }
 
     public function getId(): ?int
