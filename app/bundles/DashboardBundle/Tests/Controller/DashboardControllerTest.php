@@ -145,10 +145,10 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $twig = $this->createStub(Environment::class);
         $twig->method('render')->willReturn('');
 
-        $this->containerMock->method('has')->willReturnCallback(fn (string $id) => 'twig' === $id);
+        $this->containerMock->method('has')->willReturnCallback(fn (string $id): bool => 'twig' === $id);
         $this->containerMock
             ->method('get')
-            ->willReturnCallback(fn (string $id) => match ($id) {
+            ->willReturnCallback(fn (string $id): object => match ($id) {
                 'router' => $this->routerMock,
                 'twig'   => $twig,
                 default  => throw new \LogicException("Unexpected service {$id}"),
@@ -187,10 +187,10 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $twig = $this->createStub(Environment::class);
         $twig->method('render')->willReturn('');
 
-        $this->containerMock->method('has')->willReturnCallback(fn (string $id) => 'twig' === $id);
+        $this->containerMock->method('has')->willReturnCallback(fn (string $id): bool => 'twig' === $id);
         $this->containerMock
             ->method('get')
-            ->willReturnCallback(fn (string $id) => match ($id) {
+            ->willReturnCallback(fn (string $id): object => match ($id) {
                 'router' => $this->routerMock,
                 'twig'   => $twig,
                 default  => throw new \LogicException("Unexpected service {$id}"),
