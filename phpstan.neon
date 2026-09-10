@@ -92,6 +92,15 @@ parameters:
             message: '#Property .+::\$variantParent type mapping mismatch: property can contain .+VariantEntityInterface\|null but database expects#'
             path: app/bundles/CoreBundle/Entity/VariantEntityTrait.php
             identifier: doctrine.associationType
+        # oAuth2 entities redeclare FOS parent properties whose declared types (interfaces, int) differ from the concrete Doctrine mapping
+        -
+            message: '#Property .+::\$(client|user) type mapping mismatch: property can contain .+but database expects#'
+            path: app/bundles/ApiBundle/Entity/oAuth2/*.php
+            identifier: doctrine.associationType
+        -
+            message: '#Property .+::\$expiresAt type mapping mismatch: database can contain string\|null but property expects int\|null#'
+            path: app/bundles/ApiBundle/Entity/oAuth2/*.php
+            identifier: doctrine.columnType
         # mocks
         - '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
         - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
@@ -232,6 +241,11 @@ parameters:
             identifier: parameterByRef.type
             path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
 
+        # not relevant
+        -
+            path: utils/rector/src/LoadMetadataToDoctrineAttributeRector.php
+            identifier: return.type
+
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
         - vendor/javer/sp-bundle/src
@@ -251,6 +265,7 @@ parameters:
 rules:
     - Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
     - Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
+    - Utils\PHPStan\Rule\NoStringTargetEntityRule
     - Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
     - Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
     - Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
@@ -281,6 +296,9 @@ rules:
     - Utils\PHPStan\Rule\NoServiceGetterRule
     - Utils\PHPStan\Rule\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
+    # enable later, might not be needed
+    # - Utils\PHPStan\Rule\NoLoadMetadataMethodRule
+    - Utils\PHPStan\Rule\NoDuplicateNonRepeatableAttributeRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver

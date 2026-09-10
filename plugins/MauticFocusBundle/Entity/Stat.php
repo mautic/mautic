@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
+#[ORM\Entity(repositoryClass: StatRepository::class)]
+#[ORM\Table(name: 'focus_stats')]
+#[ORM\Index(columns: ['type'], name: 'focus_type')]
+#[ORM\Index(columns: ['type', 'type_id'], name: 'focus_type_id')]
+#[ORM\Index(columns: ['date_added'], name: 'focus_date_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     // Used for querying stats
@@ -20,57 +25,39 @@ class Stat
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var Focus
      */
+    #[ORM\ManyToOne(targetEntity: Focus::class)]
+    #[ORM\JoinColumn(name: 'focus_id', nullable: false, onDelete: 'CASCADE')]
     private $focus;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $type;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'type_id', type: 'integer', nullable: true)]
     private $typeId;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
-    /**
-     * @var ?Lead
-     */
-    private $lead;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('focus_stats')
-            ->setCustomRepositoryClass(StatRepository::class)
-            ->addIndex(['type'], 'focus_type')
-            ->addIndex(['type', 'type_id'], 'focus_type_id')
-            ->addIndex(['date_added'], 'focus_date_added');
-
-        $builder->addId();
-
-        $builder->createManyToOne('focus', 'Focus')
-            ->addJoinColumn('focus_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->addField('type', 'string');
-
-        $builder->addNamedField('typeId', 'integer', 'type_id', true);
-
-        $builder->addNamedField('dateAdded', 'datetime', 'date_added');
-
-        $builder->addLead(true, 'SET NULL');
-    }
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @return mixed
@@ -152,10 +139,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return ?Lead
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
