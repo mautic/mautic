@@ -5,11 +5,23 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
+#[ORM\Entity(repositoryClass: StatRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['email_id', 'lead_id'], name: 'stat_email_search')]
+#[ORM\Index(columns: ['lead_id', 'email_id'], name: 'stat_email_search2')]
+#[ORM\Index(columns: ['is_failed'], name: 'stat_email_failed_search')]
+#[ORM\Index(columns: ['is_read', 'date_sent'], name: 'is_read_date_sent')]
+#[ORM\Index(columns: ['tracking_hash'], name: 'stat_email_hash_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_email_source_search')]
+#[ORM\Index(columns: ['date_sent'], name: 'email_date_sent')]
+#[ORM\Index(columns: ['date_read', 'lead_id'], name: 'email_date_read_lead')]
+#[ORM\Index(columns: ['lead_id', 'date_sent'], name: 'stat_email_lead_id_date_sent')]
+#[ORM\Index(columns: ['email_id', 'is_read'], name: 'stat_email_email_id_is_read')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     /**
@@ -19,98 +31,108 @@ class Stat
 
     public const TABLE_NAME = 'email_stats';
 
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?string $id = null;
 
-    /**
-     * @var Email|null
-     */
-    private $email;
+    #[ORM\ManyToOne(targetEntity: Email::class, inversedBy: 'stats')]
+    #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
+    private ?\Mautic\EmailBundle\Entity\Email $email = null;
 
-    /**
-     * @var Lead|null
-     */
-    private $lead;
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'email_address', type: 'string', length: 191)]
     private $emailAddress;
 
     /**
      * @var LeadList|null
      */
+    #[ORM\ManyToOne(targetEntity: LeadList::class)]
+    #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
     private $list;
 
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private ?\DateTimeInterface $dateSent = null;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_read', type: 'boolean')]
     private $isRead = false;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_failed', type: 'boolean')]
     private $isFailed = false;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'viewed_in_browser', type: 'boolean')]
     private $viewedInBrowser = false;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $dateRead;
+    #[ORM\Column(name: 'date_read', type: 'datetime', nullable: true)]
+    private ?\DateTime $dateRead = null;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_hash', type: 'string', length: 191, nullable: true)]
     private $trackingHash;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'retry_count', type: 'integer', nullable: true)]
     private $retryCount = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
-    /**
-     * @var int|null
-     */
-    private $sourceId;
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
+    private ?int $sourceId = null;
 
-    /**
-     * @var array
-     */
-    private $tokens = [];
+    #[ORM\Column(type: 'array', nullable: true)]
+    private array $tokens = [];
 
-    /**
-     * @var Copy|null
-     */
-    private $storedCopy;
+    #[ORM\ManyToOne(targetEntity: Copy::class)]
+    #[ORM\JoinColumn(name: 'copy_id', onDelete: 'SET NULL')]
+    private ?\Mautic\EmailBundle\Entity\Copy $storedCopy = null;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'open_count', type: 'integer', nullable: true)]
     private $openCount = 0;
 
+    #[ORM\Column(name: 'last_opened', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $lastOpened = null;
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'open_details', type: 'array', nullable: true)]
     private $openDetails = [];
 
     /**
      * @var ArrayCollection|EmailReply[]
      */
-    private $replies;
+    #[ORM\OneToMany(mappedBy: 'stat', targetEntity: EmailReply::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
+    private \Doctrine\Common\Collections\Collection $replies;
 
     /**
      * @var array<string,mixed[]>
@@ -120,103 +142,6 @@ class Stat
     public function __construct()
     {
         $this->replies = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(StatRepository::class)
-            ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
-            ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
-            ->addIndex(['is_failed'], 'stat_email_failed_search')
-            ->addIndex(['is_read', 'date_sent'], 'is_read_date_sent')
-            ->addIndex(['tracking_hash'], 'stat_email_hash_search')
-            ->addIndex(['source', 'source_id'], 'stat_email_source_search')
-            ->addIndex(['date_sent'], 'email_date_sent')
-            ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead')
-            ->addIndex(['lead_id', 'date_sent'], 'stat_email_lead_id_date_sent')
-            ->addIndex(['email_id', 'is_read'], 'stat_email_email_id_is_read');
-
-        $builder->addBigIntIdField();
-
-        $builder->createManyToOne('email', 'Email')
-            ->inversedBy('stats')
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->addLead(true, 'SET NULL');
-
-        $builder->createField('emailAddress', 'string')
-            ->columnName('email_address')
-            ->build();
-
-        $builder->createManyToOne('list', LeadList::class)
-            ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('isRead', 'boolean')
-            ->columnName('is_read')
-            ->build();
-
-        $builder->createField('isFailed', 'boolean')
-            ->columnName('is_failed')
-            ->build();
-
-        $builder->createField('viewedInBrowser', 'boolean')
-            ->columnName('viewed_in_browser')
-            ->build();
-
-        $builder->createField('dateRead', 'datetime')
-            ->columnName('date_read')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingHash', 'string')
-            ->columnName('tracking_hash')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retryCount', 'integer')
-            ->columnName('retry_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->createManyToOne('storedCopy', Copy::class)
-            ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->addNullableField('openCount', 'integer', 'open_count');
-
-        $builder->addNullableField('lastOpened', 'datetime', 'last_opened');
-
-        $builder->addNullableField('openDetails', 'array', 'open_details');
-
-        $builder->createOneToMany('replies', EmailReply::class)
-            ->mappedBy('stat')
-            ->fetchExtraLazy()
-            ->cascadeAll()
-            ->build();
     }
 
     /**
@@ -272,10 +197,7 @@ class Stat
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return Email|null
-     */
-    public function getEmail()
+    public function getEmail(): ?\Mautic\EmailBundle\Entity\Email
     {
         return $this->email;
     }
@@ -325,10 +247,7 @@ class Stat
         $this->isRead = $isRead;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -472,10 +391,7 @@ class Stat
         $this->source = $source;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getSourceId()
+    public function getSourceId(): ?int
     {
         return $this->sourceId;
     }
@@ -489,10 +405,7 @@ class Stat
         $this->sourceId = (int) $sourceId;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
@@ -574,10 +487,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return Copy|null
-     */
-    public function getStoredCopy()
+    public function getStoredCopy(): ?\Mautic\EmailBundle\Entity\Copy
     {
         return $this->storedCopy;
     }
@@ -592,7 +502,7 @@ class Stat
     /**
      * @return ArrayCollection<int, EmailReply>
      */
-    public function getReplies()
+    public function getReplies(): \Doctrine\Common\Collections\Collection|array
     {
         return $this->replies;
     }

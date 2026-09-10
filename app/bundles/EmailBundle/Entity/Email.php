@@ -12,7 +12,6 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
@@ -38,6 +37,7 @@ use Mautic\EmailBundle\Validator\ValidEmailLinks;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -73,6 +73,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 #[EntityEvent]
 #[ScheduleDateRange]
 #[ValidEmailLinks]
+#[ORM\Entity(repositoryClass: EmailRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface, OptimisticLockInterface
 {
     use VariantEntityTrait;
@@ -81,6 +85,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     use UuidTrait;
     use ProjectTrait;
     use OptimisticLockTrait;
+
+    /**
+     * @var Collection<int, Project>
+     */
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\JoinTable(name: 'email_projects_xref')]
+    #[ORM\JoinColumn(name: 'email_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
+    private \Doctrine\Common\Collections\Collection $projects;
 
     public const ENTITY_NAME = 'email';
 
@@ -94,6 +108,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var int
      */
     #[Groups(['email:read', 'download:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -102,12 +119,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[NotBlank(message: 'mautic.core.name.required')]
     #[Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.name.length')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -116,31 +135,37 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[NotBlank(message: 'mautic.core.subject.required')]
     #[Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.subject.length')]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private $subject;
 
     /**
      * @var bool|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'use_owner_as_mailer', type: Types::BOOLEAN, nullable: true)]
     private $useOwnerAsMailer;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'send_to_dnc', type: Types::BOOLEAN, options: ['default' => 0])]
     private bool $sendToDnc = false;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[Length(max: 130, maxMessage: 'mautic.email.preheader_text.length')]
+    #[ORM\Column(name: 'preheader_text', type: Types::STRING, length: 191, nullable: true)]
     private ?string $preheaderText = null;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'from_address', type: Types::STRING, length: 191, nullable: true)]
     private $fromAddress;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'from_name', type: Types::STRING, length: 191, nullable: true)]
     private $fromName;
 
     /**
@@ -148,6 +173,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[\Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
+    #[ORM\Column(name: 'reply_to_address', type: Types::STRING, length: 191, nullable: true)]
     private $replyToAddress;
 
     /**
@@ -155,131 +181,165 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[\Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
+    #[ORM\Column(name: 'bcc_address', type: Types::STRING, length: 191, nullable: true)]
     private $bccAddress;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private $template;
 
     /**
      * @var array
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private $content = [];
 
     /**
      * @var array
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'utm_tags', type: Types::ARRAY, nullable: true)]
     private $utmTags = [];
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'plain_text', type: Types::TEXT, nullable: true)]
     private $plainText;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'custom_html', type: Types::TEXT, nullable: true)]
     private $customHtml;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'email_type', type: Types::TEXT, nullable: true)]
     private $emailType = 'template';
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var bool|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, nullable: true)]
     private $publicPreview = false;
 
     /**
      * @var int
      */
     #[Groups(['email:read', 'download:read'])]
+    #[ORM\Column(name: 'read_count', type: Types::INTEGER)]
     private $readCount = 0;
 
     /**
      * @var int
      */
     #[Groups(['email:read', 'download:read'])]
+    #[ORM\Column(name: 'sent_count', type: Types::INTEGER)]
     private $sentCount = 0;
 
     /**
      * @var int
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::INTEGER)]
     private $revision = 1;
 
     /**
      * @var Category|null
      */
     #[Groups(['email:read', 'email:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
      * @var ArrayCollection<LeadList>
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\ManyToMany(targetEntity: LeadList::class, fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\JoinTable(name: 'email_list_xref')]
+    #[ORM\JoinColumn(name: 'email_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
     private $lists;
 
     /**
      * @var ArrayCollection<LeadList>
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\ManyToMany(targetEntity: LeadList::class, fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\JoinTable(name: 'email_list_excluded')]
+    #[ORM\JoinColumn(name: 'email_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
     private $excludedLists;
 
     /**
      * @var ArrayCollection<Stat>
      */
+    #[ORM\OneToMany(mappedBy: 'email', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
      * @var int
      */
     #[Groups(['email:read', 'download:read'])]
+    #[ORM\Column(name: 'variant_sent_count', type: Types::INTEGER)]
     private $variantSentCount = 0;
 
     /**
      * @var int
      */
     #[Groups(['email:read', 'download:read'])]
+    #[ORM\Column(name: 'variant_read_count', type: Types::INTEGER)]
     private $variantReadCount = 0;
 
     /**
      * @var Form|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\ManyToOne(targetEntity: Form::class)]
+    #[ORM\JoinColumn(name: 'unsubscribeform_id', onDelete: 'SET NULL')]
     private $unsubscribeForm;
 
     /**
      * @var Page|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\ManyToOne(targetEntity: Page::class)]
+    #[ORM\JoinColumn(name: 'preference_center_id', onDelete: 'SET NULL')]
     private $preferenceCenter;
 
     /**
      * @var ArrayCollection<Asset>
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\ManyToMany(targetEntity: Asset::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\JoinTable(name: 'email_assets_xref')]
+    #[ORM\JoinColumn(name: 'email_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'asset_id', nullable: false, onDelete: 'CASCADE')]
     private $assetAttachments;
 
     /**
@@ -291,6 +351,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var array
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::JSON)]
     private $headers = [];
 
     /**
@@ -304,6 +365,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'download:read'])]
     private $queuedCount = 0;
 
+    #[ORM\OneToOne(mappedBy: 'email', targetEntity: EmailDraft::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private ?EmailDraft $draft = null;
 
     private bool $isCloned = false;
@@ -325,6 +387,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var mixed[]|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $settings = null;
 
     public function __clone()
@@ -373,33 +436,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(EmailRepository::class)
-            ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
-            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
-
-        $builder->addIdColumns();
-        $builder->addNullableField('subject', Types::TEXT);
-        $builder->addNullableField('preheaderText', Types::STRING, 'preheader_text');
-        $builder->addNullableField('fromAddress', Types::STRING, 'from_address');
-        $builder->addNullableField('fromName', Types::STRING, 'from_name');
-        $builder->addNullableField('replyToAddress', Types::STRING, 'reply_to_address');
-        $builder->addNullableField('bccAddress', Types::STRING, 'bcc_address');
-        $builder->addNullableField('useOwnerAsMailer', Types::BOOLEAN, 'use_owner_as_mailer');
-
-        $builder->createField('sendToDnc', Types::BOOLEAN)
-            ->columnName('send_to_dnc')
-            ->option('default', 0)
-            ->build();
-
-        $builder->addNullableField('template', Types::STRING);
-        $builder->addNullableField('content', Types::ARRAY);
-        $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
-        $builder->addNullableField('plainText', Types::TEXT, 'plain_text');
-        $builder->addNullableField('customHtml', Types::TEXT, 'custom_html');
-        $builder->addNullableField('emailType', Types::TEXT, 'email_type');
-        $builder->addPublishDates();
         $builder->addField('continueSending', Types::BOOLEAN, [
             'columnName' => 'continue_sending',
             'nullable'   => false,
@@ -407,73 +443,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 'default' => false,
             ],
         ]);
-        $builder->addNamedField('readCount', Types::INTEGER, 'read_count');
-        $builder->addNamedField('sentCount', Types::INTEGER, 'sent_count');
-        $builder->addNamedField('variantSentCount', Types::INTEGER, 'variant_sent_count');
-        $builder->addNamedField('variantReadCount', Types::INTEGER, 'variant_read_count');
-        $builder->addField('revision', Types::INTEGER);
-        $builder->addCategory();
-
-        $builder->createManyToMany('lists', LeadList::class)
-            ->setJoinTable('email_list_xref')
-            ->setIndexBy('id')
-            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createManyToMany('excludedLists', LeadList::class)
-            ->setJoinTable('email_list_excluded')
-            ->setIndexBy('id')
-            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('stats', 'Stat')
-            ->setIndexBy('id')
-            ->mappedBy('email')
-            ->cascadePersist()
-            ->fetchExtraLazy()
-            ->build();
-
-        self::addTranslationMetadata($builder, self::class);
-        self::addVariantMetadata($builder, self::class);
-        self::addDynamicContentMetadata($builder);
-
-        $builder->createManyToOne('unsubscribeForm', Form::class)
-            ->addJoinColumn('unsubscribeform_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createManyToOne('preferenceCenter', Page::class)
-            ->addJoinColumn('preference_center_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createManyToMany('assetAttachments', Asset::class)
-            ->setJoinTable('email_assets_xref')
-            ->addInverseJoinColumn('asset_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->addField('headers', Types::JSON);
-
-        $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
-
-        $builder->createOneToOne('draft', EmailDraft::class)
-            ->mappedBy('email')
-            ->fetchExtraLazy()
-            ->cascadeAll()
-            ->build();
-
-        $builder->createField('settings', Types::JSON)
-            ->columnName('settings')
-            ->nullable()
-            ->build();
-
-        static::addUuidField($builder);
-        self::addProjectsField($builder, 'email_projects_xref', 'email_id');
-        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -1173,6 +1142,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Lifecycle callback to clean URLs in the content.
      */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function cleanUrlsInContent(): void
     {
         if (is_string($this->plainText)) {

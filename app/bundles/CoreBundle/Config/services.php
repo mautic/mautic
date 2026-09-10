@@ -151,6 +151,9 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
         ->tag('doctrine.event_listener', ['event' => 'postGenerateSchema', 'lazy' => true]);
 
+    $services->get(Mautic\CoreBundle\EventListener\LoadStaticMetadataSubscriber::class)
+        ->tag('doctrine.event_listener', ['event' => 'loadClassMetadata']);
+
     $services->set(Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class)
         ->arg('$fixturesLoader', \Symfony\Component\DependencyInjection\Loader\Configurator\service('doctrine.fixtures.loader'));
 

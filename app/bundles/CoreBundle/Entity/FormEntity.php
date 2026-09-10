@@ -4,11 +4,12 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ORM\MappedSuperclass]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FormEntity extends CommonEntity
 {
     #[Groups([
@@ -30,6 +31,7 @@ class FormEntity extends CommonEntity
         'segment:read', 'segment:write',
         'email:read', 'email:write',
     ])]
+    #[ORM\Column(name: 'is_published', type: 'boolean')]
     private bool $isPublished = true;
 
     /**
@@ -54,16 +56,19 @@ class FormEntity extends CommonEntity
         'form:read', 'form:write',
         'stage:read', 'stage:write',
     ])]
+    #[ORM\Column(name: 'date_added', type: 'datetime', nullable: true)]
     private $dateAdded;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'created_by', type: 'integer', nullable: true)]
     private $createdBy;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'created_by_user', type: 'string', length: 191, nullable: true)]
     private $createdByUser;
 
     /**
@@ -86,31 +91,37 @@ class FormEntity extends CommonEntity
         'segment:read', 'segment:write',
         'asset:read', 'asset:write',
     ])]
+    #[ORM\Column(name: 'date_modified', type: 'datetime', nullable: true)]
     private $dateModified;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'modified_by', type: 'integer', nullable: true)]
     private $modifiedBy;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'modified_by_user', type: 'string', length: 191, nullable: true)]
     private $modifiedByUser;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'checked_out', type: 'datetime', nullable: true)]
     private $checkedOut;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'checked_out_by', type: 'integer', nullable: true)]
     private $checkedOutBy;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'checked_out_by_user', type: 'string', length: 191, nullable: true)]
     private $checkedOutByUser;
 
     /**
@@ -127,59 +138,6 @@ class FormEntity extends CommonEntity
      * @var int|null
      */
     public $deletedId;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setMappedSuperClass();
-
-        $builder->createField('isPublished', 'boolean')
-            ->columnName('is_published')
-            ->build();
-
-        $builder->addDateAdded(true);
-
-        $builder->createField('createdBy', 'integer')
-            ->columnName('created_by')
-            ->nullable()
-            ->build();
-
-        $builder->createField('createdByUser', 'string')
-            ->columnName('created_by_user')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateModified', 'datetime')
-            ->columnName('date_modified')
-            ->nullable()
-            ->build();
-
-        $builder->createField('modifiedBy', 'integer')
-            ->columnName('modified_by')
-            ->nullable()
-            ->build();
-
-        $builder->createField('modifiedByUser', 'string')
-            ->columnName('modified_by_user')
-            ->nullable()
-            ->build();
-
-        $builder->createField('checkedOut', 'datetime')
-            ->columnName('checked_out')
-            ->nullable()
-            ->build();
-
-        $builder->createField('checkedOutBy', 'integer')
-            ->columnName('checked_out_by')
-            ->nullable()
-            ->build();
-
-        $builder->createField('checkedOutByUser', 'string')
-            ->columnName('checked_out_by_user')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.
