@@ -38,6 +38,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: FieldRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['type'], name: 'form_field_type_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Field implements UuidInterface
 {
     use UuidTrait;
@@ -50,90 +54,107 @@ class Field implements UuidInterface
      * @var int
      */
     #[Groups(['field:read', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: Types::TEXT)]
     private $label;
 
     /**
      * @var bool|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'show_label', type: Types::BOOLEAN, nullable: true)]
     private $showLabel = true;
 
     /**
      * @var string
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $alias;
 
     /**
      * @var string
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $type;
 
     /**
      * @var bool
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'is_custom', type: Types::BOOLEAN)]
     private $isCustom = false;
 
     /**
      * @var array
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'custom_parameters', type: Types::ARRAY, nullable: true)]
     private $customParameters = [];
 
     /**
      * @var string|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'default_value', type: Types::TEXT, nullable: true)]
     private $defaultValue;
 
     /**
      * @var bool
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'is_required', type: Types::BOOLEAN)]
     private $isRequired = false;
 
     /**
      * @var string|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'validation_message', type: Types::TEXT, nullable: true)]
     private $validationMessage;
 
     /**
      * @var string|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'help_message', type: Types::TEXT, nullable: true)]
     private $helpMessage;
 
     /**
      * @var int|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'field_order', type: Types::INTEGER, nullable: true)]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private $properties = [];
 
     /**
      * @var array
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private $validation = [];
 
     /**
      * @var array<string,mixed>|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: 'json', nullable: true)]
     private $conditions = [];
 
     /**
@@ -146,18 +167,21 @@ class Field implements UuidInterface
      * @var string|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'label_attr', type: Types::STRING, length: 191, nullable: true)]
     private $labelAttributes;
 
     /**
      * @var string|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'input_attr', type: Types::STRING, length: 191, nullable: true)]
     private $inputAttributes;
 
     /**
      * @var string|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'container_attr', type: Types::STRING, length: 191, nullable: true)]
     private $containerAttributes;
 
     /**
@@ -166,24 +190,29 @@ class Field implements UuidInterface
      * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'lead_field', type: Types::STRING, length: 191, nullable: true)]
     private $leadField;
 
     /**
      * @var bool|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'save_result', type: Types::BOOLEAN, nullable: true)]
     private $saveResult = true;
 
     /**
      * @var bool|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'is_auto_fill', type: Types::BOOLEAN, nullable: true)]
     private $isAutoFill = false;
 
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'is_read_only', type: Types::BOOLEAN, options: ['default' => false])]
     private bool $isReadOnly = false;
 
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'field_width', type: Types::STRING, length: 50, options: ['default' => '100%'])]
     private string $fieldWidth = '100%';
 
     /**
@@ -197,36 +226,42 @@ class Field implements UuidInterface
      * @var bool|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'show_when_value_exists', type: Types::BOOLEAN, nullable: true)]
     private $showWhenValueExists;
 
     /**
      * @var int|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'show_after_x_submissions', type: Types::INTEGER, nullable: true)]
     private $showAfterXSubmissions;
 
     /**
      * @var bool|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'always_display', type: Types::BOOLEAN, nullable: true)]
     private $alwaysDisplay;
 
     /**
      * @var string|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'parent_id', type: 'string', length: 191, nullable: true)]
     private $parent;
 
     /**
      * @var string|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'mapped_object', type: Types::STRING, length: 191, nullable: true)]
     private $mappedObject;
 
     /**
      * @var string|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'mapped_field', type: Types::STRING, length: 191, nullable: true)]
     private $mappedField;
 
     public ?int $deletedId = null;
@@ -241,57 +276,11 @@ class Field implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(FieldRepository::class)
-            ->addIndex(['type'], 'form_field_type_search');
-
-        $builder->addId();
-        $builder->addField('label', Types::TEXT);
-        $builder->addNullableField('showLabel', Types::BOOLEAN, 'show_label');
-        $builder->addField('alias', Types::STRING);
-        $builder->addField('type', Types::STRING);
-        $builder->addNamedField('isCustom', Types::BOOLEAN, 'is_custom');
-        $builder->addNullableField('customParameters', Types::ARRAY, 'custom_parameters');
-        $builder->addNullableField('defaultValue', Types::TEXT, 'default_value');
-        $builder->addNamedField('isRequired', Types::BOOLEAN, 'is_required');
-        $builder->addNullableField('validationMessage', Types::TEXT, 'validation_message');
-        $builder->addNullableField('helpMessage', Types::TEXT, 'help_message');
-        $builder->addNullableField('order', Types::INTEGER, 'field_order');
-        $builder->addNullableField('properties', Types::ARRAY);
-        $builder->addNullableField('validation', Types::JSON);
-
-        $builder->addNullableField('parent', 'string', 'parent_id');
-        $builder->addNullableField('conditions', 'json');
-
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
             ->isOwnershipParent()
             ->build();
-
-        $builder->addNullableField('labelAttributes', Types::STRING, 'label_attr');
-        $builder->addNullableField('inputAttributes', Types::STRING, 'input_attr');
-        $builder->addNullableField('containerAttributes', Types::STRING, 'container_attr');
-        $builder->addNullableField('leadField', Types::STRING, 'lead_field');
-        $builder->addNullableField('saveResult', Types::BOOLEAN, 'save_result');
-        $builder->addNullableField('isAutoFill', Types::BOOLEAN, 'is_auto_fill');
-
-        $builder->createField('isReadOnly', Types::BOOLEAN)
-            ->columnName('is_read_only')
-            ->option('default', false)
-            ->build();
-
-        $builder->addNullableField('showWhenValueExists', Types::BOOLEAN, 'show_when_value_exists');
-        $builder->addNullableField('showAfterXSubmissions', Types::INTEGER, 'show_after_x_submissions');
-        $builder->addNullableField('alwaysDisplay', Types::BOOLEAN, 'always_display');
-        $builder->addNullableField('mappedObject', Types::STRING, 'mapped_object');
-        $builder->addNullableField('mappedField', Types::STRING, 'mapped_field');
-        $builder->createField('fieldWidth', Types::STRING)
-            ->columnName('field_width')
-            ->length(50)
-            ->option('default', '100%')
-            ->build();
-        static::addUuidField($builder);
     }
 
     /**

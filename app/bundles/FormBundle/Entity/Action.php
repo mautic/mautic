@@ -35,6 +35,10 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: ActionRepository::class)]
+#[ORM\Table(name: 'form_actions')]
+#[ORM\Index(columns: ['type'], name: 'form_action_type_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Action implements UuidInterface
 {
     use UuidTrait;
@@ -45,18 +49,23 @@ class Action implements UuidInterface
      * @var int
      */
     #[Groups(['action:read', 'form:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -64,18 +73,21 @@ class Action implements UuidInterface
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required', groups: ['action'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var int
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(name: 'action_order', type: 'integer')]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
@@ -99,29 +111,11 @@ class Action implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('form_actions')
-            ->setCustomRepositoryClass(ActionRepository::class)
-            ->addIndex(['type'], 'form_action_type_search');
-
-        $builder->addIdColumns();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('action_order')
-            ->build();
-
-        $builder->addField('properties', 'array');
-
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('actions')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
             ->isOwnershipParent()
             ->build();
-
-        static::addUuidField($builder);
     }
 
     /**
