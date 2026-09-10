@@ -49,8 +49,8 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $tag = $tags[0];
 
             // Assert that the tag name does not contain the malicious script
-            $this->assertStringNotContainsString('<script>', $tag->getTag());
-            $this->assertStringNotContainsString('</script>', $tag->getTag());
+            $this->assertStringNotContainsString('<script>', (string) $tag->getTag());
+            $this->assertStringNotContainsString('</script>', (string) $tag->getTag());
 
             // Assert that the tag name has been properly sanitized
             $this->assertEquals($expectedSanitized, $tag->getTag());

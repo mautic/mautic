@@ -4,7 +4,6 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -12,6 +11,14 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\PageBundle\Validator\PageHit;
 
 #[PageHit]
+#[ORM\Entity(repositoryClass: HitRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['tracking_id'], name: 'page_hit_tracking_search')]
+#[ORM\Index(columns: ['code'], name: 'page_hit_code_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'page_hit_source_search')]
+#[ORM\Index(columns: ['date_hit', 'date_left'], name: 'date_hit_left_index')]
+#[ORM\Index(columns: ['url'], name: 'page_hit_url', options: ['lengths' => [0 => 128]])]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Hit
 {
     public const TABLE_NAME = 'page_hits';
@@ -19,235 +26,154 @@ class Hit
     /**
      * @var string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_hit', type: 'datetime')]
     private $dateHit;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_left', type: 'datetime', nullable: true)]
     private $dateLeft;
 
+    #[ORM\ManyToOne(targetEntity: Page::class)]
+    #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
     private ?Page $page = null;
 
     /**
      * @var Redirect|null
      */
+    #[ORM\ManyToOne(targetEntity: Redirect::class)]
+    #[ORM\JoinColumn(name: 'redirect_id', onDelete: 'SET NULL')]
     private $redirect;
 
+    #[ORM\ManyToOne(targetEntity: Email::class)]
+    #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private ?Email $email = null;
 
     /**
      * @var Lead|null
      */
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private $lead;
 
     /**
      * @var IpAddress|null
      */
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'merge', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private $ipAddress;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $country;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $region;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $city;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $isp;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $organization;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $code;
 
+    #[ORM\Column(type: 'text', nullable: true)]
     private $referer;
 
+    #[ORM\Column(type: 'text', nullable: true)]
     private $url;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'url_title', type: 'string', length: 191, nullable: true)]
     private $urlTitle;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'user_agent', type: 'text', nullable: true)]
     private $userAgent;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'remote_host', type: 'string', length: 191, nullable: true)]
     private $remoteHost;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'page_language', type: 'string', length: 191, nullable: true)]
     private $pageLanguage;
 
     /**
      * @var array<string>
      */
+    #[ORM\Column(name: 'browser_languages', type: 'array', nullable: true)]
     private $browserLanguages = [];
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191)]
     private $trackingId;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $query = [];
 
     /**
      * @var LeadDevice|null
      */
+    #[ORM\ManyToOne(targetEntity: LeadDevice::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'device_id', onDelete: 'SET NULL')]
     private $device;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(HitRepository::class)
-            ->addIndex(['tracking_id'], 'page_hit_tracking_search')
-            ->addIndex(['code'], 'page_hit_code_search')
-            ->addIndex(['source', 'source_id'], 'page_hit_source_search')
-            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index')
-            ->addIndexWithOptions(['url'], 'page_hit_url', ['lengths' => [0 => 128]]);
-
-        $builder->addBigIntIdField();
-
-        $builder->createField('dateHit', 'datetime')
-            ->columnName('date_hit')
-            ->build();
-
-        $builder->createField('dateLeft', 'datetime')
-            ->columnName('date_left')
-            ->nullable()
-            ->build();
-
-        $builder->createManyToOne('page', 'Page')
-            ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createManyToOne('redirect', 'Redirect')
-            ->addJoinColumn('redirect_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createManyToOne('email', Email::class)
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->addLead(true, 'SET NULL');
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('country', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('region', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('city', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isp', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('organization', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->addField('code', 'integer');
-
-        $builder->createField('referer', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('url', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('urlTitle', 'string')
-            ->columnName('url_title')
-            ->nullable()
-            ->build();
-
-        $builder->createField('userAgent', 'text')
-            ->columnName('user_agent')
-            ->nullable()
-            ->build();
-
-        $builder->createField('remoteHost', 'string')
-            ->columnName('remote_host')
-            ->nullable()
-            ->build();
-
-        $builder->createField('pageLanguage', 'string')
-            ->columnName('page_language')
-            ->nullable()
-            ->build();
-
-        $builder->createField('browserLanguages', 'array')
-            ->columnName('browser_languages')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('query', 'array');
-
-        $builder->createManyToOne('device', LeadDevice::class)
-            ->addJoinColumn('device_id', 'id', true, false, 'SET NULL')
-            ->cascadePersist()
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.
