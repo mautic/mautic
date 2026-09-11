@@ -12,6 +12,7 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
@@ -141,7 +142,7 @@ final class SchemaHelper
         $mauticTables  = [];
 
         foreach ($installSchema->getTables() as $m) {
-            $tableName                = $m->getName();
+            $tableName                = AssetName::of($m);
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
@@ -249,7 +250,7 @@ final class SchemaHelper
                     continue;
                 }
 
-                $oldName = $oldIndex->getName();
+                $oldName = AssetName::of($oldIndex);
                 $newName = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $oldName);
 
                 $newIndex = new Index(
@@ -262,7 +263,7 @@ final class SchemaHelper
                 );
 
                 $newIndexes[] = $newIndex;
-                $sql[]        = $this->platform->getDropIndexSQL($oldIndex->getName(), $t);
+                $sql[]        = $this->platform->getDropIndexSQL(AssetName::of($oldIndex), $t);
             }
 
             // rename table
@@ -287,7 +288,7 @@ final class SchemaHelper
                     $or->getLocalColumns(),
                     $foreignTableName,
                     $or->getForeignColumns(),
-                    $backupPrefix.$or->getName(),
+                    $backupPrefix.AssetName::of($or),
                     $or->getOptions()
                 );
                 $sql[] = $this->platform->getCreateForeignKeySQL($r, $table);

@@ -164,7 +164,7 @@ readonly class ContactSegmentService
         // Make sure that leads.id is the first column
         array_unshift($select, $distinct.$leadsTableAlias.'.id');
         $queryBuilder->resetQueryPart('select');
-        $queryBuilder->select($select);
+        $queryBuilder->select(...$select);
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
