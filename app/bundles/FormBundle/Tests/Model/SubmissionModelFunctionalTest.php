@@ -77,8 +77,8 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
 
         $this->logoutUser();
 
-        $contactTracker = self::getContainer()->get('mautic.tracker.contact');
-        $this->assertInstanceOf(ContactTracker::class, $contactTracker);
+        /** @var ContactTracker $contactTracker */
+        $contactTracker = self::getContainer()->get(ContactTracker::class);
         $contactTracker->setTrackedContact($anonymousContact);
 
         $this->submitFormWithoutCompanies($formId, $formAlias, 'existing.winner@example.com', 'Updated', 'Winner');
