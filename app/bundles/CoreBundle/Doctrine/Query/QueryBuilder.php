@@ -47,10 +47,19 @@ class QueryBuilder extends BaseQueryBuilder
      */
     protected string $statementType = 'select';
 
-    public function __construct(
-        protected readonly Connection $connection,
-    ) {
+    /**
+     * DBAL keeps its own connection private, so this class holds its own reference for
+     * generating SELECT. Declared and assigned rather than promoted: a constructor whose
+     * body is only parent::__construct() is removed by
+     * RemoveParentDelegatingConstructorRector, which does not account for promotion.
+     */
+    protected readonly Connection $connection;
+
+    public function __construct(Connection $connection)
+    {
         parent::__construct($connection);
+
+        $this->connection = $connection;
     }
 
     /**

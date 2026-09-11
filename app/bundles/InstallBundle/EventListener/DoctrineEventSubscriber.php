@@ -34,19 +34,19 @@ final class DoctrineEventSubscriber
                     $table->addColumn($definition['name'], $definition['type'], $definition['options']);
 
                     if ('textarea' !== $type) {
-                        self::addIndexIfMissing($table, [$definition['name']], $definition['name'].'_search');
+                        $this->addIndexIfMissing($table, [$definition['name']], $definition['name'].'_search');
                     }
                 }
             }
 
             if ('leads' === $tableName) {
                 // Add an attribution index
-                self::addIndexIfMissing($table, ['attribution', 'attribution_date'], 'contact_attribution');
+                $this->addIndexIfMissing($table, ['attribution', 'attribution_date'], 'contact_attribution');
                 // Add date added and country index
-                self::addIndexIfMissing($table, ['date_added', 'country'], 'date_added_country_index');
+                $this->addIndexIfMissing($table, ['date_added', 'country'], 'date_added_country_index');
             } else {
-                self::addIndexIfMissing($table, ['companyname', 'companyemail'], 'company_filter');
-                self::addIndexIfMissing($table, ['companyname', 'companycity', 'companycountry', 'companystate'], 'company_match');
+                $this->addIndexIfMissing($table, ['companyname', 'companyemail'], 'company_filter');
+                $this->addIndexIfMissing($table, ['companyname', 'companycity', 'companycountry', 'companystate'], 'company_match');
             }
         }
     }
@@ -58,7 +58,7 @@ final class DoctrineEventSubscriber
      *
      * @param string[] $columns
      */
-    private static function addIndexIfMissing(Table $table, array $columns, string $name): void
+    private function addIndexIfMissing(Table $table, array $columns, string $name): void
     {
         if ($table->hasIndex($name)) {
             return;

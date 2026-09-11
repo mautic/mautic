@@ -86,10 +86,8 @@ class LeadListRepository extends CommonRepository
      * @param string $alias
      * @param string $id
      * @param bool   $justPublished if false, returns all published and unpublished segments
-     *
-     * @return array
      */
-    public function getLists(?User $user = null, $alias = '', $id = '', bool $justPublished = true)
+    public function getLists(?User $user = null, $alias = '', $id = '', bool $justPublished = true): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
@@ -230,10 +228,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * Return a list of global lists.
-     *
-     * @return array
      */
-    public function getGlobalLists()
+    public function getGlobalLists(): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
@@ -360,7 +356,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return QueryBuilder
      */
-    protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
+    protected function createFilterExpressionSubQuery($table, ?string $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
     {
         $subQb   = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subExpr = [];
@@ -591,7 +587,7 @@ SQL;
             )
             ->fetchFirstColumn();
 
-        return !empty($segmentIds);
+        return $segmentIds !== [];
     }
 
     public function isNotContactInAnySegment(int $contactId): bool

@@ -649,10 +649,8 @@ class LeadModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0)
+    public function getLookupResults($type, $filter = '', $limit = 10, ?int $start = 0): array
     {
         $results    = [];
 
@@ -684,7 +682,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getOwnerList()
+    public function getOwnerList(): array
     {
         return $this->userRepository->getUserList('', 0);
     }
@@ -2004,12 +2002,11 @@ class LeadModel extends FormModel
     /**
      * Get a list of top (by leads owned) users.
      *
-     * @param int    $limit
      * @param string $dateFrom
      * @param string $dateTo
      * @param array  $filters
      */
-    public function getTopOwners($limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
+    public function getTopOwners(?int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
@@ -2030,12 +2027,11 @@ class LeadModel extends FormModel
     /**
      * Get a list of top (by leads owned) users.
      *
-     * @param int    $limit
      * @param string $dateFrom
      * @param string $dateTo
      * @param array  $filters
      */
-    public function getTopCreators($limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
+    public function getTopCreators(?int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
@@ -2056,11 +2052,10 @@ class LeadModel extends FormModel
     /**
      * Get a list of leads in a date range.
      *
-     * @param int                  $limit
      * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getLeadList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getLeadList(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         if (!empty($options['canViewOthers'])) {
             $filter['owner_id'] = $this->userHelper->getUser()->getId();

@@ -190,10 +190,9 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a contact column.
      *
-     * @param string      $onDelete
      * @param string|null $inversedBy
      */
-    public function addContact(bool $nullable = false, $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
+    public function addContact(bool $nullable = false, ?string $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
     {
         $lead = $this->createManyToOne('contact', Lead::class);
 
@@ -215,11 +214,9 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a lead column.
      *
-     * @param string $onDelete
-     *
      * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
      */
-    public function addLead(bool $nullable = false, $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
+    public function addLead(bool $nullable = false, ?string $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
     {
         $lead = $this->createManyToOne('lead', Lead::class);
 
@@ -295,8 +292,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Adds Field. Overridden for IDE suggestions when stringing methods in entity class.
-     *
-     * @return $this
      */
     public function addField(string $name, string $type, array $mapping = []): static
     {

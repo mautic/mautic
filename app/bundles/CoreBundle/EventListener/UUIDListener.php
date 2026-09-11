@@ -54,7 +54,7 @@ final readonly class UUIDListener
             'uuid' => $object->getUuid(),
         ]);
 
-        if ($entityExists) {
+        if ($entityExists !== []) {
             $object->setUuid((string) Uuid::uuid4());
         }
     }

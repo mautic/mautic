@@ -67,7 +67,7 @@ final class EmailRepositoryTest extends TestCase
             $countWithMaxMin
         );
 
-        $this->assertEquals($this->replaceQueryPrefix($expectedQuery), $query->getSql());
+        $this->assertSame($this->replaceQueryPrefix($expectedQuery), $query->getSql());
 
         if ($variantIds) {
             $variantIds[] = $emailId;
@@ -132,7 +132,7 @@ final class EmailRepositoryTest extends TestCase
             $expectedParams['excludedListIds'] = $excludedListIds;
         }
 
-        $this->assertEquals($this->replaceQueryPrefix($expectedQuery), $query->getSql());
+        $this->assertSame($this->replaceQueryPrefix($expectedQuery), $query->getSql());
         $this->assertEquals($expectedParams, $query->getParameters());
     }
 

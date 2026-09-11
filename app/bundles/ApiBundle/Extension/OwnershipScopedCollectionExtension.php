@@ -176,7 +176,7 @@ final readonly class OwnershipScopedCollectionExtension implements QueryCollecti
 
         // For entities without a direct ownership field, follow the association marked
         // by #[OwnershipParent] on the entity class.
-        $associationName = self::getOwnershipParentAssociation($resourceClass);
+        $associationName = $this->getOwnershipParentAssociation($resourceClass);
         if (null !== $associationName && $metadata->hasAssociation($associationName)) {
             $targetClass    = $metadata->getAssociationTargetClass($associationName);
             /** @phpstan-var class-string $targetClass */
@@ -209,7 +209,7 @@ final readonly class OwnershipScopedCollectionExtension implements QueryCollecti
      * the life of the process, as it cannot change at runtime. The cache is a method-local
      * static rather than a property because this class is readonly.
      */
-    private static function getOwnershipParentAssociation(string $resourceClass): ?string
+    private function getOwnershipParentAssociation(string $resourceClass): ?string
     {
         /** @var array<class-string, string|null> $cache */
         static $cache = [];
@@ -219,7 +219,7 @@ final readonly class OwnershipScopedCollectionExtension implements QueryCollecti
             return $cache[$resourceClass];
         }
 
-        $attributes = (new \ReflectionClass($resourceClass))->getAttributes(OwnershipParent::class);
+        $attributes = new \ReflectionClass($resourceClass)->getAttributes(OwnershipParent::class);
 
         return $cache[$resourceClass] = ([] === $attributes)
             ? null

@@ -333,10 +333,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         return $choices;
     }
 
-    /**
-     * @return array
-     */
-    public function getUserLists(string $alias = '')
+    public function getUserLists(string $alias = ''): array
     {
         $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : null;
 
@@ -345,10 +342,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of global lead lists.
-     *
-     * @return mixed
      */
-    public function getGlobalLists()
+    public function getGlobalLists(): array
     {
         return $this->leadListRepository->getGlobalLists();
     }
@@ -921,11 +916,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of top (by leads added) lists.
      *
-     * @param int       $limit
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      */
-    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, bool $canViewOthers = true): array
+    public function getTopLists(?int $limit = 10, $dateFrom = null, $dateTo = null, bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')
@@ -959,7 +953,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function getLifeCycleSegments($limit, $dateFrom, $dateTo, $canViewOthers, $segments)
+    public function getLifeCycleSegments($limit, $dateFrom, $dateTo, $canViewOthers, $segments): array
     {
         if (!empty($segments)) {
             $segmentlist = "'".implode("','", $segments)."'";

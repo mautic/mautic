@@ -79,7 +79,7 @@ class LeadFieldRepository extends CommonRepository
      */
     public function getFields(): array
     {
-        if (!isset($this->fields)) {
+        if ($this->fields === null) {
             $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
             $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
@@ -466,7 +466,7 @@ class LeadFieldRepository extends CommonRepository
     /**
      * @return LeadField[]
      */
-    public function getFieldsByType($type)
+    public function getFieldsByType($type): array
     {
         return $this->findBy(['type' => $type]);
     }

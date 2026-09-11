@@ -243,10 +243,8 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
 
     /**
      * Search for an notification stat by notification and lead IDs.
-     *
-     * @return array
      */
-    public function getNotificationStatByLeadId($notificationId, $leadId)
+    public function getNotificationStatByLeadId($notificationId, $leadId): array
     {
         return $this->statRepository->findBy(
             [

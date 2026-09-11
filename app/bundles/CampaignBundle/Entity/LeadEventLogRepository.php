@@ -208,7 +208,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $query->orderBy('ll.trigger_date');
 
-        if (empty($options['canViewOthers']) && isset($this->currentUser)) {
+        if (empty($options['canViewOthers']) && $this->currentUser !== null) {
             $query->andWhere('c.created_by = :userId')
                 ->setParameter('userId', $this->currentUser->getId());
         }
@@ -517,7 +517,7 @@ class LeadEventLogRepository extends CommonRepository
         return $events;
     }
 
-    public function getDatesExecuted($eventId, array $contactIds): array
+    public function getDatesExecuted(string $eventId, array $contactIds): array
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.lead_id, log.date_triggered, log.is_scheduled')
@@ -580,7 +580,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
-        return !empty($results);
+        return $results !== [];
     }
 
     /**

@@ -377,10 +377,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @return array
      */
-    public function getLookupResults(string $type, string $filter = '', int $limit = 10)
+    public function getLookupResults(string $type, string $filter = '', int $limit = 10): array
     {
         $results = [];
         switch ($type) {

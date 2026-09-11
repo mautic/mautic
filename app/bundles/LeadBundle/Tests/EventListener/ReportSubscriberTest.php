@@ -156,7 +156,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilderMock
             ->method('getQueryPart')
-            ->willReturnCallback(function ($input): array|string {
+            ->willReturnCallback(function (string $input): array|string {
                 if ('join' === $input) {
                     return [
                         'lp' => [[

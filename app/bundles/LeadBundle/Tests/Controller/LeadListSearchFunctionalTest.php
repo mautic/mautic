@@ -112,7 +112,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $previousQueries   = $allQueries;
         $doctrineExtension = new DoctrineExtension();
 
-        $queries = array_map(fn (array $query) => $doctrineExtension->replaceQueryParameters($query['sql'], $query['params']), $queries);
+        $queries = array_map(fn (array $query): string => $doctrineExtension->replaceQueryParameters($query['sql'], $query['params']), $queries);
 
         foreach ($expectedQueries as $expectedQuery) {
             $matchedQueries = array_filter($queries, fn (string $query): bool => $expectedQuery === $query);

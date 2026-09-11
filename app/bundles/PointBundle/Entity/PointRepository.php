@@ -38,7 +38,7 @@ class PointRepository extends CommonRepository
      *
      * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType($type): mixed
     {
         $q = $this->createQueryBuilder('p')
             ->select('partial p.{id, type, name, delta, repeatable, properties}')

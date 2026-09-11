@@ -2583,7 +2583,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $trackedIds          = [];
         foreach ($historySF['records'] as $sfModifiedDNC) {
             // if we have no history in Mautic, then update the Mautic record
-            if (empty($lastModifiedDNCDate)) {
+            if ($lastModifiedDNCDate === []) {
                 $leads  = array_flip($leadIds);
                 $leadId = $leads[$sfModifiedDNC[$sfObject.'Id']];
                 $this->updateMauticDNC($leadId, $sfModifiedDNC['NewValue']);

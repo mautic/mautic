@@ -95,10 +95,8 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *
      * @param mixed $x the left expression
      * @param mixed $y the right expression
-     *
-     * @return string
      */
-    public function regexp($x, $y)
+    public function regexp(string $x, string $y): string
     {
         return $this->comparison($x, self::REGEXP, $y);
     }
@@ -116,7 +114,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      * @param mixed $x the left expression
      * @param mixed $y the right expression
      */
-    public function notRegexp($x, $y): string
+    public function notRegexp(string $x, string $y): string
     {
         return 'NOT '.$this->comparison($x, self::REGEXP, $y);
     }

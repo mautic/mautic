@@ -422,7 +422,7 @@ class ChartQuery extends AbstractChart
      *
      * @return QueryBuilder
      */
-    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], array $options = [], $tablePrefix = 't')
+    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], array $options = [], ?string $tablePrefix = 't')
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
@@ -438,9 +438,8 @@ class ChartQuery extends AbstractChart
      *
      * @param string               $uniqueColumn name
      * @param array<string, mixed> $options      for special behavior
-     * @param string               $tablePrefix
      */
-    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, array $options = [], $tablePrefix = 't')
+    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, array $options = [], ?string $tablePrefix = 't')
     {
         $query->select('COUNT('.$tablePrefix.'.'.$uniqueColumn.') AS count');
 

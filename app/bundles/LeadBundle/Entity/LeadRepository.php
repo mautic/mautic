@@ -559,7 +559,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @return QueryBuilder
      */
-    public function getEntitiesDbalQueryBuilder()
+    public function getEntitiesDbalQueryBuilder(): \Mautic\CoreBundle\Doctrine\Query\QueryBuilder
     {
         $alias = $this->getTableAlias();
 
@@ -802,7 +802,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     );
                 \assert($queryBuilder instanceof TrackingQueryBuilder);
                 $from = $queryBuilder->getQueryPart('from')[0];
-                \assert($queryBuilder instanceof TrackingQueryBuilder);
                 $queryBuilder->resetQueryPart('from');
                 $queryBuilder->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
 
@@ -1190,7 +1189,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
-        if ($results) {
+        if ($results !== []) {
             $contacts = [];
             foreach ($results as $result) {
                 $contacts[$result['id']] = $result;
@@ -1326,7 +1325,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
         foreach ($tables as $table) {
             $exists = false;
-            \assert($q instanceof TrackingQueryBuilder);
             $joins  = $q->getQueryPart('join');
 
             if (isset($joins[$table['from_alias']])) {
@@ -1443,7 +1441,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $queries = array_map(
-            fn (string $fieldAlias) => $this->getDuplicateValuesQuery([$fieldAlias])->getSQL(),
+            fn (string $fieldAlias): string => $this->getDuplicateValuesQuery([$fieldAlias])->getSQL(),
             $fieldsAliases
         );
 

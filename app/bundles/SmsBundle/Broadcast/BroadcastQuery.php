@@ -34,7 +34,7 @@ final class BroadcastQuery
     /**
      * @return bool|string
      */
-    public function getPendingCount(Sms $sms)
+    public function getPendingCount(Sms $sms): mixed
     {
         $query = $this->getBasicQuery($sms);
         $query->select('COUNT(DISTINCT l.id)');

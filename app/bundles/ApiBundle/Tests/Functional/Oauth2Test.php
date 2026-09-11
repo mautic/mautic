@@ -26,12 +26,6 @@ final class Oauth2Test extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    protected function setUp(): void
-    {
-
-        parent::setUp();
-    }
-
     #[DataProvider('provideMethods')]
     public function testAuthorize(string $method): void
     {

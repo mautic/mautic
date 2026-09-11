@@ -405,13 +405,11 @@ final class ReportSubscriber implements EventSubscriberInterface
 
             \assert($queryBuilder instanceof TrackingQueryBuilder);
             if ('lp' === $queryBuilder->getQueryPart('from')[0]['alias']) {
-                \assert($queryBuilder instanceof TrackingQueryBuilder);
                 $join = $queryBuilder->getQueryPart('join');
                 $queryBuilder->resetQueryPart('join');
 
                 $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
                 if (isset($join['l'])) {
-                    \assert($queryBuilder instanceof TrackingQueryBuilder);
                     $where = $queryBuilder->getQueryPart('where');
                     foreach ($join['l'] as $item) {
                         if (str_contains($where, $item['joinAlias'].'.leadlist_id')) {
@@ -429,7 +427,6 @@ final class ReportSubscriber implements EventSubscriberInterface
                     \assert($attributionQb instanceof TrackingQueryBuilder);
                     $attributionQb->resetQueryParts(['select', 'orderBy']);
                     $outerQb = clone $attributionQb;
-                    \assert($outerQb instanceof TrackingQueryBuilder);
                     $outerQb->resetQueryParts()
                         ->select('slice, sum(contact_attribution) as total_attribution')
                         ->groupBy('slice');

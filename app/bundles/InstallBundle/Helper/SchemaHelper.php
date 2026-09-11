@@ -23,10 +23,7 @@ final class SchemaHelper
 {
     private Connection $db;
 
-    /**
-     * @var AbstractPlatform
-     */
-    private $platform;
+    private ?\Doctrine\DBAL\Platforms\AbstractPlatform $platform = null;
 
     private array $dbParams;
 
@@ -134,7 +131,7 @@ final class SchemaHelper
         $backupPrefix   = (!empty($this->dbParams['backup_prefix'])) ? $this->dbParams['backup_prefix'] : 'bak_';
 
         $metadatas = $this->entityManager->getMetadataFactory()->getAllMetadata();
-        if (empty($metadatas)) {
+        if ($metadatas === []) {
             $this->db->close();
 
             return false;
@@ -235,7 +232,7 @@ final class SchemaHelper
             }
 
             foreach ($restraints as $restraint) {
-                $sql[] = $this->platform->getDropForeignKeySQL(self::constraintName($restraint), $t);
+                $sql[] = $this->platform->getDropForeignKeySQL($this->constraintName($restraint), $t);
             }
         }
 
@@ -258,7 +255,7 @@ final class SchemaHelper
 
                 $newIndex = new Index(
                     $newName,
-                    self::indexColumnNames($oldIndex),
+                    $this->indexColumnNames($oldIndex),
                     IndexType::UNIQUE === $oldIndex->getType(),
                     // primary keys are skipped above, and are a PrimaryKeyConstraint in DBAL 4 rather than an index type
                     false,
@@ -289,10 +286,10 @@ final class SchemaHelper
                 $foreignTable     = AssetName::fromName($or->getReferencedTableName());
                 $foreignTableName = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $foreignTable);
                 $r                = new ForeignKeyConstraint(
-                    self::namesToStrings($or->getReferencingColumnNames()),
+                    $this->namesToStrings($or->getReferencingColumnNames()),
                     $foreignTableName,
-                    self::namesToStrings($or->getReferencedColumnNames()),
-                    $backupPrefix.self::constraintName($or),
+                    $this->namesToStrings($or->getReferencedColumnNames()),
+                    $backupPrefix.$this->constraintName($or),
                     null !== $or->getMatchType() ? ['match' => $or->getMatchType()] : []
                 );
                 $sql[] = $this->platform->getCreateForeignKeySQL($r, $table);
@@ -345,7 +342,7 @@ final class SchemaHelper
      * A foreign key's name is optional in DBAL 4, so it is read through the nullable
      * getObjectName() rather than AssetName::of(), which expects an always-named object.
      */
-    private static function constraintName(ForeignKeyConstraint $constraint): string
+    private function constraintName(ForeignKeyConstraint $constraint): string
     {
         $name = $constraint->getObjectName();
 
@@ -355,7 +352,7 @@ final class SchemaHelper
     /**
      * @return list<string>
      */
-    private static function indexColumnNames(Index $index): array
+    private function indexColumnNames(Index $index): array
     {
         return array_map(
             static fn (IndexedColumn $indexedColumn): string => AssetName::fromName($indexedColumn->getColumnName()),
@@ -368,7 +365,7 @@ final class SchemaHelper
      *
      * @return list<string>
      */
-    private static function namesToStrings(array $names): array
+    private function namesToStrings(array $names): array
     {
         return array_map(AssetName::fromName(...), $names);
     }
