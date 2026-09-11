@@ -450,7 +450,7 @@ final class SubmissionModel extends CommonFormModel
     /**
      * @param array<string,mixed> $args
      *
-     * @return Submission[]|array<int,Submission>|iterable<Submission>|\Doctrine\ORM\Internal\Hydration\IterableResult<Submission>|Paginator<Submission>|SimplePaginator<Submission>
+     * @return Submission[]|array<int,Submission>|iterable<Submission>|Paginator<Submission>|SimplePaginator<Submission>
      */
     public function getEntities(array $args = [])
     {
