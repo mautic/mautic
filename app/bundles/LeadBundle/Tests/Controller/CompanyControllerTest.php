@@ -12,9 +12,14 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CompanyControllerTest extends MauticMysqlTestCase
@@ -191,6 +196,68 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertCount(0, $leadsTableRows, $crawler->html());
+    }
+
+    public function testBatchRemoveContactsRemovesOnlySelectedContactsFromCompany(): void
+    {
+        $selectedContact   = $this->createLead('Selected', 'Contact', 'selected@example.com');
+        $remainingContact  = $this->createLead('Remaining', 'Contact', 'remaining@example.com');
+        $unrelatedContact  = new Lead();
+        $unrelatedContact->setFirstname('Unrelated')->setLastname('Contact')->setEmail('unrelated@example.com');
+        $this->em->persist($unrelatedContact);
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf(
+                '/s/companies/batchRemoveContacts/%d?ids=%s',
+                $this->company1Id,
+                urlencode((string) json_encode([$selectedContact->getId(), $unrelatedContact->getId()]))
+            )
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertStringContainsString('1 contact removed from company', (string) $response->getContent());
+
+        $companyLeadIds = $this->getCompanyLeadIds($this->company1Id);
+        $this->assertNotContains($selectedContact->getId(), $companyLeadIds);
+        $this->assertContains($remainingContact->getId(), $companyLeadIds);
+        $this->assertNotContains($unrelatedContact->getId(), $companyLeadIds);
+    }
+
+    public function testBatchRemoveContactsDeniesUsersWithoutCompanyAccess(): void
+    {
+        $contact = $this->createLead('Protected', 'Contact', 'protected@example.com');
+        $this->loginUser($this->createUserWithLeadPermissions([]));
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf(
+                '/s/companies/batchRemoveContacts/%d?ids=%s',
+                $this->company1Id,
+                urlencode((string) json_encode([$contact->getId()]))
+            )
+        );
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testCompanyContactsListShowsBatchRemoveConfirmation(): void
+    {
+        $this->createLead('Listed', 'Contact', 'listed@example.com');
+
+        $this->client->request(Request::METHOD_GET, '/s/company/'.$this->company1Id.'/contacts/');
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertStringContainsString('Remove from company', (string) $response->getContent());
+        $this->assertStringContainsString(
+            "Remove the selected contacts from this company? The contacts will remain in Mautic. If this is a contact's primary company, another company may become primary or the contact will have no company.",
+            html_entity_decode((string) $response->getContent())
+        );
+        $this->assertStringContainsString('/s/companies/batchRemoveContacts/'.$this->company1Id, (string) $response->getContent());
     }
 
     public function testCompanyFieldsAreUpdatedWithBatchFindAndReplace(): void
@@ -471,6 +538,48 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $companyModel->saveEntity($company);
 
         return $company;
+    }
+
+    /**
+     * @param string[] $permissions
+     */
+    private function createUserWithLeadPermissions(array $permissions): User
+    {
+        $role = new Role();
+        $role->setName('Company controller role '.uniqid('', true));
+        $this->em->persist($role);
+        $this->em->flush();
+
+        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel->setRolePermissions($role, ['lead:leads' => $permissions]);
+
+        $user = new User();
+        $user->setFirstName('Company')->setLastName('Editor');
+        $user->setUsername('company.editor.'.uniqid());
+        $user->setEmail('company.editor.'.uniqid().'@example.com');
+        $user->setRole($role);
+
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $user->setPassword($hasher->hash('Maut1cR0cks!'));
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
+    }
+
+    /**
+     * @return int[]
+     */
+    private function getCompanyLeadIds(int $companyId): array
+    {
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+
+        return array_map(
+            static fn (array $companyLead): int => (int) $companyLead['lead_id'],
+            $companyModel->getCompanyLeadRepository()->getCompanyLeads($companyId)
+        );
     }
 
     private function createSegment(): LeadList
