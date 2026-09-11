@@ -23,7 +23,7 @@ final class SchemaHelper
 {
     private Connection $db;
 
-    private ?\Doctrine\DBAL\Platforms\AbstractPlatform $platform = null;
+    private AbstractPlatform $platform;
 
     private array $dbParams;
 
@@ -119,8 +119,10 @@ final class SchemaHelper
         $sm = $this->getSchemaManager();
 
         try {
-            // check to see if the table already exist
-            $tables = $sm->introspectTableNames();
+            // check to see if the table already exist; introspectTableNames() returns name
+            // objects rather than the strings listTableNames() gave, and the schema helpers
+            // below work on strings
+            $tables = array_map(AssetName::fromName(...), $sm->introspectTableNames());
         } catch (\Exception $e) {
             $this->db->close();
 
@@ -131,7 +133,7 @@ final class SchemaHelper
         $backupPrefix   = (!empty($this->dbParams['backup_prefix'])) ? $this->dbParams['backup_prefix'] : 'bak_';
 
         $metadatas = $this->entityManager->getMetadataFactory()->getAllMetadata();
-        if ($metadatas === []) {
+        if ([] === $metadatas) {
             $this->db->close();
 
             return false;

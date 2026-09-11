@@ -107,7 +107,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
                     $keys = $schemaManager->listTableForeignKeys($table);
                     /** @var \Doctrine\DBAL\Schema\ForeignKeyConstraint $k */
                     foreach ($keys as $k) {
-                        $name                       = strtolower(AssetName::of($k));
+                        $name                       = strtolower(AssetName::ofOptional($k));
                         $key                        = substr($name, -4);
                         $tables[$table]['fk'][$key] = $name;
                     }
