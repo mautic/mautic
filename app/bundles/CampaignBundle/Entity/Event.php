@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 
 #[ApiResource(
     operations: [
@@ -42,6 +43,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ]
 )]
 #[EntityEvent]
+#[OwnershipParent('campaign')]
 class Event implements ChannelInterface, UuidInterface
 {
     use UuidTrait;
@@ -352,7 +354,6 @@ class Event implements ChannelInterface, UuidInterface
         $builder->createManyToOne('campaign', 'Campaign')
             ->inversedBy('events')
             ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
             ->build();
 
         $builder->createOneToMany('children', 'Event')

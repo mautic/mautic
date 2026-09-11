@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 
 #[ApiResource(
     shortName: 'Contact Category',
@@ -34,6 +35,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent('lead')]
 class LeadCategory
 {
     /**
@@ -87,7 +89,6 @@ class LeadCategory
 
         $builder->createManyToOne('lead', Lead::class)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
             ->build();
 
         $builder->addDateAdded();
