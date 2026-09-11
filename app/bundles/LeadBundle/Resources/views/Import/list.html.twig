@@ -16,7 +16,7 @@
             'new': permissions[permissionBase~':create'],
         },
         'routeBase': 'import',
-        'query': {'object': app.request.get('object', 'contacts')},
+        'query': {'object': app.request.attributes.all()['object'] ?? app.request.query.all()['object'] ?? app.request.request.all()['object'] ?? 'contacts'},
   }) }}
 {% endblock %}
 

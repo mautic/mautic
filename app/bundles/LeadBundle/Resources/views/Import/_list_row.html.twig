@@ -19,7 +19,7 @@
               {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'lead.import'}) }}
             {% endif %}
             {% if securityHasEntityAccess(true, permissions[permissionBase~':viewother'], item.createdBy) %}
-              <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': item.id, 'object': app.request.get('object', 'contacts')}) }}" data-toggle="ajax">
+              <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': item.id, 'object': app.request.attributes.all()['object'] ?? app.request.query.all()['object'] ?? app.request.request.all()['object'] ?? 'contacts'}) }}" data-toggle="ajax">
                 {{ item.name }}
               </a>
             {% else %}

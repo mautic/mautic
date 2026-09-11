@@ -1,6 +1,6 @@
 {% set request = app.request %}
-{% set contentOnly = request.get('contentOnly', false) or (contentOnly is defined and contentOnly is not empty) %}
-{% set modalView = request.get('modal', false) or (modalView is defined and modalView is not empty) %}
+{% set contentOnly = (request.attributes.all()['contentOnly'] ?? request.query.all()['contentOnly'] ?? request.request.all()['contentOnly'] ?? false) or (contentOnly is defined and contentOnly is not empty) %}
+{% set modalView = (request.attributes.all()['modal'] ?? request.query.all()['modal'] ?? request.request.all()['modal'] ?? false) or (modalView is defined and modalView is not empty) %}
 {# load base template #}
 {% set template = null %}
 {% if not request.isXmlHttpRequest() and not modalView %}
