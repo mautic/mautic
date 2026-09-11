@@ -680,8 +680,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $formScriptStripped = str_replace($search, $replace, $formScript);
 
         // Use proper JSON encoding for JavaScript strings
-        $htmlEscaped       = json_encode($html);
-        $formScriptEscaped = json_encode($formScriptStripped);
+        $htmlEscaped       = json_encode($html, JSON_UNESCAPED_SLASHES);
+        $formScriptEscaped = json_encode($formScriptStripped, JSON_UNESCAPED_SLASHES);
 
         // Write html for all browser and fallback for IE
         $script = '
@@ -986,7 +986,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             } else {
                 $scriptContent = $script->nodeValue;
                 // Use json_encode to properly escape content for JavaScript string
-                $escapedContent = json_encode($scriptContent);
+                $escapedContent = json_encode($scriptContent, JSON_UNESCAPED_SLASHES);
 
                 $javascript .= "
                 var inlineScript{$key} = document.createTextNode($escapedContent);

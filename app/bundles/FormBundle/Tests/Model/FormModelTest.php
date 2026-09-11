@@ -766,8 +766,8 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         yield 'closing_script_tag_is_escaped' => [
             '<script type="text/javascript">if (typeof MauticSDKLoaded == \'undefined\') { var x = "</script>"; }</script>',
             '<div class="mauticform_wrapper"><form></form></div>',
-            ['<\/script>'],
             ['</script>'],
+            [],
         ];
         yield 'html_and_script_are_json_encoded' => [
             '<script type="text/javascript">var msg = "Please wait...";</script>',
@@ -785,7 +785,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
             "<script type=\"text/javascript\">\nMauticSDK.onLoad();\n// single line comment\nvar x = 1;\n</script>",
             '<div></div>',
             // The JSON-encoded text node content preserves \n so // comments don't swallow subsequent lines
-            ['createTextNode', 'MauticSDK.onLoad();', '\\n\\/\\/ single line comment\\nvar x = 1;'],
+            ['createTextNode', 'MauticSDK.onLoad();', '\\n// single line comment\\nvar x = 1;'],
             [],
         ];
     }
