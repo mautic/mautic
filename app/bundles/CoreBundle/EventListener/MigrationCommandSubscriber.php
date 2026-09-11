@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnInterface;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
+use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -92,7 +93,7 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
 
     private function generatedColumnExistsInSchema(GeneratedColumn $generatedColumn): bool
     {
-        $tableColumns = $this->connection->createSchemaManager()->listTableColumns($generatedColumn->getTableName());
+        $tableColumns = ColumnIntrospector::listColumns($this->connection->createSchemaManager(), $generatedColumn->getTableName());
 
         return isset($tableColumns[$generatedColumn->getColumnName()]);
     }
