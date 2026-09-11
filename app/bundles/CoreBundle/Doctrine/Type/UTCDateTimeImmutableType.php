@@ -12,7 +12,7 @@ final class UTCDateTimeImmutableType extends DateTimeImmutableType
     /**
      * Persist the date in UTC.
      */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
         if ($value instanceof \DateTimeImmutable) {
             $value = $value->setTimezone(new \DateTimeZone('UTC'));
@@ -24,7 +24,7 @@ final class UTCDateTimeImmutableType extends DateTimeImmutableType
     /**
      * Convert the UTC persisted date to the current timezone (determined by date_default_timezone_get()).
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform): ?\DateTimeImmutable
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?\DateTimeImmutable
     {
         $value = parent::convertToPHPValue($value, $platform);
 
