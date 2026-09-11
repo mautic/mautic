@@ -53,7 +53,7 @@
     {% endif %}
 
     {# Add view tracking image #}
-    {% if not preview %}
+    {% if not preview and (trackingEnabled is not defined or trackingEnabled) %}
         <img src="{{ url('mautic_focus_pixel', {'id': focus.id}, true) }}" alt="Mautic Focus" style="display: none;"/>
     {% endif %}
 </div>

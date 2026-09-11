@@ -32,7 +32,7 @@
 {# === MULTI VARIANT === #}
 {% elseif variant == 'multi' %}
 <div class="code-snippet code-snippet--multi" {% if disabled is defined and disabled %}disabled{% endif %}>
-    <pre class="code-snippet__code {{ className|default('') }}" aria-label="{{ ariaLabel|default(copyButtonDescription|default('mautic.core.copy_code_snippet')|trans) }}">{{ innerText|raw }}</pre>
+    <pre class="code-snippet__code {{ className|default('') }}" aria-label="{{ ariaLabel|default(copyButtonDescription|default('mautic.core.copy_code_snippet')|trans) }}">{{ innerText|escape }}</pre>
     {% if hideCopyButton is not defined or not hideCopyButton %}
     {% include '@MauticCore/Helper/button.html.twig' with {
         buttons: [{

@@ -10,7 +10,7 @@
 <div class="mautic-focus mf-{{ style }} {% if placement %}mf-{{ style }}-{{ placement }}{% endif %} {% if animate %}mf-animate{% endif %}">
     <div class="mf-{{ style }}-container">
         <div class="mf-{{ style }}-close">
-            <a href="javascript:void(0)" {% if not preview %}onclick="Mautic.closeFocusModal('{{ style }}')"{% endif %}>x</a>
+            <a href="javascript:void(0)">x</a>
         </div>
         <div class="mf-content">
             {% if htmlMode in ['editor', 'html'] %}
