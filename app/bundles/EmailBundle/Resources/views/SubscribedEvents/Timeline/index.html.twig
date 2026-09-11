@@ -14,14 +14,16 @@
             {% else %}
                 {{ 'mautic.email.timeline.event.failed'|trans }}
             {% endif %}
-        {% elseif item.dateRead is empty %}
-            {{ 'mautic.email.timeline.event.not.read'|trans|purify }}
-        {% else %}
-            {{ ('mautic.email.timeline.event.' ~ event['extra']['type'])|trans({
-                    '%date%': dateToFull(event.timestamp),
-                    '%interval%': dateFormatRange(item.dateSent.diff(event.timestamp)),
-                    '%sent%': dateToFull(item.dateSent),
-            })|purify }}
+        {% elseif event['extra']['type'] == 'read' %}
+            {% if item.dateRead is empty %}
+                {{ 'mautic.email.timeline.event.not.read'|trans|purify }}
+            {% else %}
+                {{ ('mautic.email.timeline.event.' ~ event['extra']['type'])|trans({
+                        '%date%': dateToFull(item.dateRead),
+                        '%interval%': dateFormatRange(item.dateSent.diff(item.dateRead)),
+                        '%sent%': dateToFull(item.dateSent),
+                })|purify }}
+            {% endif %}
         {% endif %}
 
         {% if item.viewedInBrowser is not empty and item.viewedInBrowser %}
