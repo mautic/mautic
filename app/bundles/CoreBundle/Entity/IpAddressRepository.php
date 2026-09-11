@@ -86,7 +86,7 @@ SQL;
         $params = ['limit' => $limit];
         $types  = ['limit' => \PDO::PARAM_INT];
 
-        return $this->_em->getConnection()->executeQuery($sql, $params, $types)->fetchFirstColumn();
+        return $this->getEntityManager()->getConnection()->executeQuery($sql, $params, $types)->fetchFirstColumn();
     }
 
     /**
@@ -102,7 +102,7 @@ SQL;
                 DELETE FROM {$prefix}ip_addresses WHERE {$prefix}ip_addresses.id IN ({$ids});
 SQL;
 
-        return $this->_em->getConnection()->executeStatement($deleteSql);
+        return $this->getEntityManager()->getConnection()->executeStatement($deleteSql);
     }
 
     /**

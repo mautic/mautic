@@ -22,7 +22,7 @@ class AuditLogRepository extends CommonRepository
      */
     public function getAuditLogsCount(Lead $lead, ?array $filters = null)
     {
-        $query = $this->_em->getConnection()->createQueryBuilder()
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'al')
             ->select('count(*)')
             ->where('al.object = \'lead\'')

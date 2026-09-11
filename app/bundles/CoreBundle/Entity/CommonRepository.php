@@ -10,7 +10,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\QueryBuilder;
@@ -141,7 +141,7 @@ class CommonRepository extends ServiceEntityRepository
     public function createFromArray($className, array &$data): object
     {
         $entity        = new $className();
-        $meta          = $this->_em->getClassMetadata($className);
+        $meta          = $this->getEntityManager()->getClassMetadata($className);
         $ormProperties = $this->getBaseColumns($className, true);
 
         foreach ($ormProperties as $property => $dbCol) {
@@ -150,7 +150,7 @@ class CommonRepository extends ServiceEntityRepository
 
                 if ($v && $meta->hasAssociation($property)) {
                     $map = $meta->getAssociationMapping($property);
-                    $v   = $this->_em->getRepository($map['targetEntity'])->find($v);
+                    $v   = $this->getEntityManager()->getRepository($map['targetEntity'])->find($v);
                     if (empty($v)) {
                         throw new \Exception('Associate data not found');
                     }
@@ -182,10 +182,10 @@ class CommonRepository extends ServiceEntityRepository
             $this->deleteEntity($entity, false);
 
             if (0 === ++$i % $batchSize) {
-                $this->_em->flush();
+                $this->getEntityManager()->flush();
             }
         }
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
     }
 
     /**
@@ -196,10 +196,10 @@ class CommonRepository extends ServiceEntityRepository
     public function deleteEntity(object $entity, bool $flush = true): void
     {
         // delete entity
-        $this->_em->remove($entity);
+        $this->getEntityManager()->remove($entity);
 
         if ($flush) {
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
         }
     }
 
@@ -312,7 +312,7 @@ class CommonRepository extends ServiceEntityRepository
                 $baseCols[false][$entityClass] = $metadata->getFieldNames();
 
                 foreach ($metadata->getAssociationMappings() as $field => $association) {
-                    if (in_array($association['type'], [ClassMetadataInfo::ONE_TO_ONE, ClassMetadataInfo::MANY_TO_ONE])) {
+                    if (in_array($association['type'], [ClassMetadata::ONE_TO_ONE, ClassMetadata::MANY_TO_ONE])) {
                         $baseCols[true][$entityClass][]  = $association['joinColumns'][0]['name'];
                         $baseCols[false][$entityClass][] = $field;
                     }
@@ -354,7 +354,7 @@ class CommonRepository extends ServiceEntityRepository
         if (isset($args['qb'])) {
             $q = $args['qb'];
         } else {
-            $q = $this->_em
+            $q = $this->getEntityManager()
                 ->createQueryBuilder()
                 ->select($alias)
                 ->from($this->getEntityName(), $alias, "{$alias}.id");
@@ -632,7 +632,7 @@ class CommonRepository extends ServiceEntityRepository
         $alias    = $this->getTableAlias();
         $metadata = $this->getClassMetadata();
         $table    = $metadata->getTableName();
-        $q        = $this->_em->getConnection()->createQueryBuilder();
+        $q        = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(*)')
             ->from($table, $alias);
@@ -680,7 +680,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     public function getValue($id, $column)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select($this->getTableAlias().'.'.$column)
             ->from($this->getClassMetadata()->getTableName(), $this->getTableAlias())
             ->where($this->getTableAlias().'.id = :id')
@@ -714,14 +714,14 @@ class CommonRepository extends ServiceEntityRepository
      */
     public function getSimpleList(?CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $extraColumns = null, $limit = 0): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $alias = $prefix = $this->getTableAlias();
         if (!empty($prefix)) {
             $prefix .= '.';
         }
 
-        $tableName = $this->_em->getClassMetadata($this->getEntityName())->getTableName();
+        $tableName = $this->getEntityManager()->getClassMetadata($this->getEntityName())->getTableName();
 
         $class      = '\\'.$this->getClassName();
         $reflection = new \ReflectionClass(new $class());
@@ -1292,7 +1292,7 @@ class CommonRepository extends ServiceEntityRepository
         $joinAdded = false;
         foreach ($associations as $property => $association) {
             $subJoinAdded  = false;
-            $targetMetdata = $this->_em->getRepository($association['targetEntity'])->getClassMetadata();
+            $targetMetdata = $this->getEntityManager()->getRepository($association['targetEntity'])->getClassMetadata();
             if ($propertyAllowedJoins = preg_grep('/^'.$property.'\..*/', $allowed)) {
                 foreach ($propertyAllowedJoins as $key => $join) {
                     $propertyAllowedJoins[$key] = str_replace($property.'.', '', $join);

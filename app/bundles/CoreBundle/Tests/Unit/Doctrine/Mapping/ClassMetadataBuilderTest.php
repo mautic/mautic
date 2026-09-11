@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Mapping;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -13,10 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 #[AllowMockObjectsWithoutExpectations]
 final class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&ClassMetadataInfo
-     */
-    private MockObject $classMetadataInfo;
+    private MockObject&ClassMetadata $classMetadata;
 
     private ClassMetadataBuilder $classMetadataBuilder;
 
@@ -24,13 +21,13 @@ final class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->classMetadataInfo    = $this->createMock(ClassMetadataInfo::class);
-        $this->classMetadataBuilder = new ClassMetadataBuilder($this->classMetadataInfo);
+        $this->classMetadata        = $this->createMock(ClassMetadata::class);
+        $this->classMetadataBuilder = new ClassMetadataBuilder($this->classMetadata);
     }
 
     public function testAddNullableFieldWithoutColumnName(): void
     {
-        $this->classMetadataInfo->expects($this->once())
+        $this->classMetadata->expects($this->once())
             ->method('mapField')
             ->with([
                 'fieldName' => 'column_name',
@@ -44,7 +41,7 @@ final class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testAddNullableFieldWithColumnName(): void
     {
-        $this->classMetadataInfo->expects($this->once())
+        $this->classMetadata->expects($this->once())
             ->method('mapField')
             ->with([
                 'fieldName'  => 'columnName',

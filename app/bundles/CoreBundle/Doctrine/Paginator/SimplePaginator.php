@@ -42,7 +42,7 @@ final class SimplePaginator implements \IteratorAggregate, \Countable
     private function fetchCount(): int
     {
         $query = clone $this->query;
-        $query->setFirstResult(null);
+        $query->setFirstResult(0);
         $query->setMaxResults(null);
         $query->setParameters($this->query->getParameters());
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [CountWalker::class]);

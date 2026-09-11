@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ProjectBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -195,7 +195,7 @@ final class ProjectEntityLoaderService
 
             foreach ($metadata->getAssociationMappings() as $association) {
                 if (
-                    ClassMetadataInfo::MANY_TO_MANY === $association['type']
+                    ClassMetadata::MANY_TO_MANY === $association['type']
                     && Project::class === $association['targetEntity']
                 ) {
                     $shortName  = $metadata->getReflectionClass()->getShortName();

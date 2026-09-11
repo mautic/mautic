@@ -6,7 +6,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder as OrmClassMetadataBuilder;
 use Doctrine\ORM\Mapping\Builder\FieldBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
@@ -22,7 +21,7 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
      */
     public const int MAX_VARCHAR_INDEXED_LENGTH = 191;
 
-    public function __construct(ClassMetadataInfo $cm)
+    public function __construct(ClassMetadata $cm)
     {
         parent::__construct($cm);
 
