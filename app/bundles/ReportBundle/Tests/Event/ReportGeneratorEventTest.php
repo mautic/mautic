@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Event;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -253,7 +253,7 @@ final class ReportGeneratorEventTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->queryBuilder->expects($matcher)
-            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher): void {
+            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher): QueryBuilder {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'companies_leads', $parameters[1]);
@@ -266,6 +266,7 @@ final class ReportGeneratorEventTest extends TestCase
                     $this->assertSame(ReportGeneratorEvent::COMPANY_PREFIX, $parameters[2]);
                     $this->assertSame('companies_lead.company_id = '.ReportGeneratorEvent::COMPANY_PREFIX.'.id', $parameters[3]);
                 }
+                    return $this->queryBuilder;
             });
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
     }
