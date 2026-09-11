@@ -41,7 +41,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             $parts[] = $expr->eq($field, $expr->literal(''));
         }
 
-        $event->addExpression(new CompositeExpression(CompositeExpression::TYPE_OR, $parts));
+        $event->addExpression(CompositeExpression::or(...$parts));
         $event->stopPropagation();
     }
 
@@ -61,7 +61,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             $parts[] = $expr->neq($field, $expr->literal(''));
         }
 
-        $event->addExpression(new CompositeExpression(CompositeExpression::TYPE_AND, $parts));
+        $event->addExpression(CompositeExpression::and(...$parts));
         $event->stopPropagation();
     }
 
