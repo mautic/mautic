@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Doctrine\Connection;
 
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Exception;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 
 final class PrimaryReadReplicaConnectionWrapper extends PrimaryReadReplicaConnection
 {
@@ -28,5 +29,19 @@ final class PrimaryReadReplicaConnectionWrapper extends PrimaryReadReplicaConnec
         $params['user']     = $dbParams['user'];
         $params['password'] = $dbParams['password'];
         $this->__construct($params, $this->_driver, $this->_config);
+    }
+
+    /**
+     * Return Mautic's query builder rather than DBAL's.
+     *
+     * DBAL 4 removed the query-part API and made the builder's state private, but Mautic
+     * reads queries back and rewrites them after building - resolving a table name from an
+     * alias, attaching index hints, rewriting join conditions. Returning the tracking
+     * builder from every connection keeps that working wherever createQueryBuilder() is
+     * used, without each call site having to know.
+     */
+    public function createQueryBuilder(): QueryBuilder
+    {
+        return new QueryBuilder($this);
     }
 }
