@@ -3,8 +3,8 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Doctrine\DBAL\Exception;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\EventRepository;

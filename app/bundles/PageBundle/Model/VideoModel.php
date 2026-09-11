@@ -63,7 +63,7 @@ final class VideoModel extends FormModel
      * @param Request $request
      * @param string  $code
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Exception
      */
     public function hitVideo($request, $code = '200'): void

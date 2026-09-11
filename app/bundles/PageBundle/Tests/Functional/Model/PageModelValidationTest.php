@@ -74,7 +74,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     private function createPage(DynamicContent $dynamicContent): Page
     {
@@ -111,7 +111,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     private function createLead(string $companyEmail): Lead
     {
