@@ -759,36 +759,34 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<string, array{string, string, string[], string[]}>
+     * @return \Iterator<string, array{string, string, array<string>, array<string>}>
      */
-    public static function automaticJavascriptProvider(): array
+    public static function automaticJavascriptProvider(): \Iterator
     {
-        return [
-            'closing_script_tag_is_escaped' => [
-                '<script type="text/javascript">if (typeof MauticSDKLoaded == \'undefined\') { var x = "</script>"; }</script>',
-                '<div class="mauticform_wrapper"><form></form></div>',
-                ['<\/script>'],
-                ['</script>'],
-            ],
-            'html_and_script_are_json_encoded' => [
-                '<script type="text/javascript">var msg = "Please wait...";</script>',
-                '<div>"quoted" & \'single\'</div>',
-                ['var html =', 'document.write('],
-                [],
-            ],
-            'external_script_uses_src_attribute' => [
-                '<script type="text/javascript" src="https://example.com/mautic-form.js"></script>',
-                '<div class="mauticform_wrapper"></div>',
-                ["script0.src = 'https://example.com/mautic-form.js'"],
-                ['createTextNode'],
-            ],
-            'inline_script_uses_create_text_node' => [
-                "<script type=\"text/javascript\">\nMauticSDK.onLoad();\n// single line comment\nvar x = 1;\n</script>",
-                '<div></div>',
-                // The JSON-encoded text node content preserves \n so // comments don't swallow subsequent lines
-                ['createTextNode', 'MauticSDK.onLoad();', '\\n\\/\\/ single line comment\\nvar x = 1;'],
-                [],
-            ],
+        yield 'closing_script_tag_is_escaped' => [
+            '<script type="text/javascript">if (typeof MauticSDKLoaded == \'undefined\') { var x = "</script>"; }</script>',
+            '<div class="mauticform_wrapper"><form></form></div>',
+            ['<\/script>'],
+            ['</script>'],
+        ];
+        yield 'html_and_script_are_json_encoded' => [
+            '<script type="text/javascript">var msg = "Please wait...";</script>',
+            '<div>"quoted" & \'single\'</div>',
+            ['var html =', 'document.write('],
+            [],
+        ];
+        yield 'external_script_uses_src_attribute' => [
+            '<script type="text/javascript" src="https://example.com/mautic-form.js"></script>',
+            '<div class="mauticform_wrapper"></div>',
+            ["script0.src = 'https://example.com/mautic-form.js'"],
+            ['createTextNode'],
+        ];
+        yield 'inline_script_uses_create_text_node' => [
+            "<script type=\"text/javascript\">\nMauticSDK.onLoad();\n// single line comment\nvar x = 1;\n</script>",
+            '<div></div>',
+            // The JSON-encoded text node content preserves \n so // comments don't swallow subsequent lines
+            ['createTextNode', 'MauticSDK.onLoad();', '\\n\\/\\/ single line comment\\nvar x = 1;'],
+            [],
         ];
     }
 
@@ -801,7 +799,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         string $formScript,
         string $html,
         array $assertContains,
-        array $assertNotContains
+        array $assertNotContains,
     ): void {
         $form      = new Form();
         $formModel = $this->createFormModelPartialMock();
