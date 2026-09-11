@@ -72,12 +72,12 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($anonymousContact);
         $this->em->flush();
 
-        $existingContactId  = (int) $existingContact->getId();
-        $anonymousContactId = (int) $anonymousContact->getId();
+        $existingContactId  = $existingContact->getId();
+        $anonymousContactId = $anonymousContact->getId();
 
         $this->logoutUser();
 
-        $contactTracker = static::getContainer()->get('mautic.tracker.contact');
+        $contactTracker = self::getContainer()->get('mautic.tracker.contact');
         $this->assertInstanceOf(ContactTracker::class, $contactTracker);
         $contactTracker->setTrackedContact($anonymousContact);
 
