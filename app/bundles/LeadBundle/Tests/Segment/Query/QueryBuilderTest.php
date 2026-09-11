@@ -9,6 +9,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -502,7 +503,7 @@ final class QueryBuilderTest extends TestCase
     private function createConnectionFake(): Connection
     {
         return new class([], $this->createStub(Driver::class)) extends Connection {
-            public function getDatabasePlatform()
+            public function getDatabasePlatform(): AbstractPlatform
             {
                 return new MySQLPlatform();
             }
