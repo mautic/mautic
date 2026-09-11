@@ -122,13 +122,33 @@ final class DoctrineEventsSubscriber
             // Single column indexes that are the leftmost column of another index are obsolete.
             // That leftmost column is available to look up rows.
             // @see https://dev.mysql.com/doc/refman/8.4/en/multiple-column-indexes.html
-            $pk              = $table->getPrimaryKey();
-            $pk_first_column = $this->trimQuotes(strtolower($pk->getColumns()[0]));
+            // DBAL 4: the primary key is a PrimaryKeyConstraint rather than an Index, and
+            // index columns come back as name objects instead of strings.
+            $primaryKey = $table->getPrimaryKeyConstraint();
+
+            if (null === $primaryKey) {
+                continue;
+            }
+
+            $pkFirstColumn = $this->trimQuotes(strtolower(AssetName::fromName($primaryKey->getColumnNames()[0])));
 
             foreach ($table->getIndexes() as $id => $index) {
-                $index_first_column = $this->trimQuotes(strtolower($index->getColumns()[0]));
+                // getIndexes() still returns the primary key under the "primary" key, and
+                // Index::isPrimary() is deprecated, so it is skipped by name - as
+                // InstallBundle's SchemaHelper already does.
+                if ('primary' === strtolower((string) $id)) {
+                    continue;
+                }
 
-                if (!$index->isPrimary() && 1 === count($index->getColumns()) && $index_first_column === $pk_first_column) {
+                $indexedColumns = $index->getIndexedColumns();
+
+                if (1 !== count($indexedColumns)) {
+                    continue;
+                }
+
+                $indexFirstColumn = $this->trimQuotes(strtolower(AssetName::fromName($indexedColumns[0]->getColumnName())));
+
+                if ($indexFirstColumn === $pkFirstColumn) {
                     $table->dropIndex($id);
                 }
             }
