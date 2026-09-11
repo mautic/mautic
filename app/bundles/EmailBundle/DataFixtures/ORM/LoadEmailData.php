@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\LeadBundle\Entity\LeadList;
 
 final class LoadEmailData extends Fixture implements OrderedFixtureInterface
 {
@@ -34,7 +35,7 @@ final class LoadEmailData extends Fixture implements OrderedFixtureInterface
                     $email->{$setter}($val);
                 }
             }
-            $email->addList($this->getReference('lead-list'));
+            $email->addList($this->getReference('lead-list', LeadList::class));
 
             $this->emailRepository->saveEntity($email);
             $this->setReference('email-'.$key, $email);

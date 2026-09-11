@@ -6,6 +6,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -29,7 +30,7 @@ final class LoadUserData extends Fixture implements OrderedFixtureInterface, Fix
         $user->setUsername('admin');
         $user->setEmail('admin@yoursite.com');
         $user->setPassword($this->hasher->hashPassword($user, 'Maut1cR0cks!'));
-        $user->setRole($this->getReference('admin-role'));
+        $user->setRole($this->getReference('admin-role', Role::class));
         $manager->persist($user);
         $manager->flush();
 
@@ -41,7 +42,7 @@ final class LoadUserData extends Fixture implements OrderedFixtureInterface, Fix
         $user->setUsername('sales');
         $user->setEmail('sales@yoursite.com');
         $user->setPassword($this->hasher->hashPassword($user, 'Maut1cR0cks!'));
-        $user->setRole($this->getReference('sales-role'));
+        $user->setRole($this->getReference('sales-role', Role::class));
         $manager->persist($user);
         $manager->flush();
 

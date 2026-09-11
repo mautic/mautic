@@ -5,9 +5,11 @@ namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\UserBundle\Entity\User;
 
 final class LoadSegmentsData extends Fixture implements OrderedFixtureInterface
 {
@@ -146,8 +148,8 @@ final class LoadSegmentsData extends Fixture implements OrderedFixtureInterface
                     ],
                 ],
                 'populate'        => true,
-                'manually_add'    => [$this->getReference('lead-1')->id, $this->getReference('lead-2')->id, $this->getReference('lead-3')->id],
-                'manually_remove' => [$this->getReference('lead-4')->id, $this->getReference('lead-5')->id],
+                'manually_add'    => [$this->getReference('lead-1', Lead::class)->getId(), $this->getReference('lead-2', Lead::class)->getId(), $this->getReference('lead-3', Lead::class)->getId()],
+                'manually_remove' => [$this->getReference('lead-4', Lead::class)->getId(), $this->getReference('lead-5', Lead::class)->getId()],
             ],
             [ // ID 10
                 'name'     => 'Include segment membership with filters',
@@ -1112,7 +1114,7 @@ final class LoadSegmentsData extends Fixture implements OrderedFixtureInterface
      */
     private function createSegment(array $listConfig, ObjectManager $manager): void
     {
-        $adminUser = $this->getReference('admin-user');
+        $adminUser = $this->getReference('admin-user', User::class);
 
         $list = new LeadList();
         $list->setName($listConfig['name']);

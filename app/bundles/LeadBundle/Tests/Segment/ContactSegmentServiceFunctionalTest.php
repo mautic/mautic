@@ -233,14 +233,14 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     private function getReference(string $name): LeadList
     {
         /** @var LeadList $reference */
-        $reference = $this->fixtures->getReference($name);
+        $reference = $this->fixtures->getReference($name, LeadList::class);
 
         return $reference;
     }
 
     public function testSegmentRebuildCommandFailsOnMissingTable(): void
     {
-        $segment = $this->fixtures->getReference('table-name-missing-in-filter');
+        $segment = $this->fixtures->getReference('table-name-missing-in-filter', LeadList::class);
         $this->assertInstanceOf(LeadList::class, $segment);
 
         $this->expectException(TableNotFoundException::class);
@@ -249,7 +249,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     public function testGetNewLeadListLeadsWithLeadIdsLimiter(): void
     {
-        $segment = $this->fixtures->getReference('segment-having-company');
+        $segment = $this->fixtures->getReference('segment-having-company', LeadList::class);
         $this->assertInstanceOf(LeadList::class, $segment);
 
         $this->connection->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads', ['leadlist_id' => $segment->getId()]);

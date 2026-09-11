@@ -5,13 +5,23 @@ namespace Mautic\PageBundle\DataFixtures\ORM;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 
 final class LoadPageHitData extends Fixture implements OrderedFixtureInterface
 {
+    /**
+     * @var array<string, class-string>
+     */
+    private const array REFERENCE_CLASSES = [
+        'page'      => Page::class,
+        'ipAddress' => IpAddress::class,
+    ];
+
     public function __construct(
         private readonly PageRepository $pageRepository,
     ) {
@@ -27,7 +37,7 @@ final class LoadPageHitData extends Fixture implements OrderedFixtureInterface
                 if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['page', 'ipAddress'])) {
-                        $hit->{$setter}($this->getReference($col.'-'.$val));
+                        $hit->{$setter}($this->getReference($col.'-'.$val, self::REFERENCE_CLASSES[$col]));
                     } elseif (in_array($col, ['dateHit', 'dateLeft'])) {
                         $hit->{$setter}(new \DateTime($val));
                     } elseif ('browserLanguages' == $col) {

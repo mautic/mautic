@@ -156,7 +156,7 @@ final class RelativeDateFunctionalTest extends MauticMysqlTestCase
 
         $segmentName = 'segment-with-relative-date-'.$alias;
         /** @var LeadList $segmentRef */
-        $segmentRef      = $this->fixtures->getReference($segmentName);
+        $segmentRef      = $this->fixtures->getReference($segmentName, LeadList::class);
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentRef);
 
         $this->assertEquals(

@@ -7,7 +7,9 @@ namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\SmsBundle\Entity\Sms;
@@ -107,11 +109,11 @@ final class LoadClickData extends Fixture implements OrderedFixtureInterface
     {
         $hit = new Hit();
 
-        $hit->setIpAddress($this->getReference('ipAddress-1'));
+        $hit->setIpAddress($this->getReference('ipAddress-1', IpAddress::class));
         $hit->setUrl('https://mautic.org');
         $hit->setReferer('https://google.com');
         $hit->setUrlTitle('Test Title');
-        $hit->setLead($this->getReference('lead-'.$hitConfig['lead_id']));
+        $hit->setLead($this->getReference('lead-'.$hitConfig['lead_id'], Lead::class));
         $hit->setDateHit($hitConfig['date_hit']);
         $hit->setCode(200);
         $hit->setTrackingId('abc');

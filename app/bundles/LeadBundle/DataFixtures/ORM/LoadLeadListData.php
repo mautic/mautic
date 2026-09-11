@@ -7,6 +7,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\UserBundle\Entity\User;
 
 final class LoadLeadListData extends Fixture implements OrderedFixtureInterface
 {
@@ -17,7 +18,7 @@ final class LoadLeadListData extends Fixture implements OrderedFixtureInterface
 
     public function load(ObjectManager $manager): void
     {
-        $adminUser = $this->getReference('admin-user');
+        $adminUser = $this->getReference('admin-user', User::class);
 
         $list = new LeadList();
         $list->setName('United States');
