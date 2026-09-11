@@ -208,7 +208,6 @@ $container->loadFromExtension('doctrine', [
         ],
     ],
     'orm'  => [
-        'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
         'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
         'dql'                         => [
