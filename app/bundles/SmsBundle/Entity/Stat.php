@@ -17,7 +17,7 @@ class Stat
     public const TABLE_NAME = 'sms_message_stats';
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

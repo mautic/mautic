@@ -17,7 +17,7 @@ class Hit
     public const TABLE_NAME = 'page_hits';
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

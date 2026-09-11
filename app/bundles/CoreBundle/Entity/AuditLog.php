@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class AuditLog
 {
     /**
-     * @var string
+     * @var int|string
      */
     protected $id;
 
@@ -35,7 +35,7 @@ class AuditLog
     protected $object;
 
     /**
-     * @var string
+     * @var int|string
      */
     protected $objectId;
 

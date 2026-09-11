@@ -35,7 +35,7 @@ class Download
     public const TABLE_NAME = 'asset_downloads';
 
     /**
-     * @var string
+     * @var int|string
      */
     #[Groups(['download:read'])]
     private $id;

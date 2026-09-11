@@ -24,7 +24,7 @@ class MessageQueue
     public const PRIORITY_HIGH   = 1;
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

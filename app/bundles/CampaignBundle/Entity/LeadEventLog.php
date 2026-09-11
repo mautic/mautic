@@ -19,7 +19,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     public const TABLE_NAME = 'campaign_lead_event_log';
 
     /**
-     * @var string|null
+     * @var int|string|null
      */
     private $id;
 

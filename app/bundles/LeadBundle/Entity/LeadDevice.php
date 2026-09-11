@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class LeadDevice
 {
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 
