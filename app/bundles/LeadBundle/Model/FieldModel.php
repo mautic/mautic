@@ -188,11 +188,6 @@ class FieldModel extends FormModel
             'group'    => 'social',
             'object'   => 'lead',
         ],
-        'foursquare' => [
-            'listable' => true,
-            'group'    => 'social',
-            'object'   => 'lead',
-        ],
         'instagram' => [
             'listable' => true,
             'group'    => 'social',
@@ -203,12 +198,17 @@ class FieldModel extends FormModel
             'group'    => 'social',
             'object'   => 'lead',
         ],
-        'skype' => [
+        'tiktok' => [
             'listable' => true,
             'group'    => 'social',
             'object'   => 'lead',
         ],
         'twitter' => [
+            'listable' => true,
+            'group'    => 'social',
+            'object'   => 'lead',
+        ],
+        'youtube' => [
             'listable' => true,
             'group'    => 'social',
             'object'   => 'lead',
