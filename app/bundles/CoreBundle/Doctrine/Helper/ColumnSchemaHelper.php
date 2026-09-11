@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -183,7 +182,9 @@ class ColumnSchemaHelper
     public function executeChanges(): void
     {
         // create a table diff
-        $comparator = new Comparator();
+        // DBAL 4's Comparator needs the platform, so it is obtained from the schema
+        // manager rather than constructed directly.
+        $comparator = $this->sm->createComparator();
         $diff       = $comparator->compareTables($this->fromTable, $this->toTable);
 
         if (!$diff->isEmpty()) {
