@@ -9,6 +9,7 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -799,7 +800,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                             $queryBuilder->expr()->in('lla.leadlist_id', ":{$unique}")
                         )
                     );
+                \assert($from instanceof TrackingQueryBuilder);
                 $from = $queryBuilder->getQueryPart('from')[0];
+                \assert($queryBuilder instanceof TrackingQueryBuilder);
                 $queryBuilder->resetQueryPart('from');
                 $queryBuilder->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
 
@@ -1312,6 +1315,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
 
         $this->useDistinctCount = true;
+        \assert($primaryTable instanceof TrackingQueryBuilder);
         if (!preg_match('/"'.preg_quote($primaryTable['alias'], '/').'"/i', json_encode($q->getQueryPart('join')))) {
             $q->{$joinType}(
                 $primaryTable['from_alias'],
@@ -1322,6 +1326,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
         foreach ($tables as $table) {
             $exists = false;
+            \assert($joins instanceof TrackingQueryBuilder);
             $joins  = $q->getQueryPart('join');
 
             if (isset($joins[$table['from_alias']])) {
