@@ -536,7 +536,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.email.graph.pie.ignored.read.failed':
-                    $queryBuilder->resetQueryPart('groupBy');
+                    $queryBuilder->resetGroupBy();
                     $counts = $this->statRepository->getIgnoredReadFailed($queryBuilder);
                     $chart  = new PieChart();
                     $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $counts['read']);
@@ -633,7 +633,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
                     );
                     $this->addDNCTableForEmails($queryBuilder);
-                    $queryBuilder->resetQueryPart('groupBy');
+                    $queryBuilder->resetGroupBy();
                     $counts = $queryBuilder->executeQuery()->fetchAssociative();
                     $chart  = new PieChart();
                     $chart->setDataset(

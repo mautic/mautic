@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -586,7 +587,7 @@ SQL;
             ->executeQuery(
                 $sql,
                 [$contactId],
-                [\PDO::PARAM_INT]
+                [ParameterType::INTEGER]
             )
             ->fetchFirstColumn();
 
@@ -664,7 +665,7 @@ SQL;
                 $sql,
                 [$contactId, $expectedSegmentIds],
                 [
-                    \PDO::PARAM_INT,
+                    ParameterType::INTEGER,
                     ArrayParameterType::INTEGER,
                 ]
             )

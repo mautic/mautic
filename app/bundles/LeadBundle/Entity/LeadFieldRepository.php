@@ -391,7 +391,7 @@ class LeadFieldRepository extends CommonRepository
                         $q->expr()->isNotNull($property)
                 )
             )
-            ->setParameter('lead', $lead, \PDO::PARAM_INT);
+            ->setParameter('lead', $lead, ParameterType::INTEGER);
         $result = $q->executeQuery()->fetchAssociative();
 
         return !empty($result['id']);

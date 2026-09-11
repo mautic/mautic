@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
@@ -185,7 +186,7 @@ final class LeadListRepositoryTest extends TestCase
 SQL;
         $this->connection->expects($this->once())
             ->method('executeQuery')
-            ->with($sql, [$contactId], [\PDO::PARAM_INT])
+            ->with($sql, [$contactId], [ParameterType::INTEGER])
             ->willReturn($this->result);
         $this->result->expects($this->once())
             ->method('fetchFirstColumn')
@@ -211,7 +212,7 @@ SQL;
             ->with(
                 $sql,
                 [$contactId, $expectedSegmentIds],
-                [\PDO::PARAM_INT, ArrayParameterType::INTEGER]
+                [ParameterType::INTEGER, ArrayParameterType::INTEGER]
             )
             ->willReturn($this->result);
 

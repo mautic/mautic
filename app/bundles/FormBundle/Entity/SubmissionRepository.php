@@ -94,8 +94,6 @@ class SubmissionRepository extends CommonRepository
         $this->buildOrderByClause($dq, $args);
         $this->buildLimiterClauses($dq, $args);
 
-        $dq->resetQueryPart('select');
-
         $databasePlatform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
         // Quote reserved keywords in field aliases
         $fieldAliases = array_map($databasePlatform->quoteIdentifier(...), $fieldAliases);
@@ -234,7 +232,6 @@ class SubmissionRepository extends CommonRepository
         $this->buildOrderByClause($dq, $args);
         $this->buildLimiterClauses($dq, $args);
 
-        $dq->resetQueryPart('select');
         $dq->select('s.id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.form_id as formId, s.referer, i.ip_address as ipAddress');
         $results = $dq->executeQuery()->fetchAllAssociative();
 

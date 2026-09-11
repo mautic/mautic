@@ -472,7 +472,7 @@ class EmailRepository extends CommonRepository
      */
     public function getSentReadNotReadCount(QueryBuilder $queryBuilder): array
     {
-        $queryBuilder->resetQueryPart('groupBy');
+        $queryBuilder->resetGroupBy();
         $queryBuilder->resetQueryParts(['join']);
 
         $queryBuilder->select('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count');
