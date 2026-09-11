@@ -111,7 +111,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * @return QueryBuilder
+     * @return TrackingQueryBuilder
      *
      * @throws InvalidReportQueryException
      */

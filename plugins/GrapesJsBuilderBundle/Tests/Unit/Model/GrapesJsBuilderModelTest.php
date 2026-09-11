@@ -77,7 +77,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             ) {
             }
 
-            public function getRepository($entityName): \Doctrine\ORM\EntityRepository
+            public function getRepository(string $entityName): \Doctrine\ORM\EntityRepository
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 
@@ -184,7 +184,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             ) {
             }
 
-            public function getRepository($entityName): \Doctrine\ORM\EntityRepository
+            public function getRepository(string $entityName): \Doctrine\ORM\EntityRepository
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 

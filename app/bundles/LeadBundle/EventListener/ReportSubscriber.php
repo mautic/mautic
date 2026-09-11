@@ -482,7 +482,7 @@ final class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.lead.graph.line.leads':
                     $chart          = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $parametersKeys = array_keys($queryBuilder->getParameters() ?? []);
+                    $parametersKeys = array_keys($queryBuilder->getParameters());
                     $leadListFilter = preg_grep('/leadlistid/', $parametersKeys);
                     $tablePrefix    = $leadListFilter ? 's' : 'l';
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', $tablePrefix);

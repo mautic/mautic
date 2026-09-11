@@ -547,9 +547,6 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
             if (!empty($selectedGraphs)) {
                 $availableGraphs = $this->getGraphData($entity->getSource());
-                if (empty($query)) {
-                    $query = $reportGenerator->getQuery();
-                }
 
                 $eventGraphs                     = [];
                 $defaultGraphOptions             = $options;

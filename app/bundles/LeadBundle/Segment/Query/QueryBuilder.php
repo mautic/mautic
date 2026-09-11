@@ -4,7 +4,9 @@ namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Types\Type;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as BaseQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
@@ -43,13 +45,13 @@ class QueryBuilder extends BaseQueryBuilder
         return $this->_expr;
     }
 
-    public function setParameter(int|string $key, mixed $value, $type = null): static
+    public function setParameter(int|string $key, mixed $value, string|ParameterType|Type|ArrayParameterType|null $type = null): static
     {
         if (is_bool($value)) {
             $value = (int) $value;
         }
 
-        parent::setParameter($key, $value, $type ?? \Doctrine\DBAL\ParameterType::STRING);
+        parent::setParameter($key, $value, $type ?? ParameterType::STRING);
 
         return $this;
     }
@@ -230,8 +232,6 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @return mixed|string
-     *
      * @throws \Doctrine\DBAL\Exception
      */
     public function getDebugOutput(): string|array
