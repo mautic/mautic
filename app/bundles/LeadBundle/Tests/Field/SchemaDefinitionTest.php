@@ -161,7 +161,7 @@ final class SchemaDefinitionTest extends TestCase
                 [
                     'name'    => 'some',
                     'type'    => 'string',
-                    'options' => ['notnull' => false],
+                    'options' => ['notnull' => false, 'length' => SchemaDefinition::DEFAULT_VARCHAR_LENGTH],
                 ],
             ];
         }
