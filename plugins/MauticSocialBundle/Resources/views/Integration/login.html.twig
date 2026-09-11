@@ -137,7 +137,7 @@
 {% endif %}
 {# end: field_helper #}
 
-{% set action = app.request.get('objectAction') %}
+{% set action = app.request.attributes.all()['objectAction'] ?? app.request.query.all()['objectAction'] ?? app.request.request.all()['objectAction'] ?? null %}
 {% set settings = field.properties %}
 
 {% set integrations = [] %}

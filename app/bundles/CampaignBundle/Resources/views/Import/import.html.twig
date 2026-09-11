@@ -17,7 +17,7 @@
             'templateButtons': {'close': true},
             'routeVars': {
                 'close': {
-                    'object': app.request.get('object', 'campaigns'),
+                    'object': app.request.attributes.all()['object'] ?? app.request.query.all()['object'] ?? app.request.request.all()['object'] ?? 'campaigns',
                 },
             },
     }) -}}

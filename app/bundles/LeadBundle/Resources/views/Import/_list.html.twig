@@ -92,7 +92,7 @@
           'page': page,
           'limit': limit,
           'menuLinkId': indexRoute,
-          'baseUrl': path(indexRoute, {'object': app.request.get('object', 'contacts')}),
+          'baseUrl': path(indexRoute, {'object': app.request.attributes.all()['object'] ?? app.request.query.all()['object'] ?? app.request.request.all()['object'] ?? 'contacts'}),
           'sessionVar': sessionVar,
       }) }}
   </div>
