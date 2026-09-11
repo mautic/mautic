@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @template T of object
  */
-abstract class AbstractCommonModel implements MauticModelInterface
+abstract class AbstractCommonModel implements MauticModelInterface, SearchCommandListInterface
 {
     public function __construct(
         protected EntityManagerInterface $em,

@@ -183,7 +183,9 @@
             'tooltip': 'mautic.lead.lead.searchcommand.dnc.description',
             'icon': 'ri-prohibited-line'
         }
-    ]
+    ],
+    'searchScopeHint': searchScopeHint|default(''),
+    'searchScopes': searchScopes|default([]),
 }) -}}
 <div class="btn-group ml-5 sr-only ">
     <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">

@@ -324,6 +324,17 @@ final class DateHelperTest extends TestCase
         $this->assertStringContainsString('December', $result);
     }
 
+    public function testToFullDoesNotMutatePassedDateTimeTimezone(): void
+    {
+        $this->setDefaultLocalTimezone('UTC');
+
+        $dateTime = new \DateTime('2026-12-15 19:00:00', new \DateTimeZone('Europe/Berlin'));
+        $this->helper->toFull($dateTime);
+
+        $this->assertSame('Europe/Berlin', $dateTime->getTimezone()->getName());
+        $this->assertSame('2026-12-15 19:00:00', $dateTime->format('Y-m-d H:i:s'));
+    }
+
     public function testToTextShortWithEmptyDateTime(): void
     {
         $result = $this->helper->toTextShort('');

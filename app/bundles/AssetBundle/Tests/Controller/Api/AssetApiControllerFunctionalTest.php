@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\Controller\Api;
 
+use Mautic\AssetBundle\Tests\RemoteFileServerTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use RemoteFileServerTrait;
+
+    private const LOCAL_IMAGE_PLACEHOLDER = '@local-image@';
+
     protected function setUp(): void
     {
         $this->configParams['allowed_extensions']      = ['txt', 'csv', 'jpg', 'jpeg', 'png', 'pdf'];
@@ -20,7 +25,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['allowed_remote_domains']  = [
                 'first-allowed.tld',
                 'second-allowed.tld',
-                'fastly.picsum.photos',
+                '127.0.0.1',
             ];
         }
 
@@ -77,7 +82,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
     public static function dataCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(): iterable
     {
         yield 'Not in allowed domains' => ['https://some-domain.com/foo.jpg', false];
-        yield 'Is in allowed domains' => ['https://fastly.picsum.photos/id/13/2500/1667.jpg?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s', true];
+        yield 'Is in allowed domains' => [self::LOCAL_IMAGE_PLACEHOLDER, true];
         yield 'Using site URL' => ['https://raw.githubusercontent.com/mautic/mautic/7.x/.github/readme_logo.png', true];
     }
 
@@ -85,6 +90,11 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(string $file, bool $isAllowed): void
     {
         $message = 'remotePath: The remote domain in the URL is not allowed due to security reasons.';
+
+        if (self::LOCAL_IMAGE_PLACEHOLDER === $file) {
+            $file = $this->serveRemoteFile('image.jpg').'?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s';
+        }
+
         $payload = [
             'file'            => $file,
             'storageLocation' => 'remote',

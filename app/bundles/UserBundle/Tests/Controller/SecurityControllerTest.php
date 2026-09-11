@@ -45,4 +45,14 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $loginText = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.user.auth.form.loginbtn', [], 'messages');
         $this->assertStringContainsString($loginText, (string) $clientResponse->getContent());
     }
+
+    public function testLoginPageDoesNotLoadEditorAssets(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/login');
+
+        $this->assertResponseIsSuccessful();
+
+        $clientResponse = (string) $this->client->getResponse()->getContent();
+        $this->assertStringNotContainsString('ckeditor.js', $clientResponse);
+    }
 }

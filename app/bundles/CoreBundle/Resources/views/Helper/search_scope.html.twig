@@ -1,0 +1,83 @@
+{% if searchScopes is defined and searchScopes is not empty %}
+{% set scopeId = scopeId|default(id ~ '-scope') %}
+{% set hasCustomFieldScopes = false %}
+{% for scope in searchScopes %}
+    {% if scope.indent|default(false) and scope.disabled|default(false) is same as(false) %}
+        {% set hasCustomFieldScopes = true %}
+    {% endif %}
+{% endfor %}
+{% set activeScopeLabel = 'mautic.core.search.scope.label'|trans %}
+{% for scope in searchScopes %}
+    {% set scopeCommand = scope.command|default('') %}
+    {% if scope.indent|default(false) or scopeCommand in ['__custom_fields__', '__hint__'] %}
+    {% elseif scope.disabled|default(false) is same as(false) and parsedScope.command|default('') == scopeCommand %}
+        {% set activeScopeLabel = scope.translate|default(true) ? scope.label|trans : scope.label %}
+    {% endif %}
+{% endfor %}
+{% set mobileScopeTooltip = parsedScope.command|default('') is not empty
+    ? 'mautic.core.search.scope.filtering_by'|trans({'%label%': activeScopeLabel})
+    : activeScopeLabel %}
+<div class="search-scope-wrapper">
+    <button
+        type="button"
+        class="btn btn-ghost btn--icon-only btn-nospin search-scope-mobile-trigger{% if parsedScope.command|default('') is not empty %} search-scope-mobile-trigger--active{% endif %}"
+        data-livesearch-scope-trigger-for="{{ id }}"
+        data-toggle="tooltip"
+        data-placement="bottom"
+        data-container="body"
+        title="{{ mobileScopeTooltip|e('html_attr') }}"
+        data-filtering-by="{{ 'mautic.core.search.scope.filtering_by'|trans({'%label%': '__LABEL__'})|e('html_attr') }}"
+        aria-label="{{ 'mautic.core.search.scope.label'|trans }}"
+        aria-haspopup="listbox"
+        aria-expanded="false"
+    >
+        <i class="ri-focus-3-line ri-fw" aria-hidden="true"></i>
+    </button>
+    <div class="search-scope-chosen">
+    <select
+        id="{{ scopeId }}"
+        class="form-control chosen search-scope-select"
+        data-livesearch-scope-for="{{ id }}"
+        data-toggle="searchscope"
+        data-scopes="{{ scopeCommands|default([])|json_encode|e('html_attr') }}"
+        data-initial-search="{{ searchValue|default('')|e('html_attr') }}"
+        aria-label="{{ 'mautic.core.search.scope.label'|trans }}"
+        data-scope-search-placeholder="{{ 'mautic.core.search.scope.placeholder'|trans }}"
+        {% if searchScopeHint is defined and searchScopeHint is not empty %}data-scope-hint="{{ searchScopeHint|trans }}"{% endif %}
+    >
+        {% for scope in searchScopes %}
+            {% set scopeCommand = scope.command|default('') %}
+            {% if scope.indent|default(false) or scopeCommand in ['__custom_fields__', '__hint__'] %}
+                {# custom fields are rendered in their own optgroup below #}
+            {% else %}
+                {% set scopeLabel = scope.translate|default(true) ? scope.label|trans : scope.label %}
+                {% set isSelected = scope.default|default(false) and parsedScope.command|default('') == '' %}
+                {% if not isSelected and scope.disabled|default(false) is same as(false) %}
+                    {% set isSelected = parsedScope.command|default('') == scopeCommand %}
+                {% endif %}
+                <option
+                    value="{{ scopeCommand|escape('html_attr') }}"
+                    {% if scope.disabled|default(false) %}disabled{% endif %}
+                    {% if isSelected %}selected{% endif %}
+                >{{ scopeLabel|search_scope_label }}{% if scope.suffix|default(false) %}{{ scope.suffix }}{% endif %}</option>
+            {% endif %}
+        {% endfor %}
+        {% if hasCustomFieldScopes %}
+            <optgroup label="{{ 'mautic.core.search.scope.custom_fields'|trans }}">
+                {% for scope in searchScopes %}
+                    {% if scope.indent|default(false) and scope.disabled|default(false) is same as(false) %}
+                        {% set scopeCommand = scope.command|default('') %}
+                        {% set scopeLabel = scope.translate|default(true) ? scope.label|trans : scope.label %}
+                        {% set isSelected = parsedScope.command|default('') == scopeCommand %}
+                        <option
+                            value="{{ scopeCommand|escape('html_attr') }}"
+                            {% if isSelected %}selected{% endif %}
+                        >{{ scopeLabel|search_scope_label }}</option>
+                    {% endif %}
+                {% endfor %}
+            </optgroup>
+        {% endif %}
+    </select>
+    </div>
+</div>
+{% endif %}

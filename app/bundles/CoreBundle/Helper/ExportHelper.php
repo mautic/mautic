@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -35,6 +36,7 @@ class ExportHelper
         private readonly FilePathResolver $filePathResolver,
         private readonly ProcessSignalService $processSignalService,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -277,6 +279,13 @@ class ExportHelper
             foreach ($assetList as $assetPath) {
                 if (file_exists($assetPath)) {
                     $zip->addFile($assetPath, 'assets/'.basename($assetPath));
+                } else {
+                    // Surface the gap instead of silently shipping an archive without the
+                    // file — a missing asset here means the export/share ZIP is incomplete.
+                    $this->logger?->warning('Export asset file not found; skipping it in the ZIP archive.', [
+                        'assetPath' => $assetPath,
+                        'zipFilePath' => $zipFilePath,
+                    ]);
                 }
             }
 

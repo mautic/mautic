@@ -145,7 +145,13 @@ final class JumpToActionTest extends MauticMysqlTestCase
         $this->em->persist($jumpTo);
         $this->em->flush();
 
-        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaign->getId()]);
+        $contactId  = $contact->getId();
+        $campaignId = $campaign->getId();
+
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaignId]);
+
+        $this->em->clear();
+        $contact = $this->em->getRepository(Lead::class)->find($contactId);
 
         $eventLogs = $this->getEventLogsForContact($contact);
 
@@ -160,17 +166,13 @@ final class JumpToActionTest extends MauticMysqlTestCase
         }
 
         $this->em->flush();
-        $this->em->detach($eventLog);
-        $this->em->detach($jumpTo);
-        $this->em->detach($eventLog);
-        $this->em->detach($decision);
-        $this->em->detach($addTag);
-        $this->em->detach($campaignMember);
-        $this->em->detach($tag);
+        $this->em->clear();
 
         // Executing the command for the second time should not schedule any new events:
-        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaign->getId()]);
+        $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaignId]);
 
+        // Refresh contact after command
+        $contact   = $this->em->getRepository(Lead::class)->find($contactId);
         $eventLogs = $this->getEventLogsForContact($contact);
 
         $this->assertCount(3, $eventLogs); // This was 6 before the fix.

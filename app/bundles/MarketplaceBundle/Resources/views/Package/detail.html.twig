@@ -35,12 +35,27 @@
          'target'      : '_blank',
          'rel'         : 'noopener noreferrer',
          'data-toggle' : '',
+         'class'       : 'btn btn-tertiary btn-nospin',
      },
      'btnText'   : 'marketplace.package.issue.tracker'|trans,
      'iconClass' : 'ri-question-mark',
      'primary'   : false,
  }}) %}
 {% endif %}
+
+{% set buttons = buttons|merge([{
+    'attr': {
+        'id': 'ratePackage',
+        'href': marketplaceWebsiteUrl ~ '/package/' ~ packageDetail.packageBase.getVendorName() ~ '/' ~ packageDetail.packageBase.getPackageName(),
+        'target': '_blank',
+        'rel': 'noopener noreferrer',
+        'data-toggle': '',
+        'class': 'btn btn-primary btn-nospin',
+    },
+    'btnText': 'mautic.marketplace.rate.package'|trans,
+    'iconClass': 'ri-star-line',
+    'primary': true,
+}]) %}
 
 {% if latestVersion and latestVersion.wiki %}
  {% set buttons = buttons|merge({0:{
@@ -49,6 +64,7 @@
          'target'      : '_blank',
          'rel'         : 'noopener noreferrer',
          'data-toggle' : '',
+         'class'       : 'btn btn-tertiary btn-nospin',
      },
      'btnText'   : 'marketplace.package.wiki'|trans,
      'iconClass' : 'ri-book-line',
@@ -56,7 +72,11 @@
  }}) %}
 {% endif %}
 
-{% if security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and not isInstalled and isComposerEnabled %}
+{% set isResource = packageDetail.packageBase.type == 'mautic-resource' %}
+{% set canInstall = security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) %}
+{% set canRemove = security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_REMOVE_PACKAGES')) %}
+
+{% if canInstall and not isInstalled and (isComposerEnabled or isResource) %}
     {% set installRoute = path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_INSTALL'),
         {
             'vendor' : packageDetail.packageBase.getVendorName(),
@@ -75,7 +95,7 @@
         'primary'   : true,
     }}) %}
 
-{% elseif security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and isComposerEnabled %}
+{% elseif canRemove and isInstalled and (isComposerEnabled or isResource) %}
     {% set removeRoute = path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_REMOVE'),
         {'vendor' : packageDetail.packageBase.getVendorName(),
         'package' : packageDetail.packageBase.getPackageName(),
@@ -134,12 +154,16 @@
                     {
                         type: 'read-only',
                         color: 'warm-gray',
-                        label: packageDetail.packageBase.type == 'theme'
+                        label: packageDetail.packageBase.type == 'mautic-theme'
                             ? 'marketplace.package.type.theme'|trans
-                            : 'marketplace.package.type.plugin'|trans,
-                        icon: packageDetail.packageBase.type == 'theme'
+                            : (packageDetail.packageBase.type == 'mautic-resource'
+                                ? 'marketplace.package.type.resource'|trans
+                                : 'marketplace.package.type.plugin'|trans),
+                        icon: packageDetail.packageBase.type == 'mautic-theme'
                             ? 'ri-paint-brush-line marketplace-icon'
-                            : 'ri-plug-line',
+                            : (packageDetail.packageBase.type == 'mautic-resource'
+                                ? 'ri-folder-download-line'
+                                : 'ri-plug-line'),
                         attributes: {
                             'title': 'marketplace.package.type'|trans,
                             'data-toggle': 'tooltip',
@@ -177,6 +201,67 @@
         'style': 'line'
     } %}
 
+    <div class="panel">
+        <div class="panel-heading">
+            <div class="panel-title">{% trans %}marketplace.package.all.versions{% endtrans %}</div>
+        </div>
+        <table class="table table-hover mb-0">
+            <tr>
+                <th>{% trans %}marketplace.package.version{% endtrans %}</th>
+                <th>{% trans %}marketplace.package.version.release.date{% endtrans %}</th>
+            </tr>
+            {% for version in packageDetail.versions.sortByLatest() %}
+            <tr>
+                <td>
+                    {% if version.isStable() or version.isPreRelease() %}
+                        <a href="{{ packageDetail.packageBase.repository|escape }}/releases/tag/{{ version.version|escape }}" target="_blank" rel="noopener noreferrer" >
+                        {% if version.isStable() %}
+                            <b>{{ version.version|escape }}</b>
+                        {% else %}
+                            {{ version.version|escape }}
+                        {% endif %}
+                        </a>
+                    {% else %}
+                        <i>{{ version.version|escape }}</i>
+                    {% endif %}
+                </td>
+                <td title="{{ dateToText(version.time) }}">
+                    {{ dateToFullConcat(version.time) }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="panel">
+        <div class="panel-heading">
+            <div class="panel-title">{% trans %}marketplace.reviews{% endtrans %}</div>
+        </div>
+        {% for review in packageDetail.reviews %}
+        <div class="row">
+            <div class="col-md-2">
+                <ul class="list-inline pt-lg pl-lg pr-lg">
+                    {% for i in 1..5 %}
+                        <li>
+                            {% if i <= review.rating %}
+                                <i class="ri-star-fill text-warning"></i>
+                            {% else %}
+                                <i class="ri-star-line text-muted"></i>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-10">
+                <blockquote>
+                    <p>{{ review.review }}</p>
+                    <footer>{{ review.username }}</footer>
+                </blockquote>
+            </div>
+        </div>
+        <hr/>
+        {% endfor %}
+    </div>
 </div>
 
 <div class="col-md-3 pb-lg">
@@ -185,7 +270,6 @@
         <div class="panel-heading">
             <h3 class="panel-title">{% trans %}marketplace.package.maintainers{% endtrans %}</h3>
         </div>
-
         {% for maintainer in packageDetail.maintainers %}
         <div class="box-layout">
             <div class="col-xs-3 va-m">

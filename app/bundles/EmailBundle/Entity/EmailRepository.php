@@ -578,6 +578,8 @@ class EmailRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      * @param object                                  $filter
+     *
+     * @return array{0: mixed, 1: array<string, mixed>}
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -590,6 +592,8 @@ class EmailRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      * @param object                                  $filter
+     *
+     * @return array{0: mixed, 1: array<string, mixed>}
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -639,6 +643,16 @@ class EmailRepository extends CommonRepository
                     $filter->string,
                     $filter->not
                 );
+            case $this->translator->trans('mautic.core.searchcommand.name'):
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                $expr            = $q->expr()->like('e.name', ":$unique");
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.email.email.searchcommand.subject'):
+            case $this->translator->trans('mautic.email.email.searchcommand.subject', [], null, 'en_US'):
+                $expr            = $q->expr()->like('e.subject', ":$unique");
+                $returnParameter = true;
+                break;
         }
 
         if ($expr && $filter->not) {
@@ -665,6 +679,8 @@ class EmailRepository extends CommonRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
+            'mautic.core.searchcommand.name',
+            'mautic.email.email.searchcommand.subject',
             'mautic.email.email.searchcommand.isexpired',
             'mautic.email.email.searchcommand.ispending',
             'mautic.core.searchcommand.category',

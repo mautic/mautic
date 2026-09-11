@@ -277,6 +277,19 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function addLeadToCompany($companies, $lead): bool
     {
+        return [] !== $this->addLeadToCompanyReturningAddedIds($companies, $lead);
+    }
+
+    /**
+     * @param array|Company $companies
+     * @param array|Lead    $lead
+     *
+     * @return list<int> IDs of companies the lead was newly added to
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function addLeadToCompanyReturningAddedIds($companies, $lead): array
+    {
         // Primary company name to be persisted to the lead's contact company field
         $companyName        = '';
         $companyLeadAdd     = [];
@@ -327,7 +340,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         $persistCompany = [];
         $dispatchEvents = [];
-        $contactAdded   = false;
         foreach ($companies as $companyId) {
             if (!isset($companyLeadAdd[$companyId])) {
                 // List no longer exists in the DB so continue to the next
@@ -351,7 +363,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $companyLead->setCompany($companyLeadAdd[$companyId]);
             $companyLead->setLead($lead);
             $companyLead->setDateAdded($dateManipulated);
-            $contactAdded     = true;
             $persistCompany[] = $companyLead;
             $dispatchEvents[] = $companyId;
 
@@ -390,7 +401,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         // Clear CompanyLead entities from Doctrine memory
         $this->companyLeadRepository->detachEntities($persistCompany);
 
-        return $contactAdded;
+        return $dispatchEvents;
     }
 
     /**
@@ -774,9 +785,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array<mixed>    $data
      * @param int|string|null $owner
      */
-    public function import(array $fields, array $data, $owner = null, bool $skipIfExists = false): bool
+    public function import(array $fields, array $data, $owner = null, bool $skipIfExists = false, bool $createNew = true): bool
     {
-        $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
+        $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists, $createNew);
 
         if (null === $company) {
             throw new \Exception($this->translator->trans('mautic.lead.import.unique_field_not_exist', [], 'flashes'));
@@ -792,7 +803,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @throws \Exception
      */
-    public function importCompany(array $fields, array $data, $owner = null, $persist = true, $skipIfExists = false): ?Company
+    public function importCompany(array $fields, array $data, $owner = null, $persist = true, $skipIfExists = false, bool $createNew = true): ?Company
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
@@ -801,6 +812,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         $company = $duplicateCompanies[0] ?? new Company();
+
+        if (!$createNew && $company->isNew()) {
+            throw new \Exception($this->translator->trans('mautic.lead.import.creating_companies_disabled'));
+        }
 
         if (!$company->isNew() && !$this->existDataForUpdate($fields, $data)) {
             return $company;

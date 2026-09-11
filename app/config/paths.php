@@ -9,6 +9,16 @@ $paths = [
     'plugins'      => 'plugins',
     'translations' => 'translations',
     'local_config' => '%kernel.project_dir%/config/local.php',
+
+/**
+ * Webroot override for recommended-project installations where the webroot
+ * (docroot/ or public/) is a subdirectory of the project root.
+ * This is automatically detected from composer.json's:
+ *   - extra.mautic-scaffold.locations.web-root (used by mautic/recommended-project)
+ *   - extra.public-dir (Symfony convention)
+ * Set explicitly here or in paths_local.php if auto-detection fails:
+ */
+    // 'local_root' => '%kernel.project_dir%/docroot',
 ];
 
 $root ??= realpath(__DIR__.'/..');

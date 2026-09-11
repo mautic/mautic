@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Field\CustomFieldFindReplace;
 use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
+use Mautic\LeadBundle\Helper\CompanySearchScopeProvider;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -93,7 +94,7 @@ final class CompanyController extends FormController
         ]);
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, CompanySearchScopeProvider $companySearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -174,8 +175,9 @@ final class CompanyController extends FormController
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,
-                    'tmpl'        => $tmpl,
-                    'totalItems'  => $count,
+                    'tmpl'            => $tmpl,
+                    'totalItems'      => $count,
+                    'searchScopes'    => $companySearchScopeProvider->getScopes(),
                 ],
                 'contentTemplate' => '@MauticLead/Company/list.html.twig',
                 'passthroughVars' => [

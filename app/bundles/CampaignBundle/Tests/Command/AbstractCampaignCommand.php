@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
@@ -47,6 +48,8 @@ abstract class AbstractCampaignCommand extends MauticMysqlTestCase
      */
     protected function setUp(): void
     {
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+
         // Everything needs to happen anonymously
         $this->defaultClientServer = $this->clientServer;
         $this->clientServer        = [];
@@ -187,5 +190,18 @@ abstract class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->em->persist($leadEventLog);
 
         return $leadEventLog;
+    }
+
+    /**
+     * Simulate a fully completed condition/decision event log by incrementing the version to 2.
+     * A version=1 log means the event was inserted but execution never completed (stuck mid-execution).
+     * A version=2 log means the event was fully executed and its children may now be considered.
+     */
+    protected function markEventLogAsCompleted(LeadEventLog $log): void
+    {
+        /** @var OptimisticLockServiceInterface $lockService */
+        $lockService = self::getContainer()->get(OptimisticLockServiceInterface::class);
+        $this->em->flush();
+        $lockService->incrementVersion($log);
     }
 }
