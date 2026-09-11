@@ -16,9 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
-        $this->useCleanupRollback = false;
 
         parent::setUp();
     }

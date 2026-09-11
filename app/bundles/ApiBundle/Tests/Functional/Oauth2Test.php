@@ -24,9 +24,10 @@ use Symfony\Component\HttpFoundation\Response;
 #[AllowMockObjectsWithoutExpectations]
 final class Oauth2Test extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
-        $this->useCleanupRollback = false;
 
         parent::setUp();
     }
