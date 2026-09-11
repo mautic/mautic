@@ -323,18 +323,18 @@ Mautic.showConfirmation = function (el, customMessage) {
             }
         })
         .html(confirmText);
-    if (cancelText) {
-        var cancelButton = mQuery('<button type="button" />')
-            .addClass("btn btn-primary")
-            .click(function () {
-                if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
-                    window["Mautic"][cancelCallback].apply('window', [el]);
-                } else {
-                    Mautic.dismissConfirmation();
-                }
-            })
-            .html(cancelText);
-    }
+	    if (cancelText) {
+	        var cancelButton = mQuery('<button type="button" />')
+	            .addClass("btn btn-primary")
+	            .click(function () {
+	                if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
+	                    window["Mautic"][cancelCallback].apply('window', [el]);
+	                } else {
+	                    Mautic.dismissConfirmation();
+	                }
+	            })
+	            .text(cancelText);
+	    }
 
     if (typeof cancelButton != 'undefined') {
         confirmFooterDiv.append(cancelButton);
@@ -452,5 +452,4 @@ Mautic.showModal = function(target) {
 
     mQuery(target).modal('show');
 };
-
 
