@@ -10,6 +10,17 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead as TheLead;
 
+#[ORM\Entity(repositoryClass: TweetStatRepository::class)]
+#[ORM\Table(name: 'tweet_stats')]
+#[ORM\Index(columns: ['tweet_id', 'lead_id'], name: 'stat_tweet_search')]
+#[ORM\Index(columns: ['lead_id', 'tweet_id'], name: 'stat_tweet_search2')]
+#[ORM\Index(columns: ['is_failed'], name: 'stat_tweet_failed_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_tweet_source_search')]
+#[ORM\Index(columns: ['favorite_count'], name: 'favorite_count_index')]
+#[ORM\Index(columns: ['retweet_count'], name: 'retweet_count_index')]
+#[ORM\Index(columns: ['date_sent'], name: 'tweet_date_sent')]
+#[ORM\Index(columns: ['twitter_tweet_id'], name: 'twitter_tweet_id_index')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class TweetStat
 {
     /**
@@ -22,8 +33,11 @@ class TweetStat
      *
      * @var string|null
      */
+    #[ORM\Column(name: 'twitter_tweet_id', type: 'string', length: 191, nullable: true)]
     private $twitterTweetId;
 
+    #[ORM\ManyToOne(targetEntity: Tweet::class, inversedBy: 'stats')]
+    #[ORM\JoinColumn(name: 'tweet_id', onDelete: 'SET NULL')]
     private ?Tweet $tweet = null;
 
     /**
@@ -34,25 +48,31 @@ class TweetStat
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $handle;
 
     /**
      * @var \DateTime|null
      */
+    #[ORM\Column(name: 'date_sent', type: 'datetime', nullable: true)]
     private $dateSent;
 
+    #[ORM\Column(name: 'is_failed', type: 'boolean', nullable: true)]
     private ?bool $isFailed = false;
 
+    #[ORM\Column(name: 'retry_count', type: 'integer', nullable: true)]
     private ?int $retryCount = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     private ?int $favoriteCount = 0;
@@ -68,57 +88,9 @@ class TweetStat
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('tweet_stats')
-            ->setCustomRepositoryClass(TweetStatRepository::class)
-            ->addIndex(['tweet_id', 'lead_id'], 'stat_tweet_search')
-            ->addIndex(['lead_id', 'tweet_id'], 'stat_tweet_search2')
-            ->addIndex(['is_failed'], 'stat_tweet_failed_search')
-            ->addIndex(['source', 'source_id'], 'stat_tweet_source_search')
-            ->addIndex(['favorite_count'], 'favorite_count_index')
-            ->addIndex(['retweet_count'], 'retweet_count_index')
-            ->addIndex(['date_sent'], 'tweet_date_sent')
-            ->addIndex(['twitter_tweet_id'], 'twitter_tweet_id_index');
-
         $builder->addId();
 
-        $builder->createManyToOne('tweet', 'Tweet')
-            ->inversedBy('stats')
-            ->addJoinColumn('tweet_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createField('twitterTweetId', 'string')
-            ->columnName('twitter_tweet_id')
-            ->nullable()
-            ->build();
-
         $builder->addLead(true, 'SET NULL');
-
-        $builder->createField('handle', 'string')
-            ->build();
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isFailed', 'boolean')
-            ->columnName('is_failed')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retryCount', 'integer')
-            ->columnName('retry_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('favoriteCount', 'integer', 'favorite_count');
         $builder->addNullableField('retweetCount', 'integer', 'retweet_count');

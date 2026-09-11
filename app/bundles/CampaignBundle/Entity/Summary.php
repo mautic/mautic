@@ -8,6 +8,10 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: SummaryRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\UniqueConstraint(name: 'campaign_event_date_triggered', columns: ['campaign_id', 'event_id', 'date_triggered'])]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Summary
 {
     public const TABLE_NAME = 'campaign_summary';
@@ -45,8 +49,12 @@ class Summary
     /**
      * @var Event|null
      */
+    #[ORM\ManyToOne(targetEntity: Event::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\JoinColumn(name: 'event_id', nullable: false, onDelete: 'CASCADE')]
     private $event;
 
+    #[ORM\ManyToOne(targetEntity: Campaign::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\JoinColumn(name: 'campaign_id')]
     private ?Campaign $campaign = null;
 
     /**
@@ -58,21 +66,7 @@ class Summary
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(SummaryRepository::class)
-            ->addUniqueConstraint(['campaign_id', 'event_id', 'date_triggered'], 'campaign_event_date_triggered');
-
         $builder->addId();
-
-        $builder->createManyToOne('campaign', Campaign::class)
-            ->addJoinColumn('campaign_id', 'id')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createManyToOne('event', Event::class)
-            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
 
         $builder->addNullableField('dateTriggered', Types::DATETIME_IMMUTABLE, 'date_triggered');
         $builder->addNamedField('scheduledCount', Types::INTEGER, 'scheduled_count');

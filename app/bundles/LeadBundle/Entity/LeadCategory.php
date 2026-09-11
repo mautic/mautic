@@ -34,6 +34,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: LeadCategoryRepository::class)]
+#[ORM\Table(name: 'lead_categories')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadCategory
 {
     /**
@@ -46,6 +49,8 @@ class LeadCategory
      * @var Category
      */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
+    #[ORM\ManyToOne(targetEntity: Category::class)]
+    #[ORM\JoinColumn(name: 'category_id', nullable: false, onDelete: 'CASCADE')]
     private $category;
 
     /**
@@ -64,26 +69,21 @@ class LeadCategory
      * @var bool
      */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
+    #[ORM\Column(name: 'manually_removed', type: 'boolean')]
     private $manuallyRemoved = false;
 
     /**
      * @var bool
      */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
+    #[ORM\Column(name: 'manually_added', type: 'boolean')]
     private $manuallyAdded = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_categories')
-            ->setCustomRepositoryClass(LeadCategoryRepository::class);
-
         $builder->addId();
-
-        $builder->createManyToOne('category', Category::class)
-            ->addJoinColumn('category_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->createManyToOne('lead', Lead::class)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
@@ -91,14 +91,6 @@ class LeadCategory
             ->build();
 
         $builder->addDateAdded();
-
-        $builder->createField('manuallyRemoved', 'boolean')
-            ->columnName('manually_removed')
-            ->build();
-
-        $builder->createField('manuallyAdded', 'boolean')
-            ->columnName('manually_added')
-            ->build();
     }
 
     /**

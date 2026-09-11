@@ -9,35 +9,23 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Ramsey\Uuid\Uuid;
 
+#[ORM\Entity(repositoryClass: EmailReplyRepository::class)]
+#[ORM\Table(name: 'email_stat_replies')]
+#[ORM\Index(columns: ['stat_id', 'message_id'], name: 'email_replies')]
+#[ORM\Index(columns: ['date_replied'], name: 'date_email_replied')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class EmailReply
 {
     private readonly string $id;
 
+    #[ORM\Column(name: 'date_replied', type: 'datetime')]
     private readonly \DateTimeInterface $dateReplied;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('email_stat_replies')
-            ->setCustomRepositoryClass(EmailReplyRepository::class)
-            ->addIndex(['stat_id', 'message_id'], 'email_replies')
-            ->addIndex(['date_replied'], 'date_email_replied');
-
         $builder->addUuid();
-
-        $builder->createManyToOne('stat', Stat::class)
-            ->inversedBy('replies')
-            ->addJoinColumn('stat_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('dateReplied', 'datetime')
-            ->columnName('date_replied')
-            ->build();
-
-        $builder->createField('messageId', 'string')
-            ->columnName('message_id')
-            ->build();
     }
 
     /**
@@ -57,7 +45,10 @@ class EmailReply
     }
 
     public function __construct(
+        #[ORM\ManyToOne(targetEntity: Stat::class, inversedBy: 'replies')]
+        #[ORM\JoinColumn(name: 'stat_id', nullable: false, onDelete: 'CASCADE')]
         private readonly Stat $stat,
+        #[ORM\Column(name: 'message_id', type: 'string', length: 191)]
         private readonly ?string $messageId,
         ?\DateTime $dateReplied = null,
     ) {

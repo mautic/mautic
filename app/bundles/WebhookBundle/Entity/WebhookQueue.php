@@ -9,12 +9,17 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: WebhookQueueRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class WebhookQueue
 {
     public const TABLE_NAME = 'webhook_queue';
 
     private ?string $id = null;
 
+    #[ORM\ManyToOne(targetEntity: Webhook::class)]
+    #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private ?Webhook $webhook = null;
 
     private ?\DateTime $dateAdded = null;
@@ -26,34 +31,23 @@ class WebhookQueue
      */
     private $payloadCompressed;
 
+    #[ORM\ManyToOne(targetEntity: Event::class, inversedBy: 'queues')]
+    #[ORM\JoinColumn(name: 'event_id', nullable: false, onDelete: 'CASCADE')]
     private ?Event $event = null;
 
+    #[ORM\Column(type: Types::SMALLINT, options: ['unsigned' => true, 'default' => 0])]
     private int $retries = 0;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(WebhookQueueRepository::class);
         $builder->addBigIntIdField();
-        $builder->createManyToOne('webhook', 'Webhook')
-            ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
-            ->build();
         $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
         $builder->addNullableField('dateModified', Types::DATETIME_IMMUTABLE, 'date_modified');
         $builder->createField('payloadCompressed', Types::BLOB)
             ->columnName('payload_compressed')
             ->nullable()
             ->length(MySQLPlatform::LENGTH_LIMIT_MEDIUMBLOB)
-            ->build();
-        $builder->createManyToOne('event', 'Event')
-            ->inversedBy('queues')
-            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
-            ->build();
-        $builder->createField('retries', Types::SMALLINT)
-            ->columnName('retries')
-            ->option('unsigned', true)
-            ->option('default', 0)
             ->build();
     }
 

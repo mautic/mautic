@@ -28,6 +28,7 @@ return RectorConfig::configure()
     ->withRules([
         // to be used next on loadMetadata()
         // \Utils\Rector\LoadMetadataToDoctrineAttributeRector::class,
+        // \Utils\Rector\AddDoctrineOrmMappingAliasImportRector::class,
         // LoadMetadataStaticHelperToAttributeRector::class,
         // LoadMetadataMauticHelperToAttributeRector::class
 
