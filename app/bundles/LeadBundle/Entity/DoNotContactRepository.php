@@ -20,7 +20,7 @@ class DoNotContactRepository extends CommonRepository
      *
      * @return DoNotContact[]
      */
-    public function getEntriesByLeadAndChannel(Lead $lead, $channel)
+    public function getEntriesByLeadAndChannel(Lead $lead, $channel): array
     {
         return $this->findBy(['channel' => $channel, 'lead' => $lead]);
     }

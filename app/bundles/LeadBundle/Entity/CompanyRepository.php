@@ -88,10 +88,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return $this->getEntitiesWithCustomFields('company', $args);
     }
 
-    /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function getEntitiesDbalQueryBuilder()
+    public function getEntitiesDbalQueryBuilder(): \Doctrine\DBAL\Query\QueryBuilder
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -347,7 +344,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
-        return ($results) ? $results[0] : null;
+        return ($results !== []) ? $results[0] : null;
     }
 
     public function getCompaniesForContacts(array $contacts): array
@@ -391,7 +388,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getCompaniesByGroup($query, $column): array
+    public function getCompaniesByGroup($query, string $column): array
     {
         $query->select('count(comp.id) as companies, '.$column)
             ->addGroupBy($column)

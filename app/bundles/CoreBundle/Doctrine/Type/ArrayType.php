@@ -94,7 +94,7 @@ final class ArrayType extends Type
         });
 
         try {
-            return unserialize((string) $value);
+            return \Mautic\CoreBundle\Helper\Serializer::decode((string) $value);
         } finally {
             restore_error_handler();
         }

@@ -168,7 +168,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->entityManagerMock->expects($matcher)
-            ->method('getReference')->willReturnCallback(function (string $entityClass, string|int $entityId) use ($matcher, $modifier) {
+            ->method('getReference')->willReturnCallback(function (string $entityClass, string|int $entityId) use ($matcher, $modifier): ?object {
                 $this->assertSame(User::class, $entityClass);
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->createdBy, $entityId);

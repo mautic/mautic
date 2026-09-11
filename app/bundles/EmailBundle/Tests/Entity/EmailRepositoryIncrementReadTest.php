@@ -47,7 +47,7 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
 
         // Assert that the generated SQL matches our expectations
         $expectedSql = 'UPDATE test_emails e SET read_count = read_count + 1 WHERE (e.id = :emailId) AND (e.id NOT IN (SELECT es.email_id FROM test_email_stats es WHERE (es.id = :statId) AND (es.is_read = 1)))';
-        $this->assertEquals($expectedSql, $generatedSql);
+        $this->assertSame($expectedSql, $generatedSql);
     }
 
     public function testIncrementReadWithVariant(): void
@@ -62,7 +62,7 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
 
         // Assert that the generated SQL matches our expectations
         $expectedSql = 'UPDATE test_emails e SET read_count = read_count + 1, variant_read_count = variant_read_count + 1 WHERE (e.id = :emailId) AND (e.id NOT IN (SELECT es.email_id FROM test_email_stats es WHERE (es.id = :statId) AND (es.is_read = 1)))';
-        $this->assertEquals($expectedSql, $generatedSql);
+        $this->assertSame($expectedSql, $generatedSql);
     }
 
     public function testUpCountWithTwoErrors(): void

@@ -18,7 +18,7 @@ class ImportRepository extends CommonRepository
      *
      * @return array
      */
-    public function getGhostImports($ghostDelay = 2, $limit = null)
+    public function getGhostImports($ghostDelay = 2, $limit = null): mixed
     {
         $q = $this->getQueryForStatuses([Import::IN_PROGRESS]);
         $q->select($this->getTableAlias())
@@ -40,7 +40,7 @@ class ImportRepository extends CommonRepository
      *
      * @return array
      */
-    public function getImportsWithStatuses(array $statuses, $limit = null)
+    public function getImportsWithStatuses(array $statuses, $limit = null): mixed
     {
         $q = $this->getQueryForStatuses($statuses);
         $q->select($this->getTableAlias())
@@ -77,7 +77,7 @@ class ImportRepository extends CommonRepository
         return $this->countImportsWithStatuses([Import::IN_PROGRESS]);
     }
 
-    public function getQueryForStatuses($statuses)
+    public function getQueryForStatuses($statuses): \Doctrine\ORM\QueryBuilder
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
 

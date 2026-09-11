@@ -193,7 +193,7 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('id', $id);
             $results = $q->executeQuery()->fetchAllAssociative();
 
-            if (!empty($results)) {
+            if ($results !== []) {
                 unset($results[0]['submission_id']);
                 $entity->setResults($results[0]);
             }
@@ -309,13 +309,11 @@ class SubmissionRepository extends CommonRepository
      * Get list of forms ordered by it's count.
      *
      * @param DbalQueryBuilder $query
-     * @param int              $limit
-     * @param int              $offset
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getTopReferrers($query, $limit = 10, $offset = 0): array
+    public function getTopReferrers($query, ?int $limit = 10, int $offset = 0): array
     {
         $query->select('fs.referer, count(fs.referer) as sessions')
             ->groupBy('fs.referer')
@@ -330,13 +328,11 @@ class SubmissionRepository extends CommonRepository
      * Get list of forms ordered by it's count.
      *
      * @param DbalQueryBuilder $query
-     * @param int              $limit
-     * @param int              $offset
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostSubmitted($query, $limit = 10, $offset = 0, $column = 'fs.id', $as = 'submissions'): array
+    public function getMostSubmitted($query, ?int $limit = 10, int $offset = 0, $column = 'fs.id', $as = 'submissions'): array
     {
         $asSelect = ($as) ? ' as '.$as : '';
 
@@ -509,7 +505,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * @param Form $form
      */
-    public function getSubmissionCounts($form)
+    public function getSubmissionCounts($form): array|false
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->select('COUNT(fs.id) AS `total`, COUNT(DISTINCT (fs.lead_id)) AS `unique`')

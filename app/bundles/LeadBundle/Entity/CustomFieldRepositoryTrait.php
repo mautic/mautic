@@ -66,7 +66,7 @@ trait CustomFieldRepositoryTrait
             }
 
             $result = $statement->fetchAllAssociative();
-            $total  = ($result) ? $result[0]['count'] : 0;
+            $total  = ($result !== []) ? $result[0]['count'] : 0;
         } else {
             $total = $args['count'];
         }
@@ -81,8 +81,6 @@ trait CustomFieldRepositoryTrait
 
             $this->buildOrderByClause($dq, $args);
             $this->buildLimiterClauses($dq, $args);
-
-            \assert($dq instanceof TrackingQueryBuilder);
             $dq->resetQueryPart('select');
             $this->buildSelectClause($dq, $args);
 

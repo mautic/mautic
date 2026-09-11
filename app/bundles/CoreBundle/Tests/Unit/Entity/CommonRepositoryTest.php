@@ -218,7 +218,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
-        \assert($qb instanceof TrackingQueryBuilder);
+        $this->assertInstanceOf(TrackingQueryBuilder::class, $qb);
         $this->assertStringStartsWith('l.user_id IN (', (string) $qb->getQueryPart('where'));
         $parameters = $qb->getParameters();
         $this->assertEquals($matchArgs, array_shift($parameters));

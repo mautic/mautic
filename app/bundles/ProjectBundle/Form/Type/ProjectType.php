@@ -36,7 +36,7 @@ final class ProjectType extends AbstractType
             [
                 'label'                => 'project.menu.index',
                 'class'                => Project::class,
-                'query_builder'        => fn (EntityRepository $er) => $er->createQueryBuilder('p')->orderBy('p.name', 'ASC'),
+                'query_builder'        => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er->createQueryBuilder('p')->orderBy('p.name', 'ASC'),
                 'choice_label'         => 'name',
                 'multiple'             => true,
                 'required'             => false,

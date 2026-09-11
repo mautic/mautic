@@ -38,9 +38,8 @@ trait FilterTrait
 
     /**
      * @param int|null $campaignId
-     * @param string   $fromAlias
      */
-    protected function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't'): void
+    protected function addCampaignFilter(QueryBuilder $q, $campaignId = null, string $fromAlias = 't'): void
     {
         if (null !== $campaignId && intval($campaignId)) {
             $q->innerJoin($fromAlias, '(SELECT DISTINCT event_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId)', 'clel', $fromAlias.'.source_id = clel.event_id AND '.$fromAlias.'.source = "campaign.event" AND '.$fromAlias.'.lead_id = clel.lead_id')
@@ -50,9 +49,8 @@ trait FilterTrait
 
     /**
      * @param int|null $campaignId
-     * @param string   $fromAlias
      */
-    protected function addCampaignFilterForEmailSource(QueryBuilder $q, $campaignId = null, $fromAlias = 't'): void
+    protected function addCampaignFilterForEmailSource(QueryBuilder $q, $campaignId = null, string $fromAlias = 't'): void
     {
         if (null !== $campaignId && intval($campaignId)) {
             $q->innerJoin($fromAlias, '(SELECT DISTINCT channel_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId AND channel = "email")', 'clel', $fromAlias.'.source_id = clel.channel_id AND '.$fromAlias.'.source = "email" AND '.$fromAlias.'.lead_id = clel.lead_id')

@@ -514,11 +514,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                 $choices['lists'] = [];
                 $lists            = $globalOnly ? $this->leadListModel->getGlobalLists() : $this->leadListModel->getUserLists();
 
-                if ($lists) {
-                    foreach ($lists as $list) {
-                        $identifier                    = $useIdsForLists ? $list['id'] : $list['alias'];
-                        $choices['lists'][$identifier] = $list['name'];
-                    }
+                foreach ($lists as $list) {
+                    $identifier                    = $useIdsForLists ? $list['id'] : $list['alias'];
+                    $choices['lists'][$identifier] = $list['name'];
                 }
 
                 // no break
@@ -546,7 +544,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return array
      */
-    public function getCampaignsByForm($form)
+    public function getCampaignsByForm($form): mixed
     {
         $formId = ($form instanceof Form) ? $form->getId() : $form;
 
@@ -635,10 +633,8 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @param Campaign $campaign
      * @param array    $event
-     *
-     * @return mixed
      */
-    public function getCampaignLeads($campaign, $event = null)
+    public function getCampaignLeads($campaign, $event = null): mixed
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;

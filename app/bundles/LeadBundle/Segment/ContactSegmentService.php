@@ -95,14 +95,12 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param int $limit
-     *
      * @return array<int,mixed[]>
      *
      * @throws \Doctrine\DBAL\Exception
      * @throws Exception\SegmentQueryException
      */
-    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000): array
+    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, ?int $limit = 1000): array
     {
         $queryBuilder = $this->getNewLeadListLeadsQueryBuilder($segment, $batchLimiters);
         $queryBuilder->setMaxResults($limit);
@@ -313,11 +311,9 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @return mixed
-     *
      * @throws \Exception
      */
-    private function timedFetch(QueryBuilder $qb, ?int $segmentId)
+    private function timedFetch(QueryBuilder $qb, ?int $segmentId): array|false
     {
         try {
             $start = microtime(true);

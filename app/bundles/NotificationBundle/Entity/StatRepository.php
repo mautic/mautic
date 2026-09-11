@@ -140,7 +140,7 @@ final class StatRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostNotifications($query, $limit = 10, $offset = 0): array
+    public function getMostNotifications($query, ?int $limit = 10, int $offset = 0): array
     {
         $query
             ->setMaxResults($limit)

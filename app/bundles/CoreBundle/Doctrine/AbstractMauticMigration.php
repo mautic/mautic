@@ -207,7 +207,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $table       = $schema->getTable($this->getPrefixedTableName($tableName));
         $idColumn    = $table->getColumn($columnName);
 
-        if (true === $idColumn->getUnsigned()) {
+        if ($idColumn->getUnsigned()) {
             return self::COLUMN_TYPE_UNSIGNED;
         }
 

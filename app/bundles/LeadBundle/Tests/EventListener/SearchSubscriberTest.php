@@ -53,7 +53,7 @@ final class SearchSubscriberTest extends TestCase
                     $primaryTable = $tables[0];
                     unset($tables[0]);
                     $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
-                    \assert($q instanceof TrackingQueryBuilder);
+                    $this->assertInstanceOf(TrackingQueryBuilder::class, $q);
                     $joins    = $q->getQueryPart('join');
                     if (!array_key_exists($primaryTable['alias'], $joins)) {
                         $q->{$joinType}(

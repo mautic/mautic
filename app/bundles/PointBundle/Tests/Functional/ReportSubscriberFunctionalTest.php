@@ -18,12 +18,6 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    protected function setUp(): void
-    {
-
-        parent::setUp();
-    }
-
     public function testContactPointLogReportWithGroup(): void
     {
         $this->createTestContactWithGroupPoints();

@@ -202,7 +202,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
             $lists = $this->leadListModel->getLifeCycleSegments($maxSegmentsToshow, $params['dateFrom'], $params['dateTo'], $canViewOthers, $params['filter']['flag']);
             $items = [];
 
-            if (empty($lists)) {
+            if ($lists === []) {
                 $lists[] = [
                     'leads' => 0,
                     'id'    => 0,

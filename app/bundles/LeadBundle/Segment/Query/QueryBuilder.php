@@ -43,7 +43,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this->_expr;
     }
 
-    public function setParameter($key, $value, $type = null): static
+    public function setParameter(int|string $key, mixed $value, $type = null): static
     {
         if (is_bool($value)) {
             $value = (int) $value;
@@ -108,10 +108,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function setParametersPairs($parameters, $filterParameters)
+    public function setParametersPairs($parameters, $filterParameters): static
     {
         if (!is_array($parameters)) {
             return $this->setParameter($parameters, $filterParameters);
@@ -237,7 +234,7 @@ class QueryBuilder extends BaseQueryBuilder
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getDebugOutput()
+    public function getDebugOutput(): string|array
     {
         $params = $this->getParameters();
         $sql    = $this->getSQL();
@@ -288,7 +285,7 @@ class QueryBuilder extends BaseQueryBuilder
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept). You may not use andWhere in filters!!!
      */
-    public function addLogic($expression, $glue): void
+    public function addLogic(string|\Doctrine\DBAL\Query\Expression\CompositeExpression $expression, $glue): void
     {
         // little setup
         $glue = strtolower($glue);

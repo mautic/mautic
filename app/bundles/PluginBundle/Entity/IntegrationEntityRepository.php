@@ -126,13 +126,13 @@ class IntegrationEntityRepository extends CommonRepository
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
-        return ($results) ? $results[0] : null;
+        return ($results !== []) ? $results[0] : null;
     }
 
     /**
      * @return IntegrationEntity[]
      */
-    public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds)
+    public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds): mixed
     {
         $q = $this->createQueryBuilder('i', 'i.internalEntityId');
 
@@ -404,17 +404,15 @@ class IntegrationEntityRepository extends CommonRepository
     /**
      * @return int
      */
-    public function getIntegrationEntityCount($leadId, $integration = null, $integrationEntity = null, $internalEntity = null)
+    public function getIntegrationEntityCount($leadId, $integration = null, $integrationEntity = null, $internalEntity = null): int|array
     {
         return $this->getIntegrationEntityByLead($leadId, $integration, $integrationEntity, $internalEntity, false);
     }
 
     /**
      * @param int|bool $limit
-     *
-     * @return array|int
      */
-    public function getIntegrationEntityByLead($leadId, $integration = null, $integrationEntity = null, $internalEntity = null, $limit = 100)
+    public function getIntegrationEntityByLead($leadId, $integration = null, $integrationEntity = null, $internalEntity = null, $limit = 100): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');

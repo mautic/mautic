@@ -53,7 +53,7 @@ class LeadRepository extends CommonRepository
      *
      * @return array
      */
-    public function getLeads($campaignId, $eventId = null)
+    public function getLeads($campaignId, $eventId = null): mixed
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Lead::class, 'lc')
@@ -513,7 +513,7 @@ class LeadRepository extends CommonRepository
             ->executeQuery()
             ->fetchAllAssociative();
 
-        if (empty($segmentResults)) {
+        if ($segmentResults === []) {
             // No segments so no contacts
             return [];
         }

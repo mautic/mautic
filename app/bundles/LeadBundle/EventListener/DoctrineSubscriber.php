@@ -60,7 +60,7 @@ final readonly class DoctrineSubscriber
                     }
 
                     if (!empty($field['is_unique']) || !empty($field['is_index'])) {
-                        self::addIndexIfMissing($table, [$columnDef['name']], MAUTIC_TABLE_PREFIX.$field['alias'].'_search');
+                        $this->addIndexIfMissing($table, [$columnDef['name']], MAUTIC_TABLE_PREFIX.$field['alias'].'_search');
                     }
                 }
 
@@ -80,17 +80,17 @@ final readonly class DoctrineSubscriber
                     // Only use three to prevent max key length errors
                     asort($uniqueFields);
                     $uniqueFields = array_slice($uniqueFields, 0, 3);
-                    self::addIndexIfMissing($table, $uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
+                    $this->addIndexIfMissing($table, $uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
                 }
 
                 switch ($object) {
                     case 'lead':
-                        self::addIndexIfMissing($table, ['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
-                        self::addIndexIfMissing($table, ['date_added', 'country'], MAUTIC_TABLE_PREFIX.'date_added_country_index');
+                        $this->addIndexIfMissing($table, ['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
+                        $this->addIndexIfMissing($table, ['date_added', 'country'], MAUTIC_TABLE_PREFIX.'date_added_country_index');
                         break;
                     case 'company':
-                        self::addIndexIfMissing($table, ['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');
-                        self::addIndexIfMissing($table, ['companyname', 'companycity', 'companycountry', 'companystate'], MAUTIC_TABLE_PREFIX.'company_match');
+                        $this->addIndexIfMissing($table, ['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');
+                        $this->addIndexIfMissing($table, ['companyname', 'companycity', 'companycountry', 'companystate'], MAUTIC_TABLE_PREFIX.'company_match');
                         break;
                 }
             }
@@ -110,7 +110,7 @@ final readonly class DoctrineSubscriber
      *
      * @param string[] $columns
      */
-    private static function addIndexIfMissing(Table $table, array $columns, string $name): void
+    private function addIndexIfMissing(Table $table, array $columns, string $name): void
     {
         if ($table->hasIndex($name)) {
             return;

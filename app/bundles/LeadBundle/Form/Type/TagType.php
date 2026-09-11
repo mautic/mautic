@@ -41,7 +41,7 @@ final class TagType extends AbstractType
             [
                 'label'           => 'mautic.lead.tags',
                 'class'           => Tag::class,
-                'query_builder'   => fn (EntityRepository $er) => $er->createQueryBuilder('t')->orderBy('t.tag', Order::Ascending->value),
+                'query_builder'   => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er->createQueryBuilder('t')->orderBy('t.tag', Order::Ascending->value),
                 'choice_label'    => 'tag',
                 'multiple'        => true,
                 'required'        => false,

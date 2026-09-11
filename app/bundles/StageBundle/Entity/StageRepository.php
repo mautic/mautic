@@ -47,7 +47,7 @@ class StageRepository extends CommonRepository
      *
      * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType($type): mixed
     {
         $q = $this->createQueryBuilder('s')
             ->select('partial s.{id, name}')
@@ -188,7 +188,7 @@ class StageRepository extends CommonRepository
      *
      * @return Stage|null
      */
-    public function findByIdOrName($value)
+    public function findByIdOrName($value): mixed
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('s')

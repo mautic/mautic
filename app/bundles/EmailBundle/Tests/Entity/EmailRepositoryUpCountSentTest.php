@@ -58,7 +58,7 @@ final class EmailRepositoryUpCountSentTest extends \PHPUnit\Framework\TestCase
 
         // Assert that the generated SQL matches our expectations
         $expectedSql = 'UPDATE test_emails SET sent_count = sent_count + :increaseBy WHERE id = :id';
-        $this->assertEquals($expectedSql, $generatedSql);
+        $this->assertSame($expectedSql, $generatedSql);
 
         // Assert parameters are properly set up
         $this->assertEquals(11, $this->queryBuilder->getParameter('id'));
@@ -79,7 +79,7 @@ final class EmailRepositoryUpCountSentTest extends \PHPUnit\Framework\TestCase
 
         // Assert that the generated SQL matches our expectations
         $expectedSql = 'UPDATE test_emails SET sent_count = sent_count + :increaseBy, variant_sent_count = variant_sent_count + :increaseBy WHERE id = :id';
-        $this->assertEquals($expectedSql, $generatedSql);
+        $this->assertSame($expectedSql, $generatedSql);
     }
 
     public function testUpCountWithTwoErrors(): void

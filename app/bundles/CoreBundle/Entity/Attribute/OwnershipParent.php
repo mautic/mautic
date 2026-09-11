@@ -17,13 +17,13 @@ namespace Mautic\CoreBundle\Entity\Attribute;
  * entity itself now.
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class OwnershipParent
+final readonly class OwnershipParent
 {
     /**
      * @param string $association name of the association whose target holds the owner/createdBy
      */
     public function __construct(
-        public readonly string $association,
+        public string $association,
     ) {
     }
 }

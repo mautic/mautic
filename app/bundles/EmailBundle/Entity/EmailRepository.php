@@ -389,13 +389,10 @@ class EmailRepository extends CommonRepository
     /**
      * @param string|array<int|string> $search
      * @param int                      $limit
-     * @param int                      $start
      * @param string|null              $emailType
      * @param int|null                 $variantParentId
-     *
-     * @return array
      */
-    public function getEmailList($search = '', $limit = 10, $start = 0, bool $viewOther = false, bool|string|array $topLevel = false, $emailType = null, array $ignoreIds = [], $variantParentId = null)
+    public function getEmailList($search = '', $limit = 10, ?int $start = 0, bool $viewOther = false, bool|string|array $topLevel = false, $emailType = null, array $ignoreIds = [], $variantParentId = null): array
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, subject, name, language}');
@@ -925,7 +922,7 @@ class EmailRepository extends CommonRepository
             ->executeQuery()
             ->fetchFirstColumn();
 
-        if (!$excludedListIds) {
+        if ($excludedListIds === []) {
             return null;
         }
 

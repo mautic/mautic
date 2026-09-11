@@ -130,12 +130,11 @@ final class SegmentContactsLineChartQuery extends ChartQuery
         $this->removedEventLogStats = $this->getDataFromLeadEventLog('removed');
     }
 
-    private function optimizeSearchInLeadEventLog(QueryBuilder $qb): QueryBuilder
+    private function optimizeSearchInLeadEventLog(QueryBuilder $qb): \Mautic\CoreBundle\Doctrine\Query\QueryBuilder
     {
         \assert($qb instanceof TrackingQueryBuilder);
         $fromPart             = $qb->getQueryPart('from');
         $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], MAUTIC_TABLE_PREFIX.LeadEventLog::INDEX_SEARCH);
-        \assert($qb instanceof TrackingQueryBuilder);
         $qb->resetQueryPart('from');
         $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
 

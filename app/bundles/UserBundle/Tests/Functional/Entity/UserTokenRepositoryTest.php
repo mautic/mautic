@@ -39,10 +39,10 @@ final class UserTokenRepositoryTest extends MauticMysqlTestCase
         // The dry run must report the real number of expired tokens, not a constant 1.
         $this->assertSame(3, $this->repository->deleteExpired(true));
         // The dry run must not delete anything.
-        $this->assertSame(4, (int) $this->repository->count([]));
+        $this->assertSame(4, $this->repository->count([]));
         // The real run deletes exactly the expired tokens and returns the same count.
         $this->assertSame(3, $this->repository->deleteExpired(false));
-        $this->assertSame(1, (int) $this->repository->count([]));
+        $this->assertSame(1, $this->repository->count([]));
     }
 
     public function testDeleteExpiredDryRunReturnsZeroWhenNothingExpired(): void

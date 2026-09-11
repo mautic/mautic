@@ -644,7 +644,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             /**
              * @return \ArrayIterator<int,array{label: string, alias: string, isPublished: bool, id: int, object: string, group: string, type: string}>
              */
-            public function getIterator()
+            public function getIterator(): \Traversable
             {
                 return new \ArrayIterator([
                     4 => ['label' => 'Email', 'alias' => 'email', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'email'],

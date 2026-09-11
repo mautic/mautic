@@ -620,12 +620,9 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Get an array of rows from one table using DBAL.
      *
-     * @param int $start
-     * @param int $limit
-     *
      * @return array<string, mixed>
      */
-    public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], ?array $select = null, array $allowedJoins = []): array
+    public function getRows(int $start = 0, ?int $limit = 100, array $order = [], array $where = [], ?array $select = null, array $allowedJoins = []): array
     {
         $alias    = $this->getTableAlias();
         $metadata = $this->getClassMetadata();
@@ -807,10 +804,8 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * Returns entity table name.
-     *
-     * @return string
      */
-    public function getTableName()
+    public function getTableName(): string
     {
         return $this->getClassMetadata()->getTableName();
     }
@@ -1288,10 +1283,8 @@ class CommonRepository extends ServiceEntityRepository
      * but DBAL 4's CompositeExpression requires at least one part.
      *
      * @param array<int, mixed> $parts
-     *
-     * @return mixed
      */
-    protected function createCompositeExpression(QueryBuilder|DbalQueryBuilder $qb, string $type, array $parts)
+    protected function createCompositeExpression(QueryBuilder|DbalQueryBuilder $qb, string $type, array $parts): null|\Doctrine\ORM\Query\Expr\Orx|\Doctrine\ORM\Query\Expr\Andx|\Doctrine\DBAL\Query\Expression\CompositeExpression
     {
         if ([] === $parts) {
             return null;

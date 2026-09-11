@@ -64,14 +64,13 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param int      $limit
      * @param int|null $createdByUserId
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
      */
     public function getSentEmailToContactData(
-        $limit,
+        ?int $limit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $createdByUserId = null,
@@ -555,7 +554,7 @@ class StatRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostEmails($query, $limit = 10, $offset = 0): array
+    public function getMostEmails($query, ?int $limit = 10, int $offset = 0): array
     {
         $query
             ->setMaxResults($limit)
@@ -647,7 +646,7 @@ class StatRepository extends CommonRepository
     /**
      * @return array
      */
-    public function findContactEmailStats($leadId, $emailId)
+    public function findContactEmailStats($leadId, $emailId): mixed
     {
         return $this->createQueryBuilder('s')
             ->where('IDENTITY(s.lead) = :leadId AND IDENTITY(s.email) =  :emailId')

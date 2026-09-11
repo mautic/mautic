@@ -21,7 +21,7 @@ class TableSchemaColumnsCache
     {
         if (!isset($this->cache[$tableName])) {
             $columns                 = ColumnIntrospector::listColumns($this->entityManager->getConnection()->createSchemaManager(), $tableName);
-            $this->cache[$tableName] = $columns ?: [];
+            $this->cache[$tableName] = $columns;
         }
 
         return $this->cache[$tableName];
@@ -34,10 +34,7 @@ class TableSchemaColumnsCache
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCurrentDatabaseName()
+    public function getCurrentDatabaseName(): ?string
     {
         return $this->entityManager->getConnection()->getDatabase();
     }

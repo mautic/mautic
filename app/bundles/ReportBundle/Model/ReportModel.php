@@ -537,7 +537,6 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         \assert($query instanceof TrackingQueryBuilder);
         $parts = $query->getQueryParts();
         $order = $parts['orderBy'];
-        \assert($query instanceof TrackingQueryBuilder);
         $query->resetQueryPart('orderBy');
 
         if (empty($options['ignoreGraphData'])) {
