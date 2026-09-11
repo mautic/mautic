@@ -384,6 +384,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/brynnclaw"><img src="https://avatars.githubusercontent.com/u/261708852?v=4?s=100" width="100px;" alt="Brynn Bendixen"/><br /><sub><b>Brynn Bendixen</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=brynnclaw" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://dadosquebatem.com.br/"><img src="https://avatars.githubusercontent.com/u/152011896?v=4?s=100" width="100px;" alt="Fábio Oliveira"/><br /><sub><b>Fábio Oliveira</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=fabiooliveir" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/peculiaruc"><img src="https://avatars.githubusercontent.com/u/35475543?v=4?s=100" width="100px;" alt="Peculiar C. Umeh"/><br /><sub><b>Peculiar C. Umeh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=peculiaruc" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
