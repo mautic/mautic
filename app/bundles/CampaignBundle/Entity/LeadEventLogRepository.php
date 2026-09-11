@@ -242,12 +242,12 @@ class LeadEventLogRepository extends CommonRepository
         );
 
         $expr = $q->expr()->and(
-            $q->expr()->eq('o.campaign_id', (int) $campaignId)
+            $q->expr()->eq('o.campaign_id', (string) ((int) $campaignId))
         );
 
         if ($eventId) {
             $expr = $expr->with(
-                $q->expr()->eq('o.event_id', $eventId)
+                $q->expr()->eq('o.event_id', (string) ($eventId))
             );
         }
 
@@ -491,7 +491,7 @@ class LeadEventLogRepository extends CommonRepository
             $q->expr()->eq('l.campaign_id', ':campaignId'),
             $q->expr()->eq('l.is_scheduled', ':true'),
             $q->expr()->lte('l.trigger_date', ':now'),
-            $q->expr()->eq('c.is_published', 1)
+            $q->expr()->eq('c.is_published', (string) (1))
         );
 
         $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
@@ -616,7 +616,7 @@ SQL;
             ->set('is_scheduled', 0)
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('is_scheduled', 1),
+                    $qb->expr()->eq('is_scheduled', (string) (1)),
                     $qb->expr()->eq('lead_id', ':contactId'),
                     $qb->expr()->eq('campaign_id', ':campaignId'),
                     $qb->expr()->eq('rotation', ':rotation')

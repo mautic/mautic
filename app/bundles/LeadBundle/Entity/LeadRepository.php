@@ -626,7 +626,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if ($entityId && $entityColumnName) {
             $joinCondition = $joinCondition->with(
-                $qb->expr()->eq("entity.{$entityColumnName}", (int) $entityId)
+                $qb->expr()->eq("entity.{$entityColumnName}", (string) ((int) $entityId))
             );
         }
 
@@ -1285,7 +1285,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $qb->where(
             $qb->expr()->and(
-                $qb->expr()->gt("{$alias}.id", (int) $lastId),
+                $qb->expr()->gt("{$alias}.id", (string) ((int) $lastId)),
                 $qb->expr()->isNotNull("{$alias}.date_identified")
             )
         )

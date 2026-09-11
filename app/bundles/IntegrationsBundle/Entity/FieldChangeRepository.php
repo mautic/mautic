@@ -96,7 +96,7 @@ class FieldChangeRepository extends CommonRepository
 
         if ($afterObjectId) {
             $qb->andWhere(
-                $qb->expr()->gt('f.object_id', (int) $afterObjectId)
+                $qb->expr()->gt('f.object_id', (string) ((int) $afterObjectId))
             );
         }
 

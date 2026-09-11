@@ -169,7 +169,7 @@ class CampaignRepository extends CommonRepository
         if ($id) {
             $q->select('cl.leadlist_id')
                 ->where(
-                    $q->expr()->eq('cl.campaign_id', $id)
+                    $q->expr()->eq('cl.campaign_id', (string) ($id))
                 );
         } else {
             // Retrieve a list of unique IDs that are assigned to a campaign
@@ -354,7 +354,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
@@ -397,7 +397,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
@@ -413,7 +413,7 @@ class CampaignRepository extends CommonRepository
             ->where(
                 $sq->expr()->and(
                     $sq->expr()->eq('e.lead_id', 'cl.lead_id'),
-                    $sq->expr()->eq('e.campaign_id', (int) $campaignId),
+                    $sq->expr()->eq('e.campaign_id', (string) ((int) $campaignId)),
                     $sq->expr()->eq('e.rotation', 'cl.rotation')
                 )
             );
@@ -489,7 +489,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
@@ -630,12 +630,12 @@ class CampaignRepository extends CommonRepository
                         // version = 1 means the job was killed after the DB INSERT but before evaluation —
                         // children must NOT be picked up; the condition/decision itself must be re-executed.
                         $query->expr()->in('parent.event_type', ["'condition'", "'decision'"]),
-                        $query->expr()->gt('log.version', 1),
+                        $query->expr()->gt('log.version', (string) (1)),
                         $query->expr()->or(
                             // "No" path taken
                             $query->expr()->and(
                                 $query->expr()->eq('ce.decision_path', $query->expr()->literal('no')),
-                                $query->expr()->eq('log.non_action_path_taken', 1)
+                                $query->expr()->eq('log.non_action_path_taken', (string) (1))
                             ),
                             // "Yes" path or default path taken
                             $query->expr()->and(
@@ -644,7 +644,7 @@ class CampaignRepository extends CommonRepository
                                     $query->expr()->isNull('ce.decision_path')
                                 ),
                                 $query->expr()->or(
-                                    $query->expr()->eq('log.non_action_path_taken', 0),
+                                    $query->expr()->eq('log.non_action_path_taken', (string) (0)),
                                     $query->expr()->isNull('log.non_action_path_taken')
                                 )
                             )

@@ -30,7 +30,7 @@ class DownloadRepository extends CommonRepository
         $q2->where(
             $q2->expr()->and(
                 $q2->expr()->eq('d.tracking_id', ':id'),
-                $q2->expr()->eq('d.asset_id', $assetId)
+                $q2->expr()->eq('d.asset_id', (string) ($assetId))
             )
         );
 

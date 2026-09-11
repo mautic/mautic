@@ -537,9 +537,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $expr->or(
                     $expr->and(
                         $expr->isNull('comp.owner_id'),
-                        $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
+                        $expr->eq('comp.created_by', (string) ((int) $this->userHelper->getUser()->getId()))
                     ),
-                    $expr->eq('comp.owner_id', (int) $this->userHelper->getUser()->getId())
+                    $expr->eq('comp.owner_id', (string) ((int) $this->userHelper->getUser()->getId()))
                 )
             );
         }
@@ -582,9 +582,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $expr->or(
                             $expr->and(
                                 $expr->isNull('comp.owner_id'),
-                                $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
+                                $expr->eq('comp.created_by', (string) ((int) $this->userHelper->getUser()->getId()))
                             ),
-                            $expr->eq('comp.owner_id', (int) $this->userHelper->getUser()->getId())
+                            $expr->eq('comp.owner_id', (string) ((int) $this->userHelper->getUser()->getId()))
                         )
                     );
                 }

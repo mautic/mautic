@@ -116,7 +116,7 @@ class IntegrationEntityRepository extends CommonRepository
                 $q->expr()->eq('i.integration', ':integration'),
                 $q->expr()->eq('i.internal_entity', ':internalEntity'),
                 $q->expr()->eq('i.integration_entity', ':integrationEntity'),
-                $q->expr()->eq('i.internal_entity_id', (int) $internalEntityId)
+                $q->expr()->eq('i.internal_entity_id', (string) ((int) $internalEntityId))
             )
         )
             ->setParameter('integration', $integration)

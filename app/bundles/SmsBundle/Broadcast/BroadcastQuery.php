@@ -73,7 +73,7 @@ final class BroadcastQuery
             ->where(
                 $statQb->expr()->and(
                     $statQb->expr()->eq('stat.lead_id', 'l.id'),
-                    $statQb->expr()->eq('stat.sms_id', $smsId)
+                    $statQb->expr()->eq('stat.sms_id', (string) ($smsId))
                 )
             );
 

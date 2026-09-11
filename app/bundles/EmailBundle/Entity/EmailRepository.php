@@ -218,8 +218,8 @@ class EmailRepository extends CommonRepository
             $mqQb->andWhere($mqQb->expr()->in('mq.channel_id', ':variantIds'))
                 ->setParameter('variantIds', $variantIds, ArrayParameterType::INTEGER);
         } else {
-            $statQb->andWhere($statQb->expr()->eq('stat.email_id', (int) $emailId));
-            $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int) $emailId));
+            $statQb->andWhere($statQb->expr()->eq('stat.email_id', (string) ((int) $emailId)));
+            $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (string) ((int) $emailId)));
         }
 
         // Only include those who belong to the associated lead lists
@@ -878,7 +878,7 @@ class EmailRepository extends CommonRepository
         return $qb->select('lc.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc')
             ->innerJoin('lc', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.category_id = lc.category_id')
-            ->where($qb->expr()->eq('e.id', $emailId))
+            ->where($qb->expr()->eq('e.id', (string) ($emailId)))
             ->andWhere('lc.manually_removed = 1');
     }
 

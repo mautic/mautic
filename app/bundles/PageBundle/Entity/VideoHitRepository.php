@@ -29,7 +29,7 @@ final class VideoHitRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'video_hits', 'h');
 
         if ($leadId) {
-            $query->where($query->expr()->eq('h.lead_id', (int) $leadId));
+            $query->where($query->expr()->eq('h.lead_id', (string) ((int) $leadId)));
         }
 
         if (isset($options['search']) && $options['search']) {

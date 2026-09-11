@@ -435,7 +435,7 @@ class SubmissionRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('s.form_id', (int) $formId),
+                    $q->expr()->eq('s.form_id', (string) ((int) $formId)),
                     $q->expr()->in('s.id', ':ids')
                 )
             )
