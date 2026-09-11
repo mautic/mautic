@@ -30,7 +30,7 @@ final class LeadListRepositoryTest extends TestCase
     private MockObject $queryBuilderMock;
 
     /**
-     * @var MockObject&Expr
+     * @var MockObject&ExpressionBuilder
      */
     private MockObject $expressionMock;
 

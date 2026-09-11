@@ -36,7 +36,7 @@ class SubmissionRepository extends CommonRepository
             $reservedWords    = $databasePlatform->getReservedKeywordsList();
             foreach ($results as $alias => $value) {
                 if ($reservedWords->isKeyword($alias)) {
-                    $results[$databasePlatform->quoteIdentifier($alias)] = $value;
+                    $results[$databasePlatform->quoteSingleIdentifier($alias)] = $value;
                     unset($results[$alias]);
                 }
             }
@@ -96,7 +96,7 @@ class SubmissionRepository extends CommonRepository
 
         $databasePlatform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
         // Quote reserved keywords in field aliases
-        $fieldAliases = array_map($databasePlatform->quoteIdentifier(...), $fieldAliases);
+        $fieldAliases = array_map($databasePlatform->quoteSingleIdentifier(...), $fieldAliases);
 
         $fieldAliasSql = ([] !== $fieldAliases) ? ', r.'.implode(',r.', $fieldAliases) : '';
         $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
