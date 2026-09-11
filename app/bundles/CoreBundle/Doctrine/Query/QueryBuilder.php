@@ -344,7 +344,7 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @param array<string, true> $knownAliases
+     * @param array<array-key, true> $knownAliases
      */
     protected function getSQLForJoins(string $fromAlias, array &$knownAliases): string
     {
@@ -376,7 +376,7 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @param array<string, true> $knownAliases
+     * @param array<array-key, true> $knownAliases
      */
     protected function verifyAllAliasesAreKnown(array $knownAliases): void
     {
@@ -420,7 +420,7 @@ class QueryBuilder extends BaseQueryBuilder
 
 
     /**
-     * @param string[] $knownAliases
+     * @param list<array-key> $knownAliases
      */
     protected function nonUniqueAliasException(string $alias, array $knownAliases): \Throwable
     {
@@ -432,7 +432,7 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @param string[] $knownAliases
+     * @param list<array-key> $knownAliases
      */
     protected function unknownAliasException(string $alias, array $knownAliases): \Throwable
     {
