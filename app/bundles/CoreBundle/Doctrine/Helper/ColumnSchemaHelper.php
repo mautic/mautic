@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 
@@ -87,7 +88,10 @@ class ColumnSchemaHelper
     public function getColumns()
     {
         if (empty($this->columns)) {
-            $this->columns = $this->toTable->getColumns();
+            // DBAL 4 hands the columns back as a list, and they are looked up by name here
+            foreach ($this->toTable->getColumns() as $column) {
+                $this->columns[AssetName::of($column)] = $column;
+            }
         }
 
         return $this->columns;
