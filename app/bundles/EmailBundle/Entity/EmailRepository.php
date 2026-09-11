@@ -794,7 +794,7 @@ class EmailRepository extends CommonRepository
             ->where('es.id = :statId')
             ->andWhere('es.is_read = 1');
 
-        $q->update(MAUTIC_TABLE_PREFIX.'emails', 'e')
+        $q->update(MAUTIC_TABLE_PREFIX.'emails e')
             ->set('read_count', 'read_count + 1')
             ->where(
                 $q->expr()->and(

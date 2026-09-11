@@ -5,7 +5,7 @@ namespace Mautic\InstallBundle\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
@@ -84,7 +84,7 @@ final class SchemaHelper
     public function createDatabase(): bool
     {
         try {
-            $this->db->connect();
+            $this->db->getNativeConnection();
         } catch (\Exception) {
             // it failed to connect so remove the dbname and try to create it
             $dbName                   = $this->dbParams['dbname'];
@@ -146,7 +146,7 @@ final class SchemaHelper
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        $isSqlite = $this->entityManager->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
+        $isSqlite = $this->entityManager->getConnection()->getDatabasePlatform() instanceof SQLitePlatform;
         $sql      = $isSqlite ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
@@ -232,7 +232,7 @@ final class SchemaHelper
             }
 
             foreach ($restraints as $restraint) {
-                $sql[] = $this->platform->getDropForeignKeySQL($restraint, $t);
+                $sql[] = $this->platform->getDropForeignKeySQL(self::constraintName($restraint), $t);
             }
         }
 
@@ -288,7 +288,7 @@ final class SchemaHelper
                     $or->getLocalColumns(),
                     $foreignTableName,
                     $or->getForeignColumns(),
-                    $backupPrefix.AssetName::of($or),
+                    $backupPrefix.self::constraintName($or),
                     $or->getOptions()
                 );
                 $sql[] = $this->platform->getCreateForeignKeySQL($r, $table);
@@ -335,5 +335,16 @@ final class SchemaHelper
         }
 
         return $this->schemaManager = $this->db->createSchemaManager();
+    }
+
+    /**
+     * A foreign key's name is optional in DBAL 4, so it is read through the nullable
+     * getObjectName() rather than AssetName::of(), which expects an always-named object.
+     */
+    private static function constraintName(ForeignKeyConstraint $constraint): string
+    {
+        $name = $constraint->getObjectName();
+
+        return null === $name ? '' : AssetName::fromName($name);
     }
 }
