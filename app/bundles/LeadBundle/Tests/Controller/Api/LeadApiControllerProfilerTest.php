@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
-use Doctrine\Common\Cache\CacheProvider;
+use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -35,10 +35,8 @@ final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
         // reset result cache if any
         $cache = $this->em->getConfiguration()->getResultCache();
 
-        if ($cache instanceof CacheProvider) {
-            $cache = clone $cache;
-            $cache->setNamespace('leadCount');
-            $cache->deleteAll();
+        if (null !== $cache) {
+            ResultCacheHelper::getNamespacedCache($cache, 'leadCount')->clear();
         }
 
         for ($i = 0; $i < 11; ++$i) {
