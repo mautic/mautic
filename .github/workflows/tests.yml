@@ -120,6 +120,17 @@ jobs:
           php -d zend.assertions=1 vendor/bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
         fi
 
+    - name: Doctrine mapping validation
+      # Validates the Doctrine mapping metadata against the running database service.
+      # --skip-sync skips the schema diff, so only the mapping is checked.
+      if: ${{ matrix.php-versions == '8.4' && matrix.db-types == 'mariadb:10.11' }}
+      env:
+        APP_ENV: test
+        MAUTIC_ENV: test
+        DB_PORT: ${{ job.services.database.ports[3306] }}
+      run: |
+        bin/console doctrine:schema:validate --skip-sync
+
     - name: Upload coverage report
       if: ${{ env.COVERAGE == 'true' }}
       uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
