@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine;
 
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
@@ -215,5 +218,25 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $table = $schema->getTable($this->getPrefixedTableName($tableName));
 
         return Type::getTypeRegistry()->lookupName($table->getColumn($columnName)->getType());
+    }
+
+    /**
+     * Declare a table's primary key.
+     *
+     * DBAL 4 deprecated Table::setPrimaryKey() in favour of addPrimaryKeyConstraint(),
+     * which takes name objects rather than column-name strings. This keeps the call sites
+     * in migrations reading the way they did.
+     *
+     * @param non-empty-list<string> $columnNames
+     */
+    protected function setPrimaryKey(Table $table, array $columnNames): void
+    {
+        $table->addPrimaryKeyConstraint(
+            new PrimaryKeyConstraint(
+                null,
+                array_map(UnqualifiedName::unquoted(...), $columnNames),
+                false
+            )
+        );
     }
 }
