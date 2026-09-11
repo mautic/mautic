@@ -208,7 +208,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
         $builder->createManyToOne('role', 'Role')
             ->inversedBy('users')
-            ->cascadeMerge()
             ->addJoinColumn('role_id', 'id', false)
             ->build();
 
