@@ -72,10 +72,10 @@ final class SchemaHelper
             unset($dbParams['dbname']);
             $db = DriverManager::getConnection($dbParams);
 
-            $db->connect();
+            $db->getNativeConnection();
             $db->close();
         } else {
-            $this->db->connect();
+            $this->db->getNativeConnection();
             $this->db->close();
         }
     }
@@ -262,12 +262,12 @@ final class SchemaHelper
                 );
 
                 $newIndexes[] = $newIndex;
-                $sql[]        = $this->platform->getDropIndexSQL($oldIndex, $t);
+                $sql[]        = $this->platform->getDropIndexSQL($oldIndex->getName(), $t);
             }
 
             // rename table
-            $queries = $this->platform->getRenameTableSQL($t, $backup);
-            $sql     = array_merge($sql, $queries);
+            // DBAL 4 returns a single statement here rather than a list of them
+            $sql[] = $this->platform->getRenameTableSQL($t, $backup);
 
             // create new index
             if (!empty($newIndexes)) {

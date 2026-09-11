@@ -27,7 +27,7 @@ final class Version20250618122722 extends PreUpAssertionMigration
         $table = $schema->createTable($this->prefix.'dynamic_content_projects_xref');
         $table->addColumn('dynamic_content_id', 'integer', ['unsigned' => 'UNSIGNED' === $targetIdDataType, 'notnull' => true]);
         $table->addColumn('project_id', 'integer', ['unsigned' => 'UNSIGNED' === $projectIdDataType, 'notnull' => true]);
-        $table->setPrimaryKey(['dynamic_content_id', 'project_id']);
+        $this->setPrimaryKey($table, ['dynamic_content_id', 'project_id']);
         $table->addForeignKeyConstraint($this->prefix.'dynamic_content', ['dynamic_content_id'], ['id'], ['onDelete' => 'CASCADE']);
         $table->addForeignKeyConstraint($this->prefix.'projects', ['project_id'], ['id'], ['onDelete' => 'CASCADE']);
     }

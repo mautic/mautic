@@ -27,7 +27,7 @@ final class Version20250425125026 extends PreUpAssertionMigration
         $table = $schema->createTable($this->prefix.'email_projects_xref');
         $table->addColumn('email_id', 'integer', ['unsigned' => 'UNSIGNED' === $targetIdDataType, 'notnull' => true]);
         $table->addColumn('project_id', 'integer', ['unsigned' => 'UNSIGNED' === $projectIdDataType, 'notnull' => true]);
-        $table->setPrimaryKey(['email_id', 'project_id']);
+        $this->setPrimaryKey($table, ['email_id', 'project_id']);
         $table->addForeignKeyConstraint($this->prefix.'emails', ['email_id'], ['id'], ['onDelete' => 'CASCADE']);
         $table->addForeignKeyConstraint($this->prefix.'projects', ['project_id'], ['id'], ['onDelete' => 'CASCADE']);
     }
