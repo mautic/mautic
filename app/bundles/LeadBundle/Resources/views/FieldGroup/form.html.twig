@@ -1,0 +1,37 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}leadfieldgroup{% endblock %}
+
+{% block headerTitle %}
+    {% if entity.id %}
+        {{ 'mautic.lead.field_group.menu.edit'|trans }}
+    {% else %}
+        {{ 'mautic.lead.field_group.menu.new'|trans }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <!-- start: box layout -->
+    <div class="box-layout">
+        <!-- container -->
+        <div class="col-md-9 height-auto bdr-r">
+            <div class="pa-md">
+                {{ form_row(form.name) }}
+                {{ form_row(form.order) }}
+                {% if entity.alias %}
+                    <div class="form-group">
+                        <div class="control-label">{{ 'mautic.lead.field.alias'|trans }}</div>
+                        <div class="input-group">
+                            <span class="form-control-static"><code>{{ entity.alias }}</code></span>
+                        </div>
+                        <span class="help-block">{{ 'mautic.lead.field_group.alias.help'|trans }}</span>
+                    </div>
+                {% endif %}
+                {{ form_row(form.description) }}
+            </div>
+        </div>
+    </div>
+    <!-- end: box layout -->
+    {{ form_end(form) }}
+{% endblock %}

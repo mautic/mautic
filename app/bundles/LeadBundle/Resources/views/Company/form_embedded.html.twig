@@ -10,14 +10,14 @@
             {% for g in groups %}
                 {% if fields[g] is not empty %}
                     <li class="{% if loop.first %}active{% endif %}">
-                        <a href="#company-{{ g }}" class="steps" data-toggle="tab">{{ ('mautic.lead.field.group.'~g)|trans }}</a>
+                        <a href="#company-{{ g }}" class="steps" data-toggle="tab">{{ translatedGroups[g] ?? ('mautic.lead.field.group.'~g)|trans }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
         </ul>
     </div>
     <div class="tab-content pa-md">
-        {{ include('@MauticLead/Company/form_fields.html.twig', {'form': form, 'groups': groups, 'fields': fields, 'embedded': true}) }}
+        {{ include('@MauticLead/Company/form_fields.html.twig', {'form': form, 'groups': groups, 'fields': fields, 'embedded': true, 'translatedGroups': translatedGroups ?? {}}) }}
     </div>
     </div>
 {{ form_end(form) }}

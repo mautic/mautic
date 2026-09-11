@@ -47,6 +47,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\FieldGroupModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -402,7 +403,7 @@ final class LeadController extends FormController
     /**
      * Loads a specific lead into the detailed panel.
      */
-    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId): Response
+    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, FieldGroupModel $fieldGroupModel, $objectId): Response
     {
         $lead = $this->leadModel->getEntity($objectId);
 
@@ -471,7 +472,7 @@ final class LeadController extends FormController
             $this->throwAccessDenied();
         }
 
-        $fields            = $lead->getFields();
+        $fields            = $fieldGroupModel->sortGroupedFields($lead->getFields(), 'lead');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
@@ -523,6 +524,7 @@ final class LeadController extends FormController
                     'doNotContact'           => end($dnc),
                     'doNotContactSms'        => end($dncSms),
                     'pointGroups'            => $pointGroupModel->getEntities(),
+                    'translatedGroups'       => $fieldGroupModel->getTranslatedGroups('lead'),
                     'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('lead:export:enable', 'MATCH_ONE'),
                     'returnUrl'              => $returnUrl,
                     // 'leadNotes'         => $this->forward(
@@ -880,7 +882,7 @@ final class LeadController extends FormController
                 'viewParameters' => [
                     'form'   => $form->createView(),
                     'lead'   => $lead,
-                    'fields' => $lead->getFields(), // pass in the lead fields as they are already organized by ['group']['alias']
+                    'fields' => $lead->getFields(), // already organized by ['group']['alias']
                 ],
                 'contentTemplate' => '@MauticLead/Lead/form.html.twig',
                 'passthroughVars' => [

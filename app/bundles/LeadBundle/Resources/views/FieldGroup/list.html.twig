@@ -1,0 +1,141 @@
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% block mauticContent %}leadfieldgroup{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.lead.field_group.header.index'|trans }}{% endblock %}
+
+{% set canCreate = isAdmin ?? (permissions['admin:full:create'] ?? false) %}
+{% set canEdit   = isAdmin ?? (permissions['admin:full:edit']   ?? false) %}
+{% set canDelete = isAdmin ?? (permissions['admin:full:delete'] ?? false) %}
+
+{% block content %}
+    <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+            'searchValue': searchValue,
+            'action': currentRoute,
+            'page_actions': {
+                'templateButtons': {
+                    'new': canCreate
+                },
+                'routeBase': 'lead_field_group',
+                'langVar': 'lead.field_group'
+            },
+            'bulk_actions': {
+                'langVar': 'lead.field_group',
+                'routeBase': 'lead_field_group',
+                'templateButtons': {
+                    'delete': canDelete,
+                },
+            },
+        }) -}}
+        <div class="page-list">
+            {% if items is defined and items is not empty %}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="fieldGroupTable">
+                        <thead>
+                        <tr>
+                            {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                                'checkall': 'true',
+                                'target': '#fieldGroupTable',
+                            }) }}
+                            {{ include(
+                                '@MauticCore/Helper/tableheader.html.twig',
+                                {
+                                    'sessionVar': 'lead.field_group',
+                                    'orderBy'   : 'fg.name',
+                                    'text'      : 'mautic.core.name',
+                                    'class'     : 'col-fieldgroup-name',
+                                    'default'   : true,
+                                }
+                            ) }}
+                            <th class="col-fieldgroup-alias visible-md visible-lg" scope="col">
+                                <span>{{ 'mautic.lead.field_group.header.alias'|trans }}</span>
+                            </th>
+                            <th class="col-fieldgroup-count visible-md visible-lg text-center" scope="col">
+                                <span>{{ 'mautic.lead.field_group.header.field_count'|trans }}</span>
+                            </th>
+                            {{ include(
+                                '@MauticCore/Helper/tableheader.html.twig',
+                                {
+                                    'sessionVar' : 'lead.field_group',
+                                    'orderBy'    : 'fg.id',
+                                    'text'       : 'mautic.core.id',
+                                    'class'      : 'visible-md visible-lg col-fieldgroup-id',
+                                }
+                            ) }}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>
+                                    {{- include('@MauticCore/Helper/list_actions.html.twig', {
+                                        item: item,
+                                        templateButtons: {
+                                            edit: canEdit,
+                                            delete: canDelete,
+                                        },
+                                        routeBase: 'lead_field_group',
+                                        langVar: 'lead.field_group',
+                                    }) -}}
+                                </td>
+                                <td>
+                                    {% if canEdit %}
+                                        <a href="{{ path('mautic_lead_field_group_action', {
+                                            objectAction: 'edit',
+                                            objectId: item.getId()
+                                        }) }}" data-toggle="ajax">
+                                            {{ item.getName() }}
+                                        </a>
+                                    {% else %}
+                                        {{ item.getName() }}
+                                    {% endif %}
+                                    {% set description = item.getDescription() %}
+                                    {{ include('@MauticCore/Helper/description--inline.html.twig', {
+                                        'description': description
+                                    }) }}
+                                </td>
+                                <td class="visible-md visible-lg">
+                                    <code>{{ item.getAlias() }}</code>
+                                </td>
+                                <td class="visible-md visible-lg text-center">
+                                    {{ fieldCounts[item.getAlias()] ?? 0 }}
+                                </td>
+                                <td class="visible-md visible-lg">{{ item.getId() }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="panel-footer">
+                        {{- include('@MauticCore/Helper/pagination.html.twig', {
+                            'totalItems' : totalItems,
+                            'page'       : page,
+                            'limit'      : limit,
+                            'baseUrl'    : path('mautic_lead_field_group_index'),
+                            'sessionVar' : 'lead.field_group',
+                        }) -}}
+                    </div>
+                </div>
+            {% else %}
+                {% if searchValue is not empty %}
+                    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+                {% else %}
+                    <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
+                        <div class="mb-md">
+                            {{ include('@MauticCore/Components/pictogram.html.twig', {
+                                'pictogram': 'filter-and-group-data',
+                                'size': '80'
+                            }) }}
+                        </div>
+                        {{ include('@MauticCore/Components/content-block.html.twig', {
+                            heading: 'mautic.lead.field_group.onboarding.heading',
+                            subheading: 'mautic.lead.field_group.onboarding.subheading',
+                            copy: 'mautic.lead.field_group.onboarding.copy',
+                        }) }}
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
