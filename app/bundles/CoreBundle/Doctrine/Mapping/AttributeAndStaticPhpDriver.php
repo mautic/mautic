@@ -29,9 +29,9 @@ final readonly class AttributeAndStaticPhpDriver implements MappingDriver
     public function loadMetadataForClass(string $className, ClassMetadata $metadata): void
     {
         // Attributes first so that any leftover loadMetadata() calls can still add or override.
-        // if (!$this->attributeDriver->isTransient($className)) {
+        if (!$this->attributeDriver->isTransient($className)) {
             $this->attributeDriver->loadMetadataForClass($className, $metadata);
-        //}
+        }
 
         if (method_exists($className, 'loadMetadata')) {
             $className::loadMetadata($metadata);
