@@ -65,6 +65,10 @@ trait RepositoryConfiguratorTrait
 
     private function configureMocks(string $entityClass): void
     {
+        // ORM 3 declares ClassMetadata::$name as a typed property and EntityRepository reads
+        // it on construction, so a mock leaves it uninitialised unless it is set here.
+        $this->classMetadata->name = $entityClass;
+
         // these are stubs on purpose - repositories may or may not resolve metadata, so no invocation count can be expected
         $this->managerRegistry->method('getManagerForClass')->willReturn($this->entityManager);
         $this->entityManager->method('getClassMetadata')->willReturn($this->classMetadata);
