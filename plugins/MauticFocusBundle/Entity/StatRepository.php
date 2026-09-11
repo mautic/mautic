@@ -134,7 +134,7 @@ class StatRepository extends CommonRepository
         $q->where($q->expr()->eq('s.type', ':type'));
 
         if ($leadId) {
-            $q->andWhere($q->expr()->eq('s.lead_id', (int) $leadId));
+            $q->andWhere($q->expr()->eq('s.lead_id', (string) ((int) $leadId)));
         }
 
         $q->setParameter('type', $type);

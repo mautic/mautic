@@ -579,7 +579,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $q->select('id, companyname, companycity, companystate')
             ->from(MAUTIC_TABLE_PREFIX.Company::TABLE_NAME)
-            ->where($q->expr()->eq('is_published', true))
+            ->where($q->expr()->eq('is_published', (string) (true)))
             ->andWhere($q->expr()->like('companyname', ':filterVar'))
             ->setParameter('filterVar', '%'.$filterVal.'%')
             ->andWhere($q->expr()->isNull('deleted'))

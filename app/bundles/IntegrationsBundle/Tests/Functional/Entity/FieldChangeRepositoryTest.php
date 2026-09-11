@@ -119,7 +119,7 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         $qb2 = $this->em->getConnection()->createQueryBuilder();
         $qb2->delete(MAUTIC_TABLE_PREFIX.'leads')
             ->where(
-                $qb2->expr()->eq('id', $lead->getId())
+                $qb2->expr()->eq('id', (string) ($lead->getId()))
             );
 
         $qb2->executeStatement();

@@ -218,7 +218,7 @@ class LeadListRepository extends CommonRepository
                 $qb->expr()->and(
                     $qb->expr()->in('ll.leadlist_id', ':ids'),
                     $qb->expr()->eq('ll.lead_id', ':leadId'),
-                    $qb->expr()->eq('ll.manually_removed', 0)
+                    $qb->expr()->eq('ll.manually_removed', (string) (0))
                 )
             )
             ->setParameter('leadId', $lead->getId())
@@ -557,7 +557,7 @@ class LeadListRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx')
             ->join('clx', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = clx.campaign_id');
         $q->where(
-            $q->expr()->eq('clx.leadlist_id', $segmentId)
+            $q->expr()->eq('clx.leadlist_id', (string) ($segmentId))
         );
 
         $lists   = [];

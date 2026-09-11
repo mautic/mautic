@@ -135,7 +135,7 @@ class StatRepository extends CommonRepository
             $state = $options['state'];
             if ('failed' == $state) {
                 $query->andWhere(
-                    $query->expr()->eq('s.is_failed', 1)
+                    $query->expr()->eq('s.is_failed', (string) (1))
                 );
             }
         }

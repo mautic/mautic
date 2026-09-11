@@ -124,7 +124,7 @@ class DoNotContactRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc');
 
         if ($leadId) {
-            $query->where($query->expr()->eq('dnc.lead_id', (int) $leadId));
+            $query->where($query->expr()->eq('dnc.lead_id', (string) ((int) $leadId)));
         }
 
         if (isset($options['search']) && $options['search']) {

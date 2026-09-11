@@ -150,7 +150,7 @@ class StatRepository extends CommonRepository
                     $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
-                        $sb->expr()->eq('lll.manually_removed', 0)
+                        $sb->expr()->eq('lll.manually_removed', (string) (0))
                     )
                 );
 
@@ -474,11 +474,11 @@ class StatRepository extends CommonRepository
             if ('read' == $state) {
                 $timestampColumn = 's.date_read';
                 $query->andWhere(
-                    $query->expr()->eq('s.is_read', 1)
+                    $query->expr()->eq('s.is_read', (string) (1))
                 );
             } elseif ('failed' == $state) {
                 $query->andWhere(
-                    $query->expr()->eq('s.is_failed', 1)
+                    $query->expr()->eq('s.is_failed', (string) (1))
                 );
             }
         }

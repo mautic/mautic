@@ -282,9 +282,9 @@ final class ReportSubscriber implements EventSubscriberInterface
                     ->andWhere(
                         $qb->expr()->and(
                             $qb->expr()->eq('e.event_type', $qb->expr()->literal('decision')),
-                            $qb->expr()->eq('log.is_scheduled', 0),
+                            $qb->expr()->eq('log.is_scheduled', (string) (0)),
                             $qb->expr()->isNotNull('l.attribution'),
-                            $qb->expr()->neq('l.attribution', 0),
+                            $qb->expr()->neq('l.attribution', (string) (0)),
                             $qb->expr()->lte("DATE({$localDateTriggered})", 'DATE(l.attribution_date)')
                         )
                     );
