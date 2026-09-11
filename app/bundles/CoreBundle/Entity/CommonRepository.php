@@ -450,14 +450,12 @@ class CommonRepository extends ServiceEntityRepository
                 foreach ($orGroup as $subFilter) {
                     [$subExpr, $subParameters] = $this->getFilterExpr($q, $subFilter);
 
-                    // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                    $groupExpr->add($subExpr);
+                            $groupExpr->add($subExpr);
                     if (!empty($subParameters)) {
                         $parameter = array_merge($parameter, $subParameters);
                     }
                 }
-                // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                $expr->add($groupExpr);
+                    $expr->add($groupExpr);
             }
         } elseif (str_contains($filter['column'], ',')) {
             $columns      = explode(',', $filter['column']);
@@ -473,8 +471,7 @@ class CommonRepository extends ServiceEntityRepository
                     $setParameter = true;
                 }
 
-                // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                $expr->add($subExpr);
+                    $expr->add($subExpr);
             }
             if ($setParameter) {
                 $parameter = [$unique => $filter['value']];
@@ -1044,14 +1041,14 @@ class CommonRepository extends ServiceEntityRepository
             $type = 'and';
         }
 
-        $parameters  = [];
-        $expressions = $qb->expr()->{"{$type}X"}();
+        $parameters = [];
+        $parts      = [];
 
         if ($parseFilters) {
-            $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
+            $this->parseSearchFilters($parseFilters, $qb, $parts, $parameters);
         }
 
-        return [$expressions, $parameters];
+        return [$this->createCompositeExpression($qb, $type, $parts), $parameters];
     }
 
     protected function addCatchAllWhereClause(QueryBuilder|DbalQueryBuilder $qb, \stdClass $filter): array
@@ -1093,7 +1090,6 @@ class CommonRepository extends ServiceEntityRepository
         $expr = $q->expr()->{$xFunc}();
 
         foreach ($columns as $column) {
-            // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
             $expr->add(
                 $q->expr()->{$exprFunc}($column, ":{$unique}")
             );
@@ -1158,7 +1154,6 @@ class CommonRepository extends ServiceEntityRepository
 
         $expr = $q->expr()->{$xFunc}();
         foreach ($columns as $col) {
-            // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
             $expr->add(
                 $q->expr()->{$exprFunc}($col, ":{$unique}")
             );
@@ -1265,15 +1260,50 @@ class CommonRepository extends ServiceEntityRepository
         return [$expr, $parameters];
     }
 
-    protected function appendExpression($appendTo, $expr)
+    /**
+     * Collect an expression for later assembly.
+     *
+     * DBAL 4 made CompositeExpression immutable - add() is gone, and with() returns a new
+     * instance - and it cannot represent an empty composite at all. So the parts are
+     * gathered in a list and the composite is built once, by createCompositeExpression().
+     *
+     * @param array<int, mixed> $parts
+     * @param mixed             $expr
+     */
+    protected function appendExpression(array &$parts, $expr): void
     {
         if ($expr instanceof CompositeExpression || $expr instanceof Query\Expr\Composite) {
             if ($expr->count()) {
-                $appendTo->add($expr);
+                $parts[] = $expr;
             }
         } elseif (!empty($expr)) {
-            $appendTo->add($expr);
+            $parts[] = $expr;
         }
+    }
+
+    /**
+     * Build an AND/OR composite of the given parts, for whichever query builder is in use.
+     *
+     * Returns null when there is nothing to combine: ORM's Andx/Orx tolerate being empty,
+     * but DBAL 4's CompositeExpression requires at least one part.
+     *
+     * @param array<int, mixed> $parts
+     *
+     * @return mixed
+     */
+    protected function createCompositeExpression(QueryBuilder|DbalQueryBuilder $qb, string $type, array $parts)
+    {
+        if ([] === $parts) {
+            return null;
+        }
+
+        $expr = $qb->expr();
+
+        if ($expr instanceof Query\Expr) {
+            return 'or' === $type ? $expr->orX(...$parts) : $expr->andX(...$parts);
+        }
+
+        return 'or' === $type ? CompositeExpression::or(...$parts) : CompositeExpression::and(...$parts);
     }
 
     protected function buildClauses(QueryBuilder|DbalQueryBuilder $q, array $args): bool
@@ -1489,20 +1519,18 @@ class CommonRepository extends ServiceEntityRepository
         $this->advancedFilterCommands = [];
         $advancedFilterStrings        = [];
         $queryParameters              = [];
-        $queryExpression              = $q->expr()->andX();
+        $queryExpressionParts         = [];
 
         if (isset($args['ids'])) {
             $ids   = array_map(intval(...), $args['ids']);
             $param = $this->generateRandomParameterName();
-            // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-            $queryExpression->add(
+            $queryExpressionParts[] = (
                 $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
             );
             $q->setParameter($param, $ids, ArrayParameterType::INTEGER);
         } elseif (!empty($args['ownedBy'])) {
             $param = $this->generateRandomParameterName();
-            // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-            $queryExpression->add(
+            $queryExpressionParts[] = (
                 $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], ':'.$param)
             );
             $q->setParameter($param, array_map(strval(...), $args['ownedBy'][1]), ArrayParameterType::STRING);
@@ -1520,8 +1548,7 @@ class CommonRepository extends ServiceEntityRepository
                         // defined columns with keys of column, expr, value
                         foreach ($criteria as $criterion) {
                             if ($criterion instanceof Query\Expr || $criterion instanceof CompositeExpression) {
-                                // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                                $queryExpression->add($criterion);
+                                                    $queryExpressionParts[] = $criterion;
 
                                 if (isset($criterion->parameters) && is_array($criterion->parameters)) {
                                     $queryParameters = array_merge($queryParameters, $criterion->parameters);
@@ -1529,8 +1556,7 @@ class CommonRepository extends ServiceEntityRepository
                                 }
                             } elseif (is_array($criterion)) {
                                 [$expr, $parameters] = $this->getFilterExpr($q, $criterion);
-                                // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                                $queryExpression->add($expr);
+                                                    $queryExpressionParts[] = $expr;
                                 if (is_array($parameters)) {
                                     $queryParameters = array_merge($queryParameters, $parameters);
                                 }
@@ -1562,7 +1588,7 @@ class CommonRepository extends ServiceEntityRepository
                 $this->advancedFilterCommands = $advancedFilters->commands;
 
                 [$expr, $parameters] = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
-                $this->appendExpression($queryExpression, $expr);
+                $this->appendExpression($queryExpressionParts, $expr);
 
                 if (is_array($parameters)) {
                     $queryParameters = array_merge($queryParameters, $parameters);
@@ -1571,7 +1597,8 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         // parse the filter if set
-        if ($queryExpression->count()) {
+        $queryExpression = $this->createCompositeExpression($q, 'and', $queryExpressionParts);
+        if (null !== $queryExpression) {
             $q->andWhere($queryExpression);
         }
 
@@ -1762,7 +1789,10 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param \stdClass $parseFilters
      */
-    protected function parseSearchFilters($parseFilters, QueryBuilder|DbalQueryBuilder $qb, $expressions, &$parameters)
+    /**
+     * @param array<int, mixed> $expressions
+     */
+    protected function parseSearchFilters($parseFilters, QueryBuilder|DbalQueryBuilder $qb, array &$expressions, &$parameters)
     {
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
