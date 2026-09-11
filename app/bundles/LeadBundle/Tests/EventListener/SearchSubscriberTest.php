@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
-use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
@@ -53,7 +52,6 @@ final class SearchSubscriberTest extends TestCase
                     $primaryTable = $tables[0];
                     unset($tables[0]);
                     $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
-                    $this->assertInstanceOf(TrackingQueryBuilder::class, $q);
                     $joins    = $q->getQueryPart('join');
                     if (!array_key_exists($primaryTable['alias'], $joins)) {
                         $q->{$joinType}(

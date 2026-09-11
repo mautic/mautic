@@ -1459,7 +1459,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     private function getDuplicateValuesQuery(array $fieldsAliases): QueryBuilder
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select(array_merge(["MIN({$this->getTableAlias()}.id) as minId"], $fieldsAliases))
+            ->select(...array_merge(["MIN({$this->getTableAlias()}.id) as minId"], $fieldsAliases))
             ->from($this->getTableName(), $this->getTableAlias());
 
         $andWhere = [$qb->expr()->isNotNull($this->getTableAlias().'.date_identified')];
@@ -1469,7 +1469,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $qb->where($qb->expr()->and(...$andWhere));
-        $qb->groupBy($fieldsAliases);
+        $qb->groupBy(...$fieldsAliases);
         $qb->having('count(*) > 1');
 
         return $qb;

@@ -491,6 +491,7 @@ class EmailRepository extends CommonRepository
 
     public function getUnsubscribedCount(QueryBuilder $queryBuilder): int
     {
+        \assert($queryBuilder instanceof TrackingQueryBuilder);
         $queryBuilder->resetQueryParts(['join']);
         $this->addDNCTableForEmails($queryBuilder);
         $queryBuilder->select('e.id as email_id, dnc.lead_id');

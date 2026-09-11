@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -106,6 +107,7 @@ class FieldChangeRepository extends CommonRepository
         }
 
         // Get all the field changes for the requested objects
+        \assert($qb instanceof TrackingQueryBuilder);
         $qb
             ->resetQueryParts()
             ->select('*')

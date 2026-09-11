@@ -480,7 +480,7 @@ class CampaignRepository extends CommonRepository
     {
         $q = $this->getReplicaConnection()->createQueryBuilder();
 
-        $q->select($select)
+        $q->select(...(array) $select)
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(

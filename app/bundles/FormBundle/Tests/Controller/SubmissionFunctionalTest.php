@@ -1471,7 +1471,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         // we are expecting form results table to be deleted in background, so the table should exists
-        $this->assertTrue($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_{$formId}_{$formAlias}"));
+        $this->assertTrue($this->connection->createSchemaManager()->tablesExist(["{$tablePrefix}form_results_{$formId}_{$formAlias}"]));
 
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
@@ -1562,7 +1562,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         parent::beforeTearDown();
 
-        if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
+        if ($this->connection->createSchemaManager()->tablesExist(["{$tablePrefix}form_results_1_submission"])) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
         }
     }
