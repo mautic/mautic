@@ -10,6 +10,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
+#[ORM\Entity(repositoryClass: StatDeviceRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['date_opened'], name: 'date_opened_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class StatDevice
 {
     public const TABLE_NAME = 'email_stats_devices';
@@ -19,11 +23,15 @@ class StatDevice
      */
     private $id;
 
+    #[ORM\ManyToOne(targetEntity: Stat::class)]
+    #[ORM\JoinColumn(name: 'stat_id', onDelete: 'CASCADE')]
     private ?Stat $stat = null;
 
     /**
      * @var LeadDevice|null
      */
+    #[ORM\ManyToOne(targetEntity: LeadDevice::class)]
+    #[ORM\JoinColumn(name: 'device_id', onDelete: 'CASCADE')]
     private $device;
 
     private ?IpAddress $ipAddress = null;
@@ -31,31 +39,16 @@ class StatDevice
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_opened', type: 'datetime')]
     private $dateOpened;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(StatDeviceRepository::class)
-            ->addIndex(['date_opened'], 'date_opened_search');
-
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('device', LeadDevice::class)
-            ->addJoinColumn('device_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createManyToOne('stat', 'Stat')
-            ->addJoinColumn('stat_id', 'id', true, false, 'CASCADE')
-            ->build();
-
         $builder->addIpAddress(true);
-
-        $builder->createField('dateOpened', 'datetime')
-            ->columnName('date_opened')
-            ->build();
     }
 
     /**

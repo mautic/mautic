@@ -7,6 +7,9 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: PostCountRepository::class)]
+#[ORM\Table(name: 'monitor_post_count')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PostCount
 {
     /**
@@ -17,6 +20,8 @@ class PostCount
     /**
      * @var Monitoring|null
      */
+    #[ORM\ManyToOne(targetEntity: Monitoring::class)]
+    #[ORM\JoinColumn(name: 'monitor_id', onDelete: 'CASCADE')]
     private $monitor;
 
     /**
@@ -33,14 +38,7 @@ class PostCount
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('monitor_post_count')
-            ->setCustomRepositoryClass(PostCountRepository::class);
-
         $builder->addId();
-
-        $builder->createManyToOne('monitor', 'Monitoring')
-            ->addJoinColumn('monitor_id', 'id', true, false, 'CASCADE')
-            ->build();
 
         $builder->addNamedField('postDate', 'date', 'post_date');
 

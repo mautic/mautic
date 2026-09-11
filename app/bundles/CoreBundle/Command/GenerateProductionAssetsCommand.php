@@ -56,12 +56,14 @@ final class GenerateProductionAssetsCommand extends Command
             return Command::FAILURE;
         }
 
+
         $ckeditorFile = $mediaDir.'/libraries/ckeditor/ckeditor.js';
         if (!$this->filesystem->exists($ckeditorFile)) {
             $output->writeln('<error>'.$this->translator->trans("{$ckeditorFile} does not exist. Execute `npm install` to generate it.").'</error>');
 
             return Command::FAILURE;
         }
+
 
         foreach ([
             'sass:build'        => [],
@@ -79,6 +81,7 @@ final class GenerateProductionAssetsCommand extends Command
 
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
+
         $this->ensureStylesheetCompatibilityFiles($mediaDir, $vendorDir);
 
         $this->moveExtraLibraries($nodeModulesDir, $mediaDir);

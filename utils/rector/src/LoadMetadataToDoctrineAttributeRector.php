@@ -86,6 +86,14 @@ final class LoadMetadataToDoctrineAttributeRector extends AbstractRector
             return null;
         }
 
+        // Entities extending a FOS OAuth server model keep their loadMetadata() mapping,
+        // as the parent mapping is defined there and not via attributes.
+        if ($node->extends instanceof Name
+            && str_starts_with((string) $this->getName($node->extends), 'FOS\\OAuthServerBundle\\Model\\')
+        ) {
+            return null;
+        }
+
         // A class may already carry ORM attributes on its properties while class-level and
         // lifecycle mapping stays in loadMetadata. In that hybrid state we convert the leftover
         // calls and merge the generated attributes into the existing ones instead of duplicating.

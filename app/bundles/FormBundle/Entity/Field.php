@@ -38,6 +38,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: FieldRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['type'], name: 'form_field_type_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Field implements UuidInterface
 {
     use UuidTrait;
@@ -56,6 +60,7 @@ class Field implements UuidInterface
      * @var string
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: Types::TEXT)]
     private $label;
 
     /**
@@ -68,12 +73,14 @@ class Field implements UuidInterface
      * @var string
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $alias;
 
     /**
      * @var string
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $type;
 
     /**
@@ -181,9 +188,11 @@ class Field implements UuidInterface
     private $isAutoFill = false;
 
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'is_read_only', type: Types::BOOLEAN, options: ['default' => false])]
     private bool $isReadOnly = false;
 
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'field_width', type: Types::STRING, length: 50, options: ['default' => '100%'])]
     private string $fieldWidth = '100%';
 
     /**
@@ -241,15 +250,8 @@ class Field implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(FieldRepository::class)
-            ->addIndex(['type'], 'form_field_type_search');
-
         $builder->addId();
-        $builder->addField('label', Types::TEXT);
         $builder->addNullableField('showLabel', Types::BOOLEAN, 'show_label');
-        $builder->addField('alias', Types::STRING);
-        $builder->addField('type', Types::STRING);
         $builder->addNamedField('isCustom', Types::BOOLEAN, 'is_custom');
         $builder->addNullableField('customParameters', Types::ARRAY, 'custom_parameters');
         $builder->addNullableField('defaultValue', Types::TEXT, 'default_value');
@@ -276,21 +278,11 @@ class Field implements UuidInterface
         $builder->addNullableField('saveResult', Types::BOOLEAN, 'save_result');
         $builder->addNullableField('isAutoFill', Types::BOOLEAN, 'is_auto_fill');
 
-        $builder->createField('isReadOnly', Types::BOOLEAN)
-            ->columnName('is_read_only')
-            ->option('default', false)
-            ->build();
-
         $builder->addNullableField('showWhenValueExists', Types::BOOLEAN, 'show_when_value_exists');
         $builder->addNullableField('showAfterXSubmissions', Types::INTEGER, 'show_after_x_submissions');
         $builder->addNullableField('alwaysDisplay', Types::BOOLEAN, 'always_display');
         $builder->addNullableField('mappedObject', Types::STRING, 'mapped_object');
         $builder->addNullableField('mappedField', Types::STRING, 'mapped_field');
-        $builder->createField('fieldWidth', Types::STRING)
-            ->columnName('field_width')
-            ->length(50)
-            ->option('default', '100%')
-            ->build();
         static::addUuidField($builder);
     }
 

@@ -36,6 +36,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\Entity(repositoryClass: PermissionRepository::class)]
+#[ORM\Table(name: 'permissions')]
+#[ORM\UniqueConstraint(name: 'unique_perm', columns: ['bundle', 'name', 'role_id'])]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Permission implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
@@ -52,12 +56,14 @@ class Permission implements CacheInvalidateInterface, UuidInterface
      * @var string
      */
     #[Groups(['permission:read', 'permission:write', 'role:read'])]
+    #[ORM\Column(type: 'string', length: 50)]
     protected $bundle;
 
     /**
      * @var string
      */
     #[Groups(['permission:read', 'permission:write', 'role:read'])]
+    #[ORM\Column(type: 'string', length: 50)]
     protected $name;
 
     /**
@@ -70,33 +76,20 @@ class Permission implements CacheInvalidateInterface, UuidInterface
      * @var int
      */
     #[Groups(['permission:read', 'permission:write', 'role:read'])]
+    #[ORM\Column(type: 'integer')]
     protected $bitwise;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('permissions')
-            ->setCustomRepositoryClass(PermissionRepository::class)
-            ->addUniqueConstraint(['bundle', 'name', 'role_id'], 'unique_perm');
-
         $builder->addId();
-
-        $builder->createField('bundle', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('name', 'string')
-            ->length(50)
-            ->build();
 
         $builder->createManyToOne('role', 'Role')
             ->inversedBy('permissions')
             ->addJoinColumn('role_id', 'id', false, false, 'CASCADE')
             ->isOwnershipParent()
             ->build();
-
-        $builder->addField('bitwise', 'integer');
 
         static::addUuidField($builder);
     }

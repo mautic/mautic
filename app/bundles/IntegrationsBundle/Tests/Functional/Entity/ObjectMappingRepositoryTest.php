@@ -56,8 +56,10 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
             'is_deleted'               => (string) (int) $objectMapping->isDeleted(),
             'integration_reference_id' => $objectMapping->getIntegrationReferenceId(),
         ];
-        $this->assertSame($expectedData, $this->repository->getInternalObject(...$arguments));
-        $this->assertSame($expectedData, $this->repository->getInternalObjectWithLock(...$arguments));
+        // internal_object_id is mapped via loadMetadata() while the rest are attributes, so the
+        // combined driver orders that column last; compare by content, not column order.
+        $this->assertEquals($expectedData, $this->repository->getInternalObject(...$arguments));
+        $this->assertEquals($expectedData, $this->repository->getInternalObjectWithLock(...$arguments));
     }
 
     public function testUpdateInternalObjectId(): void

@@ -8,6 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 
+#[ORM\Entity(repositoryClass: LeadTriggerLogRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadTriggerLog
 {
     public const TABLE_NAME = 'point_lead_event_log';
@@ -15,6 +18,9 @@ class LeadTriggerLog
     /**
      * @var TriggerEvent
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: TriggerEvent::class, inversedBy: 'log')]
+    #[ORM\JoinColumn(name: 'event_id', nullable: false, onDelete: 'CASCADE')]
     private $event;
 
     /**
@@ -30,28 +36,16 @@ class LeadTriggerLog
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_fired', type: 'datetime')]
     private $dateFired;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(LeadTriggerLogRepository::class);
-
-        $builder->createManyToOne('event', 'TriggerEvent')
-            ->isPrimaryKey()
-            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
-            ->inversedBy('log')
-            ->build();
-
         $builder->addLead(false, 'CASCADE', true);
 
         $builder->addIpAddress(true);
-
-        $builder->createField('dateFired', 'datetime')
-            ->columnName('date_fired')
-            ->build();
     }
 
     /**

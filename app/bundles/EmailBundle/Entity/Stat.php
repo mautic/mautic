@@ -10,6 +10,19 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
+#[ORM\Entity(repositoryClass: StatRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['email_id', 'lead_id'], name: 'stat_email_search')]
+#[ORM\Index(columns: ['lead_id', 'email_id'], name: 'stat_email_search2')]
+#[ORM\Index(columns: ['is_failed'], name: 'stat_email_failed_search')]
+#[ORM\Index(columns: ['is_read', 'date_sent'], name: 'is_read_date_sent')]
+#[ORM\Index(columns: ['tracking_hash'], name: 'stat_email_hash_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_email_source_search')]
+#[ORM\Index(columns: ['date_sent'], name: 'email_date_sent')]
+#[ORM\Index(columns: ['date_read', 'lead_id'], name: 'email_date_read_lead')]
+#[ORM\Index(columns: ['lead_id', 'date_sent'], name: 'stat_email_lead_id_date_sent')]
+#[ORM\Index(columns: ['email_id', 'is_read'], name: 'stat_email_email_id_is_read')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     /**
@@ -24,6 +37,8 @@ class Stat
     /**
      * @var Email|null
      */
+    #[ORM\ManyToOne(targetEntity: Email::class, inversedBy: 'stats')]
+    #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private $email;
 
     /**
@@ -34,65 +49,80 @@ class Stat
     /**
      * @var string
      */
+    #[ORM\Column(name: 'email_address', type: 'string', length: 191)]
     private $emailAddress;
 
     /**
      * @var LeadList|null
      */
+    #[ORM\ManyToOne(targetEntity: LeadList::class)]
+    #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
     private $list;
 
     private ?IpAddress $ipAddress = null;
 
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private ?\DateTimeInterface $dateSent = null;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_read', type: 'boolean')]
     private $isRead = false;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_failed', type: 'boolean')]
     private $isFailed = false;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'viewed_in_browser', type: 'boolean')]
     private $viewedInBrowser = false;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'date_read', type: 'datetime', nullable: true)]
     private $dateRead;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_hash', type: 'string', length: 191, nullable: true)]
     private $trackingHash;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'retry_count', type: 'integer', nullable: true)]
     private $retryCount = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
 
     /**
      * @var Copy|null
      */
+    #[ORM\ManyToOne(targetEntity: Copy::class)]
+    #[ORM\JoinColumn(name: 'copy_id', onDelete: 'SET NULL')]
     private $storedCopy;
 
     /**
@@ -110,6 +140,7 @@ class Stat
     /**
      * @var ArrayCollection|EmailReply[]
      */
+    #[ORM\OneToMany(mappedBy: 'stat', targetEntity: EmailReply::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private $replies;
 
     /**
@@ -126,97 +157,17 @@ class Stat
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(StatRepository::class)
-            ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
-            ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
-            ->addIndex(['is_failed'], 'stat_email_failed_search')
-            ->addIndex(['is_read', 'date_sent'], 'is_read_date_sent')
-            ->addIndex(['tracking_hash'], 'stat_email_hash_search')
-            ->addIndex(['source', 'source_id'], 'stat_email_source_search')
-            ->addIndex(['date_sent'], 'email_date_sent')
-            ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead')
-            ->addIndex(['lead_id', 'date_sent'], 'stat_email_lead_id_date_sent')
-            ->addIndex(['email_id', 'is_read'], 'stat_email_email_id_is_read');
-
         $builder->addBigIntIdField();
-
-        $builder->createManyToOne('email', 'Email')
-            ->inversedBy('stats')
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
-            ->build();
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createField('emailAddress', 'string')
-            ->columnName('email_address')
-            ->build();
-
-        $builder->createManyToOne('list', LeadList::class)
-            ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
-            ->build();
-
         $builder->addIpAddress(true);
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('isRead', 'boolean')
-            ->columnName('is_read')
-            ->build();
-
-        $builder->createField('isFailed', 'boolean')
-            ->columnName('is_failed')
-            ->build();
-
-        $builder->createField('viewedInBrowser', 'boolean')
-            ->columnName('viewed_in_browser')
-            ->build();
-
-        $builder->createField('dateRead', 'datetime')
-            ->columnName('date_read')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingHash', 'string')
-            ->columnName('tracking_hash')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retryCount', 'integer')
-            ->columnName('retry_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->createManyToOne('storedCopy', Copy::class)
-            ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
-            ->build();
 
         $builder->addNullableField('openCount', 'integer', 'open_count');
 
         $builder->addNullableField('lastOpened', 'datetime', 'last_opened');
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
-
-        $builder->createOneToMany('replies', EmailReply::class)
-            ->mappedBy('stat')
-            ->fetchExtraLazy()
-            ->cascadeAll()
-            ->build();
     }
 
     /**

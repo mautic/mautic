@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class CoreParametersHelper
 {
@@ -12,11 +12,9 @@ class CoreParametersHelper
     private ?array $resolvedParameters = null;
 
     public function __construct(
-        private readonly ContainerInterface $container,
+        private readonly ParameterBagInterface $symfonyParameterBag,
     ) {
-        $loader = new ParameterLoader();
-
-        $this->parameters = $loader->getParameterBag();
+        $this->parameters = new ParameterLoader()->getParameterBag();
 
         $this->resolveParameters();
     }
@@ -38,8 +36,8 @@ class CoreParametersHelper
 
         // First check the container so that Symfony will resolve container parameters within Mautic config values
         $containerName = sprintf('mautic.%s', $name);
-        if ($this->container->hasParameter($containerName)) {
-            return $this->container->getParameter($containerName);
+        if ($this->symfonyParameterBag->has($containerName)) {
+            return $this->symfonyParameterBag->get($containerName);
         }
 
         return $this->parameters->get($name, $default);
