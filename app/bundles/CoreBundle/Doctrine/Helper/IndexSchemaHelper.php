@@ -63,7 +63,7 @@ class IndexSchemaHelper
             throw new SchemaException("Table {$name} does not exist!");
         }
 
-        $this->table = $this->sm->introspectTable($this->prefix.$name);
+        $this->table = $this->sm->introspectTableByUnquotedName($this->prefix.$name);
 
         return $this;
     }

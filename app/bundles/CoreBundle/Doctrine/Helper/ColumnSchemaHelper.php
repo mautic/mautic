@@ -55,7 +55,7 @@ class ColumnSchemaHelper
         $this->checkTableExists($this->tableName, true);
 
         // use the to schema to get table details so that changes will be calculated
-        $this->fromTable = $this->sm->introspectTable($this->tableName);
+        $this->fromTable = $this->sm->introspectTableByUnquotedName($this->tableName);
         $this->toTable   = clone $this->fromTable;
 
         return $this;

@@ -489,7 +489,7 @@ class LeadRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->update(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_leads cl')
             ->set('cl.rotation', 'cl.rotation + 1')
             ->where(
                 $q->expr()->and(
