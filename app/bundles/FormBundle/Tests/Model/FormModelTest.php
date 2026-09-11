@@ -759,6 +759,101 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @return array<string, array{string, string, string[], string[]}>
+     */
+    public static function automaticJavascriptProvider(): array
+    {
+        return [
+            'closing_script_tag_is_escaped' => [
+                '<script type="text/javascript">if (typeof MauticSDKLoaded == \'undefined\') { var x = "</script>"; }</script>',
+                '<div class="mauticform_wrapper"><form></form></div>',
+                ['<\/script>'],
+                ['</script>'],
+            ],
+            'html_and_script_are_json_encoded' => [
+                '<script type="text/javascript">var msg = "Please wait...";</script>',
+                '<div>"quoted" & \'single\'</div>',
+                ['var html =', 'document.write('],
+                [],
+            ],
+            'external_script_uses_src_attribute' => [
+                '<script type="text/javascript" src="https://example.com/mautic-form.js"></script>',
+                '<div class="mauticform_wrapper"></div>',
+                ["script0.src = 'https://example.com/mautic-form.js'"],
+                ['createTextNode'],
+            ],
+            'inline_script_uses_create_text_node' => [
+                "<script type=\"text/javascript\">\nMauticSDK.onLoad();\n// single line comment\nvar x = 1;\n</script>",
+                '<div></div>',
+                // The JSON-encoded text node content preserves \n so // comments don't swallow subsequent lines
+                ['createTextNode', 'MauticSDK.onLoad();', '\\n\\/\\/ single line comment\\nvar x = 1;'],
+                [],
+            ],
+        ];
+    }
+
+    /**
+     * @param string[] $assertContains
+     * @param string[] $assertNotContains
+     */
+    #[DataProvider('automaticJavascriptProvider')]
+    public function testGetAutomaticJavascript(
+        string $formScript,
+        string $html,
+        array $assertContains,
+        array $assertNotContains
+    ): void {
+        $form      = new Form();
+        $formModel = $this->createFormModelPartialMock();
+        $formModel->method('getContent')->willReturn($html);
+        $formModel->method('getFormScript')->willReturn($formScript);
+
+        $script = $formModel->getAutomaticJavascript($form);
+
+        foreach ($assertContains as $expected) {
+            $this->assertStringContainsString($expected, $script);
+        }
+
+        foreach ($assertNotContains as $unexpected) {
+            $this->assertStringNotContainsString($unexpected, $script);
+        }
+    }
+
+    /**
+     * @return FormModel&MockObject
+     */
+    private function createFormModelPartialMock(): FormModel
+    {
+        return $this->getMockBuilder(FormModel::class)
+            ->setConstructorArgs([
+                $this->createStub(RequestStack::class),
+                $this->createStub(Environment::class),
+                $this->createStub(ThemeHelper::class),
+                $this->createStub(ActionModel::class),
+                $this->createStub(FieldModel::class),
+                $this->fieldHelper,
+                $this->primaryCompanyHelper,
+                $this->leadFieldModel,
+                $this->createStub(FormUploader::class),
+                $this->contactTracker,
+                $this->createStub(ColumnSchemaHelper::class),
+                $this->createStub(TableSchemaHelper::class),
+                $this->createStub(MappedObjectCollectorInterface::class),
+                $this->createStub(EntityManager::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcher::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
+                $this->formRepository,
+            ])
+            ->onlyMethods(['getContent', 'getFormScript'])
+            ->getMock();
+    }
+
+    /**
      * @return mixed[]
      */
     private function getTestFormFields(): array
