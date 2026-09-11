@@ -1373,9 +1373,11 @@ class CommonRepository extends ServiceEntityRepository
                 $q->addOrderBy($order[0], $order[1]);
             }
         } else {
+            // ORM 3 validates the direction and rejects ""; null means ascending, which is
+            // what an absent orderByDir used to fall through to.
             $orderByDir = $this->sanitize(
                 array_key_exists('orderByDir', $args) ? $args['orderByDir'] : ''
-            );
+            ) ?: null;
             // add direction after each column
             $parts = explode(',', $orderBy);
             foreach ($parts as $order) {
