@@ -25,10 +25,7 @@ class QueryBuilder extends BaseQueryBuilder
         parent::__construct($connection);
     }
 
-    /**
-     * @return ExpressionBuilder
-     */
-    public function expr()
+    public function expr(): ExpressionBuilder
     {
         if (null !== $this->_expr) {
             return $this->_expr;
