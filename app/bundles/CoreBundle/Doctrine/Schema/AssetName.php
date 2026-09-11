@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\Name;
 use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\NamedObject;
+use Doctrine\DBAL\Schema\OptionallyNamedObject;
 
 /**
  * Reads the plain name of a schema object.
@@ -25,6 +26,17 @@ final class AssetName
     public static function of(NamedObject $object): string
     {
         return self::fromName($object->getObjectName());
+    }
+
+    /**
+     * For objects whose name is optional - a foreign key constraint, for instance -
+     * returning an empty string when unnamed.
+     */
+    public static function ofOptional(OptionallyNamedObject $object): string
+    {
+        $name = $object->getObjectName();
+
+        return null === $name ? '' : self::fromName($name);
     }
 
     public static function fromName(Name $name): string
