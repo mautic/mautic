@@ -127,8 +127,8 @@ jobs:
       env:
         APP_ENV: test
         MAUTIC_ENV: test
+        DB_PORT: ${{ job.services.database.ports[3306] }}
       run: |
-        export DB_PORT="${{ job.services.database.ports[3306] }}"
         bin/console doctrine:schema:validate --skip-sync
 
     - name: Upload coverage report
