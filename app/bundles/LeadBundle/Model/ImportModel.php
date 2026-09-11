@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
+use Mautic\CoreBundle\Exception\OrmException as MauticOrmException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -343,7 +344,7 @@ class ImportModel extends FormModel
                 if (!$this->em->isOpen()) {
                     // Something bad must have happened if the entity manager is closed.
                     // We will not be able to save any entities.
-                    throw new ORMException($errorMessage);
+                    throw new MauticOrmException($errorMessage);
                 }
                 // This should be called only if the entity manager is open
                 $this->logImportRowError($eventLog, $errorMessage);
