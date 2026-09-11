@@ -31,6 +31,7 @@
 {% set isWinner = abTestResults.winners is defined and variant.id in abTestResults.winners and variants.parent.variantStartDate and isPublished %}
 {% set actionUrl = path(actionRoute, {'objectAction': 'view', 'objectId': variant.id}) %}
 {% set isCurrent = (variant.id is same as activeEntity.id) %}
+{% set canMakeWinner = variants.parent.variantStartDate and isPublished %}
 
 <li class="list-group-item bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
     <div class="box-layout">
@@ -49,7 +50,7 @@
                     {% endif %}
                 </div>
                 <div class="col-xs-11">
-                    {% if isWinner %}
+                    {% if canMakeWinner %}
                         <div class="mr-xs pull-left" data-toggle="tooltip" title="{{ 'mautic.core.ab_test.make_winner'|trans }}">
                             {% include '@MauticCore/Helper/button.html.twig' with {
                                 buttons: [
@@ -57,7 +58,7 @@
                                         label: 'mautic.core.ab_test.make_winner',
                                         variant: 'warning',
                                         icon_only: true,
-                                        icon: 'ri-trophy-fill',
+                                        icon: isWinner ? 'ri-trophy-fill' : 'ri-trophy-line',
                                         href: path(actionRoute, {'objectAction': 'winner', 'objectId': variant.id}),
                                         attributes: {
                                             'data-toggle': 'confirmation',
