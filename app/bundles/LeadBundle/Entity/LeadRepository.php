@@ -556,9 +556,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return ['core', 'social', 'personal', 'professional'];
     }
 
-    /**
-     * @return QueryBuilder
-     */
     public function getEntitiesDbalQueryBuilder(): \Mautic\CoreBundle\Doctrine\Query\QueryBuilder
     {
         $alias = $this->getTableAlias();

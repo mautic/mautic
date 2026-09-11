@@ -278,7 +278,7 @@ readonly class ContactSegmentService
         $qbO->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
         $qbO->setParameters($queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
         $qbO->andWhere($expr->eq('orp.leadlist_id', ':orpsegid'));
-        $qbO->andWhere($expr->eq('orp.manually_added', $expr->literal(0)));
+        $qbO->andWhere($expr->eq('orp.manually_added', $expr->literal('0')));
         $qbO->andWhere($expr->notIn('orp.lead_id', $queryBuilder->getSQL()));
         $qbO->setParameter('orpsegid', $segment->getId());
         $this->addLeadAndMinMaxLimiters($qbO, $batchLimiters, 'lead_lists_leads');

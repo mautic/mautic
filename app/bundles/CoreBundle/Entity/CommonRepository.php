@@ -1315,7 +1315,9 @@ class CommonRepository extends ServiceEntityRepository
         $joinAdded = false;
         foreach ($associations as $property => $association) {
             $subJoinAdded  = false;
-            $targetMetdata = $this->getEntityManager()->getRepository($association['targetEntity'])->getClassMetadata();
+            $targetEntity  = $association['targetEntity'];
+            \assert(is_string($targetEntity) && class_exists($targetEntity));
+            $targetMetdata = $this->getEntityManager()->getClassMetadata($targetEntity);
             if ($propertyAllowedJoins = preg_grep('/^'.$property.'\..*/', $allowed)) {
                 foreach ($propertyAllowedJoins as $key => $join) {
                     $propertyAllowedJoins[$key] = str_replace($property.'.', '', $join);
@@ -1786,10 +1788,8 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \stdClass $parseFilters
-     */
-    /**
-     * @param array<int, mixed> $expressions
+     * @param \stdClass           $parseFilters
+     * @param array<int, mixed>   $expressions
      */
     protected function parseSearchFilters($parseFilters, QueryBuilder|DbalQueryBuilder $qb, array &$expressions, &$parameters)
     {
