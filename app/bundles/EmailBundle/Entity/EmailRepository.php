@@ -848,8 +848,12 @@ class EmailRepository extends CommonRepository
 
     private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
+        // The last argument allows a null publish up date so that a published segment
+        // email without a start date is broadcast immediately, consistent with how it
+        // is shown as active in the UI (see FormEntity::getPublishStatus()). A future
+        // publish up date still holds the email back until the scheduled start.
         $qb   = $this->createQueryBuilder($this->getTableAlias());
-        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, false);
+        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, true);
 
         $expr->add(
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
