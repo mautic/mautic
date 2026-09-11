@@ -197,6 +197,23 @@
   Non-model services that happen to live under the same `mautic.<bundle>.model.*` namespace (e.g. `mautic.lead.model.dnc` was a model but `mautic.report.model.report_exporter` is a helper) are unaffected — only aliases pointing at `MauticModelInterface` models were removed.
 - Dead routes removed from bundle route config. `mautic_receive_notification` (`/notification/receive`), `mautic_campaign_import_index` (`/s/campaign/import`) and `mautic_integration_companies` (`/plugin/{integration}/company_data`, CRM plugin) pointed at controller actions that do not exist (`NotificationApiController::receiveAction`, `ImportController::indexAction`, `MauticCrmBundle\Controller\PublicController::companyDataAction`), so they returned an error on every request.
 
+- Method `Mautic\CoreBundle\Doctrine\Mapping\AssociationBuilder::isOwnershipParent()` removed. It wrote an `isOwnershipParent` key into the association mapping, and ORM 3 maps associations onto typed `AssociationMapping` objects that reject unknown keys. Mark the entity class with `#[Mautic\CoreBundle\Entity\Attribute\OwnershipParent]` instead, naming the association that carries the owner:
+
+```diff
++#[OwnershipParent('form')]
+ class Field
+ {
+     public static function loadMetadata(ORM\ClassMetadata $metadata): void
+     {
+         $builder->createManyToOne('form', 'Form')
+-            ->isOwnershipParent()
+             ->build();
+```
+
+- Classes `Mautic\CoreBundle\Doctrine\Mapping\ManyToManyAssociationBuilder` and `Mautic\CoreBundle\Doctrine\Mapping\OneToManyAssociationBuilder` removed, along with the `ClassMetadataBuilder::createManyToMany()` and `createOneToMany()` overrides that returned them. They only existed to add `orphanRemoval()`, which Doctrine's own builders have carried for years. Both `createManyToMany()` and `createOneToMany()` still work; they now return Doctrine's builders.
+- Entity `MauticPlugin\MauticTagManagerBundle\Entity\Tag` removed. It mapped the same `lead_tags` table as `Mautic\LeadBundle\Entity\Tag`, declared no fields of its own and existed only to point at the plugin's repository, and ORM 3 rejects a subclass of a mapped entity that declares no inheritance mapping. Use `Mautic\LeadBundle\Entity\Tag`; the plugin's `TagRepository` is a service and is unchanged.
+- Method `Mautic\CoreBundle\Doctrine\Type\GeneratedType::getName()` removed, following DBAL 4's removal of `Doctrine\DBAL\Types\Type::getName()`. A type is identified by the name it is registered under.
+
 ## Changed code
 
 - CampaignBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\CampaignBundle\CampaignEvents` string constants. Update any subscriber or listener that keys on one of the converted `CampaignEvents::*` constants (or the raw string name such as `mautic.campaign_on_build`) to key on the event class instead:
@@ -635,3 +652,36 @@
     -[$company, $companyEntities] = IdentifyCompanyHelper::identifyLeadsCompany($data, $lead, $companyModel);
     +[$company, $companyEntities] = $this->identifyCompanyHelper->identifyLeadsCompany($data, $lead);
     ```
+
+- Doctrine was upgraded to ORM 3.7, DBAL 4.4, doctrine-bundle 3.3, doctrine-migrations-bundle 4.0 and persistence 4.2 (`doctrine/cache` and `doctrine/common` are gone). Plugins that touch Doctrine directly need the same treatment the core bundles got. The changes that reach plugin code most often:
+
+    | Was | Now |
+    | --- | --- |
+    | `Doctrine\ORM\Mapping\ClassMetadataInfo` | `Doctrine\ORM\Mapping\ClassMetadata` |
+    | `Doctrine\ORM\ORMException` | `Doctrine\ORM\Exception\ORMException` (an interface) |
+    | `Doctrine\DBAL\Exception` as a class to throw | an interface - throw `Mautic\CoreBundle\Exception\DbalException` |
+    | `EntityRepository::$_em` | `getEntityManager()` |
+    | `EntityManager::merge()`, cascade `merge` | gone, with no replacement |
+    | `ExpressionBuilder::andX()` / `orX()` (DBAL) | `and()` / `or()`, or `CompositeExpression::and()` / `or()` |
+    | `CompositeExpression::add()` | immutable - build the composite from the finished list of parts |
+    | `Connection::ARRAY_PARAM_OFFSET`, `Connection::PARAM_*_ARRAY` | `Doctrine\DBAL\ArrayParameterType` |
+    | `AbstractPlatform::quoteIdentifier()` | `quoteSingleIdentifier()` |
+    | `AbstractSchemaManager::listTableColumns()` / `listTableNames()` | `introspectTableColumnsByUnquotedName()` / `introspectTableNames()`, which return lists and name objects |
+    | `AbstractAsset::getName()` | `getObjectName()`, whose `toString()` is quoted |
+    | `Doctrine\DBAL\Logging\SQLLogger` | a middleware given to the connection when it is built |
+
+- `Doctrine\DBAL\Connection::createQueryBuilder()` returns `Mautic\CoreBundle\Doctrine\Query\QueryBuilder` on every Mautic connection. DBAL 4 made its builder's state private and dropped the query-part API, and Mautic reads a query back after building it - resolving a table name from an alias, attaching an index hint, rewriting a join condition. The returned builder is a `Doctrine\DBAL\Query\QueryBuilder`, so existing type hints keep working, and it keeps `getQueryPart()`, `getQueryParts()` and `resetQueryPart()`. Code that builds its own DBAL builder with `new QueryBuilder($connection)` loses those methods; take the builder from the connection instead.
+- `Mautic\LeadBundle\Segment\Query\QueryBuilder` now extends `Mautic\CoreBundle\Doctrine\Query\QueryBuilder` rather than carrying its own copy of the query-part bookkeeping. Its public API is unchanged.
+- `Mautic\CoreBundle\Entity\CommonRepository::appendExpression()` takes the list of parts by reference and returns nothing: `appendExpression(array &$parts, $expr): void`. Build the composite from the finished list with the new `createCompositeExpression($queryBuilder, 'and'|'or', $parts)`, which returns `null` when there is nothing to combine. A repository that overrode `addSearchCommandWhereClause()` and appended to a composite needs the same shape:
+
+```diff
+-$expr = $q->expr()->andX();
+-$expr->add($q->expr()->eq('a.b', ':c'));
++$parts = [];
++$this->appendExpression($parts, $q->expr()->eq('a.b', ':c'));
++$expr = $this->createCompositeExpression($q, 'and', $parts);
+```
+
+- `Mautic\CoreBundle\Cache\ResultCacheHelper::getCache()` returns a PSR-6 `CacheItemPoolInterface` instead of a `Doctrine\Common\Cache\CacheProvider`, which doctrine-bundle 3 no longer accepts.
+- `Mautic\LeadBundle\Field\SchemaDefinition::getSchemaDefinition()` now returns an explicit `length` for a unique identifier field, where it previously left the length to DBAL. DBAL 4 refuses a VARCHAR without one. The value is the 255 DBAL 3 applied implicitly, so the column is unchanged.
+- `Mautic\CoreBundle\Model\FormModel::cleanAlias()` and `Mautic\FormBundle\Entity\SubmissionRepository` check a generated alias against `Mautic\CoreBundle\Doctrine\ReservedWords` instead of the platform's keyword list, which DBAL 4 deprecated with no replacement. The list is the union of the newest MySQL and MariaDB reserved words, so a handful of aliases that were left alone before are now prefixed.
