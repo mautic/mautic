@@ -102,7 +102,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * @param array<string, mixed> $systemEntry
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Exception
      */
     public function trackDownload(Asset $asset, ?Request $request = null, int $code = 200, array $systemEntry = []): void

@@ -13,7 +13,7 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function testNewActionWithJapanese(): void
     {

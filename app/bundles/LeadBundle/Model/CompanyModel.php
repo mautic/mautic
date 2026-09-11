@@ -266,7 +266,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array|Company $companies
      * @param array|Lead    $lead
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function addLeadToCompany($companies, $lead): bool
     {
@@ -387,7 +387,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function removeLeadFromCompany($companies, $lead): void
     {

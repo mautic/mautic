@@ -142,7 +142,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @throws \Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function testOnCampaignTriggerActionSendEmailToContactWithWrongEventType(): void
     {

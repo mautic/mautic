@@ -60,7 +60,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     protected function createLeadCompany(Lead $contactA, Company $company): CompanyLead
     {

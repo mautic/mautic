@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Model;
 
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Exception\InvalidValueException;
 use Mautic\CoreBundle\Exception\RecordException;
 use Mautic\CoreBundle\Helper\ArrayHelper;

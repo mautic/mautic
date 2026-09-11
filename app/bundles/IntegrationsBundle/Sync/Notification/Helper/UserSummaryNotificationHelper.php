@@ -34,7 +34,7 @@ final class UserSummaryNotificationHelper
 
     /**
      * @throws ObjectNotSupportedException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function writeNotifications(string $mauticObject, string $listTranslationKey): void
     {
@@ -67,7 +67,7 @@ final class UserSummaryNotificationHelper
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws ObjectNotSupportedException
      */
     private function findAndSendToUsers(array $ids): void
@@ -101,7 +101,7 @@ final class UserSummaryNotificationHelper
 
     /**
      * @throws ObjectNotSupportedException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     private function writeNotification(array $ids, int $userId): void
     {

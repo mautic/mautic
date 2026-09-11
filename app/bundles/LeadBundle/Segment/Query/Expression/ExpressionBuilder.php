@@ -27,32 +27,32 @@ class ExpressionBuilder extends BaseExpressionBuilder
      * (contact ids, counts, timestamps), so they are cast here rather than at every
      * call site.
      */
-    public function eq($x, $y): string
+    public function eq(string|int|float $x, string|int|float $y): string
     {
         return parent::eq((string) $x, (string) $y);
     }
 
-    public function neq($x, $y): string
+    public function neq(string|int|float $x, string|int|float $y): string
     {
         return parent::neq((string) $x, (string) $y);
     }
 
-    public function lt($x, $y): string
+    public function lt(string|int|float $x, string|int|float $y): string
     {
         return parent::lt((string) $x, (string) $y);
     }
 
-    public function lte($x, $y): string
+    public function lte(string|int|float $x, string|int|float $y): string
     {
         return parent::lte((string) $x, (string) $y);
     }
 
-    public function gt($x, $y): string
+    public function gt(string|int|float $x, string|int|float $y): string
     {
         return parent::gt((string) $x, (string) $y);
     }
 
-    public function gte($x, $y): string
+    public function gte(string|int|float $x, string|int|float $y): string
     {
         return parent::gte((string) $x, (string) $y);
     }

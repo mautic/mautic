@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Model\AssetModel;
