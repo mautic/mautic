@@ -10,7 +10,9 @@ use Mautic\FormBundle\Form\Type\FormFieldCheckboxGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldEmailType;
 use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Helper\PhoneCountryValidationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Intl\Countries;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class FormValidationSubscriber implements EventSubscriberInterface
@@ -113,19 +115,68 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     private function fieldTelValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();
-        $value = $event->getValue();
 
-        if ('tel' === $field->getType() && !empty($field->getValidation()['international'])) {
-            $phoneUtil = PhoneNumberUtil::getInstance();
-            try {
-                $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
-            } catch (NumberParseException) {
-                if (!empty($field->getValidation()['international_validationmsg'])) {
-                    $event->failedValidation($field->getValidation()['international_validationmsg']);
-                } else {
-                    $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'));
-                }
+        if ('tel' !== $field->getType()) {
+            return;
+        }
+
+        $validation = $field->getValidation();
+
+        if ($this->validatePhoneCountry($event, $validation)) {
+            return;
+        }
+
+        $this->validateInternationalPhone($event, $validation);
+    }
+
+    /**
+     * @param array<string, mixed> $validation
+     */
+    private function validatePhoneCountry(Events\ValidationEvent $event, array $validation): bool
+    {
+        if (empty($validation['country'])) {
+            return false;
+        }
+
+        $countryCode = (string) $validation['country'];
+
+        // Unknown/legacy value (e.g. a display name saved before this stored the ISO code):
+        // skip validation rather than crash or reject every submission.
+        if (!Countries::exists($countryCode)) {
+            return false;
+        }
+
+        if (PhoneCountryValidationHelper::isValidForCountry((string) $event->getValue(), $countryCode)) {
+            return false;
+        }
+
+        $message = $validation['country_validationmsg'] ?? $this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => Countries::getName($countryCode)], 'validators');
+        $event->failedValidation($message);
+
+        return true;
+    }
+
+    /**
+     * @param array<string, mixed> $validation
+     */
+    private function validateInternationalPhone(Events\ValidationEvent $event, array $validation): void
+    {
+        if (empty($validation['international'])) {
+            return;
+        }
+
+        $phoneUtil = PhoneNumberUtil::getInstance();
+
+        try {
+            $phoneUtil->parse((string) $event->getValue(), PhoneNumberUtil::UNKNOWN_REGION);
+        } catch (NumberParseException) {
+            if (!empty($validation['international_validationmsg'])) {
+                $event->failedValidation($validation['international_validationmsg']);
+
+                return;
             }
+
+            $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'));
         }
     }
 
