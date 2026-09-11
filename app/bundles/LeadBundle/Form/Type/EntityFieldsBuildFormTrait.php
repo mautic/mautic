@@ -282,19 +282,21 @@ trait EntityFieldsBuildFormTrait
                             $constraints[] = new SafeUrl();
                     }
 
-                    $builder->add(
-                        $alias,
-                        $type,
-                        [
-                            'required'    => $field['isRequired'],
-                            'label'       => $field['label'],
-                            'label_attr'  => ['class' => 'control-label'],
-                            'attr'        => $attr,
-                            'data'        => $value,
-                            'mapped'      => $mapped,
-                            'constraints' => $constraints,
-                        ]
-                    );
+                    $typeOptions = [
+                        'required'    => $field['isRequired'],
+                        'label'       => $field['label'],
+                        'label_attr'  => ['class' => 'control-label'],
+                        'attr'        => $attr,
+                        'data'        => $value,
+                        'mapped'      => $mapped,
+                        'constraints' => $constraints,
+                    ];
+
+                    if (UrlType::class === $type) {
+                        $typeOptions['default_protocol'] = 'http';
+                    }
+
+                    $builder->add($alias, $type, $typeOptions);
                     break;
             }
         }

@@ -94,6 +94,7 @@ final class MobileNotificationType extends AbstractType
                     'tooltip' => 'mautic.notification.form.mobile.url.tooltip',
                 ],
                 'required' => false,
+                'default_protocol' => 'http',
             ]
         );
 

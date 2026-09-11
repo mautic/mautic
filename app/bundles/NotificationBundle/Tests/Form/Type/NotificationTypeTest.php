@@ -91,6 +91,13 @@ final class NotificationTypeTest extends TypeTestCase
         $this->assertCount(0, $view->vars['errors']);
     }
 
+    public function testUrlFieldUsesHttpAsDefaultProtocol(): void
+    {
+        $form = $this->factory->create(NotificationType::class);
+
+        $this->assertSame('http', $form->get('url')->getConfig()->getOption('default_protocol'));
+    }
+
     public function testSubmitValidData(): void
     {
         $form = $this->factory->create(NotificationType::class);

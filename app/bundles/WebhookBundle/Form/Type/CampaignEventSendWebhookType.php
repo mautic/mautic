@@ -33,6 +33,7 @@ final class CampaignEventSendWebhookType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
                 'required'    => true,
+                'default_protocol' => 'http',
                 'constraints' => [
                     new NotBlank(
                         message: 'mautic.core.value.required'

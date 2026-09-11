@@ -101,6 +101,7 @@ final class NotificationType extends AbstractType
                     'tooltip' => 'mautic.notification.form.url.tooltip',
                 ],
                 'required' => false,
+                'default_protocol' => 'http',
             ]
         );
 

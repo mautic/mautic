@@ -62,6 +62,7 @@ final class WebhookType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => true,
+                'default_protocol' => 'http',
             ]
         );
 

@@ -32,6 +32,7 @@ final class SubmitActionRepostType extends AbstractType
                     'class'    => 'form-control',
                     'preaddon' => 'ri-earth-line',
                 ],
+                'default_protocol' => 'http',
                 'constraints' => [
                     new NotBlank(
                         message: 'mautic.core.value.required'
