@@ -896,7 +896,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
     private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
-        \assert($joins instanceof TrackingQueryBuilder);
+        \assert($query instanceof TrackingQueryBuilder);
         $joins = $query->getQueryParts()['join'];
         if (empty($joins) || empty($joins[$fromAlias])) {
             return false;

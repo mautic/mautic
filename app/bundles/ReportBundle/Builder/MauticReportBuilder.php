@@ -279,7 +279,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         $selectColumns            = [];
         $aggregators              = $this->entity->getAggregators();
-        \assert($groupByColumns instanceof TrackingQueryBuilder);
+        \assert($queryBuilder instanceof TrackingQueryBuilder);
         $groupByColumns           = $queryBuilder->getQueryPart('groupBy') ?? [];
         $groupByColumnsKeys       = array_flip($groupByColumns);
         $aggregatorFieldKeys      = $groupByOptions && $aggregators

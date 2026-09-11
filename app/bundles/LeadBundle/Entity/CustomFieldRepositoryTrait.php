@@ -45,7 +45,7 @@ trait CustomFieldRepositoryTrait
         // Generate where clause first to know if we need to use distinct on primary ID or not
         $this->useDistinctCount = false;
         $this->buildWhereClause($dq, $args);
-        \assert($groupBy instanceof TrackingQueryBuilder);
+        \assert($dq instanceof TrackingQueryBuilder);
         $groupBy = $dq->getQueryPart('groupBy');
 
         if (!empty($args['withTotalCount']) || !isset($args['count'])) {

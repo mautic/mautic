@@ -405,13 +405,13 @@ final class ReportSubscriber implements EventSubscriberInterface
 
             \assert($queryBuilder instanceof TrackingQueryBuilder);
             if ('lp' === $queryBuilder->getQueryPart('from')[0]['alias']) {
-                \assert($join instanceof TrackingQueryBuilder);
+                \assert($queryBuilder instanceof TrackingQueryBuilder);
                 $join = $queryBuilder->getQueryPart('join');
                 $queryBuilder->resetQueryPart('join');
 
                 $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
                 if (isset($join['l'])) {
-                    \assert($where instanceof TrackingQueryBuilder);
+                    \assert($queryBuilder instanceof TrackingQueryBuilder);
                     $where = $queryBuilder->getQueryPart('where');
                     foreach ($join['l'] as $item) {
                         if (str_contains($where, $item['joinAlias'].'.leadlist_id')) {

@@ -534,7 +534,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         }
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
-        \assert($parts instanceof TrackingQueryBuilder);
+        \assert($query instanceof TrackingQueryBuilder);
         $parts = $query->getQueryParts();
         $order = $parts['orderBy'];
         \assert($query instanceof TrackingQueryBuilder);

@@ -800,7 +800,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                             $queryBuilder->expr()->in('lla.leadlist_id', ":{$unique}")
                         )
                     );
-                \assert($from instanceof TrackingQueryBuilder);
+                \assert($queryBuilder instanceof TrackingQueryBuilder);
                 $from = $queryBuilder->getQueryPart('from')[0];
                 \assert($queryBuilder instanceof TrackingQueryBuilder);
                 $queryBuilder->resetQueryPart('from');
@@ -1315,7 +1315,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
 
         $this->useDistinctCount = true;
-        \assert($primaryTable instanceof TrackingQueryBuilder);
+        \assert($q instanceof TrackingQueryBuilder);
         if (!preg_match('/"'.preg_quote($primaryTable['alias'], '/').'"/i', json_encode($q->getQueryPart('join')))) {
             $q->{$joinType}(
                 $primaryTable['from_alias'],
@@ -1326,7 +1326,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
         foreach ($tables as $table) {
             $exists = false;
-            \assert($joins instanceof TrackingQueryBuilder);
+            \assert($q instanceof TrackingQueryBuilder);
             $joins  = $q->getQueryPart('join');
 
             if (isset($joins[$table['from_alias']])) {

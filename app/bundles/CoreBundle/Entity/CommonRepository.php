@@ -1447,7 +1447,7 @@ class CommonRepository extends ServiceEntityRepository
 
             if ([] !== $partials) {
                 $newSelect = implode(', ', $partials);
-                \assert($select instanceof TrackingQueryBuilder);
+                \assert($q instanceof TrackingQueryBuilder);
                 $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
                 if ($isOrm) {
                     $q->select($newSelect);

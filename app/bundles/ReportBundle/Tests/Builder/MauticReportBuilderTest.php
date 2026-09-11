@@ -44,7 +44,7 @@ final class MauticReportBuilderTest extends TestCase
             new QueryBuilder($this->connection),
             new QueryBuilder($this->connection),
         );
-        $this->connection->method('getExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
+        $this->connection->method('createExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
         $this->connection->method('quote')->willReturnMap([['', null, "''"]]);
     }
 

@@ -552,7 +552,7 @@ class EmailRepository extends CommonRepository
 
     private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
-        \assert($joins instanceof TrackingQueryBuilder);
+        \assert($query instanceof TrackingQueryBuilder);
         $joins = $query->getQueryParts()['join'][$fromAlias] ?? null;
 
         if (empty($joins)) {

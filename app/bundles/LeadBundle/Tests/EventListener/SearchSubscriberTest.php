@@ -53,7 +53,7 @@ final class SearchSubscriberTest extends TestCase
                     $primaryTable = $tables[0];
                     unset($tables[0]);
                     $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
-                    \assert($joins instanceof TrackingQueryBuilder);
+                    \assert($q instanceof TrackingQueryBuilder);
                     $joins    = $q->getQueryPart('join');
                     if (!array_key_exists($primaryTable['alias'], $joins)) {
                         $q->{$joinType}(
@@ -76,7 +76,7 @@ final class SearchSubscriberTest extends TestCase
                 }
             );
 
-        $connection->method('getExpressionBuilder')
+        $connection->method('createExpressionBuilder')
             ->willReturn(new ExpressionBuilder($connection));
 
         $mockPlatform->method('getName')
