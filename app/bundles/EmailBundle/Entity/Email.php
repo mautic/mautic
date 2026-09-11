@@ -45,6 +45,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 
 #[ApiResource(
     operations: [
@@ -394,8 +395,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->build();
 
         $builder->addNullableField('template', Types::STRING);
-        $builder->addNullableField('content', Types::ARRAY);
-        $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
+        $builder->addNullableField('content', ArrayType::ARRAY);
+        $builder->addNullableField('utmTags', ArrayType::ARRAY, 'utm_tags');
         $builder->addNullableField('plainText', Types::TEXT, 'plain_text');
         $builder->addNullableField('customHtml', Types::TEXT, 'custom_html');
         $builder->addNullableField('emailType', Types::TEXT, 'email_type');

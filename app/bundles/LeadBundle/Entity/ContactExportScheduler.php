@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 
 class ContactExportScheduler
 {
@@ -46,7 +47,7 @@ class ContactExportScheduler
         $builder->createField('scheduledDateTime', Types::DATETIME_IMMUTABLE)
             ->columnName('scheduled_datetime')
             ->build();
-        $builder->addNullableField('data', Types::ARRAY);
+        $builder->addNullableField('data', ArrayType::ARRAY);
     }
 
     public function getId(): ?int

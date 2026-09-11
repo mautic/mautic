@@ -200,8 +200,7 @@ $container->loadFromExtension('doctrine', [
             ]),
         ],
         'types'    => [
-            // Types::ARRAY is deprecated in DBAL, but the "array" type name is still used by entity mappings
-            'array'                       => Type\ArrayType::class,
+            Type\ArrayType::ARRAY         => Type\ArrayType::class,
             Types::DATETIME_MUTABLE       => Type\UTCDateTimeType::class,
             Types::DATETIME_IMMUTABLE     => Type\UTCDateTimeImmutableType::class,
             Type\GeneratedType::GENERATED => Type\GeneratedType::class,

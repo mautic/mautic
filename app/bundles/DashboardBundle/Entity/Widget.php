@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 
 class Widget extends FormEntity
 {
@@ -95,7 +96,7 @@ class Widget extends FormEntity
         $builder->addField('height', Types::INTEGER);
         $builder->addNullableField('cacheTimeout', Types::INTEGER, 'cache_timeout');
         $builder->addNullableField('ordering', Types::INTEGER);
-        $builder->addNullableField('params', Types::ARRAY);
+        $builder->addNullableField('params', ArrayType::ARRAY);
     }
 
     /**

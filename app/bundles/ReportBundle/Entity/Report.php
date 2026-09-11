@@ -23,6 +23,7 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 
 #[ApiResource(
     operations: [
@@ -175,29 +176,29 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
         $builder->addField('source', Types::STRING);
 
-        $builder->createField('columns', Types::ARRAY)
+        $builder->createField('columns', ArrayType::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('filters', Types::ARRAY)
+        $builder->createField('filters', ArrayType::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('tableOrder', Types::ARRAY)
+        $builder->createField('tableOrder', ArrayType::ARRAY)
             ->columnName('table_order')
             ->nullable()
             ->build();
 
-        $builder->createField('graphs', Types::ARRAY)
+        $builder->createField('graphs', ArrayType::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('groupBy', Types::ARRAY)
+        $builder->createField('groupBy', ArrayType::ARRAY)
             ->columnName('group_by')
             ->nullable()
             ->build();
 
-        $builder->createField('aggregators', Types::ARRAY)
+        $builder->createField('aggregators', ArrayType::ARRAY)
             ->columnName('aggregators')
             ->nullable()
             ->build();
