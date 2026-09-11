@@ -380,6 +380,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/TechEnthusGH"><img src="https://avatars.githubusercontent.com/u/289884007?v=4?s=100" width="100px;" alt="TechEnthusGH"/><br /><sub><b>TechEnthusGH</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=TechEnthusGH" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://vaibhavsrivastava.me"><img src="https://avatars.githubusercontent.com/u/173471846?v=4?s=100" width="100px;" alt="Vaibhav Srivastava"/><br /><sub><b>Vaibhav Srivastava</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=vaibhav8a" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://rant.ae"><img src="https://avatars.githubusercontent.com/u/45711841?v=4?s=100" width="100px;" alt="Dmitry"/><br /><sub><b>Dmitry</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=darkdi" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://turingpoint.de/en/"><img src="https://avatars.githubusercontent.com/u/36455663?v=4?s=100" width="100px;" alt="Jan Kahmen"/><br /><sub><b>Jan Kahmen</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=kah-ja" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/brynnclaw"><img src="https://avatars.githubusercontent.com/u/261708852?v=4?s=100" width="100px;" alt="Brynn Bendixen"/><br /><sub><b>Brynn Bendixen</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=brynnclaw" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://dadosquebatem.com.br/"><img src="https://avatars.githubusercontent.com/u/152011896?v=4?s=100" width="100px;" alt="Fábio Oliveira"/><br /><sub><b>Fábio Oliveira</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=fabiooliveir" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/peculiaruc"><img src="https://avatars.githubusercontent.com/u/35475543?v=4?s=100" width="100px;" alt="Peculiar C. Umeh"/><br /><sub><b>Peculiar C. Umeh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=peculiaruc" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
