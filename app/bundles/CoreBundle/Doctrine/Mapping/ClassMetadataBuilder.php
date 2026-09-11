@@ -33,11 +33,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * Creates a ManyToOne Association Builder.
      *
      * Note: This method does not add the association, you have to call build() on the AssociationBuilder.
-     *
-     * @param string $name
-     * @param string $targetEntity
-     *
-     * @return AssociationBuilder
      */
     public function createManyToOne(string $name, string $targetEntity): AssociationBuilder
     {
@@ -53,11 +48,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Creates a OneToOne Association Builder.
-     *
-     * @param string $name
-     * @param string $targetEntity
-     *
-     * @return AssociationBuilder
      */
     public function createOneToOne(string $name, string $targetEntity): AssociationBuilder
     {
@@ -306,9 +296,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Adds Field. Overridden for IDE suggestions when stringing methods in entity class.
      *
-     * @param string $name
-     * @param string $type
-     *
      * @return $this
      */
     public function addField(string $name, string $type, array $mapping = []): static
@@ -335,7 +322,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * @param string  $name
      * @param mixed[] $flags
      * @param mixed[] $options
      */
