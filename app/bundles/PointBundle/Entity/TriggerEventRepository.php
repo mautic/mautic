@@ -39,7 +39,7 @@ class TriggerEventRepository extends CommonRepository
     }
 
     /**
-     * @param ArrayCollection<int,GroupContactScore> $groupScores
+     * @param Collection<int,GroupContactScore> $groupScores
      *
      * @return mixed[]
      */

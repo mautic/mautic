@@ -557,7 +557,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int, Field>
+     * @return Collection<int, Field>
      */
     public function getFields()
     {
@@ -681,7 +681,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return ArrayCollection<string, Action>
+     * @return Collection<string, Action>
      */
     public function getActions()
     {
