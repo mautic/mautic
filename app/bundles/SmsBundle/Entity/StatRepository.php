@@ -38,7 +38,7 @@ class StatRepository extends CommonRepository
 
     public function getSentStats($smsId, $listId = null): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'sms_messages_stats', 's')
             ->where('s.sms_id = :sms')
@@ -70,7 +70,7 @@ class StatRepository extends CommonRepository
      */
     public function getSentCount($smsIds = null, $listId = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(s.id) as sent_count')
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 's');
@@ -169,7 +169,7 @@ class StatRepository extends CommonRepository
      */
     public function updateLead($fromLeadId, $toLeadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'sms_message_stats')
             ->set('sms_id', (int) $toLeadId)
             ->where('sms_id = '.(int) $fromLeadId)
@@ -178,7 +178,7 @@ class StatRepository extends CommonRepository
 
     public function deleteStat($id): void
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'sms_message_stats', ['id' => (int) $id]);
+        $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'sms_message_stats', ['id' => (int) $id]);
     }
 
     public function getTableAlias(): string

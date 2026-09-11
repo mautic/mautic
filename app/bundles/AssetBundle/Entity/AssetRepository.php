@@ -115,7 +115,7 @@ class AssetRepository extends CommonRepository
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
-                    $this->_em->getConnection()->createQueryBuilder(),
+                    $this->getEntityManager()->getConnection()->createQueryBuilder(),
                     'asset_id',
                     'asset_projects_xref',
                     $this->getTableAlias(),
@@ -180,7 +180,7 @@ class AssetRepository extends CommonRepository
      */
     public function getAssetSize(array $assets): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('sum(a.size) as total_size')
             ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
             ->where('a.id IN (:assetIds)')
@@ -193,7 +193,7 @@ class AssetRepository extends CommonRepository
 
     public function upDownloadCount(int $id, int $increaseBy = 1, bool $unique = false): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'assets')
             ->set('download_count', 'download_count + '.$increaseBy)

@@ -43,7 +43,7 @@ class StatRepository extends CommonRepository
 
     public function getViewsCount(int $id): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('COUNT(s.id) as views_count')
             ->from(MAUTIC_TABLE_PREFIX.'focus_stats', 's');
@@ -62,7 +62,7 @@ class StatRepository extends CommonRepository
 
     public function getUniqueViewsCount(int $id): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('COUNT(DISTINCT s.lead_id) as views_count')
             ->from(MAUTIC_TABLE_PREFIX.'focus_stats', 's');
@@ -81,7 +81,7 @@ class StatRepository extends CommonRepository
 
     public function getClickThroughCount(int $id): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('COUNT(DISTINCT s.lead_id) as click_through_count')
             ->from(MAUTIC_TABLE_PREFIX.'focus_stats', 's');

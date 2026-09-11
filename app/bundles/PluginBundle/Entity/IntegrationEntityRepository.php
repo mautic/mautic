@@ -31,7 +31,7 @@ class IntegrationEntityRepository extends CommonRepository
         $limit = 0,
         $integrationEntityIds = null,
     ): array {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('DISTINCT(i.integration_entity_id), i.id, i.internal_entity_id, i.integration_entity, i.internal_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
 
@@ -103,7 +103,7 @@ class IntegrationEntityRepository extends CommonRepository
 
     public function getIntegrationEntity($integration, $integrationEntity, $internalEntity, $internalEntityId, $leadFields = null): ?array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i')
             ->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id');
         $q->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id');
@@ -174,7 +174,7 @@ class IntegrationEntityRepository extends CommonRepository
         } else {
             $joinTable = 'leads';
         }
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i')
             ->join('i', MAUTIC_TABLE_PREFIX.$joinTable, 'l', 'l.id = i.internal_entity_id');
 
@@ -310,7 +310,7 @@ class IntegrationEntityRepository extends CommonRepository
         } else {
             $joinTable = 'leads';
         }
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.$joinTable, 'l');
 
         if (false === $limit) {
@@ -416,7 +416,7 @@ class IntegrationEntityRepository extends CommonRepository
      */
     public function getIntegrationEntityByLead($leadId, $integration = null, $integrationEntity = null, $internalEntity = null, $limit = 100)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
 
         if (false === $limit) {
@@ -430,7 +430,7 @@ class IntegrationEntityRepository extends CommonRepository
 
         if (empty($integration)) {
             // get list of published integrations
-            $pq = $this->_em->getConnection()->createQueryBuilder()
+            $pq = $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->select('p.name')
                 ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
                 ->where('p.is_published = 1');
@@ -477,7 +477,7 @@ class IntegrationEntityRepository extends CommonRepository
 
     public function markAsDeleted(array $integrationIds, $integration, $internalEntityType): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'integration_entity')
             ->set('internal_entity', ':entity')
             ->where(
@@ -494,7 +494,7 @@ class IntegrationEntityRepository extends CommonRepository
 
     public function findLeadsToDelete($internalEntity, $leadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity');
 
@@ -507,7 +507,7 @@ class IntegrationEntityRepository extends CommonRepository
 
     public function updateErrorLeads($internalEntity, $leadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'integration_entity')
             ->set('internal_entity', ':lead')->setParameter('lead', 'lead');
 
@@ -518,7 +518,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('internalEntity', $internalEntity)
             ->executeStatement();
 
-        $z = $this->_em->getConnection()->createQueryBuilder()
+        $z = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity');
 

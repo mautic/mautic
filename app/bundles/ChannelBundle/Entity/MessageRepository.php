@@ -69,7 +69,7 @@ final class MessageRepository extends CommonRepository
 
     public function getMessageChannels($messageId): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')
             ->select('id, channel, channel_id, properties')
             ->where($q->expr()->eq('message_id', ':messageId'))
@@ -92,7 +92,7 @@ final class MessageRepository extends CommonRepository
      */
     public function getChannelMessageByChannelId($channelId)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')
             ->select('id, channel, channel_id, properties, message_id')
             ->where($q->expr()->eq('id', ':channelId'))
@@ -110,7 +110,7 @@ final class MessageRepository extends CommonRepository
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'),
             $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
-                $this->_em->getConnection()->createQueryBuilder(),
+                $this->getEntityManager()->getConnection()->createQueryBuilder(),
                 'message_id',
                 'message_projects_xref',
                 $this->getTableAlias(),

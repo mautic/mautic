@@ -181,7 +181,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'),
         ])) {
             return $this->handleProjectFilter(
-                $this->_em->getConnection()->createQueryBuilder(),
+                $this->getEntityManager()->getConnection()->createQueryBuilder(),
                 'company_id',
                 'company_projects_xref',
                 $this->getTableAlias(),
@@ -236,7 +236,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getCompanies(bool $user = false, $id = '')
     {
-        $q                = $this->_em->getConnection()->createQueryBuilder();
+        $q                = $this->getEntityManager()->getConnection()->createQueryBuilder();
         static $companies = [];
 
         if ($user) {
@@ -280,7 +280,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getLeadCount($companyIds)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(cl.lead_id) as thecount, cl.company_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
@@ -318,7 +318,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function identifyCompany($companyName, $city = null, $country = null, $state = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if (empty($companyName)) {
             return [];
         }
@@ -431,14 +431,14 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         int $limit = 10,
         int $start = 0,
     ): array {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $alias = $prefix = $this->getTableAlias();
         if (!empty($prefix)) {
             $prefix .= '.';
         }
 
-        $tableName = $this->_em->getClassMetadata($this->getEntityName())->getTableName();
+        $tableName = $this->getEntityManager()->getClassMetadata($this->getEntityName())->getTableName();
 
         $class      = '\\'.$this->getClassName();
         $reflection = new \ReflectionClass(new $class());
@@ -575,7 +575,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getCompanyLookupData(string $filterVal): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('id, companyname, companycity, companystate')
             ->from(MAUTIC_TABLE_PREFIX.Company::TABLE_NAME)

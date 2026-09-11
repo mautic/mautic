@@ -28,7 +28,7 @@ final class SummaryRepository extends CommonRepository
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
     ): array {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select(
                 'cs.event_id',
                 'SUM(cs.scheduled_count) as scheduled_count',

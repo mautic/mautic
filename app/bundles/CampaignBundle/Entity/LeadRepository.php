@@ -137,7 +137,7 @@ class LeadRepository extends CommonRepository
         if (empty($options['campaigns'])) {
             return false;
         }
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l');
         $q->where(

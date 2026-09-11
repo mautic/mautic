@@ -28,7 +28,7 @@ class FocusRepository extends CommonRepository
     {
         $alias = $this->getTableAlias();
 
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($alias)
             ->from(Focus::class, $alias, $alias.'.id');
@@ -52,7 +52,7 @@ class FocusRepository extends CommonRepository
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'),
             $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
-                $this->_em->getConnection()->createQueryBuilder(),
+                $this->getEntityManager()->getConnection()->createQueryBuilder(),
                 'focus_id',
                 'focus_projects_xref',
                 $this->getTableAlias(),

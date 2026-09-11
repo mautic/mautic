@@ -129,7 +129,7 @@ class HitRepository extends CommonRepository
      */
     public function getEmailClickthroughHitCount($emailIds, ?\DateTime $fromDate = null, $code = 200, ?\DateTime $toDate = null): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         if (!is_array($emailIds)) {
             $emailIds = [$emailIds];
@@ -230,7 +230,7 @@ class HitRepository extends CommonRepository
      */
     public function getLatestHit($options): ?\DateTime
     {
-        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sq->select('h.date_hit')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->orderBy('h.date_hit', 'DESC')
@@ -364,7 +364,7 @@ class HitRepository extends CommonRepository
      */
     public function getDwellTimesForPages(array $pageIds, array $options): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
             ->select('ph.page_id, ph.date_hit, ph.date_left, p.title')
@@ -417,7 +417,7 @@ class HitRepository extends CommonRepository
      */
     public function getDwellTimesForUrl($url, array $options): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
             ->select('ph.id, ph.page_id, ph.date_hit, ph.date_left, ph.tracking_id, ph.page_language, p.title')
@@ -470,7 +470,7 @@ class HitRepository extends CommonRepository
     public function updateHitDateLeft($lastHitId): void
     {
         $dt = new DateTimeHelper();
-        $q  = $this->_em->getConnection()->createQueryBuilder();
+        $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('date_left', ':datetime')
             ->where('id = '.(int) $lastHitId)
@@ -529,7 +529,7 @@ class HitRepository extends CommonRepository
 
     public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('lead_id', (int) $leadId)
             ->set('tracking_id', ':newTrackingId')
@@ -548,7 +548,7 @@ class HitRepository extends CommonRepository
      */
     public function updateLead($fromLeadId, $toLeadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
@@ -557,7 +557,7 @@ class HitRepository extends CommonRepository
 
     public function getLatestHitDateByLead(int $leadId, ?string $trackingId = null): ?\DateTime
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('MAX(date_hit)')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits')
             ->where('lead_id = :leadId')

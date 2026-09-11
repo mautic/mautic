@@ -22,7 +22,7 @@ class RoleRepository extends CommonRepository
         $q = $this->createQueryBuilder('r');
         $q->select('r');
 
-        $sq = $this->_em->createQueryBuilder()
+        $sq = $this->getEntityManager()->createQueryBuilder()
             ->select('count(u.id)')
             ->from(User::class, 'u')
             ->where('u.role = r');
@@ -62,7 +62,7 @@ class RoleRepository extends CommonRepository
      */
     public function getRoleList($search = '', $limit = 10, $start = 0)
     {
-        $q = $this->_em->createQueryBuilder();
+        $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('partial r.{id, name}')
             ->from(Role::class, 'r');
@@ -135,7 +135,7 @@ class RoleRepository extends CommonRepository
      */
     public function getUserCount($roleIds)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(u.id) as thecount, u.role_id')
             ->from(MAUTIC_TABLE_PREFIX.'users', 'u');

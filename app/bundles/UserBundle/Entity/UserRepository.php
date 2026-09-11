@@ -30,7 +30,7 @@ class UserRepository extends CommonRepository
     {
         $now      = new DateTimeHelper();
         $datetime = $now->toUtcString();
-        $conn     = $this->_em->getConnection();
+        $conn     = $this->getEntityManager()->getConnection();
         $conn->update(MAUTIC_TABLE_PREFIX.'users', [
             'last_login'  => $datetime,
             'last_active' => $datetime,
@@ -40,7 +40,7 @@ class UserRepository extends CommonRepository
     public function setLastActive($user): void
     {
         $now  = new DateTimeHelper();
-        $conn = $this->_em->getConnection();
+        $conn = $this->getEntityManager()->getConnection();
         $conn->update(MAUTIC_TABLE_PREFIX.'users', ['last_active' => $now->toUtcString()], ['id' => (int) $user->getId()]);
     }
 
@@ -97,7 +97,7 @@ class UserRepository extends CommonRepository
      */
     public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
     {
-        $q = $this->_em->createQueryBuilder();
+        $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('DISTINCT partial u.{id, firstName, lastName, email}')
             ->from(User::class, 'u')
@@ -185,7 +185,7 @@ class UserRepository extends CommonRepository
      */
     public function getPositionList($search = '', $limit = 10, $start = 0)
     {
-        $q = $this->_em->createQueryBuilder()
+        $q = $this->getEntityManager()->createQueryBuilder()
             ->select('u.position')
             ->distinct()
             ->from(User::class, 'u')

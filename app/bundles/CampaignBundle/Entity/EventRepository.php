@@ -455,7 +455,7 @@ class EventRepository extends CommonRepository
      */
     public function incrementFailedCount(Event $event): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
             ->set('failed_count', 'failed_count + 1')
@@ -473,7 +473,7 @@ class EventRepository extends CommonRepository
      */
     public function decreaseFailedCount(Event $event): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
             ->set('failed_count', 'failed_count - 1')
@@ -490,7 +490,7 @@ class EventRepository extends CommonRepository
      */
     public function getFailedCount(Event $event): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('failed_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_events')
@@ -506,7 +506,7 @@ class EventRepository extends CommonRepository
      */
     public function resetFailedCountsForEventsInCampaign(Campaign $campaign): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
             ->set('failed_count', ':failedCount')
@@ -522,7 +522,7 @@ class EventRepository extends CommonRepository
      */
     public function getFailedCountLeadEvent(int $leadId, int $eventId): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('count(le.id)')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'le')
             ->innerJoin('le', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fle', 'le.id = fle.log_id')

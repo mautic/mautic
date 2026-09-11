@@ -14,7 +14,7 @@ class PointRepository extends CommonRepository
 
     public function getEntities(array $args = [])
     {
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
             ->from(Point::class, $this->getTableAlias())
@@ -59,7 +59,7 @@ class PointRepository extends CommonRepository
      */
     public function getCompletedLeadActions($type, $leadId): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('p.*')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_action_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX.'points', 'p', 'x.point_id = p.id');
@@ -89,7 +89,7 @@ class PointRepository extends CommonRepository
      */
     public function getCompletedLeadActionsByLeadId($leadId): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('p.*')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_action_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX.'points', 'p', 'x.point_id = p.id');
@@ -124,7 +124,7 @@ class PointRepository extends CommonRepository
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
-                $this->_em->getConnection()->createQueryBuilder(),
+                $this->getEntityManager()->getConnection()->createQueryBuilder(),
                 'point_id',
                 'point_projects_xref',
                 $this->getTableAlias(),

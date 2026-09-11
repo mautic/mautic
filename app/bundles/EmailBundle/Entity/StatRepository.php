@@ -46,7 +46,7 @@ class StatRepository extends CommonRepository
      */
     public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('distinct ph.url, ph.date_hit')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->where('ph.email_id = :emailId')
@@ -184,7 +184,7 @@ class StatRepository extends CommonRepository
             $emailIds = [(int) $emailIds];
         }
 
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->where(
@@ -252,7 +252,7 @@ class StatRepository extends CommonRepository
      */
     public function getStatusCount($column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(s.id) as count')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
@@ -337,7 +337,7 @@ class StatRepository extends CommonRepository
     {
         $inIds = (!is_array($emailIds)) ? [$emailIds] : $emailIds;
 
-        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sq->select('e.email_id, count(e.id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'e')
             ->where(
@@ -409,7 +409,7 @@ class StatRepository extends CommonRepository
      */
     public function getOpenedStatIds($emailIds = null, $listId = null): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('s.id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
@@ -571,7 +571,7 @@ class StatRepository extends CommonRepository
      */
     public function getSentCounts($emailIds = [], ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'e')
             ->where(
@@ -615,7 +615,7 @@ class StatRepository extends CommonRepository
      */
     public function updateLead($fromLeadId, $toLeadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'email_stats')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)

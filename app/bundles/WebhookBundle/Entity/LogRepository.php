@@ -17,7 +17,7 @@ class LogRepository extends CommonRepository
      */
     public function getWebhooksBasedOnLogLimit(int $logMaxLimit): array
     {
-        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('webhook_id')
             ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
             ->groupBy('webhook_id')
@@ -75,7 +75,7 @@ class LogRepository extends CommonRepository
     public function getSuccessVsErrorStatusCodeRatio($webhookId, $limit): int|float|null
     {
         // Generate query to select last X = $limit rows
-        $selectqb = $this->_em->getConnection()->createQueryBuilder();
+        $selectqb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $selectqb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
             ->where($this->getTableAlias().'.webhook_id = :webhookId')
@@ -84,7 +84,7 @@ class LogRepository extends CommonRepository
             ->orderBy($this->getTableAlias().'.date_added', 'DESC');
 
         // Count all responses
-        $countAllQb = $this->_em->getConnection()->createQueryBuilder();
+        $countAllQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $countAllQb->select('COUNT('.$this->getTableAlias().'.id) AS thecount')
             ->from(sprintf('(%s)', $selectqb->getSQL()), $this->getTableAlias())
             ->setParameter('webhookId', $webhookId);
@@ -98,7 +98,7 @@ class LogRepository extends CommonRepository
         }
 
         // Count successful responses
-        $countSuccessQb = $this->_em->getConnection()->createQueryBuilder();
+        $countSuccessQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $countSuccessQb->select('COUNT('.$this->getTableAlias().'.id) AS thecount')
             ->from(sprintf('(%s)', $selectqb->getSQL()), $this->getTableAlias())
             ->andWhere($countSuccessQb->expr()->gte($this->getTableAlias().'.status_code', 200))

@@ -31,7 +31,7 @@ final class PluginRepository extends CommonRepository
 
     public function getEntities(array $args = [])
     {
-        $q = $this->_em->createQueryBuilder();
+        $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias())
             ->from(Plugin::class, $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
 

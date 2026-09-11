@@ -33,7 +33,7 @@ class DoNotContactRepository extends CommonRepository
      */
     public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(dnc.id) as dnc_count')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc');

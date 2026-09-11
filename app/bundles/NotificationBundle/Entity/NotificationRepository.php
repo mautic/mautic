@@ -18,7 +18,7 @@ final class NotificationRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('e')
             ->from(Notification::class, 'e', 'e.id');
@@ -38,7 +38,7 @@ final class NotificationRepository extends CommonRepository
      */
     public function getSentReadCount()
     {
-        $q = $this->_em->createQueryBuilder();
+        $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
             ->from(Notification::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
@@ -132,7 +132,7 @@ final class NotificationRepository extends CommonRepository
     public function upCount($id, $type = 'sent', $increaseBy = 1): void
     {
         try {
-            $q = $this->_em->getConnection()->createQueryBuilder();
+            $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $q->update(MAUTIC_TABLE_PREFIX.'push_notifications')
                 ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
