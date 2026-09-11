@@ -5,12 +5,12 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Proxy\DefaultProxyClassNameResolver;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\QueryBuilder;
@@ -220,7 +220,7 @@ class CommonRepository extends ServiceEntityRepository
         if ($this->getEntityManager()->contains($entity)) {
             $this->getEntityManager()->detach($entity);
 
-            $metadata         = $this->getEntityManager()->getClassMetadata(ClassUtils::getClass($entity));
+            $metadata         = $this->getEntityManager()->getClassMetadata(DefaultProxyClassNameResolver::getClass($entity));
             $identifierValues = $metadata->getIdentifierValues($entity);
             if (count($identifierValues) > 1) {
                 throw new \RuntimeException('Multiple identifiers are not supported.');

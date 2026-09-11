@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Cache;
 
-use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\ORM\Query;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\Adapter\ProxyAdapter;
 
 final class ResultCacheHelper
 {
@@ -50,28 +51,27 @@ final class ResultCacheHelper
         );
     }
 
-    public static function getCache(Configuration $configuration): ?CacheProvider
+    public static function getCache(Configuration $configuration): ?CacheItemPoolInterface
     {
-        $cache = $configuration->getResultCache();
-
-        if (!$cache) {
-            return null;
-        }
-
-        $cache = DoctrineProvider::wrap($cache);
-
-        if (!$cache instanceof CacheProvider) {
-            return null;
-        }
-
-        return $cache;
+        return $configuration->getResultCache();
     }
 
-    private static function createCacheProfile(ResultCacheOptions $resultCacheOptions, CacheProvider $cache): QueryCacheProfile
+    /**
+     * Returns a view of the pool scoped to $namespace: keys are prefixed with it, and
+     * clear() drops only that namespace. This is what doctrine/cache's
+     * setNamespace()/deleteAll() pair used to provide.
+     */
+    public static function getNamespacedCache(CacheItemPoolInterface $cache, string $namespace): AdapterInterface
     {
-        $cache = clone $cache;
-        $cache->setNamespace($resultCacheOptions->getNamespace());
+        return new ProxyAdapter($cache, $namespace);
+    }
 
-        return new QueryCacheProfile((int) $resultCacheOptions->getTtl(), $resultCacheOptions->getId(), $cache);
+    private static function createCacheProfile(ResultCacheOptions $resultCacheOptions, CacheItemPoolInterface $cache): QueryCacheProfile
+    {
+        return new QueryCacheProfile(
+            (int) $resultCacheOptions->getTtl(),
+            $resultCacheOptions->getId(),
+            self::getNamespacedCache($cache, $resultCacheOptions->getNamespace())
+        );
     }
 }
