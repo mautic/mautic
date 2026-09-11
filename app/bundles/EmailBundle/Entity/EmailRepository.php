@@ -12,10 +12,14 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Event\SearchCommandEvent;
+use Mautic\CoreBundle\Event\SearchQueryEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<Email>
@@ -24,6 +28,14 @@ class EmailRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
     use QueryBuilderManipulatorTrait;
+
+    protected EventDispatcherInterface $dispatcher;
+
+    #[Required]
+    public function autowireDispatcher(EventDispatcherInterface $dispatcher): void
+    {
+        $this->dispatcher = $dispatcher;
+    }
 
     public const EMAILS_PREFIX        = 'e';
 
@@ -602,9 +614,15 @@ class EmailRepository extends CommonRepository
             return [$expr, $parameters];
         }
 
+        [$expr, $parameters] = $this->dispatchAddSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $parameters      = [];
 
         switch ($command) {
             case $this->translator->trans('mautic.email.email.searchcommand.isexpired'):
@@ -687,6 +705,10 @@ class EmailRepository extends CommonRepository
             'mautic.core.searchcommand.lang',
             'mautic.project.searchcommand.name',
         ];
+
+        $searchCommandEvent = new SearchCommandEvent($commands, 'email');
+        $this->dispatcher->dispatch($searchCommandEvent);
+        $commands = $searchCommandEvent->getCommands();
 
         return array_merge($commands, parent::getSearchCommands());
     }
@@ -974,5 +996,18 @@ class EmailRepository extends CommonRepository
             ->where($expr);
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $query
+     *
+     * @return array<mixed>
+     */
+    private function dispatchAddSearchCommandWhereClause($query, object $filter): array
+    {
+        $searchQueryEvent = new SearchQueryEvent($filter, $query, $this->getTableAlias(), 'email');
+        $this->dispatcher->dispatch($searchQueryEvent);
+
+        return [$searchQueryEvent->getExpr(), $searchQueryEvent->getParameters()];
     }
 }
