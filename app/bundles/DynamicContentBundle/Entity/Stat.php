@@ -9,6 +9,12 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
+#[ORM\Entity(repositoryClass: StatRepository::class)]
+#[ORM\Table(name: 'dynamic_content_stats')]
+#[ORM\Index(columns: ['dynamic_content_id', 'lead_id'], name: 'stat_dynamic_content_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_dynamic_content_source_search')]
+#[ORM\Index(columns: ['date_sent'], name: 'stat_dynamic_content_date_sent')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     /**
@@ -19,6 +25,8 @@ class Stat
     /**
      * @var DynamicContent|null
      */
+    #[ORM\ManyToOne(targetEntity: DynamicContent::class, inversedBy: 'stats')]
+    #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'SET NULL')]
     private $dynamicContent;
 
     /**
@@ -29,6 +37,7 @@ class Stat
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private $dateSent;
 
     /**
@@ -49,53 +58,28 @@ class Stat
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('dynamic_content_stats')
-            ->setCustomRepositoryClass(StatRepository::class)
-            ->addIndex(['dynamic_content_id', 'lead_id'], 'stat_dynamic_content_search')
-            ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search')
-            ->addIndex(['date_sent'], 'stat_dynamic_content_date_sent');
-
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('dynamicContent', 'DynamicContent')
-            ->inversedBy('stats')
-            ->addJoinColumn('dynamic_content_id', 'id', true, false, 'SET NULL')
-            ->build();
-
         $builder->addLead(true, 'SET NULL');
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('sentCount', 'integer', 'sent_count');
 

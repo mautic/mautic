@@ -3,9 +3,12 @@
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Log
 {
     /**
@@ -16,11 +19,14 @@ class Log
     /**
      * @var Webhook
      */
+    #[ORM\ManyToOne(targetEntity: Webhook::class, inversedBy: 'logs')]
+    #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private $webhook;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'status_code', type: Types::STRING, length: 50)]
     private $statusCode;
 
     /**
@@ -42,16 +48,6 @@ class Log
             ->setCustomRepositoryClass(LogRepository::class)
             ->addIndex(['webhook_id', 'date_added'], 'webhook_id_date_added')
             ->addId();
-
-        $builder->createManyToOne('webhook', 'Webhook')
-            ->inversedBy('logs')
-            ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('statusCode', Types::STRING)
-            ->columnName('status_code')
-            ->length(50)
-            ->build();
 
         $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
         $builder->addNullableField('note', Types::STRING);

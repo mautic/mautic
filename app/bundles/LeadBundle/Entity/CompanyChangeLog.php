@@ -7,6 +7,10 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: CompanyChangeLogRepository::class)]
+#[ORM\Table(name: 'lead_companies_change_log')]
+#[ORM\Index(columns: ['date_added'], name: 'company_date_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class CompanyChangeLog
 {
     /**
@@ -22,21 +26,25 @@ class CompanyChangeLog
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text', length: 50)]
     private $type;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_name', type: 'string', length: 191)]
     private $eventName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'action_name', type: 'string', length: 191)]
     private $actionName;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'company_id', type: 'integer')]
     private $company;
 
     /**
@@ -48,29 +56,9 @@ class CompanyChangeLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_companies_change_log')
-            ->setCustomRepositoryClass(CompanyChangeLogRepository::class)
-            ->addIndex(['date_added'], 'company_date_added');
-
         $builder->addId();
 
         $builder->addLead(false, 'CASCADE', false, 'companyChangeLog');
-
-        $builder->createField('type', 'text')
-            ->length(50)
-            ->build();
-
-        $builder->createField('eventName', 'string')
-            ->columnName('event_name')
-            ->build();
-
-        $builder->createField('actionName', 'string')
-            ->columnName('action_name')
-            ->build();
-
-        $builder->createField('company', 'integer')
-            ->columnName('company_id')
-            ->build();
 
         $builder->addDateAdded();
     }

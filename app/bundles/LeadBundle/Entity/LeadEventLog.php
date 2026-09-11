@@ -12,6 +12,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 /**
  * Store here contact events.
  */
+#[ORM\Entity]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog
 {
     /**
@@ -27,6 +29,8 @@ class LeadEventLog
     /**
      * @var Lead|null
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'eventLog')]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'CASCADE')]
     protected $lead;
 
     /**
@@ -94,11 +98,6 @@ class LeadEventLog
             ->addNullableField('objectId', Types::INTEGER, 'object_id')
             ->addNamedField('dateAdded', Types::DATETIME_MUTABLE, 'date_added')
             ->addNullableField('properties', Types::JSON);
-
-        $builder->createManyToOne('lead', Lead::class)
-            ->addJoinColumn('lead_id', 'id', true, false, 'CASCADE')
-            ->inversedBy('eventLog')
-            ->build();
     }
 
     /**

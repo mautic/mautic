@@ -8,6 +8,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
+#[ORM\Entity(repositoryClass: StatRepository::class)]
+#[ORM\Table(name: 'focus_stats')]
+#[ORM\Index(columns: ['type'], name: 'focus_type')]
+#[ORM\Index(columns: ['type', 'type_id'], name: 'focus_type_id')]
+#[ORM\Index(columns: ['date_added'], name: 'focus_date_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     // Used for querying stats
@@ -25,11 +31,14 @@ class Stat
     /**
      * @var Focus
      */
+    #[ORM\ManyToOne(targetEntity: Focus::class)]
+    #[ORM\JoinColumn(name: 'focus_id', nullable: false, onDelete: 'CASCADE')]
     private $focus;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $type;
 
     /**
@@ -51,19 +60,7 @@ class Stat
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('focus_stats')
-            ->setCustomRepositoryClass(StatRepository::class)
-            ->addIndex(['type'], 'focus_type')
-            ->addIndex(['type', 'type_id'], 'focus_type_id')
-            ->addIndex(['date_added'], 'focus_date_added');
-
         $builder->addId();
-
-        $builder->createManyToOne('focus', 'Focus')
-            ->addJoinColumn('focus_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->addField('type', 'string');
 
         $builder->addNamedField('typeId', 'integer', 'type_id', true);
 

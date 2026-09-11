@@ -7,6 +7,11 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: ListLeadRepository::class)]
+#[ORM\Table(name: 'lead_lists_leads')]
+#[ORM\Index(columns: ['manually_removed'], name: 'manually_removed')]
+#[ORM\Index(columns: ['lead_id', 'leadlist_id', 'manually_removed'], name: 'lead_id_lists_id_removed')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ListLead
 {
     /**
@@ -17,6 +22,9 @@ class ListLead
     /**
      * @var LeadList
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: LeadList::class, inversedBy: 'leads')]
+    #[ORM\JoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
     private $list;
 
     /**
@@ -32,40 +40,22 @@ class ListLead
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'manually_removed', type: 'boolean')]
     private $manuallyRemoved = false;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'manually_added', type: 'boolean')]
     private $manuallyAdded = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_lists_leads')
-            ->setCustomRepositoryClass(ListLeadRepository::class);
-
-        $builder->createManyToOne('list', 'LeadList')
-            ->isPrimaryKey()
-            ->inversedBy('leads')
-            ->addJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
-            ->build();
-
         $builder->addLead(false, 'CASCADE', true);
 
         $builder->addDateAdded();
-
-        $builder->createField('manuallyRemoved', 'boolean')
-            ->columnName('manually_removed')
-            ->build();
-
-        $builder->createField('manuallyAdded', 'boolean')
-            ->columnName('manually_added')
-            ->build();
-
-        $builder->addIndex(['manually_removed'], 'manually_removed');
-        $builder->addIndex(['lead_id', 'leadlist_id', 'manually_removed'], 'lead_id_lists_id_removed');
     }
 
     /**

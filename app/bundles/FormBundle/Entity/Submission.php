@@ -11,6 +11,11 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 
+#[ORM\Entity(repositoryClass: SubmissionRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['tracking_id'], name: 'form_submission_tracking_search')]
+#[ORM\Index(columns: ['date_submitted'], name: 'form_date_submitted')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Submission
 {
     public const TABLE_NAME = 'form_submissions';
@@ -23,6 +28,8 @@ class Submission
     /**
      * @var Form
      */
+    #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'submissions')]
+    #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private $form;
 
     /**
@@ -38,21 +45,26 @@ class Submission
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191, nullable: true)]
     private $trackingId;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_submitted', type: 'datetime')]
     private $dateSubmitted;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text')]
     private $referer;
 
     /**
      * @var Page|null
      */
+    #[ORM\ManyToOne(targetEntity: Page::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
     private $page;
 
     /**
@@ -64,37 +76,11 @@ class Submission
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(SubmissionRepository::class)
-            ->addIndex(['tracking_id'], 'form_submission_tracking_search')
-            ->addIndex(['date_submitted'], 'form_date_submitted');
-
         $builder->addBigIntIdField();
-
-        $builder->createManyToOne('form', 'Form')
-            ->inversedBy('submissions')
-            ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->addIpAddress(true);
 
         $builder->addLead(true, 'SET NULL');
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateSubmitted', 'datetime')
-            ->columnName('date_submitted')
-            ->build();
-
-        $builder->addField('referer', 'text');
-
-        $builder->createManyToOne('page', Page::class)
-            ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
-            ->fetchExtraLazy()
-            ->build();
     }
 
     /**

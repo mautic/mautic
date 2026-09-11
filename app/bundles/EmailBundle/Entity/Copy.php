@@ -5,6 +5,9 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: CopyRepository::class)]
+#[ORM\Table(name: 'email_copies')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Copy
 {
     /**
@@ -12,11 +15,14 @@ class Copy
      *
      * @var string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'string', length: 32)]
     private $id;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_created', type: 'datetime')]
     private $dateCreated;
 
     /**
@@ -34,18 +40,6 @@ class Copy
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('email_copies')
-            ->setCustomRepositoryClass(CopyRepository::class);
-
-        $builder->createField('id', 'string')
-            ->makePrimaryKey()
-            ->length(32)
-            ->build();
-
-        $builder->createField('dateCreated', 'datetime')
-            ->columnName('date_created')
-            ->build();
 
         $builder->addNullableField('body', 'text');
         $builder->addNullableField('bodyText', 'text', 'body_text');

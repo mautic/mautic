@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: PageDraftRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PageDraft
 {
     /**
@@ -24,9 +27,12 @@ class PageDraft
     private ?int $id = null;
 
     public function __construct(
+        #[ORM\OneToOne(inversedBy: 'draft', targetEntity: Page::class)]
+        #[ORM\JoinColumn(name: 'page_id', nullable: false)]
         private Page $page,
         private ?string $html = null,
         private ?string $template = null,
+        #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, options: ['default' => 1])]
         private bool $publicPreview = true,
     ) {
     }
@@ -35,29 +41,16 @@ class PageDraft
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(PageDraftRepository::class)
-            ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
-            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
-
         $builder->addId();
         $builder->addNullableField('html', Types::TEXT);
         $builder->addNullableField('template', Types::STRING);
-        $builder->createField('publicPreview', Types::BOOLEAN)
-            ->columnName('public_preview')
-            ->nullable(false)
-            ->option('default', 1)
-            ->build();
-
-        $builder->createOneToOne('page', Page::class)
-            ->inversedBy('draft')
-            ->addJoinColumn('page_id', 'id', false)
-            ->build();
     }
 
     /**
      * Lifecycle callback to clean URLs in the content.
      */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function cleanUrlsInContent(): void
     {
         $this->html = $this->decodeAmpersands((string) $this->html);
