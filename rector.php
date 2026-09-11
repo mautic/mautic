@@ -65,6 +65,11 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+            // reproduces what DBAL's own ArrayType did before DBAL 4 removed it: the objects
+            // have to be unserialized so that convertToPHPValue can drop the ones that would
+            // carry null bytes. Serializer::decode() refuses the whole value instead, which
+            // loses array fields that legitimately hold one.
+            __DIR__.'/app/bundles/CoreBundle/Doctrine/Type/ArrayType.php',
         ],
 
         // streamed response above
