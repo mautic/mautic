@@ -56,7 +56,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $this->qb             = new QueryBuilder($emMock);
         $this->connectionMock = $this->createMock(Connection::class);
-        $this->connectionMock->method('getExpressionBuilder')
+        $this->connectionMock->method('createExpressionBuilder')
             ->willReturn(new ExpressionBuilder($this->connectionMock));
     }
 
@@ -205,7 +205,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testArgumentCSVArray(): void
     {
-        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $qb   = new TrackingQueryBuilder($this->connectionMock);
         $args = [
             [
                 'col'   => 'l.user_id',
@@ -218,12 +218,12 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
-        \assert($this instanceof TrackingQueryBuilder);
+        \assert($qb instanceof TrackingQueryBuilder);
         $this->assertStringStartsWith('l.user_id IN (', (string) $qb->getQueryPart('where'));
         $parameters = $qb->getParameters();
         $this->assertEquals($matchArgs, array_shift($parameters));
 
-        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $qb   = new TrackingQueryBuilder($this->connectionMock);
         $args = [
             [
                 'col'   => 'l.user_id',
@@ -243,7 +243,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testNoEnquotedArgumentCSVArray(): void
     {
-        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $qb   = new TrackingQueryBuilder($this->connectionMock);
         $args = [
             [
                 'col'   => 'l.user_id',
@@ -261,7 +261,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $parameters = $qb->getParameters();
         $this->assertEquals($matchArgs, array_shift($parameters));
 
-        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $qb   = new TrackingQueryBuilder($this->connectionMock);
         $args = [
             [
                 'col'   => 'l.user_id',
@@ -282,7 +282,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testNoEnquotedStringArgumentCSVArray(): void
     {
-        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $qb   = new TrackingQueryBuilder($this->connectionMock);
         $args = [
             [
                 'col'   => 'l.firstname',
@@ -300,7 +300,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $parameters = $qb->getParameters();
         $this->assertEquals($matchArgs, array_shift($parameters));
 
-        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $qb   = new TrackingQueryBuilder($this->connectionMock);
         $args = [
             [
                 'col'   => 'l.firstname',
@@ -321,7 +321,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testStringArgumentInterpretedAsSingleValueEnquoted(): void
     {
-        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $qb   = new TrackingQueryBuilder($this->connectionMock);
         $args = [
             [
                 'col'   => 'l.firstname',
@@ -336,7 +336,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $parameters = $qb->getParameters();
         $this->assertEquals(trim($args[0]['val'], '"'), array_shift($parameters));
 
-        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $qb   = new TrackingQueryBuilder($this->connectionMock);
         $args = [
             [
                 'col'   => 'l.firstname',

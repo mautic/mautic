@@ -132,7 +132,7 @@ final class SegmentContactsLineChartQuery extends ChartQuery
 
     private function optimizeSearchInLeadEventLog(QueryBuilder $qb): QueryBuilder
     {
-        \assert($fromPart instanceof TrackingQueryBuilder);
+        \assert($qb instanceof TrackingQueryBuilder);
         $fromPart             = $qb->getQueryPart('from');
         $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], MAUTIC_TABLE_PREFIX.LeadEventLog::INDEX_SEARCH);
         \assert($qb instanceof TrackingQueryBuilder);
