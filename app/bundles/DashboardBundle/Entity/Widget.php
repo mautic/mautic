@@ -5,10 +5,10 @@ namespace Mautic\DashboardBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 
 class Widget extends FormEntity
 {

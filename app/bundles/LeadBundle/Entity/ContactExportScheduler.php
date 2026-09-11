@@ -7,9 +7,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
-use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 
 class ContactExportScheduler
 {
