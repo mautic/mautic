@@ -787,10 +787,25 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     private function getTotalCount(QueryBuilder $qb, array &$debugData): int
     {
         $countQb = clone $qb;
+
+        // Total rows must ignore the current page size and sort order.
+        $countQb->setFirstResult(0)
+            ->setMaxResults(null)
+            ->resetQueryPart('orderBy');
+
+        if ($countQb->getQueryPart('groupBy')) {
+            // For grouped reports, the count query only needs one row per group.
+            // Keeping the report's display SELECT list can select non-grouped,
+            // non-aggregated columns and fail under MySQL's ONLY_FULL_GROUP_BY mode.
+            $countQb->resetQueryPart('select')
+                ->select('1');
+        }
+
+        $countSql = $countQb->getSQL();
         $countQb->resetQueryParts();
 
         $countQb->select('count(*)')
-            ->from('('.$qb->getSQL().')', 'c');
+            ->from('('.$countSql.')', 'c');
 
         if ($this->isDebugMode()) {
             $debugData['count_query'] = $countQb->getSQL();
