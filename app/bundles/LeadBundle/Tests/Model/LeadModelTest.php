@@ -71,6 +71,11 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     private MockObject|RequestStack $requestStack;
 
     /**
+     * @var MockObject&IntegrationHelper
+     */
+    private MockObject $integrationHelperMock;
+
+    /**
      * @var MockObject&FieldModel
      */
     private MockObject $fieldModelMock;
@@ -144,6 +149,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->requestStack             = new RequestStack([new Request()]);
+        $this->integrationHelperMock            = $this->createMock(IntegrationHelper::class);
         $this->fieldModelMock                   = $this->createMock(FieldModel::class);
         $this->fieldsWithUniqueIdentifier       = $this->createMock(FieldsWithUniqueIdentifier::class);
         $this->companyModelMock                 = $this->createMock(CompanyModel::class);
@@ -162,7 +168,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->requestStack,
             $this->createStub(IpLookupHelper::class),
             $this->createStub(PathsHelper::class),
-            $this->createStub(IntegrationHelper::class),
+            $this->integrationHelperMock,
             $this->fieldModelMock,
             $this->fieldsWithUniqueIdentifier,
             $this->createStub(ListModel::class),
@@ -465,6 +471,32 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->with('mautic.stage.event.changed');
 
         $this->leadModel->setFieldValues($lead, $data, false, false);
+    }
+
+    /**
+     * The social-cache block fills "empty" fields from social profile data. empty() is true
+     * for 0, so a contact's legitimate zero used to be replaced by whatever social returned.
+     * Reusing $isEmpty keeps one definition of empty in the method.
+     */
+    public function testSetFieldValuesDoesNotReplaceZeroFromSocialCache(): void
+    {
+        $lead = new Lead();
+        $lead->setFields([
+            'core' => [
+                'score' => ['alias' => 'score', 'type' => 'number', 'value' => 0],
+            ],
+        ]);
+
+        $socialCache           = ['twitter' => ['profile' => ['profileHandle' => 999]]];
+        $socialFeatureSettings = ['twitter' => ['leadFields' => ['profileHandle' => 'score']]];
+
+        $this->integrationHelperMock->expects($this->once())
+            ->method('getUserProfiles')
+            ->willReturn([$socialCache, $socialFeatureSettings]);
+
+        $this->leadModel->setFieldValues($lead, ['score' => 0], false, true);
+
+        $this->assertEqualsWithDelta(0.0, $lead->getFieldValue('score'), PHP_FLOAT_EPSILON, 'A zero must not be overwritten from the social cache.');
     }
 
     public function testImportIsIgnoringContactWithNotFoundStage(): void

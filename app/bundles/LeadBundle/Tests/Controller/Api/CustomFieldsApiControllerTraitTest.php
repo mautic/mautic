@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
 final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
 {
@@ -64,10 +65,12 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
     }
 
     /**
+     * A value the client sent explicitly is always forwarded, including 0.
+     *
      * @param array<string, mixed> $expectedParameters
      */
     #[DataProvider('numericValueProvider')]
-    public function testSetCustomFieldValuesFiltersOnlyNumericZero(mixed $value, array $expectedParameters): void
+    public function testSetCustomFieldValuesKeepsValuesSentByTheClient(mixed $value, array $expectedParameters): void
     {
         $model = new class() {
             /**
@@ -108,15 +111,104 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             }
         };
 
-        $controller->setCustomFieldValuesPublic(new Lead(), $this->createStub(Form::class), ['number_field' => $value]);
+        $controller->setCustomFieldValuesPublic(new Lead(), $this->createFormStub([]), ['number_field' => $value]);
 
         $this->assertSame($expectedParameters, $model->parameters);
+    }
+
+    /**
+     * A value the client did NOT send is injected by the form loop from the entity's current
+     * state. On a unique identifier match a 0 there must not overwrite an existing value.
+     *
+     * @param array<string, mixed> $expectedParameters
+     */
+    #[DataProvider('injectedValueProvider')]
+    public function testSetCustomFieldValuesDropsZeroInjectedByTheForm(mixed $value, array $expectedParameters): void
+    {
+        $model = new class() {
+            /**
+             * @var array<string, mixed>
+             */
+            public array $parameters = [];
+
+            /**
+             * @param array<string, mixed> $parameters
+             */
+            public function setFieldValues(Lead $lead, array $parameters, bool $overwriteWithBlank): void
+            {
+                $this->parameters = $parameters;
+            }
+        };
+
+        $controller = new class($model) {
+            use CustomFieldsApiControllerTrait;
+
+            private string $entityNameOne = 'lead';
+
+            public function __construct(
+                private object $model,
+            ) {
+            }
+
+            public function getModel(?string $name): object
+            {
+                return $this->model;
+            }
+
+            /**
+             * @param array<string, mixed> $parameters
+             */
+            public function setCustomFieldValuesPublic(Lead $lead, Form $form, array $parameters): void
+            {
+                $this->setCustomFieldValues($lead, $form, $parameters, true);
+            }
+        };
+
+        $controller->setCustomFieldValuesPublic(new Lead(), $this->createFormStub(['number_field' => $value]), []);
+
+        $this->assertSame($expectedParameters, $model->parameters);
+    }
+
+    /**
+     * @param array<string, mixed> $children
+     */
+    private function createFormStub(array $children): Form
+    {
+        $formFields = [];
+
+        foreach ($children as $name => $data) {
+            $formField = $this->createStub(FormInterface::class);
+            $formField->method('getName')->willReturn($name);
+            $formField->method('getData')->willReturn($data);
+            $formFields[] = $formField;
+        }
+
+        $form = $this->createStub(Form::class);
+        $form->method('getIterator')->willReturn(new \ArrayIterator($formFields));
+
+        return $form;
     }
 
     /**
      * @return \Generator<string, array{mixed, array<string, mixed>}>
      */
     public static function numericValueProvider(): \Generator
+    {
+        yield 'positive fraction' => [0.5, ['number_field' => 0.5]];
+        yield 'positive fraction string' => ['0.5', ['number_field' => '0.5']];
+        yield 'negative fraction' => [-0.5, ['number_field' => -0.5]];
+        yield 'integer' => [5, ['number_field' => 5]];
+        yield 'integer string' => ['5', ['number_field' => '5']];
+        yield 'integer zero' => [0, ['number_field' => 0]];
+        yield 'float zero' => [0.0, ['number_field' => 0.0]];
+        yield 'zero string' => ['0', ['number_field' => '0']];
+        yield 'decimal zero string' => ['0.00', ['number_field' => '0.00']];
+    }
+
+    /**
+     * @return \Generator<string, array{mixed, array<string, mixed>}>
+     */
+    public static function injectedValueProvider(): \Generator
     {
         yield 'positive fraction' => [0.5, ['number_field' => 0.5]];
         yield 'positive fraction string' => ['0.5', ['number_field' => '0.5']];
