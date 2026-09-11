@@ -39,6 +39,8 @@ use Symfony\Component\HttpFoundation\Response;
 #[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     use LeadFieldTestTrait;
 
     private LeadRepository $contactRepository;
@@ -87,7 +89,6 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         if ('testUpdatesContactCampaignActionWithBooleanFields' === $this->name()) {
-            $this->useCleanupRollback = false;
         } else {
             $this->useCleanupRollback = true;
         }
@@ -1071,7 +1072,6 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('regexOperatorProvider')]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
-        $this->useCleanupRollback = false;
 
         // Create the custom date field
         $this->createField([

@@ -17,12 +17,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
+    protected $useCleanupRollback = false;
 
-        $this->useCleanupRollback = false;
-    }
 
     public function testWithIdAndUserArgs(): void
     {
