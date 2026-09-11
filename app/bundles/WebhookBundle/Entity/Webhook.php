@@ -159,7 +159,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
             ->setIndexBy('eventType')
             ->mappedBy('webhook')
             ->cascadePersist()
-            ->cascadeMerge()
             ->cascadeDetach()
             ->build();
 
@@ -167,7 +166,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
             ->fetchExtraLazy()
             ->mappedBy('webhook')
             ->cascadePersist()
-            ->cascadeMerge()
             ->cascadeDetach()
             ->build();
 
