@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -33,9 +34,8 @@ class SubmissionRepository extends CommonRepository
         if (!empty($results)) {
             // Check that alias is SQL safe since it will be used for the column name
             $databasePlatform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
-            $reservedWords    = $databasePlatform->getReservedKeywordsList();
             foreach ($results as $alias => $value) {
-                if ($reservedWords->isKeyword($alias)) {
+                if (ReservedWords::isReserved($alias)) {
                     $results[$databasePlatform->quoteSingleIdentifier($alias)] = $value;
                     unset($results[$alias]);
                 }

@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\UnitOfWork;
+use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
@@ -479,10 +480,7 @@ class FormModel extends AbstractCommonModel
         }
 
         // Check that alias is SQL safe since it will be used for the column name
-        $databasePlatform = $this->em->getConnection()->getDatabasePlatform();
-        $reservedWords    = $databasePlatform->getReservedKeywordsList();
-
-        if ($reservedWords->isKeyword($alias) || is_numeric($alias)) {
+        if (ReservedWords::isReserved($alias) || is_numeric($alias)) {
             return $prefix.$alias;
         }
 
