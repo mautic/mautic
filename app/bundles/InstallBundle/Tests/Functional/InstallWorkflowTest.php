@@ -8,9 +8,9 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -73,6 +73,8 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
         $submitButton = $crawler->selectButton('install_doctrine_step[buttons][next]');
         $form         = $submitButton->form();
 
+        $form['install_doctrine_step[driver]']->setValue($this->connection->getParams()['driver']);
+        $form['install_doctrine_step[charset]']->setValue($this->connection->getParams()['charset']);
         $form['install_doctrine_step[host]']->setValue($this->connection->getParams()['host']);
         $form['install_doctrine_step[port]']->setValue((string) $this->connection->getParams()['port']);
         $form['install_doctrine_step[name]']->setValue($this->connection->getParams()['dbname']);
@@ -85,6 +87,11 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
 
         // Step 2: Admin user.
         $submitButton = $crawler->selectButton('install_user_step[buttons][next]');
+        $this->assertGreaterThan(
+            0,
+            $submitButton->count(),
+            'DB step did not advance to user step.'.PHP_EOL.$this->formatInstallerFailureMessage($crawler)
+        );
         $form         = $submitButton->form();
 
         $form['install_user_step[username]']->setValue('admin');
@@ -129,5 +136,38 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
 
         $details = $crawler->filter('#minorDetails ul')->html();
         $this->assertStringNotContainsString($expectedMemoryMessage, $details);
+    }
+
+    private function formatInstallerFailureMessage(Crawler $crawler): string
+    {
+        $errors = [];
+
+        // Symfony / form field errors
+        $crawler->filter('.has-error .help-block, .text-danger, .alert-danger, .form-error, .help-block.error')
+            ->each(static function (Crawler $node) use (&$errors): void {
+                $text = trim($node->text(''));
+                if ('' !== $text) {
+                    $errors[] = $text;
+                }
+            });
+
+        // Generic flash / alert messages
+        $crawler->filter('.alert, .flash-message, [role="alert"]')
+            ->each(static function (Crawler $node) use (&$errors): void {
+                $text = trim($node->text(''));
+                if ('' !== $text) {
+                    $errors[] = $text;
+                }
+            });
+
+        $errors = array_values(array_unique($errors));
+
+        $parts = [];
+
+        if ([] !== $errors) {
+            $parts[] = 'Messages:'.PHP_EOL.implode(PHP_EOL, $errors);
+        }
+
+        return implode(PHP_EOL, $parts);
     }
 }

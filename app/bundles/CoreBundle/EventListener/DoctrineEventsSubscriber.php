@@ -40,7 +40,7 @@ final class DoctrineEventsSubscriber
         /** @var ClassMetadataInfo $classMetadata */
         $classMetadata = $args->getClassMetadata();
 
-        // Do not re-apply the prefix in an inheritance hierarchy.
+        // Do not re-apply the prefix in an inheritance hierarchy or embedded tables.
         if ($classMetadata->isInheritanceTypeSingleTable() && !$classMetadata->isRootEntity()) {
             return;
         }
@@ -83,19 +83,24 @@ final class DoctrineEventsSubscriber
 
             // Prefix sequences if supported by the DB platform
             if ($classMetadata->isIdGeneratorSequence()) {
-                $newDefinition                 = $classMetadata->sequenceGeneratorDefinition;
-                $newDefinition['sequenceName'] = $this->tablePrefix.$newDefinition['sequenceName'];
+                $definition      = $classMetadata->sequenceGeneratorDefinition;
+                $newSequenceName = $this->generateSequenceName($definition['sequenceName']);
 
-                $classMetadata->setSequenceGeneratorDefinition($newDefinition);
+                // only redefine if it changed
+                if ($definition['sequenceName'] != $newSequenceName) {
+                    $definition['sequenceName'] = $newSequenceName;
+                    $classMetadata->setSequenceGeneratorDefinition($definition);
+                }
+
                 $em = $args->getEntityManager();
                 if (isset($classMetadata->idGenerator)) {
                     $sequenceGenerator = new SequenceGenerator(
                         $em->getConfiguration()->getQuoteStrategy()->getSequenceName(
-                            $newDefinition,
+                            $definition,
                             $classMetadata,
                             $em->getConnection()->getDatabasePlatform()
                         ),
-                        $newDefinition['allocationSize']
+                        $definition['allocationSize']
                     );
                     $classMetadata->setIdGenerator($sequenceGenerator);
                 }
@@ -141,5 +146,15 @@ final class DoctrineEventsSubscriber
     private function trimQuotes(string $identifier): string
     {
         return str_replace(['`', '"', '[', ']'], '', $identifier);
+    }
+
+    private function generateSequenceName(string $sequenceName): string
+    {
+        // Remove prefix if present (test_, mautic_, etc.)
+        if (str_starts_with($sequenceName, $this->tablePrefix)) {
+            $sequenceName = substr($sequenceName, strlen($this->tablePrefix));
+        }
+
+        return $this->tablePrefix.$sequenceName;
     }
 }

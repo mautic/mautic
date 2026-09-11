@@ -6,6 +6,8 @@ namespace Mautic\LeadBundle\Field\Helper;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -13,10 +15,8 @@ use Mautic\LeadBundle\Entity\Lead;
  *
  * @see Lead
  */
-final class IndexHelper
+class IndexHelper
 {
-    public const MAX_COUNT_ALLOWED = 64;
-
     /**
      * @var bool|array<string>
      */
@@ -29,6 +29,7 @@ final class IndexHelper
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
+        private readonly IndexSchemaHelper $indexSchemaHelper,
     ) {
     }
 
@@ -51,7 +52,7 @@ final class IndexHelper
 
     public function getMaxCount(): int
     {
-        return self::MAX_COUNT_ALLOWED;
+        return DatabasePlatform::getMaxIndexAllowed($this->entityManager->getConnection()->getDatabasePlatform());
     }
 
     public function isNewIndexAllowed(): bool
@@ -75,16 +76,23 @@ final class IndexHelper
 
         $tableName = $this->entityManager->getClassMetadata(Lead::class)->getTableName();
 
-        $sql = "SHOW INDEXES FROM `{$tableName}`";
+        // Use get table index implementation which work well with PostgreSQL too
+        // This bypasses the buggy PostgreSQL Doctrine introspection in older DBAL versions (below 4.0)
+        $indexes = $this->indexSchemaHelper->getTableIndexes($tableName);
 
-        $stmt    = $this->entityManager->getConnection()->prepare($sql);
-        $indexes = $stmt->executeQuery()->fetchAllAssociative();
+        $indexedColumns = [];
 
-        $this->indexedColumns = array_map(
-            fn (array $index): mixed => $index['Column_name'],
-            $indexes
-        );
+        foreach ($indexes as $index) {
+            $columns = $index->getColumns();
 
-        $this->indexCount = count($indexes);
+            foreach ($columns as $column) {
+                $indexedColumns[] = $column;
+            }
+        }
+
+        $this->indexedColumns = $indexedColumns;
+        // index column count may not be equal indexed column count
+        // (unique search index may include more than 1 column)
+        $this->indexCount     = count($indexes);
     }
 }

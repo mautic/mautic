@@ -38,17 +38,20 @@ final readonly class Metadata implements \JsonSerializable
 
     private string $minSupportedMariaDbVersion;
 
+    private string $minSupportedPostgreSqlVersion;
+
     public function __construct(array $metadata)
     {
-        $this->version                      = $metadata['version'];
-        $this->stability                    = $metadata['stability'];
-        $this->minSupportedPHPVersion       = $metadata['minimum_php_version'];
-        $this->maxSupportedPHPVersion       = $metadata['maximum_php_version'];
-        $this->showPHPVersionWarningIfUnder = $metadata['show_php_version_warning_if_under'] ?? '';
-        $this->minSupportedMauticVersion    = $metadata['minimum_mautic_version'];
-        $this->announcementUrl              = $metadata['announcement_url'];
-        $this->minSupportedMySqlVersion     = $metadata['minimum_mysql_version'] ?? '';
-        $this->minSupportedMariaDbVersion   = $metadata['minimum_mariadb_version'] ?? '';
+        $this->version                       = $metadata['version'];
+        $this->stability                     = $metadata['stability'];
+        $this->minSupportedPHPVersion        = $metadata['minimum_php_version'];
+        $this->maxSupportedPHPVersion        = $metadata['maximum_php_version'];
+        $this->showPHPVersionWarningIfUnder  = $metadata['show_php_version_warning_if_under'] ?? '';
+        $this->minSupportedMauticVersion     = $metadata['minimum_mautic_version'];
+        $this->announcementUrl               = $metadata['announcement_url'];
+        $this->minSupportedMySqlVersion      = $metadata['minimum_mysql_version'] ?? '';
+        $this->minSupportedMariaDbVersion    = $metadata['minimum_mariadb_version'] ?? '';
+        $this->minSupportedPostgreSqlVersion = $metadata['minimum_postgresql_version'] ?? '';
 
         preg_match('#^(\d+)\.(\d+)\.(\d+)[\. \-]?(.*+)?$#', $this->version, $match);
         $this->majorVersion = (int) $match[1];
@@ -128,6 +131,11 @@ final readonly class Metadata implements \JsonSerializable
         return $this->minSupportedMariaDbVersion;
     }
 
+    public function getMinSupportedPostgreSqlVersion(): string
+    {
+        return $this->minSupportedPostgreSqlVersion;
+    }
+
     /**
      * @return array<string, int|string>
      */
@@ -143,6 +151,7 @@ final readonly class Metadata implements \JsonSerializable
             'announcement_url'                  => $this->announcementUrl,
             'minimum_mysql_version'             => $this->minSupportedMySqlVersion,
             'minimum_mariadb_version'           => $this->minSupportedMariaDbVersion,
+            'minimum_postgresql_version'        => $this->minSupportedPostgreSqlVersion,
         ];
     }
 }

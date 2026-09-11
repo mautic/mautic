@@ -56,6 +56,7 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($formElement);
 
         $this->em->clear();
+
         foreach ($expectedLeadData as $field => $value) {
             $leadFieldValue = $lead->getFieldValue($field);
             if ('{datetime=now}' === $value) {

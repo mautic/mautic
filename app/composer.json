@@ -139,6 +139,8 @@
         "[project-root]/config/.gitkeep": "assets/scaffold/files/gitkeep",
         "[project-root]/patches/at.js+1.5.4.patch": "assets/scaffold/files/patches/at.js+1.5.4.patch",
         "[project-root]/patches/chosen-js+1.8.7.patch": "assets/scaffold/files/patches/chosen-js+1.8.7.patch",
+        "[project-root]/patches/doctrine-dbal-pgsql-platform-indexes.patch": "assets/scaffold/files/patches/doctrine-dbal-pgsql-platform-indexes.patch",
+        "[project-root]/patches/doctrine-dbal-pgsql-php85-driver.patch": "assets/scaffold/files/patches/doctrine-dbal-pgsql-php85-driver.patch",
         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
         "[web-root]/index.php": "assets/scaffold/files/index.php",
         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",

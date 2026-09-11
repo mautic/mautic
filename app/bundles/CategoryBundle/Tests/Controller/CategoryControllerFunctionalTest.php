@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
@@ -18,6 +17,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const SALES_USER = 'sales';
+
     private TranslatorInterface $translator;
 
     /**
@@ -139,15 +140,13 @@ final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
     {
         /** @var CategoryModel $categoryModel */
         $categoryModel      = self::getContainer()->get(CategoryModel::class);
-        /** @var UserModel $userModel */
-        $userModel      = self::getContainer()->get(UserModel::class);
-        $user           = $userModel->getEntity(2);
+        $user               = $this->getUser(self::SALES_USER);
+        $this->assertInstanceOf(User::class, $user);
 
         $category = new Category();
         $category->setTitle('New Category');
         $category->setAlias('category');
         $category->setBundle('global');
-        $this->assertInstanceOf(User::class, $user);
         $category->setCheckedOutBy($user);
         $category->setCheckedOut(new \DateTime('now'));
         $categoryModel->saveEntity($category, false);

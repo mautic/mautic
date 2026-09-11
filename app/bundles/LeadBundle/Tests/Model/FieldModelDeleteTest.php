@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -60,14 +61,13 @@ final class FieldModelDeleteTest extends MauticMysqlTestCase
     {
         $prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
-        return (bool) $this->connection->createQueryBuilder()
-            ->select('1')
-            ->from('INFORMATION_SCHEMA.COLUMNS')
-            ->where('TABLE_SCHEMA = DATABASE()')
-            ->andWhere('TABLE_NAME = :table')
-            ->andWhere('COLUMN_NAME = :column')
-            ->setParameter('table', $prefix.$table)
-            ->setParameter('column', $column)
-            ->fetchOne();
+        $helper = new ColumnSchemaHelper(
+            $this->connection,
+            $prefix
+        );
+
+        $helper->setName($table);   // internally adds prefix
+
+        return $helper->getTable()->hasColumn($column);
     }
 }

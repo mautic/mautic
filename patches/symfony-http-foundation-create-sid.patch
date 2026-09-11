@@ -1,0 +1,32 @@
+diff --git a/vendor/symfony/http-foundation/Session/Storage/Handler/AbstractSessionHandler.php b/vendor/symfony/http-foundation/Session/Storage/Handler/AbstractSessionHandler.php
+index ccdabbfa7c..784dbaed4a 100644
+--- a/vendor/symfony/http-foundation/Session/Storage/Handler/AbstractSessionHandler.php
++++ b/vendor/symfony/http-foundation/Session/Storage/Handler/AbstractSessionHandler.php
+@@ -38,6 +38,11 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
+         return true;
+     }
+
++    public function create_sid(): string
++    {
++        return session_create_id() ?: throw new \RuntimeException('Unable to create a session ID.');
++    }
++
+     abstract protected function doRead(#[\SensitiveParameter] string $sessionId): string;
+
+     abstract protected function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool;
+diff --git a/vendor/symfony/http-foundation/Session/Storage/Proxy/SessionHandlerProxy.php b/vendor/symfony/http-foundation/Session/Storage/Proxy/SessionHandlerProxy.php
+index 6f8ad120f3..d0068852db 100644
+--- a/vendor/symfony/http-foundation/Session/Storage/Proxy/SessionHandlerProxy.php
++++ b/vendor/symfony/http-foundation/Session/Storage/Proxy/SessionHandlerProxy.php
+@@ -32,6 +32,11 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
+
+     // \SessionHandlerInterface
+
++    public function create_sid(): string
++    {
++        return session_create_id() ?: throw new \RuntimeException('Unable to create a session ID.');
++    }
++
+     public function open(string $savePath, string $sessionName): bool
+     {
+         return $this->handler->open($savePath, $sessionName);

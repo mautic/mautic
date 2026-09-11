@@ -6,6 +6,7 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
@@ -17,20 +18,15 @@ final class Version20211209022550 extends AbstractMauticMigration
     {
         $roleModel = $this->container->get(RoleModel::class);
 
-        // Get all non admin roles.
-        $roles = $roleModel->getEntities([
-            'orderBy'       => 'r.id',
-            'orderByDir'    => 'ASC',
-            'filter'        => [
-                'where' => [
-                    [
-                        'col'  => 'r.isAdmin',
-                        'expr' => 'eq',
-                        'val'  => 0,
-                    ],
-                ],
-            ],
-        ]);
+        // Build custom query to force OBJECT hydration
+        $qb = $roleModel->getRepository()->createQueryBuilder('r');
+
+        // Get all non admin roles (use queryBuilder to force OBJECT hydration on PostgreSQL)
+        $roles = $qb->where($qb->expr()->eq('r.isAdmin', ':isAdmin'))
+            ->setParameter('isAdmin', 0)
+            ->orderBy('r.id', 'ASC')
+            ->getQuery()
+            ->getResult();
 
         /** @var Role $role */
         foreach ($roles as $role) {
@@ -91,7 +87,7 @@ final class Version20211209022550 extends AbstractMauticMigration
 
         $bit = 0;
         foreach ($perms as $perm) {
-            $bit += $permBitwise[$perm];
+            $bit += $permBitwise[$perm] ?? 0;
         }
 
         return $bit;

@@ -83,7 +83,7 @@ final class AjaxController extends CommonAjaxController
 
     private function createProjectIfNotExists(string $name, ProjectModel $projectModel, ProjectRepository $projectRepository): int
     {
-        if ($project = $projectRepository->findOneBy(['name' => $name])) {
+        if ($project = $projectRepository->getProjectByName($name)) {
             return $project->getId();
         }
 

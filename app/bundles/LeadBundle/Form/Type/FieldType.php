@@ -496,6 +496,14 @@ final class FieldType extends AbstractType
                     $data['charLengthLimit'] = null;
                 }
 
+                if (!isset($data['group'])) {
+                    $data['group'] = 'core';
+                }
+
+                if (!isset($data['object'])) {
+                    $data['object'] = 'lead';
+                }
+
                 $event->setData($data);
                 $setupOrderField($event->getForm());
             }

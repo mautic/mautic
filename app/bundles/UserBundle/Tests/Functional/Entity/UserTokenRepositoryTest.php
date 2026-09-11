@@ -11,6 +11,8 @@ use Mautic\UserBundle\Entity\UserTokenRepository;
 
 final class UserTokenRepositoryTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     private UserTokenRepository $repository;
 
     protected function setUp(): void
@@ -25,7 +27,7 @@ final class UserTokenRepositoryTest extends MauticMysqlTestCase
 
     public function testDeleteExpiredDryRunReturnsRealCount(): void
     {
-        $user = $this->em->find(User::class, 1);
+        $user = $this->getUser(self::ADMIN_USER);
         $this->assertInstanceOf(User::class, $user);
 
         // Three expired tokens and one that is still valid.
@@ -47,7 +49,7 @@ final class UserTokenRepositoryTest extends MauticMysqlTestCase
 
     public function testDeleteExpiredDryRunReturnsZeroWhenNothingExpired(): void
     {
-        $user = $this->em->find(User::class, 1);
+        $user = $this->getUser(self::ADMIN_USER);
         $this->assertInstanceOf(User::class, $user);
 
         $this->createToken($user, new \DateTime('+1 day'));

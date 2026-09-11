@@ -58,7 +58,7 @@ final class EmailReplyRepository extends CommonRepository implements EmailReplyR
             $qb,
             $options,
             'storedSubject, email.subject',
-            'reply.id',
+            'reply.date_replied', // 'reply.id', // THIS IS BUG
             [],
             ['date_replied']
         );

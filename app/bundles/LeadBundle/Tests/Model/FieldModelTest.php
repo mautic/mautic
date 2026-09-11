@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -324,8 +325,15 @@ final class FieldModelTest extends MauticMysqlTestCase
         $this->assertEquals('ui1', $columns[1]['COLUMN_NAME']);
         $alteredIndexes = $stack->getIndexQueries();
         $this->assertCount(3, $alteredIndexes);
-        $this->assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
-        $this->assertEquals(sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
+
+        $dropAssertString = DatabasePlatform::getDropIndexSql(
+            $this->connection->getDatabasePlatform(),
+            MAUTIC_TABLE_PREFIX.'leads',
+            MAUTIC_TABLE_PREFIX.'lead_unique_identifier_search',
+        );
+
+        $this->assertEquals($dropAssertString, $alteredIndexes[0]);
+        $this->assertEquals(sprintf('CREATE INDEX %1$slead_unique_identifier_search ON %1$sleads (email, ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
         $this->assertEquals(sprintf('CREATE INDEX %1$sui1_search ON %1$sleads (ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
         $stack->resetQueries();
 
@@ -350,8 +358,12 @@ final class FieldModelTest extends MauticMysqlTestCase
         $this->assertEquals('ui2', $columns[2]['COLUMN_NAME']);
         $alteredIndexes = $stack->getIndexQueries();
         $this->assertCount(4, $alteredIndexes);
-        $this->assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
-        $this->assertEquals(sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1, ui2)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
+
+        $this->assertEquals($dropAssertString, $alteredIndexes[0]);
+        $this->assertEquals(
+            sprintf('CREATE INDEX %1$slead_unique_identifier_search ON %1$sleads (email, ui1, ui2)', MAUTIC_TABLE_PREFIX),
+            $alteredIndexes[1]
+        );
         $this->assertEquals(sprintf('CREATE INDEX %1$sui2_search ON %1$sleads (ui2)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
         $this->assertEquals(sprintf('CREATE INDEX %1$sui3_search ON %1$sleads (ui3)', MAUTIC_TABLE_PREFIX), $alteredIndexes[3]);
         $stack->resetQueries();
@@ -372,29 +384,48 @@ final class FieldModelTest extends MauticMysqlTestCase
      */
     private function getColumns(string $table, string $column): array
     {
-        $stmt = $this->connection->executeQuery(
-            "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND TABLE_NAME = '"
-            .MAUTIC_TABLE_PREFIX
-            ."{$table}' AND COLUMN_NAME = '{$column}'"
-        );
+        $fullTable = MAUTIC_TABLE_PREFIX.$table;
 
-        return $stmt->fetchAllAssociative();
+        return DatabasePlatform::getColumnMetadata(
+            $this->connection,
+            $fullTable,
+            $column
+        );
     }
 
     /**
      * @return array<mixed>
      */
-    private function getUniqueIdentifierIndexColumns(string $table): array
+    private function getUniqueIdentifierIndexColumns(string $table, string $object = 'lead'): array
     {
-        $stmt       = $this->connection->executeQuery(
-            sprintf(
-                "SELECT * FROM information_schema.statistics where table_schema = '%s' and table_name = '%s' and index_name = '%sunique_identifier_search'",
-                $this->connection->getDatabase(),
-                MAUTIC_TABLE_PREFIX.$table,
-                MAUTIC_TABLE_PREFIX
-            )
+        $indexName = MAUTIC_TABLE_PREFIX.$object.'_unique_identifier_search';
+        $fullTable = MAUTIC_TABLE_PREFIX.$table;
+
+        // $sm      = $this->connection->createSchemaManager();
+        // $indexes = $sm->listTableIndexes($fullTable);
+        $indexes = DatabasePlatform::listTableIndexes(
+            $this->connection,
+            $fullTable
         );
 
-        return $stmt->fetchAllAssociative();
+        foreach ($indexes as $index) {
+            if (strtolower($index->getName()) === strtolower($indexName)) {
+                // Return columns in the same format as the old queries
+                $result = [];
+                foreach ($index->getColumns() as $col) {
+                    $result[] = [
+                        'COLUMN_NAME'  => $col,
+                        'IS_UNIQUE'    => $index->isUnique() ? 1 : 0,
+                        'IS_PRIMARY'   => $index->isPrimary() ? 1 : 0,
+                        'TABLE_NAME'   => $fullTable,
+                        'INDEX_NAME'   => $index->getName(),
+                    ];
+                }
+
+                return $result;
+            }
+        }
+
+        return [];
     }
 }

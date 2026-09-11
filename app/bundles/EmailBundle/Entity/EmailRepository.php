@@ -11,6 +11,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
@@ -410,19 +411,31 @@ class EmailRepository extends CommonRepository
         $q->select('partial e.{id, subject, name, language}');
 
         if (!empty($search)) {
+            $param = 'search';
             if (is_array($search)) {
                 $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                     ->setParameter('search', $search);
             } else {
+                $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+
                 $q->andWhere(
                     $q->expr()->orX(
-                        $q->expr()->like('e.name', ':search'),
-                        $q->expr()->like('e.id', ':searchId')
+                        DatabasePlatform::getCaseInsensitiveLike(
+                            $platform,
+                            'e.name',
+                            ':'.$param,
+                            DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
+                        ),
+                        'e.id = :'.$param.'Id',
                     )
-                )
-                    ->setParameter('search', "%{$search}%")
-                    ->setParameter('searchId', $search);
+                )->setParameter(
+                    $param,
+                    '%'.DatabasePlatform::normalizeSearchValue($platform, $search).'%'
+                )->setParameter(
+                    $param.'Id',
+                    intval($search)
+                );
             }
         }
 
@@ -485,7 +498,7 @@ class EmailRepository extends CommonRepository
         $queryBuilder->resetQueryPart('groupBy');
         $queryBuilder->resetQueryParts(['join']);
 
-        $queryBuilder->select('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count');
+        $queryBuilder->select('SUM(e.sent_count) as sent_count, SUM(e.read_count) as read_count');
         $results = $queryBuilder->executeQuery()->fetchAssociative();
 
         if ($results) {
@@ -513,7 +526,11 @@ class EmailRepository extends CommonRepository
     public function getUniqueClicks(QueryBuilder $queryBuilder): int
     {
         $this->addTrackableTablesForEmailStats($queryBuilder);
-        $queryBuilder->select('SUM( tr.unique_hits) as `unique_clicks`');
+
+        $connection      = $this->getEntityManager()->getConnection();
+        $uniqueClicksCol = $connection->quoteIdentifier('unique_clicks');
+
+        $queryBuilder->select("SUM(tr.unique_hits) as $uniqueClicksCol");
 
         return (int) $queryBuilder->executeQuery()->fetchOne();
     }
@@ -943,12 +960,20 @@ class EmailRepository extends CommonRepository
         }
 
         $queryBuilder = $connection->createQueryBuilder();
+        $platform     = $connection->getDatabasePlatform();
+
+        /**
+         * Uses FORCE INDEX to ensure the PRIMARY key (leadlist_id, lead_id) is used,
+         * preventing full table scans on large lead_lists_leads tables.
+         *
+         * Fix: Only apply MySQL-specific index hints if on a MySQL/MariaDB platform
+         */
+        $from = DatabasePlatform::allowsIndexHint($platform) ?
+            MAUTIC_TABLE_PREFIX.'lead_lists_leads ll FORCE INDEX (`PRIMARY`)' :
+            MAUTIC_TABLE_PREFIX.'lead_lists_leads ll';
+
         $queryBuilder->select('ll.lead_id')
-            /**
-             * Uses FORCE INDEX to ensure the PRIMARY key (leadlist_id, lead_id) is used,
-             * preventing full table scans on large lead_lists_leads tables.
-             */
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads ll FORCE INDEX (`PRIMARY`)')
+            ->from($from)
             ->where($queryBuilder->expr()->in('ll.leadlist_id', ':excludedListIds'))
             ->setParameter('excludedListIds', $excludedListIds, ArrayParameterType::INTEGER);
 

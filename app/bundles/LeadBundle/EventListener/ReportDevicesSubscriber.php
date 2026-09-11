@@ -117,7 +117,7 @@ final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
         }
 
         if ($event->hasFilter('s.leadlist_id')) {
-            $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
+            $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = FALSE');
         }
 
         $event->setQueryBuilder($qb);

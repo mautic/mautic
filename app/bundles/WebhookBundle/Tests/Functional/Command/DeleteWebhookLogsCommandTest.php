@@ -89,7 +89,14 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
      */
     private function assertLogs(Webhook $webhook, int $expectedCount, array $expectedIds): void
     {
-        $logs   = $this->em->getRepository(Log::class)->findBy(['webhook' => $webhook]);
+        $logs = $this->em->getRepository(Log::class)
+            ->createQueryBuilder('l')
+            ->where('l.webhook = :webhook')
+            ->setParameter('webhook', $webhook)
+            ->orderBy('l.id', 'ASC') // This makes the order deterministic on ALL databases
+            ->getQuery()
+            ->getResult();
+
         $logIds = array_map(fn (Log $log) => $log->getId(), $logs);
 
         $this->assertCount($expectedCount, $logs);

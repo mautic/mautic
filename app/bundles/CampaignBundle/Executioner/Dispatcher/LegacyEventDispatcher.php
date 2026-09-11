@@ -206,7 +206,8 @@ class LegacyEventDispatcher
                 }
             }
 
-            return $reflection->invokeArgs($this, $pass);
+            // PHP8.6: Calling ReflectionMethod::invokeArgs() for static method does not need an object parameter
+            return $reflection->invokeArgs($reflection->isStatic() ? null : $this, $pass);
         } catch (\ReflectionException) {
             return false;
         }

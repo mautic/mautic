@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    stderr="true"
     backupGlobals="false"
     backupStaticProperties="false"
     colors="true"
@@ -10,6 +11,8 @@
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
     failOnRisky="true"
     failOnWarning="true"
+    failOnDeprecation="false"
+    failOnPhpunitDeprecation="false"
     displayDetailsOnTestsThatTriggerDeprecations="true"
     displayDetailsOnPhpunitDeprecations="true"
     displayDetailsOnTestsThatTriggerErrors="true"
@@ -66,6 +69,8 @@
     <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
     <env name="MAXMIND_LICENSE_KEY" value=""/>
     <env name="KERNEL_CLASS" value="AppTestKernel"/>
+    <env name="SHELL_VERBOSITY" value="-1"/>
+    <env name="KERNEL_EXCEPTION_ON_500" value="1"/>
     <const name="IS_PHPUNIT" value="true"/>
     <const name="MAUTIC_ENV" value="test"/>
     <server name="KERNEL_DIR" value="app"/>

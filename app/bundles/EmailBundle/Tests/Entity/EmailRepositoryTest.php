@@ -143,13 +143,26 @@ final class EmailRepositoryTest extends TestCase
         yield [[96, 98, 103], "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM {prefix}leads l WHERE (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (:listIds)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id NOT IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll FORCE INDEX (`PRIMARY`) WHERE ll.leadlist_id IN (:excludedListIds))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
     }
 
-    public function testGetUniqueCliks(): void
+    public function testGetUniqueClicks(): void
     {
+        $this->repo = $this->configureRepository(Email::class);
+
+        // Make quoteIdentifier behave realistically
+        $this->connection->method('quoteIdentifier')
+            ->willReturnCallback(function (string $identifier): string {
+                // For MySQL/MariaDB simulation (most common in CI)
+                return '`'.$identifier.'`';
+                // If testing PostgreSQL quoting:
+                // return '"' . $identifier . '"';
+            });
+
         $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $uniqueClicksCol = $this->connection->quoteIdentifier('unique_clicks');
 
         $queryBuilder->expects($this->once())
             ->method('select')
-            ->with('SUM( tr.unique_hits) as `unique_clicks`')
+            ->with("SUM(tr.unique_hits) as $uniqueClicksCol")
             ->willReturnSelf();
 
         $resultMock = $this->createMock(Result::class);
@@ -159,16 +172,11 @@ final class EmailRepositoryTest extends TestCase
 
         $resultMock->expects($this->once())
             ->method('fetchOne')
-            ->willReturn(10);
+            ->willReturn('10');
 
-        $repository = $this->getMockBuilder(EmailRepository::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['addTrackableTablesForEmailStats'])
-            ->getMock();
+        $result = $this->repo->getUniqueClicks($queryBuilder);
 
-        $result = $repository->getUniqueClicks($queryBuilder);
-
-        $this->assertEquals(10, $result);
+        $this->assertSame(10, $result);
     }
 
     public function testGetUnsubscribedCount(): void
@@ -225,7 +233,7 @@ final class EmailRepositoryTest extends TestCase
 
         $queryBuilder->expects($this->once())
             ->method('select')
-            ->with('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count')
+            ->with('SUM(e.sent_count) as sent_count, SUM(e.read_count) as read_count')
             ->willReturnSelf();
 
         $resultMock = $this->createMock(Result::class);
@@ -265,7 +273,7 @@ final class EmailRepositoryTest extends TestCase
 
         $queryBuilder->expects($this->once())
             ->method('select')
-            ->with('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count')
+            ->with('SUM(e.sent_count) as sent_count, SUM(e.read_count) as read_count')
             ->willReturnSelf();
 
         $resultMock = $this->createMock(Result::class);

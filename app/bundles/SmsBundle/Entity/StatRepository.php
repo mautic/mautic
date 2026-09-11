@@ -109,7 +109,10 @@ class StatRepository extends CommonRepository
      */
     public function getLeadStats($leadId, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection       = $this->getEntityManager()->getConnection();
+        $databasePlatform = $connection->getDatabasePlatform();
+
+        $query = $connection->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'sms_messages', 'e', 's.sms_id = e.id');
 
@@ -121,11 +124,28 @@ class StatRepository extends CommonRepository
 
         if (!empty($options['basic_select'])) {
             $query->select(
-                's.sms_id, s.id, s.date_sent as dateSent, e.name, e.name as sms_name,  s.is_failed as isFailed'
+                's.sms_id',
+                's.id',
+                's.date_sent as '.$databasePlatform->quoteIdentifier('dateSent'),
+                'e.name',
+                'e.name as '.$databasePlatform->quoteIdentifier('sms_name'),
+                's.is_failed as '.$databasePlatform->quoteIdentifier('isFailed')
             );
         } else {
             $query->select(
-                's.sms_id, s.id, s.date_sent as dateSent, e.name, e.name as sms_name, e.message, e.sms_type as type, s.is_failed as isFailed, s.list_id, l.name as list_name, s.tracking_hash as idHash, s.lead_id, s.details'
+                's.sms_id',
+                's.id',
+                's.date_sent as '.$databasePlatform->quoteIdentifier('dateSent'),
+                'e.name',
+                'e.name as '.$databasePlatform->quoteIdentifier('sms_name'),
+                'e.message',
+                'e.sms_type as '.$databasePlatform->quoteIdentifier('type'),
+                's.is_failed as '.$databasePlatform->quoteIdentifier('isFailed'),
+                's.list_id',
+                'l.name as '.$databasePlatform->quoteIdentifier('list_name'),
+                's.tracking_hash as '.$databasePlatform->quoteIdentifier('idHash'),
+                's.lead_id',
+                's.details'
             )
                 ->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 's.list_id = l.id');
         }

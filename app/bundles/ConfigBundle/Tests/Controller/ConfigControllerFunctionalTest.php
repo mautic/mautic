@@ -16,8 +16,6 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const SUBDOMAIN_URL = 'subdomain_url.com';
 
-    private string $prefix;
-
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -41,8 +39,6 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             self::getContainer()->set(RestrictionHelper::class, $restrictionHelper);
             self::getContainer()->set('mautic.config.form.restriction_helper', $restrictionHelper);
         }
-
-        $this->prefix = MAUTIC_TABLE_PREFIX;
     }
 
     public function testValuesAreEscapedProperly(): void
@@ -126,52 +122,46 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     public function testConfigNotFoundPageConfiguration(): void
     {
         // insert published record
-        $this->connection->insert($this->prefix.'pages', [
-            'is_published' => 1,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
-            'title'        => 'page1',
-            'alias'        => 'page1',
-            'template'     => 'blank',
-            'custom_html'  => 'Page1 Test Html',
-            'hits'         => 0,
-            'unique_hits'  => 0,
-            'variant_hits' => 0,
-            'revision'     => 0,
-            'lang'         => 'en',
-        ]);
-        $page1 = $this->connection->lastInsertId();
+        $pageEntity = new \Mautic\PageBundle\Entity\Page();
+        $pageEntity->setIsPublished(true);
+        $pageEntity->setDateAdded(new \DateTime());
+        $pageEntity->setTitle('page1');
+        $pageEntity->setAlias('page1');
+        $pageEntity->setTemplate('blank');
+        $pageEntity->setCustomHtml('Page1 Test Html');
+        $pageEntity->setLanguage('en');
+
+        $this->em->persist($pageEntity);
+        $this->em->flush();
+
+        $page1 = $pageEntity->getId();
 
         // insert unpublished record
-        $this->connection->insert($this->prefix.'pages', [
-            'is_published' => 0,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
-            'title'        => 'page2',
-            'alias'        => 'page2',
-            'template'     => 'blank',
-            'custom_html'  => 'Page2 Test Html',
-            'hits'         => 0,
-            'unique_hits'  => 0,
-            'variant_hits' => 0,
-            'revision'     => 0,
-            'lang'         => 'en',
-        ]);
-        $this->connection->lastInsertId();
+        $pageEntity2 = new \Mautic\PageBundle\Entity\Page();
+        $pageEntity2->setIsPublished(false);
+        $pageEntity2->setDateAdded(new \DateTime());
+        $pageEntity2->setTitle('page2');
+        $pageEntity2->setAlias('page2');
+        $pageEntity2->setTemplate('blank');
+        $pageEntity2->setCustomHtml('Page2 Test Html');
+        $pageEntity2->setLanguage('en');
+
+        $this->em->persist($pageEntity2);
+        $this->em->flush();
 
         // insert published record
-        $this->connection->insert($this->prefix.'pages', [
-            'is_published' => 1,
-            'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
-            'title'        => 'page3',
-            'alias'        => 'page3',
-            'template'     => 'blank',
-            'custom_html'  => 'Page3 Test Html',
-            'hits'         => 0,
-            'unique_hits'  => 0,
-            'variant_hits' => 0,
-            'revision'     => 0,
-            'lang'         => 'en',
-        ]);
-        $page3 = $this->connection->lastInsertId();
+        $pageEntity3 = new \Mautic\PageBundle\Entity\Page();
+        $pageEntity3->setIsPublished(true);
+        $pageEntity3->setDateAdded(new \DateTime());
+        $pageEntity3->setTitle('page3');
+        $pageEntity3->setAlias('page3');
+        $pageEntity3->setTemplate('blank');
+        $pageEntity3->setCustomHtml('Page3 Test Html');
+        $pageEntity3->setLanguage('en');
+
+        $this->em->persist($pageEntity3);
+        $this->em->flush();
+        $page3 = $pageEntity3->getId();
 
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');

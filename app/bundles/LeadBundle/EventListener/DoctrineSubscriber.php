@@ -78,7 +78,7 @@ final readonly class DoctrineSubscriber
                     // Only use three to prevent max key length errors
                     asort($uniqueFields);
                     $uniqueFields = array_slice($uniqueFields, 0, 3);
-                    $table->addIndex($uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
+                    $table->addIndex($uniqueFields, MAUTIC_TABLE_PREFIX.$object.'_unique_identifier_search');
                 }
 
                 switch ($object) {

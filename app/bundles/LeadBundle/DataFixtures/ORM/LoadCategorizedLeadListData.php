@@ -22,7 +22,14 @@ final class LoadCategorizedLeadListData extends AbstractFixture implements Order
     {
         $leadLists = CsvHelper::csv_to_array(__DIR__.'/fakecategorizedleadlistdata.csv');
         foreach ($leadLists as $leadList) {
-            $category       = $this->categoryRepository->find($leadList['category']);
+            // PostgreSQL will crash if you pass "" to find() for an integer column.
+            $categoryId = !empty($leadList['category']) ? $leadList['category'] : null;
+
+            $category = null;
+            if (null !== $categoryId) {
+                $category = $this->categoryRepository->find($categoryId);
+            }
+
             $leadListEntity = new LeadList();
             $leadListEntity->setName($leadList['name']);
             $leadListEntity->setPublicName($leadList['publicname']);

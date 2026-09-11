@@ -120,7 +120,7 @@ final class SubmissionModel extends CommonFormModel
      */
     public function saveSubmission(array $post, array $server, Form $form, Request $request, $returnEvent = false): array|false
     {
-        $leadFields = array_merge($this->leadFieldModel->getFieldListWithProperties(false), $this->leadFieldModel->getSpecialLeadFields());
+        $leadFields = array_merge($this->leadFieldModel->getFieldListWithProperties(), $this->leadFieldModel->getSpecialLeadFields());
 
         // everything matches up so let's save the results
         $submission = new Submission();

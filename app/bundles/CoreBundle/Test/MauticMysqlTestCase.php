@@ -6,19 +6,22 @@ namespace Mautic\CoreBundle\Test;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
-use Mautic\UserBundle\Entity\User;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
+    private const TRUNCATE_TABLE_SQL = 'TRUNCATE TABLE';
+
     private bool $databaseInstalled = false;
 
-    private bool $setUpInvoked      = false;
+    private bool $setUpInvoked;
 
     /**
      * Use transaction rollback for cleanup. Sometimes it is not possible to use it because of the following:
@@ -29,15 +32,36 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected $useCleanupRollback = true;
 
+    public function __construct(?string $name = null)
+    {
+        parent::__construct($name);
+
+        // Only default to MySQL if no DB_DRIVER is not set
+        if (!isset($this->configParams['db_driver']) || empty($this->configParams['db_driver'])) {
+            $this->configParams['db_driver'] = 'pdo_mysql';
+        }
+        // Initialize default charset if no DB_CHARSET is set
+        if (!isset($this->configParams['db_charset']) || empty($this->configParams['db_charset'])) {
+            $this->configParams['db_charset'] = 'pdo_pgsql' == $this->configParams['db_driver'] ? 'UTF8' : 'utf8mb4';
+        }
+    }
+
+    protected function isMysqlPlatform(): bool
+    {
+        // if its not PostgreSQL, we treat is as MySQL
+        return !$this->isPostgresqlPlatform();
+    }
+
+    protected function isPostgresqlPlatform(): bool
+    {
+        return DatabasePlatform::isPostgreSQL($this->connection->getDatabasePlatform());
+    }
+
     /**
      * @throws \Exception
      */
     protected function setUp(): void
     {
-        $this->configParams += [
-            'db_driver' => 'pdo_mysql',
-        ];
-
         $this->setUpInvoked = true;
 
         parent::setUp();
@@ -54,7 +78,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             $this->markDatabasePrepared();
         }
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
+        $user = $this->getUser($this->clientServer['PHP_AUTH_USER'] ?? 'admin');
         $this->loginUser($user); // also creates session
 
         if ($this->useCleanupRollback) {
@@ -136,10 +160,21 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function resetAutoincrement(array $tables): void
     {
-        $prefix     = $this->getTablePrefix();
+        $prefix = $this->getTablePrefix();
 
         foreach ($tables as $table) {
-            $this->connection->executeStatement(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
+            $fullTable = $prefix.$table;
+
+            if ($this->isMysqlPlatform()) {
+                $this->connection->executeStatement(sprintf('ALTER TABLE `%s` AUTO_INCREMENT=1', $fullTable));
+            } elseif ($this->isPostgresqlPlatform()) {
+                $sequence = DatabasePlatform::getSerialSequence($this->connection, $fullTable);
+
+                if ($sequence) {
+                    $quotedSequence = $this->connection->quoteIdentifier($sequence);
+                    $this->connection->executeStatement("ALTER SEQUENCE $quotedSequence RESTART WITH 1");
+                }
+            }
         }
     }
 
@@ -151,38 +186,80 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function truncateTables(string ...$tables): void
     {
-        $prefix = MAUTIC_TABLE_PREFIX;
-
-        foreach ($tables as $table) {
+        $prefix = $this->getTablePrefix();
+        if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
-            $this->connection->executeQuery("TRUNCATE TABLE `{$prefix}{$table}`");
+        }
+        foreach ($tables as $table) {
+            $fullTable    = $prefix.$table;
+            $quotedTable  = $this->connection->quoteIdentifier($fullTable);
+
+            $sql = self::TRUNCATE_TABLE_SQL.' '.$quotedTable;
+
+            if ($this->isPostgresqlPlatform()) {
+                // Reset sequences (equivalent to MySQL AUTO_INCREMENT reset)
+                // and cascade to handle foreign key references (equivalent to disabling checks)
+                $sql .= ' RESTART IDENTITY CASCADE';
+            }
+
+            $this->connection->executeQuery($sql);
+        }
+        if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
         }
     }
 
+    protected function loadEssentialFixtures(): void
+    {
+        $this->installDatabaseFixtures([
+            LeadFieldData::class,
+            RoleData::class,
+            LoadRoleData::class,
+            LoadUserData::class,
+        ]);
+    }
+
     /**
-     * @throws \Exception
+     * @throws \InvalidArgumentException
+     * @throws ProcessFailedException
      */
     private function applySqlFromFile(string $file): void
     {
         $connectionParams = $this->connection->getParams();
-        $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
-        $command          = sprintf(
-            'mysql -h%s -P%s -u%s %s %s < %s',
-            escapeshellarg($connectionParams['host']),
-            escapeshellarg((string) $connectionParams['port']),
-            escapeshellarg($connectionParams['user']),
-            $password,
-            escapeshellarg($connectionParams['dbname']),
-            escapeshellarg($file)
-        );
+
+        if ($this->isMysqlPlatform()) {
+            // Existing mysql command (unchanged)
+            $password = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
+            $command  = sprintf(
+                'mysql -h%s -P%s -u%s %s %s < %s',
+                escapeshellarg($connectionParams['host']),
+                escapeshellarg((string) $connectionParams['port']),
+                escapeshellarg($connectionParams['user']),
+                $password,
+                escapeshellarg($connectionParams['dbname']),
+                escapeshellarg($file)
+            );
+        } elseif ($this->isPostgresqlPlatform()) {
+            // Use psql for PostgreSQL
+            $password    = $connectionParams['password'] ?? '';
+            $passwordCmd = $password ? "export PGPASSWORD={$password};" : '';
+            $command     = $passwordCmd.sprintf(
+                'psql -h %s -p %s -U %s -d %s -f %s',
+                escapeshellarg($connectionParams['host']),
+                escapeshellarg((string) ($connectionParams['port'] ?? 5432)),
+                escapeshellarg($connectionParams['user']),
+                escapeshellarg($connectionParams['dbname']),
+                escapeshellarg($file)
+            );
+        } else {
+            throw new \InvalidArgumentException('Unsupported database platform: '.$this->connection->getDatabasePlatform()::class);
+        }
 
         $process = Process::fromShellCommandline($command);
         $process->run();
 
-        // executes after the command finishes
         if (!$process->isSuccessful()) {
-            throw new \Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
+            throw new ProcessFailedException($process);
         }
     }
 
@@ -203,8 +280,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         if (!file_exists($sqlDumpFile)) {
             $this->installDatabase();
-            $this->dumpToFile($sqlDumpFile);
-            $this->generateResetDatabaseSql($this->getSqlFilePath('reset_db'));
+
+            if ($this->databaseInstalled && $this->isMysqlPlatform()) {
+                // Only generate full dump and reset SQL for MySQL
+                $this->dumpToFile($sqlDumpFile);
+                $this->generateResetDatabaseSql($this->getSqlFilePath('reset_db'));
+            } elseif ($this->databaseInstalled && $this->isPostgresqlPlatform()) {
+                // Generate fast TRUNCATE-based reset SQL for PostgreSQL
+                $this->generateResetDatabaseSql($this->getSqlFilePath('reset_db'));
+            }
 
             return;
         }
@@ -214,7 +298,34 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function resetDatabase(): void
     {
-        $this->applySqlFromFile($this->getSqlFilePath('reset_db'));
+        $resetFile = $this->getSqlFilePath('reset_db');
+
+        if (file_exists($resetFile) && ($this->isMysqlPlatform() || $this->isPostgresqlPlatform())) {
+            $this->applySqlFromFile($resetFile);
+
+            // PostgreSQL needs essential fixtures reloaded after TRUNCATE
+            if ($this->isPostgresqlPlatform()) {
+                $this->loadEssentialFixtures();
+            }
+        } else {
+            // Fallback (rare)
+            if ($this->isPostgresqlPlatform()) {
+                $prefix        = $this->getTablePrefix();
+                $schemaManager = $this->connection->createSchemaManager();
+                $tables        = $schemaManager->listTableNames();
+
+                $prefixedTables = array_filter($tables, fn (string $table): bool => str_starts_with($table, $prefix));
+
+                if ([] !== $prefixedTables) {
+                    $quotedTables = array_map($this->connection->quoteIdentifier(...), $prefixedTables);
+                    $this->connection->executeStatement(
+                        self::TRUNCATE_TABLE_SQL.' '.implode(', ', $quotedTables).' RESTART IDENTITY CASCADE'
+                    );
+                }
+
+                $this->loadEssentialFixtures();
+            }
+        }
     }
 
     /**
@@ -230,13 +341,29 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function createDatabase(): void
     {
-        $this->testSymfonyCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
-        $this->testSymfonyCommand('doctrine:database:create');
+        if (!$this->isPostgresqlPlatform()) {
+            // DROP doesnt work on postgresq with existing connection
+            $this->testSymfonyCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
+        }
+        $this->testSymfonyCommand('doctrine:database:create', ['--if-not-exists' => true]);
+        if ($this->isPostgresqlPlatform()) {
+            // Database can't be dropped if there is existing connection (drop schema instead)
+            $this->testSymfonyCommand('doctrine:schema:drop', ['--force' => true, '--full-database' => true]);
+        }
         $this->testSymfonyCommand('doctrine:schema:create');
         $this->testSymfonyCommand('doctrine:migration:sync-metadata-storage');
     }
 
     private function generateResetDatabaseSql(string $file): void
+    {
+        if ($this->isMysqlPlatform()) {
+            $this->generateMysqlResetSql($file);
+        } elseif ($this->isPostgresqlPlatform()) {
+            $this->generatePostgresqlResetSql($file);
+        }
+    }
+
+    private function generateMysqlResetSql(string $file): void
     {
         $content = 'SET autocommit=0;'.PHP_EOL;
         $content .= 'SET unique_checks=0;'.PHP_EOL;
@@ -250,7 +377,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
 
         $password = ($this->connection->getParams()['password']) ? " -p{$this->connection->getParams()['password']}" : '';
-        $command  = "mysqldump --skip-triggers --compact --no-create-info --skip-opt --single-transaction --opt -h{$this->connection->getParams()['host']} -P{$this->connection->getParams()['port']} -u{$this->connection->getParams()['user']}$password {$this->connection->getParams()['dbname']} | grep -v \"LOCK TABLE\" | grep -v \"ALTER TABLE\"";
+        $command  = "mysqldump --set-gtid-purged=OFF --skip-triggers --compact --no-create-info --skip-opt --single-transaction --opt -h{$this->connection->getParams()['host']} -P{$this->connection->getParams()['port']} -u{$this->connection->getParams()['user']}$password {$this->connection->getParams()['dbname']} | grep -v \"LOCK TABLE\" | grep -v \"ALTER TABLE\"";
 
         $content .= shell_exec($command);
         $content .= 'COMMIT;'.PHP_EOL;
@@ -260,15 +387,44 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         file_put_contents($file, $content);
     }
 
+    private function generatePostgresqlResetSql(string $file): void
+    {
+        $prefix        = $this->getTablePrefix();
+        $schemaManager = $this->connection->createSchemaManager();
+        $tables        = $schemaManager->listTableNames();
+
+        $prefixedTables = array_filter($tables, fn (string $table): bool => str_starts_with($table, $prefix));
+
+        if ([] === $prefixedTables) {
+            // Nothing to do
+            file_put_contents($file, '-- No tables to truncate');
+
+            return;
+        }
+
+        // Quote identifiers properly for PostgreSQL
+        $quotedTables = array_map($this->connection->quoteIdentifier(...), $prefixedTables);
+
+        $content = "-- PostgreSQL reset script for prefixed tables\n";
+        $content .= self::TRUNCATE_TABLE_SQL.' '.implode(', ', $quotedTables)." RESTART IDENTITY CASCADE;\n";
+
+        file_put_contents($file, $content);
+    }
+
     /**
      * @throws \Exception
      */
     private function dumpToFile(string $sqlDumpFile): void
     {
+        if (!$this->isMysqlPlatform()) {
+            // Skip full dump for PostgreSQL (not needed with TRUNCATE-based reset)
+            return;
+        }
+
         $connectionParams = $this->connection->getParams();
         $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';
         $command          = sprintf(
-            'mysqldump --opt -h%s -P%s -u%s %s %s > %s',
+            'mysqldump --set-gtid-purged=OFF --opt -h%s -P%s -u%s %s %s > %s',
             escapeshellarg($connectionParams['host']),
             escapeshellarg((string) $connectionParams['port']),
             escapeshellarg($connectionParams['user']),
@@ -309,15 +465,38 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function resetCustomFields(): bool
     {
-        $prefix = $this->getTablePrefix();
-        $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
+        try {
+            $prefix = $this->getTablePrefix();
+            $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object, is_unique_identifer, is_index FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
+            foreach ($result as $data) {
+                $table = 'company' === $data['object'] ? 'companies' : 'leads';
 
-        foreach ($result as $data) {
-            $table = 'company' === $data['object'] ? 'companies' : 'leads';
-            try {
-                $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
-            } catch (\Exception) {
+                // Drop column from main table
+                try {
+                    $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
+                } catch (DBALException) {
+                    // Ignore if table doesn't exist
+                }
+                // Drop dynamic search/unique index table if the field required it
+                // Mautic creates {prefix}{alias}_search when is_unique_identifer = true or is_index = true
+                if ($this->isPostgresqlPlatform() && ($data['is_unique_identifer'] || $data['is_index'])) {
+                    $indexName = $prefix.$data['alias'].'_search';
+
+                    $this->connection->executeStatement(sprintf(
+                        'DROP INDEX IF EXISTS %s CASCADE',
+                        $indexName
+                    ));
+
+                    $this->connection->executeStatement(
+                        sprintf('DROP TABLE IF EXISTS %s CASCADE',
+                            $indexName
+                        ));
+                }
             }
+        } catch (DBALException) {
+            // SQLSTATE[25P02]: In failed sql transaction: 7 ERROR:
+            // current transaction is aborted, commands ignored until end of transaction block
+            $result = true; // on any error we force database clean
         }
 
         return (bool) $result;
@@ -359,7 +538,18 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function insertRollbackCheckData(): void
     {
-        $this->connection->executeStatement("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
+        try {
+            $fullTable = $this->getTablePrefix().'ip_addresses';
+            if ($this->isPostgresqlPlatform()) {
+                $sequence = DatabasePlatform::getSerialSequence($this->connection, $fullTable);
+                $this->connection->executeStatement("INSERT INTO $fullTable (id, ip_address) VALUES (nextval('$sequence'), '0.0.0.0')");
+            } else {
+                $this->connection->executeStatement("INSERT INTO $fullTable (ip_address) VALUES ('0.0.0.0')");
+            }
+        } catch (DBALException) {
+            // SQLSTATE[25P02]: In failed sql transaction: 7 ERROR:
+            // current transaction is aborted, commands ignored until end of transaction block
+        }
     }
 
     private function wasRollbackSuccessful(): bool
@@ -403,5 +593,51 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         });
 
         return $payload;
+    }
+
+    /**
+     * Platform-safe create (unique) test index.
+     *
+     * @param array<string> $columns
+     */
+    protected function createTestIndex(
+        string $tableName,
+        string $indexName,
+        array $columns,
+        bool $unique = false,
+        bool $withAlter = false,
+        bool $ifNotExists = false,
+    ): int|string {
+        return $this->connection->executeStatement(
+            DatabasePlatform::getCreateIndexSql(
+                $this->connection->getDatabasePlatform(),
+                $tableName,
+                $indexName,
+                $columns,
+                $unique,
+                $withAlter,
+                $ifNotExists
+            )
+        );
+    }
+
+    /**
+     * Platform-safe drop test index.
+     */
+    protected function dropTestIndex(
+        string $tableName,
+        string $indexName,
+        bool $withAlter = false,
+        bool $ifExists = false,
+    ): int|string {
+        return $this->connection->executeStatement(
+            DatabasePlatform::getDropIndexSql(
+                $this->connection->getDatabasePlatform(),
+                $tableName,
+                $indexName,
+                $withAlter,
+                $ifExists
+            )
+        );
     }
 }

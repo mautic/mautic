@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Stats;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 final readonly class EmailPeriodMetrics
@@ -35,11 +36,10 @@ final readonly class EmailPeriodMetrics
         $queryBuilder
             ->select(
                 'd.day',
-                'IFNULL(s.sent_count, 0) AS sent_count',
-                'IFNULL(r.read_count, 0) AS read_count',
-                'IFNULL(c.hit_count, 0) AS hit_count'
-            )
-            ->from("({$daysSubQuery->getSQL()})", 'd')
+                'COALESCE(s.sent_count, 0) AS sent_count',
+                'COALESCE(r.read_count, 0) AS read_count',
+                'COALESCE(c.hit_count, 0) AS hit_count'
+            )->from("({$daysSubQuery->getSQL()})", 'd')
             ->leftJoin('d', "({$this->createClicksSubQuery()->getSQL()})", 'c', 'c.hit_day = d.day')
             ->leftJoin('d', "({$this->createSentSubQuery()->getSQL()})", 's', 's.sent_day = d.day')
             ->leftJoin('d', "({$this->createReadSubQuery()->getSQL()})", 'r', 'r.read_day = d.day')
@@ -64,22 +64,29 @@ final readonly class EmailPeriodMetrics
         $queryBuilder  = $this->connection->createQueryBuilder();
         $hoursSubQuery = $this->createHoursSubQuery();
 
+        $platform = $this->connection->getDatabasePlatform();
+        $queryBuilder->select(
+            'h.hour',
+            'COALESCE(s.sent_count, 0) AS sent_count',
+            'COALESCE(r.read_count, 0) AS read_count',
+            'COALESCE(c.hit_count, 0) AS hit_count'
+        );
+
+        // make sure value is an integer
+        $hitHourCondition  = DatabasePlatform::applyTypeIfStrict($platform, 'c.hit_hour').' + 0 = h.hour';
+        $sentHourCondition = DatabasePlatform::applyTypeIfStrict($platform, 's.sent_hour').' + 0 = h.hour';
+        $readHourCondition = DatabasePlatform::applyTypeIfStrict($platform, 'r.read_hour').' + 0 = h.hour';
+
         $queryBuilder
-            ->select(
-                'h.hour',
-                'IFNULL(s.sent_count, 0) AS sent_count',
-                'IFNULL(r.read_count, 0) AS read_count',
-                'IFNULL(c.hit_count, 0) AS hit_count'
-            )
             ->from("({$hoursSubQuery->getSQL()})", 'h')
-            ->leftJoin('h', "({$this->createClicksHourlySubQuery()->getSQL()})", 'c', 'c.hit_hour = h.hour')
-            ->leftJoin('h', "({$this->createSentHourlySubQuery()->getSQL()})", 's', 's.sent_hour = h.hour')
-            ->leftJoin('h', "({$this->createReadHourlySubQuery()->getSQL()})", 'r', 'r.read_hour = h.hour')
+            ->leftJoin('h', "({$this->createClicksHourlySubQuery()->getSQL()})", 'c', $hitHourCondition)
+            ->leftJoin('h', "({$this->createSentHourlySubQuery()->getSQL()})", 's', $sentHourCondition)
+            ->leftJoin('h', "({$this->createReadHourlySubQuery()->getSQL()})", 'r', $readHourCondition)
             ->setParameter('source_ids', $eventsIds, ArrayParameterType::INTEGER)
             ->setParameter('timezoneOffset', $timezoneOffset)
             ->setParameter('format', '%H')
             ->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB))
-            ->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format('Y-m-d H:i:s'))
+            ->setParameter('dateTo', $dateTo->setTime(23, 59, 59)->format(DateTimeHelper::FORMAT_DB))
             ->setParameter('email_source', self::EMAIL_SOURCE)
             ->setParameter('campaign_event_source', self::CAMPAIGN_EVENT_SOURCE)
             ->orderBy('h.hour');
@@ -89,9 +96,13 @@ final readonly class EmailPeriodMetrics
 
     private function createClicksSubQuery(): QueryBuilder
     {
+        $platform     = $this->connection->getDatabasePlatform();
+        $adjustedDate = DatabasePlatform::getOffsetAdjustedDate($platform, 'ph.date_hit');
+        $hitDay       = DatabasePlatform::getWeekdayExpression($platform, $adjustedDate);
+
         return $this->connection->createQueryBuilder()
             ->select(
-                'WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, ph.date_hit)) AS hit_day',
+                $hitDay.' AS hit_day',
                 'COUNT(DISTINCT ph.id) AS hit_count'
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
@@ -118,9 +129,13 @@ final readonly class EmailPeriodMetrics
 
     private function createClicksHourlySubQuery(): QueryBuilder
     {
+        $platform     = $this->connection->getDatabasePlatform();
+        $adjustedDate = DatabasePlatform::getOffsetAdjustedDate($platform, 'ph.date_hit');
+        $hourExpr     = DatabasePlatform::getHourExpression($platform, $adjustedDate);
+
         return $this->connection->createQueryBuilder()
             ->select(
-                'TIME_FORMAT(TIMESTAMPADD(SECOND, :timezoneOffset, ph.date_hit), :format) AS hit_hour',
+                "$hourExpr AS hit_hour",
                 'COUNT(DISTINCT ph.id) AS hit_count'
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
@@ -148,9 +163,13 @@ final readonly class EmailPeriodMetrics
 
     private function createBasicStatsSubQuery(string $dateColumn, string $groupByAlias, string $countAlias): QueryBuilder
     {
+        $platform     = $this->connection->getDatabasePlatform();
+        $adjustedDate = DatabasePlatform::getOffsetAdjustedDate($platform, $dateColumn);
+        $weekdayExpr  = DatabasePlatform::getWeekdayExpression($platform, $adjustedDate);
+
         return $this->connection->createQueryBuilder()
             ->select(
-                "WEEKDAY(TIMESTAMPADD(SECOND, :timezoneOffset, {$dateColumn})) AS {$groupByAlias}",
+                "{$weekdayExpr} AS {$groupByAlias}",
                 "COUNT(id) AS {$countAlias}"
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
@@ -164,9 +183,13 @@ final readonly class EmailPeriodMetrics
 
     private function createBasicHourlyStatsSubQuery(string $dateColumn, string $groupByAlias, string $countAlias): QueryBuilder
     {
-        return $this->connection->createQueryBuilder()
+        $platform     = $this->connection->getDatabasePlatform();
+        $adjustedDate = DatabasePlatform::getOffsetAdjustedDate($platform, $dateColumn);
+        $hourExpr     = DatabasePlatform::getHourExpression($platform, $adjustedDate);
+
+        $qb = $this->connection->createQueryBuilder()
             ->select(
-                "TIME_FORMAT(TIMESTAMPADD(SECOND, :timezoneOffset, {$dateColumn}), :format) AS {$groupByAlias}",
+                "{$hourExpr} AS {$groupByAlias}",
                 "COUNT(id) AS {$countAlias}"
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
@@ -175,8 +198,9 @@ final readonly class EmailPeriodMetrics
             ->andWhere('es.source = :campaign_event_source')
             ->andWhere('es.source_id IN (:source_ids)')
             ->groupBy($groupByAlias)
-            ->orderBy($groupByAlias, 'ASC')
-            ->setMaxResults(24);
+            ->orderBy($groupByAlias, 'ASC');
+
+        return $qb->setMaxResults(24);
     }
 
     private function createDaysSubQuery(): QueryBuilder

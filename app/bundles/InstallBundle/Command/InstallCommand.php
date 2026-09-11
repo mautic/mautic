@@ -187,6 +187,7 @@ final class InstallCommand extends Command
             'name'          => null,
             'user'          => null,
             'password'      => null,
+            'charset'       => null,
             'table_prefix'  => null,
             'backup_tables' => true,
             'backup_prefix' => 'bak_',
@@ -224,6 +225,11 @@ final class InstallCommand extends Command
         } else {
             $siteUrl               = $input->getArgument('site_url');
             $allParams['site_url'] = $siteUrl;
+        }
+
+        // Make sure charset is correct for PostgreSQL DB
+        if (empty($allParams['charset'])) {
+            $allParams['charset'] = $dbParams['charset'] = ('pdo_pgsql' == $dbParams['driver']) ? 'UTF8' : 'utf8mb4';
         }
 
         $step = (float) $input->getArgument('step');

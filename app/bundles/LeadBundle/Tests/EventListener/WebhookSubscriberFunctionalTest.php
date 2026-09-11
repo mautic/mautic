@@ -17,6 +17,8 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 
 final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -59,7 +61,9 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $this->assertTrue($webhookQueueRepository->exists($webhook->getId()));
 
-        $queueWebhook   = $webhookQueueRepository->getEntity(1);
+        $queueWebhook = $webhookQueueRepository->findOneBy(['webhook' => $webhook]);
+        $this->assertInstanceOf(WebhookQueue::class, $queueWebhook);
+
         $decodedPayload = json_decode($queueWebhook->getPayload(), true);
         $this->assertEquals('added', $decodedPayload['action']);
     }
@@ -69,6 +73,8 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $webhook = new Webhook();
         $event   = new Event();
 
+        $userCreator = $this->getUser(self::ADMIN_USER);
+
         $event->setEventType('mautic.lead_list_change');
         $event->setWebhook($webhook);
 
@@ -77,7 +83,7 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $webhook->setWebhookUrl('https:://whatever.url');
         $webhook->setSecret('any_secret_will_do');
         $webhook->isPublished(true);
-        $webhook->setCreatedBy(1);
+        $webhook->setCreatedBy($userCreator->getId());
 
         $this->em->persist($event);
         $this->em->persist($webhook);
