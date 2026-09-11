@@ -106,7 +106,7 @@ class TriggerEventRepository extends CommonRepository
      */
     public function getLeadTriggeredEvents($leadId): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('e.*')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX.'point_trigger_events', 'e', 'x.event_id = e.id')
@@ -131,7 +131,7 @@ class TriggerEventRepository extends CommonRepository
      */
     public function getLeadsForEvent($eventId): array
     {
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('e.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'e')
             ->where('e.event_id = '.(int) $eventId)

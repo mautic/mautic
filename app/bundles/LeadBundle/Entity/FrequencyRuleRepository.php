@@ -50,7 +50,7 @@ class FrequencyRuleRepository extends CommonRepository
 
     public function getFrequencyRules($channel = null, $leadIds = null): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select(
             'fr.id, fr.frequency_time, fr.frequency_number, fr.channel, fr.preferred_channel, fr.pause_from_date, fr.pause_to_date, fr.lead_id'
@@ -94,7 +94,7 @@ class FrequencyRuleRepository extends CommonRepository
 
     public function getPreferredChannel($leadId): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('fr.id, fr.frequency_time, fr.frequency_number, fr.channel, fr.pause_from_date, fr.pause_to_date')
             ->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr');

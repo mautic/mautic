@@ -16,7 +16,7 @@ final class LeadPointLogRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('pl.point_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_action_log', 'pl')
             ->where('pl.lead_id = '.$toLeadId)
@@ -28,7 +28,7 @@ final class LeadPointLogRepository extends CommonRepository
             $actions[] = $r['point_id'];
         }
 
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'point_lead_action_log')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
@@ -41,7 +41,7 @@ final class LeadPointLogRepository extends CommonRepository
                 ->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
-            $this->_em->getConnection()->createQueryBuilder()
+            $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'point_lead_action_log')
                 ->where('lead_id = '.(int) $fromLeadId)
                 ->executeStatement();

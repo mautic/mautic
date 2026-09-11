@@ -21,7 +21,7 @@ final class FailedLeadEventLogRepository extends CommonRepository
             return;
         }
 
-        $this->_em->getConnection()
+        $this->getEntityManager()->getConnection()
             ->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log')
             ->where('log_id IN (:ids)')

@@ -13,7 +13,7 @@ final class PointInsightRepository extends CommonRepository
 {
     public function getEntities(array $args = [])
     {
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
             ->from(PointInsight::class, $this->getTableAlias())

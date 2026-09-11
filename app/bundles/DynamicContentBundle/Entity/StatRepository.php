@@ -16,7 +16,7 @@ final class StatRepository extends CommonRepository
 
     public function getSentStats($dynamicContentId): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
             ->where('s.dynamic_content_id = :dynamic_content')
@@ -43,7 +43,7 @@ final class StatRepository extends CommonRepository
      */
     public function getSentCount($dynamicContentIds = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(s.id) as sent_count')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's');
@@ -70,7 +70,7 @@ final class StatRepository extends CommonRepository
      */
     public function getSentCounts($dynamicContentIds = [], ?\DateTime $fromDate = null): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.dynamic_content_id, count(s.id) as sent_count')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
             ->andWhere(
@@ -136,7 +136,7 @@ final class StatRepository extends CommonRepository
      */
     public function updateLead($fromLeadId, $toLeadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content_stats')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
@@ -145,7 +145,7 @@ final class StatRepository extends CommonRepository
 
     public function deleteStat($id): void
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', ['id' => (int) $id]);
+        $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', ['id' => (int) $id]);
     }
 
     public function getTableAlias(): string

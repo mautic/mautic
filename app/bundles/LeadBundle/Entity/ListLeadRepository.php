@@ -18,7 +18,7 @@ class ListLeadRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
             ->where('l.lead_id = '.$toLeadId)
@@ -30,7 +30,7 @@ class ListLeadRepository extends CommonRepository
             $lists[] = $r['leadlist_id'];
         }
 
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_lists_leads')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
@@ -43,7 +43,7 @@ class ListLeadRepository extends CommonRepository
                 ->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
-            $this->_em->getConnection()->createQueryBuilder()
+            $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads')
                 ->where('lead_id = '.(int) $fromLeadId)
                 ->executeStatement();

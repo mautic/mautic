@@ -35,7 +35,7 @@ class LeadDeviceRepository extends CommonRepository
      */
     public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)
     {
-        $selectQuery = $this->_em->getConnection()->createQueryBuilder();
+        $selectQuery = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $selectQuery->select('es.id as id, es.device as device')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
 

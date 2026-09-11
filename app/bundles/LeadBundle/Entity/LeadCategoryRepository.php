@@ -30,7 +30,7 @@ class LeadCategoryRepository extends CommonRepository
      */
     public function getLeadCategories(Lead $lead): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('lc.id, lc.category_id, lc.date_added, lc.manually_added, lc.manually_removed, c.alias, c.title')
             ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc')
             ->join('lc', MAUTIC_TABLE_PREFIX.'categories', 'c', 'c.id = lc.category_id')
@@ -54,7 +54,7 @@ class LeadCategoryRepository extends CommonRepository
      */
     public function getUnsubscribedLeadCategories(Lead $lead): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('lc.id, lc.category_id, lc.date_added, lc.manually_added, lc.manually_removed, c.alias, c.title')
             ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc')
             ->join('lc', MAUTIC_TABLE_PREFIX.'categories', 'c', 'c.id = lc.category_id')

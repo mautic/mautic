@@ -20,7 +20,7 @@ class PageRepository extends CommonRepository
 
         if (!empty($args['submissionCount'])) {
             // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
-            $sq = $this->_em->createQueryBuilder()
+            $sq = $this->getEntityManager()->createQueryBuilder()
                 ->select('count(fs.id)')
                 ->from(Submission::class, 'fs')
                 ->where('fs.page = p');
@@ -171,7 +171,7 @@ class PageRepository extends CommonRepository
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
-                    $this->_em->getConnection()->createQueryBuilder(),
+                    $this->getEntityManager()->getConnection()->createQueryBuilder(),
                     'page_id',
                     'page_projects_xref',
                     $this->getTableAlias(),
