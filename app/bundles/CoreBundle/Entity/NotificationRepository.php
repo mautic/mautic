@@ -26,7 +26,7 @@ class NotificationRepository extends CommonRepository
      */
     public function markAllReadForUser($userId): void
     {
-        $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX.'notifications', ['is_read' => 1], ['user_id' => (int) $userId]);
+        $this->getEntityManager()->getConnection()->update(MAUTIC_TABLE_PREFIX.'notifications', ['is_read' => 1], ['user_id' => (int) $userId]);
     }
 
     /**
