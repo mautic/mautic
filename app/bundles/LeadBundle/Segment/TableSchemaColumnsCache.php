@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
 
 class TableSchemaColumnsCache
 {
@@ -19,7 +20,7 @@ class TableSchemaColumnsCache
     public function getColumns($tableName)
     {
         if (!isset($this->cache[$tableName])) {
-            $columns                 = $this->entityManager->getConnection()->createSchemaManager()->listTableColumns($tableName);
+            $columns                 = ColumnIntrospector::listColumns($this->entityManager->getConnection()->createSchemaManager(), $tableName);
             $this->cache[$tableName] = $columns ?: [];
         }
 
