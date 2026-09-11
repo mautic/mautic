@@ -186,7 +186,12 @@
       "@asset-map:clean",
       "php bin/console sass:build --watch"
     ],
-    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./",
+    "clear-cache": "@php build/clear_cache.php",
+    "generate-assets": [
+      "@clear-cache",
+      "bin/console mautic:assets:generate",
+      "bin/console assets:install --symlink --relative ./"
+    ],
     "motd": "bin/console mautic:motd"
   },
   "config": {
