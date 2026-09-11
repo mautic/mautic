@@ -285,15 +285,20 @@ class LeadListRepository extends CommonRepository
             $listIds = [$listIds];
         }
 
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
-
         $countListIds = count($listIds);
 
+        // The index hint has to be folded into the alias as the FROM is built: DBAL 4
+        // removed the query-part API that previously allowed rewriting it afterwards.
+        $fromAlias = 1 === $countListIds
+            ? sprintf('l USE INDEX (%s)', MAUTIC_TABLE_PREFIX.'manually_removed')
+            : 'l';
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $fromAlias);
+
         if (1 === $countListIds) {
-            $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
-            $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
+            $expression = $q->expr()->eq('l.leadlist_id', (string) $listIds[0]);
         } else {
             $expression = $q->expr()->in('l.leadlist_id', ':listIds');
             $q->setParameter('listIds', $listIds, ArrayParameterType::INTEGER);
@@ -319,16 +324,6 @@ class LeadListRepository extends CommonRepository
         }
 
         return (1 === $countListIds) ? $return[$listIds[0]] : $return;
-    }
-
-    private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
-    {
-        $fromPart             = $qb->getQueryPart('from');
-        $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
-        $qb->resetQueryPart('from');
-        $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
-
-        return $qb;
     }
 
     public function arrangeFilters($filters): array
