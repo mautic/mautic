@@ -23,7 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Trigger>
  */
-class TriggerType extends AbstractType
+final class TriggerType extends AbstractType
 {
     public function __construct(
         private readonly CorePermissions $security,

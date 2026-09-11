@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ContactChannelsType extends AbstractType
+final class ContactChannelsType extends AbstractType
 {
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,

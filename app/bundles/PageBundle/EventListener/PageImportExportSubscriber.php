@@ -12,10 +12,11 @@ use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class PageImportExportSubscriber implements EventSubscriberInterface
 {
@@ -24,9 +25,10 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
     public function __construct(
         private PageModel $pageModel,
         private EntityManagerInterface $entityManager,
+        private PageRepository $pageRepository,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private ImportEntityDenormalizer $serializer,
     ) {
     }
 
@@ -94,7 +96,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $element) {
-            $object = $this->entityManager->getRepository(Page::class)->findOneBy(['uuid' => $element['uuid']]);
+            $object = $this->pageRepository->findOneBy(['uuid' => $element['uuid']]);
             $isNew  = !$object;
 
             $object ??= new Page();
@@ -135,7 +137,7 @@ final class PageImportExportSubscriber implements EventSubscriberInterface
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(Page::class)->find($id);
+            $entity = $this->pageRepository->find($id);
 
             if ($entity) {
                 $this->entityManager->remove($entity);

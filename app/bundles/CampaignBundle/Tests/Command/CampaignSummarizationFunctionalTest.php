@@ -12,7 +12,6 @@ use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class CampaignSummarizationFunctionalTest extends MauticMysqlTestCase
 {
@@ -26,14 +25,14 @@ final class CampaignSummarizationFunctionalTest extends MauticMysqlTestCase
     {
         $this->createDataAndExecuteCommand();
         $campaignSummary = $this->em->getRepository(Summary::class)->findAll();
-        Assert::assertCount(0, $campaignSummary);
+        $this->assertCount(0, $campaignSummary);
     }
 
     public function testExecuteCampaignEventWithSummarization(): void
     {
         $this->createDataAndExecuteCommand();
         $campaignSummary = $this->em->getRepository(Summary::class)->findAll();
-        Assert::assertCount(1, $campaignSummary);
+        $this->assertCount(1, $campaignSummary);
     }
 
     private function createDataAndExecuteCommand(): void

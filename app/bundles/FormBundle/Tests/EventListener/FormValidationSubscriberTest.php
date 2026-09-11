@@ -8,10 +8,11 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\EventListener\FormValidationSubscriber;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(FormValidationSubscriber::class)]
+#[CoversClass(FormValidationSubscriber::class)]
 final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private const MINIMUM_TWO_OPTIONS_MESSAGE = 'You must select at least 2 options.';
@@ -49,8 +50,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, ['a']);
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame(self::MINIMUM_TWO_OPTIONS_MESSAGE, $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame(self::MINIMUM_TWO_OPTIONS_MESSAGE, $event->getInvalidReason());
     }
 
     public function testFailsWhenNoSelectionsProvided(): void
@@ -67,8 +68,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, []);
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame(self::MINIMUM_TWO_OPTIONS_MESSAGE, $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame(self::MINIMUM_TWO_OPTIONS_MESSAGE, $event->getInvalidReason());
     }
 
     public function testFailsWhenValueIsNull(): void
@@ -85,8 +86,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, null);
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame('You must select at least 1 options.', $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame('You must select at least 1 options.', $event->getInvalidReason());
     }
 
     public function testFailsWhenAboveMaximum(): void
@@ -103,8 +104,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, ['a', 'b', 'c', 'd']);
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame('You cannot select more than 3 options.', $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame('You cannot select more than 3 options.', $event->getInvalidReason());
     }
 
     public function testValidWithinRange(): void
@@ -116,7 +117,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, ['a', 'b']);
         $this->subscriber->onFormValidate($event);
 
-        self::assertTrue($event->isValid());
+        $this->assertTrue($event->isValid());
     }
 
     public function testUsesCustomMinimumMessage(): void
@@ -131,8 +132,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, ['a']);
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame('Custom minimum message', $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame('Custom minimum message', $event->getInvalidReason());
     }
 
     public function testUsesCustomMaximumMessage(): void
@@ -147,8 +148,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, ['a', 'b', 'c']);
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame('Custom maximum message', $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame('Custom maximum message', $event->getInvalidReason());
     }
 
     public function testFallsBackToDefaultMessageWhenCustomMessageEmpty(): void
@@ -168,8 +169,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, ['a']);
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame(self::MINIMUM_TWO_OPTIONS_MESSAGE, $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame(self::MINIMUM_TWO_OPTIONS_MESSAGE, $event->getInvalidReason());
     }
 
     public function testEmailDonotSubmitDomainPatternTriggersFailure(): void
@@ -194,8 +195,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, $email);
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame('Cannot be sent with this email', $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame('Cannot be sent with this email', $event->getInvalidReason());
     }
 
     public function testEmailBlockedFreeProviderTriggersFailure(): void
@@ -220,7 +221,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, $email);
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame('Blocked free email provider', $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame('Blocked free email provider', $event->getInvalidReason());
     }
 }

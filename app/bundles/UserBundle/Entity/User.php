@@ -14,6 +14,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\UserBundle\ApiPlatform\UserProcessor;
 use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\Form;
@@ -28,10 +29,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     shortName: 'User',
     operations: [
         new GetCollection(uriTemplate: '/users', security: "is_granted('user:users:viewown')"),
-        new Post(uriTemplate: '/users', security: "is_granted('user:users:create')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Post(uriTemplate: '/users', security: "is_granted('user:users:create')", processor: UserProcessor::class),
         new Get(uriTemplate: '/users/{id}', security: "is_granted('user:users:viewown', object)"),
-        new Put(uriTemplate: '/users/{id}', security: "is_granted('user:users:editown', object)", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
-        new Patch(uriTemplate: '/users/{id}', security: "is_granted('user:users:editother', object)", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Put(uriTemplate: '/users/{id}', security: "is_granted('user:users:editown', object)", processor: UserProcessor::class),
+        new Patch(uriTemplate: '/users/{id}', security: "is_granted('user:users:editother', object)", processor: UserProcessor::class),
         new Delete(uriTemplate: '/users/{id}', security: "is_granted('user:users:deleteown', object)"),
     ],
     normalizationContext: [
@@ -229,77 +230,38 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('username', new Assert\NotBlank(
-            ['message' => 'mautic.user.user.username.notblank']
+            message: 'mautic.user.user.username.notblank'
         ));
 
-        $metadata->addConstraint(new UniqueEntity(
-            [
-                'fields'           => ['username'],
-                'message'          => 'mautic.user.user.username.unique',
-                'repositoryMethod' => 'checkUniqueUsernameEmail',
-            ]
-        ));
+        $metadata->addConstraint(new UniqueEntity(fields: ['username'], message: 'mautic.user.user.username.unique', repositoryMethod: 'checkUniqueUsernameEmail'));
 
         $metadata->addPropertyConstraint('firstName', new Assert\NotBlank(
-            ['message' => 'mautic.user.user.firstname.notblank']
+            message: 'mautic.user.user.firstname.notblank'
         ));
 
         $metadata->addPropertyConstraint('lastName', new Assert\NotBlank(
-            ['message' => 'mautic.user.user.lastname.notblank']
+            message: 'mautic.user.user.lastname.notblank'
         ));
 
         $metadata->addPropertyConstraint('email', new Assert\NotBlank(
-            ['message' => 'mautic.user.user.email.valid']
+            message: 'mautic.user.user.email.valid'
         ));
 
-        $metadata->addPropertyConstraint('email', new Assert\Email(
-            [
-                'message' => 'mautic.user.user.email.valid',
-                'groups'  => ['SecondPass'],
-            ]
-        ));
+        $metadata->addPropertyConstraint('email', new Assert\Email(message: 'mautic.user.user.email.valid', groups: ['SecondPass']));
 
-        $metadata->addConstraint(new UniqueEntity(
-            [
-                'fields'           => ['email'],
-                'message'          => 'mautic.user.user.email.unique',
-                'repositoryMethod' => 'checkUniqueUsernameEmail',
-                'groups'           => ['User', 'SecondPass'],
-            ]
-        ));
+        $metadata->addConstraint(new UniqueEntity(fields: ['email'], message: 'mautic.user.user.email.unique', repositoryMethod: 'checkUniqueUsernameEmail', groups: ['User', 'SecondPass']));
 
-        $metadata->addPropertyConstraint('position', new Assert\Length(
-            [
-                'max'        => 191,
-                'maxMessage' => 'mautic.user.user.position.toolong',
-            ]
-        ));
+        $metadata->addPropertyConstraint('position', new Assert\Length(max: 191, maxMessage: 'mautic.user.user.position.toolong'));
 
         $metadata->addPropertyConstraint('role', new Assert\NotBlank(
-            ['message' => 'mautic.user.user.role.notblank']
+            message: 'mautic.user.user.role.notblank'
         ));
 
-        $metadata->addPropertyConstraint('plainPassword', new Assert\NotBlank(
-            [
-                'message' => 'mautic.user.user.password.notblank',
-                'groups'  => ['CheckPasswordNotBlank'],
-            ]
-        ));
+        $metadata->addPropertyConstraint('plainPassword', new Assert\NotBlank(message: 'mautic.user.user.password.notblank', groups: ['CheckPasswordNotBlank']));
 
-        $metadata->addPropertyConstraint('plainPassword', new Assert\Length(
-            [
-                'min'        => 6,
-                'minMessage' => 'mautic.user.user.password.minlength',
-                'groups'     => ['CheckPassword'],
-            ]
-        ));
+        $metadata->addPropertyConstraint('plainPassword', new Assert\Length(min: 6, minMessage: 'mautic.user.user.password.minlength', groups: ['CheckPassword']));
 
-        $metadata->addPropertyConstraint('plainPassword', new NotWeak(
-            [
-                'message'    => 'mautic.user.user.password.weak',
-                'groups'     => ['CheckPassword'],
-            ]
-        ));
+        $metadata->addPropertyConstraint('plainPassword', new NotWeak(message: 'mautic.user.user.password.weak', groups: ['CheckPassword']));
 
         $metadata->setGroupSequence(['User', 'SecondPass', 'CheckPassword']);
     }
@@ -308,7 +270,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     {
         $data   = $form->getData();
         $groups = ['User', 'SecondPass'];
-        if ($data instanceof User) {
+        if ($data instanceof self) {
             $isNewUser        = !$data->getId();
             $hasPlainPassword = !empty($data->getPlainPassword());
 
@@ -354,7 +316,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('role' == $prop) {
             if ($current && !$val) {
                 $this->changes['role'] = [$current->getName().' ('.$current->getId().')', $val];
@@ -750,7 +712,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
             return false;
         }
 
-        $thisUser = $this->getId().$this->getUserIdentifier().$this->getPassword();
+        $thisUser = $this->id.$this->getUserIdentifier().$this->password;
         $thatUser = $user->getId().$user->getUserIdentifier().$user->getPassword();
 
         return $thisUser === $thatUser;

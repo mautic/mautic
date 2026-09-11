@@ -40,7 +40,7 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $form = $this->factory->create(ToBcBccStubFormType::class);
         $form->submit(['to' => 'user@example.com', 'cc' => '', 'bcc' => '']);
 
-        self::assertTrue($form->isValid());
+        $this->assertTrue($form->isValid());
     }
 
     public function testCommaSeparatedValidEmailsPasses(): void
@@ -48,7 +48,7 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $form = $this->factory->create(ToBcBccStubFormType::class);
         $form->submit(['to' => 'user1@example.com,user2@example.com', 'cc' => '', 'bcc' => '']);
 
-        self::assertTrue($form->isValid());
+        $this->assertTrue($form->isValid());
     }
 
     public function testCommaSeparatedEmailsWithSpacesPasses(): void
@@ -56,7 +56,7 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $form = $this->factory->create(ToBcBccStubFormType::class);
         $form->submit(['to' => 'user1@example.com, user2@example.com', 'cc' => '', 'bcc' => '']);
 
-        self::assertTrue($form->isValid());
+        $this->assertTrue($form->isValid());
     }
 
     public function testEmptyValuePasses(): void
@@ -64,7 +64,24 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $form = $this->factory->create(ToBcBccStubFormType::class);
         $form->submit(['to' => '', 'cc' => '', 'bcc' => '']);
 
-        self::assertTrue($form->isValid());
+        $this->assertTrue($form->isValid());
+    }
+
+    public function testRequiredToEmptyValueFails(): void
+    {
+        $form = $this->factory->create(RequiredToBcBccStubFormType::class);
+        $form->submit(['to' => '', 'cc' => '', 'bcc' => '']);
+
+        $this->assertFalse($form->isValid());
+        $this->assertGreaterThan(0, $form->get('to')->getErrors()->count());
+    }
+
+    public function testRequiredToValidEmailPasses(): void
+    {
+        $form = $this->factory->create(RequiredToBcBccStubFormType::class);
+        $form->submit(['to' => 'user@example.com', 'cc' => '', 'bcc' => '']);
+
+        $this->assertTrue($form->isValid());
     }
 
     public function testInvalidEmailFails(): void
@@ -72,7 +89,7 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $form = $this->factory->create(ToBcBccStubFormType::class);
         $form->submit(['to' => 'notanemail', 'cc' => '', 'bcc' => '']);
 
-        self::assertFalse($form->isValid());
+        $this->assertFalse($form->isValid());
     }
 
     public function testZeroValueFails(): void
@@ -80,7 +97,7 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $form = $this->factory->create(ToBcBccStubFormType::class);
         $form->submit(['to' => '0', 'cc' => '', 'bcc' => '']);
 
-        self::assertFalse($form->isValid());
+        $this->assertFalse($form->isValid());
     }
 
     public function testOneInvalidEmailInListFails(): void
@@ -88,7 +105,7 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $form = $this->factory->create(ToBcBccStubFormType::class);
         $form->submit(['to' => 'valid@example.com,notanemail', 'cc' => '', 'bcc' => '']);
 
-        self::assertFalse($form->isValid());
+        $this->assertFalse($form->isValid());
     }
 
     public function testCcAndBccFieldsAlsoValidate(): void
@@ -96,19 +113,29 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $form = $this->factory->create(ToBcBccStubFormType::class);
         $form->submit(['to' => '', 'cc' => 'invalid', 'bcc' => 'also-invalid']);
 
-        self::assertFalse($form->isValid());
+        $this->assertFalse($form->isValid());
     }
 }
 
 /**
  * @extends AbstractType<mixed>
  */
-class ToBcBccStubFormType extends AbstractType
+final class ToBcBccStubFormType extends AbstractType
 {
     use ToBcBccFieldsTrait;
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->addToBcBccFields($builder);
+    }
+}
+
+final class RequiredToBcBccStubFormType extends AbstractType
+{
+    use ToBcBccFieldsTrait;
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $this->addToBcBccFields($builder, true);
     }
 }

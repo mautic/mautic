@@ -19,7 +19,7 @@ final class PasswordStrengthSubscriberTest extends TestCase
         $passport->method('hasBadge')
             ->with(PasswordCredentials::class)
             ->willReturn(false);
-        $passport->expects(self::never())
+        $passport->expects($this->never())
             ->method('getBadge');
 
         $event = $this->createMock(CheckPassportEvent::class);

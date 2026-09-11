@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\DependencyInjection\EnvProcessor;
 use Mautic\CoreBundle\Helper\Dsn\Dsn;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 
-class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
+final class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
 {
     public function getEnv(string $prefix, string $name, \Closure $getEnv): string
     {

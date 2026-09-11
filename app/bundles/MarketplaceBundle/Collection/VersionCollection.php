@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Collection;
 use Mautic\MarketplaceBundle\DTO\Version;
 use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 
-class VersionCollection implements \Iterator, \Countable, \ArrayAccess
+final class VersionCollection implements \Iterator, \Countable, \ArrayAccess
 {
     /**
      * @var Version[]
@@ -24,7 +24,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         $this->records = array_values($records);
     }
 
-    public static function fromArray(array $array): VersionCollection
+    public static function fromArray(array $array): self
     {
         return new self(
             array_map(
@@ -34,12 +34,12 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         );
     }
 
-    public function map(callable $callback): VersionCollection
+    public function map(callable $callback): self
     {
         return new self(array_map($callback, $this->records));
     }
 
-    public function sortByLatest(): VersionCollection
+    public function sortByLatest(): self
     {
         $records = $this->records;
 
@@ -51,7 +51,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         return new self($records);
     }
 
-    public function filter(callable $callback): VersionCollection
+    public function filter(callable $callback): self
     {
         return new self(array_values(array_filter($this->records, $callback)));
     }
@@ -109,7 +109,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
 
     public function offsetSet($offset, $value): void
     {
-        if (is_null($offset)) {
+        if (null === $offset) {
             $this->records[] = $value;
         } else {
             $this->records[$offset] = $value;

@@ -35,7 +35,7 @@ final class DashboardSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->router      = $this->createMock(RouterInterface::class);
         $this->permissions = $this->createMock(CorePermissions::class);
         $this->cacheProvider = $this->createMock(CacheProviderTagAwareInterface::class);
-        $this->translator  = new class implements TranslatorInterface {
+        $this->translator  = new class() implements TranslatorInterface {
             public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 return (string) $id;
@@ -94,7 +94,7 @@ final class DashboardSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber->onWidgetDetailGenerate($event);
 
         $templateData = $event->getTemplateData();
-        self::assertArrayHasKey('chartData', $templateData);
+        $this->assertArrayHasKey('chartData', $templateData);
     }
 
     public function testUniqueVsRepetitiveDownloadsPassesFilterArrayAndPermissionFlagToAssetModel(): void
@@ -133,7 +133,7 @@ final class DashboardSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber->onWidgetDetailGenerate($event);
 
         $templateData = $event->getTemplateData();
-        self::assertArrayHasKey('chartData', $templateData);
+        $this->assertArrayHasKey('chartData', $templateData);
     }
 
     public function testPopularAssetsPassesFilterArrayAndPermissionFlagToAssetModel(): void
@@ -178,6 +178,6 @@ final class DashboardSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber->onWidgetDetailGenerate($event);
 
         $templateData = $event->getTemplateData();
-        self::assertArrayHasKey('bodyItems', $templateData);
+        $this->assertArrayHasKey('bodyItems', $templateData);
     }
 }

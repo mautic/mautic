@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
-use PHPUnit\Framework\Assert;
 
 final class ContactExportSchedulerTest extends MauticMysqlTestCase
 {
@@ -37,8 +36,8 @@ final class ContactExportSchedulerTest extends MauticMysqlTestCase
         $id        = $exportScheduler->getId();
         $localDate = $exportScheduler->getScheduledDateTime()->format(DateTimeHelper::FORMAT_DB);
         $utcDate   = $this->convertDateTimezone($localDate, $timezone, 'UTC');
-        Assert::assertSame($timezone, $exportScheduler->getScheduledDateTime()->getTimezone()->getName(), sprintf('Timezone should be %s.', $timezone));
-        Assert::assertSame($utcDate, $this->fetchScheduledDate($id), 'Database value should be converted to UTC.');
+        $this->assertSame($timezone, $exportScheduler->getScheduledDateTime()->getTimezone()->getName(), sprintf('Timezone should be %s.', $timezone));
+        $this->assertSame($utcDate, $this->fetchScheduledDate($id), 'Database value should be converted to UTC.');
 
         $this->em->clear();
 
@@ -48,8 +47,8 @@ final class ContactExportSchedulerTest extends MauticMysqlTestCase
         $exportScheduler = $this->em->find(ContactExportScheduler::class, $id);
         $localDate       = $this->convertDateTimezone($this->fetchScheduledDate($id), 'UTC', $timezone);
         $this->assertInstanceOf(ContactExportScheduler::class, $exportScheduler);
-        Assert::assertSame($timezone, $exportScheduler->getScheduledDateTime()->getTimezone()->getName(), sprintf('Timezone should be %s.', $timezone));
-        Assert::assertSame($localDate, $exportScheduler->getScheduledDateTime()->format(DateTimeHelper::FORMAT_DB), sprintf('PHP value should be converted to %s.', $timezone));
+        $this->assertSame($timezone, $exportScheduler->getScheduledDateTime()->getTimezone()->getName(), sprintf('Timezone should be %s.', $timezone));
+        $this->assertSame($localDate, $exportScheduler->getScheduledDateTime()->format(DateTimeHelper::FORMAT_DB), sprintf('PHP value should be converted to %s.', $timezone));
     }
 
     private function convertDateTimezone(string $date, string $timezoneFrom, string $timezoneTo): string

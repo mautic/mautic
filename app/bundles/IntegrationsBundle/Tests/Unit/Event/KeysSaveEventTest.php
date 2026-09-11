@@ -20,8 +20,8 @@ final class KeysSaveEventTest extends TestCase
 
         $event = new KeysSaveEvent($integration, $keys);
 
-        self::assertSame($integration, $event->getIntegrationConfiguration());
-        self::assertSame($keys, $event->getOldKeys());
-        self::assertSame($keys, $event->getNewKeys());
+        $this->assertSame($integration, $event->getIntegrationConfiguration());
+        $this->assertSame($keys, $event->getOldKeys());
+        $this->assertSame($keys, $event->getNewKeys());
     }
 }

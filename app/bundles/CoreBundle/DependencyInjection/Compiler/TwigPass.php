@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
@@ -7,7 +9,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TwigPass implements CompilerPassInterface
+final class TwigPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

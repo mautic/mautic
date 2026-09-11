@@ -11,14 +11,19 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
+use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
+use Mautic\PageBundle\Entity\PageRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -31,6 +36,8 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         'testUnsubscribeWithEmailStat',
         'testUnsubscribeEmail',
         'testHeadRequestWithNoShowContactPreferences',
+        'testUnsubscribeWithExistingStatRejectsDifferentValidEmailHashPair',
+        'testUnsubscribeWithDeletedStatAllowsValidEmailHashPair',
     ];
 
     protected function setUp(): void
@@ -41,10 +48,9 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['show_contact_categories']         = 0;
         $this->configParams['show_contact_preferred_channels'] = 0;
 
+        $this->configParams['show_contact_preferences'] = 1;
         if (in_array($this->name(), self::UNSUBSCRIBE_TESTS)) {
             $this->configParams['show_contact_preferences'] = 0;
-        } else {
-            $this->configParams['show_contact_preferences'] = 1;
         }
 
         if (in_array($this->name(), ['testContactPreferencesSaveMessage', 'testLandingPageContactPreferencesSaveMessage'])) {
@@ -55,6 +61,17 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_preferred_channels'] = 1;
         }
 
+        if ('testContactPreferencesFormRenderOnUnsubscribePage' === $this->name()) {
+            $this->configParams['show_contact_segments'] = 1;
+        }
+
+        switch ($this->name()) {
+            case 'testResubscribeSuccessMessageContainsDirectUnsubscribeLinkWhenValidationDisabled':
+            case 'testUnsubscribeSuccessMessageContainsDirectResubscribeLinkWhenValidationDisabled':
+                $this->configParams['validate_unsubscribe_emails'] = false;
+                break;
+        }
+
         parent::setUp();
     }
 
@@ -63,39 +80,37 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/mailer/callback');
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        Assert::assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
+        $this->assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
     }
 
     public function testMailerCallbackWhenTransportDoesNotProccessIt(): void
     {
-        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (): null => null /* exists but does nothing */);
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (): null => null /* exists but does nothing */);
         $this->client->request('POST', '/mailer/callback');
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        Assert::assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
+        $this->assertSame('No email transport that could process this callback was found', $this->client->getResponse()->getContent());
     }
 
     public function testMailerCallbackWhenTransportProccessesIt(): void
     {
-        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
+        self::getContainer()->get(EventDispatcherInterface::class)->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (TransportWebhookEvent $event) => $event->setResponse(new Response('OK')));
         $this->client->request('POST', '/mailer/callback');
 
         self::assertResponseIsSuccessful();
-        Assert::assertSame('OK', $this->client->getResponse()->getContent());
+        $this->assertSame('OK', $this->client->getResponse()->getContent());
     }
 
     public function testUnsubscribeFormActionWithoutTheme(): void
     {
         $form = $this->getForm(null);
-
         $stat = $this->getStat($form);
-
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
     }
 
     public function testContactPreferencesLandingPageTracking(): void
@@ -107,11 +122,11 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
-        $this->em->clear(Page::class);
+        $this->em->clear();
 
-        $entity = $this->em->getRepository(Page::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
+        $entity = self::getContainer()->get(PageRepository::class)->getEntity($stat->getEmail()->getPreferenceCenter()->getId());
         $this->assertSame(1, $entity->getHits(), $this->client->getResponse()->getContent());
     }
 
@@ -121,7 +136,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = $this->getStat(null, $lead);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
         self::assertResponseIsSuccessful();
         $form = $crawler->filter('form')->form();
@@ -135,7 +150,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $this->assertCount(1, $crawler->filter('#success-message-text'), $this->client->getResponse()->getContent());
-        $expectedMessage = static::getContainer()->get('translator')->trans('mautic.email.preferences_center_success_message.text');
+        $expectedMessage = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.email.preferences_center_success_message.text');
         $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertResponseIsSuccessful();
 
@@ -143,37 +158,33 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $dncRepository = $this->em->getRepository(DoNotContact::class);
         $this->assertInstanceOf(DoNotContactRepository::class, $dncRepository);
         $dncRecords = $dncRepository->findBy(['lead' => $lead->getId()]);
-        Assert::assertCount(1, $dncRecords);
-        Assert::assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
-        Assert::assertSame('email', $dncRecords[0]->getChannel());
-        Assert::assertSame($stat->getEmail()->getId(), $dncRecords[0]->getChannelId());
+        $this->assertCount(1, $dncRecords);
+        $this->assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
+        $this->assertSame('email', $dncRecords[0]->getChannel());
+        $this->assertSame($stat->getEmail()->getId(), $dncRecords[0]->getChannelId());
     }
 
     public function testUnsubscribeFormActionWithThemeWithoutFormSupport(): void
     {
         $form = $this->getForm('aurora');
-
         $stat = $this->getStat($form);
-
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
     }
 
     public function testUnsubscribeFormActionWithThemeWithFormSupport(): void
     {
         $form = $this->getForm('blank');
-
         $stat = $this->getStat($form);
-
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
     }
 
@@ -185,9 +196,9 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
-        self::assertStringNotContainsString('form/submit?formId=', $crawler->html());
+        $this->assertStringNotContainsString('form/submit?formId=', $crawler->html());
         $this->assertResponseIsSuccessful();
     }
 
@@ -196,7 +207,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead = $this->createLead();
         $stat = $this->getStat(null, $lead);
         $this->em->flush();
-        $this->client->request('POST', '/email/unsubscribe/'.$stat->getTrackingHash(), [
+        $this->client->request('POST', $this->buildUnsubscribeUrl($stat), [
             'List-Unsubscribe' => 'One-Click',
         ]);
         $this->assertResponseIsSuccessful();
@@ -205,15 +216,28 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncCollection->first()->getReason());
     }
 
+    public function testOneClickUnsubscribeWithWrongSecretHashIsForbidden(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+        $this->client->request('POST', "/email/unsubscribe/{$stat->getTrackingHash()}/{$stat->getEmailAddress()}/wronghash", [
+            'List-Unsubscribe' => 'One-Click',
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $dncCollection = $stat->getLead()->getDoNotContact();
+        $this->assertCount(0, $dncCollection);
+    }
+
     public function testHeadRequestWithNoShowContactPreferences(): void
     {
         $lead = $this->createLead();
         $stat = $this->getStat(null, $lead);
         $this->em->flush();
-        $this->client->request('HEAD', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->client->request('HEAD', $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
         $dncCollection = $stat->getLead()->getDoNotContact();
-        $this->assertEquals(0, $dncCollection->count());
+        $this->assertCount(0, $dncCollection);
     }
 
     public function testUnsubscribeActionWithCustomPreferenceCenterHasCsrfToken(): void
@@ -223,7 +247,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $preferencesCenter = $this->createCustomPreferencesPage('{segmentlist}{saveprefsbutton}');
         $stat              = $this->getStat(null, $lead, $preferencesCenter);
         $this->em->flush();
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
         $tokenInput = $crawler->filter('input[name="lead_contact_frequency_rules[_token]"]');
         $this->assertCount(1, $tokenInput, $this->client->getResponse()->getContent());
@@ -250,7 +274,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = $this->getStat(null, $lead, $page);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Save preferences', $crawler->html());
     }
@@ -309,7 +333,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForTestUnsubscribeFormActionWithUsingLandingPage')]
+    #[DataProvider('dataForTestUnsubscribeFormActionWithUsingLandingPage')]
     public function testUnsubscribeFormActionWithUsingLandingPage(?string $contactLocale, ?string $pageLocale, string $expectedLocale): void
     {
         $lead = $this->createLead($contactLocale);
@@ -318,10 +342,10 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = $this->getStat(null, $lead, $page);
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $needle     = $translator->trans('mautic.page.form.saveprefs', [], null, $expectedLocale);
 
         $this->assertStringContainsString($needle, $crawler->html());
@@ -339,6 +363,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email->setName($emailName);
         $email->setSubject($emailName);
         $email->setEmailType('template');
+        $email->setTemplate('blank');
         $email->setUnsubscribeForm($form);
         $email->setPreferenceCenter($preferenceCenter);
         $this->em->persist($email);
@@ -480,9 +505,17 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     ): void {
         $uri = '/email/unsubscribe/'.$statHash.'/'.$email.'/'.$emailHash;
         $this->client->request(Request::METHOD_GET, $uri);
+        $this->assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertStringContainsString($message, $clientResponse->getContent());
+        $this->assertStringContainsString($message, (string) $clientResponse->getContent());
+
+        if ($addedRow) {
+            $this->assertStringContainsString(
+                '/email/validate/resubscribe/'.$this->getSecretHash($email).'/'.$statHash,
+                (string) $clientResponse->getContent()
+            );
+        }
+
         $doNotContacts       = $this->em->getRepository(DoNotContact::class)->findBy(['lead' => $this->leadId]);
         $isAddedDoNotContact = (bool) count($doNotContacts);
         $addedDoNotContact   = $isAddedDoNotContact ? $doNotContacts[0] : null;
@@ -492,6 +525,11 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->em->remove($addedDoNotContact);
             $this->em->flush();
         }
+    }
+
+    private function buildUnsubscribeUrl(Stat $stat): string
+    {
+        return "/email/unsubscribe/{$stat->getTrackingHash()}/{$stat->getEmailAddress()}/{$this->getSecretHash($stat->getEmailAddress())}";
     }
 
     /**
@@ -511,7 +549,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         // Email hash
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper   = self::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper   = self::getContainer()->get(CoreParametersHelper::class);
         $configSecretEmailHash  = $coreParametersHelper->get('secret_key');
         $rightHashForWrongEmail = hash_hmac('sha256', $wrongEmail, $configSecretEmailHash);
         $rightHashForRightEmail = hash_hmac('sha256', $rightEmail, $configSecretEmailHash);
@@ -537,12 +575,12 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
                 'We are sorry to see you go!',
                 true,
             ],
-            'ok_right_stat_hash' => [
+            'ok_right_stat_hash_wrong_sectet' => [
                 $rightStatHash,
                 $wrongEmail,
                 $wrongHash,
-                'We are sorry to see you go!',
-                true,
+                'Record not found',
+                false,
             ],
             'ok_right_email_and_hash' => [
                 $wrongStatHash,
@@ -570,11 +608,8 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testUnsubscribeNotFoundEmailStat(): void
     {
-        $this->client->request(Request::METHOD_GET, '/email/unsubscribe/non-existant-hash');
-        Assert::assertStringContainsString(
-            'Record not found.',
-            strip_tags((string) $this->client->getResponse()->getContent())
-        );
+        $this->client->request(Request::METHOD_GET, '/email/unsubscribe/non-existant-hash/test@mautic.org/'.$this->getSecretHash('test@mautic.org'));
+        $this->assertStringContainsString('Record not found.', strip_tags((string) $this->client->getResponse()->getContent()));
         self::assertResponseIsSuccessful();
     }
 
@@ -597,12 +632,12 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($emailStat);
         $this->em->flush();
 
-        $this->client->request(Request::METHOD_GET, '/email/unsubscribe/existing-tracking-hash');
-
-        Assert::assertStringContainsString(
-            'We are sorry to see you go! john@doe.email will no longer receive emails from us. If this was by mistake, click here to re-subscribe.',
-            strip_tags((string) $this->client->getResponse()->getContent())
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/unsubscribe/existing-tracking-hash/john@doe.email/'.$this->getSecretHash('john@doe.email')
         );
+
+        $this->assertStringContainsString('We are sorry to see you go! john@doe.email will no longer receive emails from us. If this was by mistake, click here to re-subscribe.', strip_tags((string) $this->client->getResponse()->getContent()));
         self::assertResponseIsSuccessful();
 
         /** @var DoNotContactRepository $dncRepository */
@@ -611,14 +646,223 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoNotContact[] $dncRecords */
         $dncRecords = $dncRepository->findAll();
 
-        Assert::assertCount(1, $dncRecords);
-        Assert::assertSame($contact->getId(), $dncRecords[0]->getLead()->getId());
-        Assert::assertSame('email', $dncRecords[0]->getChannel());
-        Assert::assertSame((int) $email->getId(), (int) $dncRecords[0]->getChannelId());
-        Assert::assertSame('User unsubscribed.', $dncRecords[0]->getComments());
+        $this->assertCount(1, $dncRecords);
+        $this->assertSame($contact->getId(), $dncRecords[0]->getLead()->getId());
+        $this->assertSame('email', $dncRecords[0]->getChannel());
+        $this->assertSame((int) $email->getId(), (int) $dncRecords[0]->getChannelId());
+        $this->assertSame('User unsubscribed.', $dncRecords[0]->getComments());
     }
 
-    public function testUnsubscribeAllFromPreferencesPage(): void
+    public function testUnsubscribeWithExistingStatRejectsDifferentValidEmailHashPair(): void
+    {
+        $email = new Email();
+        $email->setName('Victim Email');
+        $email->setSubject('Victim Subject');
+        $email->setEmailType('template');
+
+        $victimLead = new Lead();
+        $victimLead->setEmail('victim@mautic.tld');
+
+        $attackerLead = new Lead();
+        $attackerLead->setEmail('attacker@mautic.tld');
+
+        $emailStat = new Stat();
+        $emailStat->setEmail($email);
+        $emailStat->setLead($victimLead);
+        $emailStat->setEmailAddress((string) $victimLead->getEmail());
+        $emailStat->setDateSent(new \DateTime());
+        $emailStat->setTrackingHash('existing-stat-hash-for-mismatch-test');
+
+        $this->em->persist($email);
+        $this->em->persist($victimLead);
+        $this->em->persist($attackerLead);
+        $this->em->persist($emailStat);
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/unsubscribe/existing-stat-hash-for-mismatch-test/attacker@mautic.tld/'.$this->getSecretHash('attacker@mautic.tld')
+        );
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Record not found.', strip_tags((string) $this->client->getResponse()->getContent()));
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+
+        $this->assertCount(0, $dncRepository->findBy(['lead' => $victimLead->getId()]));
+        $this->assertCount(0, $dncRepository->findBy(['lead' => $attackerLead->getId()]));
+    }
+
+    public function testUnsubscribeWithDeletedStatAllowsValidEmailHashPair(): void
+    {
+        $requestLead = new Lead();
+        $requestLead->setEmail('request@mautic.tld');
+        $this->em->persist($requestLead);
+        $this->em->flush();
+
+        // Synthetic stale tracking hash: this simulates a link whose stat once existed but is now deleted.
+        $staleTrackingHash = 'deleted-stat-hash-for-unsubscribe-test';
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/unsubscribe/'.$staleTrackingHash.'/request@mautic.tld/'.$this->getSecretHash('request@mautic.tld')
+        );
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('We are sorry to see you go!', strip_tags($content));
+        $this->assertStringContainsString('/email/validate/resubscribe/'.$this->getSecretHash('request@mautic.tld').'/'.$staleTrackingHash, $content);
+
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        /** @var DoNotContact[] $requestLeadDncRecords */
+        $requestLeadDncRecords = $dncRepository->findBy(['lead' => $requestLead->getId()]);
+
+        $this->assertCount(1, $requestLeadDncRecords);
+        $this->assertSame(DoNotContact::UNSUBSCRIBED, $requestLeadDncRecords[0]->getReason());
+        $this->assertSame('email', $requestLeadDncRecords[0]->getChannel());
+    }
+
+    public function testValidateEmailFormRejectsInvalidAction(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/email/validate/invalid-action/secret/hash');
+
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testValidateEmailFormWithMissingStatDoesNotThrowError(): void
+    {
+        $email      = 'validate.without.stat@mautic.tld';
+        $secretHash = $this->getSecretHash($email);
+
+        $crawler = $this->client->request(
+            Request::METHOD_GET,
+            '/email/validate/unsubscribe/'.$secretHash.'/non-existing-tracking-hash'
+        );
+
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertStringContainsString('Confirm your email address', strip_tags($crawler->html()));
+    }
+
+    public function testValidateEmailFormRedirectsToUnsubscribeWithValidEmail(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(
+            Request::METHOD_GET,
+            '/email/validate/unsubscribe/'.$secretHash.'/'.$stat->getTrackingHash()
+        );
+
+        $this->assertStringContainsString('Confirm your email address', $crawler->html());
+
+        $form           = $crawler->selectButton('Verify email')->form();
+        $emailFieldName = $crawler->filter('input[type="email"]')->attr('name');
+        \assert(is_string($emailFieldName));
+        $form[$emailFieldName] = (string) $email;
+        $this->client->submit($form);
+
+        $this->assertStringContainsString('We are sorry to see you go!', strip_tags((string) $this->client->getResponse()->getContent()));
+    }
+
+    public function testValidateEmailFormShowsErrorForMismatchedEmail(): void
+    {
+        $stat       = $this->getStat();
+        $secretHash = $this->getSecretHash($stat->getEmailAddress());
+        $this->em->flush();
+
+        $crawler = $this->client->request(
+            Request::METHOD_GET,
+            '/email/validate/unsubscribe/'.$secretHash.'/'.$stat->getTrackingHash()
+        );
+
+        $form           = $crawler->selectButton('Verify email')->form();
+        $emailFieldName = $crawler->filter('input[type="email"]')->attr('name');
+        \assert(is_string($emailFieldName));
+        $form[$emailFieldName] = 'mismatch@email.tld';
+        $crawler               = $this->client->submit($form);
+
+        $this->assertFalse($this->client->getResponse()->isRedirect());
+        $this->assertStringContainsString('This email address does not match the email address that was used to generate this link.', strip_tags($crawler->html()));
+        $this->assertStringNotContainsString('mautic.email.address.does.not.match.link', strip_tags($crawler->html()));
+        $this->assertStringContainsString('Confirm your email address', strip_tags($crawler->html()));
+        $this->assertStringNotContainsString('We are sorry to see you go!', strip_tags($crawler->html()));
+    }
+
+    public function testLegacyResubscribeLinkRedirectsToValidateEmailForm(): void
+    {
+        $stat = $this->getStat();
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/email/resubscribe/'.$stat->getTrackingHash());
+
+        $this->assertStringContainsString('Confirm your email address', $crawler->html());
+    }
+
+    public function testValidateEmailFormRedirectsToResubscribeWithValidEmail(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $crawler = $this->client->request(
+            Request::METHOD_GET,
+            '/email/validate/resubscribe/'.$secretHash.'/'.$idHash
+        );
+
+        $form           = $crawler->selectButton('Verify email')->form();
+        $emailFieldName = $crawler->filter('input[type="email"]')->attr('name');
+        \assert(is_string($emailFieldName));
+        $form[$emailFieldName] = (string) $email;
+        $this->client->submit($form);
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString('has been re-subscribed', strip_tags((string) $this->client->getResponse()->getContent()));
+        $this->assertStringContainsString('/email/validate/unsubscribe/'.$secretHash.'/'.$idHash, (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testLegacyResubscribeLinkWithoutStatReturnsNotFound(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/email/resubscribe/non-existing-tracking-hash');
+
+        $this->assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testResubscribeWithInvalidHashShowsRecordNotFound(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/resubscribe/'.$stat->getTrackingHash().'/'.$email.'/invalid-hash'
+        );
+
+        $this->assertStringContainsString('Record not found.', strip_tags((string) $this->client->getResponse()->getContent()));
+    }
+
+    public function testResubscribeWithoutStatButValidHashWorks(): void
+    {
+        $email      = 'resubscribe.without.stat@mautic.tld';
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = 'non-existing-tracking-hash';
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/resubscribe/'.$idHash.'/'.$email.'/'.$secretHash
+        );
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString('/email/validate/unsubscribe/'.$secretHash.'/'.$idHash, (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testWebviewReturns404ForAnonymousUser(): void
     {
         // Create a lead and email stat
         $lead = $this->createLead();
@@ -626,7 +870,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Get the unsubscribe page
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
         self::assertResponseIsSuccessful();
 
@@ -643,7 +887,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         // Assert that the response contains the expected string
         $this->assertStringContainsString(
             'We are sorry to see you go! john@doe.email will no longer receive emails from us',
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
 
         // Assert that a DoNotContact record was created
@@ -670,7 +914,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->logoutUser();
 
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
 
         $this->assertResponseIsSuccessful();
         $form = $crawler->filter('form')->form();
@@ -681,5 +925,149 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $successMessage = $crawler->filter('div.pref-successmessage');
         $this->assertCount(1, $successMessage);
+    }
+
+    public function testContactPreferencesFormRenderOnUnsubscribePage(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+
+        // Preference-center segments - unique public names
+        $segmentOne = $this->createSegment('Segment First', 'Segment 2', 'segment-1');
+        $segmentTwo = $this->createSegment('Segment Second', 'Segment 1', 'segment-2');
+
+        // Same public name segments (must both render, deterministic order)
+        $sameNameOne = $this->createSegment('Same A', 'Same Name', 'same-1');
+        $sameNameTwo = $this->createSegment('Same B', 'Same Name', 'same-2');
+
+        // Unpublished preference segment (should NOT appear)
+        $unpublishedSegment = $this->createSegment('Draft Segment', 'Draft', 'draft-segment', false);
+
+        // Non-preference segment (should NOT appear)
+        $nonPreferenceSegment = $this->createSegment('Hidden Segment', 'Should Not Appear', 'hidden-segment', true, false);
+
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
+
+        $this->assertResponseIsSuccessful();
+
+        // Collect only segment labels
+        $labels = $crawler->filter('#contact-segments label[for]')
+            ->each(fn ($node): string => trim($node->text()));
+
+        $this->assertSame(
+            [
+                // same publicName → sorted by ID for stability
+                sprintf('%s (%s)', $sameNameOne->getPublicName(), $sameNameOne->getId()),
+                sprintf('%s (%s)', $sameNameTwo->getPublicName(), $sameNameTwo->getId()),
+
+                // sorted by publicName
+                sprintf('%s (%s)', $segmentTwo->getPublicName(), $segmentTwo->getId()), // Segment 1
+                sprintf('%s (%s)', $segmentOne->getPublicName(), $segmentOne->getId()), // Segment 2
+            ],
+            $labels,
+            'Segments must be ordered by publicName, then by ID for stability'
+        );
+
+        // Assert: non-preference and unpublished segments are excluded
+        $labelText = implode(' ', $labels);
+
+        $this->assertStringNotContainsString($nonPreferenceSegment->getPublicName(), $labelText);
+        $this->assertStringNotContainsString($unpublishedSegment->getPublicName(), $labelText);
+
+        // Assert: checkbox ↔ label wiring
+        $crawler->filter('#contact-segments input[type="checkbox"]')->each(
+            function ($input) use ($crawler): void {
+                $id = $input->attr('id');
+
+                $this->assertGreaterThan(
+                    0,
+                    $crawler->filter(sprintf('label[for="%s"]', $id))->count(),
+                    sprintf('Missing label for checkbox %s', $id)
+                );
+            }
+        );
+    }
+
+    private function createSegment(
+        string $name,
+        string $publicName,
+        string $alias,
+        bool $isPublished = true,
+        bool $isPreferenceCenter = true): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name);
+        $segment->setPublicName($publicName);
+        $segment->setAlias($alias);
+        $segment->setIsPreferenceCenter($isPreferenceCenter);
+        $segment->setIsPublished($isPublished);
+        $this->em->persist($segment);
+
+        return $segment;
+    }
+
+    public function testResubscribeSuccessMessageContainsDirectUnsubscribeLinkWhenValidationDisabled(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/resubscribe/'.$idHash.'/'.$email.'/'.$secretHash
+        );
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString(
+            'has been re-subscribed',
+            strip_tags((string) $this->client->getResponse()->getContent())
+        );
+        $this->assertStringContainsString(
+            '/email/unsubscribe/'.$idHash.'/'.$email.'/'.$secretHash,
+            (string) $this->client->getResponse()->getContent()
+        );
+        $this->assertStringNotContainsString(
+            '/email/validate/',
+            (string) $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testUnsubscribeSuccessMessageContainsDirectResubscribeLinkWhenValidationDisabled(): void
+    {
+        $stat       = $this->getStat();
+        $email      = $stat->getEmailAddress();
+        $secretHash = $this->getSecretHash($email);
+        $idHash     = $stat->getTrackingHash();
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/email/unsubscribe/'.$idHash.'/'.$email.'/'.$secretHash
+        );
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString(
+            'will no longer receive emails from us',
+            strip_tags((string) $this->client->getResponse()->getContent())
+        );
+        $this->assertStringContainsString(
+            '/email/resubscribe/'.$idHash.'/'.$email.'/'.$secretHash,
+            (string) $this->client->getResponse()->getContent()
+        );
+        $this->assertStringNotContainsString(
+            '/email/validate/',
+            (string) $this->client->getResponse()->getContent()
+        );
+    }
+
+    private function getSecretHash(string $email): string
+    {
+        $mailHashHelper = self::getContainer()->get(MailHashHelper::class);
+
+        return $mailHashHelper->getEmailHash($email);
     }
 }

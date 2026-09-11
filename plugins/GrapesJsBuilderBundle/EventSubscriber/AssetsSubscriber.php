@@ -12,16 +12,16 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AssetsSubscriber implements EventSubscriberInterface
+final readonly class AssetsSubscriber implements EventSubscriberInterface
 {
     private const ASSET_DIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
 
     public function __construct(
-        private readonly Config $config,
-        private readonly InstallService $installer,
-        private readonly RequestStack $requestStack,
-        private readonly string $projectDir,
-        private readonly LoggerInterface $logger,
+        private Config $config,
+        private InstallService $installer,
+        private RequestStack $requestStack,
+        private string $projectDir,
+        private LoggerInterface $logger,
     ) {
     }
 

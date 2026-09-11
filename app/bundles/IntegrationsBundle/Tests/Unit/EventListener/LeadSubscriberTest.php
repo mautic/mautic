@@ -20,7 +20,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -80,16 +79,13 @@ final class LeadSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        Assert::assertSame(
-            [
-                LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
-                LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
-                LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
-                LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
-                LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 128],
-            ],
-            LeadSubscriber::getSubscribedEvents()
-        );
+        $this->assertSame([
+            LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
+            LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
+            LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
+            LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
+            LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 128],
+        ], LeadSubscriber::getSubscribedEvents());
     }
 
     public function testOnLeadPostSaveAnonymousLead(): void
@@ -257,11 +253,11 @@ final class LeadSubscriberTest extends TestCase
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, Lead::class);
+            ->with($deletedId, Lead::class);
 
         $this->objectMappingRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+            ->with($deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
 
         $this->subscriber->onLeadPostDelete(new LeadEvent($lead));
     }
@@ -402,11 +398,11 @@ final class LeadSubscriberTest extends TestCase
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, Company::class);
+            ->with($deletedId, Company::class);
 
         $this->objectMappingRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
+            ->with($deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
 
         $this->subscriber->onCompanyPostDelete($this->companyEvent);
     }
@@ -419,7 +415,7 @@ final class LeadSubscriberTest extends TestCase
         $integrationName     = 'testIntegration';
         $enabledIntegrations = [$integrationName];
 
-        $this->syncIntegrationsHelper->expects($this->any())
+        $this->syncIntegrationsHelper
             ->method('getEnabledIntegrations')
             ->willReturn($enabledIntegrations);
 

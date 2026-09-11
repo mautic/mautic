@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadTagsType extends AbstractType
+final class CampaignEventLeadTagsType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

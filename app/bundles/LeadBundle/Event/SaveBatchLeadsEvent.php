@@ -12,7 +12,7 @@ final class SaveBatchLeadsEvent extends Event
         /**
          * @var LeadEvent[]
          */
-        protected array $leadsEvents,
+        private readonly array $leadsEvents,
     ) {
     }
 

@@ -239,9 +239,6 @@ class AuthenticationEvent extends Event
         return $this->response;
     }
 
-    /**
-     * Get the request.
-     */
     public function getRequest(): Request
     {
         return $this->request;

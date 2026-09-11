@@ -19,7 +19,7 @@ namespace Mautic\CoreBundle\Helper\Tree;
  *  ]
  *];
  */
-class JsPlumbFormatter implements NodeFormatterInterface
+final class JsPlumbFormatter implements NodeFormatterInterface
 {
     /**
      * @return mixed[]

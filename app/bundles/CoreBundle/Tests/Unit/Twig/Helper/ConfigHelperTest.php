@@ -12,7 +12,7 @@ final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGet(): void
     {
-        $coreParametersHelper = new class extends CoreParametersHelper {
+        $coreParametersHelper = new class() extends CoreParametersHelper {
             public function __construct()
             {
             }
@@ -27,12 +27,12 @@ final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 
         $helper = new ConfigHelper($coreParametersHelper);
 
-        Assert::assertEquals('value A', $helper->get('param_a'));
+        $this->assertEquals('value A', $helper->get('param_a'));
     }
 
     public function testGetName(): void
     {
-        $coreParametersHelper = new class extends CoreParametersHelper {
+        $coreParametersHelper = new class() extends CoreParametersHelper {
             public function __construct()
             {
             }
@@ -40,6 +40,6 @@ final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 
         $helper = new ConfigHelper($coreParametersHelper);
 
-        Assert::assertSame('config', $helper->getName());
+        $this->assertSame('config', $helper->getName());
     }
 }

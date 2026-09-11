@@ -13,7 +13,7 @@ return function (ContainerConfigurator $configurator): void {
         ->public();
 
     $excludes = [
-        'EventCollector',
+        'EventCollector/Accessor',
         'Executioner/ContactFinder/Limiter/ContactLimiter.php',
         'Executioner/Dispatcher/Exception',
         'Executioner/Scheduler/Mode/DAO',
@@ -25,6 +25,30 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+
+    $services->set(Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class)->tag(Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG);
+
+    $services->set('mautic.campaign.contact_finder.kickoff', Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder::class);
+    $services->set('mautic.campaign.contact_finder.scheduled', Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder::class);
+    $services->set('mautic.campaign.contact_finder.inactive', Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder::class);
+    $services->set('mautic.campaign.dispatcher.action', Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher::class);
+    $services->set('mautic.campaign.dispatcher.condition', Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher::class);
+    $services->set('mautic.campaign.dispatcher.decision', Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher::class);
+    $services->set('mautic.campaign.scheduler.datetime', Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime::class);
+    $services->set('mautic.campaign.scheduler.interval', Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval::class);
+    $services->set('mautic.campaign.executioner.condition', Mautic\CampaignBundle\Executioner\Event\ConditionExecutioner::class);
+    $services->set('mautic.campaign.executioner.decision', Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner::class);
+    $services->set('mautic.campaign.event_executioner', Mautic\CampaignBundle\Executioner\EventExecutioner::class);
+    $services->set('mautic.campaign.helper.decision', Mautic\CampaignBundle\Executioner\Helper\DecisionHelper::class);
+    $services->set('mautic.campaign.helper.inactivity', Mautic\CampaignBundle\Executioner\Helper\InactiveHelper::class);
+    $services->set('mautic.campaign.helper.removed_contact_tracker', Mautic\CampaignBundle\Helper\RemovedContactTracker::class);
+    $services->set('mautic.campaign.helper.notification', Mautic\CampaignBundle\Executioner\Helper\NotificationHelper::class);
+    $services->set('mautic.campaign.legacy_event_dispatcher', Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher::class);
+    $services->set('mautic.campaign.membership.adder', Mautic\CampaignBundle\Membership\Action\Adder::class);
+    $services->set('mautic.campaign.membership.remover', Mautic\CampaignBundle\Membership\Action\Remover::class);
+    $services->set('mautic.campaign.membership.event_dispatcher', Mautic\CampaignBundle\Membership\EventDispatcher::class);
+    $services->set('mautic.campaign.membership.manager', Mautic\CampaignBundle\Membership\MembershipManager::class);
+    $services->set('mautic.campaign.membership.builder', Mautic\CampaignBundle\Membership\MembershipBuilder::class);
     $services->alias('mautic.campaign.model.campaign', Mautic\CampaignBundle\Model\CampaignModel::class);
     $services->alias('mautic.campaign.model.event', Mautic\CampaignBundle\Model\EventModel::class);
     $services->alias('mautic.campaign.model.event_log', Mautic\CampaignBundle\Model\EventLogModel::class);

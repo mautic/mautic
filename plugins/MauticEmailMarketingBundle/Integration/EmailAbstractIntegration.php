@@ -58,8 +58,6 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
     abstract public function getFormType();
 
     /**
-     * Get the API helper.
-     *
      * @return object
      */
     public function getApiHelper()

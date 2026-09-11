@@ -9,9 +9,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mime\Message;
 
 final class SendEmailToContactTest extends MauticMysqlTestCase
 {
@@ -76,17 +76,17 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
-        Assert::assertStringContainsString('Hey John...', $email);
-        Assert::assertStringContainsString('Subject: Some interesting subject for John', $email);
-        Assert::assertStringContainsString('Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";', $email);
-        Assert::assertStringContainsString('Content-Type: application/x-pkcs7-signature; name="smime.p7s"', $email);
-        Assert::assertStringContainsString('Content-Disposition: attachment; filename="smime.p7s"', $email);
+        $this->assertStringContainsString('Hey John...', $email);
+        $this->assertStringContainsString('Subject: Some interesting subject for John', $email);
+        $this->assertStringContainsString('Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";', $email);
+        $this->assertStringContainsString('Content-Type: application/x-pkcs7-signature; name="smime.p7s"', $email);
+        $this->assertStringContainsString('Content-Disposition: attachment; filename="smime.p7s"', $email);
     }
 
     public function testSMimeWithEncryptedPrivateKey(): void
     {
         /** @var EncryptionHelper $encryptionHelper */
-        $encryptionHelper = self::getContainer()->get('mautic.helper.encryption');
+        $encryptionHelper = self::getContainer()->get(EncryptionHelper::class);
         $this->assertInstanceOf(EncryptionHelper::class, $encryptionHelper);
 
         $certPath       = $this->sMimeHelper->getSMimeCertificatePath();
@@ -126,11 +126,11 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
-        Assert::assertStringContainsString('Hey John...', $email);
-        Assert::assertStringContainsString('Subject: Some interesting subject for John', $email);
-        Assert::assertStringContainsString('Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";', $email);
-        Assert::assertStringContainsString('Content-Type: application/x-pkcs7-signature; name="smime.p7s"', $email);
-        Assert::assertStringContainsString('Content-Disposition: attachment; filename="smime.p7s"', $email);
+        $this->assertStringContainsString('Hey John...', $email);
+        $this->assertStringContainsString('Subject: Some interesting subject for John', $email);
+        $this->assertStringContainsString('Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";', $email);
+        $this->assertStringContainsString('Content-Type: application/x-pkcs7-signature; name="smime.p7s"', $email);
+        $this->assertStringContainsString('Content-Disposition: attachment; filename="smime.p7s"', $email);
     }
 
     public function testSendingEmailIfCertificateIsMissing(): void
@@ -163,11 +163,11 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
-        Assert::assertStringContainsString('Hey John...', $email);
-        Assert::assertStringContainsString('Subject: Some interesting subject for John', $email);
-        Assert::assertStringNotContainsString('Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";', $email);
-        Assert::assertStringNotContainsString('Content-Type: application/x-pkcs7-signature; name="smime.p7s"', $email);
-        Assert::assertStringNotContainsString('Content-Disposition: attachment; filename="smime.p7s"', $email);
+        $this->assertStringContainsString('Hey John...', $email);
+        $this->assertStringContainsString('Subject: Some interesting subject for John', $email);
+        $this->assertStringNotContainsString('Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";', $email);
+        $this->assertStringNotContainsString('Content-Type: application/x-pkcs7-signature; name="smime.p7s"', $email);
+        $this->assertStringNotContainsString('Content-Disposition: attachment; filename="smime.p7s"', $email);
     }
 
     public function testPreheaderConfigIsApplied(): void
@@ -211,23 +211,22 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $messages = self::getMailerMessages();
-        Assert::assertCount(1, $messages, 'Expected exactly one email message to be sent');
+        $this->assertCount(1, $messages, 'Expected exactly one email message to be sent');
         $rawMessage = $messages[0];
-        Assert::assertInstanceOf(\Symfony\Component\Mime\Message::class, $rawMessage);
-        $this->assertInstanceOf(\Symfony\Component\Mime\Message::class, $rawMessage);
+        $this->assertInstanceOf(Message::class, $rawMessage);
 
         // For signed messages, use toString() instead of getBody()
         $email   = $rawMessage->toString();
-        Assert::assertStringContainsString('Hey John...', $email);
-        Assert::assertStringContainsString('<title>Some interesting subject for John</title>', $email);
-        Assert::assertStringContainsString('Some interesting subject for John', $email);
-        Assert::assertStringContainsString('preheader text', $email);
-        Assert::assertStringContainsString('admin@test-beta.mautibot.com', $email);
-        Assert::assertStringContainsString('Admin', $email);
-        Assert::assertStringNotContainsString('This should be overwritten by the form content', $email);
+        $this->assertStringContainsString('Hey John...', $email);
+        $this->assertStringContainsString('<title>Some interesting subject for John</title>', $email);
+        $this->assertStringContainsString('Some interesting subject for John', $email);
+        $this->assertStringContainsString('preheader text', $email);
+        $this->assertStringContainsString('admin@test-beta.mautibot.com', $email);
+        $this->assertStringContainsString('Admin', $email);
+        $this->assertStringNotContainsString('This should be overwritten by the form content', $email);
 
-        Assert::assertFalse($rawMessage->getHeaders()->has('List-Unsubscribe'));
-        Assert::assertFalse($rawMessage->getHeaders()->has('List-Unsubscribe-Post'));
+        $this->assertFalse($rawMessage->getHeaders()->has('List-Unsubscribe'));
+        $this->assertFalse($rawMessage->getHeaders()->has('List-Unsubscribe-Post'));
     }
 
     public function testEmailSendWhenSubjectOrBodyIsMissing(): void
@@ -256,8 +255,8 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString($subjectErrorMessage, $responseContent, 'The missing subject line should show an error');
-        $this->assertStringNotContainsString($bodyErrorMessage, $responseContent, 'There should be no error about the email body');
+        $this->assertStringContainsString($subjectErrorMessage, (string) $responseContent, 'The missing subject line should show an error');
+        $this->assertStringNotContainsString($bodyErrorMessage, (string) $responseContent, 'There should be no error about the email body');
 
         $form->setValues([
             'lead_quickemail[fromname]'  => 'Admin',
@@ -267,8 +266,8 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString($bodyErrorMessage, $responseContent, 'The missing body should show an error');
-        $this->assertStringNotContainsString($subjectErrorMessage, $responseContent, 'There should be no error about the subject line');
+        $this->assertStringContainsString($bodyErrorMessage, (string) $responseContent, 'The missing body should show an error');
+        $this->assertStringNotContainsString($subjectErrorMessage, (string) $responseContent, 'There should be no error about the subject line');
 
         $form->setValues([
             'lead_quickemail[fromname]'  => 'Admin',
@@ -278,7 +277,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertStringNotContainsString($subjectErrorMessage, $responseContent, 'There should be no error after adding the subject line');
-        $this->assertStringNotContainsString($bodyErrorMessage, $responseContent, 'There should be no error after adding the body');
+        $this->assertStringNotContainsString($subjectErrorMessage, (string) $responseContent, 'There should be no error after adding the subject line');
+        $this->assertStringNotContainsString($bodyErrorMessage, (string) $responseContent, 'There should be no error after adding the body');
     }
 }

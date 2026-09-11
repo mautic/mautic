@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
@@ -10,7 +12,7 @@ use JMS\Serializer\Metadata\PropertyMetadata;
 /**
  * Include specific fields at a specific level.
  */
-class FieldInclusionStrategy implements ExclusionStrategyInterface
+final class FieldInclusionStrategy implements ExclusionStrategyInterface
 {
     private readonly int $level;
 

@@ -12,7 +12,7 @@ use Symfony\Component\Form\DataTransformerInterface;
  *
  * @implements DataTransformerInterface<array<string>|null, string|null>
  */
-class BarStringTransformer implements DataTransformerInterface
+final class BarStringTransformer implements DataTransformerInterface
 {
     /**
      * @param array<string>|null $array

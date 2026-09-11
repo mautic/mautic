@@ -15,15 +15,15 @@ use Mautic\SmsBundle\Helper\SmsHelper;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SmsSubscriber implements EventSubscriberInterface
+final readonly class SmsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly AuditLogModel $auditLogModel,
-        private readonly TrackableModel $trackableModel,
-        private readonly PageTokenHelper $pageTokenHelper,
-        private readonly AssetTokenHelper $assetTokenHelper,
-        private readonly SmsHelper $smsHelper,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private AuditLogModel $auditLogModel,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
+        private SmsHelper $smsHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

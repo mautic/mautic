@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Helper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 
-class FieldFilterHelper
+final class FieldFilterHelper
 {
     private int $totalFieldCount = 0;
 

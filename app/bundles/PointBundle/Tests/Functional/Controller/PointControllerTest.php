@@ -7,7 +7,6 @@ namespace Mautic\PointBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\ProjectBundle\Entity\Project;
-use PHPUnit\Framework\Assert;
 
 final class PointControllerTest extends MauticMysqlTestCase
 {
@@ -35,6 +34,6 @@ final class PointControllerTest extends MauticMysqlTestCase
 
         $savedAsset = $this->em->find(Point::class, $point->getId());
         $this->assertInstanceOf(Point::class, $savedAsset);
-        Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
+        $this->assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 }

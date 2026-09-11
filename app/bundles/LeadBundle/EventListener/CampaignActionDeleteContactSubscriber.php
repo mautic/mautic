@@ -10,11 +10,11 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
+final readonly class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LeadModel $leadModel,
-        private readonly RemovedContactTracker $removedContactTracker,
+        private LeadModel $leadModel,
+        private RemovedContactTracker $removedContactTracker,
     ) {
     }
 

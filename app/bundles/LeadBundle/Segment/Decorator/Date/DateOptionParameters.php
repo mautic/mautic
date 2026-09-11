@@ -4,9 +4,12 @@ namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 
-class DateOptionParameters
+final class DateOptionParameters
 {
+    use ParseDateFilterValueTrait;
+
     private readonly bool $hasTimePart;
 
     /**
@@ -71,11 +74,16 @@ class DateOptionParameters
      */
     private function parseTimeFrame(ContactSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
     {
-        $key = array_search($leadSegmentFilterCrate->getFilter(), $relativeDateStrings, true);
+        $filterVal = $this->parseDateFilterValue(
+            $leadSegmentFilterCrate->getFilter(),
+            $leadSegmentFilterCrate->getOperator()
+        );
+
+        $key = array_search($filterVal, $relativeDateStrings, true);
 
         if (false === $key) {
             // Time frame does not match any option from $relativeDateStrings, so return original value
-            return $leadSegmentFilterCrate->getFilter();
+            return $filterVal;
         }
 
         return str_replace('mautic.lead.list.', '', $key);
@@ -83,6 +91,6 @@ class DateOptionParameters
 
     private function setDateTimeHelper(TimezoneResolver $timezoneResolver): void
     {
-        $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart());
+        $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart);
     }
 }

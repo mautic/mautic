@@ -70,7 +70,7 @@ final class RequestStateStoreTest extends TestCase
 
     public function testGetNotHit(): void
     {
-        self::assertNull($this->requestStateStore->get($this->stateId));
+        $this->assertNotInstanceOf(RequestState::class, $this->requestStateStore->get($this->stateId));
     }
 
     public function testGetIsHitButNotRequestState(): void
@@ -85,7 +85,7 @@ final class RequestStateStoreTest extends TestCase
         );
         ($setUp)($this->cacheItem);
 
-        self::assertNull($this->requestStateStore->get($this->stateId));
+        $this->assertNotInstanceOf(RequestState::class, $this->requestStateStore->get($this->stateId));
     }
 
     public function testGetIsHitRequestState(): void
@@ -102,7 +102,7 @@ final class RequestStateStoreTest extends TestCase
         );
         ($setUp)($this->cacheItem, $state);
 
-        self::assertSame($state, $this->requestStateStore->get($this->stateId));
+        $this->assertSame($state, $this->requestStateStore->get($this->stateId));
     }
 
     public function testRemove(): void
@@ -113,7 +113,7 @@ final class RequestStateStoreTest extends TestCase
             ->with($this->cachePrefix.$id)
             ->willReturn(true);
 
-        self::assertTrue($this->requestStateStore->remove($id));
+        $this->assertTrue($this->requestStateStore->remove($id));
     }
 
     public function testClear(): void

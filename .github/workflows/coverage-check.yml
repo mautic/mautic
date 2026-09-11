@@ -1,0 +1,88 @@
+name: Coverage check
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  coverage:
+    # Only the "check-coverage" and "ready-to-commit" labels trigger this workflow
+    if: (github.event.label.name == 'check-coverage' || github.event.label.name == 'ready-to-commit') && github.repository == 'mautic/mautic'
+    runs-on: ubuntu-latest
+
+    name: PHPUnit coverage
+
+    services:
+      database:
+        image: mariadb:10.11
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: mautictest
+        ports:
+          - 3306
+        options: >-
+          --shm-size=2gb
+          --tmpfs=/var/lib/mysql
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+      saml:
+        image: kenchan0130/simplesamlphp
+        env:
+          SIMPLESAMLPHP_SP_ENTITY_ID: https://localhost
+          SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://localhost/s/saml/login_check
+          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/
+        ports:
+          - 8086:8080
+
+    steps:
+    - name: Save PR number for the cleanup workflow
+      run: echo "${{ github.event.pull_request.number }}" > pr-number.txt
+
+    - name: Upload PR number
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: pr-number
+        path: pr-number.txt
+
+    - name: Checkout pull request code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
+        fetch-depth: 0
+
+    - name: Setup PHP with Composer and extensions
+      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        coverage: pcov
+        ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
+
+    - name: Add MySQL config file
+      run: cp .github/ci-files/.my.cnf ~/.my.cnf
+
+    - name: Set SYMFONY_ENV to test
+      run: |
+        echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+        echo "MAUTIC_ENV=test" >> $GITHUB_ENV
+
+    - name: Install Composer dependencies
+      uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+
+    - name: Run PHPUnit tests with coverage
+      run: |
+        rm -rf var/cache
+        export DB_PORT="${{ job.services.database.ports[3306] }}"
+        export SAML_PORT="${{ job.services.saml.ports[8080] }}"
+        php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
+
+    - name: Upload coverage report
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: true
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

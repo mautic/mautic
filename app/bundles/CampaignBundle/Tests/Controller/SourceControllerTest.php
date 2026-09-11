@@ -22,14 +22,14 @@ final class SourceControllerTest extends MauticMysqlTestCase
     {
         $this->client->xmlHttpRequest('GET', '/s/campaigns/sources/new/1?sourceType=invalid');
         $response = $this->client->getResponse();
-        $this->assertStringContainsString(self::ACCESS_DENIED, $response->getContent());
+        $this->assertStringContainsString(self::ACCESS_DENIED, (string) $response->getContent());
     }
 
     public function testNewActionWithNonAjaxRequest(): void
     {
         $this->client->request('GET', self::NEW_FORMS_URL);
         $response = $this->client->getResponse();
-        $this->assertStringContainsString(self::ACCESS_DENIED, $response->getContent());
+        $this->assertStringContainsString(self::ACCESS_DENIED, (string) $response->getContent());
     }
 
     public function testNewActionFormCancelled(): void
@@ -123,8 +123,8 @@ final class SourceControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful($responseContent);
 
         $html = json_decode($responseContent, true)['newContent'];
-        $this->assertStringContainsString("<option value=\"{$form1->getId()}\">test ({$form1->getId()})</option>", $html);
-        $this->assertStringContainsString("<option value=\"{$form2->getId()}\">test ({$form2->getId()})</option>", $html);
+        $this->assertStringContainsString("<option value=\"{$form1->getId()}\">test ({$form1->getId()})</option>", (string) $html);
+        $this->assertStringContainsString("<option value=\"{$form2->getId()}\">test ({$form2->getId()})</option>", (string) $html);
     }
 
     public function testListSourceFormUsesNumericSegmentIds(): void
@@ -143,11 +143,11 @@ final class SourceControllerTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('newContent', $json);
         $this->assertStringContainsString(
             sprintf('<option value="%d">%s (%d)</option>', $segment->getId(), $segment->getName(), $segment->getId()),
-            $json['newContent']
+            (string) $json['newContent']
         );
         $this->assertStringNotContainsString(
             sprintf('<option value="%s">%s (%s)</option>', $segment->getAlias(), $segment->getName(), $segment->getAlias()),
-            $json['newContent']
+            (string) $json['newContent']
         );
     }
 

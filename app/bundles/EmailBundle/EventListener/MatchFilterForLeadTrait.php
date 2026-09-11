@@ -26,7 +26,7 @@ trait MatchFilterForLeadTrait
             $isCompanyField = (str_starts_with((string) $data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
-            if ('leadlist' === $data['type'] && isset($this->segmentRepository) && $this->segmentRepository instanceof LeadListRepository) {
+            if ('leadlist' === $data['type'] && property_exists($this, 'segmentRepository') && $this->segmentRepository instanceof LeadListRepository) {
                 return $this->isContactSegmentRelationshipValid($this->segmentRepository, (int) $lead['id'], $data['operator'], $data['filter']);
             }
 
@@ -92,10 +92,10 @@ trait MatchFilterForLeadTrait
                 case 'tags':
                 case 'select':
                 case 'multiselect':
-                    if (!is_null($leadVal) && !is_array($leadVal)) {
+                    if (null !== $leadVal && !is_array($leadVal)) {
                         $leadVal = explode('|', $leadVal);
                     }
-                    if (!is_null($filterVal) && !is_array($filterVal)) {
+                    if (null !== $filterVal && !is_array($filterVal)) {
                         $filterVal = explode('|', $filterVal);
                     }
                     break;

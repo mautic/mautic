@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 
 final class ListModelFunctionalTest extends MauticMysqlTestCase
 {
@@ -27,20 +26,16 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
         $repo  = $this->em->getRepository(LeadList::class);
         $lists = $repo->getGlobalLists();
 
-        Assert::assertCount(2, $lists);
-        Assert::assertArrayHasKey($firstLeadList->getId(), $lists);
-        Assert::assertArrayHasKey($thirdLeadList->getId(), $lists);
-        Assert::assertArrayNotHasKey(
-            $secondLeadList->getId(),
-            $lists,
-            'Non-global lists should not be returned by the `getGlobalLists()` method.'
-        );
+        $this->assertCount(2, $lists);
+        $this->assertArrayHasKey($firstLeadList->getId(), $lists);
+        $this->assertArrayHasKey($thirdLeadList->getId(), $lists);
+        $this->assertArrayNotHasKey($secondLeadList->getId(), $lists, 'Non-global lists should not be returned by the `getGlobalLists()` method.');
     }
 
     public function testSegmentLineChartData(): void
     {
         /** @var ListModel $segmentModel */
-        $segmentModel = static::getContainer()->get('mautic.lead.model.list');
+        $segmentModel = self::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
         $contactRepository = $this->em->getRepository(Lead::class);
@@ -67,13 +62,13 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
             ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
         );
 
-        Assert::assertSame('added', strtolower($data['datasets'][0]['label']));
-        Assert::assertSame('removed', strtolower($data['datasets'][1]['label']));
-        Assert::assertSame('total', strtolower($data['datasets'][2]['label']));
+        $this->assertSame('added', strtolower($data['datasets'][0]['label']));
+        $this->assertSame('removed', strtolower($data['datasets'][1]['label']));
+        $this->assertSame('total', strtolower($data['datasets'][2]['label']));
 
-        Assert::assertSame(4, (int) end($data['datasets'][0]['data'])); // Added for today.
-        Assert::assertSame(0, (int) end($data['datasets'][1]['data'])); // Removed for today.
-        Assert::assertSame(4, (int) end($data['datasets'][2]['data'])); // Total for today.
+        $this->assertSame(4, (int) end($data['datasets'][0]['data'])); // Added for today.
+        $this->assertSame(0, (int) end($data['datasets'][1]['data'])); // Removed for today.
+        $this->assertSame(4, (int) end($data['datasets'][2]['data'])); // Total for today.
 
         // To make this interesting, lets' remove some contacts to see what happens.
         $segmentModel->removeLead($contacts[1], $segment); // Emulating removing by a filter.
@@ -87,15 +82,15 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
             ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
         );
 
-        Assert::assertSame(4, (int) end($data['datasets'][0]['data'])); // Added for today.
-        Assert::assertSame(2, (int) end($data['datasets'][1]['data'])); // Removed for today.
-        Assert::assertSame(2, (int) end($data['datasets'][2]['data'])); // Total for today.
+        $this->assertSame(4, (int) end($data['datasets'][0]['data'])); // Added for today.
+        $this->assertSame(2, (int) end($data['datasets'][1]['data'])); // Removed for today.
+        $this->assertSame(2, (int) end($data['datasets'][2]['data'])); // Total for today.
     }
 
     public function testSegmentLineChartDataWithoutFetchDataFromLeadListTable(): void
     {
         /** @var ListModel $segmentModel */
-        $segmentModel = static::getContainer()->get('mautic.lead.model.list');
+        $segmentModel = self::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
         $contactRepository = $this->em->getRepository(Lead::class);
@@ -122,13 +117,13 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
         );
 
         // using old code there should be only 1 label added but now there should be all 3 labels
-        Assert::assertSame('added', strtolower($data['datasets'][0]['label']));
-        Assert::assertSame('removed', strtolower($data['datasets'][1]['label']));
-        Assert::assertSame('total', strtolower($data['datasets'][2]['label']));
+        $this->assertSame('added', strtolower($data['datasets'][0]['label']));
+        $this->assertSame('removed', strtolower($data['datasets'][1]['label']));
+        $this->assertSame('total', strtolower($data['datasets'][2]['label']));
 
-        Assert::assertSame(1, (int) end($data['datasets'][0]['data'])); // Added for today.
-        Assert::assertSame(0, (int) end($data['datasets'][1]['data'])); // Removed for today.
-        Assert::assertSame(1, (int) end($data['datasets'][2]['data'])); // Total for today.
+        $this->assertSame(1, (int) end($data['datasets'][0]['data'])); // Added for today.
+        $this->assertSame(0, (int) end($data['datasets'][1]['data'])); // Removed for today.
+        $this->assertSame(1, (int) end($data['datasets'][2]['data'])); // Total for today.
 
         // To make this interesting, lets' remove some contacts to see what happens.
         $segmentModel->removeLead($contacts[0], $segment, true);
@@ -141,9 +136,9 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
             ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
         );
 
-        Assert::assertSame(1, (int) end($data['datasets'][0]['data'])); // Added for today.
-        Assert::assertSame(1, (int) end($data['datasets'][1]['data'])); // Removed for today.
-        Assert::assertSame(0, (int) end($data['datasets'][2]['data'])); // Total for today.
+        $this->assertSame(1, (int) end($data['datasets'][0]['data'])); // Added for today.
+        $this->assertSame(1, (int) end($data['datasets'][1]['data'])); // Removed for today.
+        $this->assertSame(0, (int) end($data['datasets'][2]['data'])); // Total for today.
     }
 
     private function createLeadList(User $user, string $name, bool $isGlobal): LeadList

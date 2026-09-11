@@ -4,10 +4,10 @@ namespace Mautic\CategoryBundle\Model;
 
 use Mautic\LeadBundle\Model\LeadModel;
 
-class ContactActionModel
+final readonly class ContactActionModel
 {
     public function __construct(
-        private readonly LeadModel $contactModel,
+        private LeadModel $contactModel,
     ) {
     }
 

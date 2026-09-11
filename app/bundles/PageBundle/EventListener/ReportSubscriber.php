@@ -16,7 +16,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_PAGES      = 'pages';
 
@@ -25,10 +25,10 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_VIDEO_HITS = 'video.hits';
 
     public function __construct(
-        private readonly CompanyReportData $companyReportData,
-        private readonly HitRepository $hitRepository,
-        private readonly TranslatorInterface $translator,
-        private readonly DncReportService $dncReportService,
+        private CompanyReportData $companyReportData,
+        private HitRepository $hitRepository,
+        private TranslatorInterface $translator,
+        private DncReportService $dncReportService,
     ) {
     }
 

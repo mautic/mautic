@@ -11,10 +11,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ContactFrequencyType extends AbstractType
+final class ContactFrequencyType extends AbstractType
 {
     public function __construct(
-        protected CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

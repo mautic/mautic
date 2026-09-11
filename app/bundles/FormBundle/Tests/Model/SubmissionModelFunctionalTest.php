@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -25,16 +24,16 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         // Check the address.
         $companyRepository = $this->em->getRepository(Company::class);
         $companiesOriginal = $companyRepository->findBy(['address1' => 'Keplerova']);
-        Assert::assertCount(1, $companiesOriginal);
+        $this->assertCount(1, $companiesOriginal);
 
         // Create contact with the same company but different address.
         $this->submitFormWithCompanies($formId, $formAlias, 'test2@acquia.cz', 'Luk', 'Syk', 'Acquia', 'Krejpskeho');
 
         // Check that the address is changed.
         $companiesOld = $companyRepository->findBy(['address1' => 'Keplerova']);
-        Assert::assertCount(0, $companiesOld);
+        $this->assertCount(0, $companiesOld);
         $companiesNew = $companyRepository->findBy(['address1' => 'Krejpskeho']);
-        Assert::assertCount(1, $companiesNew);
+        $this->assertCount(1, $companiesNew);
     }
 
     public function testSaveSubmissionChangeContactField(): void
@@ -46,16 +45,16 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         // Check the contact.
         $contactRepository = $this->em->getRepository(Lead::class);
         $contactsOriginal  = $contactRepository->findBy(['lastname' => 'Doe Smith']);
-        Assert::assertCount(1, $contactsOriginal);
+        $this->assertCount(1, $contactsOriginal);
 
         // Create contact with the same email but different lastname.
         $this->submitFormWithoutCompanies($formId, $formAlias, 'test@acquia.cz', 'Luk', 'Sykora');
 
         // Check that the address is changed.
         $contactsOld = $contactRepository->findBy(['lastname' => 'Doe Smith']);
-        Assert::assertCount(0, $contactsOld);
+        $this->assertCount(0, $contactsOld);
         $contactsNew = $contactRepository->findBy(['lastname' => 'Sykora']);
-        Assert::assertCount(1, $contactsNew);
+        $this->assertCount(1, $contactsNew);
     }
 
     public function testExistingContactWinsMergeWhenTrackedAnonymousContactSubmitsMatchingForm(): void
@@ -79,22 +78,22 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $this->logoutUser();
 
         $contactTracker = static::getContainer()->get('mautic.tracker.contact');
-        Assert::assertInstanceOf(ContactTracker::class, $contactTracker);
+        $this->assertInstanceOf(ContactTracker::class, $contactTracker);
         $contactTracker->setTrackedContact($anonymousContact);
 
         $this->submitFormWithoutCompanies($formId, $formAlias, 'existing.winner@example.com', 'Updated', 'Winner');
 
         $this->em->clear();
 
-        Assert::assertSame($existingContactId, $this->getSubmissionLeadId($formId));
-        Assert::assertSame(1, $this->countLeadRowsById($existingContactId));
-        Assert::assertSame(0, $this->countLeadRowsById($anonymousContactId));
+        $this->assertSame($existingContactId, $this->getSubmissionLeadId($formId));
+        $this->assertSame(1, $this->countLeadRowsById($existingContactId));
+        $this->assertSame(0, $this->countLeadRowsById($anonymousContactId));
 
         $contact = $this->em->getRepository(Lead::class)->find($existingContactId);
-        Assert::assertInstanceOf(Lead::class, $contact);
-        Assert::assertSame('existing.winner@example.com', $contact->getEmail());
-        Assert::assertSame('Updated', $contact->getFirstname());
-        Assert::assertSame('Winner', $contact->getLastname());
+        $this->assertInstanceOf(Lead::class, $contact);
+        $this->assertSame('existing.winner@example.com', $contact->getEmail());
+        $this->assertSame('Updated', $contact->getFirstname());
+        $this->assertSame('Winner', $contact->getLastname());
     }
 
     /**

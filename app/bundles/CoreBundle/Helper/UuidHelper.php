@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-class UuidHelper
+final class UuidHelper
 {
     /**
      * Validates if a string is a valid UUID (v1-v5).

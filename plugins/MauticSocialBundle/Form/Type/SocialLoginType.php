@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class SocialLoginType extends AbstractType
+final class SocialLoginType extends AbstractType
 {
     public function __construct(
         private readonly IntegrationHelper $helper,

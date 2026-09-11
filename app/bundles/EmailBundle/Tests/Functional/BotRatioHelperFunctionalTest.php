@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
@@ -39,7 +40,7 @@ final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
     /**
      * @throws \Doctrine\ORM\ORMException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('hitBotScenariosProvider')]
+    #[DataProvider('hitBotScenariosProvider')]
     public function testIsHitByBotFunctional(string $trackingHash, string $sentBefore, string $userAgent, string $ipAddress, bool $isRead): void
     {
         $stat          = new Stat();

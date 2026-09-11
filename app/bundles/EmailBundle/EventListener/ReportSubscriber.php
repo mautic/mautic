@@ -24,7 +24,7 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_EMAILS       = 'emails';
 
@@ -164,13 +164,13 @@ class ReportSubscriber implements EventSubscriberInterface
     ];
 
     public function __construct(
-        private readonly Connection $db,
-        private readonly CompanyReportData $companyReportData,
-        private readonly StatRepository $statRepository,
-        private readonly EmailRepository $emailRepository,
-        private readonly GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        private readonly FieldsBuilder $fieldsBuilder,
-        private readonly DncReportService $dncReportService,
+        private Connection $db,
+        private CompanyReportData $companyReportData,
+        private StatRepository $statRepository,
+        private EmailRepository $emailRepository,
+        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private FieldsBuilder $fieldsBuilder,
+        private DncReportService $dncReportService,
     ) {
     }
 

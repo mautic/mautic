@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<Tag>
  */
-class TagEntityType extends AbstractType
+final class TagEntityType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -33,9 +33,7 @@ class TagEntityType extends AbstractType
                 'attr'        => ['class' => 'form-control', 'readonly' => $tagReadOnly],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

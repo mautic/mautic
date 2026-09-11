@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -121,9 +123,7 @@ class Message extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ValidationClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

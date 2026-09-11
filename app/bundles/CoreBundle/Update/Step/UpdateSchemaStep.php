@@ -9,18 +9,15 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class UpdateSchemaStep implements StepInterface
 {
-    private object $kernel;
-
     public function __construct(
         private TranslatorInterface $translator,
-        ContainerInterface $container,
+        private KernelInterface $kernel,
     ) {
-        $this->kernel = $container->get('kernel');
     }
 
     public function getOrder(): int

@@ -48,7 +48,7 @@ final class SegmentStressTest extends MauticMysqlTestCase
         $segmentAId = $segmentA->getId();
         $this->em->clear();
         $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['-i' => $segmentAId]);
-        self::assertSame(Command::SUCCESS, $commandTester->getStatusCode(), $commandTester->getDisplay());
+        $this->assertSame(Command::SUCCESS, $commandTester->getStatusCode(), $commandTester->getDisplay());
     }
 
     private function saveContacts(): void

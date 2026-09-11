@@ -21,21 +21,15 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         // Assert some random fields exist.
-        Assert::assertSame(
-            [
-                'label'      => 'Company Email',
-                'value'      => 'companyemail',
-                'isListType' => false,
-            ],
-            $payload['fields'][4]
-        );
-        Assert::assertSame(
-            [
-                'label'      => 'Industry',
-                'value'      => 'companyindustry',
-                'isListType' => true,
-            ],
-            $payload['fields'][9]
-        );
+        $this->assertSame([
+            'label'      => 'Company Email',
+            'value'      => 'companyemail',
+            'isListType' => false,
+        ], $payload['fields'][4]);
+        $this->assertSame([
+            'label'      => 'Industry',
+            'value'      => 'companyindustry',
+            'isListType' => true,
+        ], $payload['fields'][9]);
     }
 }

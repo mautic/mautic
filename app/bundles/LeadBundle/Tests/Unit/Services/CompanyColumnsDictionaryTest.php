@@ -51,16 +51,16 @@ final class CompanyColumnsDictionaryTest extends TestCase
 
         $columns = $this->dictionary->getColumns();
 
-        self::assertSame(['companywebsite' => 'mautic.company.website', 'companyname' => 'mautic.company.name'], $columns);
+        $this->assertSame(['companywebsite' => 'mautic.company.website', 'companyname' => 'mautic.company.name'], $columns);
     }
 
     public function testGetFieldsMergesCoreAndCompanyCustomFields(): void
     {
         $fields = $this->dictionary->getFields();
 
-        self::assertArrayHasKey('companyname', $fields);
-        self::assertArrayHasKey('leadcount', $fields);
-        self::assertArrayHasKey('annual_revenue', $fields);
-        self::assertSame('Annual Revenue', $fields['annual_revenue']);
+        $this->assertArrayHasKey('companyname', $fields);
+        $this->assertArrayHasKey('leadcount', $fields);
+        $this->assertArrayHasKey('annual_revenue', $fields);
+        $this->assertSame('Annual Revenue', $fields['annual_revenue']);
     }
 }

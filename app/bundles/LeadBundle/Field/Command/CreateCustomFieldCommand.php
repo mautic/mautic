@@ -25,6 +25,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AsCommand(
     name: CreateCustomFieldCommand::COMMAND_NAME,
     description: 'Create custom field column in the background',
+    help: <<<'TXT'
+The <info>%command.name%</info> command will create columns in a lead_fields table if the process should run in background.
+
+<info>php %command.full_name%</info>
+TXT
 )]
 class CreateCustomFieldCommand extends ModeratedCommand
 {
@@ -46,14 +51,7 @@ class CreateCustomFieldCommand extends ModeratedCommand
 
         $this
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'LeadField ID.')
-            ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command will create columns in a lead_fields table if the process should run in background.
-
-<info>php %command.full_name%</info>
-EOT
-            );
+            ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

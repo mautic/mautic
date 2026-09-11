@@ -26,8 +26,8 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->translator = $this->getContainer()->get('translator');
-        $this->notifier   = $this->getContainer()->get('mautic.lead.field.notification.custom_field');
+        $this->translator = $this->getContainer()->get(TranslatorInterface::class);
+        $this->notifier   = $this->getContainer()->get(CustomFieldNotification::class);
         $this->leadField  = $this->createCustomField();
     }
 
@@ -66,7 +66,7 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
         $field->setCharLengthLimit(64);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
         $fieldModel->getRepository()->detachEntity($field);
 

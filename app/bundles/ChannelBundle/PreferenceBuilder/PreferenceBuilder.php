@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\LoggerInterface;
 
-class PreferenceBuilder
+final class PreferenceBuilder
 {
     /**
      * @var ChannelPreferences[]

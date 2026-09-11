@@ -28,7 +28,7 @@ trait CampaignAuditLogTrait
             $log->setAction('edit');
             $log->setObjectId($campaign->getId());
             $log->setUserId($user->getId());
-            $log->setUserName($user->getUsername());
+            $log->setUserName($user->getUserIdentifier());
             $log->setIpAddress('127.0.0.1');
             $em->persist($log);
         }

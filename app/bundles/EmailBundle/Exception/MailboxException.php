@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Exception;
 
-class MailboxException extends \Exception
+final class MailboxException extends \Exception
 {
     public function __construct($message = null, $code = 0, ?\Exception $previous = null)
     {

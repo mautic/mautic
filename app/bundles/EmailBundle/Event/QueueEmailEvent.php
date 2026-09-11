@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class QueueEmailEvent extends Event
+final class QueueEmailEvent extends Event
 {
     private bool $retry = false;
 

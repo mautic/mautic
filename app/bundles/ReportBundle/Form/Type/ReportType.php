@@ -24,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Report>
  */
-class ReportType extends AbstractType
+final class ReportType extends AbstractType
 {
     public function __construct(
         private readonly ReportModel $reportModel,

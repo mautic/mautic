@@ -90,8 +90,8 @@ final class CampaignAuditServiceTest extends MauticMysqlTestCase
             ->with(
                 'mautic.core.notice.campaign.unpublished.email',
                 $this->callback(function (array $messageVars) use ($unpublishedEmail): true {
-                    $this->assertStringContainsString($unpublishedEmail->getName(), $messageVars['%name%']);
-                    $this->assertStringContainsString('mautic_email_index', $messageVars['%menu_link%']);
+                    $this->assertStringContainsString($unpublishedEmail->getName(), (string) $messageVars['%name%']);
+                    $this->assertStringContainsString('mautic_email_index', (string) $messageVars['%menu_link%']);
 
                     return true;
                 }),

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Crate;
 
 use Mautic\FormBundle\Crate\FieldCrate;
-use PHPUnit\Framework\Assert;
 
 final class FieldCrateTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,11 +12,11 @@ final class FieldCrateTest extends \PHPUnit\Framework\TestCase
     {
         $field = new FieldCrate('6', 'Email', 'email', []);
 
-        Assert::assertSame('6', $field->getKey());
-        Assert::assertSame('Email', $field->getName());
-        Assert::assertSame('email', $field->getType());
-        Assert::assertSame([], $field->getProperties());
-        Assert::assertFalse($field->isListType());
+        $this->assertSame('6', $field->getKey());
+        $this->assertSame('Email', $field->getName());
+        $this->assertSame('email', $field->getType());
+        $this->assertSame([], $field->getProperties());
+        $this->assertFalse($field->isListType());
     }
 
     public function testGettersForSelectField(): void
@@ -30,10 +29,10 @@ final class FieldCrateTest extends \PHPUnit\Framework\TestCase
         ];
         $field = new FieldCrate('7', 'Colors', 'select', $properties);
 
-        Assert::assertSame('7', $field->getKey());
-        Assert::assertSame('Colors', $field->getName());
-        Assert::assertSame('select', $field->getType());
-        Assert::assertSame($properties, $field->getProperties());
-        Assert::assertTrue($field->isListType());
+        $this->assertSame('7', $field->getKey());
+        $this->assertSame('Colors', $field->getName());
+        $this->assertSame('select', $field->getType());
+        $this->assertSame($properties, $field->getProperties());
+        $this->assertTrue($field->isListType());
     }
 }

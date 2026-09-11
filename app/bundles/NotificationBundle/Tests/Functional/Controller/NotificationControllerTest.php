@@ -6,7 +6,6 @@ namespace Mautic\NotificationBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\NotificationBundle\Tests\NotificationTrait;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,16 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 final class NotificationControllerTest extends MauticMysqlTestCase
 {
     use NotificationTrait;
-
-    /**
-     * @var string
-     */
-    private const REST_API_ID = 'restApiID';
-
-    /**
-     * @var string
-     */
-    private const API_ID = 'apiID';
 
     /**
      * Smoke test to ensure the '/s/notifications' route loads.
@@ -41,10 +30,14 @@ final class NotificationControllerTest extends MauticMysqlTestCase
      */
     public function testNewRouteSuccessfullyLoads(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/notifications/new');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/notifications/new');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertCount(1, $crawler->filter('#notification-preview'));
+        $this->assertCount(1, $crawler->filter('[data-notification-preview="heading"]'));
+        $this->assertCount(1, $crawler->filter('[data-notification-preview="message"]'));
+        $this->assertCount(1, $crawler->filter('[data-notification-preview="button"].hide'));
     }
 
     public function testNewWebNotificationValidSubmit(): void
@@ -61,7 +54,7 @@ final class NotificationControllerTest extends MauticMysqlTestCase
         ]);
         $crawler = $this->client->submit($form);
 
-        Assert::assertStringContainsString('Some Name has been created!', $crawler->text());
+        $this->assertStringContainsString('Some Name has been created!', $crawler->text());
     }
 
     public function testNewWebNotificationValidationErrors(): void
@@ -95,8 +88,8 @@ final class NotificationControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->submit($form);
         $formCrawler = $crawler->filter('form[name=notification]');
         $this->assertCount(1, $formCrawler);
-        Assert::assertMatchesRegularExpression('/A name is required\./', $formCrawler->text());
-        Assert::assertMatchesRegularExpression('/A heading is required\./', $formCrawler->text());
-        Assert::assertMatchesRegularExpression('/A message is required\./', $formCrawler->text());
+        $this->assertMatchesRegularExpression('/A name is required\./', $formCrawler->text());
+        $this->assertMatchesRegularExpression('/A heading is required\./', $formCrawler->text());
+        $this->assertMatchesRegularExpression('/A message is required\./', $formCrawler->text());
     }
 }

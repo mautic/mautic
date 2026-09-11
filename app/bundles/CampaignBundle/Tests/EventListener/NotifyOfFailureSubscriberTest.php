@@ -35,8 +35,8 @@ final class NotifyOfFailureSubscriberTest extends TestCase
         $this->notificationHelper->expects($this->once())
             ->method('notifyOfFailure')
             ->with(
-                $this->equalTo($lead),
-                $this->equalTo($event)
+                $lead,
+                $event
             );
 
         $this->subscriber->notifyOfFailure($notifyEvent);

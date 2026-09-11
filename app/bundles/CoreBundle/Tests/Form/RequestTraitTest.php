@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Form;
 
 use Mautic\CoreBundle\Form\RequestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -21,8 +22,7 @@ final class RequestTraitTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $dispatcher        = $this->createMock(EventDispatcherInterface::class);
-        $formConfigBuilder = new FormConfigBuilder('foo', null, $dispatcher);
+        $formConfigBuilder = new FormConfigBuilder('foo', null, $this->createStub(EventDispatcherInterface::class));
         $formConfigBuilder->setFormFactory((new FormFactoryBuilder())->getFormFactory());
         $formConfigBuilder->setCompound(true);
         $formConfigBuilder->setDataMapper(
@@ -73,7 +73,7 @@ final class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedValues, $params);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('boolProvider')]
+    #[DataProvider('boolProvider')]
     public function testCleanFieldsBoolean(?bool $expected, string|int|bool|null $value): void
     {
         $fieldData = ['boolVal' => $value];

@@ -9,10 +9,10 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ContactScheduledExportSubscriber implements EventSubscriberInterface
+final readonly class ContactScheduledExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly ContactExportSchedulerModel $contactExportSchedulerModel,
+        private ContactExportSchedulerModel $contactExportSchedulerModel,
     ) {
     }
 

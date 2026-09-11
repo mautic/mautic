@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 /**
  * Holds IDs for different types of objects. Can be used for Mautic or integration objects.
  */
-class ObjectIdsDAO
+final class ObjectIdsDAO
 {
     /**
      * Expected structure:

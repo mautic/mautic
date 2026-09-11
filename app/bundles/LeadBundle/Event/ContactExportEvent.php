@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ContactExportEvent extends Event
+final class ContactExportEvent extends Event
 {
     /**
      * @param array<string|int, int|string|array<string, mixed>> $args

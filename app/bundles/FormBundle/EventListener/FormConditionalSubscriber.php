@@ -54,7 +54,7 @@ final readonly class FormConditionalSubscriber implements EventSubscriberInterfa
             }
         }
 
-        if (!empty($deleteIds)) {
+        if ([] !== $deleteIds) {
             $this->formModel->deleteFields($form, $deleteIds);
         }
     }

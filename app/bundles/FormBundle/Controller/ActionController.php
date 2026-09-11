@@ -9,9 +9,19 @@ use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class ActionController extends CommonFormController
+final class ActionController extends CommonFormController
 {
+    private FormModel $formModel;
+
+    #[Required]
+    public function autowireActionController(
+        FormModel $formModel,
+    ): void {
+        $this->formModel = $formModel;
+    }
+
     /**
      * Generates new form and processes post data.
      */
@@ -41,11 +51,7 @@ class ActionController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        // fire the form builder event
-        $formModel = $this->getModel('form.form');
-        \assert($formModel instanceof FormModel);
-        $customComponents = $formModel->getCustomComponents();
+        $customComponents = $this->formModel->getCustomComponents();
         $form             = $this->formFactory->create(ActionType::class, $formAction, [
             'action'   => $this->generateUrl('mautic_formaction_action', ['objectAction' => 'new']),
             'settings' => $customComponents['actions'][$actionType],
@@ -147,13 +153,11 @@ class ActionController extends CommonFormController
         $actions    = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $success    = 0;
         $valid      = $cancelled      = false;
-        $formAction = array_key_exists($objectId, $actions) ? $actions[$objectId] : null;
+        $formAction = $actions[$objectId] ?? null;
 
         if (null !== $formAction) {
-            $formModel = $this->getModel('form.form');
-            \assert($formModel instanceof FormModel);
             $actionType             = $formAction['type'];
-            $customComponents       = $formModel->getCustomComponents();
+            $customComponents       = $this->formModel->getCustomComponents();
             $formAction['settings'] = $customComponents['actions'][$actionType];
 
             // ajax only for form fields
@@ -269,10 +273,8 @@ class ActionController extends CommonFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return JsonResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $session = $request->getSession();
         $formId  = $request->query->get('formId');
@@ -286,7 +288,7 @@ class ActionController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
+        $formAction = $actions[$objectId] ?? null;
         if ('POST' === $request->getMethod() && null !== $formAction) {
             // add the field to the delete list
             if (!in_array($objectId, $delete)) {

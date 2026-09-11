@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Collector\ObjectCollectorInterface;
@@ -24,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FieldType extends AbstractType
+final class FieldType extends AbstractType
 {
     use FormFieldTrait;
 
@@ -33,6 +34,7 @@ class FieldType extends AbstractType
         private ObjectCollectorInterface $objectCollector,
         private FieldCollectorInterface $fieldCollector,
         private AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -205,7 +207,7 @@ class FieldType extends AbstractType
                 'attr'        => ['class' => 'form-control'],
                 'constraints' => [
                     new Assert\NotBlank(
-                        ['message' => 'mautic.form.field.label.notblank']
+                        message: 'mautic.form.field.label.notblank'
                     ),
                 ],
             ]
@@ -390,6 +392,7 @@ class FieldType extends AbstractType
 
         if ($addBehaviorFields) {
             $alwaysDisplay = $options['data']['alwaysDisplay'] ?? false;
+            $isAutoFillFeatureEnabled = (bool) $this->coreParametersHelper->get('form_field_autofill', false);
             $builder->add(
                 'alwaysDisplay',
                 YesNoButtonGroupType::class,
@@ -432,19 +435,21 @@ class FieldType extends AbstractType
                 ]
             );
 
-            $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? false : (bool) $options['data']['isAutoFill'];
-            $builder->add(
-                'isAutoFill',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.form.field.form.auto_fill',
-                    'data'  => $isAutoFillValue,
-                    'attr'  => [
-                        'class'   => 'auto-fill-data',
-                        'tooltip' => 'mautic.form.field.help.auto_fill',
-                    ],
-                ]
-            );
+            if ($isAutoFillFeatureEnabled) {
+                $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? false : (bool) $options['data']['isAutoFill'];
+                $builder->add(
+                    'isAutoFill',
+                    YesNoButtonGroupType::class,
+                    [
+                        'label' => 'mautic.form.field.form.auto_fill',
+                        'data'  => $isAutoFillValue,
+                        'attr'  => [
+                            'class'   => 'auto-fill-data',
+                            'tooltip' => 'mautic.form.field.help.auto_fill',
+                        ],
+                    ]
+                );
+            }
 
             $isReadOnlyValue = (bool) ($options['data']['isReadOnly'] ?? false);
             $builder->add(

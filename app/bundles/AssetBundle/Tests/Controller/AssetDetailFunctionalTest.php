@@ -6,7 +6,6 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 
 final class AssetDetailFunctionalTest extends MauticMysqlTestCase
 {
@@ -29,7 +28,7 @@ final class AssetDetailFunctionalTest extends MauticMysqlTestCase
         $onError  = $imageTag->attr('onerror');
         $altProp  = $imageTag->attr('alt');
 
-        Assert::assertNull($onError);
-        Assert::assertSame($title, $altProp);
+        $this->assertNull($onError);
+        $this->assertSame($title, $altProp);
     }
 }

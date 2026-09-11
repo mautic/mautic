@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ChannelExtension extends AbstractExtension
+final class ChannelExtension extends AbstractExtension
 {
     public function __construct(
         private readonly DncReasonHelper $dncReasonHelper,

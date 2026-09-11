@@ -115,7 +115,7 @@ class Stat
     /**
      * @var array<string,mixed[]>
      */
-    private $changes = [];
+    private array $changes = [];
 
     public function __construct()
     {
@@ -313,7 +313,7 @@ class Stat
      */
     public function isRead()
     {
-        return $this->getIsRead();
+        return $this->isRead;
     }
 
     /**
@@ -418,7 +418,7 @@ class Stat
      */
     public function isFailed()
     {
-        return $this->getIsFailed();
+        return $this->isFailed;
     }
 
     /**
@@ -526,7 +526,7 @@ class Stat
      */
     public function addOpenDetails($details): void
     {
-        if (self::MAX_OPEN_DETAILS > $this->getOpenCount()) {
+        if (self::MAX_OPEN_DETAILS > $this->openCount) {
             $this->openDetails[] = $details;
         }
 

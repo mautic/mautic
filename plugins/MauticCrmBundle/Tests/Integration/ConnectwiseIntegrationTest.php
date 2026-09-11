@@ -8,13 +8,15 @@ use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ConnectwiseIntegration::class)]
+#[CoversClass(ConnectwiseIntegration::class)]
 final class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 {
     use DataGeneratorTrait;
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that all records are fetched till last page of results are consumed')]
+    #[TestDox('Test that all records are fetched till last page of results are consumed')]
     public function testMultiplePagesOfRecordsAreFetched(): void
     {
         $this->reset();
@@ -43,7 +45,7 @@ final class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
         $integration->getRecords([], 'Contact');
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that all records are fetched till last page of results are consumed')]
+    #[TestDox('Test that all records are fetched till last page of results are consumed')]
     public function testMultiplePagesOfCampaignMemberRecordsAreFetched(): void
     {
         $this->reset();

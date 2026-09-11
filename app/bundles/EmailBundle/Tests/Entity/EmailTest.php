@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Entity;
 
 use Mautic\EmailBundle\Entity\Email;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -34,7 +33,7 @@ final class EmailTest extends TestCase
     {
         $email = new Email();
         $email->setIsDuplicate($isDuplicate);
-        Assert::assertIsBool($email->isDuplicate());
+        $this->assertIsBool($email->isDuplicate());
     }
 
     /**
@@ -50,7 +49,7 @@ final class EmailTest extends TestCase
     {
         $email = new Email();
 
-        Assert::assertSame([], $email->getSettings());
+        $this->assertSame([], $email->getSettings());
     }
 
     public function testSetSettings(): void
@@ -58,8 +57,8 @@ final class EmailTest extends TestCase
         $email    = new Email();
         $settings = ['subject' => 'Welcome', 'reply_to' => 'reply@example.com'];
 
-        Assert::assertSame($email, $email->setSettings($settings));
-        Assert::assertSame($settings, $email->getSettings());
+        $this->assertSame($email, $email->setSettings($settings));
+        $this->assertSame($settings, $email->getSettings());
     }
 
     public function testMagicSetterStoresPrefixedSetting(): void
@@ -67,7 +66,7 @@ final class EmailTest extends TestCase
         $email                       = new Email();
         $email->settings_subjectline = 'Welcome!'; // @phpstan-ignore property.notFound
 
-        Assert::assertSame('Welcome!', $email->getSettings()['subjectline']);
+        $this->assertSame('Welcome!', $email->getSettings()['subjectline']);
     }
 
     public function testMagicGetterReadsPrefixedSetting(): void
@@ -75,7 +74,7 @@ final class EmailTest extends TestCase
         $email = new Email();
         $email->setSettings(['subjectline' => 'Welcome!']);
 
-        Assert::assertSame('Welcome!', $email->settings_subjectline); // @phpstan-ignore property.notFound
+        $this->assertSame('Welcome!', $email->settings_subjectline); // @phpstan-ignore property.notFound
     }
 
     public function testMagicGetterReturnsNullForUnknownOrUnsupportedFields(): void
@@ -83,8 +82,8 @@ final class EmailTest extends TestCase
         $email = new Email();
         $email->setSettings(['subjectline' => 'Welcome!']);
 
-        Assert::assertNull($email->settings_non_existent); // @phpstan-ignore property.notFound
-        Assert::assertNull($email->subjectline); // @phpstan-ignore property.notFound
+        $this->assertNull($email->settings_non_existent); // @phpstan-ignore property.notFound
+        $this->assertNull($email->subjectline); // @phpstan-ignore property.notFound
     }
 
     public function testMagicSetterIgnoresUnsupportedFields(): void
@@ -93,6 +92,6 @@ final class EmailTest extends TestCase
         $email->setSettings(['subjectline' => 'Welcome!']);
         $email->subjectline = 'Ignored'; // @phpstan-ignore property.notFound
 
-        Assert::assertSame(['subjectline' => 'Welcome!'], $email->getSettings());
+        $this->assertSame(['subjectline' => 'Welcome!'], $email->getSettings());
     }
 }

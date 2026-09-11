@@ -4,23 +4,23 @@ namespace Acceptance;
 
 use Page\Acceptance\ThemesPage;
 
-class ThemeManagementCest
+final class ThemeManagementCest
 {
-    public function _before(\AcceptanceTester $I)
+    public function _before(\AcceptanceTester $I): void
     {
         $I->login('admin', 'Maut1cR0cks!');
 
         $I->click(ThemesPage::$dropDown); // gear icon
-        $I->waitForElementVisible(ThemesPage::$dropDown_Themes, 30);
+        $I->waitForElementVisible(ThemesPage::$dropDown_Themes, \AcceptanceTester::TIMEOUT);
 
         $I->click(ThemesPage::$dropDown_Themes);
-        $I->waitForText('Themes', 30); // let the page render
+        $I->waitForText('Themes', \AcceptanceTester::TIMEOUT); // let the page render
     }
 
     public function themesHaveNoBlankActions(\AcceptanceTester $I): void
     {
         $I->amOnPage(ThemesPage::$URL);
-        $I->waitForElementVisible(ThemesPage::$themeTable, 30);
+        $I->waitForElementVisible(ThemesPage::$themeTable, \AcceptanceTester::TIMEOUT);
 
         $rows = $I->grabMultiple(ThemesPage::$themeRows);
         for ($i = 1; $i <= count($rows); ++$i) {

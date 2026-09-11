@@ -13,11 +13,11 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormValidationSubscriber implements EventSubscriberInterface
+final readonly class FormValidationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -102,7 +102,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
 
         if (!empty($field->getValidation()['blockfreeemail'])) {
             $blockedProviders = $this->coreParametersHelper->get('blocked_free_email_providers') ?? [];
-            $domain           = strtolower((string) substr(strrchr($value, '@'), 1));
+            $domain           = strtolower(substr(strrchr($value, '@'), 1));
             if ($domain && in_array($domain, $blockedProviders, true)) {
                 $validationMsg = $field->getValidation()['blockfreeemail_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.freeproviders.invalid', [], 'validators');
                 $event->failedValidation($validationMsg);

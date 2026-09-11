@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Stat;
 
 use Mautic\EmailBundle\Entity\Stat;
 
-class Reference
+final class Reference
 {
     private readonly ?int $emailId;
 

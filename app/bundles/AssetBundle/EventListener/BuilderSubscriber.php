@@ -14,7 +14,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber implements EventSubscriberInterface
 {
     private string $assetToken = '{assetlink=(.*?)}';
 
@@ -48,7 +48,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
                 'title'
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
         }

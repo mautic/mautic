@@ -6,7 +6,7 @@ namespace Mautic\MarketplaceBundle\Service;
 
 use Symfony\Component\Routing\RouterInterface;
 
-class RouteProvider
+final readonly class RouteProvider
 {
     public const ROUTE_LIST = 'mautic_marketplace_list';
 
@@ -19,19 +19,19 @@ class RouteProvider
     public const ROUTE_CLEAR_CACHE = 'mautic_marketplace_clear_cache';
 
     public function __construct(
-        private readonly RouterInterface $router,
+        private RouterInterface $router,
     ) {
     }
 
     public function buildListRoute(int $page = 1): string
     {
-        return $this->router->generate(static::ROUTE_LIST, ['page' => $page]);
+        return $this->router->generate(self::ROUTE_LIST, ['page' => $page]);
     }
 
     public function buildDetailRoute(string $vendor, string $package): string
     {
         return $this->router->generate(
-            static::ROUTE_DETAIL,
+            self::ROUTE_DETAIL,
             ['vendor' => $vendor, 'package' => $package]
         );
     }
@@ -39,7 +39,7 @@ class RouteProvider
     public function buildInstallRoute(string $vendor, string $package): string
     {
         return $this->router->generate(
-            static::ROUTE_DETAIL,
+            self::ROUTE_DETAIL,
             ['vendor' => $vendor, 'package' => $package]
         );
     }
@@ -47,7 +47,7 @@ class RouteProvider
     public function buildRemoveRoute(string $vendor, string $package): string
     {
         return $this->router->generate(
-            static::ROUTE_REMOVE,
+            self::ROUTE_REMOVE,
             ['vendor' => $vendor, 'package' => $package]
         );
     }
@@ -55,7 +55,7 @@ class RouteProvider
     public function buildClearCacheRoute(): string
     {
         return $this->router->generate(
-            static::ROUTE_CLEAR_CACHE
+            self::ROUTE_CLEAR_CACHE
         );
     }
 }

@@ -21,7 +21,7 @@ final class CompanyTest extends MauticMysqlTestCase
         $company->addUpdatedField('email', $email);
         $changes = $company->getChanges();
 
-        $this->assertFalse(empty($changes['fields']['email']));
+        $this->assertNotEmpty($changes['fields']['email']);
 
         $this->assertEquals($email, $changes['fields']['email'][1]);
     }

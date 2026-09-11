@@ -10,11 +10,11 @@ use Mautic\LeadBundle\Event\ContactExportEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ContactExportAuditLogSubscriber implements EventSubscriberInterface
+final readonly class ContactExportAuditLogSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly AuditLogModel $auditLogModel,
-        private readonly IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 

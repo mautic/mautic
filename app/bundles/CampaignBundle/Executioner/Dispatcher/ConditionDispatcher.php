@@ -8,10 +8,10 @@ use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConditionDispatcher
+final readonly class ConditionDispatcher
 {
     public function __construct(
-        private readonly EventDispatcherInterface $dispatcher,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

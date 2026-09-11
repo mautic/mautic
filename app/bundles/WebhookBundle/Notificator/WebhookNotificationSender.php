@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Notificator;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\MissingIdentifierField;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -16,16 +16,16 @@ use Mautic\WebhookBundle\Event\WebhookNotificationEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-class WebhookNotificationSender
+final readonly class WebhookNotificationSender
 {
     public function __construct(
-        private readonly Environment $twig,
-        private readonly NotificationModel $notificationModel,
-        private readonly EntityManager $entityManager,
-        private readonly MailHelper $mailer,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly UserRepository $userRepository,
-        private readonly EventDispatcherInterface $dispatcher,
+        private Environment $twig,
+        private NotificationModel $notificationModel,
+        private EntityManagerInterface $entityManager,
+        private MailHelper $mailer,
+        private CoreParametersHelper $coreParametersHelper,
+        private UserRepository $userRepository,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

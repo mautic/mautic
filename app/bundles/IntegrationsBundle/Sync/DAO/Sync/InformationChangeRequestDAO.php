@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
-class InformationChangeRequestDAO
+final class InformationChangeRequestDAO
 {
     private ?\DateTimeInterface $possibleChangeDateTime = null;
 

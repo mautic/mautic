@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\EventListener;
 
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
@@ -12,12 +14,12 @@ use Mautic\PointBundle\Entity\GroupRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentFilterSubscriber implements EventSubscriberInterface
+final readonly class SegmentFilterSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly GroupRepository $groupRepository,
-        private readonly TypeOperatorProviderInterface $typeOperatorProvider,
-        private readonly TranslatorInterface $translator,
+        private GroupRepository $groupRepository,
+        private TypeOperatorProviderInterface $typeOperatorProvider,
+        private TranslatorInterface $translator,
     ) {
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -226,7 +228,7 @@ class TweetStat
 
     public function retryCountUp(): void
     {
-        $this->setRetryCount($this->getRetryCount() + 1);
+        $this->setRetryCount($this->retryCount + 1);
     }
 
     public function getFavoriteCount(): ?int
@@ -265,7 +267,7 @@ class TweetStat
 
     public function isFailed(): ?bool
     {
-        return $this->getIsFailed();
+        return $this->isFailed;
     }
 
     /**

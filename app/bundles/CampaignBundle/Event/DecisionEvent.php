@@ -5,7 +5,7 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-class DecisionEvent extends CampaignExecutionEvent
+final class DecisionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 

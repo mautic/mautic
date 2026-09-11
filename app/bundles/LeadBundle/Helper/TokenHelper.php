@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-class TokenHelper
+final class TokenHelper
 {
     public const REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
 

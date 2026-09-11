@@ -291,7 +291,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
@@ -509,6 +509,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
     public function getIsMms(): bool
     {
-        return (bool) $this->isMms;
+        return $this->isMms;
     }
 }

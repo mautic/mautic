@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints\Valid;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PermissionsType extends AbstractType
+final class PermissionsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

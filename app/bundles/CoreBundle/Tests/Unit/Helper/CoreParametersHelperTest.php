@@ -37,10 +37,10 @@ final class CoreParametersHelperTest extends TestCase
         $all = $this->getHelper()->all();
 
         // Assert that a few of the config keys exist
-        Assert::assertArrayHasKey('api_enabled', $all);
-        Assert::assertArrayHasKey('cache_path', $all);
-        Assert::assertSame('/path/to/cache', $all['cache_path']);
-        Assert::assertArrayHasKey('log_path', $all);
+        $this->assertArrayHasKey('api_enabled', $all);
+        $this->assertArrayHasKey('cache_path', $all);
+        $this->assertSame('/path/to/cache', $all['cache_path']);
+        $this->assertArrayHasKey('log_path', $all);
     }
 
     private function getHelper(): CoreParametersHelper

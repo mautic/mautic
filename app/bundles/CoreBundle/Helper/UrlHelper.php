@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Psr7\Query;
 
-class UrlHelper
+final class UrlHelper
 {
     /**
      * Append query string to URL.
@@ -223,7 +223,7 @@ class UrlHelper
         if (!empty($query)) {
             $parsedQuery = Query::parse($query);
 
-            if ($parsedQuery) {
+            if ([] !== $parsedQuery) {
                 $queryItems = [];
 
                 // Remove duplicate query parameters from query.

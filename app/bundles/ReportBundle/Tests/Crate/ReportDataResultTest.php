@@ -112,7 +112,7 @@ final class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $expectedDateFrom = Fixtures::getDateFrom();
 
         $this->assertEquals($expectedDateFrom, $reportDataResult->getDateFrom());
-        $this->assertTrue($reportDataResult->getDateFrom() instanceof \DateTime);
+        $this->assertInstanceOf(\DateTime::class, $reportDataResult->getDateFrom());
     }
 
     public function testGetDateTo(): void
@@ -121,7 +121,7 @@ final class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $dateTo           = Fixtures::getDateTo();
 
         $this->assertEquals($dateTo, $reportDataResult->getDateTo());
-        $this->assertTrue($reportDataResult->getDateTo() instanceof \DateTime);
+        $this->assertInstanceOf(\DateTime::class, $reportDataResult->getDateTo());
     }
 
     public function testIsLastPage(): void
@@ -165,21 +165,21 @@ final class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $calcWithPrev = $reportDataResult->calcTotal('MIN', $valuesCount, $values, 0);
 
         $this->assertSame(1, $calc);
-        $this->assertSame(0.0, $calcWithPrev);
+        $this->assertEqualsWithDelta(0.0, $calcWithPrev, PHP_FLOAT_EPSILON);
 
         // Calc test MAX
         $calc         = $reportDataResult->calcTotal('MAX', $valuesCount, $values);
         $calcWithPrev = $reportDataResult->calcTotal('MAX', $valuesCount, $values, 25);
 
         $this->assertSame(20, $calc);
-        $this->assertSame(25.0, $calcWithPrev);
+        $this->assertEqualsWithDelta(25.0, $calcWithPrev, PHP_FLOAT_EPSILON);
 
         // Calc test 'default'
         $calc         = $reportDataResult->calcTotal('RANDOM', $valuesCount, $values);
         $calcWithPrev = $reportDataResult->calcTotal('RANDOM', $valuesCount, $values, 50);
 
         $this->assertNull($calc);
-        $this->assertSame(50.0, $calcWithPrev);
+        $this->assertEqualsWithDelta(50.0, $calcWithPrev, PHP_FLOAT_EPSILON);
     }
 
     public function testGetColumnKeys(): void

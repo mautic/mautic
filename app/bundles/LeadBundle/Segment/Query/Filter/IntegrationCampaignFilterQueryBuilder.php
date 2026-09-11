@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 
-class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
+final class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     public static function getServiceId(): string
     {
@@ -48,7 +48,7 @@ class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
             $queryType = $filter->getParameterValue() ? 'isNull' : 'isNotNull';
         }
 
-        $queryBuilder->addLogic($queryBuilder->expr()->$queryType($tableAlias.'.id'), $filter->getGlue());
+        $queryBuilder->addLogic($queryBuilder->expr()->{$queryType}($tableAlias.'.id'), $filter->getGlue());
 
         $queryBuilder->setParameter($integrationNameParameter, $integrationCampaignParts->getIntegrationName());
         $queryBuilder->setParameter($campaignIdParameter, $integrationCampaignParts->getCampaignId());

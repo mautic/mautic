@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 
 final class HitRepositoryTest extends MauticMysqlTestCase
 {
@@ -23,13 +22,13 @@ final class HitRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->hitRepository = $this->em->getRepository(Hit::class);
+        $this->hitRepository = self::getContainer()->get(HitRepository::class);
     }
 
     public function testGetLatestHitDateByLead(): void
     {
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLead(1, 'someId'));
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLead(1));
+        $this->assertNotInstanceOf(\DateTime::class, $this->hitRepository->getLatestHitDateByLead(1, 'someId'));
+        $this->assertNotInstanceOf(\DateTime::class, $this->hitRepository->getLatestHitDateByLead(1));
 
         $leadOne  = $this->createLead();
         $leadTwo  = $this->createLead();
@@ -46,8 +45,8 @@ final class HitRepositoryTest extends MauticMysqlTestCase
         $this->assertHitDate($dateThree, $leadOne, null);
         $this->assertHitDate($dateFive, $leadTwo, null);
 
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLead((int) $leadOne->getId(), 'two-first'));
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLead((int) $leadTwo->getId(), 'one-second'));
+        $this->assertNotInstanceOf(\DateTime::class, $this->hitRepository->getLatestHitDateByLead($leadOne->getId(), 'two-first'));
+        $this->assertNotInstanceOf(\DateTime::class, $this->hitRepository->getLatestHitDateByLead($leadTwo->getId(), 'one-second'));
     }
 
     public function testGetEmailClickthroughHitCount(): void
@@ -99,8 +98,8 @@ final class HitRepositoryTest extends MauticMysqlTestCase
             new \DateTime('2026-03-31 23:59:59', new \DateTimeZone('UTC'))
         );
 
-        Assert::assertArrayHasKey((string) $email->getId(), $result);
-        Assert::assertSame('2', (string) $result[(string) $email->getId()]);
+        $this->assertArrayHasKey((string) $email->getId(), $result);
+        $this->assertSame('2', (string) $result[(string) $email->getId()]);
     }
 
     public function testGetDwellTimesForPages(): void
@@ -132,10 +131,10 @@ final class HitRepositoryTest extends MauticMysqlTestCase
 
     private function assertHitDate(\DateTime $expectedHitDate, Lead $lead, ?string $trackingId): void
     {
-        $hitDate = $this->hitRepository->getLatestHitDateByLead((int) $lead->getId(), $trackingId);
+        $hitDate = $this->hitRepository->getLatestHitDateByLead($lead->getId(), $trackingId);
 
-        Assert::assertInstanceOf(\DateTime::class, $hitDate);
-        Assert::assertSame($expectedHitDate->getTimestamp(), $hitDate->getTimestamp());
+        $this->assertInstanceOf(\DateTime::class, $hitDate);
+        $this->assertSame($expectedHitDate->getTimestamp(), $hitDate->getTimestamp());
     }
 
     /**

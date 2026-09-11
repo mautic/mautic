@@ -30,11 +30,10 @@ final class DeleteCustomFieldCommandTest extends TestCase
     {
         $this->backgroundServiceMock    = $this->createMock(BackgroundService::class);
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
-        $leadFieldRepository            = $this->createMock(LeadFieldRepository::class);
         $this->deleteCustomFieldCommand = new DeleteCustomFieldCommand(
             $this->backgroundServiceMock,
             $this->translatorInterfaceMock,
-            $leadFieldRepository,
+            $this->createStub(LeadFieldRepository::class),
         );
     }
 

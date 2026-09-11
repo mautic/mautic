@@ -77,22 +77,20 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->dispatcherMock             = $this->createMock(EventDispatcher::class);
         $this->leadFieldModelMock         = $this->createMock(FieldModel::class);
         $this->ipLookupHelperMock         = $this->createMock(IpLookupHelper::class);
-        $this->requestStack               = new RequestStack();
+        $this->requestStack               = new RequestStack([new Request()]);
 
         $this->securityMock->method('isAnonymous')
             ->willReturn(true);
 
         $this->ipLookupHelperMock->method('isRequestTrackable')
             ->willReturn(true);
-
-        $this->requestStack->push(new Request());
     }
 
     public function testSystemContactIsUsedOverTrackedContact(): void
     {
         $contactTracker = $this->getContactTracker();
 
-        $this->leadRepositoryMock->expects($this->any())
+        $this->leadRepositoryMock
             ->method('getFieldValues')
             ->willReturn([]);
 
@@ -176,7 +174,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->method('getTrackedLead')
             ->willReturn(null);
 
-        $this->coreParametersHelperMock->expects($this->any())
+        $this->coreParametersHelperMock
             ->method('get')
             ->willReturn(true);
 
@@ -212,7 +210,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepositoryMock->expects($this->never())
             ->method('getLeadsByIp');
-        $this->leadFieldModelMock->expects($this->any())->method('getFieldListWithProperties')->willReturn([]);
+        $this->leadFieldModelMock->method('getFieldListWithProperties')->willReturn([]);
 
         $contact = $contactTracker->getContact();
         $this->assertInstanceOf(Lead::class, $contact);

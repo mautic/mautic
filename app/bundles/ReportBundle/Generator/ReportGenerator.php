@@ -5,15 +5,17 @@ namespace Mautic\ReportBundle\Generator;
 use Doctrine\DBAL\Connection;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
+use Mautic\ReportBundle\Builder\ReportBuilderInterface;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
-class ReportGenerator
+final class ReportGenerator
 {
-    private string $validInterface = \Mautic\ReportBundle\Builder\ReportBuilderInterface::class;
+    private string $validInterface = ReportBuilderInterface::class;
 
     private ?string $contentTemplate = null;
 
@@ -45,9 +47,9 @@ class ReportGenerator
     /**
      * @param array $options Parameters set by the caller
      *
-     * @return \Symfony\Component\Form\FormInterface<Report>
+     * @return FormInterface<Report>
      */
-    public function getForm(Report $entity, $options): \Symfony\Component\Form\FormInterface
+    public function getForm(Report $entity, $options): FormInterface
     {
         return $this->formFactory->createBuilder(ReportType::class, $entity, $options)->getForm();
     }
@@ -63,7 +65,7 @@ class ReportGenerator
     /**
      * @throws RuntimeException
      */
-    protected function getBuilder(): MauticReportBuilder
+    private function getBuilder(): MauticReportBuilder
     {
         $className = MauticReportBuilder::class;
 

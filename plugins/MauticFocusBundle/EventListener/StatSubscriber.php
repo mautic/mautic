@@ -11,11 +11,11 @@ use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class StatSubscriber implements EventSubscriberInterface
+final readonly class StatSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly FocusModel $model,
-        private readonly RequestStack $requestStack,
+        private FocusModel $model,
+        private RequestStack $requestStack,
     ) {
     }
 

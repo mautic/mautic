@@ -8,9 +8,9 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class InputExtension extends AbstractExtension
+final class InputExtension extends AbstractExtension
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('inputUrl', InputHelper::url(...)),

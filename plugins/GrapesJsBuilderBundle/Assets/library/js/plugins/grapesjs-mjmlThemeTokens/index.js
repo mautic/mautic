@@ -1,5 +1,6 @@
 import { pluginId, extractMjHeadContent, createHeadInjectingMjmlParser } from './utils';
 import { patchBlocks, createBlockPatcher } from './blocks';
+import { createMjColumnClassStyles } from './mjColumnClassStyles';
 
 export { pluginId, extractMjHeadContent, createHeadInjectingMjmlParser };
 
@@ -12,6 +13,11 @@ export default (editor, opts = {}) => {
     // Default token mapping for newly dropped components
     defaults: {
       text: 't-body',
+      heading1: 't-h1',
+      heading2: 't-h2',
+      heading3: 't-h3',
+      heading4: 't-h4',
+      subtitle: 't-lead',
       button: 't-btn t-btn-primary',
       buttonSecondary: 't-btn t-btn-secondary',
       section: 't-section t-surface-1',
@@ -194,9 +200,28 @@ export default (editor, opts = {}) => {
 
   // Must be executed during init (before setComponents) so mj-attributes content is hidden on parse
   registerHiddenMjAttributesTypes();
+  const mjColumnClassStyles = createMjColumnClassStyles(editor, headContent);
+  let currentHeadContent = headContent;
+  let previousHeadContent = headContent;
+
+  const updateHeadContent = (updatedHeadContent) => {
+    if (typeof options.mjmlParser?.updateHeadContent === 'function') {
+      options.mjmlParser.updateHeadContent(updatedHeadContent);
+    }
+    mjColumnClassStyles.updateHeadContent(updatedHeadContent);
+
+    classNames.clear();
+    parseMjClassNames(updatedHeadContent).forEach((className) => classNames.add(className));
+  };
+
+  editor.on('mautic:code-editor-update:before', (mjml) => {
+    readyForNewDrops = false;
+    previousHeadContent = currentHeadContent;
+    currentHeadContent = extractMjHeadContent(mjml);
+    updateHeadContent(currentHeadContent);
+  });
 
   editor.on('component:add', onComponentAdd);
-
 
   const patchBlocksWithContext = createBlockPatcher({
     editor,
@@ -210,6 +235,20 @@ export default (editor, opts = {}) => {
   if (blockColl?.on) {
     blockColl.on('add reset', patchBlocksWithContext);
   }
+
+  editor.on('mautic:code-editor-update', () => {
+    stripDefaultAttrsForTokenizedComponents();
+    patchBlocksWithContext();
+  });
+
+  editor.on('mautic:code-editor-update:complete', (successful) => {
+    if (!successful) {
+      currentHeadContent = previousHeadContent;
+      updateHeadContent(currentHeadContent);
+      patchBlocksWithContext();
+    }
+    readyForNewDrops = true;
+  });
 
   // Service will call this after its setComponents + reparse workaround
   editor.on('mjml-theme-tokens:content:ready', () => {

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class DetermineWinnerEvent extends Event
+final class DetermineWinnerEvent extends Event
 {
     /**
      * @var array{

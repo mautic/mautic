@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -10,7 +12,7 @@ use Symfony\Component\Form\FormView;
 /**
  * @extends AbstractType<mixed>
  */
-class LookupType extends AbstractType
+final class LookupType extends AbstractType
 {
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {

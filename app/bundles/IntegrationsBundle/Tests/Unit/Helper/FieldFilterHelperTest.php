@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Helper;
 use Mautic\IntegrationsBundle\Helper\FieldFilterHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class FieldFilterHelperTest extends TestCase
@@ -20,11 +21,11 @@ final class FieldFilterHelperTest extends TestCase
         $this->assertSame(5, $fieldFilterHelper->getTotalFieldCount());
         $filteredFields = $fieldFilterHelper->getFilteredFields();
 
-        $this->assertFalse(isset($filteredFields['field1']));
-        $this->assertFalse(isset($filteredFields['field2']));
-        $this->assertFalse(isset($filteredFields['field3']));
-        $this->assertTrue(isset($filteredFields['field4']));
-        $this->assertTrue(isset($filteredFields['field5']));
+        $this->assertArrayNotHasKey('field1', $filteredFields);
+        $this->assertArrayNotHasKey('field2', $filteredFields);
+        $this->assertArrayNotHasKey('field3', $filteredFields);
+        $this->assertArrayHasKey('field4', $filteredFields);
+        $this->assertArrayHasKey('field5', $filteredFields);
     }
 
     public function testFieldsFilteredByKeyword(): void
@@ -36,11 +37,11 @@ final class FieldFilterHelperTest extends TestCase
         $this->assertSame(1, $fieldFilterHelper->getTotalFieldCount());
         $filteredFields = $fieldFilterHelper->getFilteredFields();
 
-        $this->assertFalse(isset($filteredFields['field1']));
-        $this->assertFalse(isset($filteredFields['field2']));
-        $this->assertTrue(isset($filteredFields['field3']));
-        $this->assertFalse(isset($filteredFields['field4']));
-        $this->assertFalse(isset($filteredFields['field5']));
+        $this->assertArrayNotHasKey('field1', $filteredFields);
+        $this->assertArrayNotHasKey('field2', $filteredFields);
+        $this->assertArrayHasKey('field3', $filteredFields);
+        $this->assertArrayNotHasKey('field4', $filteredFields);
+        $this->assertArrayNotHasKey('field5', $filteredFields);
     }
 
     public function testFieldsFilteredByKeywordAndPage(): void
@@ -52,17 +53,17 @@ final class FieldFilterHelperTest extends TestCase
         $this->assertSame(5, $fieldFilterHelper->getTotalFieldCount());
         $filteredFields = $fieldFilterHelper->getFilteredFields();
 
-        $this->assertFalse(isset($filteredFields['field1']));
-        $this->assertFalse(isset($filteredFields['field2']));
-        $this->assertFalse(isset($filteredFields['field3']));
-        $this->assertTrue(isset($filteredFields['field4']));
-        $this->assertTrue(isset($filteredFields['field5']));
+        $this->assertArrayNotHasKey('field1', $filteredFields);
+        $this->assertArrayNotHasKey('field2', $filteredFields);
+        $this->assertArrayNotHasKey('field3', $filteredFields);
+        $this->assertArrayHasKey('field4', $filteredFields);
+        $this->assertArrayHasKey('field5', $filteredFields);
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject&ConfigFormSyncInterface
+     * @return MockObject&ConfigFormSyncInterface
      */
-    private function getIntegrationObject(): \PHPUnit\Framework\MockObject\MockObject
+    private function getIntegrationObject(): MockObject
     {
         $field1 = $this->createMock(MappedFieldInfoInterface::class);
         $field1->method('getLabel')

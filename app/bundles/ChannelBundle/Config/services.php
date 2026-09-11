@@ -27,4 +27,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.channel.model.channel.action', Mautic\ChannelBundle\Model\ChannelActionModel::class);
     $services->alias('mautic.channel.model.frequency.action', Mautic\ChannelBundle\Model\FrequencyActionModel::class);
     $services->alias('mautic.channel.repository.message_queue', Mautic\ChannelBundle\Entity\MessageQueueRepository::class);
+
+    $services->set(Mautic\ChannelBundle\Helper\ChannelListHelper::class)
+        ->tag('twig.helper', ['alias' => 'channel']);
 };

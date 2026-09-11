@@ -25,7 +25,7 @@ final class ExcelExporterTest extends TestCase
     protected function setUp(): void
     {
         $translator       = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())
+        $translator
             ->method('trans')
             ->with('mautic.report.report.groupby.totals')
             ->willReturn('Totals');

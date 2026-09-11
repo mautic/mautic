@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -24,13 +25,23 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Submission>
  */
-class SubmissionApiController extends CommonApiController
+final class SubmissionApiController extends CommonApiController
 {
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $formSubmissionModel = $modelFactory->getModel('form.submission');
-        \assert($formSubmissionModel instanceof SubmissionModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        SubmissionModel $formSubmissionModel,
+        private readonly FormModel $formModel,
+    ) {
         $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;
         $this->entityNameOne    = 'submission';
@@ -45,10 +56,8 @@ class SubmissionApiController extends CommonApiController
      * Obtains a list of entities as defined by the API URL.
      *
      * @param int $formId
-     *
-     * @return Response
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper, $formId = null)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper, $formId = null): Response
     {
         $form = $this->getFormOrResponseWithError($formId);
 
@@ -73,10 +82,8 @@ class SubmissionApiController extends CommonApiController
      *
      * @param int $formId
      * @param int $contactId
-     *
-     * @return Response
      */
-    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId)
+    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId): Response
     {
         $filter = [
             'filter' => [
@@ -97,10 +104,8 @@ class SubmissionApiController extends CommonApiController
 
     /**
      * Obtains a specific entity as defined by the API URL.
-     *
-     * @return Response
      */
-    public function getEntityAction(Request $request, $formId = null, $submissionId = null)
+    public function getEntityAction(Request $request, $formId = null, $submissionId = null): Response
     {
         $form = $this->getFormOrResponseWithError($formId);
 
@@ -124,8 +129,7 @@ class SubmissionApiController extends CommonApiController
      */
     protected function getFormOrResponseWithError($formId)
     {
-        $formModel = $this->getModel('form');
-        $form      = $formModel->getEntity($formId);
+        $form = $this->formModel->getEntity($formId);
 
         if (!$form) {
             return $this->notFound();

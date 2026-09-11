@@ -94,7 +94,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
     {
         $updatedMappedObjects = [];
 
-        if (!$ids) {
+        if ([] === $ids) {
             return $updatedMappedObjects;
         }
 
@@ -208,7 +208,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
 
     public function findOwnerIds(array $objectIds): array
     {
-        if (empty($objectIds)) {
+        if ([] === $objectIds) {
             return [];
         }
 

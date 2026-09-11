@@ -110,7 +110,7 @@ final class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testContactsAreAddedOrUpdated(): void
     {
-        $contact = new class extends Lead {
+        $contact = new class() extends Lead {
             public function __construct(
                 private readonly int $id = 1,
             ) {
@@ -121,7 +121,7 @@ final class MembershipManagerTest extends \PHPUnit\Framework\TestCase
                 return $this->id;
             }
         };
-        $contact2 = new class extends Lead {
+        $contact2 = new class() extends Lead {
             public function __construct(
                 private readonly int $id = 2,
             ) {
@@ -163,7 +163,7 @@ final class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testContactsAreRemoved(): void
     {
-        $contact = new class extends Lead {
+        $contact = new class() extends Lead {
             public function __construct(
                 private readonly int $id = 1,
             ) {
@@ -174,7 +174,7 @@ final class MembershipManagerTest extends \PHPUnit\Framework\TestCase
                 return $this->id;
             }
         };
-        $contact2 = new class extends Lead {
+        $contact2 = new class() extends Lead {
             public function __construct(
                 private readonly int $id = 2,
             ) {

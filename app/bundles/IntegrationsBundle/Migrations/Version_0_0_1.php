@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
-class Version_0_0_1 extends AbstractMigration
+final class Version_0_0_1 extends AbstractMigration
 {
     private string $table = 'sync_object_mapping';
 

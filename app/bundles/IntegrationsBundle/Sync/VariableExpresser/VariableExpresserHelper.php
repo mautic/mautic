@@ -33,7 +33,7 @@ final readonly class VariableExpresserHelper implements VariableExpresserHelperI
      */
     public function encodeVariable($var): EncodedValueDAO
     {
-        if (is_null($var)) {
+        if (null === $var) {
             return new EncodedValueDAO(EncodedValueDAO::STRING_TYPE, '');
         }
 
@@ -42,7 +42,7 @@ final readonly class VariableExpresserHelper implements VariableExpresserHelperI
         }
 
         if (is_string($var)) {
-            return new EncodedValueDAO(EncodedValueDAO::STRING_TYPE, (string) $var);
+            return new EncodedValueDAO(EncodedValueDAO::STRING_TYPE, $var);
         }
 
         if (is_float($var)) {

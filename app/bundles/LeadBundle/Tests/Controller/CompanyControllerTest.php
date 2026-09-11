@@ -15,6 +15,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CompanyControllerTest extends MauticMysqlTestCase
 {
@@ -47,7 +48,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         ];
 
         /** @var CompanyModel $model */
-        $model = self::getContainer()->get('mautic.lead.model.company');
+        $model = self::getContainer()->get(CompanyModel::class);
 
         foreach ($companiesData as $i => $companyData) {
             $company    = new Company();
@@ -76,11 +77,11 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var CompanyModel $model */
-        $model                  = self::getContainer()->get('mautic.lead.model.company');
+        $model                  = self::getContainer()->get(CompanyModel::class);
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertInstanceOf(Company::class, $company);
-        $this->assertStringContainsString($company->getName(), $clientResponseContent, 'The return must contain the name of company');
+        $this->assertStringContainsString($company->getName(), (string) $clientResponseContent, 'The return must contain the name of company');
         $this->assertSame('', trim($crawler->filter('#company_contact_engagement')->text()));
         $this->assertSame('', trim($crawler->filter('#contacts-table')->text()));
     }
@@ -101,8 +102,8 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $engagementData = $datasets[0]['data'] ?? [];
         $totalContacts  = array_sum($engagementData);
 
-        self::assertStringContainsString('Engagements', $response->getContent());
-        self::assertSame(1, $totalContacts);
+        $this->assertStringContainsString('Engagements', (string) $response->getContent());
+        $this->assertSame(1, $totalContacts);
     }
 
     /**
@@ -114,11 +115,11 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var CompanyModel $model */
-        $model                  = self::getContainer()->get('mautic.lead.model.company');
+        $model                  = self::getContainer()->get(CompanyModel::class);
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertInstanceOf(Company::class, $company);
-        $this->assertStringContainsString('Edit Company '.$company->getName(), $clientResponseContent, 'The return must contain \'Edit Company\' text');
+        $this->assertStringContainsString('Edit Company '.$company->getName(), (string) $clientResponseContent, 'The return must contain \'Edit Company\' text');
 
         $buttonCrawler = $crawler->selectButton('Save & Close');
         $form          = $buttonCrawler->form();
@@ -142,11 +143,11 @@ final class CompanyControllerTest extends MauticMysqlTestCase
     public function testListCompanyContacts(): void
     {
         /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $leadModel);
 
         $company1 = $companyModel->getEntity($this->company1Id);
@@ -181,9 +182,9 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $leadsTableRows, $crawler->html());
 
         $clientResponse = $this->client->getResponse();
-        $this->assertStringContainsString('test1@test.com', $clientResponse->getContent());
-        $this->assertStringContainsString('/s/contacts/view/'.$lead1->getId(), $clientResponse->getContent());
-        $this->assertStringContainsString('1 item', $clientResponse->getContent());
+        $this->assertStringContainsString('test1@test.com', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('/s/contacts/view/'.$lead1->getId(), (string) $clientResponse->getContent());
+        $this->assertStringContainsString('1 item', (string) $clientResponse->getContent());
 
         $crawler        = $this->client->request('GET', '/s/company/'.$this->company2Id.'/contacts/');
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
@@ -215,23 +216,23 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get(CompanyModel::class);
 
         $companyA = $companyModel->getEntity($companyA->getId());
         $companyB = $companyModel->getEntity($companyB->getId());
         $companyC = $companyModel->getEntity($companyC->getId());
 
-        self::assertInstanceOf(Company::class, $companyA);
-        self::assertInstanceOf(Company::class, $companyB);
-        self::assertInstanceOf(Company::class, $companyC);
-        self::assertSame('Retail', $companyA->getIndustry());
-        self::assertSame('Retail', $companyB->getIndustry());
-        self::assertSame('Services', $companyC->getIndustry());
+        $this->assertInstanceOf(Company::class, $companyA);
+        $this->assertInstanceOf(Company::class, $companyB);
+        $this->assertInstanceOf(Company::class, $companyC);
+        $this->assertSame('Retail', $companyA->getIndustry());
+        $this->assertSame('Retail', $companyB->getIndustry());
+        $this->assertSame('Services', $companyC->getIndustry());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertArrayHasKey('closeModal', $response, 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('2 companies affected', $response['flashes']);
+        $this->assertStringContainsString('2 companies affected', (string) $response['flashes']);
     }
 
     public function testCompanyFieldsAreUpdatedWithBatchFindAndReplaceForCurrentSearch(): void
@@ -269,7 +270,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get(CompanyModel::class);
 
         $companyA = $companyModel->getEntity($companyA->getId());
         $companyB = $companyModel->getEntity($companyB->getId());
@@ -279,25 +280,25 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $companyF = $companyModel->getEntity($companyF->getId());
         $companyG = $companyModel->getEntity($companyG->getId());
 
-        self::assertInstanceOf(Company::class, $companyA);
-        self::assertInstanceOf(Company::class, $companyB);
-        self::assertInstanceOf(Company::class, $companyC);
-        self::assertInstanceOf(Company::class, $companyD);
-        self::assertInstanceOf(Company::class, $companyE);
-        self::assertInstanceOf(Company::class, $companyF);
-        self::assertInstanceOf(Company::class, $companyG);
-        self::assertSame('Retail', $companyA->getIndustry());
-        self::assertSame('Retail', $companyB->getIndustry());
-        self::assertSame('Goods', $companyC->getIndustry());
-        self::assertSame('Services', $companyD->getIndustry());
-        self::assertSame('Retail', $companyE->getIndustry());
-        self::assertSame('Retail', $companyF->getIndustry());
-        self::assertSame('Retail', $companyG->getIndustry());
+        $this->assertInstanceOf(Company::class, $companyA);
+        $this->assertInstanceOf(Company::class, $companyB);
+        $this->assertInstanceOf(Company::class, $companyC);
+        $this->assertInstanceOf(Company::class, $companyD);
+        $this->assertInstanceOf(Company::class, $companyE);
+        $this->assertInstanceOf(Company::class, $companyF);
+        $this->assertInstanceOf(Company::class, $companyG);
+        $this->assertSame('Retail', $companyA->getIndustry());
+        $this->assertSame('Retail', $companyB->getIndustry());
+        $this->assertSame('Goods', $companyC->getIndustry());
+        $this->assertSame('Services', $companyD->getIndustry());
+        $this->assertSame('Retail', $companyE->getIndustry());
+        $this->assertSame('Retail', $companyF->getIndustry());
+        $this->assertSame('Retail', $companyG->getIndustry());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertArrayHasKey('closeModal', $response, 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('5 companies affected', $response['flashes']);
+        $this->assertStringContainsString('5 companies affected', (string) $response['flashes']);
     }
 
     /**
@@ -376,7 +377,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
 
         /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $company     = $companyModel->getEntity($this->company1Id);
@@ -411,22 +412,22 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $content = $clientResponse->getContent();
 
         /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $company1 = $companyModel->getEntity($this->company1Id);
         $company2 = $companyModel->getEntity($this->company2Id);
         $this->assertInstanceOf(Company::class, $company1);
 
-        $this->assertStringContainsString($company1->getName(), $content);
+        $this->assertStringContainsString($company1->getName(), (string) $content);
         $this->assertInstanceOf(Company::class, $company2);
-        $this->assertStringContainsString($company2->getName(), $content);
+        $this->assertStringContainsString($company2->getName(), (string) $content);
 
-        $translator  = self::getContainer()->get('translator');
+        $translator  = self::getContainer()->get(TranslatorInterface::class);
         $itemMessage = $translator->trans('mautic.core.pagination.items', ['%count%' => 2]);
-        $this->assertStringContainsString($itemMessage, $content);
+        $this->assertStringContainsString($itemMessage, (string) $content);
 
         $pageMessage = $translator->trans('mautic.core.pagination.pages', ['%count%' => 1]);
-        $this->assertStringContainsString($pageMessage, $content);
+        $this->assertStringContainsString($pageMessage, (string) $content);
     }
 
     protected function createLead(string $firstName = 'Firstname', string $lastName = 'Lastname', string $email = 'test@test.com', string $phoneNumber = '555-666-777'): Lead
@@ -440,7 +441,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $company = $companyModel->getEntity($this->company1Id);
@@ -466,7 +467,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
             ->setIndustry($industry);
 
         /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $companyModel->saveEntity($company);
 
         return $company;

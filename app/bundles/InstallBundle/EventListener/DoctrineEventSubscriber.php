@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Model\FieldModel;
 
 #[AsDoctrineListener(ToolEvents::postGenerateSchema)]
-class DoctrineEventSubscriber
+final class DoctrineEventSubscriber
 {
     public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {

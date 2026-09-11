@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Event\EntityExportEvent;
@@ -29,6 +30,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
     public function __construct(
         private CampaignModel $campaignModel,
         private EntityManagerInterface $entityManager,
+        private EventRepository $eventRepository,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private EventDispatcherInterface $dispatcher,
@@ -52,7 +54,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
             return;
         }
 
-        $campaignId = (int) $event->getEntityId();
+        $campaignId = $event->getEntityId();
         $campaign   = $this->campaignModel->getEntity($campaignId);
 
         if (!$campaign instanceof Campaign) {
@@ -238,7 +240,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
                 continue;
             }
 
-            $campaignEvent = $this->entityManager->getRepository(Event::class)->findOneBy(['uuid' => $element['uuid'] ?? null]);
+            $campaignEvent = $this->eventRepository->findOneBy(['uuid' => $element['uuid'] ?? null]);
             $isNew         = !$campaignEvent;
 
             $campaignEvent ??= new Event();
@@ -307,7 +309,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
                 break;
             }
 
-            $existing = $this->entityManager->getRepository(Event::class)->findOneBy(['uuid' => $element['uuid'] ?? null]);
+            $existing = $this->eventRepository->findOneBy(['uuid' => $element['uuid'] ?? null]);
 
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
@@ -342,8 +344,8 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
 
                 if ($newParentId) {
                     $campaignEventId = $idMap[(int) $element['id']];
-                    $campaignEvent   = $this->entityManager->getRepository(Event::class)->find($campaignEventId);
-                    $parentEvent     = $this->entityManager->getRepository(Event::class)->find($newParentId);
+                    $campaignEvent   = $this->eventRepository->find($campaignEventId);
+                    $parentEvent     = $this->eventRepository->find($newParentId);
 
                     if ($campaignEvent && $parentEvent) {
                         $campaignEvent->setParent($parentEvent);
@@ -357,7 +359,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
 
                 if ($newJumpToEventId) {
                     $campaignEventId = $idMap[(int) $element['id']];
-                    $campaignEvent   = $this->entityManager->getRepository(Event::class)->find($campaignEventId);
+                    $campaignEvent   = $this->eventRepository->find($campaignEventId);
 
                     $element['properties']['jumpToEvent'] = $newJumpToEventId;
                     if ($campaignEvent) {
@@ -383,10 +385,10 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(Event::class)->find($id);
+            $entity = $this->eventRepository->find($id);
 
             if ($entity) {
-                $dependentEvents = $this->entityManager->getRepository(Event::class)->findBy(['parent' => $id]);
+                $dependentEvents = $this->eventRepository->findBy(['parent' => $id]);
 
                 foreach ($dependentEvents as $dependentEvent) {
                     // Set parent_id to null

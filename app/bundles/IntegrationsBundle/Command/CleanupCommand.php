@@ -15,7 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: CleanupCommand::NAME,
     description: 'Delete records from field changes which are invalid'
 )]
-class CleanupCommand extends Command
+final class CleanupCommand extends Command
 {
     public const NAME = 'mautic:integrations:cleanup';
 

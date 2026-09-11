@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FieldValidationHelper
+final class FieldValidationHelper
 {
     private ?ConfigFormSyncInterface $integrationObject = null;
 
@@ -63,7 +63,7 @@ class FieldValidationHelper
         $hasMissingFields  = false;
         $errorsOnGivenPage = false;
 
-        if (!empty($missingFields)) {
+        if ([] !== $missingFields) {
             $hasMissingFields = true;
         }
 
@@ -113,7 +113,7 @@ class FieldValidationHelper
     private function validateMauticRequiredFields(FormInterface $fieldMappingsForm, string $object, array $objectFieldMappings): void
     {
         $missingFields = $this->findMissingInternalRequiredFieldMappings($object, $objectFieldMappings);
-        if (empty($missingFields)) {
+        if ([] === $missingFields) {
             return;
         }
 

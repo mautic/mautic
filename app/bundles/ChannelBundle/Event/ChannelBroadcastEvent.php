@@ -1,30 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Event;
 
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ChannelBroadcastEvent extends Event
+final class ChannelBroadcastEvent extends Event
 {
     /**
      * Number of contacts successfully processed and/or failed per channel.
-     *
-     * @var array
      */
-    protected $results = [];
+    private array $results = [];
 
     /**
      * Min contact ID filter can be used for process parallelization.
      *
-     * @var int
+     * @var int|null
      */
     private $minContactIdFilter;
 
     /**
      * Max contact ID filter can be used for process parallelization.
      *
-     * @var int
+     * @var int|null
      */
     private $maxContactIdFilter;
 
@@ -46,12 +46,12 @@ class ChannelBroadcastEvent extends Event
         /**
          * Specific channel.
          */
-        protected ?string $channel,
+        private readonly ?string $channel,
         /**
          * Specific ID of a specific channel.
          */
-        protected string|int|null $id,
-        protected OutputInterface $output,
+        private readonly string|int|null $id,
+        private readonly OutputInterface $output,
     ) {
     }
 
@@ -79,10 +79,7 @@ class ChannelBroadcastEvent extends Event
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getResults()
+    public function getResults(): array
     {
         return $this->results;
     }

@@ -135,7 +135,7 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $helper       = $this->getContactRequestHelper();
         $foundContact = $helper->getContactFromQuery($query);
 
-        $this->assertTrue($contact === $foundContact);
+        $this->assertSame($foundContact, $contact);
     }
 
     private function getContactRequestHelper(): ContactRequestHelper

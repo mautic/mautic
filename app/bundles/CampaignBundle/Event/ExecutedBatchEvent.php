@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-class ExecutedBatchEvent extends AbstractLogCollectionEvent
+final class ExecutedBatchEvent extends AbstractLogCollectionEvent
 {
     /**
      * @return ArrayCollection

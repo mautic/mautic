@@ -65,11 +65,12 @@ final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var EventModel $eventModel */
-        $eventModel = $this->getContainer()->get('mautic.campaign.model.event');
+        $eventModel = $this->getContainer()->get(EventModel::class);
 
         // Reload event after custom field change
         $eventEntity = $this->em->getRepository(CampaignEvent::class)
           ->findOneBy(['name' => 'Update Industry']);
+        $this->assertInstanceOf(CampaignEvent::class, $eventEntity);
 
         // Trigger normalization (your fix runs inside EventModel::saveEntity)
         $eventModel->saveEntity($eventEntity);

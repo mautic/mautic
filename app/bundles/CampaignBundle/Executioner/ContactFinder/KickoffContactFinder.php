@@ -32,7 +32,7 @@ class KickoffContactFinder
         // Get list of all campaign leads; start is always zero in practice because of $pendingOnly
         $campaignContacts = $this->campaignRepository->getPendingContactIds($campaignId, $limiter);
 
-        if (empty($campaignContacts)) {
+        if ([] === $campaignContacts) {
             // No new contacts found in the campaign
 
             throw new NoContactsFoundException();

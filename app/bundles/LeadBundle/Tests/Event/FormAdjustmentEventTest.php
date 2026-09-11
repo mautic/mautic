@@ -10,11 +10,6 @@ use Symfony\Component\Form\FormInterface;
 
 final class FormAdjustmentEventTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testConstructGettersSetters(): void
     {
         $alias        = 'email';

@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
+final class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
@@ -77,7 +77,7 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
     /**
      * @param Lead[] $contacts
      */
-    private function writeEntries(array $contacts, Campaign $campaign, $action): void
+    private function writeEntries(array $contacts, Campaign $campaign, ?string $action): void
     {
         $user = $this->userHelper->getUser();
 

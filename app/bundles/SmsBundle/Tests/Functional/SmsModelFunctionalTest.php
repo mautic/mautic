@@ -49,18 +49,15 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
             ->method('sendBatchSms')
             ->with(
                 $this->anything(),
-                $this->callback(function (string $template) use ($expectedMessage): true {
-                    $this->assertSame($expectedMessage, $template);
-
-                    return true;
-                })
+                $expectedMessage
             )
             ->willReturn(new RecipientCollection($sms));
 
         $this->getContainer()->set('mautic.sms.transport_chain', $transportMock);
 
         /** @var SmsModel $smsModel */
-        $smsModel = $this->getContainer()->get('mautic.sms.model.sms');
+        $smsModel = $this->getContainer()->get(SmsModel::class);
+        $this->assertInstanceOf(Sms::class, $sms);
 
         // 4. Send SMS
         $smsModel->sendSms($sms, $contact);
@@ -161,7 +158,8 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->getContainer()->set('mautic.sms.transport_chain', $transportMock);
 
         /** @var SmsModel $smsModel */
-        $smsModel = $this->getContainer()->get('mautic.sms.model.sms');
+        $smsModel = $this->getContainer()->get(SmsModel::class);
+        $this->assertInstanceOf(Sms::class, $sms);
 
         // 6. Send SMS
         $results = $smsModel->sendSms($sms, [$contact1, $contact2, $contact3]);
@@ -172,7 +170,6 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(Lead::class, $contact1);
 
         $stat1 = $statRepo->getLeadStats($contact1->getId());
-        $this->assertInstanceOf(Sms::class, $sms);
         $this->assertSame((string) $sms->getId(), $stat1[0]['sms_id'], 'English contact should map to base SMS.');
 
         $stat2 = $statRepo->getLeadStats($contact2->getId());
@@ -181,9 +178,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
         // 8. Validate SMS stats for translation and parent
         $this->em->clear();
-        $this->assertInstanceOf(Sms::class, $sms);
         $sms      = $this->em->find(Sms::class, $sms->getId());
-        $this->assertInstanceOf(Sms::class, $smsFr);
         $smsFr    = $this->em->find(Sms::class, $smsFr->getId());
         $this->assertInstanceOf(Sms::class, $sms);
 

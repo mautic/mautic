@@ -8,21 +8,24 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-class InjectCustomContentSubscriber implements EventSubscriberInterface
+final readonly class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
-        private readonly Environment $twig,
-        private readonly RequestStack $requestStack,
-        private readonly RouterInterface $router,
+        private Config $config,
+        private GrapesJsBuilderModel $grapesJsBuilderModel,
+        private Environment $twig,
+        private RequestStack $requestStack,
+        private RouterInterface $router,
+        private GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
     }
 
@@ -59,7 +62,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
                 }
             }
 
-            $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $parameters['email']]);
+            $grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $parameters['email']]);
             if ('POST' !== $this->requestStack->getCurrentRequest()->getMethod()) {
                 if (!$grapesJsBuilder instanceof GrapesJsBuilder && $parameters['email']->getIsClone()) {
                     $grapesJsBuilder = $this->grapesJsBuilderModel->getGrapesJsFromEmailId(
@@ -80,9 +83,9 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
             $customContentEvent->addContent($content);
         } elseif ('page.header.left' === $customContentEvent->getContext()) {
             // Inject fileManager URL
-            $passParams['dataAssets'] = $this->router->generate('grapesjsbuilder_assets', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
-            $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
-            $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+            $passParams['dataAssets'] = $this->router->generate('grapesjsbuilder_assets', [], UrlGeneratorInterface::ABSOLUTE_URL);
+            $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], UrlGeneratorInterface::ABSOLUTE_URL);
+            $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
             $content = $this->twig->render(
                 '@GrapesJsBuilder/Setting/vars.html.twig',

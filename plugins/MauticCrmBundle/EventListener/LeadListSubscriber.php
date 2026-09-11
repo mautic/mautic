@@ -12,12 +12,12 @@ use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListSubscriber implements EventSubscriberInterface
+final readonly class LeadListSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly IntegrationHelper $helper,
-        private readonly ListModel $listModel,
-        private readonly TranslatorInterface $translator,
+        private IntegrationHelper $helper,
+        private ListModel $listModel,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -63,7 +63,7 @@ class LeadListSubscriber implements EventSubscriberInterface
             }
         }
 
-        if (!empty($choices)) {
+        if ([] !== $choices) {
             $config = [
                 'label'      => $this->translator->trans('mautic.plugin.integration.campaign_members'),
                 'properties' => ['type' => 'select', 'list' => $choices],

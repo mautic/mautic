@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -37,6 +36,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setParams(['graph' => sprintf('%s:mautic.lead.graph.line.leads', $report->getId())]);
         $widget->setWidth(100);
         $widget->setHeight(200);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
         $this->em->persist($widget);
 
@@ -50,20 +50,20 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
-        Assert::assertJson($content);
+        $this->assertJson($content);
 
         $data = json_decode($content, true);
-        Assert::assertIsArray($data);
-        Assert::assertArrayHasKey('success', $data);
-        Assert::assertSame(1, $data['success']);
-        Assert::assertArrayHasKey('widgetId', $data);
-        Assert::assertSame((string) $widget->getId(), $data['widgetId']);
-        Assert::assertArrayHasKey('widgetWidth', $data);
-        Assert::assertSame($widget->getWidth(), $data['widgetWidth']);
-        Assert::assertArrayHasKey('widgetHeight', $data);
-        Assert::assertSame($widget->getHeight(), $data['widgetHeight']);
-        Assert::assertArrayHasKey('widgetHtml', $data);
-        Assert::assertStringContainsString('View Full Report', $data['widgetHtml']);
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('success', $data);
+        $this->assertSame(1, $data['success']);
+        $this->assertArrayHasKey('widgetId', $data);
+        $this->assertSame((string) $widget->getId(), $data['widgetId']);
+        $this->assertArrayHasKey('widgetWidth', $data);
+        $this->assertSame($widget->getWidth(), $data['widgetWidth']);
+        $this->assertArrayHasKey('widgetHeight', $data);
+        $this->assertSame($widget->getHeight(), $data['widgetHeight']);
+        $this->assertArrayHasKey('widgetHtml', $data);
+        $this->assertStringContainsString('View Full Report', (string) $data['widgetHtml']);
     }
 
     public function testWidgetWithBestHours(): void
@@ -76,6 +76,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setParams(['timeFormat' => 24, 'segmentId' => $segment->getId()]);
         $widget->setWidth(100);
         $widget->setHeight(200);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
         $this->em->persist($widget);
 
@@ -86,25 +87,26 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();
-        Assert::assertJson($content);
+        $this->assertJson($content);
 
         $data = json_decode($content, true);
-        Assert::assertIsArray($data);
-        Assert::assertArrayHasKey('success', $data);
-        Assert::assertSame(1, $data['success']);
-        Assert::assertArrayHasKey('widgetId', $data);
-        Assert::assertSame((string) $widget->getId(), $data['widgetId']);
-        Assert::assertArrayHasKey('widgetWidth', $data);
-        Assert::assertSame($widget->getWidth(), $data['widgetWidth']);
-        Assert::assertArrayHasKey('widgetHeight', $data);
-        Assert::assertSame($widget->getHeight(), $data['widgetHeight']);
-        Assert::assertArrayHasKey('widgetHtml', $data);
-        Assert::assertStringContainsString('Best email read hours', $data['widgetHtml']);
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('success', $data);
+        $this->assertSame(1, $data['success']);
+        $this->assertArrayHasKey('widgetId', $data);
+        $this->assertSame((string) $widget->getId(), $data['widgetId']);
+        $this->assertArrayHasKey('widgetWidth', $data);
+        $this->assertSame($widget->getWidth(), $data['widgetWidth']);
+        $this->assertArrayHasKey('widgetHeight', $data);
+        $this->assertSame($widget->getHeight(), $data['widgetHeight']);
+        $this->assertArrayHasKey('widgetHtml', $data);
+        $this->assertStringContainsString('Best email read hours', (string) $data['widgetHtml']);
     }
 
     public function testWidgetWithSegmentBuildTime(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
         $this->createSegment('A', 'a', 3, $user);
         $this->createSegment('B', 'b', 60, $user);
         $this->createSegment('C', 'c', 66, $user);
@@ -129,13 +131,13 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
-        Assert::assertJson($content);
+        $this->assertJson($content);
 
         $data = json_decode($content, true);
-        Assert::assertIsArray($data);
-        Assert::assertArrayHasKey('success', $data);
-        Assert::assertSame(1, $data['success']);
-        Assert::assertArrayHasKey('widgetHtml', $data);
+        $this->assertIsArray($data);
+        $this->assertArrayHasKey('success', $data);
+        $this->assertSame(1, $data['success']);
+        $this->assertArrayHasKey('widgetHtml', $data);
         $tableArray = $this->widgetHtmlWithTableToArray($data['widgetHtml']);
 
         $this->assertSame([
@@ -154,13 +156,14 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setType('recent.activity');
         $widget->setWidth(100);
         $widget->setHeight(300);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
         $this->em->persist($widget);
         $this->em->flush();
         $contact = new Lead();
         $contact->setFirstName('John');
         /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
         $contactModel->deleteEntity($contact);
@@ -168,8 +171,8 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/dashboard/widget/{$widget->getId()}");
         $this->assertResponseIsSuccessful();
         $printResponse = fn (): string => print_r(json_decode($this->client->getResponse()->getContent(), true), true);
-        Assert::assertStringContainsString('created', $printResponse());
-        Assert::assertStringContainsString('deleted', $printResponse());
+        $this->assertStringContainsString('created', $printResponse());
+        $this->assertStringContainsString('deleted', $printResponse());
     }
 
     private function createSegment(string $name, string $alias, float $lastBuildTime = 0, ?User $user = null): LeadList
@@ -212,6 +215,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setType('upcoming.emails');
         $widget->setWidth(50);
         $widget->setHeight(330);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
 
         $this->em->persist($widget);
@@ -241,6 +245,6 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/dashboard/widget/{$widget->getId()}", [], [], $this->createAjaxHeaders());
 
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('TestFN TestLN', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('TestFN TestLN', (string) $this->client->getResponse()->getContent());
     }
 }

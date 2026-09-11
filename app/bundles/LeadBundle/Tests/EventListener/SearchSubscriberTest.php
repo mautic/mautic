@@ -36,7 +36,7 @@ final class SearchSubscriberTest extends TestCase
         $emailRepository   = $this->createStub(EmailRepository::class);
         $connection        = $this->getMockedConnection();
         $mockPlatform      = $this->createMock(AbstractPlatform::class);
-        $leadModel         = $this->createMock(LeadModel::class);
+        $leadModel         = $this->createStub(LeadModel::class);
         $companyModel      = $this->createStub(CompanyModel::class);
         $listModel         = $this->createStub(ListModel::class);
         $translator        = $this->createMock(TranslatorInterface::class);
@@ -53,14 +53,14 @@ final class SearchSubscriberTest extends TestCase
                     $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
                     $joins    = $q->getQueryPart('join');
                     if (!array_key_exists($primaryTable['alias'], $joins)) {
-                        $q->$joinType(
+                        $q->{$joinType}(
                             $primaryTable['from_alias'],
                             MAUTIC_TABLE_PREFIX.$primaryTable['table'],
                             $primaryTable['alias'],
                             $primaryTable['condition']
                         );
                         foreach ($tables as $table) {
-                            $q->$joinType($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
+                            $q->{$joinType}($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
                         }
                         if ($whereExpression) {
                             $q->andWhere($whereExpression);
@@ -85,12 +85,9 @@ final class SearchSubscriberTest extends TestCase
         $contactRepository->method('createQueryBuilder')
             ->willReturn(new QueryBuilder($connection));
 
-        $leadModel->method('getRepository')
-            ->willReturn($contactRepository);
-
-        $translator->expects($this->any())
+        $translator
             ->method('trans')
-            ->willReturnCallback(function ($key): string|array|null {
+            ->willReturnCallback(function (string $key): ?string {
                 return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
             });
 
@@ -102,7 +99,8 @@ final class SearchSubscriberTest extends TestCase
             $translator,
             $security,
             $twig,
-            $globalSearch
+            $globalSearch,
+            $contactRepository
         );
 
         $dispatcher = new EventDispatcher();

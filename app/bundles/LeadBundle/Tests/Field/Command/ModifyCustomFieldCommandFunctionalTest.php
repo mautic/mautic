@@ -54,7 +54,7 @@ final class ModifyCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('1 Field(s) updated successfully.', $output);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $field      = $fieldModel->getEntityByAlias('field_text_one');
         $this->assertEquals($field->getCharLengthLimit(), $csvRows['field_text_one']['newLen']);
     }
@@ -91,7 +91,7 @@ final class ModifyCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $fieldModel->saveEntities($fields);
         $fieldModel->getRepository()->detachEntities($fields);
     }

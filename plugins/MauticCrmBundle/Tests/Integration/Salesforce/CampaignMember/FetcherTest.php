@@ -10,6 +10,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
+use PHPUnit\Framework\Exception;
 
 final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
@@ -59,7 +60,7 @@ final class FetcherTest extends \PHPUnit\Framework\TestCase
         $matcher   = $this->exactly(4);
 
         $repo->expects($matcher)
-            ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer) {
+            ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertSame(Lead::OBJECT, $parameters[1]);
@@ -170,6 +171,8 @@ final class FetcherTest extends \PHPUnit\Framework\TestCase
                         ],
                     ];
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $fetcher = new Fetcher($repo, $organizer, '701f10000021UnkAAE');

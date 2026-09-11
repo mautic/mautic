@@ -132,7 +132,7 @@ class Redirect extends FormEntity
     /**
      * @param int $hits
      */
-    public function setHits($hits): Redirect
+    public function setHits($hits): self
     {
         $this->hits = $hits;
 
@@ -150,7 +150,7 @@ class Redirect extends FormEntity
     /**
      * @param int $uniqueHits
      */
-    public function setUniqueHits($uniqueHits): Redirect
+    public function setUniqueHits($uniqueHits): self
     {
         $this->uniqueHits = $uniqueHits;
 

@@ -25,8 +25,7 @@
     {% if securityHasEntityAccess(permissions['campaign:campaigns:viewown'], permissions['campaign:campaigns:viewother'], campaign.createdBy) and enableExportPermission is not empty%}
         {% set buttons = buttons|merge([{
             'attr': {
-                'data-toggle': 'download',
-                'href': path('mautic_campaign_action', {'objectAction': 'export', 'objectId': campaign.id}),
+                'href': path('mautic_campaign_action', {'objectAction': 'share', 'objectId': campaign.id}),
             },
             'btnText': 'mautic.core.export'|trans,
             'iconClass': 'ri-export-line',

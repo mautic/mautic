@@ -5,7 +5,7 @@ namespace Mautic\NotificationBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class NotificationPermissions extends AbstractPermissions
+final class NotificationPermissions extends AbstractPermissions
 {
     /**
      * @param mixed[] $params

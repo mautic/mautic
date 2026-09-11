@@ -21,7 +21,7 @@ trait CampaignControllerTrait
     {
         $crawler = $this->client->request('GET', sprintf('/s/campaigns/edit/%s', $campaign->getId()));
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Edit Campaign', $crawler->text());
+        Assert::assertStringContainsString('Edit Campaign', (string) $crawler->text());
 
         return $crawler;
     }

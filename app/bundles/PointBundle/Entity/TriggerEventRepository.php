@@ -26,7 +26,7 @@ class TriggerEventRepository extends CommonRepository
             ->orderBy('a.order,r.points');
 
         // make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q, 'r');
+        $expr = $this->getPublishedByDateOrmExpression($q, 'r');
 
         $expr->add(
             $q->expr()->lte('r.points', (int) $points)
@@ -56,7 +56,7 @@ class TriggerEventRepository extends CommonRepository
             ->orderBy('a.order');
 
         // make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q, 'r');
+        $expr = $this->getPublishedByDateOrmExpression($q, 'r');
 
         $groupsExpr = $q->expr()->orX();
         /** @var GroupContactScore $score */
@@ -91,7 +91,7 @@ class TriggerEventRepository extends CommonRepository
             ->orderBy('e.order');
 
         // make sure the published up and down dates are good
-        $expr = $this->getPublishedByDateExpression($q);
+        $expr = $this->getPublishedByDateOrmExpression($q);
         $expr->add(
             $q->expr()->eq('e.type', ':type')
         );

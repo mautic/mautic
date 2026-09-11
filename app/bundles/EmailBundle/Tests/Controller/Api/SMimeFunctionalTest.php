@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\RawMessage;
 
@@ -46,7 +48,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         yield 'encrypted certificate' => ['encrypted' => true];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('certificateTypeProvider')]
+    #[DataProvider('certificateTypeProvider')]
     public function testSendingSegmentEmailWithSMime(bool $encrypted): void
     {
         if ($encrypted) {
@@ -79,7 +81,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         // Verify all contacts received signed emails
         foreach ($contacts as $contactEmail) {
             $message = $this->getMailerMessagesByToAddress($contactEmail)[0];
-            Assert::assertStringContainsString('Hey '.$contactEmail, $message->toString());
+            $this->assertStringContainsString('Hey '.$contactEmail, $message->toString());
             $this->assertMessageIsSigned($message, 'Test Subject');
         }
     }
@@ -99,12 +101,12 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
         // Assert that emails were sent successfully
-        Assert::assertEquals(1, $response['success']);
-        Assert::assertEquals([$expectedCount, $expectedCount], $response['progress']);
-        Assert::assertEquals(100, $response['percent']);
-        Assert::assertEquals($expectedCount, $response['stats']['sent']);
-        Assert::assertEquals(0, $response['stats']['failed']);
-        Assert::assertEmpty($response['stats']['failedRecipients']);
+        $this->assertEquals(1, $response['success']);
+        $this->assertEquals([$expectedCount, $expectedCount], $response['progress']);
+        $this->assertEquals(100, $response['percent']);
+        $this->assertEquals($expectedCount, $response['stats']['sent']);
+        $this->assertEquals(0, $response['stats']['failed']);
+        $this->assertEmpty($response['stats']['failedRecipients']);
 
         // With sync messenger, emails are sent immediately
         $this->assertEmailCount($expectedCount);
@@ -119,7 +121,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         $privateKeyContent = file_get_contents($privateKeyPath);
 
         // Encrypt it using the EncryptionHelper
-        $encryptionHelper = $this->getContainer()->get(\Mautic\CoreBundle\Helper\EncryptionHelper::class);
+        $encryptionHelper = $this->getContainer()->get(EncryptionHelper::class);
         $encryptedContent = $encryptionHelper->encrypt($privateKeyContent);
 
         // Write the encrypted content to .pem.enc file
@@ -190,9 +192,9 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
     private function assertMessageIsSigned(RawMessage $message, string $expectedSubject): void
     {
         $email = $message->toString();
-        Assert::assertStringContainsString('Subject: '.$expectedSubject, $email);
-        Assert::assertStringContainsString('Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";', $email);
-        Assert::assertSame(1, substr_count($email, 'Content-Disposition: attachment; filename="smime.p7s"'), $email);
-        Assert::assertSame(1, substr_count($email, 'Content-Type: application/x-pkcs7-signature; name="smime.p7s'), $email);
+        $this->assertStringContainsString('Subject: '.$expectedSubject, $email);
+        $this->assertStringContainsString('Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";', $email);
+        $this->assertSame(1, substr_count($email, 'Content-Disposition: attachment; filename="smime.p7s"'), $email);
+        $this->assertSame(1, substr_count($email, 'Content-Type: application/x-pkcs7-signature; name="smime.p7s'), $email);
     }
 }

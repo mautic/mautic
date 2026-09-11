@@ -34,17 +34,9 @@ final class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $doctrine             = $this->createMock(ManagerRegistry::class);
-        $modelFactory         = $this->createMock(ModelFactory::class);
-        $userHelper           = $this->createMock(UserHelper::class);
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $translator           = $this->createMock(Translator::class);
-        $flashBag             = $this->createMock(FlashBag::class);
         $this->requestStack   = new RequestStack();
-        $security             = $this->createMock(CorePermissions::class);
 
-        $this->classFromAbstractFormController = new class($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $this->requestStack, $security) extends AbstractFormController {
+        $this->classFromAbstractFormController = new class($this->createStub(ManagerRegistry::class), $this->createStub(ModelFactory::class), $this->createStub(UserHelper::class), $this->createStub(CoreParametersHelper::class), $this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class), $this->createStub(FlashBag::class), $this->requestStack, $this->createStub(CorePermissions::class)) extends AbstractFormController {
         };
         $this->formMock = $this->createMock(Form::class);
     }

@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -18,7 +19,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_FORMS           = 'forms';
 
@@ -27,13 +28,14 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_FORM_RESULT     = 'form.results';
 
     public function __construct(
-        private readonly CompanyReportData $companyReportData,
-        private readonly SubmissionRepository $submissionRepository,
-        private readonly FormModel $formModel,
-        private readonly ReportHelper $reportHelper,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly TranslatorInterface $translator,
-        private readonly DncReportService $dncReportService,
+        private CompanyReportData $companyReportData,
+        private SubmissionRepository $submissionRepository,
+        private FormModel $formModel,
+        private ReportHelper $reportHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+        private DncReportService $dncReportService,
+        private FormRepository $formRepository,
     ) {
     }
 
@@ -128,12 +130,11 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext(self::CONTEXT_FORM_RESULT)) {
-            $formRepository = $this->formModel->getRepository();
             // select only the table for an existing report, if the setting is disabled
             if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
                 $reportSource = empty($event->getContext()) ? ($event->getReportSource() ?? '') : $event->getContext();
 
-                $id   = $formRepository->getFormTableIdViaResults($reportSource);
+                $id   = $this->formRepository->getFormTableIdViaResults($reportSource);
                 $args = [
                     'filter' => [
                         'force' => [
@@ -147,7 +148,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 ];
             }
 
-            $forms = $formRepository->getEntities($args ?? []);
+            $forms = $this->formRepository->getEntities($args ?? []);
             foreach ($forms as $form) {
                 $formEntity         = $form[0];
 
@@ -165,7 +166,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     'columns'      => $formResultsColumns,
                 ];
 
-                $resultsTableName   = $formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
+                $resultsTableName   = $this->formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
                 $event->addTable(self::CONTEXT_FORM_RESULT.'.'.$resultsTableName, $data, self::CONTEXT_FORM_RESULT);
             }
         }

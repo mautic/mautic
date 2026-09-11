@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\ReportBundle\Entity\ReportRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\CsvExporter;
@@ -63,7 +64,8 @@ final class ReportModelTest extends \PHPUnit\Framework\TestCase
             $translatorMock,
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(RequestStack::class)
+            $this->createStub(RequestStack::class),
+            $this->createStub(ReportRepository::class), // $reportRepository
         );
 
         // Do this to build the initial set of data from the subscribers that get used in all other contexts

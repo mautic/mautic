@@ -23,7 +23,7 @@ final class ThemesExtensionTest extends TestCase
 
     public function testGetBrandPrimaryColor(): void
     {
-        $this->coreParametersHelper->expects($this->any())
+        $this->coreParametersHelper
             ->method('get')
             ->with('primary_brand_color', '000000')
             ->willReturn('123456');
@@ -33,7 +33,7 @@ final class ThemesExtensionTest extends TestCase
 
     public function testGetTextOnBrandColor(): void
     {
-        $this->coreParametersHelper->expects($this->any())
+        $this->coreParametersHelper
             ->method('get')
             ->with('primary_brand_color', '000000')
             ->willReturnOnConsecutiveCalls('000000', 'ffffff');
@@ -48,7 +48,7 @@ final class ThemesExtensionTest extends TestCase
     public function testGetTextOnBrandHelperColor(): void
     {
         // First call: primary color is '000000'
-        $this->coreParametersHelper->expects($this->any())
+        $this->coreParametersHelper
             ->method('get')
             ->with('primary_brand_color', '000000')
             ->willReturnOnConsecutiveCalls('000000', 'ffffff');
@@ -63,7 +63,7 @@ final class ThemesExtensionTest extends TestCase
     public function testGetRoundedCorners(): void
     {
         // First set of assertions: rounded corners set to 8
-        $this->coreParametersHelper->expects($this->any())
+        $this->coreParametersHelper
             ->method('get')
             ->with('rounded_corners', 0)
             ->willReturn(8);
@@ -77,7 +77,7 @@ final class ThemesExtensionTest extends TestCase
         $this->themesExtension      = new ThemesExtension($this->coreParametersHelper);
 
         // Second set of assertions: rounded corners set to 16
-        $this->coreParametersHelper->expects($this->any())
+        $this->coreParametersHelper
             ->method('get')
             ->with('rounded_corners', 0)
             ->willReturn(16);
@@ -91,7 +91,7 @@ final class ThemesExtensionTest extends TestCase
         $this->themesExtension      = new ThemesExtension($this->coreParametersHelper);
 
         // Third set of assertions: rounded corners set to 32
-        $this->coreParametersHelper->expects($this->any())
+        $this->coreParametersHelper
             ->method('get')
             ->with('rounded_corners', 0)
             ->willReturn(32);

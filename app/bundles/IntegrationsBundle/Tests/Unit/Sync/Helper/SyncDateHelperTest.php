@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
 use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class SyncDateHelperTest extends TestCase
@@ -29,7 +28,7 @@ final class SyncDateHelperTest extends TestCase
 
         $this->syncDateHelper->setSyncDateTimes($syncFromDateTime);
 
-        Assert::assertEquals($syncFromDateTime, $this->syncDateHelper->getSyncFromDateTime('Test', 'Object'));
+        $this->assertEquals($syncFromDateTime, $this->syncDateHelper->getSyncFromDateTime('Test', 'Object'));
     }
 
     public function testLastSyncDateForIntegrationSyncObjectIsReturned(): void
@@ -39,7 +38,7 @@ final class SyncDateHelperTest extends TestCase
         $this->syncDateHelper->method('getLastSyncDateForObject')
             ->willReturn($objectLastSyncDate);
 
-        Assert::assertEquals($objectLastSyncDate, $this->syncDateHelper->getSyncFromDateTime('Test', 'Object'));
+        $this->assertEquals($objectLastSyncDate, $this->syncDateHelper->getSyncFromDateTime('Test', 'Object'));
     }
 
     public function testSyncToDateTimeIsReturnedIfSpecified(): void
@@ -48,14 +47,14 @@ final class SyncDateHelperTest extends TestCase
 
         $this->syncDateHelper->setSyncDateTimes(null, $syncToDateTime);
 
-        Assert::assertEquals($syncToDateTime, $this->syncDateHelper->getSyncToDateTime());
+        $this->assertEquals($syncToDateTime, $this->syncDateHelper->getSyncToDateTime());
     }
 
     public function testSyncDateTimeIsReturnedForSyncToDateTimeIfNotSpecified(): void
     {
         $this->syncDateHelper->setSyncDateTimes();
 
-        Assert::assertInstanceOf(\DateTimeImmutable::class, $this->syncDateHelper->getSyncToDateTime());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $this->syncDateHelper->getSyncToDateTime());
     }
 
     public function testThatSetInternalSyncStartDateTimeMethodUsesSyncToDateValueIfItIsEarlier(): void
@@ -66,7 +65,7 @@ final class SyncDateHelperTest extends TestCase
         $this->syncDateHelper->setSyncDateTimes(null, $fiveSecondsBefore);
         $this->syncDateHelper->setInternalSyncStartDateTime();
         $internalSyncStartDateTime = $this->syncDateHelper->getInternalSyncStartDateTime();
-        Assert::assertSame($fiveSecondsBefore->getTimestamp(), $internalSyncStartDateTime->getTimestamp());
+        $this->assertSame($fiveSecondsBefore->getTimestamp(), $internalSyncStartDateTime->getTimestamp());
     }
 
     public function testThatSetInternalSyncStartDateTimeMethodUsesNowIfItIsEarlier(): void
@@ -81,6 +80,6 @@ final class SyncDateHelperTest extends TestCase
         $difference                = $internalSyncStartDateTime->getTimestamp() - $now->getTimestamp();
 
         // Add a 1 second buffer in case there is some delay
-        Assert::assertTrue((1 >= $difference) && (-1 < $difference));
+        $this->assertTrue((1 >= $difference) && (-1 < $difference));
     }
 }

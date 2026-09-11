@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\ProcessSignal\Exception;
 
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalState;
 
-class SignalCaughtException extends \Exception
+final class SignalCaughtException extends \Exception
 {
     public function __construct(
         int $signal,

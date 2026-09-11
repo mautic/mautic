@@ -32,7 +32,7 @@ final class TokenPersistenceFactoryTest extends TestCase
             'expires_at'    => $expiresAt,
         ];
 
-        $this->integration->expects($this->any())
+        $this->integration
             ->method('getApiKeys')
             ->willReturn($apiKeys);
 
@@ -52,7 +52,7 @@ final class TokenPersistenceFactoryTest extends TestCase
             'expires_at'    => $expiresAt,
         ];
 
-        $this->integration->expects($this->any())
+        $this->integration
             ->method('getApiKeys')
             ->willReturn($apiKeys);
 

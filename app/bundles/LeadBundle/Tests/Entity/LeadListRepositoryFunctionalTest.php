@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 
 final class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
@@ -20,7 +21,7 @@ final class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
         $this->createSegmentMember($segmentA, $lead);
         $this->createSegmentMember($segmentB, $lead, true);
 
-        $leadListRepository = $this->em->getRepository(LeadList::class);
+        $leadListRepository = self::getContainer()->get(LeadListRepository::class);
 
         $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentA->getId()]);
         $this->assertTrue($result);

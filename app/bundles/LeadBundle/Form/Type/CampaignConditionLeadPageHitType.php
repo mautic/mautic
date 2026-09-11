@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignConditionLeadPageHitType extends AbstractType
+final class CampaignConditionLeadPageHitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

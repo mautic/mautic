@@ -132,9 +132,9 @@ final class FormApiControllerTest extends MauticMysqlTestCase
 
         // Check that the error mentions the duplicate alias
         if (isset($responseData['error']['message'])) {
-            $this->assertStringContainsString('duplicate_alias', $responseData['error']['message']);
+            $this->assertStringContainsString('duplicate_alias', (string) $responseData['error']['message']);
         } elseif (isset($responseData['errors'][0]['message'])) {
-            $this->assertStringContainsString('duplicate_alias', $responseData['errors'][0]['message']);
+            $this->assertStringContainsString('duplicate_alias', (string) $responseData['errors'][0]['message']);
         }
     }
 
@@ -201,58 +201,54 @@ final class FormApiControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array<mixed>>
+     * @return \Iterator<string, array<mixed>>
      */
-    public static function formDataProvider(): array
+    public static function formDataProvider(): \Iterator
     {
-        return [
-            'simple form' => [
-                [
-                    'name'        => 'Simple Test Form',
-                    'description' => 'A simple test form',
-                ],
-                Response::HTTP_CREATED,
+        yield 'simple form' => [
+            [
+                'name'        => 'Simple Test Form',
+                'description' => 'A simple test form',
             ],
-            'form with fields' => [
-                [
-                    'name'   => 'Form with Fields',
-                    'fields' => [
-                        [
-                            'label' => 'First Name',
-                            'type'  => 'text',
-                            'alias' => 'first_name',
-                        ],
-                        [
-                            'label' => 'Email Address',
-                            'type'  => 'email',
-                            'alias' => 'email',
-                        ],
+            Response::HTTP_CREATED,
+        ];
+        yield 'form with fields' => [
+            [
+                'name'   => 'Form with Fields',
+                'fields' => [
+                    [
+                        'label' => 'First Name',
+                        'type'  => 'text',
+                        'alias' => 'first_name',
+                    ],
+                    [
+                        'label' => 'Email Address',
+                        'type'  => 'email',
+                        'alias' => 'email',
                     ],
                 ],
-                Response::HTTP_CREATED,
             ],
+            Response::HTTP_CREATED,
         ];
     }
 
     /**
-     * @return array<string, array<mixed>>
+     * @return \Iterator<string, array<mixed>>
      */
-    public static function updateFormDataProvider(): array
+    public static function updateFormDataProvider(): \Iterator
     {
-        return [
-            'update name only' => [
-                ['name' => 'Original Form'],
-                ['name' => 'Updated Form Name'],
-            ],
-            'add fields to existing form' => [
-                ['name' => 'Form without fields'],
-                [
-                    'name'   => 'Form with fields',
-                    'fields' => [
-                        [
-                            'label' => 'New Field',
-                            'type'  => 'text',
-                        ],
+        yield 'update name only' => [
+            ['name' => 'Original Form'],
+            ['name' => 'Updated Form Name'],
+        ];
+        yield 'add fields to existing form' => [
+            ['name' => 'Form without fields'],
+            [
+                'name'   => 'Form with fields',
+                'fields' => [
+                    [
+                        'label' => 'New Field',
+                        'type'  => 'text',
                     ],
                 ],
             ],

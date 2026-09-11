@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\NotificationBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\NotificationBundle\Entity\Notification;
 
-class NotificationEvent extends CommonEvent
+final class NotificationEvent extends CommonEvent
 {
     /**
      * @param bool $isNew
