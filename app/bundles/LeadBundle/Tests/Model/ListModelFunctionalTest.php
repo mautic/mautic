@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
 
@@ -139,6 +140,44 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, (int) end($data['datasets'][0]['data'])); // Added for today.
         $this->assertSame(1, (int) end($data['datasets'][1]['data'])); // Removed for today.
         $this->assertSame(0, (int) end($data['datasets'][2]['data'])); // Total for today.
+    }
+
+    public function testManuallyAddContactWhoWasAutomaticallyAddedToSegmentBefore(): void
+    {
+        /** @var ListModel $segmentModel */
+        $segmentModel = self::getContainer()->get(ListModel::class);
+
+        /** @var LeadRepository $contactRepository */
+        $contactRepository = $this->em->getRepository(Lead::class);
+
+        $segment = new LeadList();
+        $segment->setName('Test Segment');
+        $segmentModel->saveEntity($segment);
+
+        $contact = new Lead();
+        $contactRepository->saveEntities([$contact]);
+
+        $segmentModel->addLead($contact, $segment, false);
+
+        $listLead = $this->em->getRepository(ListLead::class)->findOneBy([
+            'lead' => $contact,
+            'list' => $segment,
+        ]);
+        $this->assertInstanceOf(ListLead::class, $listLead);
+        $this->assertFalse($listLead->wasManuallyAdded());
+        $this->assertFalse($listLead->wasManuallyRemoved());
+
+        $segmentModel->addLead($contact, $segment, true);
+
+        $this->em->clear();
+        $listLead = $this->em->getRepository(ListLead::class)->findOneBy([
+            'lead' => $contact,
+            'list' => $segment,
+        ]);
+
+        $this->assertInstanceOf(ListLead::class, $listLead);
+        $this->assertTrue($listLead->wasManuallyAdded());
+        $this->assertFalse($listLead->wasManuallyRemoved());
     }
 
     private function createLeadList(User $user, string $name, bool $isGlobal): LeadList
