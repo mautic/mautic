@@ -21,6 +21,42 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *
      * @throws SegmentQueryException
      */
+    /**
+     * DBAL 4 types the comparison operands as string; DBAL 3 accepted any scalar and
+     * cast it while building the SQL. Segment filters still pass ints and floats
+     * (contact ids, counts, timestamps), so they are cast here rather than at every
+     * call site.
+     */
+    public function eq($x, $y): string
+    {
+        return parent::eq((string) $x, (string) $y);
+    }
+
+    public function neq($x, $y): string
+    {
+        return parent::neq((string) $x, (string) $y);
+    }
+
+    public function lt($x, $y): string
+    {
+        return parent::lt((string) $x, (string) $y);
+    }
+
+    public function lte($x, $y): string
+    {
+        return parent::lte((string) $x, (string) $y);
+    }
+
+    public function gt($x, $y): string
+    {
+        return parent::gt((string) $x, (string) $y);
+    }
+
+    public function gte($x, $y): string
+    {
+        return parent::gte((string) $x, (string) $y);
+    }
+
     public function between($x, $arr): string
     {
         if (!is_array($arr) || 2 !== count($arr)) {

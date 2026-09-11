@@ -8,6 +8,18 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as BaseQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
+/**
+ * Segment query builder.
+ *
+ * DBAL 4 removed the query-part API (getQueryPart()/setQueryPart()/resetQueryPart())
+ * and made the underlying state private, so this class keeps its own record of the
+ * parts and generates the SELECT statement from it.
+ *
+ * That is not merely convenience: the segment engine rewrites joins after they have
+ * been added (addJoinCondition(), replaceJoinCondition()), which DBAL 4 offers no way
+ * to do. The part shapes are kept identical to DBAL 3's so the rest of the segment
+ * code reads them unchanged.
+ */
 class QueryBuilder extends BaseQueryBuilder
 {
     private ?ExpressionBuilder $_expr = null;
@@ -18,6 +30,26 @@ class QueryBuilder extends BaseQueryBuilder
      * @var string[]|CompositeExpression[]
      */
     private array $logicStack = [];
+
+    /**
+     * Mirrors the structure DBAL 3 exposed through getQueryParts().
+     *
+     * @var array{select: string[], distinct: bool, from: array<int, array{table: string, alias: string|null, hint?: string}>, join: array<string, array<int, array{joinType: string, joinTable: string, joinAlias: string, joinCondition: string|null}>>, set: string[], where: string|CompositeExpression|null, groupBy: string[], having: string|CompositeExpression|null, orderBy: string[], values: array<string, mixed>}
+     */
+    private array $queryParts = self::EMPTY_QUERY_PARTS;
+
+    private const array EMPTY_QUERY_PARTS = [
+        'select'   => [],
+        'distinct' => false,
+        'from'     => [],
+        'join'     => [],
+        'set'      => [],
+        'where'    => null,
+        'groupBy'  => [],
+        'having'   => null,
+        'orderBy'  => [],
+        'values'   => [],
+    ];
 
     public function __construct(
         private readonly Connection $connection,
@@ -36,62 +68,251 @@ class QueryBuilder extends BaseQueryBuilder
         return $this->_expr;
     }
 
-    public function setParameter($key, $value, $type = null)
+    public function setParameter($key, $value, $type = null): static
     {
         if (is_bool($value)) {
             $value = (int) $value;
         }
 
-        return parent::setParameter($key, $value, $type);
-    }
-
-    /**
-     * @param string $queryPartName
-     * @param mixed  $value
-     */
-    public function setQueryPart($queryPartName, $value): static
-    {
-        $this->resetQueryPart($queryPartName);
-        $this->add($queryPartName, $value);
+        parent::setParameter($key, $value, $type ?? \Doctrine\DBAL\ParameterType::STRING);
 
         return $this;
     }
 
-    public function getSQL()
+    /**
+     * @return array<string, mixed>
+     */
+    public function getQueryParts(): array
     {
-        $sql   = &$this->parentProperty('sql');
-        $state = &$this->parentProperty('state');
-
-        if (null !== $sql && 1 /* self::STATE_CLEAN */ === $state) {
-            return $sql;
-        }
-
-        $sql = match ($this->getType()) { /** @phpstan-ignore-line this method is deprecated. We'll have to find a way how to refactor this method. */
-            3 /* self::INSERT */ => $this->parentMethod('getSQLForInsert'),
-            1 /* self::DELETE */ => $this->parentMethod('getSQLForDelete'),
-            2 /* self::UPDATE */ => $this->parentMethod('getSQLForUpdate'),
-            default              => $this->getSQLForSelect(),
-        };
-
-        $state = 1 /* self::STATE_CLEAN */;
-
-        return $sql;
+        return $this->queryParts;
     }
 
-    private function getSQLForSelect(): string
+    /**
+     * @return mixed
+     */
+    public function getQueryPart(string $queryPartName)
     {
-        $sqlParts = $this->getQueryParts();
+        return $this->queryParts[$queryPartName] ?? null;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function setQueryPart(string $queryPartName, $value): static
+    {
+        $this->queryParts[$queryPartName] = $value;
+
+        return $this;
+    }
+
+    public function resetQueryPart(string $queryPartName): static
+    {
+        $this->queryParts[$queryPartName] = self::EMPTY_QUERY_PARTS[$queryPartName] ?? null;
+
+        return $this;
+    }
+
+    public function resetQueryParts(?array $queryPartNames = null): static
+    {
+        foreach ($queryPartNames ?? array_keys(self::EMPTY_QUERY_PARTS) as $name) {
+            $this->resetQueryPart($name);
+        }
+
+        return $this;
+    }
+
+    public function select(string ...$expressions): static
+    {
+        $this->queryParts['select'] = $expressions;
+
+        return $this;
+    }
+
+    public function addSelect(string ...$expressions): static
+    {
+        $this->queryParts['select'] = array_merge($this->queryParts['select'], $expressions);
+
+        return $this;
+    }
+
+    public function distinct(bool $distinct = true): static
+    {
+        $this->queryParts['distinct'] = $distinct;
+
+        return $this;
+    }
+
+    public function from(string $table, ?string $alias = null): static
+    {
+        $this->queryParts['from'][] = ['table' => $table, 'alias' => $alias];
+
+        return $this;
+    }
+
+    public function join(string $fromAlias, string $join, string $alias, ?string $condition = null): static
+    {
+        return $this->innerJoin($fromAlias, $join, $alias, $condition);
+    }
+
+    public function innerJoin(string $fromAlias, string $join, string $alias, ?string $condition = null): static
+    {
+        return $this->addJoin('inner', $fromAlias, $join, $alias, $condition);
+    }
+
+    public function leftJoin(string $fromAlias, string $join, string $alias, ?string $condition = null): static
+    {
+        return $this->addJoin('left', $fromAlias, $join, $alias, $condition);
+    }
+
+    public function rightJoin(string $fromAlias, string $join, string $alias, ?string $condition = null): static
+    {
+        return $this->addJoin('right', $fromAlias, $join, $alias, $condition);
+    }
+
+    private function addJoin(string $type, string $fromAlias, string $join, string $alias, ?string $condition): static
+    {
+        $this->queryParts['join'][$fromAlias][] = [
+            'joinType'      => $type,
+            'joinTable'     => $join,
+            'joinAlias'     => $alias,
+            'joinCondition' => $condition,
+        ];
+
+        return $this;
+    }
+
+    public function where(...$predicates): static
+    {
+        $this->queryParts['where'] = 1 === count($predicates) ? $predicates[0] : CompositeExpression::and(...$predicates);
+
+        return $this;
+    }
+
+    public function andWhere(...$predicates): static
+    {
+        $where = $this->queryParts['where'];
+
+        if ($where instanceof CompositeExpression && CompositeExpression::TYPE_AND === $where->getType()) {
+            // Match DBAL: append to an existing composite of the same type rather than
+            // nesting a new one, so the generated SQL keeps the same grouping.
+            $where = $where->with(...$predicates);
+        } elseif (null !== $where) {
+            $where = CompositeExpression::and($where, ...$predicates);
+        } else {
+            $where = 1 === count($predicates) ? $predicates[0] : CompositeExpression::and(...$predicates);
+        }
+
+        $this->queryParts['where'] = $where;
+
+        return $this;
+    }
+
+    public function orWhere(...$predicates): static
+    {
+        $where = $this->queryParts['where'];
+
+        if ($where instanceof CompositeExpression && CompositeExpression::TYPE_OR === $where->getType()) {
+            // Match DBAL: append to an existing composite of the same type rather than
+            // nesting a new one, so the generated SQL keeps the same grouping.
+            $where = $where->with(...$predicates);
+        } elseif (null !== $where) {
+            $where = CompositeExpression::or($where, ...$predicates);
+        } else {
+            $where = 1 === count($predicates) ? $predicates[0] : CompositeExpression::or(...$predicates);
+        }
+
+        $this->queryParts['where'] = $where;
+
+        return $this;
+    }
+
+    public function groupBy(string ...$expressions): static
+    {
+        $this->queryParts['groupBy'] = $expressions;
+
+        return $this;
+    }
+
+    public function addGroupBy(string ...$expressions): static
+    {
+        $this->queryParts['groupBy'] = array_merge($this->queryParts['groupBy'], $expressions);
+
+        return $this;
+    }
+
+    public function having(...$predicates): static
+    {
+        $this->queryParts['having'] = 1 === count($predicates) ? $predicates[0] : CompositeExpression::and(...$predicates);
+
+        return $this;
+    }
+
+    public function andHaving(...$predicates): static
+    {
+        $having = $this->queryParts['having'];
+
+        if ($having instanceof CompositeExpression && CompositeExpression::TYPE_AND === $having->getType()) {
+            // Match DBAL: append to an existing composite of the same type rather than
+            // nesting a new one, so the generated SQL keeps the same grouping.
+            $having = $having->with(...$predicates);
+        } elseif (null !== $having) {
+            $having = CompositeExpression::and($having, ...$predicates);
+        } else {
+            $having = 1 === count($predicates) ? $predicates[0] : CompositeExpression::and(...$predicates);
+        }
+
+        $this->queryParts['having'] = $having;
+
+        return $this;
+    }
+
+    public function orHaving(...$predicates): static
+    {
+        $having = $this->queryParts['having'];
+
+        if ($having instanceof CompositeExpression && CompositeExpression::TYPE_OR === $having->getType()) {
+            // Match DBAL: append to an existing composite of the same type rather than
+            // nesting a new one, so the generated SQL keeps the same grouping.
+            $having = $having->with(...$predicates);
+        } elseif (null !== $having) {
+            $having = CompositeExpression::or($having, ...$predicates);
+        } else {
+            $having = 1 === count($predicates) ? $predicates[0] : CompositeExpression::or(...$predicates);
+        }
+
+        $this->queryParts['having'] = $having;
+
+        return $this;
+    }
+
+    public function orderBy(string $sort, ?string $order = null): static
+    {
+        $this->queryParts['orderBy'] = [$sort.' '.($order ?? 'ASC')];
+
+        return $this;
+    }
+
+    public function addOrderBy(string $sort, ?string $order = null): static
+    {
+        $this->queryParts['orderBy'][] = $sort.' '.($order ?? 'ASC');
+
+        return $this;
+    }
+
+    public function getSQL(): string
+    {
+        $sqlParts = $this->queryParts;
 
         $query = 'SELECT '.($sqlParts['distinct'] ? 'DISTINCT ' : '').
-            implode(', ', $sqlParts['select']);
+            implode(', ', (array) $sqlParts['select']);
 
         $query .= ($sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
-            .(null !== $sqlParts['where'] ? ' WHERE '.($sqlParts['where']) : '')
-            .($sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', $sqlParts['groupBy']) : '')
-            .(null !== $sqlParts['having'] ? ' HAVING '.($sqlParts['having']) : '')
-            .($sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', $sqlParts['orderBy']) : '');
+            .(null !== $sqlParts['where'] ? ' WHERE '.$sqlParts['where'] : '')
+            .($sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', (array) $sqlParts['groupBy']) : '')
+            .(null !== $sqlParts['having'] ? ' HAVING '.$sqlParts['having'] : '')
+            .($sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', (array) $sqlParts['orderBy']) : '');
 
-        if ($this->parentMethod('isLimitQuery')) {
+        if (null !== $this->getMaxResults() || 0 !== $this->getFirstResult()) {
             return $this->connection->getDatabasePlatform()->modifyLimitQuery(
                 $query,
                 $this->getMaxResults(),
@@ -111,7 +332,7 @@ class QueryBuilder extends BaseQueryBuilder
         $knownAliases = [];
 
         // Loop through all FROM clauses
-        foreach ($this->getQueryParts()['from'] as $from) {
+        foreach ($this->queryParts['from'] as $from) {
             if (null === $from['alias']) {
                 $tableSql       = $from['table'];
                 $tableReference = $from['table'];
@@ -126,16 +347,60 @@ class QueryBuilder extends BaseQueryBuilder
 
             $knownAliases[$tableReference] = true;
 
-            $fromClauses[$tableReference] = $tableSql.\Closure::bind(
-                fn ($tableReference, &$knownAliases): string => $this->{'getSQLForJoins'}($tableReference, $knownAliases),
-                $this,
-                parent::class
-            )($tableReference, $knownAliases);
+            $fromClauses[$tableReference] = $tableSql.$this->getSQLForJoins($tableReference, $knownAliases);
         }
 
-        $this->parentMethod('verifyAllAliasesAreKnown', $knownAliases);
+        $this->verifyAllAliasesAreKnown($knownAliases);
 
         return $fromClauses;
+    }
+
+    /**
+     * @param array<string, true> $knownAliases
+     *
+     * @throws QueryException
+     */
+    private function getSQLForJoins(string $fromAlias, array &$knownAliases): string
+    {
+        $sql = '';
+
+        if (!isset($this->queryParts['join'][$fromAlias])) {
+            return $sql;
+        }
+
+        foreach ($this->queryParts['join'][$fromAlias] as $join) {
+            if (array_key_exists($join['joinAlias'], $knownAliases)) {
+                throw QueryException::nonUniqueAlias($join['joinAlias'], array_keys($knownAliases));
+            }
+
+            $sql .= ' '.strtoupper($join['joinType']).' JOIN '.$join['joinTable'].' '.$join['joinAlias'];
+
+            if (null !== $join['joinCondition']) {
+                $sql .= ' ON '.$join['joinCondition'];
+            }
+
+            $knownAliases[$join['joinAlias']] = true;
+        }
+
+        foreach ($this->queryParts['join'][$fromAlias] as $join) {
+            $sql .= $this->getSQLForJoins($join['joinAlias'], $knownAliases);
+        }
+
+        return $sql;
+    }
+
+    /**
+     * @param array<string, true> $knownAliases
+     *
+     * @throws QueryException
+     */
+    private function verifyAllAliasesAreKnown(array $knownAliases): void
+    {
+        foreach ($this->queryParts['join'] as $fromAlias => $joins) {
+            if (!isset($knownAliases[$fromAlias])) {
+                throw QueryException::unknownAlias($fromAlias, array_keys($knownAliases));
+            }
+        }
     }
 
     public function getJoinCondition(string $alias): string|false
@@ -416,25 +681,5 @@ class QueryBuilder extends BaseQueryBuilder
     public function createQueryBuilder(?Connection $connection = null): self
     {
         return new self($connection ?: $this->connection);
-    }
-
-    /**
-     * @return mixed
-     *
-     * @noinspection PhpPassByRefInspection
-     */
-    private function &parentProperty(string $property)
-    {
-        return \Closure::bind(fn &() => $this->{$property}, $this, parent::class)();
-    }
-
-    /**
-     * @param mixed ...$arguments
-     *
-     * @return mixed
-     */
-    private function parentMethod(string $method, ...$arguments)
-    {
-        return \Closure::bind(fn () => $this->{$method}(...$arguments), $this, parent::class)();
     }
 }
