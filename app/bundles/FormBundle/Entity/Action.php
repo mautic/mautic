@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 
 #[ApiResource(
     operations: [
@@ -35,6 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent('form')]
 class Action implements UuidInterface
 {
     use UuidTrait;
@@ -118,7 +120,6 @@ class Action implements UuidInterface
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('actions')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
             ->build();
 
         static::addUuidField($builder);

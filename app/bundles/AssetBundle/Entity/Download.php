@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 
 #[ApiResource(
     operations: [
@@ -28,6 +29,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent('asset')]
 class Download
 {
     public const TABLE_NAME = 'asset_downloads';
@@ -120,7 +122,6 @@ class Download
 
         $builder->createManyToOne('asset', 'Asset')
             ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
-            ->isOwnershipParent()
             ->build();
 
         $builder->addIpAddress(true);

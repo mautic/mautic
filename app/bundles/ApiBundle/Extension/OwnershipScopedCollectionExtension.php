@@ -9,6 +9,7 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -149,11 +150,11 @@ final readonly class OwnershipScopedCollectionExtension implements QueryCollecti
      * Strategy:
      * 1. Check if entity has direct owner field (like Lead/Company)
      * 2. Otherwise check for direct createdBy field
-     * 3. For child entities with getPermissionUser(), check for association marked with isOwnershipParent
+     * 3. For child entities with getPermissionUser(), follow the #[OwnershipParent] association
      * 4. Otherwise skip filtering (no ownership field defined)
      *
      * Child entities that delegate permission checks should mark the parent association:
-     *   $builder->createManyToOne('parent', 'ParentEntity')->isOwnershipParent()->build();
+     *   #[OwnershipParent('parent')] on the entity class
      *
      * @return array{0: string, 1: bool}|null Returns [field path, uses owner field] or null if not applicable
      */
@@ -173,34 +174,56 @@ final readonly class OwnershipScopedCollectionExtension implements QueryCollecti
             return [sprintf('%s.createdBy', $rootAlias), false];
         }
 
-        // For entities without direct ownership field, check if any association is marked as ownership parent
-        // Child entities mark this in their metadata with ->isOwnershipParent() in loadMetadata()
-        foreach ($metadata->getAssociationNames() as $associationName) {
-            $associationMapping = $metadata->getAssociationMapping($associationName);
-            if (isset($associationMapping['isOwnershipParent']) && $associationMapping['isOwnershipParent']) {
-                $targetClass    = $metadata->getAssociationTargetClass($associationName);
-                /** @phpstan-var class-string $targetClass */
-                $targetMetadata = $this->entityManager->getClassMetadata($targetClass);
+        // For entities without a direct ownership field, follow the association marked
+        // by #[OwnershipParent] on the entity class.
+        $associationName = self::getOwnershipParentAssociation($resourceClass);
+        if (null !== $associationName && $metadata->hasAssociation($associationName)) {
+            $targetClass    = $metadata->getAssociationTargetClass($associationName);
+            /** @phpstan-var class-string $targetClass */
+            $targetMetadata = $this->entityManager->getClassMetadata($targetClass);
 
-                // Check parent's ownership field (prefer owner over createdBy)
-                if ($targetMetadata->hasField('owner') || $targetMetadata->hasAssociation('owner')) {
-                    $parentAlias = $associationName.'_ownership';
-                    $queryBuilder->leftJoin(sprintf('%s.%s', $rootAlias, $associationName), $parentAlias);
+            // Check parent's ownership field (prefer owner over createdBy)
+            if ($targetMetadata->hasField('owner') || $targetMetadata->hasAssociation('owner')) {
+                $parentAlias = $associationName.'_ownership';
+                $queryBuilder->leftJoin(sprintf('%s.%s', $rootAlias, $associationName), $parentAlias);
 
-                    return [sprintf('%s.owner', $parentAlias), true];
-                }
+                return [sprintf('%s.owner', $parentAlias), true];
+            }
 
-                if ($targetMetadata->hasField('createdBy') || $targetMetadata->hasAssociation('createdBy')) {
-                    $parentAlias = $associationName.'_ownership';
-                    $queryBuilder->leftJoin(sprintf('%s.%s', $rootAlias, $associationName), $parentAlias);
+            if ($targetMetadata->hasField('createdBy') || $targetMetadata->hasAssociation('createdBy')) {
+                $parentAlias = $associationName.'_ownership';
+                $queryBuilder->leftJoin(sprintf('%s.%s', $rootAlias, $associationName), $parentAlias);
 
-                    return [sprintf('%s.createdBy', $parentAlias), false];
-                }
+                return [sprintf('%s.createdBy', $parentAlias), false];
             }
         }
 
         // Cannot determine ownership automatically - skip filtering for safety
         return null;
+    }
+
+    /**
+     * Resolves the association named by #[OwnershipParent] on the entity class, if any.
+     *
+     * Reflection runs once per class; the result (including "no attribute") is memoised for
+     * the life of the process, as it cannot change at runtime. The cache is a method-local
+     * static rather than a property because this class is readonly.
+     */
+    private static function getOwnershipParentAssociation(string $resourceClass): ?string
+    {
+        /** @var array<class-string, string|null> $cache */
+        static $cache = [];
+
+        /** @phpstan-var class-string $resourceClass */
+        if (array_key_exists($resourceClass, $cache)) {
+            return $cache[$resourceClass];
+        }
+
+        $attributes = (new \ReflectionClass($resourceClass))->getAttributes(OwnershipParent::class);
+
+        return $cache[$resourceClass] = ([] === $attributes)
+            ? null
+            : $attributes[0]->newInstance()->association;
     }
 
     /**

@@ -16,6 +16,12 @@ use Doctrine\DBAL\Types\Type;
  */
 final class ArrayType extends Type
 {
+    /**
+     * DBAL 4 removed Doctrine's Types::ARRAY along with the built-in type; entity mappings
+     * still refer to the 'array' type name this class is registered under.
+     */
+    public const string ARRAY = 'array';
+
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
         return $platform->getClobTypeDeclarationSQL($column);

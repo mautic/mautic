@@ -12,8 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Adds Mautic's shared column conventions on top of Doctrine's builder, and
- * returns Mautic's AssociationBuilder so entities can use isPrimaryKey() and
- * isOwnershipParent().
+ * returns Mautic's AssociationBuilder so entities can use isPrimaryKey().
  */
 final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 {
