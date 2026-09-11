@@ -37,14 +37,20 @@ final class GenerateProductionAssetsCommand extends Command
         private readonly TranslatorInterface $translator,
         private readonly Filesystem $filesystem,
     ) {
+        var_dump(-1);
+
         parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        var_dump(0);
+
         $mediaDir  = $this->pathsHelper->getSystemPath('media', true);
         $assetsDir = $this->pathsHelper->getSystemPath('assets', true);
         $vendorDir = $this->pathsHelper->getVendorRootPath();
+
+        var_dump(1);
 
         $relativeMediaPath = Path::makeRelative($mediaDir, $vendorDir);
 
@@ -56,6 +62,9 @@ final class GenerateProductionAssetsCommand extends Command
             return Command::FAILURE;
         }
 
+        var_dump(2);
+
+
         $ckeditorFile = $mediaDir.'/libraries/ckeditor/ckeditor.js';
         if (!$this->filesystem->exists($ckeditorFile)) {
             $output->writeln('<error>'.$this->translator->trans("{$ckeditorFile} does not exist. Execute `npm install` to generate it.").'</error>');
@@ -63,11 +72,16 @@ final class GenerateProductionAssetsCommand extends Command
             return Command::FAILURE;
         }
 
+        var_dump(3);
+
+
         foreach ([
             'sass:build'        => [],
             'importmap:install' => ['--no-interaction' => true],
             'asset-map:compile' => [],
         ] as $commandName => $arguments) {
+            var_dump(4 . ' ' . $commandName);
+
             if (Command::SUCCESS !== $this->runConsoleCommand($commandName, $arguments, $output)) {
                 $output->writeln('<error>'.$this->translator->trans("The {$commandName} command failed. Generating production assets was not successful.").'</error>');
 
@@ -75,13 +89,24 @@ final class GenerateProductionAssetsCommand extends Command
             }
         }
 
+        var_dump(5);
+
         $this->installElFinderAssets($relativeMediaPath);
+
+        var_dump(6);
 
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
+
+        var_dump(7);
+
         $this->ensureStylesheetCompatibilityFiles($mediaDir, $vendorDir);
 
+        var_dump(8);
+
         $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
+
+        var_dump(9);
 
         foreach (['mediaelementplayer', 'modal'] as $css_file) {
             $minifier = new Minify\CSS($assetsDir.'/css/'.$css_file.'.css');

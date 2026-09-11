@@ -14,8 +14,7 @@ class CoreParametersHelper
     public function __construct(
         private readonly ParameterBagInterface $symfonyParameterBag,
     ) {
-        $loader = new ParameterLoader();
-        $this->parameters = $loader->getParameterBag();
+        $this->parameters = new ParameterLoader()->getParameterBag();
 
         $this->resolveParameters();
     }

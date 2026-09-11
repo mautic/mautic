@@ -19,7 +19,7 @@ final class CoreParametersHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerInterface::class);
+        $this->parameter = $this->createMock(ContainerInterface::class);
     }
 
     public function testAllReturnsResolvedParameters(): void
