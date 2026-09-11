@@ -15,7 +15,7 @@ class StatDevice
     public const TABLE_NAME = 'email_stats_devices';
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

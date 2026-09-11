@@ -20,7 +20,7 @@ class LeadEventLog
     public const INDEX_SEARCH = 'IDX_SEARCH';
 
     /**
-     * @var string
+     * @var int|string
      */
     protected $id;
 

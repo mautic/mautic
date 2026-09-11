@@ -16,7 +16,7 @@ class Submission
     public const TABLE_NAME = 'form_submissions';
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 
