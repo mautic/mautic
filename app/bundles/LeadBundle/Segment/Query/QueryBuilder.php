@@ -121,18 +121,96 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    public function select(string ...$expressions): static
+    /**
+     * SELECT is generated here; the other statement types are left to DBAL, which still
+     * builds them from its own state.
+     */
+    private string $statementType = 'select';
+
+    public function insert(string $table): static
     {
-        $this->queryParts['select'] = $expressions;
+        $this->statementType = 'insert';
+        parent::insert($table);
 
         return $this;
     }
 
-    public function addSelect(string ...$expressions): static
+    public function update(string $table): static
     {
-        $this->queryParts['select'] = array_merge($this->queryParts['select'], $expressions);
+        $this->statementType = 'update';
+        parent::update($table);
 
         return $this;
+    }
+
+    public function delete(string $table): static
+    {
+        $this->statementType = 'delete';
+        parent::delete($table);
+
+        return $this;
+    }
+
+    /**
+     * Compatibility shim for DBAL 3's add(), which Mautic uses to attach index hints to a
+     * FROM clause - something the fluent API has never been able to express and DBAL 4
+     * removed along with the rest of the query-part API.
+     *
+     * @param mixed $value
+     */
+    public function add(string $sqlPartName, $value, bool $append = false): static
+    {
+        if (!$append) {
+            $this->queryParts[$sqlPartName] = $value;
+
+            return $this;
+        }
+
+        if (is_array($this->queryParts[$sqlPartName] ?? null)) {
+            $this->queryParts[$sqlPartName][] = $value;
+        } else {
+            $this->queryParts[$sqlPartName] = [$value];
+        }
+
+        return $this;
+    }
+
+    /**
+     * DBAL 3 accepted either a variadic list or a single array; segment code still passes
+     * arrays, so both are flattened here.
+     */
+    public function select(...$expressions): static
+    {
+        $this->queryParts['select'] = self::flatten($expressions);
+
+        return $this;
+    }
+
+    public function addSelect(...$expressions): static
+    {
+        $this->queryParts['select'] = array_merge($this->queryParts['select'], self::flatten($expressions));
+
+        return $this;
+    }
+
+    /**
+     * @param array<mixed> $expressions
+     *
+     * @return string[]
+     */
+    private static function flatten(array $expressions): array
+    {
+        $flat = [];
+
+        foreach ($expressions as $expression) {
+            if (is_array($expression)) {
+                $flat = array_merge($flat, array_map(strval(...), $expression));
+            } else {
+                $flat[] = (string) $expression;
+            }
+        }
+
+        return $flat;
     }
 
     public function distinct(bool $distinct = true): static
@@ -185,6 +263,11 @@ class QueryBuilder extends BaseQueryBuilder
     {
         $this->queryParts['where'] = 1 === count($predicates) ? $predicates[0] : CompositeExpression::and(...$predicates);
 
+
+        // Keep DBAL's own state in step: it still builds UPDATE and DELETE.
+        if (null !== $this->queryParts['where']) {
+            parent::where($this->queryParts['where']);
+        }
         return $this;
     }
 
@@ -204,6 +287,11 @@ class QueryBuilder extends BaseQueryBuilder
 
         $this->queryParts['where'] = $where;
 
+
+        // Keep DBAL's own state in step: it still builds UPDATE and DELETE.
+        if (null !== $this->queryParts['where']) {
+            parent::where($this->queryParts['where']);
+        }
         return $this;
     }
 
@@ -223,19 +311,24 @@ class QueryBuilder extends BaseQueryBuilder
 
         $this->queryParts['where'] = $where;
 
+
+        // Keep DBAL's own state in step: it still builds UPDATE and DELETE.
+        if (null !== $this->queryParts['where']) {
+            parent::where($this->queryParts['where']);
+        }
         return $this;
     }
 
-    public function groupBy(string ...$expressions): static
+    public function groupBy(...$expressions): static
     {
-        $this->queryParts['groupBy'] = $expressions;
+        $this->queryParts['groupBy'] = self::flatten($expressions);
 
         return $this;
     }
 
-    public function addGroupBy(string ...$expressions): static
+    public function addGroupBy(...$expressions): static
     {
-        $this->queryParts['groupBy'] = array_merge($this->queryParts['groupBy'], $expressions);
+        $this->queryParts['groupBy'] = array_merge($this->queryParts['groupBy'], self::flatten($expressions));
 
         return $this;
     }
@@ -301,6 +394,10 @@ class QueryBuilder extends BaseQueryBuilder
 
     public function getSQL(): string
     {
+        if ('select' !== $this->statementType) {
+            return parent::getSQL();
+        }
+
         $sqlParts = $this->queryParts;
 
         $query = 'SELECT '.($sqlParts['distinct'] ? 'DISTINCT ' : '').
@@ -671,7 +768,7 @@ class QueryBuilder extends BaseQueryBuilder
     public function applyStackLogic(): static
     {
         if ($this->hasLogicStack()) {
-            $stackGroupExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack());
+            $stackGroupExpression = CompositeExpression::and(...$this->popLogicStack());
             $this->orWhere($stackGroupExpression);
         }
 
