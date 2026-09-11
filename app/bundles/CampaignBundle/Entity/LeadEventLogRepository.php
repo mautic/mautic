@@ -117,7 +117,7 @@ class LeadEventLogRepository extends CommonRepository
                     $query->expr()->or(
                         $query->expr()->eq('ll.is_scheduled', ':scheduled'),
                         $query->expr()->and(
-                            $query->expr()->eq('ll.is_scheduled', 0),
+                            $query->expr()->eq('ll.is_scheduled', '0'),
                             $query->expr()->isNull('ll.date_triggered')
                         )
                     )
@@ -519,14 +519,14 @@ class LeadEventLogRepository extends CommonRepository
         return $events;
     }
 
-    public function getDatesExecuted(string $eventId, array $contactIds): array
+    public function getDatesExecuted(int $eventId, array $contactIds): array
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
         $qb->select('log.lead_id, log.date_triggered, log.is_scheduled')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('log.event_id', $eventId),
+                    $qb->expr()->eq('log.event_id', (string) $eventId),
                     $qb->expr()->in('log.lead_id', ':contactIds')
                 )
             )
