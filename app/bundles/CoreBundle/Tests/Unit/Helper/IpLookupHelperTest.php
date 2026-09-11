@@ -164,6 +164,52 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
+    #[TestDox('Check that explicit actions bypass the GPC header')]
+    public function testIsRequestTrackableBypassesGpcForExplicitAction(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('Sec-GPC', '1');
+
+        $result = $this->getIpHelper($request)->isRequestTrackable(true);
+
+        $this->assertTrue($result);
+    }
+
+    #[TestDox('Check that explicit actions bypass the DNT header')]
+    public function testIsRequestTrackableBypassesDntForExplicitAction(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('DNT', '1');
+
+        $result = $this->getIpHelper($request)->isRequestTrackable(true);
+
+        $this->assertTrue($result);
+    }
+
+    #[TestDox('Check that explicit actions still respect the HEAD method')]
+    public function testIsRequestTrackableStillBlocksHeadForExplicitAction(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('Sec-GPC', '1');
+        $request->setMethod('HEAD');
+
+        $result = $this->getIpHelper($request)->isRequestTrackable(true);
+
+        $this->assertFalse($result);
+    }
+
+    #[TestDox('Check that explicit actions still respect prefetch headers')]
+    public function testIsRequestTrackableStillBlocksPrefetchForExplicitAction(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('DNT', '1');
+        $request->headers->set('Purpose', 'prefetch');
+
+        $result = $this->getIpHelper($request)->isRequestTrackable(true);
+
+        $this->assertFalse($result);
+    }
+
     #[TestDox('Check that normal requests are trackable')]
     public function testIsRequestTrackableReturnsTrueForNormalRequest(): void
     {
