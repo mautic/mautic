@@ -177,6 +177,17 @@ final class LeadType extends AbstractType
                 [
                     'apply_text' => false,
                     'save_text'  => 'mautic.core.form.save',
+                    'post_extra_buttons' => [
+                        [
+                            'name'  => 'save_and_new',
+                            'label' => 'mautic.lead.lead.save_and_new',
+                            'type'  => true,
+                            'attr'  => [
+                                'class' => 'btn btn-secondary btn-save-and-new',
+                                'icon'  => 'ri-add-line',
+                            ],
+                        ],
+                    ],
                 ]
             );
         }
