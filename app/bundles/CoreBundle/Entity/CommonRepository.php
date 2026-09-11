@@ -444,22 +444,23 @@ class CommonRepository extends ServiceEntityRepository
         $parameter = [];
 
         if (isset($filter['group'])) {
-            $expr = $q->expr()->orX();
+            $orParts = [];
             foreach ($filter['group'] as $orGroup) {
-                $groupExpr = $q->expr()->andX();
+                $andParts = [];
                 foreach ($orGroup as $subFilter) {
                     [$subExpr, $subParameters] = $this->getFilterExpr($q, $subFilter);
 
-                            $groupExpr->add($subExpr);
+                    $this->appendExpression($andParts, $subExpr);
                     if (!empty($subParameters)) {
                         $parameter = array_merge($parameter, $subParameters);
                     }
                 }
-                    $expr->add($groupExpr);
+                $this->appendExpression($orParts, $this->createCompositeExpression($q, 'and', $andParts));
             }
+            $expr = $this->createCompositeExpression($q, 'or', $orParts);
         } elseif (str_contains($filter['column'], ',')) {
             $columns      = explode(',', $filter['column']);
-            $expr         = $q->expr()->orX();
+            $orParts      = [];
             $setParameter = false;
             foreach ($columns as $c) {
                 $subFilter           = $filter;
@@ -471,8 +472,9 @@ class CommonRepository extends ServiceEntityRepository
                     $setParameter = true;
                 }
 
-                    $expr->add($subExpr);
+                $this->appendExpression($orParts, $subExpr);
             }
+            $expr = $this->createCompositeExpression($q, 'or', $orParts);
             if ($setParameter) {
                 $parameter = [$unique => $filter['value']];
             }
@@ -1076,19 +1078,19 @@ class CommonRepository extends ServiceEntityRepository
         $unique = $this->generateRandomParameterName(); // ensure that the string has a unique parameter identifier
         $string = ($filter->strict) ? $filter->string : "{$filter->string}";
         if ($filter->not) {
-            $xFunc    = 'andX';
+            $type     = 'and';
             $exprFunc = 'notLike';
         } else {
-            $xFunc    = 'orX';
+            $type     = 'or';
             $exprFunc = 'like';
         }
-        $expr = $q->expr()->{$xFunc}();
 
+        $parts = [];
         foreach ($columns as $column) {
-            $expr->add(
-                $q->expr()->{$exprFunc}($column, ":{$unique}")
-            );
+            $parts[] = $q->expr()->{$exprFunc}($column, ":{$unique}");
         }
+
+        $expr = $this->createCompositeExpression($q, $type, $parts);
 
         return [
             $expr,
@@ -1131,30 +1133,25 @@ class CommonRepository extends ServiceEntityRepository
             }
         }
 
-        $ormQb = true;
+        $ormQb = $q instanceof QueryBuilder;
 
-        if ($q instanceof QueryBuilder) {
-            $xFunc    = 'orX';
+        if ($ormQb || !$filter->not) {
+            $type     = 'or';
             $exprFunc = 'like';
         } else {
-            $ormQb = false;
-            if ($filter->not) {
-                $xFunc    = 'andX';
-                $exprFunc = 'notLike';
-            } else {
-                $xFunc    = 'orX';
-                $exprFunc = 'like';
-            }
+            // DBAL's expression builder has no not(), so the negation is carried by the comparison
+            $type     = 'and';
+            $exprFunc = 'notLike';
         }
 
-        $expr = $q->expr()->{$xFunc}();
+        $parts = [];
         foreach ($columns as $col) {
-            $expr->add(
-                $q->expr()->{$exprFunc}($col, ":{$unique}")
-            );
+            $parts[] = $q->expr()->{$exprFunc}($col, ":{$unique}");
         }
 
-        if ($filter->not) {
+        $expr = $this->createCompositeExpression($q, $type, $parts);
+
+        if ($ormQb && $filter->not) {
             $expr = $q->expr()->not($expr);
         }
 
@@ -1191,10 +1188,10 @@ class CommonRepository extends ServiceEntityRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized', [], null, 'en_US'):
-                $expr = $queryBuilder->expr()->orX(
+                $expr = $this->createCompositeExpression($queryBuilder, 'or', [
                     $queryBuilder->expr()->isNull("{$prefix}.category"),
-                    $queryBuilder->expr()->eq("{$prefix}.category", $queryBuilder->expr()->literal(''))
-                );
+                    $queryBuilder->expr()->eq("{$prefix}.category", $queryBuilder->expr()->literal('')),
+                ]);
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
@@ -1549,7 +1546,7 @@ class CommonRepository extends ServiceEntityRepository
                         // defined columns with keys of column, expr, value
                         foreach ($criteria as $criterion) {
                             if ($criterion instanceof Query\Expr || $criterion instanceof CompositeExpression) {
-                                                    $queryExpressionParts[] = $criterion;
+                                $queryExpressionParts[] = $criterion;
 
                                 if (isset($criterion->parameters) && is_array($criterion->parameters)) {
                                     $queryParameters = array_merge($queryParameters, $criterion->parameters);
@@ -1557,7 +1554,7 @@ class CommonRepository extends ServiceEntityRepository
                                 }
                             } elseif (is_array($criterion)) {
                                 [$expr, $parameters] = $this->getFilterExpr($q, $criterion);
-                                                    $queryExpressionParts[] = $expr;
+                                $this->appendExpression($queryExpressionParts, $expr);
                                 if (is_array($parameters)) {
                                     $queryParameters = array_merge($queryParameters, $parameters);
                                 }
@@ -1619,31 +1616,53 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected function buildWhereClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses, $expr = null)
     {
+        $parts = $this->buildWhereClausePartsFromArray($query, $clauses);
+
+        if (null === $expr) {
+            foreach ($parts as $part) {
+                $query->andWhere($part);
+            }
+
+            return;
+        }
+
+        // An ORM composite handed in by a caller. DBAL's is immutable, so it never arrives here.
+        foreach ($parts as $part) {
+            $expr->add($part);
+        }
+    }
+
+    /**
+     * Turns the clauses into expressions rather than applying them, so a composite can be
+     * built from the finished list - DBAL 4's is immutable and cannot be added to.
+     *
+     * @param array<int|string, mixed> $clauses
+     *
+     * @return array<int, mixed>
+     */
+    private function buildWhereClausePartsFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses): array
+    {
+        $parts       = [];
         $columnValue = ['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'like', 'notLike', 'in', 'notIn', 'between', 'notBetween'];
         $justColumn  = ['isNull', 'isNotNull', 'isEmpty', 'isNotEmpty'];
         $andOr       = ['andX', 'orX'];
 
         foreach ($clauses as $clause) {
             if (!empty($clause['internal']) && 'formula' === $clause['expr']) {
-                $whereClause = array_key_exists('value', $clause) ? $clause['value'] : $clause['val'];
-                if ($expr) {
-                    $expr->add($whereClause);
-                } else {
-                    $query->andWhere($whereClause);
-                }
+                $parts[] = array_key_exists('value', $clause) ? $clause['value'] : $clause['val'];
 
                 continue;
             }
 
             if (in_array($clause['expr'], $andOr)) {
-                $composite = $query->expr()->{$clause['expr']}();
-                $this->buildWhereClauseFromArray($query, $clause['val'], $composite);
-
-                if (null === $expr) {
-                    $query->andWhere($composite);
-                } else {
-                    $expr->add($composite);
-                }
+                $this->appendExpression(
+                    $parts,
+                    $this->createCompositeExpression(
+                        $query,
+                        'andX' === $clause['expr'] ? 'and' : 'or',
+                        $this->buildWhereClausePartsFromArray($query, $clause['val'])
+                    )
+                );
             } else {
                 $clause = $this->validateWhereClause($clause);
                 $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
@@ -1665,15 +1684,15 @@ class CommonRepository extends ServiceEntityRepository
                     case 'isEmpty':
                     case 'isNotEmpty':
                         if ('isEmpty' === $clause['expr']) {
-                            $whereClause = $query->expr()->orX(
+                            $whereClause = $this->createCompositeExpression($query, 'or', [
                                 $query->expr()->eq($column, $query->expr()->literal('')),
-                                $query->expr()->isNull($column)
-                            );
+                                $query->expr()->isNull($column),
+                            ]);
                         } else {
-                            $whereClause = $query->expr()->andX(
+                            $whereClause = $this->createCompositeExpression($query, 'and', [
                                 $query->expr()->neq($column, $query->expr()->literal('')),
-                                $query->expr()->isNotNull($column)
-                            );
+                                $query->expr()->isNotNull($column),
+                            ]);
                         }
                         break;
                     case 'in':
@@ -1705,14 +1724,12 @@ class CommonRepository extends ServiceEntityRepository
                 }
 
                 if ($whereClause) {
-                    if ($expr) {
-                        $expr->add($whereClause);
-                    } else {
-                        $query->andWhere($whereClause);
-                    }
+                    $parts[] = $whereClause;
                 }
             }
         }
+
+        return $parts;
     }
 
     /**
