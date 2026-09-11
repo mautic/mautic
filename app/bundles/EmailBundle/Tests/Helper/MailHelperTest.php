@@ -608,6 +608,45 @@ final class MailHelperTest extends TestCase
         $this->assertEquals('replytooverride@nowhere.com', $replyTo);
     }
 
+    #[DataProvider('emailReplyToProvider')]
+    public function testEmailReplyTo(string $expected, ?string $configFrom = null, ?string $configReplyTo = null, ?string $advancedFrom = null, ?string $advancedReplyTo = null): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
+            ['mailer_from_email', null, $configFrom],
+            ['mailer_from_name', null, 'No Body'],
+            ['mailer_reply_to_email', null, $configReplyTo],
+            ['mailer_address_length_limit', null, 320],
+        ]);
+
+        $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
+        $email  = new Email();
+
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+        $email->setFromAddress($advancedFrom);
+        $email->setReplyToAddress($advancedReplyTo);
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
+        $this->assertSame($expected, $replyTo);
+    }
+
+    /**
+     * @return \Iterator<string, array<int, (string | null)>>
+     */
+    public static function emailReplyToProvider(): \Iterator
+    {
+        $systemFromAddress    = 'system.from@nowhere.com';
+        $systemReplyAddress   = 'system.reply@nowhere.com';
+        $advancedFromAddress  = 'advanced.from@nowhere.com';
+        $advancedReplyAddress = 'advanced.reply@nowhere.com';
+        yield 'Default to system from address' => [$systemFromAddress, $systemFromAddress];
+        yield 'Prefer system reply to address over system from address' => [$systemReplyAddress, $systemFromAddress, $systemReplyAddress];
+        yield 'Prefer advanced from address over system reply to address' => [$advancedFromAddress, $systemFromAddress, $systemReplyAddress, $advancedFromAddress];
+        yield 'Prefer advanced reply address over advanced from address' => [$advancedReplyAddress, $systemFromAddress, $systemReplyAddress, $advancedFromAddress, $advancedReplyAddress];
+    }
+
     public function testEmailReplyToWithFromEmail(): void
     {
         $this->coreParametersHelper->method('get')->willReturnMap($this->defaultParams);
@@ -645,7 +684,7 @@ final class MailHelperTest extends TestCase
         $mailer->send();
         $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
         // Expect from address in reply to
-        $this->assertEquals('admin@mautic.com', $replyTo);
+        $this->assertEquals('from@nowhere.com', $replyTo);
     }
 
     public function testStandardOwnerAsMailer(): void
