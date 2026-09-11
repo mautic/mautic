@@ -257,7 +257,9 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'type'       => 'lead.stages',
                 'properties' => [
                     'type'   => 'lead.stages',
-                    'stages' => [0 => '1'],
+                    // The created stage's id, not a hard-coded 1: auto-increment does not
+                    // restart per test now that the cleanup transaction is off.
+                    'stages' => [0 => (string) $stageIds[0]],
                 ],
             ]);
 
