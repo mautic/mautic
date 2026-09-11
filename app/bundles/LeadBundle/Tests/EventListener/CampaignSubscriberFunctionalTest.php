@@ -88,11 +88,9 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        if ('testUpdatesContactCampaignActionWithBooleanFields' === $this->name()) {
-        } else {
-            $this->useCleanupRollback = true;
-        }
-
+        // The cleanup transaction stays off for every test here: they create custom field
+        // columns, and DDL makes MySQL commit the open transaction, which then fails the
+        // ORM's own commit under ORM 3.
         parent::setUp();
 
         $this->contactRepository = self::getContainer()->get(LeadRepository::class);
