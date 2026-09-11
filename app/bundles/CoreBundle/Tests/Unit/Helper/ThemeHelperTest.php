@@ -164,6 +164,91 @@ final class ThemeHelperTest extends TestCase
         $fs->remove(__DIR__.'/resource/themes/good-tmp');
     }
 
+    public function testFormStyleOnlyThemeIsInstalled(): void
+    {
+        $fs      = new Filesystem();
+        $zipPath = __DIR__.'/resource/themes/form-style-only.zip';
+
+        $archive = new \ZipArchive();
+        $result  = $archive->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        self::assertTrue($result, 'Expected test archive to be created successfully.');
+
+        $archive->addEmptyDir('html');
+        $archive->addEmptyDir('html/MauticFormBundle');
+        $archive->addEmptyDir('html/MauticFormBundle/Builder');
+        $archive->addFromString('config.json', json_encode([
+            'name'     => 'form-style-only',
+            'author'   => 'Test theme',
+            'features' => ['form'],
+        ], JSON_THROW_ON_ERROR));
+        $archive->addFromString('html/MauticFormBundle/Builder/_style.html.twig', '.test-form-style-only { color: red; }');
+        $archive->close();
+
+        $this->pathsHelper->method('getSystemPath')
+            ->with('themes', true)
+            ->willReturn(__DIR__.'/resource/themes');
+
+        try {
+            $this->themeHelper->install($zipPath);
+
+            $this->assertFileExists(__DIR__.'/resource/themes/form-style-only/config.json');
+            $this->assertFileExists(__DIR__.'/resource/themes/form-style-only/html/MauticFormBundle/Builder/_style.html.twig');
+        } finally {
+            $fs->remove(__DIR__.'/resource/themes/form-style-only');
+            if (file_exists($zipPath)) {
+                unlink($zipPath);
+            }
+        }
+    }
+
+    public function testFormStyleOverrideDoesNotRelaxMixedFeatureThemes(): void
+    {
+        $fs      = new Filesystem();
+        $zipPath = __DIR__.'/resource/themes/form-email-style-only.zip';
+
+        $archive = new \ZipArchive();
+        $result  = $archive->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        self::assertTrue($result, 'Expected test archive to be created successfully.');
+
+        $archive->addEmptyDir('html');
+        $archive->addEmptyDir('html/MauticFormBundle');
+        $archive->addEmptyDir('html/MauticFormBundle/Builder');
+        $archive->addFromString('config.json', json_encode([
+            'name'     => 'form-email-style-only',
+            'author'   => 'Test theme',
+            'features' => ['form', 'email'],
+        ], JSON_THROW_ON_ERROR));
+        $archive->addFromString('html/MauticFormBundle/Builder/_style.html.twig', '.test-form-style-only { color: red; }');
+        $archive->close();
+
+        $this->pathsHelper->method('getSystemPath')
+            ->with('themes', true)
+            ->willReturn(__DIR__.'/resource/themes');
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
+            ->willReturnCallback(
+                function ($key, array $parameters): void {
+                    $this->assertSame('mautic.core.theme.missing.files', $key);
+                    $this->assertStringContainsString('html/message.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('html/form.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('html/email.html.twig', $parameters['%files%']);
+                }
+            );
+
+        try {
+            $this->expectException(FileNotFoundException::class);
+
+            $this->themeHelper->install($zipPath);
+        } finally {
+            if (file_exists($zipPath)) {
+                unlink($zipPath);
+            }
+            $fs->remove(__DIR__.'/resource/themes/form-email-style-only');
+        }
+    }
+
     public function testThemeFallbackToDefaultIfTemplateIsMissing(): void
     {
         $this->twig->expects($this->exactly(2))
