@@ -94,7 +94,9 @@ final class ArrayType extends Type
         });
 
         try {
-            return \Mautic\CoreBundle\Helper\Serializer::decode((string) $value);
+            // Objects are unserialized rather than rejected, as DBAL did: convertToPHPValue
+            // drops the ones that would carry null bytes and keeps the rest
+            return unserialize((string) $value);
         } finally {
             restore_error_handler();
         }
