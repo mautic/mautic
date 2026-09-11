@@ -1470,8 +1470,14 @@ class CommonRepository extends ServiceEntityRepository
 
             if ([] !== $partials) {
                 $newSelect = implode(', ', $partials);
-                \assert($q instanceof TrackingQueryBuilder);
-                $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
+                // $q is an ORM builder or Mautic's tracking DBAL builder; only the latter
+                // exposes query parts, so the assertion belongs on that branch alone.
+                if ($isOrm) {
+                    $select = $q->getDQLPart('select');
+                } else {
+                    \assert($q instanceof TrackingQueryBuilder);
+                    $select = $q->getQueryPart('select');
+                }
                 if ($isOrm) {
                     $q->select($newSelect);
                 } else {

@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Event;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -25,7 +26,11 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     private ?string $contentTemplate = null;
 
-    private ?ExpressionBuilder $filterExpression = null;
+    /**
+     * A predicate destined for QueryBuilder::andWhere(), not a builder. Typed as
+     * ExpressionBuilder before, which DBAL 4 rejects there.
+     */
+    private CompositeExpression|string|null $filterExpression = null;
 
     private ?array $sortedFilters = null;
 
@@ -95,12 +100,12 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    public function getFilterExpression(): ?ExpressionBuilder
+    public function getFilterExpression(): CompositeExpression|string|null
     {
         return $this->filterExpression;
     }
 
-    public function setFilterExpression(ExpressionBuilder $filterExpression): self
+    public function setFilterExpression(CompositeExpression|string $filterExpression): self
     {
         $this->filterExpression = $filterExpression;
 

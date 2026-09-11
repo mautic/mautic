@@ -182,20 +182,26 @@ class QueryBuilder extends BaseQueryBuilder
 
     public function innerJoin(string $fromAlias, string $join, string $alias, ?string $condition = null): static
     {
-        return $this->addJoin('inner', $fromAlias, $join, $alias, $condition);
+        $this->addJoin('inner', $fromAlias, $join, $alias, $condition);
+
+        return $this;
     }
 
     public function leftJoin(string $fromAlias, string $join, string $alias, ?string $condition = null): static
     {
-        return $this->addJoin('left', $fromAlias, $join, $alias, $condition);
+        $this->addJoin('left', $fromAlias, $join, $alias, $condition);
+
+        return $this;
     }
 
     public function rightJoin(string $fromAlias, string $join, string $alias, ?string $condition = null): static
     {
-        return $this->addJoin('right', $fromAlias, $join, $alias, $condition);
+        $this->addJoin('right', $fromAlias, $join, $alias, $condition);
+
+        return $this;
     }
 
-    protected function addJoin(string $type, string $fromAlias, string $join, string $alias, ?string $condition): static
+    protected function addJoin(string $type, string $fromAlias, string $join, string $alias, ?string $condition): void
     {
         $this->queryParts['join'][$fromAlias][] = [
             'joinType'      => $type,
@@ -203,8 +209,6 @@ class QueryBuilder extends BaseQueryBuilder
             'joinAlias'     => $alias,
             'joinCondition' => $condition,
         ];
-
-        return $this;
     }
 
     public function where(string|CompositeExpression $predicate, string|CompositeExpression ...$predicates): static

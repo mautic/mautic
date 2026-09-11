@@ -256,9 +256,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 }
             }
 
-            $queryBuilder->addGroupBy($groupByColumns);
+            if ([] !== $groupByColumns) {
+                $queryBuilder->addGroupBy(...$groupByColumns);
+            }
         } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
-            $queryBuilder->addGroupBy($options['groupby']);
+            $queryBuilder->addGroupBy(...array_values((array) $options['groupby']));
         }
 
         // Build LIMIT clause
@@ -407,7 +409,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         });
 
-        $queryBuilder->addSelect($selectColumns);
+        // DBAL 4 requires at least one expression, so an empty list is skipped
+        if ([] !== $selectColumns) {
+            $queryBuilder->addSelect(...$selectColumns);
+        }
 
         // Add Aggregators
         $aggregatorSelect = [];
@@ -425,7 +430,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $aggregatorSelect[] = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
             }
 
-            $queryBuilder->addSelect($aggregatorSelect);
+            $queryBuilder->addSelect(...$aggregatorSelect);
         }
 
         return $queryBuilder;
