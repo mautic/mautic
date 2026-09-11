@@ -6,6 +6,7 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 
 final class Version20220208032455 extends PreUpAssertionMigration
 {
@@ -68,7 +69,11 @@ final class Version20220208032455 extends PreUpAssertionMigration
     private function getTableSchema(Schema $schema, string $tableName): array
     {
         try {
-            $columns = $schema->getTable($tableName)->getColumns();
+            // DBAL 4 returns the columns as a list, so they are keyed by name here
+            $columns = [];
+            foreach ($schema->getTable($tableName)->getColumns() as $column) {
+                $columns[AssetName::of($column)] = $column;
+            }
             unset($columns['submission_id'], $columns['form_id']);
 
             return array_keys($columns);
