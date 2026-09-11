@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Query;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -876,6 +877,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             $this->limitQueryToCreator($allQ);
         }
 
+        \assert($allQ instanceof TrackingQueryBuilder);
         $allQ->resetQueryPart('select')->select('t.lead_id');
         $allQ->groupBy('t.lead_id');
 

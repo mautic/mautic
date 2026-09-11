@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -217,6 +218,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
+        \assert($this instanceof TrackingQueryBuilder);
         $this->assertStringStartsWith('l.user_id IN (', (string) $qb->getQueryPart('where'));
         $parameters = $qb->getParameters();
         $this->assertEquals($matchArgs, array_shift($parameters));

@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -118,6 +119,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $queryBuilder = $this->configureBuilder($options);
 
+        \assert($queryBuilder instanceof TrackingQueryBuilder);
         if (!array_key_exists('select', $queryBuilder->getQueryParts())) {
             throw new InvalidReportQueryException('Only SELECT statements are valid');
         }
@@ -277,6 +279,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         $selectColumns            = [];
         $aggregators              = $this->entity->getAggregators();
+        \assert($groupByColumns instanceof TrackingQueryBuilder);
         $groupByColumns           = $queryBuilder->getQueryPart('groupBy') ?? [];
         $groupByColumnsKeys       = array_flip($groupByColumns);
         $aggregatorFieldKeys      = $groupByOptions && $aggregators

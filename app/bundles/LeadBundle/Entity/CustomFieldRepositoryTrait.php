@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
@@ -44,6 +45,7 @@ trait CustomFieldRepositoryTrait
         // Generate where clause first to know if we need to use distinct on primary ID or not
         $this->useDistinctCount = false;
         $this->buildWhereClause($dq, $args);
+        \assert($groupBy instanceof TrackingQueryBuilder);
         $groupBy = $dq->getQueryPart('groupBy');
 
         if (!empty($args['withTotalCount']) || !isset($args['count'])) {
@@ -80,6 +82,7 @@ trait CustomFieldRepositoryTrait
             $this->buildOrderByClause($dq, $args);
             $this->buildLimiterClauses($dq, $args);
 
+            \assert($dq instanceof TrackingQueryBuilder);
             $dq->resetQueryPart('select');
             $this->buildSelectClause($dq, $args);
 

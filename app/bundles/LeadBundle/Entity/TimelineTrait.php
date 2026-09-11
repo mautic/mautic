@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\Serializer;
@@ -116,6 +117,7 @@ trait TimelineTrait
 
         if (!empty($options['paginated'])) {
             // Get a total count along with results
+            \assert($query instanceof TrackingQueryBuilder);
             $query->resetQueryParts(['select', 'orderBy'])
                 ->setFirstResult(0)
                 ->setMaxResults(null)

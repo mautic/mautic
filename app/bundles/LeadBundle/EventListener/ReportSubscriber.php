@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -306,6 +307,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 $subQ = clone $qb;
+                \assert($subQ instanceof TrackingQueryBuilder);
                 $subQ->resetQueryParts();
 
                 $alias = str_replace('contact.attribution.', '', $context);
@@ -401,12 +403,15 @@ final class ReportSubscriber implements EventSubscriberInterface
 
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
+            \assert($queryBuilder instanceof TrackingQueryBuilder);
             if ('lp' === $queryBuilder->getQueryPart('from')[0]['alias']) {
+                \assert($join instanceof TrackingQueryBuilder);
                 $join = $queryBuilder->getQueryPart('join');
                 $queryBuilder->resetQueryPart('join');
 
                 $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
                 if (isset($join['l'])) {
+                    \assert($where instanceof TrackingQueryBuilder);
                     $where = $queryBuilder->getQueryPart('where');
                     foreach ($join['l'] as $item) {
                         if (str_contains($where, $item['joinAlias'].'.leadlist_id')) {
@@ -421,8 +426,10 @@ final class ReportSubscriber implements EventSubscriberInterface
                 case 'mautic.lead.graph.pie.attribution_campaigns':
                 case 'mautic.lead.graph.pie.attribution_actions':
                 case 'mautic.lead.graph.pie.attribution_channels':
+                    \assert($attributionQb instanceof TrackingQueryBuilder);
                     $attributionQb->resetQueryParts(['select', 'orderBy']);
                     $outerQb = clone $attributionQb;
+                    \assert($outerQb instanceof TrackingQueryBuilder);
                     $outerQb->resetQueryParts()
                         ->select('slice, sum(contact_attribution) as total_attribution')
                         ->groupBy('slice');

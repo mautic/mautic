@@ -19,6 +19,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -1446,6 +1447,7 @@ class CommonRepository extends ServiceEntityRepository
 
             if ([] !== $partials) {
                 $newSelect = implode(', ', $partials);
+                \assert($select instanceof TrackingQueryBuilder);
                 $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
                 if ($isOrm) {
                     $q->select($newSelect);
@@ -1466,6 +1468,7 @@ class CommonRepository extends ServiceEntityRepository
                 $q->select($this->getTableAlias());
             }
         } else {
+            \assert($q instanceof TrackingQueryBuilder);
             if (!$q->getQueryPart('select')) {
                 $q->select($this->getTableAlias().'.*');
             }

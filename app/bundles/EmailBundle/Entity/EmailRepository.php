@@ -11,6 +11,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
@@ -473,6 +474,7 @@ class EmailRepository extends CommonRepository
     public function getSentReadNotReadCount(QueryBuilder $queryBuilder): array
     {
         $queryBuilder->resetGroupBy();
+        \assert($queryBuilder instanceof TrackingQueryBuilder);
         $queryBuilder->resetQueryParts(['join']);
 
         $queryBuilder->select('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count');
@@ -550,6 +552,7 @@ class EmailRepository extends CommonRepository
 
     private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
+        \assert($joins instanceof TrackingQueryBuilder);
         $joins = $query->getQueryParts()['join'][$fromAlias] ?? null;
 
         if (empty($joins)) {
