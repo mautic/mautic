@@ -87,7 +87,7 @@
     "symfony/messenger": "~7.4.0",
     "symfony/mime": "~7.4.0",
     "symfony/monolog-bridge": "~7.4.0",
-    "symfony/monolog-bundle": "~3.10.0",
+    "symfony/monolog-bundle": "~4.0.2",
     "symfony/options-resolver": "~7.4.0",
     "symfony/polyfill-mbstring": "~1.0",
     "symfony/process": "~7.4.0",
