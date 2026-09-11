@@ -4,9 +4,8 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\MappedSuperclass]
-#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class CommonEntity implements \Stringable
 {
     /**
@@ -18,6 +17,13 @@ class CommonEntity implements \Stringable
      * @var array
      */
     protected $pastChanges = [];
+
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setMappedSuperClass();
+    }
 
     /**
      * Wrapper function for isProperty methods.

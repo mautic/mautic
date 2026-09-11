@@ -5,32 +5,31 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 final class CoreParametersHelperTest extends TestCase
 {
     /**
-     * @var MockObject&ContainerInterface
+     * @var MockObject&ParameterBagInterface
      */
-    private MockObject $container;
+    private MockObject $parameterBag;
 
     protected function setUp(): void
     {
-        $this->parameter = $this->createMock(ContainerInterface::class);
+        $this->parameterBag = $this->createMock(ParameterBagInterface::class);
     }
 
     public function testAllReturnsResolvedParameters(): void
     {
-        $this->container->method('hasParameter')
+        $this->parameterBag->method('has')
             ->willReturnCallback(
                 fn (string $key): bool => 'mautic.cache_path' === $key
             );
 
-        $this->container->expects($this->once())
-            ->method('getParameter')
+        $this->parameterBag->expects($this->once())
+            ->method('get')
             ->with('mautic.cache_path')
             ->willReturn('/path/to/cache');
 
@@ -45,6 +44,6 @@ final class CoreParametersHelperTest extends TestCase
 
     private function getHelper(): CoreParametersHelper
     {
-        return new CoreParametersHelper($this->container);
+        return new CoreParametersHelper($this->parameterBag);
     }
 }

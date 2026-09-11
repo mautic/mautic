@@ -3,12 +3,10 @@
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-#[ORM\Entity(repositoryClass: IntegrationRepository::class)]
-#[ORM\Table(name: 'plugin_integration_settings')]
-#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Integration extends CommonEntity implements CacheInvalidateInterface
 {
     public const CACHE_NAMESPACE = 'IntegrationSettings';
@@ -16,47 +14,75 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     /**
      * @var int
      */
-    #[ORM\Id]
-    #[ORM\Column(type: 'integer')]
-    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var Plugin|null
      */
-    #[ORM\ManyToOne(targetEntity: Plugin::class, inversedBy: 'integrations')]
-    #[ORM\JoinColumn(name: 'plugin_id', onDelete: 'CASCADE')]
     private $plugin;
 
     /**
      * @var string
      */
-    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var bool
      */
-    #[ORM\Column(name: 'is_published', type: 'boolean')]
     private $isPublished = false;
 
     /**
      * @var array
      */
-    #[ORM\Column(name: 'supported_features', type: 'array', nullable: true)]
     private $supportedFeatures = [];
 
     /**
      * @var array
      */
-    #[ORM\Column(name: 'api_keys', type: 'array')]
     private $apiKeys = [];
 
     /**
      * @var array
      */
-    #[ORM\Column(name: 'feature_settings', type: 'array', nullable: true)]
     private $featureSettings = [];
+
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('plugin_integration_settings')
+            ->setCustomRepositoryClass(IntegrationRepository::class);
+
+        $builder->createField('id', 'integer')
+            ->makePrimaryKey()
+            ->generatedValue()
+            ->build();
+
+        $builder->createManyToOne('plugin', 'Plugin')
+            ->inversedBy('integrations')
+            ->addJoinColumn('plugin_id', 'id', true, false, 'CASCADE')
+            ->build();
+
+        $builder->addField('name', 'string');
+
+        $builder->createField('isPublished', 'boolean')
+            ->columnName('is_published')
+            ->build();
+
+        $builder->createField('supportedFeatures', 'array')
+            ->columnName('supported_features')
+            ->nullable()
+            ->build();
+
+        $builder->createField('apiKeys', 'array')
+            ->columnName('api_keys')
+            ->build();
+
+        $builder->createField('featureSettings', 'array')
+            ->columnName('feature_settings')
+            ->nullable()
+            ->build();
+    }
 
     /**
      * @return int|null

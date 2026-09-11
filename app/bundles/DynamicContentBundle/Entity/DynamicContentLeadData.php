@@ -7,9 +7,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
-#[ORM\Entity(repositoryClass: DynamicContentLeadDataRepository::class)]
-#[ORM\Table(name: 'dynamic_content_lead_data')]
-#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class DynamicContentLeadData extends CommonEntity
 {
     /**
@@ -25,8 +22,6 @@ class DynamicContentLeadData extends CommonEntity
     /**
      * @var DynamicContent|null
      */
-    #[ORM\ManyToOne(targetEntity: DynamicContent::class, inversedBy: 'id')]
-    #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'CASCADE')]
     private $dynamicContent;
 
     /**
@@ -42,18 +37,29 @@ class DynamicContentLeadData extends CommonEntity
     /**
      * @var string
      */
-    #[ORM\Column(type: 'text')]
     private $slot;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
+        $builder->setTable('dynamic_content_lead_data')
+            ->setCustomRepositoryClass(DynamicContentLeadDataRepository::class);
+
         $builder->addIdColumns(false, false);
 
         $builder->addDateAdded(true);
 
         $builder->addLead();
+
+        $builder->createManyToOne('dynamicContent', 'DynamicContent')
+            ->inversedBy('id')
+            ->addJoinColumn('dynamic_content_id', 'id', true, false, 'CASCADE')
+            ->build();
+
+        $builder->createField('slot', 'text')
+            ->columnName('slot')
+            ->build();
     }
 
     /**
