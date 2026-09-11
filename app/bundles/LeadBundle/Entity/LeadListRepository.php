@@ -327,6 +327,39 @@ class LeadListRepository extends CommonRepository
         return (1 === $countListIds) ? $return[$listIds[0]] : $return;
     }
 
+    public function getManuallyAddedLeadCount(int $listId): int
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('count(l.lead_id) as thecount')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
+            ->where(
+                $q->expr()->eq('l.leadlist_id', ':listId'),
+                $q->expr()->eq('l.manually_removed', ':false'),
+                $q->expr()->eq('l.manually_added', ':true')
+            )
+            ->setParameter('listId', $listId)
+            ->setParameter('false', false, 'boolean')
+            ->setParameter('true', true, 'boolean');
+
+        return (int) $q->executeQuery()->fetchOne();
+    }
+
+    public function getFilterAddedLeadCount(int $listId): int
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('count(l.lead_id) as thecount')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
+            ->where(
+                $q->expr()->eq('l.leadlist_id', ':listId'),
+                $q->expr()->eq('l.manually_removed', ':false'),
+                $q->expr()->eq('l.manually_added', ':false')
+            )
+            ->setParameter('listId', $listId)
+            ->setParameter('false', false, 'boolean');
+
+        return (int) $q->executeQuery()->fetchOne();
+    }
+
     private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
     {
         $fromPart             = $qb->getQueryPart('from');
