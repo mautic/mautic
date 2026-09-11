@@ -9,6 +9,9 @@ use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Index\IndexedColumn;
+use Doctrine\DBAL\Schema\Index\IndexType;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -120,7 +123,7 @@ final class SchemaHelper
 
         try {
             // check to see if the table already exist
-            $tables = $sm->listTableNames();
+            $tables = $sm->introspectTableNames();
         } catch (\Exception $e) {
             $this->db->close();
 
@@ -219,13 +222,13 @@ final class SchemaHelper
                 continue;
             }
 
-            $restraints = $sm->listTableForeignKeys($t);
+            $restraints = $sm->introspectTableForeignKeyConstraintsByUnquotedName($t);
 
             if (isset($mauticTables[$t])) {
                 // to be backed up
                 $backupRestraints[$mauticTables[$t]] = $restraints;
                 $backupTables[$t]                    = $mauticTables[$t];
-                $backupIndexes[$t]                   = $sm->listTableIndexes($t);
+                $backupIndexes[$t]                   = $sm->introspectTableIndexesByUnquotedName($t);
             } else {
                 // existing backup to be dropped
                 $dropTables[] = $t;
@@ -255,11 +258,12 @@ final class SchemaHelper
 
                 $newIndex = new Index(
                     $newName,
-                    $oldIndex->getColumns(),
-                    $oldIndex->isUnique(),
-                    $oldIndex->isPrimary(),
-                    $oldIndex->getFlags(),
-                    $oldIndex->getOptions()
+                    self::indexColumnNames($oldIndex),
+                    IndexType::UNIQUE === $oldIndex->getType(),
+                    // primary keys are skipped above, and are a PrimaryKeyConstraint in DBAL 4 rather than an index type
+                    false,
+                    $oldIndex->isClustered() ? ['clustered'] : [],
+                    null !== $oldIndex->getPredicate() ? ['where' => $oldIndex->getPredicate()] : []
                 );
 
                 $newIndexes[] = $newIndex;
@@ -282,14 +286,14 @@ final class SchemaHelper
         // apply foreign keys to backup tables
         foreach ($backupRestraints as $table => $oldRestraints) {
             foreach ($oldRestraints as $or) {
-                $foreignTable     = $or->getForeignTableName();
+                $foreignTable     = AssetName::fromName($or->getReferencedTableName());
                 $foreignTableName = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $foreignTable);
                 $r                = new ForeignKeyConstraint(
-                    $or->getLocalColumns(),
+                    self::namesToStrings($or->getReferencingColumnNames()),
                     $foreignTableName,
-                    $or->getForeignColumns(),
+                    self::namesToStrings($or->getReferencedColumnNames()),
                     $backupPrefix.self::constraintName($or),
-                    $or->getOptions()
+                    null !== $or->getMatchType() ? ['match' => $or->getMatchType()] : []
                 );
                 $sql[] = $this->platform->getCreateForeignKeySQL($r, $table);
             }
@@ -346,5 +350,26 @@ final class SchemaHelper
         $name = $constraint->getObjectName();
 
         return null === $name ? '' : AssetName::fromName($name);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function indexColumnNames(Index $index): array
+    {
+        return array_map(
+            static fn (IndexedColumn $indexedColumn): string => AssetName::fromName($indexedColumn->getColumnName()),
+            $index->getIndexedColumns()
+        );
+    }
+
+    /**
+     * @param list<UnqualifiedName> $names
+     *
+     * @return list<string>
+     */
+    private static function namesToStrings(array $names): array
+    {
+        return array_map(AssetName::fromName(...), $names);
     }
 }
