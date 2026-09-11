@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional\Command;
 
 use Doctrine\DBAL\Schema\Column;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
@@ -57,7 +58,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
         $columnsSchema = ColumnIntrospector::listColumns($this->em->getConnection()->createSchemaManager(), $leadTableName);
         $columnNames   = array_map(
-            static fn (Column $column) => $column->getName(),
+            static fn (Column $column) => AssetName::of($column),
             $columnsSchema
         );
 
@@ -108,7 +109,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
         $columnsSchema = ColumnIntrospector::listColumns($this->em->getConnection()->createSchemaManager(), $leadTableName);
         $columnNames   = array_map(
-            static fn (Column $column) => $column->getName(),
+            static fn (Column $column) => AssetName::of($column),
             $columnsSchema
         );
 

@@ -9,6 +9,7 @@ use Doctrine\ORM\Id\SequenceGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -113,9 +114,9 @@ final class DoctrineEventsSubscriber
         $tables = $schema->getTables();
 
         foreach ($tables as $table) {
-            if (in_array($table->getName(), $this->deprecatedEntityTables)) {
+            if (in_array(AssetName::of($table), $this->deprecatedEntityTables)) {
                 // remove table from schema
-                $schema->dropTable($table->getName());
+                $schema->dropTable(AssetName::of($table));
             }
             // Check tables for obsolete indexes.
             // Single column indexes that are the leftmost column of another index are obsolete.

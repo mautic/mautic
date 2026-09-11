@@ -137,19 +137,17 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    /**
-     * DBAL 3 accepted either a variadic list or a single array; both are flattened here.
-     */
-    public function select(...$expressions): static
+    
+    public function select(string ...$expressions): static
     {
-        $this->queryParts['select'] = static::flatten($expressions);
+        $this->queryParts['select'] = $expressions;
 
         return $this;
     }
 
-    public function addSelect(...$expressions): static
+    public function addSelect(string $expression, string ...$expressions): static
     {
-        $this->queryParts['select'] = array_merge($this->queryParts['select'], static::flatten($expressions));
+        $this->queryParts['select'] = array_merge($this->queryParts['select'], [$expression], $expressions);
 
         return $this;
     }
@@ -200,61 +198,61 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    public function where(...$predicates): static
+    public function where(string|CompositeExpression $predicate, string|CompositeExpression ...$predicates): static
     {
-        $this->queryParts['where'] = 1 === count($predicates) ? $predicates[0] : CompositeExpression::and(...$predicates);
+        $this->queryParts['where'] = [] === $predicates ? $predicate : CompositeExpression::and($predicate, ...$predicates);
         $this->syncWhereWithDbal();
 
         return $this;
     }
 
-    public function andWhere(...$predicates): static
+    public function andWhere(string|CompositeExpression $predicate, string|CompositeExpression ...$predicates): static
     {
-        $this->queryParts['where'] = $this->combine($this->queryParts['where'], CompositeExpression::TYPE_AND, $predicates);
+        $this->queryParts['where'] = $this->combine($this->queryParts['where'], CompositeExpression::TYPE_AND, [$predicate, ...$predicates]);
         $this->syncWhereWithDbal();
 
         return $this;
     }
 
-    public function orWhere(...$predicates): static
+    public function orWhere(string|CompositeExpression $predicate, string|CompositeExpression ...$predicates): static
     {
-        $this->queryParts['where'] = $this->combine($this->queryParts['where'], CompositeExpression::TYPE_OR, $predicates);
+        $this->queryParts['where'] = $this->combine($this->queryParts['where'], CompositeExpression::TYPE_OR, [$predicate, ...$predicates]);
         $this->syncWhereWithDbal();
 
         return $this;
     }
 
-    public function groupBy(...$expressions): static
+    public function groupBy(string $expression, string ...$expressions): static
     {
-        $this->queryParts['groupBy'] = static::flatten($expressions);
+        $this->queryParts['groupBy'] = [$expression, ...$expressions];
 
         return $this;
     }
 
-    public function addGroupBy(...$expressions): static
+    public function addGroupBy(string $expression, string ...$expressions): static
     {
-        $this->queryParts['groupBy'] = array_merge($this->queryParts['groupBy'], static::flatten($expressions));
+        $this->queryParts['groupBy'] = array_merge($this->queryParts['groupBy'], [$expression], $expressions);
 
         return $this;
     }
 
-    public function having(...$predicates): static
+    public function having(string|CompositeExpression $predicate, string|CompositeExpression ...$predicates): static
     {
-        $this->queryParts['having'] = 1 === count($predicates) ? $predicates[0] : CompositeExpression::and(...$predicates);
+        $this->queryParts['having'] = [] === $predicates ? $predicate : CompositeExpression::and($predicate, ...$predicates);
 
         return $this;
     }
 
-    public function andHaving(...$predicates): static
+    public function andHaving(string|CompositeExpression $predicate, string|CompositeExpression ...$predicates): static
     {
-        $this->queryParts['having'] = $this->combine($this->queryParts['having'], CompositeExpression::TYPE_AND, $predicates);
+        $this->queryParts['having'] = $this->combine($this->queryParts['having'], CompositeExpression::TYPE_AND, [$predicate, ...$predicates]);
 
         return $this;
     }
 
-    public function orHaving(...$predicates): static
+    public function orHaving(string|CompositeExpression $predicate, string|CompositeExpression ...$predicates): static
     {
-        $this->queryParts['having'] = $this->combine($this->queryParts['having'], CompositeExpression::TYPE_OR, $predicates);
+        $this->queryParts['having'] = $this->combine($this->queryParts['having'], CompositeExpression::TYPE_OR, [$predicate, ...$predicates]);
 
         return $this;
     }
@@ -407,25 +405,6 @@ class QueryBuilder extends BaseQueryBuilder
         }
     }
 
-    /**
-     * @param array<mixed> $expressions
-     *
-     * @return string[]
-     */
-    protected static function flatten(array $expressions): array
-    {
-        $flat = [];
-
-        foreach ($expressions as $expression) {
-            if (is_array($expression)) {
-                $flat = array_merge($flat, array_map(strval(...), $expression));
-            } else {
-                $flat[] = (string) $expression;
-            }
-        }
-
-        return $flat;
-    }
 
     /**
      * @param string[] $knownAliases

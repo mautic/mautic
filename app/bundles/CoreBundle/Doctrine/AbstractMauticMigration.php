@@ -11,6 +11,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractMauticMigration extends AbstractMigration
@@ -106,7 +107,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
                     $keys = $schemaManager->listTableForeignKeys($table);
                     /** @var \Doctrine\DBAL\Schema\ForeignKeyConstraint $k */
                     foreach ($keys as $k) {
-                        $name                       = strtolower($k->getName());
+                        $name                       = strtolower(AssetName::of($k));
                         $key                        = substr($name, -4);
                         $tables[$table]['fk'][$key] = $name;
                     }
@@ -127,7 +128,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
 
                     /** @var \Doctrine\DBAL\Schema\Index $i */
                     foreach ($indexes as $i) {
-                        $name   = strtolower($i->getName());
+                        $name   = strtolower(AssetName::of($i));
                         $isIdx  = stripos($name, 'idx');
                         $isUniq = stripos($name, 'uniq');
 

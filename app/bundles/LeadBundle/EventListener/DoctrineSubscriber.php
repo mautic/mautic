@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Monolog\Logger;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -68,7 +69,7 @@ final readonly class DoctrineSubscriber
                 /** @var \Doctrine\DBAL\Schema\Column $column */
                 foreach ($columns as $column) {
                     $type = $column->getType();
-                    $name = $column->getName();
+                    $name = AssetName::of($column);
 
                     if (!$type instanceof StringType) {
                         unset($uniqueFields[$name]);
