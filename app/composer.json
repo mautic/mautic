@@ -37,7 +37,7 @@
     "doctrine/orm": "^2.14.0",
     "exercise/htmlpurifier-bundle": "^5.0",
     "ezyang/htmlpurifier": "^4.16",
-    "friendsofsymfony/rest-bundle": "^3.8",
+    "friendsofsymfony/rest-bundle": "^3.9",
     "gaufrette/aws-s3-adapter": "^0.4.0",
     "gaufrette/extras": "^0.1.0",
     "geoip2/geoip2": "~2.0",
