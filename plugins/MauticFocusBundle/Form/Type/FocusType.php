@@ -134,6 +134,7 @@ final class FocusType extends AbstractType
                     'tooltip' => 'mautic.focus.form.website.tooltip',
                 ],
                 'required' => false,
+                'default_protocol' => 'http',
             ]
         );
 
