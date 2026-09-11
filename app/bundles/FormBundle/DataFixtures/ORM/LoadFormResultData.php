@@ -5,13 +5,27 @@ namespace Mautic\FormBundle\DataFixtures\ORM;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 
 final class LoadFormResultData extends Fixture implements OrderedFixtureInterface
 {
+    /**
+     * @var array<string, class-string>
+     */
+    private const array REFERENCE_CLASSES = [
+        'form'      => Form::class,
+        'page'      => Page::class,
+        'ipAddress' => IpAddress::class,
+        'lead'      => Lead::class,
+    ];
+
     public function __construct(
         private readonly PageModel $pageModel,
         private readonly SubmissionRepository $submissionRepository,
@@ -31,9 +45,9 @@ final class LoadFormResultData extends Fixture implements OrderedFixtureInterfac
                         if (\in_array($col, ['form', 'page', 'ipAddress', 'lead'])) {
                             if ('lead' === $col) {
                                 // For some reason the lead must be linked with id - 1
-                                $entity = $this->getReference($col.'-'.($val - 1));
+                                $entity = $this->getReference($col.'-'.($val - 1), self::REFERENCE_CLASSES[$col]);
                             } else {
-                                $entity = $this->getReference($col.'-'.$val);
+                                $entity = $this->getReference($col.'-'.$val, self::REFERENCE_CLASSES[$col]);
                             }
                             if ('page' == $col) {
                                 $submission->setReferer($this->pageModel->generateUrl($entity));

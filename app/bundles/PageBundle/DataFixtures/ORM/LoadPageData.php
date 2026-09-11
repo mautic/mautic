@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\DataFixtures\ORM;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Page;
@@ -27,7 +28,7 @@ final class LoadPageData extends Fixture implements OrderedFixtureInterface
                 if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['translationParent', 'variantParent'])) {
-                        $page->{$setter}($this->getReference('page-'.$val));
+                        $page->{$setter}($this->getReference('page-'.$val, Page::class));
                     } elseif (in_array($col, ['dateAdded', 'variantStartDate'])) {
                         $page->{$setter}(new \DateTime($val));
                     } elseif (in_array($col, ['content', 'variantSettings'])) {
@@ -38,7 +39,7 @@ final class LoadPageData extends Fixture implements OrderedFixtureInterface
                     }
                 }
             }
-            $page->setCategory($this->getReference('page-cat-1'));
+            $page->setCategory($this->getReference('page-cat-1', Category::class));
             $this->pageRepository->saveEntity($page);
 
             $this->setReference('page-'.$key, $page);

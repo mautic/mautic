@@ -23,7 +23,7 @@ final class LoadRoleData extends Fixture implements OrderedFixtureInterface, Fix
 
     public function load(ObjectManager $manager): void
     {
-        if (!$this->hasReference('admin-role')) {
+        if (!$this->hasReference('admin-role', Role::class)) {
             $role = new Role();
             $role->setName('Administrators');
             $role->setDescription('Has access to everything.');

@@ -23,7 +23,7 @@ final class RoleData extends Fixture implements OrderedFixtureInterface, Fixture
 
     public function load(ObjectManager $manager): void
     {
-        if ($this->hasReference('admin-role')) {
+        if ($this->hasReference('admin-role', Role::class)) {
             return;
         }
 

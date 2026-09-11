@@ -5,6 +5,8 @@ namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 
 final class LoadPageHitData extends Fixture implements OrderedFixtureInterface
@@ -13,67 +15,67 @@ final class LoadPageHitData extends Fixture implements OrderedFixtureInterface
     {
         $hits = [
             [
-                'ipAddress'  => $this->getReference('ipAddress-1'),
+                'ipAddress'  => $this->getReference('ipAddress-1', IpAddress::class),
                 'url'        => 'http://test.com',
                 'urlTitle'   => 'Test Title',
                 'referer'    => 'http://mautic.com',
                 'alias'      => 'hit-1',
-                'contact'    => $this->getReference('lead-1'),
+                'contact'    => $this->getReference('lead-1', Lead::class),
                 'dateHit'    => new \DateTime('-1 day'),
                 'code'       => 200,
                 'trackingId' => 'asdf',
             ],
             [
-                'ipAddress'  => $this->getReference('ipAddress-2'),
+                'ipAddress'  => $this->getReference('ipAddress-2', IpAddress::class),
                 'url'        => 'https://test/regex-segment-3.com',
                 'urlTitle'   => 'Test Regex Url',
                 'referer'    => 'https://test.com',
                 'alias'      => 'hit-2',
-                'contact'    => $this->getReference('lead-2'),
+                'contact'    => $this->getReference('lead-2', Lead::class),
                 'dateHit'    => new \DateTime('-2 day'),
                 'code'       => 200,
                 'trackingId' => 'abcdr',
             ],
             [
-                'ipAddress'  => $this->getReference('ipAddress-3'),
+                'ipAddress'  => $this->getReference('ipAddress-3', IpAddress::class),
                 'url'        => 'https://test/regex-segment-2.com',
                 'urlTitle'   => 'Test Regex Url',
                 'referer'    => 'https://test.com',
                 'alias'      => 'hit-3',
-                'contact'    => $this->getReference('lead-3'),
+                'contact'    => $this->getReference('lead-3', Lead::class),
                 'dateHit'    => new \DateTime('-3 day'),
                 'code'       => 200,
                 'trackingId' => 'abcdr',
             ],
             [
-                'ipAddress'  => $this->getReference('ipAddress-4'),
+                'ipAddress'  => $this->getReference('ipAddress-4', IpAddress::class),
                 'url'        => 'https://test/regex-segment-85.com',
                 'urlTitle'   => 'Test Regex Url',
                 'referer'    => 'https://test.com',
                 'alias'      => 'hit-4',
-                'contact'    => $this->getReference('lead-4'),
+                'contact'    => $this->getReference('lead-4', Lead::class),
                 'dateHit'    => new \DateTime('-5 day'),
                 'code'       => 200,
                 'trackingId' => 'abcdr',
             ],
             [
-                'ipAddress'  => $this->getReference('ipAddress-5'),
+                'ipAddress'  => $this->getReference('ipAddress-5', IpAddress::class),
                 'url'        => 'https://test/regex-segment-0.com',
                 'urlTitle'   => 'Test Regex Url',
                 'referer'    => 'https://test.com',
                 'alias'      => 'hit-5',
-                'contact'    => $this->getReference('lead-5'),
+                'contact'    => $this->getReference('lead-5', Lead::class),
                 'dateHit'    => new \DateTime('-3 day'),
                 'code'       => 200,
                 'trackingId' => 'abcdr',
             ],
             [
-                'ipAddress'  => $this->getReference('ipAddress-5'),
+                'ipAddress'  => $this->getReference('ipAddress-5', IpAddress::class),
                 'url'        => 'https://test/regex-segment-other.com',
                 'urlTitle'   => 'Test Title',
                 'referer'    => 'https://test.com',
                 'alias'      => 'hit-6',
-                'contact'    => $this->getReference('lead-5'),
+                'contact'    => $this->getReference('lead-5', Lead::class),
                 'dateHit'    => new \DateTime('-3 day'),
                 'code'       => 200,
                 'trackingId' => 'iomio',

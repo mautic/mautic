@@ -18,11 +18,10 @@ final class LoadTagData extends Fixture implements OrderedFixtureInterface
         $manager->persist($tag);
         $manager->flush();
 
-        $contact1 = $this->getReference('lead-1');
-        \assert($contact1 instanceof Lead);
+        $contact1 = $this->getReference('lead-1', Lead::class);
         $contact1->addTag($tag);
 
-        $contact3 = $this->getReference('lead-3');
+        $contact3 = $this->getReference('lead-3', Lead::class);
         $contact3->addTag($tag);
 
         $manager->persist($contact1);

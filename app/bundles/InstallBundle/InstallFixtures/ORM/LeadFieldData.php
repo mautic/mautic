@@ -56,7 +56,7 @@ final class LeadFieldData extends Fixture implements OrderedFixtureInterface, Fi
                 $manager->persist($entity);
                 $manager->flush();
 
-                if (!$this->hasReference('leadfield-'.$alias)) {
+                if (!$this->hasReference('leadfield-'.$alias, LeadField::class)) {
                     $this->addReference('leadfield-'.$alias, $entity);
                 }
                 ++$order;
