@@ -292,6 +292,7 @@ class Event implements ChannelInterface, UuidInterface
         $builder->addNullableField('deleted', 'datetime');
 
         $builder->createManyToOne('redirectEvent', 'Event')
+            ->inversedBy('redirectingEvents')
             ->cascadePersist()
             ->addJoinColumn('redirect_event_id', 'id', true, false, 'SET NULL')
             ->build();
