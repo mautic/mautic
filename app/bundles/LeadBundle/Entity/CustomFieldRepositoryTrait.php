@@ -53,7 +53,7 @@ trait CustomFieldRepositoryTrait
 
             // Advanced search filters may have set a group by and if so, let's remove it for the count.
             if ($groupBy) {
-                $dq->resetQueryPart('groupBy');
+                $dq->resetGroupBy();
             }
 
             // get a total count

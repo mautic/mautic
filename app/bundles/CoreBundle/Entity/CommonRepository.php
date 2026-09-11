@@ -655,8 +655,7 @@ class CommonRepository extends ServiceEntityRepository
             $selectString = $alias.'.*';
         }
 
-        $q->resetQueryPart('select')
-            ->select($selectString)
+        $q->select($selectString)
             ->setFirstResult($start)
             ->setMaxResults($limit);
 

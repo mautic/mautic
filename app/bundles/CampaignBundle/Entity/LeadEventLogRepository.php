@@ -5,6 +5,7 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Types;
 use Mautic\CampaignBundle\DTO\EventLogStatsDto;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -280,8 +281,8 @@ class LeadEventLogRepository extends CommonRepository
             );
         if ($dateFrom && $dateTo) {
             $failedSq->andWhere('fe.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), ParameterType::INTEGER)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), ParameterType::INTEGER);
         }
         $expr = $expr->with(
             sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
@@ -293,8 +294,8 @@ class LeadEventLogRepository extends CommonRepository
 
         if ($dateFrom && $dateTo) {
             $q->andWhere('o.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), ParameterType::INTEGER)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), ParameterType::INTEGER);
         }
 
         if ($this->getEntityManager()->getConnection()->getConfiguration()->getResultCache()) {
@@ -502,7 +503,7 @@ class LeadEventLogRepository extends CommonRepository
             ->where($expr)
             ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('now', $now->format('Y-m-d H:i:s'))
-            ->setParameter('true', true, \PDO::PARAM_BOOL)
+            ->setParameter('true', true, ParameterType::BOOLEAN)
             ->groupBy('l.event_id')
             ->executeQuery()
             ->fetchAllAssociative();
@@ -603,11 +604,11 @@ SQL;
 
         $connection = $this->getEntityManager()->getConnection();
         $stmt       = $connection->prepare($sql);
-        $stmt->bindValue('dateAdded', $dateAdded, \PDO::PARAM_STR);
-        $stmt->bindValue('message', $message, \PDO::PARAM_STR);
-        $stmt->bindValue('contactId', $contactId, \PDO::PARAM_INT);
-        $stmt->bindValue('campaignId', $campaignId, \PDO::PARAM_INT);
-        $stmt->bindValue('rotation', $rotation, \PDO::PARAM_INT);
+        $stmt->bindValue('dateAdded', $dateAdded, ParameterType::STRING);
+        $stmt->bindValue('message', $message, ParameterType::STRING);
+        $stmt->bindValue('contactId', $contactId, ParameterType::INTEGER);
+        $stmt->bindValue('campaignId', $campaignId, ParameterType::INTEGER);
+        $stmt->bindValue('rotation', $rotation, ParameterType::INTEGER);
         $stmt->executeStatement();
 
         // Now unschedule them

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
@@ -34,8 +35,8 @@ final class Version20231110103625 extends AbstractMauticMigration
 
             $updateSql = sprintf('UPDATE %s SET readable_permissions = :permissions WHERE id = :id', $this->getPrefixedTableName());
             $stmt      = $this->connection->prepare($updateSql);
-            $stmt->bindValue('permissions', $permissionsString, \PDO::PARAM_STR);
-            $stmt->bindValue('id', $row['id'], \PDO::PARAM_INT);
+            $stmt->bindValue('permissions', $permissionsString, ParameterType::STRING);
+            $stmt->bindValue('id', $row['id'], ParameterType::INTEGER);
             $updatedRecords += $stmt->executeStatement();
 
             foreach ($addPermissions as $permissionsToAdd) {
@@ -43,10 +44,10 @@ final class Version20231110103625 extends AbstractMauticMigration
                     $sql             = sprintf('INSERT IGNORE  INTO %s (role_id, bundle, name, bitwise) VALUES (:role_id, :bundle, :name, :bitwise)', $this->prefix.'permissions');
                     $stmt            = $this->connection->prepare($sql);
                     $permissionArray = explode(':', $permissionToAdd);
-                    $stmt->bindValue('role_id', $row['id'], \PDO::PARAM_INT);
-                    $stmt->bindValue('bundle', $permissionArray[0], \PDO::PARAM_STR);
-                    $stmt->bindValue('name', $permissionArray[1], \PDO::PARAM_STR);
-                    $stmt->bindValue('bitwise', $bitwise, \PDO::PARAM_INT);
+                    $stmt->bindValue('role_id', $row['id'], ParameterType::INTEGER);
+                    $stmt->bindValue('bundle', $permissionArray[0], ParameterType::STRING);
+                    $stmt->bindValue('name', $permissionArray[1], ParameterType::STRING);
+                    $stmt->bindValue('bitwise', $bitwise, ParameterType::INTEGER);
                     $stmt->executeStatement();
                 }
             }

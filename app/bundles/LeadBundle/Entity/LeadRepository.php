@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -677,8 +678,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if ($dateFrom && $dateTo) {
             $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), ParameterType::INTEGER)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), ParameterType::INTEGER);
         }
 
         return $this->getEntities($args);
@@ -1366,7 +1367,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         // Again ignoring Aunt Sally here (PEMDAS)
         foreach ($changes as $operator => $points) {
             $qb->set('points', 'points '.$operator.' :points'.$ph)
-                ->setParameter('points'.$ph, $points, \PDO::PARAM_INT);
+                ->setParameter('points'.$ph, $points, ParameterType::INTEGER);
 
             ++$ph;
         }
