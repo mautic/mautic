@@ -78,9 +78,6 @@ final class SearchSubscriberTest extends TestCase
         $contactRepository->method('getEntity')
             ->willReturn(null);
 
-        $contactRepository->method('createQueryBuilder')
-            ->willReturn(new QueryBuilder($connection));
-
         $translator
             ->method('trans')
             ->willReturnCallback(function (string $key): ?string {
