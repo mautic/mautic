@@ -355,6 +355,7 @@ final class PageController extends FormController
                         'objectId'     => $activePage->getId(),
                         'variants'     => $variants,
                         'translations' => $translations,
+                        'actionRoute'  => 'mautic_page_action',
                     ]
                 )->createView(),
             ],
