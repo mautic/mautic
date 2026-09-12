@@ -102,6 +102,42 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
+     * DBAL 4's targeted resets have to clear the tracked part as well, or the clause
+     * lives on in the SQL this builder generates.
+     */
+    public function resetWhere(): static
+    {
+        parent::resetWhere();
+        $this->resetQueryPart('where');
+
+        return $this;
+    }
+
+    public function resetGroupBy(): static
+    {
+        parent::resetGroupBy();
+        $this->resetQueryPart('groupBy');
+
+        return $this;
+    }
+
+    public function resetHaving(): static
+    {
+        parent::resetHaving();
+        $this->resetQueryPart('having');
+
+        return $this;
+    }
+
+    public function resetOrderBy(): static
+    {
+        parent::resetOrderBy();
+        $this->resetQueryPart('orderBy');
+
+        return $this;
+    }
+
+    /**
      * Compatibility shim for DBAL 3's add(). Mautic uses it to attach MySQL index hints
      * to a FROM clause, which the fluent API has never been able to express.
      */
