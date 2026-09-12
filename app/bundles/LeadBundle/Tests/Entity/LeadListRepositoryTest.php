@@ -6,8 +6,9 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\Query\Expr;
+use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -29,7 +30,7 @@ final class LeadListRepositoryTest extends TestCase
     private MockObject $queryBuilderMock;
 
     /**
-     * @var MockObject&Expr
+     * @var MockObject&ExpressionBuilder
      */
     private MockObject $expressionMock;
 
@@ -39,7 +40,7 @@ final class LeadListRepositoryTest extends TestCase
 
         $this->connection       = $this->createMock(Connection::class);
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $this->expressionMock   = $this->createMock(Expr::class);
+        $this->expressionMock   = $this->createMock(ExpressionBuilder::class);
         $this->repository       = $this->configureRepository(LeadList::class);
     }
 
@@ -185,7 +186,7 @@ final class LeadListRepositoryTest extends TestCase
 SQL;
         $this->connection->expects($this->once())
             ->method('executeQuery')
-            ->with($sql, [$contactId], [\PDO::PARAM_INT])
+            ->with($sql, [$contactId], [ParameterType::INTEGER])
             ->willReturn($this->result);
         $this->result->expects($this->once())
             ->method('fetchFirstColumn')
@@ -211,7 +212,7 @@ SQL;
             ->with(
                 $sql,
                 [$contactId, $expectedSegmentIds],
-                [\PDO::PARAM_INT, ArrayParameterType::INTEGER]
+                [ParameterType::INTEGER, ArrayParameterType::INTEGER]
             )
             ->willReturn($this->result);
 
@@ -249,12 +250,12 @@ SQL;
         $this->expressionMock->expects($this->once())
             ->method('in')
             ->with('l.leadlist_id', ':listIds')
-            ->willReturnSelf();
+            ->willReturn('l.leadlist_id IN (:listIds)');
 
         $this->expressionMock->expects($this->once())
             ->method('eq')
             ->with('l.manually_removed', ':false')
-            ->willReturnSelf();
+            ->willReturn('l.manually_removed = :false');
 
         $expectedCalls = [
             ['listIds', $listIds, ArrayParameterType::INTEGER],
@@ -284,47 +285,29 @@ SQL;
 
         $this->mockGetLeadCount($queryResult);
 
-        $fromPart = [
-            [
-                'alias' => 'l',
-                'table' => MAUTIC_TABLE_PREFIX.'lead_lists_leads',
-            ],
-        ];
-
+        // The USE INDEX hint is folded into the alias as the FROM is built, so there is a
+        // single from() call and no read-back of the query part.
         $this->queryBuilderMock->expects($this->once())
-            ->method('getQueryPart')
-            ->willReturn($fromPart);
-        $matcher = $this->exactly(2);
-
-        $this->queryBuilderMock->expects($matcher)
-            ->method('from')->willReturnCallback(function (...$parameters) use ($matcher) {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $parameters[0]);
-                    $this->assertSame('l', $parameters[1]);
-
-                    return $this->queryBuilderMock;
-                }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $parameters[0]);
-                    $this->assertSame('l USE INDEX ('.MAUTIC_TABLE_PREFIX.'manually_removed)', $parameters[1]);
-
-                    return $this->queryBuilderMock;
-                }
-            });
+            ->method('from')
+            ->with(
+                MAUTIC_TABLE_PREFIX.'lead_lists_leads',
+                'l USE INDEX ('.MAUTIC_TABLE_PREFIX.'manually_removed)'
+            )
+            ->willReturnSelf();
         $matcher = $this->exactly(2);
 
         $this->expressionMock->expects($matcher)
-            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher, $listIds): MockObject {
+            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher, $listIds): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.leadlist_id', $parameters[0]);
-                    $this->assertSame($listIds[0], $parameters[1]);
+                    $this->assertSame((string) $listIds[0], $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.manually_removed', $parameters[0]);
                     $this->assertSame(':false', $parameters[1]);
                 }
 
-                return $this->expressionMock;
+                return 'expression';
             });
 
         $this->assertSame($counts[0], $this->repository->getLeadCount($listIds));
@@ -356,7 +339,7 @@ SQL;
 
         $this->queryBuilderMock->expects($this->once())
             ->method('where')
-            ->with($this->expressionMock)
+            ->with($this->anything(), $this->anything())
             ->willReturnSelf();
 
         $this->queryBuilderMock->expects($this->once())

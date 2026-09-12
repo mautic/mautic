@@ -27,7 +27,7 @@ class TrackableRepository extends CommonRepository
                 $q->expr()->and(
                     $q->expr()->eq('r.id', 't.redirect_id'),
                     $q->expr()->eq('t.channel', ':channel'),
-                    $q->expr()->eq('t.channel_id', (int) $channelId)
+                    $q->expr()->eq('t.channel_id', (string) ((int) $channelId))
                 )
             )
             ->setParameter('channel', $channel)
@@ -67,7 +67,7 @@ class TrackableRepository extends CommonRepository
      *
      * @return array
      */
-    public function findByUrls(array $urls, $channel, $channelId)
+    public function findByUrls(array $urls, $channel, $channelId): mixed
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($alias)
@@ -97,9 +97,9 @@ class TrackableRepository extends CommonRepository
             ->set('hits', 'hits + '.(int) $increaseBy)
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('redirect_id', (int) $redirectId),
+                    $q->expr()->eq('redirect_id', (string) ((int) $redirectId)),
                     $q->expr()->eq('channel', ':channel'),
-                    $q->expr()->eq('channel_id', (int) $channelId)
+                    $q->expr()->eq('channel_id', (string) ((int) $channelId))
                 )
             )
             ->setParameter('channel', $channel);
@@ -120,7 +120,7 @@ class TrackableRepository extends CommonRepository
      */
     public function getCount($channel, $channelIds, $listId, ?ChartQuery $chartQuery = null, bool $combined = false, $countColumn = 'ph.id')
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('count('.$countColumn.') as click_count')
             ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut')
             ->innerJoin('cut', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.redirect_id = cut.redirect_id AND ph.source = cut.channel AND ph.source_id = cut.channel_id');

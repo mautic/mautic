@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -12,7 +14,7 @@ class RedirectRepository extends CommonRepository
     /**
      * @return array
      */
-    public function findByUrls(array $urls)
+    public function findByUrls(array $urls): mixed
     {
         $q = $this->createQueryBuilder('r');
 
@@ -45,14 +47,13 @@ class RedirectRepository extends CommonRepository
     }
 
     /**
-     * @param int      $limit
      * @param int|null $createdByUserId
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
      */
     public function getMostHitEmailRedirects(
-        $limit,
+        ?int $limit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $createdByUserId = null,
@@ -117,7 +118,7 @@ class RedirectRepository extends CommonRepository
                     $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
-                        $sb->expr()->eq('lll.manually_removed', 0)
+                        $sb->expr()->eq('lll.manually_removed', (string) (0))
                     )
                 );
 

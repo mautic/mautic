@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ParameterType;
@@ -47,7 +49,7 @@ class StagesChangeLogRepository extends CommonRepository
      */
     public function updateLead(string $fromLeadId, string $toLeadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_stages_change_log')
             ->set('lead_id', ':to')
             ->where('lead_id = :from')
@@ -58,7 +60,7 @@ class StagesChangeLogRepository extends CommonRepository
 
     public function updateStage(int $fromStageId, int $toStageId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_stages_change_log')
             ->set('stage_id', ':to')
             ->where('stage_id = :from')

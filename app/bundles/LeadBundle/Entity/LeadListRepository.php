@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -85,10 +86,8 @@ class LeadListRepository extends CommonRepository
      * @param string $alias
      * @param string $id
      * @param bool   $justPublished if false, returns all published and unpublished segments
-     *
-     * @return array
      */
-    public function getLists(?User $user = null, $alias = '', $id = '', bool $justPublished = true)
+    public function getLists(?User $user = null, $alias = '', $id = '', bool $justPublished = true): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
@@ -218,7 +217,7 @@ class LeadListRepository extends CommonRepository
                 $qb->expr()->and(
                     $qb->expr()->in('ll.leadlist_id', ':ids'),
                     $qb->expr()->eq('ll.lead_id', ':leadId'),
-                    $qb->expr()->eq('ll.manually_removed', 0)
+                    $qb->expr()->eq('ll.manually_removed', (string) (0))
                 )
             )
             ->setParameter('leadId', $lead->getId())
@@ -229,10 +228,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * Return a list of global lists.
-     *
-     * @return array
      */
-    public function getGlobalLists()
+    public function getGlobalLists(): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
@@ -285,15 +282,20 @@ class LeadListRepository extends CommonRepository
             $listIds = [$listIds];
         }
 
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
-
         $countListIds = count($listIds);
 
+        // The index hint has to be folded into the alias as the FROM is built: DBAL 4
+        // removed the query-part API that previously allowed rewriting it afterwards.
+        $fromAlias = 1 === $countListIds
+            ? sprintf('l USE INDEX (%s)', MAUTIC_TABLE_PREFIX.'manually_removed')
+            : 'l';
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $fromAlias);
+
         if (1 === $countListIds) {
-            $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
-            $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
+            $expression = $q->expr()->eq('l.leadlist_id', (string) $listIds[0]);
         } else {
             $expression = $q->expr()->in('l.leadlist_id', ':listIds');
             $q->setParameter('listIds', $listIds, ArrayParameterType::INTEGER);
@@ -319,16 +321,6 @@ class LeadListRepository extends CommonRepository
         }
 
         return (1 === $countListIds) ? $return[$listIds[0]] : $return;
-    }
-
-    private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
-    {
-        $fromPart             = $qb->getQueryPart('from');
-        $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
-        $qb->resetQueryPart('from');
-        $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
-
-        return $qb;
     }
 
     public function arrangeFilters($filters): array
@@ -364,7 +356,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return QueryBuilder
      */
-    protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
+    protected function createFilterExpressionSubQuery($table, ?string $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
     {
         $subQb   = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subExpr = [];
@@ -449,7 +441,7 @@ class LeadListRepository extends CommonRepository
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
-                    $this->_em->getConnection()->createQueryBuilder(),
+                    $this->getEntityManager()->getConnection()->createQueryBuilder(),
                     'leadlist_id',
                     'lead_list_projects_xref',
                     'l',
@@ -562,7 +554,7 @@ class LeadListRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx')
             ->join('clx', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = clx.campaign_id');
         $q->where(
-            $q->expr()->eq('clx.leadlist_id', $segmentId)
+            $q->expr()->eq('clx.leadlist_id', (string) ($segmentId))
         );
 
         $lists   = [];
@@ -591,11 +583,11 @@ SQL;
             ->executeQuery(
                 $sql,
                 [$contactId],
-                [\PDO::PARAM_INT]
+                [ParameterType::INTEGER]
             )
             ->fetchFirstColumn();
 
-        return !empty($segmentIds);
+        return $segmentIds !== [];
     }
 
     public function isNotContactInAnySegment(int $contactId): bool
@@ -669,7 +661,7 @@ SQL;
                 $sql,
                 [$contactId, $expectedSegmentIds],
                 [
-                    \PDO::PARAM_INT,
+                    ParameterType::INTEGER,
                     ArrayParameterType::INTEGER,
                 ]
             )

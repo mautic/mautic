@@ -16,7 +16,7 @@ final readonly class CompanyHelper
     /**
      * @return string|bool
      */
-    public function getCompanyName(int $id)
+    public function getCompanyName(int $id): mixed
     {
         return $this->connection->createQueryBuilder()
             ->select('c.companyname')

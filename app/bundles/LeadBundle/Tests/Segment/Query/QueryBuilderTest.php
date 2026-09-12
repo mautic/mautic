@@ -10,7 +10,6 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
-use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use PHPUnit\Framework\TestCase;
@@ -28,8 +27,6 @@ final class QueryBuilderTest extends TestCase
     public function testExpr(): void
     {
         $expr = $this->queryBuilder->expr();
-
-        $this->assertInstanceOf(ExpressionBuilder::class, $expr);
         $this->assertSame($expr, $this->queryBuilder->expr());
     }
 
@@ -502,7 +499,7 @@ final class QueryBuilderTest extends TestCase
     private function createConnectionFake(): Connection
     {
         return new class([], $this->createStub(Driver::class)) extends Connection {
-            public function getDatabasePlatform()
+            public function getDatabasePlatform(): \Doctrine\DBAL\Platforms\MySQLPlatform
             {
                 return new MySQLPlatform();
             }

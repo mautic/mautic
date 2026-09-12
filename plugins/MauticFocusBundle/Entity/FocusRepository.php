@@ -12,10 +12,7 @@ class FocusRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    /**
-     * @return array
-     */
-    public function findByForm($formId)
+    public function findByForm($formId): array
     {
         return $this->findBy(
             [
@@ -28,7 +25,7 @@ class FocusRepository extends CommonRepository
     {
         $alias = $this->getTableAlias();
 
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($alias)
             ->from(Focus::class, $alias, $alias.'.id');
@@ -52,7 +49,7 @@ class FocusRepository extends CommonRepository
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'),
             $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
-                $this->_em->getConnection()->createQueryBuilder(),
+                $this->getEntityManager()->getConnection()->createQueryBuilder(),
                 'focus_id',
                 'focus_projects_xref',
                 $this->getTableAlias(),
@@ -88,10 +85,7 @@ class FocusRepository extends CommonRepository
         return 'f';
     }
 
-    /**
-     * @return array
-     */
-    public function getFocusList($currentId)
+    public function getFocusList($currentId): array
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, description}')->orderBy('f.name');

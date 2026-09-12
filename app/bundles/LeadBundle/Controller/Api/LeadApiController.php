@@ -112,7 +112,7 @@ final class LeadApiController extends CommonApiController
 
         $filter  = $request->query->get('filter');
         $limit   = $request->query->get('limit');
-        $start   = $request->query->get('start');
+        $start   = $request->query->getInt('start');
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
         $view    = $this->view($users, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['userList']);

@@ -18,6 +18,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
@@ -394,8 +395,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->build();
 
         $builder->addNullableField('template', Types::STRING);
-        $builder->addNullableField('content', Types::ARRAY);
-        $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
+        $builder->addNullableField('content', ArrayType::ARRAY);
+        $builder->addNullableField('utmTags', ArrayType::ARRAY, 'utm_tags');
         $builder->addNullableField('plainText', Types::TEXT, 'plain_text');
         $builder->addNullableField('customHtml', Types::TEXT, 'custom_html');
         $builder->addNullableField('emailType', Types::TEXT, 'email_type');

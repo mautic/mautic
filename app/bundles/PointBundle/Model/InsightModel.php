@@ -126,7 +126,7 @@ final class InsightModel extends CommonFormModel
             ->getQuery()
             ->getArrayResult();
 
-        if (empty($results)) {
+        if ($results === []) {
             return false;
         }
 

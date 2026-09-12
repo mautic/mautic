@@ -7,8 +7,8 @@ namespace Mautic\ReportBundle\Tests\Builder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
@@ -44,8 +44,8 @@ final class MauticReportBuilderTest extends TestCase
             new QueryBuilder($this->connection),
             new QueryBuilder($this->connection),
         );
-        $this->connection->method('getExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
-        $this->connection->method('quote')->willReturnMap([['', null, "''"]]);
+        $this->connection->method('createExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
+        $this->connection->method('quote')->willReturnMap([['', "''"]]);
     }
 
     public function testColumnSanitization(): void

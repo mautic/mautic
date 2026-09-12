@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
@@ -156,7 +156,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilderMock
             ->method('getQueryPart')
-            ->willReturnCallback(function ($input): array|string {
+            ->willReturnCallback(function (string $input): array|string {
                 if ('join' === $input) {
                     return [
                         'lp' => [[

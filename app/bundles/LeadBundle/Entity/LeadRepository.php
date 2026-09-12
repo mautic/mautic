@@ -6,8 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -554,10 +556,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return ['core', 'social', 'personal', 'professional'];
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getEntitiesDbalQueryBuilder()
+    public function getEntitiesDbalQueryBuilder(): \Mautic\CoreBundle\Doctrine\Query\QueryBuilder
     {
         $alias = $this->getTableAlias();
 
@@ -626,7 +625,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if ($entityId && $entityColumnName) {
             $joinCondition = $joinCondition->with(
-                $qb->expr()->eq("entity.{$entityColumnName}", (int) $entityId)
+                $qb->expr()->eq("entity.{$entityColumnName}", (string) ((int) $entityId))
             );
         }
 
@@ -677,8 +676,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if ($dateFrom && $dateTo) {
             $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), ParameterType::INTEGER)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), ParameterType::INTEGER);
         }
 
         return $this->getEntities($args);
@@ -798,6 +797,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                             $queryBuilder->expr()->in('lla.leadlist_id', ":{$unique}")
                         )
                     );
+                \assert($queryBuilder instanceof TrackingQueryBuilder);
                 $from = $queryBuilder->getQueryPart('from')[0];
                 $queryBuilder->resetQueryPart('from');
                 $queryBuilder->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
@@ -1186,7 +1186,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
-        if ($results) {
+        if ($results !== []) {
             $contacts = [];
             foreach ($results as $result) {
                 $contacts[$result['id']] = $result;
@@ -1285,7 +1285,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $qb->where(
             $qb->expr()->and(
-                $qb->expr()->gt("{$alias}.id", (int) $lastId),
+                $qb->expr()->gt("{$alias}.id", (string) ((int) $lastId)),
                 $qb->expr()->isNotNull("{$alias}.date_identified")
             )
         )
@@ -1311,6 +1311,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
 
         $this->useDistinctCount = true;
+        \assert($q instanceof TrackingQueryBuilder);
         if (!preg_match('/"'.preg_quote($primaryTable['alias'], '/').'"/i', json_encode($q->getQueryPart('join')))) {
             $q->{$joinType}(
                 $primaryTable['from_alias'],
@@ -1366,7 +1367,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         // Again ignoring Aunt Sally here (PEMDAS)
         foreach ($changes as $operator => $points) {
             $qb->set('points', 'points '.$operator.' :points'.$ph)
-                ->setParameter('points'.$ph, $points, \PDO::PARAM_INT);
+                ->setParameter('points'.$ph, $points, ParameterType::INTEGER);
 
             ++$ph;
         }
@@ -1437,7 +1438,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $queries = array_map(
-            fn (string $fieldAlias) => $this->getDuplicateValuesQuery([$fieldAlias])->getSQL(),
+            fn (string $fieldAlias): string => $this->getDuplicateValuesQuery([$fieldAlias])->getSQL(),
             $fieldsAliases
         );
 
@@ -1455,7 +1456,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     private function getDuplicateValuesQuery(array $fieldsAliases): QueryBuilder
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select(array_merge(["MIN({$this->getTableAlias()}.id) as minId"], $fieldsAliases))
+            ->select(...array_merge(["MIN({$this->getTableAlias()}.id) as minId"], $fieldsAliases))
             ->from($this->getTableName(), $this->getTableAlias());
 
         $andWhere = [$qb->expr()->isNotNull($this->getTableAlias().'.date_identified')];
@@ -1465,7 +1466,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $qb->where($qb->expr()->and(...$andWhere));
-        $qb->groupBy($fieldsAliases);
+        $qb->groupBy(...$fieldsAliases);
         $qb->having('count(*) > 1');
 
         return $qb;

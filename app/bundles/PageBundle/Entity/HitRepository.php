@@ -32,7 +32,7 @@ class HitRepository extends CommonRepository
 
         // If we know the lead, use that to determine uniqueness
         if (null !== $lead && $lead->getId()) {
-            $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', $lead->getId()));
+            $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', (string) ($lead->getId())));
         } else {
             $expr = CompositeExpression::and($q2->expr()->eq('h.tracking_id', ':id'));
             $q->setParameter('id', $trackingId);
@@ -40,11 +40,11 @@ class HitRepository extends CommonRepository
 
         if ($page instanceof Page) {
             $expr = $expr->with(
-                $q2->expr()->eq('h.page_id', $page->getId())
+                $q2->expr()->eq('h.page_id', (string) ($page->getId()))
             );
         } elseif ($page instanceof Redirect) {
             $expr = $expr->with(
-                $q2->expr()->eq('h.redirect_id', $page->getId())
+                $q2->expr()->eq('h.redirect_id', (string) ($page->getId()))
             );
         }
 
@@ -92,10 +92,7 @@ class HitRepository extends CommonRepository
         return $this->getTimelineResults($query, $options, 'p.title', 'h.date_hit', ['query'], ['dateHit', 'dateLeft'], null, 'h.id');
     }
 
-    /**
-     * @return array
-     */
-    public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200)
+    public function getHitCountForSource(bool|string|int|float $source, $sourceId = null, $fromDate = null, $code = 200): array
     {
         $query = $this->createQueryBuilder('h');
         $query->select('count(distinct(h.trackingId)) as hitCount');
@@ -129,7 +126,7 @@ class HitRepository extends CommonRepository
      */
     public function getEmailClickthroughHitCount($emailIds, ?\DateTime $fromDate = null, $code = 200, ?\DateTime $toDate = null): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         if (!is_array($emailIds)) {
             $emailIds = [$emailIds];
@@ -153,7 +150,7 @@ class HitRepository extends CommonRepository
                 ->setParameter('dateTo', $dateHelper->toUtcString());
         }
 
-        $q->andWhere($q->expr()->eq('h.code', (int) $code));
+        $q->andWhere($q->expr()->eq('h.code', (string) ((int) $code)));
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -230,7 +227,7 @@ class HitRepository extends CommonRepository
      */
     public function getLatestHit($options): ?\DateTime
     {
-        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sq->select('h.date_hit')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->orderBy('h.date_hit', 'DESC')
@@ -238,7 +235,7 @@ class HitRepository extends CommonRepository
 
         if (isset($options['leadId'])) {
             $sq->andWhere(
-                $sq->expr()->eq('h.lead_id', $options['leadId'])
+                $sq->expr()->eq('h.lead_id', (string) ($options['leadId']))
             );
         }
         if (isset($options['urls']) && $options['urls']) {
@@ -249,7 +246,7 @@ class HitRepository extends CommonRepository
             }
         }
         if (isset($options['second_to_last'])) {
-            $sq->andWhere($sq->expr()->neq('h.id', $options['second_to_last']));
+            $sq->andWhere($sq->expr()->neq('h.id', (string) ($options['second_to_last'])));
         }
 
         $latestHit = $sq->executeQuery()->fetchOne();
@@ -295,7 +292,7 @@ class HitRepository extends CommonRepository
         $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $expr = $q->expr()->and(
             $q->expr()->{$inOrEq}('h.page_id', $pageIds),
-            $q->expr()->eq('h.code', 200),
+            $q->expr()->eq('h.code', (string) (200)),
             $q->expr()->isNull('h.date_left')
         );
 
@@ -364,7 +361,7 @@ class HitRepository extends CommonRepository
      */
     public function getDwellTimesForPages(array $pageIds, array $options): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
             ->select('ph.page_id, ph.date_hit, ph.date_left, p.title')
@@ -417,7 +414,7 @@ class HitRepository extends CommonRepository
      */
     public function getDwellTimesForUrl($url, array $options): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
             ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
             ->select('ph.id, ph.page_id, ph.date_hit, ph.date_left, ph.tracking_id, ph.page_language, p.title')
@@ -427,7 +424,7 @@ class HitRepository extends CommonRepository
 
         if (isset($options['leadId']) && $options['leadId']) {
             $q->andWhere(
-                $q->expr()->eq('ph.lead_id', (int) $options['leadId'])
+                $q->expr()->eq('ph.lead_id', (string) ((int) $options['leadId']))
             );
         }
 
@@ -470,7 +467,7 @@ class HitRepository extends CommonRepository
     public function updateHitDateLeft($lastHitId): void
     {
         $dt = new DateTimeHelper();
-        $q  = $this->_em->getConnection()->createQueryBuilder();
+        $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('date_left', ':datetime')
             ->where('id = '.(int) $lastHitId)
@@ -482,13 +479,11 @@ class HitRepository extends CommonRepository
      * Get list of referers ordered by it's count.
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     * @param int                               $limit
-     * @param int                               $offset
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers($query, $limit = 10, $offset = 0): array
+    public function getReferers($query, ?int $limit = 10, int $offset = 0): array
     {
         $query->select('ph.referer, count(ph.referer) as sessions')
             ->groupBy('ph.referer')
@@ -503,15 +498,11 @@ class HitRepository extends CommonRepository
      * Get list of referers ordered by it's count.
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     * @param int                               $limit
-     * @param int                               $offset
-     * @param string                            $column
      * @param string                            $as
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostVisited($query, $limit = 10, $offset = 0, $column = 'p.hits', $as = ''): array
+    public function getMostVisited($query, ?int $limit = 10, int $offset = 0, string $column = 'p.hits', $as = ''): array
     {
         if ($as) {
             $as = ' as "'.$as.'"';
@@ -529,7 +520,7 @@ class HitRepository extends CommonRepository
 
     public function updateLeadByTrackingId($leadId, $newTrackingId, $oldTrackingId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('lead_id', (int) $leadId)
             ->set('tracking_id', ':newTrackingId')
@@ -548,7 +539,7 @@ class HitRepository extends CommonRepository
      */
     public function updateLead($fromLeadId, $toLeadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
@@ -557,7 +548,7 @@ class HitRepository extends CommonRepository
 
     public function getLatestHitDateByLead(int $leadId, ?string $trackingId = null): ?\DateTime
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('MAX(date_hit)')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits')
             ->where('lead_id = :leadId')

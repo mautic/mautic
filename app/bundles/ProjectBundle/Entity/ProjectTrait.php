@@ -30,7 +30,6 @@ trait ProjectTrait
             ->setOrderBy(['name' => 'ASC'])
             ->setIndexBy('name')
             ->fetchLazy()
-            ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
             ->build();

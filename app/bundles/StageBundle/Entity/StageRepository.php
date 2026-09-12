@@ -47,7 +47,7 @@ class StageRepository extends CommonRepository
      *
      * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType($type): mixed
     {
         $q = $this->createQueryBuilder('s')
             ->select('partial s.{id, name}')
@@ -67,7 +67,7 @@ class StageRepository extends CommonRepository
      */
     public function getCompletedLeadActions($type, $leadId): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('s.*')
             ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX.'stages', 's', 'x.stage_id = s.id');
@@ -75,7 +75,7 @@ class StageRepository extends CommonRepository
         // make sure the published up and down dates are good
         $q->where(
             $q->expr()->and(
-                $q->expr()->eq('x.lead_id', (int) $leadId)
+                $q->expr()->eq('x.lead_id', (string) ((int) $leadId))
             )
         );
 
@@ -102,7 +102,7 @@ class StageRepository extends CommonRepository
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
-                $this->_em->getConnection()->createQueryBuilder(),
+                $this->getEntityManager()->getConnection()->createQueryBuilder(),
                 'stage_id',
                 'stage_projects_xref',
                 $this->getTableAlias(),
@@ -134,7 +134,7 @@ class StageRepository extends CommonRepository
             $user = $user->getId();
         }
 
-        $q = $this->_em->createQueryBuilder()
+        $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Stage::class, 's', 's.id');
 
         $q->select('partial s.{id, name}')
@@ -163,7 +163,7 @@ class StageRepository extends CommonRepository
             return null;
         }
 
-        $q = $this->_em->createQueryBuilder()
+        $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Stage::class, 's', 's.id');
 
         $q->select('partial s.{id, name}')
@@ -188,9 +188,9 @@ class StageRepository extends CommonRepository
      *
      * @return Stage|null
      */
-    public function findByIdOrName($value)
+    public function findByIdOrName($value): mixed
     {
-        $qb = $this->_em->createQueryBuilder()
+        $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('s')
             ->from(Stage::class, 's');
 

@@ -76,7 +76,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $availableSocialFields = [];
 
     /**
-     * @var string
+     * @var int|string
      */
     #[Groups(['contact:read', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $id;
@@ -338,7 +338,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->mappedBy('lead')
             ->cascadePersist()
             ->cascadeDetach()
-            ->cascadeMerge()
             ->fetchExtraLazy()
             ->build();
 
@@ -348,7 +347,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('ipAddress')
             ->cascadeDetach()
-            ->cascadeMerge()
             ->cascadePersist()
             ->build();
 
@@ -362,7 +360,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder->createOneToMany('eventLog', LeadEventLog::class)
             ->mappedBy('lead')
             ->cascadePersist()
-            ->cascadeMerge()
             ->cascadeDetach()
             ->fetchExtraLazy()
             ->build();
@@ -391,7 +388,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->setOrderBy(['dateAdded' => 'DESC'])
             ->mappedBy('lead')
             ->cascadeDetach()
-            ->cascadeMerge()
             ->fetchExtraLazy()
             ->build();
 
@@ -407,14 +403,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->setOrderBy(['tag' => 'ASC'])
             ->setIndexBy('tag')
             ->fetchLazy()
-            ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
             ->build();
 
         $builder->createManyToOne('stage', Stage::class)
             ->cascadePersist()
-            ->cascadeMerge()
             ->cascadeDetach()
             ->addJoinColumn('stage_id', 'id', true, false, 'SET NULL')
             ->build();

@@ -16,10 +16,8 @@ class StatRepository extends CommonRepository
      * Fetch the base stat data from the database.
      *
      * @param int $id
-     *
-     * @return mixed
      */
-    public function getStats($id, $type, $fromDate = null)
+    public function getStats($id, $type, $fromDate = null): array
     {
         $q = $this->createQueryBuilder('s');
 
@@ -43,7 +41,7 @@ class StatRepository extends CommonRepository
 
     public function getViewsCount(int $id): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('COUNT(s.id) as views_count')
             ->from(MAUTIC_TABLE_PREFIX.'focus_stats', 's');
@@ -62,7 +60,7 @@ class StatRepository extends CommonRepository
 
     public function getUniqueViewsCount(int $id): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('COUNT(DISTINCT s.lead_id) as views_count')
             ->from(MAUTIC_TABLE_PREFIX.'focus_stats', 's');
@@ -81,7 +79,7 @@ class StatRepository extends CommonRepository
 
     public function getClickThroughCount(int $id): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('COUNT(DISTINCT s.lead_id) as click_through_count')
             ->from(MAUTIC_TABLE_PREFIX.'focus_stats', 's');
@@ -134,7 +132,7 @@ class StatRepository extends CommonRepository
         $q->where($q->expr()->eq('s.type', ':type'));
 
         if ($leadId) {
-            $q->andWhere($q->expr()->eq('s.lead_id', (int) $leadId));
+            $q->andWhere($q->expr()->eq('s.lead_id', (string) ((int) $leadId)));
         }
 
         $q->setParameter('type', $type);

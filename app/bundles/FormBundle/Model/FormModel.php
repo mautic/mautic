@@ -858,11 +858,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Get a list of assets in a date range.
      *
-     * @param int                  $limit
      * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getFormList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getFormList(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.name, t.date_added, t.date_modified')

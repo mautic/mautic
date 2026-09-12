@@ -47,6 +47,8 @@ phpstan.neon.dist
 /var/tmp/*
 !/var/tmp/.gitkeep
 
+/var/import/*
+
 /app/config/local*.php
 /app/config/config_local.php
 /app/config/paths_local.php
@@ -62,6 +64,9 @@ phpstan.neon.dist
 /assets/build/*
 /var/dart-sass/*
 /var/sass/*
+
+/saml_default.crt
+/saml_default.key
 
 /bundles
 /node_modules

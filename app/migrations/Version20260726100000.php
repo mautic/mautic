@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Index\IndexedColumn;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 
 final class Version20260726100000 extends PreUpAssertionMigration
 {
@@ -72,7 +74,12 @@ final class Version20260726100000 extends PreUpAssertionMigration
      */
     private function indexHasColumns(Index $index, array $columns): bool
     {
-        return $index->getColumns() === $columns;
+        $indexColumns = array_map(
+            static fn (IndexedColumn $indexedColumn): string => AssetName::fromName($indexedColumn->getColumnName()),
+            $index->getIndexedColumns()
+        );
+
+        return $indexColumns === $columns;
     }
 
     private function getIndexName(): string

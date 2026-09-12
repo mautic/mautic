@@ -259,7 +259,7 @@ final class TriggerCampaignCommand extends ModeratedCommand
                 ];
             }
 
-            /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
+            /** @var iterable<\Mautic\CampaignBundle\Entity\Campaign> $campaigns */
             $campaigns = $this->campaignRepository->getEntities($filter);
 
             foreach ($campaigns as $campaign) {

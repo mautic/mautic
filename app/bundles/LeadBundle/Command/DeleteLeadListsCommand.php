@@ -58,7 +58,7 @@ final class DeleteLeadListsCommand extends Command
         // All soft deleted segments
         $prefix = $this->leadListRepository->getTableAlias();
 
-        /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $leadLists */
+        /** @var iterable<\Mautic\LeadBundle\Entity\LeadList> $leadLists */
         $leadLists = $this->leadListRepository->getEntities([
             'filter' => [
                 'force' => [

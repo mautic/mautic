@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -36,6 +37,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent('role')]
 class Permission implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
@@ -93,7 +95,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
         $builder->createManyToOne('role', 'Role')
             ->inversedBy('permissions')
             ->addJoinColumn('role_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
             ->build();
 
         $builder->addField('bitwise', 'integer');

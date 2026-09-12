@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Exception\DbalException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -630,7 +631,7 @@ class FieldModel extends FormModel
                 $this->customFieldColumn->createLeadColumn($entity);
             } catch (CustomFieldLimitException $e) {
                 // Convert to original Exception not to cause BC
-                throw new Exception($this->translator->trans($e->getMessage()), $e->getCode(), $e);
+                throw new DbalException($this->translator->trans($e->getMessage()), $e->getCode(), $e);
             }
         } else {
             $this->leadFieldSaver->saveLeadFieldEntity($entity, false);

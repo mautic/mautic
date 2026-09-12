@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -37,6 +38,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent('trigger')]
 class TriggerEvent implements UuidInterface
 {
     use UuidTrait;
@@ -126,7 +128,6 @@ class TriggerEvent implements UuidInterface
         $builder->createManyToOne('trigger', 'Trigger')
             ->inversedBy('events')
             ->addJoinColumn('trigger_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
             ->build();
 
         $builder->createOneToMany('log', 'LeadTriggerLog')

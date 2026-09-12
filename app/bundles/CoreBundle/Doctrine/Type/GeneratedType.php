@@ -20,29 +20,13 @@ final class GeneratedType extends Type
         return '';
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
         return $value;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
     {
         return null;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return self::GENERATED;
     }
 }

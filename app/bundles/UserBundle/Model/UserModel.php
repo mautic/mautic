@@ -95,12 +95,9 @@ class UserModel extends FormModel implements GlobalSearchInterface
      *
      * @param string $search
      * @param int    $limit
-     * @param int    $start
      * @param array  $permissionLimiter
-     *
-     * @return array
      */
-    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
+    public function getUserList($search = '', $limit = 10, ?int $start = 0, $permissionLimiter = []): array
     {
         return $this->userRepository->getUserList($search, $limit, $start, $permissionLimiter);
     }
@@ -159,7 +156,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * @return User|null
      */
-    public function getSystemAdministrator()
+    public function getSystemAdministrator(): ?object
     {
         $adminRole = $this->roleRepository->findOneBy(['isAdmin' => true]);
 

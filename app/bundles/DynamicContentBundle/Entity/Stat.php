@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class Stat
 {
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

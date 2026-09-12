@@ -154,7 +154,7 @@ class DoNotContact implements MauticModelInterface
         $dncEntries = $this->dncRepo->getEntriesByLeadAndChannel($contact, $channel);
 
         // If the lead has no entries in the DNC table, we're good to go
-        if (empty($dncEntries)) {
+        if ($dncEntries === []) {
             return DNC::IS_CONTACTABLE;
         }
 

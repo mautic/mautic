@@ -51,10 +51,8 @@ final class VideoModel extends FormModel
 
     /**
      * @param string $guid
-     *
-     * @return VideoHit
      */
-    public function getHitForLeadByGuid(Lead $lead, $guid)
+    public function getHitForLeadByGuid(Lead $lead, $guid): \Mautic\PageBundle\Entity\VideoHit
     {
         return $this->videoHitRepository->getHitForLeadByGuid($lead, $guid);
     }
@@ -63,7 +61,7 @@ final class VideoModel extends FormModel
      * @param Request $request
      * @param string  $code
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Exception
      */
     public function hitVideo($request, $code = '200'): void

@@ -17,6 +17,42 @@ class ExpressionBuilder extends BaseExpressionBuilder
     private const string IN_NEXT = 'inNext';
 
     /**
+     * DBAL 4 types the comparison operands as string; DBAL 3 accepted any scalar and
+     * cast it while building the SQL. Segment filters still pass ints and floats
+     * (contact ids, counts, timestamps), so they are cast here rather than at every
+     * call site.
+     */
+    public function eq(string|int|float $x, string|int|float $y): string
+    {
+        return parent::eq((string) $x, (string) $y);
+    }
+
+    public function neq(string|int|float $x, string|int|float $y): string
+    {
+        return parent::neq((string) $x, (string) $y);
+    }
+
+    public function lt(string|int|float $x, string|int|float $y): string
+    {
+        return parent::lt((string) $x, (string) $y);
+    }
+
+    public function lte(string|int|float $x, string|int|float $y): string
+    {
+        return parent::lte((string) $x, (string) $y);
+    }
+
+    public function gt(string|int|float $x, string|int|float $y): string
+    {
+        return parent::gt((string) $x, (string) $y);
+    }
+
+    public function gte(string|int|float $x, string|int|float $y): string
+    {
+        return parent::gte((string) $x, (string) $y);
+    }
+
+    /**
      * Creates a between comparison expression.
      *
      * @throws SegmentQueryException
@@ -56,13 +92,8 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *     [php]
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
-     *
-     * @param mixed $x the left expression
-     * @param mixed $y the right expression
-     *
-     * @return string
      */
-    public function regexp($x, $y)
+    public function regexp(string $x, string $y): string
     {
         return $this->comparison($x, self::REGEXP, $y);
     }
@@ -76,11 +107,8 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *     [php]
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
-     *
-     * @param mixed $x the left expression
-     * @param mixed $y the right expression
      */
-    public function notRegexp($x, $y): string
+    public function notRegexp(string $x, string $y): string
     {
         return 'NOT '.$this->comparison($x, self::REGEXP, $y);
     }

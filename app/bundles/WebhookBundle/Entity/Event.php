@@ -47,14 +47,12 @@ class Event
         $builder->createManyToOne('webhook', 'Webhook')
             ->inversedBy('events')
             ->cascadeDetach()
-            ->cascadeMerge()
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
 
         $builder->createOneToMany('queues', 'WebhookQueue')
             ->mappedBy('event')
             ->cascadeDetach()
-            ->cascadeMerge()
             ->fetchExtraLazy()
             ->build();
 

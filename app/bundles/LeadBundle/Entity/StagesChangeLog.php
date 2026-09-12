@@ -61,7 +61,6 @@ class StagesChangeLog
             ->build();
 
         $builder->createManyToOne('stage', Stage::class)
-            ->inversedBy('log')
             ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
             ->build();
 

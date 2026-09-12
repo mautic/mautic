@@ -29,7 +29,7 @@ final class LeadStageLogRepository extends CommonRepository
      */
     public function updateLead(string $fromLeadId, string $toLeadId): void
     {
-        $connection = $this->_em->getConnection();
+        $connection = $this->getEntityManager()->getConnection();
         $table      = MAUTIC_TABLE_PREFIX.LeadStageLog::TABLE_NAME;
 
         // First check to ensure the $toLead doesn't already exist
@@ -48,7 +48,7 @@ final class LeadStageLogRepository extends CommonRepository
             ->setParameter('fromLeadId', $fromLeadId, ParameterType::STRING)
             ->setParameter('toLeadId', $toLeadId, ParameterType::STRING);
 
-        if (!empty($stageIds)) {
+        if ($stageIds !== []) {
             $q->andWhere(
                 $q->expr()->notIn('stage_id', ':stageIds')
             )->setParameter(
@@ -70,7 +70,7 @@ final class LeadStageLogRepository extends CommonRepository
 
     public function updateStage(int $fromStageId, int $toStageId): void
     {
-        $connection = $this->_em->getConnection();
+        $connection = $this->getEntityManager()->getConnection();
         $table      = MAUTIC_TABLE_PREFIX.LeadStageLog::TABLE_NAME;
 
         foreach ($this->getLeadIdBatchesForStage($fromStageId, $table) as $leadIds) {
@@ -91,7 +91,7 @@ final class LeadStageLogRepository extends CommonRepository
             yield $leadIds;
         }
 
-        $connection = $this->_em->getConnection();
+        $connection = $this->getEntityManager()->getConnection();
         if ($hasRows) {
             return;
         }

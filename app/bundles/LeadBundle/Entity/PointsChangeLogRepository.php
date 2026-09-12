@@ -50,7 +50,7 @@ class PointsChangeLogRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostPoints(QueryBuilder $query, $limit = 10, $offset = 0): array
+    public function getMostPoints(QueryBuilder $query, ?int $limit = 10, int $offset = 0): array
     {
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
@@ -64,7 +64,7 @@ class PointsChangeLogRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostLeads(QueryBuilder $query, $limit = 10, $offset = 0): array
+    public function getMostLeads(QueryBuilder $query, ?int $limit = 10, int $offset = 0): array
     {
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
@@ -80,7 +80,7 @@ class PointsChangeLogRepository extends CommonRepository
      */
     public function updateLead($fromLeadId, $toLeadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_points_change_log')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)

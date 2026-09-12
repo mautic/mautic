@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Model;
 
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Exception\DbalException as Exception;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -155,6 +155,10 @@ final class UserModelTest extends TestCase
         $errorMessage = 'Database connection failed';
 
         $this->expectException(PasswordResetTokenCreationFailedException::class);
+
+        $this->userTokenService->expects($this->once())
+            ->method('generateSecret')
+            ->willReturn($this->createStub(UserToken::class));
 
         $this->entityManager->expects($this->once())
             ->method('flush')

@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Query;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -305,10 +306,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * @param string $type
      * @param string $filter
      * @param int    $limit
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults($type, $filter = '', $limit = 10): array
     {
         $results = [];
         if ('page' === $type) {
@@ -876,6 +875,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             $this->limitQueryToCreator($allQ);
         }
 
+        \assert($allQ instanceof TrackingQueryBuilder);
         $allQ->resetQueryPart('select')->select('t.lead_id');
         $allQ->groupBy('t.lead_id');
 
@@ -951,7 +951,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         $chart   = new PieChart();
 
-        if (empty($results)) {
+        if ($results === []) {
             $results[] = [
                 'device' => $this->translator->trans('mautic.report.report.noresults'),
                 'count'  => 0,
@@ -970,10 +970,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of popular (by hits) pages.
      *
-     * @param int   $limit
      * @param array $filters
      */
-    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getPopularPages(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -998,10 +997,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of pages created in a date range.
      *
-     * @param int   $limit
      * @param array $filters
      */
-    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getPageList(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')

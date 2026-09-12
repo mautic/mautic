@@ -38,7 +38,7 @@ final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCa
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     protected function getContactWithCompanies(): Lead

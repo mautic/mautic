@@ -30,7 +30,7 @@ class UserRepository extends CommonRepository
     {
         $now      = new DateTimeHelper();
         $datetime = $now->toUtcString();
-        $conn     = $this->_em->getConnection();
+        $conn     = $this->getEntityManager()->getConnection();
         $conn->update(MAUTIC_TABLE_PREFIX.'users', [
             'last_login'  => $datetime,
             'last_active' => $datetime,
@@ -40,7 +40,7 @@ class UserRepository extends CommonRepository
     public function setLastActive($user): void
     {
         $now  = new DateTimeHelper();
-        $conn = $this->_em->getConnection();
+        $conn = $this->getEntityManager()->getConnection();
         $conn->update(MAUTIC_TABLE_PREFIX.'users', ['last_active' => $now->toUtcString()], ['id' => (int) $user->getId()]);
     }
 
@@ -51,7 +51,7 @@ class UserRepository extends CommonRepository
      *
      * @return array
      */
-    public function checkUniqueUsernameEmail(array $params)
+    public function checkUniqueUsernameEmail(array $params): mixed
     {
         $q = $this->createQueryBuilder('u');
 
@@ -90,14 +90,11 @@ class UserRepository extends CommonRepository
      *
      * @param string $search
      * @param int    $limit
-     * @param int    $start
      * @param array  $permissionLimiter
-     *
-     * @return array
      */
-    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
+    public function getUserList($search = '', $limit = 10, ?int $start = 0, $permissionLimiter = []): array
     {
-        $q = $this->_em->createQueryBuilder();
+        $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('DISTINCT partial u.{id, firstName, lastName, email}')
             ->from(User::class, 'u')
@@ -179,13 +176,10 @@ class UserRepository extends CommonRepository
     /**
      * @param string $search
      * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
      */
-    public function getPositionList($search = '', $limit = 10, $start = 0)
+    public function getPositionList($search = '', $limit = 10, ?int $start = 0): array
     {
-        $q = $this->_em->createQueryBuilder()
+        $q = $this->getEntityManager()->createQueryBuilder()
             ->select('u.position')
             ->distinct()
             ->from(User::class, 'u')

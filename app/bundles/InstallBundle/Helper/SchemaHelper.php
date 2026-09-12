@@ -5,13 +5,17 @@ namespace Mautic\InstallBundle\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Index\IndexedColumn;
+use Doctrine\DBAL\Schema\Index\IndexType;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 
@@ -19,10 +23,7 @@ final class SchemaHelper
 {
     private Connection $db;
 
-    /**
-     * @var AbstractPlatform
-     */
-    private $platform;
+    private AbstractPlatform $platform;
 
     private array $dbParams;
 
@@ -72,10 +73,10 @@ final class SchemaHelper
             unset($dbParams['dbname']);
             $db = DriverManager::getConnection($dbParams);
 
-            $db->connect();
+            $db->getNativeConnection();
             $db->close();
         } else {
-            $this->db->connect();
+            $this->db->getNativeConnection();
             $this->db->close();
         }
     }
@@ -83,7 +84,7 @@ final class SchemaHelper
     public function createDatabase(): bool
     {
         try {
-            $this->db->connect();
+            $this->db->getNativeConnection();
         } catch (\Exception) {
             // it failed to connect so remove the dbname and try to create it
             $dbName                   = $this->dbParams['dbname'];
@@ -118,8 +119,10 @@ final class SchemaHelper
         $sm = $this->getSchemaManager();
 
         try {
-            // check to see if the table already exist
-            $tables = $sm->listTableNames();
+            // check to see if the table already exist; introspectTableNames() returns name
+            // objects rather than the strings listTableNames() gave, and the schema helpers
+            // below work on strings
+            $tables = array_map(AssetName::fromName(...), $sm->introspectTableNames());
         } catch (\Exception $e) {
             $this->db->close();
 
@@ -130,7 +133,7 @@ final class SchemaHelper
         $backupPrefix   = (!empty($this->dbParams['backup_prefix'])) ? $this->dbParams['backup_prefix'] : 'bak_';
 
         $metadatas = $this->entityManager->getMetadataFactory()->getAllMetadata();
-        if (empty($metadatas)) {
+        if ([] === $metadatas) {
             $this->db->close();
 
             return false;
@@ -141,11 +144,11 @@ final class SchemaHelper
         $mauticTables  = [];
 
         foreach ($installSchema->getTables() as $m) {
-            $tableName                = $m->getName();
+            $tableName                = AssetName::of($m);
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        $isSqlite = $this->entityManager->getConnection()->getDatabasePlatform() instanceof SqlitePlatform;
+        $isSqlite = $this->entityManager->getConnection()->getDatabasePlatform() instanceof SQLitePlatform;
         $sql      = $isSqlite ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
@@ -218,20 +221,20 @@ final class SchemaHelper
                 continue;
             }
 
-            $restraints = $sm->listTableForeignKeys($t);
+            $restraints = $sm->introspectTableForeignKeyConstraintsByUnquotedName($t);
 
             if (isset($mauticTables[$t])) {
                 // to be backed up
                 $backupRestraints[$mauticTables[$t]] = $restraints;
                 $backupTables[$t]                    = $mauticTables[$t];
-                $backupIndexes[$t]                   = $sm->listTableIndexes($t);
+                $backupIndexes[$t]                   = $sm->introspectTableIndexesByUnquotedName($t);
             } else {
                 // existing backup to be dropped
                 $dropTables[] = $t;
             }
 
             foreach ($restraints as $restraint) {
-                $sql[] = $this->platform->getDropForeignKeySQL($restraint, $t);
+                $sql[] = $this->platform->getDropForeignKeySQL($this->constraintName($restraint), $t);
             }
         }
 
@@ -249,25 +252,26 @@ final class SchemaHelper
                     continue;
                 }
 
-                $oldName = $oldIndex->getName();
+                $oldName = AssetName::of($oldIndex);
                 $newName = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $oldName);
 
                 $newIndex = new Index(
                     $newName,
-                    $oldIndex->getColumns(),
-                    $oldIndex->isUnique(),
-                    $oldIndex->isPrimary(),
-                    $oldIndex->getFlags(),
-                    $oldIndex->getOptions()
+                    $this->indexColumnNames($oldIndex),
+                    IndexType::UNIQUE === $oldIndex->getType(),
+                    // primary keys are skipped above, and are a PrimaryKeyConstraint in DBAL 4 rather than an index type
+                    false,
+                    $oldIndex->isClustered() ? ['clustered'] : [],
+                    $this->indexOptions($oldIndex)
                 );
 
                 $newIndexes[] = $newIndex;
-                $sql[]        = $this->platform->getDropIndexSQL($oldIndex, $t);
+                $sql[]        = $this->platform->getDropIndexSQL(AssetName::of($oldIndex), $t);
             }
 
             // rename table
-            $queries = $this->platform->getRenameTableSQL($t, $backup);
-            $sql     = array_merge($sql, $queries);
+            // DBAL 4 returns a single statement here rather than a list of them
+            $sql[] = $this->platform->getRenameTableSQL($t, $backup);
 
             // create new index
             if (!empty($newIndexes)) {
@@ -281,14 +285,14 @@ final class SchemaHelper
         // apply foreign keys to backup tables
         foreach ($backupRestraints as $table => $oldRestraints) {
             foreach ($oldRestraints as $or) {
-                $foreignTable     = $or->getForeignTableName();
+                $foreignTable     = AssetName::fromName($or->getReferencedTableName());
                 $foreignTableName = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $foreignTable);
                 $r                = new ForeignKeyConstraint(
-                    $or->getLocalColumns(),
+                    $this->namesToStrings($or->getReferencingColumnNames()),
                     $foreignTableName,
-                    $or->getForeignColumns(),
-                    $backupPrefix.$or->getName(),
-                    $or->getOptions()
+                    $this->namesToStrings($or->getReferencedColumnNames()),
+                    $backupPrefix.$this->constraintName($or),
+                    null !== $or->getMatchType() ? ['match' => $or->getMatchType()] : []
                 );
                 $sql[] = $this->platform->getCreateForeignKeySQL($r, $table);
             }
@@ -334,5 +338,63 @@ final class SchemaHelper
         }
 
         return $this->schemaManager = $this->db->createSchemaManager();
+    }
+
+    /**
+     * A foreign key's name is optional in DBAL 4, so it is read through the nullable
+     * getObjectName() rather than AssetName::of(), which expects an always-named object.
+     */
+    private function constraintName(ForeignKeyConstraint $constraint): string
+    {
+        $name = $constraint->getObjectName();
+
+        return null === $name ? '' : AssetName::fromName($name);
+    }
+
+    /**
+     * The lengths an index covers part of a column with. They have to be carried over to
+     * the backup index: MySQL rejects an index on a BLOB or TEXT column without one.
+     *
+     * @return array<string, mixed>
+     */
+    private function indexOptions(Index $index): array
+    {
+        $options = [];
+
+        if (null !== $index->getPredicate()) {
+            $options['where'] = $index->getPredicate();
+        }
+
+        $lengths = array_map(
+            static fn (IndexedColumn $indexedColumn): ?int => $indexedColumn->getLength(),
+            $index->getIndexedColumns()
+        );
+
+        if ([] !== array_filter($lengths, static fn (?int $length): bool => null !== $length)) {
+            $options['lengths'] = $lengths;
+        }
+
+        return $options;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function indexColumnNames(Index $index): array
+    {
+        return array_map(
+            static fn (IndexedColumn $indexedColumn): string => AssetName::fromName($indexedColumn->getColumnName()),
+            $index->getIndexedColumns()
+        );
+    }
+
+    /**
+     * @param list<UnqualifiedName> $names
+     *
+     * @return list<string>
+     */
+    private function namesToStrings(array $names): array
+    {
+        return array_map(AssetName::fromName(...), $names);
     }
 }

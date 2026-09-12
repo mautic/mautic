@@ -3,6 +3,7 @@
 namespace Mautic\InstallBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\LeadBundle\Field\SchemaDefinition;
@@ -33,20 +34,36 @@ final class DoctrineEventSubscriber
                     $table->addColumn($definition['name'], $definition['type'], $definition['options']);
 
                     if ('textarea' !== $type) {
-                        $table->addIndex([$definition['name']], $definition['name'].'_search');
+                        $this->addIndexIfMissing($table, [$definition['name']], $definition['name'].'_search');
                     }
                 }
             }
 
             if ('leads' === $tableName) {
                 // Add an attribution index
-                $table->addIndex(['attribution', 'attribution_date'], 'contact_attribution');
+                $this->addIndexIfMissing($table, ['attribution', 'attribution_date'], 'contact_attribution');
                 // Add date added and country index
-                $table->addIndex(['date_added', 'country'], 'date_added_country_index');
+                $this->addIndexIfMissing($table, ['date_added', 'country'], 'date_added_country_index');
             } else {
-                $table->addIndex(['companyname', 'companyemail'], 'company_filter');
-                $table->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], 'company_match');
+                $this->addIndexIfMissing($table, ['companyname', 'companyemail'], 'company_filter');
+                $this->addIndexIfMissing($table, ['companyname', 'companycity', 'companycountry', 'companystate'], 'company_match');
             }
         }
+    }
+
+    /**
+     * DBAL 4 throws IndexAlreadyExists when an index name is reused; DBAL 3 silently
+     * replaced it. The definitions added here are identical on every pass, so skipping
+     * an existing one preserves the previous outcome.
+     *
+     * @param string[] $columns
+     */
+    private function addIndexIfMissing(Table $table, array $columns, string $name): void
+    {
+        if ($table->hasIndex($name)) {
+            return;
+        }
+
+        $table->addIndex($columns, $name);
     }
 }

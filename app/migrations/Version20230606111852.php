@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
@@ -37,8 +38,8 @@ final class Version20230606111852 extends PreUpAssertionMigration
 
             $sql  = sprintf('UPDATE %s SET properties = :properties where id = :id', $this->getPrefixedTableName());
             $stmt = $this->connection->prepare($sql);
-            $stmt->bindValue('properties', $propertiesString, \PDO::PARAM_STR);
-            $stmt->bindValue('id', $row['id'], \PDO::PARAM_INT);
+            $stmt->bindValue('properties', $propertiesString, ParameterType::STRING);
+            $stmt->bindValue('id', $row['id'], ParameterType::INTEGER);
             $updatedRecords += $stmt->executeStatement();
         }
         $this->write(sprintf('<comment>%s record(s) have been updated successfully.</comment>', $updatedRecords));

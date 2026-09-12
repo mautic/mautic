@@ -20,7 +20,7 @@ class DoNotContactRepository extends CommonRepository
      *
      * @return DoNotContact[]
      */
-    public function getEntriesByLeadAndChannel(Lead $lead, $channel)
+    public function getEntriesByLeadAndChannel(Lead $lead, $channel): array
     {
         return $this->findBy(['channel' => $channel, 'lead' => $lead]);
     }
@@ -33,7 +33,7 @@ class DoNotContactRepository extends CommonRepository
      */
     public function getCount($channel = null, $ids = null, $reason = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(dnc.id) as dnc_count')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc');
@@ -124,7 +124,7 @@ class DoNotContactRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc');
 
         if ($leadId) {
-            $query->where($query->expr()->eq('dnc.lead_id', (int) $leadId));
+            $query->where($query->expr()->eq('dnc.lead_id', (string) ((int) $leadId)));
         }
 
         if (isset($options['search']) && $options['search']) {

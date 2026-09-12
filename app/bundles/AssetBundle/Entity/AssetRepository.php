@@ -38,11 +38,8 @@ class AssetRepository extends CommonRepository
     /**
      * @param string $search
      * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
      */
-    public function getAssetList($search = '', $limit = 10, $start = 0, bool $viewOther = false)
+    public function getAssetList($search = '', $limit = 10, ?int $start = 0, bool $viewOther = false): array
     {
         $q = $this->createQueryBuilder('a');
         $q->select('partial a.{id, title, path, alias, language}');
@@ -115,7 +112,7 @@ class AssetRepository extends CommonRepository
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
-                    $this->_em->getConnection()->createQueryBuilder(),
+                    $this->getEntityManager()->getConnection()->createQueryBuilder(),
                     'asset_id',
                     'asset_projects_xref',
                     $this->getTableAlias(),
@@ -180,7 +177,7 @@ class AssetRepository extends CommonRepository
      */
     public function getAssetSize(array $assets): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('sum(a.size) as total_size')
             ->from(MAUTIC_TABLE_PREFIX.'assets', 'a')
             ->where('a.id IN (:assetIds)')
@@ -193,7 +190,7 @@ class AssetRepository extends CommonRepository
 
     public function upDownloadCount(int $id, int $increaseBy = 1, bool $unique = false): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'assets')
             ->set('download_count', 'download_count + '.$increaseBy)
@@ -214,7 +211,7 @@ class AssetRepository extends CommonRepository
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getLatestAssetForCategory($categoryId)
+    public function getLatestAssetForCategory($categoryId): mixed
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where($this->getTableAlias().'.category = :categoryId');

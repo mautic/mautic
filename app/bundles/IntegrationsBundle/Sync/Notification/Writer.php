@@ -19,7 +19,7 @@ readonly class Writer
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function writeUserNotification(string $header, string $message, int $userId, ?string $deduplicateValue = null, ?\DateTime $deduplicateDateTimeFrom = null): void
     {

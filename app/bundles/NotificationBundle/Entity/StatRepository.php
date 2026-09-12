@@ -39,7 +39,7 @@ final class StatRepository extends CommonRepository
      */
     public function getSentStats($notificationId, $listId = null): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 's')
             ->where('s.notification_id = :notification')
@@ -71,7 +71,7 @@ final class StatRepository extends CommonRepository
      */
     public function getSentCount($notificationIds = null, $listId = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(s.id) as sent_count')
             ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 's');
@@ -106,7 +106,7 @@ final class StatRepository extends CommonRepository
      */
     public function getReadCount($notificationIds = null, $listId = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('count(s.id) as read_count')
             ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 's');
@@ -140,7 +140,7 @@ final class StatRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostNotifications($query, $limit = 10, $offset = 0): array
+    public function getMostNotifications($query, ?int $limit = 10, int $offset = 0): array
     {
         $query
             ->setMaxResults($limit)
@@ -156,7 +156,7 @@ final class StatRepository extends CommonRepository
      */
     public function getSentCounts($notificationIds = [], ?\DateTime $fromDate = null): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.notification_id, count(n.id) as sentcount')
             ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 's')
             ->where(
@@ -190,7 +190,7 @@ final class StatRepository extends CommonRepository
      */
     public function updateLead($fromLeadId, $toLeadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'push_notification_stats')
             ->set('notification_id', (int) $toLeadId)
             ->where('notification_id = '.(int) $fromLeadId)
@@ -199,7 +199,7 @@ final class StatRepository extends CommonRepository
 
     public function deleteStat($id): void
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'push_notification_stats', ['id' => (int) $id]);
+        $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'push_notification_stats', ['id' => (int) $id]);
     }
 
     public function getTableAlias(): string

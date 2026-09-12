@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -27,7 +28,7 @@ class TagRepository extends CommonRepository
 
     private function deleteLeadAssociations(int $tagId): void
     {
-        $this->_em->getConnection()->createQueryBuilder()
+        $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'lead_tags_xref')
             ->where('tag_id = :tagId')
             ->setParameter('tagId', $tagId)
@@ -39,8 +40,8 @@ class TagRepository extends CommonRepository
      */
     public function deleteOrphans(): void
     {
-        $qb       = $this->_em->getConnection()->createQueryBuilder();
-        $havingQb = $this->_em->getConnection()->createQueryBuilder();
+        $qb       = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $havingQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $havingQb->select('count(x.lead_id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x')
@@ -52,6 +53,7 @@ class TagRepository extends CommonRepository
         $delete = $qb->executeQuery()->fetchFirstColumn();
 
         if (count($delete)) {
+            \assert($qb instanceof TrackingQueryBuilder);
             $qb->resetQueryParts();
             $qb->delete(MAUTIC_TABLE_PREFIX.'lead_tags')
                 ->where(
@@ -106,7 +108,7 @@ class TagRepository extends CommonRepository
             return false;
         }
 
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
@@ -174,7 +176,7 @@ class TagRepository extends CommonRepository
         }
 
         foreach ($leadIds as $leadId) {
-            $lead = $this->_em->find(Lead::class, $leadId);
+            $lead = $this->getEntityManager()->find(Lead::class, $leadId);
             foreach ($tags as $tag) {
                 if ('add' === $addOrRemove) {
                     $lead->addTag($tag);
@@ -183,8 +185,8 @@ class TagRepository extends CommonRepository
                 }
                 $result[$leadId][$tag->getId()] = true;
             }
-            $this->_em->persist($lead);
-            $this->_em->flush();
+            $this->getEntityManager()->persist($lead);
+            $this->getEntityManager()->flush();
         }
 
         return $result;
@@ -218,14 +220,14 @@ class TagRepository extends CommonRepository
             $tagIds = [$tagIds];
         }
 
-        $qb         = $this->_em->getConnection()->createQueryBuilder();
+        $qb         = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $tagsIdName = $qb->select('lt.id,lt.tag')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 'lt')
             ->where('lt.id IN (:tag)')
             ->setParameter('tag', $tagIds, ArrayParameterType::INTEGER)
             ->executeQuery()->fetchAllKeyValue();
 
-        if (empty($tagsIdName)) {
+        if ($tagsIdName === []) {
             return [];
         }
 

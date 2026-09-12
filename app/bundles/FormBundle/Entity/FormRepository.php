@@ -21,7 +21,7 @@ class FormRepository extends CommonRepository
         $q->select('f');
 
         // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
-        $sq = $this->_em->createQueryBuilder()
+        $sq = $this->getEntityManager()->createQueryBuilder()
             ->select('count(fs.id)')
             ->from(Submission::class, 'fs')
             ->where('fs.form = f');
@@ -56,9 +56,8 @@ class FormRepository extends CommonRepository
     /**
      * @param string $search
      * @param int    $limit
-     * @param int    $start
      */
-    public function getFormList($search = '', $limit = 10, $start = 0, bool $viewOther = false): array
+    public function getFormList($search = '', $limit = 10, ?int $start = 0, bool $viewOther = false): array
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, alias}');
@@ -147,7 +146,7 @@ class FormRepository extends CommonRepository
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
-                    $this->_em->getConnection()->createQueryBuilder(),
+                    $this->getEntityManager()->getConnection()->createQueryBuilder(),
                     'form_id',
                     'form_projects_xref',
                     $this->getTableAlias(),
@@ -183,7 +182,7 @@ class FormRepository extends CommonRepository
      */
     public function getFormResults(Form $form, array $options = []): array
     {
-        $query = $this->_em->getConnection()->createQueryBuilder();
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $query->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
             ->select('fr.*')
@@ -215,7 +214,7 @@ class FormRepository extends CommonRepository
      */
     public function getValidFormResultsTable(): array
     {
-        return $this->_em->getConnection()->createQueryBuilder()
+        return $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select("CONCAT('".MAUTIC_TABLE_PREFIX."','form_results_', t.id, '_', t.alias) as validFormTable")
             ->from(MAUTIC_TABLE_PREFIX.'forms', 't')
             ->executeQuery()

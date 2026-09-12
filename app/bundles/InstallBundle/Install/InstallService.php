@@ -368,6 +368,11 @@ class InstallService
      */
     public function installDatabaseFixtures(): void
     {
+        // The schema was just created, so whatever the manager still holds refers to rows
+        // that are gone. ORM 3 refuses to register a second object for an id already in the
+        // identity map, which the fixtures would hit as soon as they insert the first row.
+        $this->entityManager->clear();
+
         $fixtures = $this->fixturesLoader->getFixtures(['group_install']);
 
         if ([] === $fixtures) {

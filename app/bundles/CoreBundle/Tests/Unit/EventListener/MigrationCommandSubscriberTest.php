@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\MySQLSchemaManager;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -101,8 +104,8 @@ final class MigrationCommandSubscriberTest extends TestCase
             ->willReturn($this->generatedColumns);
 
         $this->schemaManager->expects($this->once())
-            ->method('listTableColumns')
-            ->willReturn(['generated_hit_date' => new \stdClass()]);
+            ->method('introspectTableColumnsByUnquotedName')
+            ->willReturn([new Column('generated_hit_date', Type::getType(Types::DATE_MUTABLE))]);
 
         $this->connection->expects($this->never())
             ->method('executeQuery');
@@ -125,8 +128,8 @@ final class MigrationCommandSubscriberTest extends TestCase
             ->willReturn($this->generatedColumns);
 
         $this->schemaManager->expects($this->once())
-            ->method('listTableColumns')
-            ->willReturn(['id' => new \stdClass()]);
+            ->method('introspectTableColumnsByUnquotedName')
+            ->willReturn([new Column('id', Type::getType(Types::INTEGER))]);
 
         $this->connection->expects($this->atLeastOnce())
             ->method('executeStatement');

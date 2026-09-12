@@ -102,7 +102,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * @param array<string, mixed> $systemEntry
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Exception
      */
     public function trackDownload(Asset $asset, ?Request $request = null, int $code = 200, array $systemEntry = []): void
@@ -377,10 +377,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @return array
      */
-    public function getLookupResults(string $type, string $filter = '', int $limit = 10)
+    public function getLookupResults(string $type, string $filter = '', int $limit = 10): array
     {
         $results = [];
         switch ($type) {

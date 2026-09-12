@@ -37,11 +37,8 @@ final class MessageRepository extends CommonRepository
     /**
      * @param string $search
      * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
      */
-    public function getMessageList($search = '', $limit = 10, $start = 0)
+    public function getMessageList($search = '', $limit = 10, ?int $start = 0): array
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($this->getTableAlias());
@@ -69,12 +66,12 @@ final class MessageRepository extends CommonRepository
 
     public function getMessageChannels($messageId): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')
             ->select('id, channel, channel_id, properties')
             ->where($q->expr()->eq('message_id', ':messageId'))
             ->setParameter('messageId', $messageId)
-            ->andWhere($q->expr()->eq('is_enabled', true));
+            ->andWhere($q->expr()->eq('is_enabled', (string) (true)));
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -90,14 +87,14 @@ final class MessageRepository extends CommonRepository
     /**
      * @return array
      */
-    public function getChannelMessageByChannelId($channelId)
+    public function getChannelMessageByChannelId($channelId): array|false
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')
             ->select('id, channel, channel_id, properties, message_id')
             ->where($q->expr()->eq('id', ':channelId'))
             ->setParameter('channelId', $channelId)
-            ->andWhere($q->expr()->eq('is_enabled', true));
+            ->andWhere($q->expr()->eq('is_enabled', (string) (true)));
 
         return $q->executeQuery()->fetchAssociative();
     }
@@ -110,7 +107,7 @@ final class MessageRepository extends CommonRepository
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'),
             $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
-                $this->_em->getConnection()->createQueryBuilder(),
+                $this->getEntityManager()->getConnection()->createQueryBuilder(),
                 'message_id',
                 'message_projects_xref',
                 $this->getTableAlias(),

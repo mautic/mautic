@@ -560,7 +560,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param int|null             $segmentId
      * @param array<string, mixed> $options
      */
-    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, array $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
+    public function getSentEmailToContactData(?int $limit, \DateTime $dateFrom, \DateTime $dateTo, array $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -615,13 +615,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param int                  $limit
      * @param int|null             $companyId
      * @param int|null             $campaignId
      * @param int|null             $segmentId
      * @param array<string, mixed> $options
      */
-    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, array $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
+    public function getMostHitEmailRedirects(?int $limit, \DateTime $dateFrom, \DateTime $dateTo, array $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -655,10 +654,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Search for an email stat by email and lead IDs.
-     *
-     * @return array
      */
-    public function getEmailStati($emailId, $leadId)
+    public function getEmailStati($emailId, $leadId): array
     {
         return $this->statRepository->findBy(
             [
@@ -1550,7 +1547,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return false|string[]
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function sendEmailToUser(
         Email $email,
@@ -2023,11 +2020,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get a list of emails in a date range, grouped by a stat date count.
      *
-     * @param int                  $limit
      * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getEmailStatList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getEmailStatList(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
         $q             = $this->em->getConnection()->createQueryBuilder();
@@ -2060,11 +2056,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get a list of emails in a date range.
      *
-     * @param int                  $limit
      * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getEmailList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getEmailList(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
         $q             = $this->em->getConnection()->createQueryBuilder();
@@ -2168,7 +2163,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return false|mixed[]
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function sendSampleEmailToUser(
         $email,

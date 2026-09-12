@@ -21,7 +21,7 @@ class SmsRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($this->getTableAlias())
             ->from(Sms::class, $this->getTableAlias(), $this->getTableAlias().'.id');
@@ -92,7 +92,7 @@ class SmsRepository extends CommonRepository
      */
     public function getSentCount()
     {
-        $q = $this->_em->createQueryBuilder();
+        $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count')
             ->from(Sms::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
@@ -130,7 +130,7 @@ class SmsRepository extends CommonRepository
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
-                    $this->_em->getConnection()->createQueryBuilder(),
+                    $this->getEntityManager()->getConnection()->createQueryBuilder(),
                     'sms_id',
                     'sms_projects_xref',
                     $this->getTableAlias(),
@@ -195,7 +195,7 @@ class SmsRepository extends CommonRepository
     public function upCount($id, $type = 'sent', $increaseBy = 1): void
     {
         try {
-            $q = $this->_em->getConnection()->createQueryBuilder();
+            $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $q->update(MAUTIC_TABLE_PREFIX.'sms_messages')
                 ->set($type.'_count', $type.'_count + '.(int) $increaseBy)
@@ -209,8 +209,6 @@ class SmsRepository extends CommonRepository
 
     /**
      * @param array<int> $ignoreIds
-     *
-     * @return array
      */
     public function getSmsList(
         mixed $search = '',
@@ -220,7 +218,7 @@ class SmsRepository extends CommonRepository
         ?string $smsType = null,
         ?string $topLevel = null,
         array $ignoreIds = [],
-    ) {
+    ): array {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language, media}');
 

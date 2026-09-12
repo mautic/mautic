@@ -28,7 +28,7 @@ class ObjectMapping
     private $internalObjectName;
 
     /**
-     * @var string
+     * @var int|string
      */
     private $internalObjectId;
 

@@ -13,6 +13,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -38,6 +40,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent('form')]
 class Field implements UuidInterface
 {
     use UuidTrait;
@@ -251,13 +254,13 @@ class Field implements UuidInterface
         $builder->addField('alias', Types::STRING);
         $builder->addField('type', Types::STRING);
         $builder->addNamedField('isCustom', Types::BOOLEAN, 'is_custom');
-        $builder->addNullableField('customParameters', Types::ARRAY, 'custom_parameters');
+        $builder->addNullableField('customParameters', ArrayType::ARRAY, 'custom_parameters');
         $builder->addNullableField('defaultValue', Types::TEXT, 'default_value');
         $builder->addNamedField('isRequired', Types::BOOLEAN, 'is_required');
         $builder->addNullableField('validationMessage', Types::TEXT, 'validation_message');
         $builder->addNullableField('helpMessage', Types::TEXT, 'help_message');
         $builder->addNullableField('order', Types::INTEGER, 'field_order');
-        $builder->addNullableField('properties', Types::ARRAY);
+        $builder->addNullableField('properties', ArrayType::ARRAY);
         $builder->addNullableField('validation', Types::JSON);
 
         $builder->addNullableField('parent', 'string', 'parent_id');
@@ -266,7 +269,6 @@ class Field implements UuidInterface
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
             ->build();
 
         $builder->addNullableField('labelAttributes', Types::STRING, 'label_attr');

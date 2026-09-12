@@ -126,7 +126,8 @@ final class ReportApiControllerTest extends MauticMysqlTestCase
             ->delete(Permission::class, 'p')
             ->where('p.bundle = :bundle')
             ->andWhere('p.role = :role_id')
-            ->setParameters(['bundle' => 'report', 'role_id' => $role->getId()])
+            ->setParameter('bundle', 'report')
+            ->setParameter('role_id', $role->getId())
             ->getQuery()
             ->execute();
 

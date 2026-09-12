@@ -23,7 +23,7 @@ final class EmailReplyRepository extends CommonRepository implements EmailReplyR
         if ($leadId instanceof Lead) {
             $leadId = $leadId->getId();
         }
-        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->from(MAUTIC_TABLE_PREFIX.'email_stat_replies', 'reply')
             ->innerJoin('reply', MAUTIC_TABLE_PREFIX.'email_stats', 'stat', 'reply.stat_id = stat.id')
             ->leftJoin('stat', MAUTIC_TABLE_PREFIX.'emails', 'email', 'stat.email_id = email.id')

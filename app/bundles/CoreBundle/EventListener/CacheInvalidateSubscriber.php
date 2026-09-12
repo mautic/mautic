@@ -69,11 +69,8 @@ final readonly class CacheInvalidateSubscriber
             return;
         }
 
-        $cache = clone $cache;
-
         foreach ($namespacesToDelete as $namespace) {
-            $cache->setNamespace($namespace);
-            $cache->deleteAll();
+            ResultCacheHelper::getNamespacedCache($cache, $namespace)->clear();
         }
     }
 

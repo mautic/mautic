@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -15,10 +17,8 @@ class TriggerEventRepository extends CommonRepository
      * Get array of published triggers based on point total.
      *
      * @param int $points
-     *
-     * @return array
      */
-    public function getPublishedByPointTotal($points)
+    public function getPublishedByPointTotal($points): array
     {
         $q = $this->createQueryBuilder('a')
             ->select('partial a.{id, type, name, properties}, partial r.{id, name, points, color}')
@@ -43,7 +43,7 @@ class TriggerEventRepository extends CommonRepository
      *
      * @return mixed[]
      */
-    public function getPublishedByGroupScore(Collection $groupScores)
+    public function getPublishedByGroupScore(Collection $groupScores): array
     {
         if ($groupScores->isEmpty()) {
             return [];
@@ -83,7 +83,7 @@ class TriggerEventRepository extends CommonRepository
      *
      * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType($type): mixed
     {
         $q = $this->createQueryBuilder('e')
             ->select('partial e.{id, type, name, properties}, partial t.{id, name, points, color}')
@@ -106,14 +106,14 @@ class TriggerEventRepository extends CommonRepository
      */
     public function getLeadTriggeredEvents($leadId): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('e.*')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'x')
             ->innerJoin('x', MAUTIC_TABLE_PREFIX.'point_trigger_events', 'e', 'x.event_id = e.id')
             ->innerJoin('e', MAUTIC_TABLE_PREFIX.'point_triggers', 't', 'e.trigger_id = t.id');
 
         // make sure the published up and down dates are good
-        $q->where($q->expr()->eq('x.lead_id', (int) $leadId));
+        $q->where($q->expr()->eq('x.lead_id', (string) ((int) $leadId)));
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -131,7 +131,7 @@ class TriggerEventRepository extends CommonRepository
      */
     public function getLeadsForEvent($eventId): array
     {
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('e.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'e')
             ->where('e.event_id = '.(int) $eventId)

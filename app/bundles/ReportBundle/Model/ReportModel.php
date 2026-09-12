@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -533,6 +534,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         }
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
+        \assert($query instanceof TrackingQueryBuilder);
         $parts = $query->getQueryParts();
         $order = $parts['orderBy'];
         $query->resetQueryPart('orderBy');
@@ -545,9 +547,6 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
             if (!empty($selectedGraphs)) {
                 $availableGraphs = $this->getGraphData($entity->getSource());
-                if (empty($query)) {
-                    $query = $reportGenerator->getQuery();
-                }
 
                 $eventGraphs                     = [];
                 $defaultGraphOptions             = $options;
@@ -797,6 +796,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     private function getTotalCount(QueryBuilder $qb, array &$debugData): int
     {
         $countQb = clone $qb;
+        \assert($countQb instanceof TrackingQueryBuilder);
         $countQb->resetQueryParts();
 
         $countQb->select('count(*)')

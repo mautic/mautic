@@ -53,7 +53,7 @@ class LeadRepository extends CommonRepository
      *
      * @return array
      */
-    public function getLeads($campaignId, $eventId = null)
+    public function getLeads($campaignId, $eventId = null): mixed
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Lead::class, 'lc')
@@ -137,7 +137,7 @@ class LeadRepository extends CommonRepository
         if (empty($options['campaigns'])) {
             return false;
         }
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l');
         $q->where(
@@ -176,7 +176,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('l.campaign_id', ':campaignId'),
-                    $q->expr()->eq('l.manually_removed', 0)
+                    $q->expr()->eq('l.manually_removed', (string) (0))
                 )
             )
             // Order by ID so we can query by greater than X contact ID when batching
@@ -270,7 +270,7 @@ class LeadRepository extends CommonRepository
                 ->where(
                     $q->expr()->and(
                         $q->expr()->eq('l.campaign_id', ':campaignId'),
-                        $q->expr()->eq('l.manually_removed', 0)
+                        $q->expr()->eq('l.manually_removed', (string) (0))
                     )
                 )
                 // Order by ID so we can query by greater than X contact ID when batching
@@ -364,7 +364,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('ll.manually_removed', 0),
+                    $qb->expr()->eq('ll.manually_removed', (string) (0)),
                     $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
             )
@@ -403,7 +403,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('ll.manually_removed', 0),
+                    $qb->expr()->eq('ll.manually_removed', (string) (0)),
                     $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
             )
@@ -436,9 +436,9 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
-                    $qb->expr()->eq('cl.manually_removed', 0),
-                    $qb->expr()->eq('cl.manually_added', 0)
+                    $qb->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
+                    $qb->expr()->eq('cl.manually_removed', (string) (0)),
+                    $qb->expr()->eq('cl.manually_added', (string) (0))
                 )
             );
 
@@ -459,9 +459,9 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
-                    $qb->expr()->eq('cl.manually_removed', 0),
-                    $qb->expr()->eq('cl.manually_added', 0)
+                    $qb->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
+                    $qb->expr()->eq('cl.manually_removed', (string) (0)),
+                    $qb->expr()->eq('cl.manually_added', (string) (0))
                 )
             );
 
@@ -489,7 +489,7 @@ class LeadRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->update(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_leads cl')
             ->set('cl.rotation', 'cl.rotation + 1')
             ->where(
                 $q->expr()->and(
@@ -513,7 +513,7 @@ class LeadRepository extends CommonRepository
             ->executeQuery()
             ->fetchAllAssociative();
 
-        if (empty($segmentResults)) {
+        if ($segmentResults === []) {
             // No segments so no contacts
             return [];
         }
@@ -530,13 +530,13 @@ class LeadRepository extends CommonRepository
     {
         $membershipConditions = $qb->expr()->and(
             $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-            $qb->expr()->eq('cl.campaign_id', $campaignId)
+            $qb->expr()->eq('cl.campaign_id', (string) ($campaignId))
         );
 
         if ($campaignCanBeRestarted) {
-            $alreadyInCampaign           = $qb->expr()->eq('cl.manually_removed', 0);
+            $alreadyInCampaign           = $qb->expr()->eq('cl.manually_removed', (string) (0));
             $removedFromCampaignManually = $qb->expr()->and(
-                $qb->expr()->eq('cl.manually_removed', 1),
+                $qb->expr()->eq('cl.manually_removed', (string) (1)),
                 $qb->expr()->isNull('cl.date_last_exited'),
             );
 
@@ -571,7 +571,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('ll.lead_id', 'cl.lead_id'),
-                    $qb->expr()->eq('ll.manually_removed', 0),
+                    $qb->expr()->eq('ll.manually_removed', (string) (0)),
                     $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
             );
@@ -594,7 +594,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('el.lead_id', 'll.lead_id'),
-                    $qb->expr()->eq('el.campaign_id', (int) $campaignId)
+                    $qb->expr()->eq('el.campaign_id', (string) ((int) $campaignId))
                 )
             );
 

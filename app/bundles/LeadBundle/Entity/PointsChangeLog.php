@@ -14,7 +14,7 @@ class PointsChangeLog
     public const TABLE_NAME = 'lead_points_change_log';
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

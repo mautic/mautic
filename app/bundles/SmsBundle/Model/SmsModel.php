@@ -501,10 +501,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
     /**
      * Search for an sms stat by sms and lead IDs.
-     *
-     * @return array
      */
-    public function getSmsStatByLeadId($smsId, $leadId)
+    public function getSmsStatByLeadId($smsId, $leadId): array
     {
         return $this->statRepository->findBy(
             [

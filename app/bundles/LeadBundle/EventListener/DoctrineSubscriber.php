@@ -3,9 +3,11 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Monolog\Logger;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -58,7 +60,7 @@ final readonly class DoctrineSubscriber
                     }
 
                     if (!empty($field['is_unique']) || !empty($field['is_index'])) {
-                        $table->addIndex([$columnDef['name']], MAUTIC_TABLE_PREFIX.$field['alias'].'_search');
+                        $this->addIndexIfMissing($table, [$columnDef['name']], MAUTIC_TABLE_PREFIX.$field['alias'].'_search');
                     }
                 }
 
@@ -67,7 +69,7 @@ final readonly class DoctrineSubscriber
                 /** @var \Doctrine\DBAL\Schema\Column $column */
                 foreach ($columns as $column) {
                     $type = $column->getType();
-                    $name = $column->getName();
+                    $name = AssetName::of($column);
 
                     if (!$type instanceof StringType) {
                         unset($uniqueFields[$name]);
@@ -78,17 +80,17 @@ final readonly class DoctrineSubscriber
                     // Only use three to prevent max key length errors
                     asort($uniqueFields);
                     $uniqueFields = array_slice($uniqueFields, 0, 3);
-                    $table->addIndex($uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
+                    $this->addIndexIfMissing($table, $uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
                 }
 
                 switch ($object) {
                     case 'lead':
-                        $table->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
-                        $table->addIndex(['date_added', 'country'], MAUTIC_TABLE_PREFIX.'date_added_country_index');
+                        $this->addIndexIfMissing($table, ['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
+                        $this->addIndexIfMissing($table, ['date_added', 'country'], MAUTIC_TABLE_PREFIX.'date_added_country_index');
                         break;
                     case 'company':
-                        $table->addIndex(['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');
-                        $table->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], MAUTIC_TABLE_PREFIX.'company_match');
+                        $this->addIndexIfMissing($table, ['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');
+                        $this->addIndexIfMissing($table, ['companyname', 'companycity', 'companycountry', 'companystate'], MAUTIC_TABLE_PREFIX.'company_match');
                         break;
                 }
             }
@@ -99,5 +101,21 @@ final readonly class DoctrineSubscriber
             // table doesn't exist or something bad happened so oh well
             $this->logger->error('SCHEMA ERROR: '.$e->getMessage());
         }
+    }
+
+    /**
+     * DBAL 4 throws IndexAlreadyExists when an index name is reused; DBAL 3 silently
+     * replaced it. The definitions added here are identical on every pass, so skipping
+     * an existing one preserves the previous outcome.
+     *
+     * @param string[] $columns
+     */
+    private function addIndexIfMissing(Table $table, array $columns, string $name): void
+    {
+        if ($table->hasIndex($name)) {
+            return;
+        }
+
+        $table->addIndex($columns, $name);
     }
 }

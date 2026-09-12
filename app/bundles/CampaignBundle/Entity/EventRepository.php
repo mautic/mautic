@@ -53,7 +53,7 @@ class EventRepository extends CommonRepository
      *
      * @return array
      */
-    public function getContactPendingEvents($contactId, $type)
+    public function getContactPendingEvents($contactId, $type): mixed
     {
         // Limit to events that hasn't been executed or scheduled yet
         $eventQb = $this->getEntityManager()->createQueryBuilder();
@@ -116,10 +116,8 @@ class EventRepository extends CommonRepository
      * @param int         $parentId
      * @param string|null $decisionPath
      * @param string|null $eventType
-     *
-     * @return array
      */
-    public function getEventsByParent($parentId, $decisionPath = null, $eventType = null)
+    public function getEventsByParent($parentId, $decisionPath = null, $eventType = null): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
 
@@ -217,7 +215,7 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('e.id')
             ->from(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME, 'e')
-            ->where($q->expr()->eq('e.campaign_id', $campaignId));
+            ->where($q->expr()->eq('e.campaign_id', (string) ($campaignId)));
 
         return array_column($q->executeQuery()->fetchAllAssociative(), 'id');
     }
@@ -226,10 +224,8 @@ class EventRepository extends CommonRepository
      * Get array of events with stats.
      *
      * @param array<string, mixed> $args
-     *
-     * @return array
      */
-    public function getEvents(array $args = [])
+    public function getEvents(array $args = []): array
     {
         $q = $this->createQueryBuilder('e')
             ->select('e, ec, ep')
@@ -455,7 +451,7 @@ class EventRepository extends CommonRepository
      */
     public function incrementFailedCount(Event $event): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
             ->set('failed_count', 'failed_count + 1')
@@ -473,12 +469,12 @@ class EventRepository extends CommonRepository
      */
     public function decreaseFailedCount(Event $event): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
             ->set('failed_count', 'failed_count - 1')
             ->where($q->expr()->eq('id', ':id'))
-            ->andWhere($q->expr()->gt('failed_count', 0))
+            ->andWhere($q->expr()->gt('failed_count', '0'))
             ->setParameter('id', $event->getId());
 
         $q->executeStatement();
@@ -490,7 +486,7 @@ class EventRepository extends CommonRepository
      */
     public function getFailedCount(Event $event): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->select('failed_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_events')
@@ -506,7 +502,7 @@ class EventRepository extends CommonRepository
      */
     public function resetFailedCountsForEventsInCampaign(Campaign $campaign): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
             ->set('failed_count', ':failedCount')
@@ -522,7 +518,7 @@ class EventRepository extends CommonRepository
      */
     public function getFailedCountLeadEvent(int $leadId, int $eventId): int
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('count(le.id)')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'le')
             ->innerJoin('le', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fle', 'le.id = fle.log_id')

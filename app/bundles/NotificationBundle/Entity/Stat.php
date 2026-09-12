@@ -16,7 +16,7 @@ class Stat
     public const TABLE_NAME = 'push_notification_stats';
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

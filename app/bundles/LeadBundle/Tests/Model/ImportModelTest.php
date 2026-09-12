@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\ORM\Exception\ORMException;
+use Mautic\CoreBundle\Exception\OrmException as MauticOrmException;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
@@ -209,7 +210,7 @@ final class ImportModelTest extends StandardImportTestHelper
 
         $model->expects($this->once())
             ->method('process')
-            ->willThrowException(new ORMException());
+            ->willThrowException(new MauticOrmException());
 
         $entity = $this->initImportEntity(['canProceed']);
 
@@ -374,7 +375,7 @@ final class ImportModelTest extends StandardImportTestHelper
         $this->expectException(ORMException::class);
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->willThrowException(new ORMException('Some DB error'));
+            ->willThrowException(new MauticOrmException('Some DB error'));
 
         $import->start();
         $importModel->process($import, new Progress());

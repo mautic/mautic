@@ -29,7 +29,7 @@ final class VideoHitRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'video_hits', 'h');
 
         if ($leadId) {
-            $query->where($query->expr()->eq('h.lead_id', (int) $leadId));
+            $query->where($query->expr()->eq('h.lead_id', (string) ((int) $leadId)));
         }
 
         if (isset($options['search']) && $options['search']) {
@@ -43,10 +43,8 @@ final class VideoHitRepository extends CommonRepository
 
     /**
      * @param string $guid
-     *
-     * @return VideoHit
      */
-    public function getHitForLeadByGuid(Lead $lead, $guid)
+    public function getHitForLeadByGuid(Lead $lead, $guid): \Mautic\PageBundle\Entity\VideoHit
     {
         $result = $this->findOneBy(['guid' => $guid, 'lead' => $lead]);
 
@@ -59,12 +57,10 @@ final class VideoHitRepository extends CommonRepository
      * @param int                  $leadId
      * @param array<string, mixed> $options
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadHits($leadId, array $options = [])
+    public function getLeadHits($leadId, array $options = []): array
     {
         $query = $this->createQueryBuilder('h');
         $query->select('h.userAgent, h.dateHit, h.dateLeft, h.referer, h.channel, h.channelId, h.url, h.duration, h.query, h.timeWatched')
@@ -100,13 +96,11 @@ final class VideoHitRepository extends CommonRepository
      * Get list of referers ordered by it's count.
      *
      * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     * @param int                               $limit
-     * @param int                               $offset
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers($query, $limit = 10, $offset = 0): array
+    public function getReferers($query, ?int $limit = 10, int $offset = 0): array
     {
         $query->select('h.referer, count(h.referer) as sessions')
             ->groupBy('h.referer')
@@ -122,7 +116,7 @@ final class VideoHitRepository extends CommonRepository
      */
     public function updateLead($fromLeadId, $toLeadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'video_hits')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)

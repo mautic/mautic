@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -67,7 +67,7 @@ final class EmailRepositoryTest extends TestCase
             $countWithMaxMin
         );
 
-        $this->assertEquals($this->replaceQueryPrefix($expectedQuery), $query->getSql());
+        $this->assertSame($this->replaceQueryPrefix($expectedQuery), $query->getSql());
 
         if ($variantIds) {
             $variantIds[] = $emailId;
@@ -132,7 +132,7 @@ final class EmailRepositoryTest extends TestCase
             $expectedParams['excludedListIds'] = $excludedListIds;
         }
 
-        $this->assertEquals($this->replaceQueryPrefix($expectedQuery), $query->getSql());
+        $this->assertSame($this->replaceQueryPrefix($expectedQuery), $query->getSql());
         $this->assertEquals($expectedParams, $query->getParameters());
     }
 
@@ -216,8 +216,7 @@ final class EmailRepositoryTest extends TestCase
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $queryBuilder->expects($this->once())
-            ->method('resetQueryPart')
-            ->with('groupBy')
+            ->method('resetGroupBy')
             ->willReturnSelf();
 
         $queryBuilder->expects($this->once())
@@ -256,8 +255,7 @@ final class EmailRepositoryTest extends TestCase
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $queryBuilder->expects($this->once())
-            ->method('resetQueryPart')
-            ->with('groupBy')
+            ->method('resetGroupBy')
             ->willReturnSelf();
 
         $queryBuilder->expects($this->once())

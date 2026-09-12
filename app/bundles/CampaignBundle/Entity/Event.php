@@ -16,6 +16,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\DateAddedTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -42,6 +43,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ]
 )]
 #[EntityEvent]
+#[OwnershipParent('campaign')]
 class Event implements ChannelInterface, UuidInterface
 {
     use UuidTrait;
@@ -352,7 +354,6 @@ class Event implements ChannelInterface, UuidInterface
         $builder->createManyToOne('campaign', 'Campaign')
             ->inversedBy('events')
             ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
             ->build();
 
         $builder->createOneToMany('children', 'Event')
