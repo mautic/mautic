@@ -32,6 +32,38 @@ class ConnectionWrapper extends Connection
     }
 
     /**
+     * Ask the server for its version without selecting a database when the configured one
+     * is not there yet.
+     *
+     * Doctrine resolves the platform before Mautic has a database - creating it is the very
+     * next thing the installer and the test bootstrap do - and it does so eagerly here
+     * because the connection declares mapping types. DBAL retried without the database name
+     * for exactly this case until version 4 dropped it.
+     */
+    public function getServerVersion(): string
+    {
+        try {
+            return parent::getServerVersion();
+        } catch (Exception $originalException) {
+            $params = $this->getParams();
+
+            if (!isset($params['dbname'])) {
+                throw $originalException;
+            }
+
+            unset($params['dbname']);
+
+            try {
+                return $this->driver->connect($params)->getServerVersion();
+            } catch (\Throwable) {
+                // the server is unreachable for another reason, or the driver cannot connect
+                // without a database; report the failure that was asked about
+                throw $originalException;
+            }
+        }
+    }
+
+    /**
      * Return Mautic's query builder rather than DBAL's.
      *
      * DBAL 4 removed the query-part API and made the builder's state private, but Mautic
