@@ -205,7 +205,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->assertStringContainsString('Check Contact Field Value Condition', $output);
         $this->assertStringContainsString('Yes Path - Add Tag', $output);
         $this->assertStringContainsString('No Path - Add Tag', $output);
-        $this->assertStringNotContainsString((string) $contact8->getId(), $output);
+        $this->assertNotContains($contact8->getId(), $this->getContactIdsFromOutput($output));
 
         $output = $this->executeCommand(
             [
@@ -299,11 +299,11 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->assertStringContainsString('Final Email', $output);
 
         // Active Contact 1 and Contact 2 should be in the output
-        $this->assertStringContainsString((string) $contact1->getId(), $output);
-        $this->assertStringContainsString((string) $contact2->getId(), $output);
+        $this->assertContains($contact1->getId(), $this->getContactIdsFromOutput($output));
+        $this->assertContains($contact2->getId(), $this->getContactIdsFromOutput($output));
 
         // Manually removed contacts should not be in the output
-        $this->assertStringNotContainsString((string) $contact3->getId(), $output);
+        $this->assertNotContains($contact3->getId(), $this->getContactIdsFromOutput($output));
 
         $output = $this->executeCommand(
             [
@@ -398,8 +398,8 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->assertStringContainsString('Final Email', $output);
 
         // Active Contact 1 and Contact 2 should be in the output
-        $this->assertStringContainsString((string) $contact1->getId(), $output);
-        $this->assertStringContainsString((string) $contact2->getId(), $output);
+        $this->assertContains($contact1->getId(), $this->getContactIdsFromOutput($output));
+        $this->assertContains($contact2->getId(), $this->getContactIdsFromOutput($output));
 
         $output = $this->executeCommand(
             [
@@ -516,7 +516,13 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         // ID does not appear on the same row as Yes Child Action.
         $outputLines = explode("\n", $output);
         foreach ($outputLines as $line) {
-            if (str_contains($line, (string) $contactStuck->getId())) {
+            // the contact id is read out of the first column: looking for it anywhere in the
+            // row also matches the digits of another contact's id or of the timestamp
+            if (!preg_match('/^\|\s*(\d+)\s*\|/', $line, $matches)) {
+                continue;
+            }
+
+            if ((int) $matches[1] === $contactStuck->getId()) {
                 $this->assertStringNotContainsString('Yes Child Action', $line,
                     'Stuck contact must NOT have Yes Child Action listed as a next event');
                 $this->assertStringNotContainsString('No Child Action', $line,
@@ -932,7 +938,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
             '--dry-run'   => true,
         ]);
 
-        $this->assertStringNotContainsString((string) $contact->getId(), $output,
+        $this->assertNotContains($contact->getId(), $this->getContactIdsFromOutput($output),
             'Contacts with scheduled events should not appear in next events');
     }
 
@@ -1033,9 +1039,9 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         ]);
 
         // Active contact should appear
-        $this->assertStringContainsString((string) $contact1->getId(), $output);
+        $this->assertContains($contact1->getId(), $this->getContactIdsFromOutput($output));
         // Deleted contact should NOT appear
-        $this->assertStringNotContainsString((string) $contact2->getId(), $output);
+        $this->assertNotContains($contact2->getId(), $this->getContactIdsFromOutput($output));
     }
 
     /**
@@ -1244,5 +1250,17 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         }
 
         return $this->em->getRepository(LeadEventLog::class)->findBy($criteria);
+    }
+    /**
+     * The command prints a table, and matching a contact id anywhere in it also matches
+     * the digits of another id or of a timestamp. The first column is read instead.
+     *
+     * @return list<int>
+     */
+    private function getContactIdsFromOutput(string $output): array
+    {
+        preg_match_all('/^\|\s*(\d+)\s*\|/m', $output, $matches);
+
+        return array_map(intval(...), $matches[1]);
     }
 }
