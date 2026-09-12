@@ -69,7 +69,7 @@ jobs:
 
     - name: Install honestype docblock checker
       run: |
-        GOPROXY=direct GOSUMDB=off go install github.com/rectorphp/honestype@6546e5dc237fc5787bc77dcb40dcbd271f683a7b
+        GOPROXY=direct GOSUMDB=off go install github.com/rectorphp/honestype@48a8a54d6e66ba443d09a64887f982b8a4ab058a
         echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
     - name: Instrument sources
