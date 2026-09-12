@@ -17,11 +17,6 @@ class ExpressionBuilder extends BaseExpressionBuilder
     private const string IN_NEXT = 'inNext';
 
     /**
-     * Creates a between comparison expression.
-     *
-     * @throws SegmentQueryException
-     */
-    /**
      * DBAL 4 types the comparison operands as string; DBAL 3 accepted any scalar and
      * cast it while building the SQL. Segment filters still pass ints and floats
      * (contact ids, counts, timestamps), so they are cast here rather than at every
@@ -57,6 +52,11 @@ class ExpressionBuilder extends BaseExpressionBuilder
         return parent::gte((string) $x, (string) $y);
     }
 
+    /**
+     * Creates a between comparison expression.
+     *
+     * @throws SegmentQueryException
+     */
     public function between($x, $arr): string
     {
         if (!is_array($arr) || 2 !== count($arr)) {
