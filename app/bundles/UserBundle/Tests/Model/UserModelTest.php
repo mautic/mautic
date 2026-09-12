@@ -156,6 +156,10 @@ final class UserModelTest extends TestCase
 
         $this->expectException(PasswordResetTokenCreationFailedException::class);
 
+        $this->userTokenService->expects($this->once())
+            ->method('generateSecret')
+            ->willReturn($this->createStub(UserToken::class));
+
         $this->entityManager->expects($this->once())
             ->method('flush')
             ->willThrowException(new Exception($errorMessage));

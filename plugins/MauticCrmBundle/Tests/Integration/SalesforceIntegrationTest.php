@@ -795,11 +795,9 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         $this->em->method('getReference')
             ->willReturnCallback(
-                function () {
-                    if (IntegrationEntity::class === func_get_arg(0)) {
-                        return new IntegrationEntity();
-                    }
-                }
+                // ORM 3 types getReference() as returning an object, so every class asked
+                // for has to come back with one
+                static fn (string $className): object => IntegrationEntity::class === $className ? new IntegrationEntity() : new $className()
             );
 
         $this->router->method('generate')

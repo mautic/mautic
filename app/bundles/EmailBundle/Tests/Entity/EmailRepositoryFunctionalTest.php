@@ -190,9 +190,13 @@ final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $actualLeadIds = $this->emailRepository->getEmailPendingQuery($email->getId())
-            ->executeQuery()
-            ->fetchFirstColumn();
+        // the query selects the whole row, so the id is read by name rather than by position
+        $actualLeadIds = array_column(
+            $this->emailRepository->getEmailPendingQuery($email->getId())
+                ->executeQuery()
+                ->fetchAllAssociative(),
+            'id'
+        );
         sort($actualLeadIds);
 
         $expectedLeadIds = [$leadOne->getId(), $leadFour->getId(), $leadFive->getId()];

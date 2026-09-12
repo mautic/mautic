@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -23,7 +23,7 @@ final class EventRepositoryTest extends TestCase
         $emMock           = $this->createMock(EntityManager::class);
         $connMock         = $this->createMock(Connection::class);
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $expressionMock   = $this->createMock(Expr::class);
+        $expressionMock   = $this->createMock(ExpressionBuilder::class);
 
         $queryBuilderMock
             ->method('expr')
@@ -40,7 +40,7 @@ final class EventRepositoryTest extends TestCase
 
         $expressionMock->expects($this->once())
             ->method('gt')
-            ->with('failed_count', 0)
+            ->with('failed_count', '0')
             ->willReturn('failed_count > 0');
 
         $queryBuilderMock->expects($this->once())
