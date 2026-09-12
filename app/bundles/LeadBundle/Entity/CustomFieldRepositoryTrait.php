@@ -75,7 +75,8 @@ trait CustomFieldRepositoryTrait
             $results = [];
         } else {
             if (isset($groupBy) && $groupBy) {
-                $dq->groupBy($groupBy);
+                // the query part comes back as a list, and DBAL 4 takes the expressions one by one
+                $dq->groupBy(...$groupBy);
             }
             // now get the actual paginated results
 
