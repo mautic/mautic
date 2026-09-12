@@ -262,7 +262,7 @@ final class SchemaHelper
                     // primary keys are skipped above, and are a PrimaryKeyConstraint in DBAL 4 rather than an index type
                     false,
                     $oldIndex->isClustered() ? ['clustered'] : [],
-                    null !== $oldIndex->getPredicate() ? ['where' => $oldIndex->getPredicate()] : []
+                    $this->indexOptions($oldIndex)
                 );
 
                 $newIndexes[] = $newIndex;
@@ -349,6 +349,32 @@ final class SchemaHelper
         $name = $constraint->getObjectName();
 
         return null === $name ? '' : AssetName::fromName($name);
+    }
+
+    /**
+     * The lengths an index covers part of a column with. They have to be carried over to
+     * the backup index: MySQL rejects an index on a BLOB or TEXT column without one.
+     *
+     * @return array<string, mixed>
+     */
+    private function indexOptions(Index $index): array
+    {
+        $options = [];
+
+        if (null !== $index->getPredicate()) {
+            $options['where'] = $index->getPredicate();
+        }
+
+        $lengths = array_map(
+            static fn (IndexedColumn $indexedColumn): ?int => $indexedColumn->getLength(),
+            $index->getIndexedColumns()
+        );
+
+        if ([] !== array_filter($lengths, static fn (?int $length): bool => null !== $length)) {
+            $options['lengths'] = $lengths;
+        }
+
+        return $options;
     }
 
     /**
