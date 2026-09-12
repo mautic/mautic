@@ -221,12 +221,38 @@ Mautic.getCKEditorFonts = function(fonts) {
     return CKEditorFonts;
 }
 
+Mautic.getDynamicContentCkEditorToolbar = function() {
+    return [
+        'undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize',
+        'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote',
+        'removeFormat', 'link', 'ckfinder', 'mediaEmbed', 'insertTable', 'TokenPlugin', 'sourceEditing',
+    ];
+};
+
+Mautic.ensureDynamicContentEditorAttributes = function(textarea) {
+    if (!textarea.attr('data-token-callback')) {
+        const method = typeof Mautic.getBuilderTokensMethod === 'function'
+            ? Mautic.getBuilderTokensMethod()
+            : 'email:getBuilderTokens';
+        textarea.attr('data-token-callback', method);
+    }
+};
+
 Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
     if (ckEditors.has( textarea[0] ))
     {
         ckEditors.get( textarea[0] ).destroy();
         ckEditors.delete( textarea[0] )
     }
+
+    if (textarea.hasClass('editor-dynamic-content')) {
+        Mautic.ensureDynamicContentEditorAttributes(textarea);
+
+        if (!ckEditorToolbarOptions || !ckEditorToolbarOptions.length) {
+            ckEditorToolbarOptions = Mautic.getDynamicContentCkEditorToolbar();
+        }
+    }
+
     const tokenCallback = textarea.attr('data-token-callback');
     Mautic.InitCkEditor(textarea, Mautic.GetCkEditorConfigOptions(ckEditorToolbarOptions, tokenCallback, textarea));
 }
