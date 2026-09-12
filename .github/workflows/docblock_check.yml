@@ -1,0 +1,101 @@
+name: Docblock Check
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  DOCBLOCK_CHECK_LOG: "/tmp/docblock-check.log"
+
+jobs:
+  docblock_check:
+    # We don't want the scheduled jobs to run on forks of Mautic
+    if: (github.event_name == 'schedule' && (github.repository == 'mautic/mautic' || github.repository == 'mautic/api-library') ) || (github.event_name != 'schedule')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      database:
+        image: mariadb:10.11
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: mautictest
+        ports:
+          - 3306
+        options: >-
+          --shm-size=2gb
+          --tmpfs=/var/lib/mysql
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+      saml:
+        image: kenchan0130/simplesamlphp
+        env:
+          SIMPLESAMLPHP_SP_ENTITY_ID: https://localhost
+          SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://localhost/s/saml/login_check
+          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/
+        ports:
+          - 8086:8080
+
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      with:
+        php-version: '8.4'
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        coverage: none
+        ini-values: zend.assertions=1
+
+    - name: add MySQL config file
+      run: cp .github/ci-files/.my.cnf ~/.my.cnf
+
+    - name: Set SYMFONY_ENV to test
+      run: |
+        echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+        echo "MAUTIC_ENV=test" >> $GITHUB_ENV
+
+    - name: Install dependencies
+      uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
+
+    - name: Setup Go
+      uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+      with:
+        go-version: "1.26"
+
+    - name: Install honestype docblock checker
+      run: |
+        GOPROXY=direct GOSUMDB=off go install github.com/rectorphp/honestype@48a8a54d6e66ba443d09a64887f982b8a4ab058a
+        echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+    - name: Instrument sources
+      run: honestype instrument app/bundles app/middlewares plugins
+
+    # Load the helper for every PHP process, including any parallel test
+    # workers which do not inherit a -d auto_prepend_file flag.
+    - name: Enable runtime helper globally
+      run: |
+        INI="$(php -i | grep '^Loaded Configuration File' | awk '{print $NF}')"
+        echo "auto_prepend_file=$GITHUB_WORKSPACE/app/bundles/docblock_check.php" | sudo tee -a "$INI"
+
+    - name: Run tests to collect docblock type mismatches
+      run: |
+        rm -rf var/cache
+        export DB_PORT="${{ job.services.database.ports[3306] }}"
+        export SAML_PORT="${{ job.services.saml.ports[8080] }}"
+        php -d zend.assertions=1 vendor/bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist || true
+
+    - name: Restore sources
+      if: always()
+      run: |
+        git checkout -- app/bundles app/middlewares plugins
+        rm -f app/bundles/docblock_check.php app/middlewares/docblock_check.php plugins/docblock_check.php
+
+    - name: List docblock type mismatches
+      # Report-only: annotate findings but do not fail CI while the codebase is
+      # still being cleaned up.
+      run: honestype report -github "$DOCBLOCK_CHECK_LOG" || true

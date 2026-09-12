@@ -986,7 +986,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return ArrayCollection<int,CompanyChangeLog>
+     * @return Collection<int,CompanyChangeLog>
      */
     public function getCompanyChangeLog()
     {
@@ -1862,7 +1862,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return ArrayCollection<int,GroupContactScore>
+     * @return Collection<int,GroupContactScore>
      */
     public function getGroupScores(): Collection
     {

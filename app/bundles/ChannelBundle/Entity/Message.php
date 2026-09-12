@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -254,7 +255,7 @@ class Message extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int,Channel>
+     * @return Collection<int,Channel>
      */
     public function getChannels()
     {

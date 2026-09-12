@@ -399,7 +399,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return ArrayCollection<int, Event>
+     * @return Collection<int, Event>
      */
     public function getEvents()
     {
@@ -585,7 +585,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return ArrayCollection<int, Form>
+     * @return Collection<int, Form>
      */
     public function getForms(): Collection
     {
