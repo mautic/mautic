@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Security;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('non-parallel')]
 final class LeadPermissionsFunctionalTest extends MauticMysqlTestCase
 {
     public function testRolePageForPermissionAvailability(): void

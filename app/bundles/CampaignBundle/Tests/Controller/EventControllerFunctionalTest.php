@@ -11,9 +11,11 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class EventControllerFunctionalTest extends MauticMysqlTestCase
 {
     #[DataProvider('fieldAndValueProvider')]

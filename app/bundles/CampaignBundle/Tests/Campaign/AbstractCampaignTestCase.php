@@ -15,7 +15,9 @@ use Mautic\CampaignBundle\Enum\RepublishBehavior;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 abstract class AbstractCampaignTestCase extends MauticMysqlTestCase
 {
     protected function saveSomeCampaignLeadEventLogs(bool $withPendingAction = false, bool $withActionOfRemovedLead = false): Campaign

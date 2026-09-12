@@ -9,7 +9,9 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class CompanyLeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     public function testGetCompaniesByLeadIds(): void
