@@ -2,29 +2,28 @@
 
 ROOT=$(git rev-parse --show-toplevel)
 
-echo "php-cs-fixer pre commit hook start"
+echo "ecs pre commit hook start"
 
-PHP_CS_FIXER="bin/php-cs-fixer"
-HAS_PHP_CS_FIXER=false
+ECS="vendor/bin/ecs"
 
-if [ -x $PHP_CS_FIXER ]; then
-    HAS_PHP_CS_FIXER=true
-fi
+if [ -x "$ROOT/$ECS" ]; then
 
-if $HAS_PHP_CS_FIXER; then
+    STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.php$')
 
-    # Fix changed (indexed) files
-    $PHP_CS_FIXER fix --config=$ROOT/.php-cs-fixer.php --verbose --using-cache=no $(git diff --cached --name-only)
+    if [ -n "$STAGED" ]; then
+        # Fix changed (indexed) files
+        "$ROOT/$ECS" check $STAGED --fix --no-progress-bar
 
-    # Add the changes from CS Fixer back to the git index:
-    git add $(git diff --cached --name-only)
+        # Add the changes from ECS back to the git index:
+        git add $STAGED
+    fi
 
 else
     echo ""
-    echo "Please install php-cs-fixer, e.g.:"
+    echo "Please install the dev dependencies, e.g.:"
     echo ""
-    echo "  composer require --dev friendsofphp/php-cs-fixer"
+    echo "  composer install"
     echo ""
 fi
 
-echo "php-cs-fixer pre commit hook finish"
+echo "ecs pre commit hook finish"
