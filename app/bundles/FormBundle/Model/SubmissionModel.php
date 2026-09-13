@@ -414,7 +414,7 @@ final class SubmissionModel extends CommonFormModel
     /**
      * @param Submission $submission
      */
-    public function deleteEntity($submission): void
+    public function deleteEntity(object $submission): void
     {
         $this->formUploader->deleteUploadedFiles($submission);
 

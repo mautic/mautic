@@ -127,7 +127,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return array<int,Campaign>
      */
-    public function deleteEntities($campaignIds): array
+    public function deleteEntities(array $campaignIds): array
     {
         $entities = [];
         foreach ($campaignIds as $campaignId) {
@@ -141,7 +141,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return $entities;
     }
 
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->eventRepository->nullEventParents($entity->getId());

@@ -461,7 +461,7 @@ class LeadModel extends FormModel
     /**
      * @param Lead $entity
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         // Delete custom avatar if one exists
         $imageDir = $this->pathsHelper->getSystemPath('images', true);

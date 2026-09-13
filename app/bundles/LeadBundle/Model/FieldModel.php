@@ -668,7 +668,7 @@ class FieldModel extends FormModel
      * @throws SchemaException
      * @throws DeleteEntityDependencyException
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -888,11 +888,9 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param string $object
-     *
      * @return array
      */
-    public function getPublishedFieldArrays($object = 'lead')
+    public function getPublishedFieldArrays(string $object = 'lead')
     {
         return $this->getEntities(
             [
@@ -916,10 +914,7 @@ class FieldModel extends FormModel
         );
     }
 
-    /**
-     * @param string $object
-     */
-    public function getFieldListWithProperties($object = 'lead'): array
+    public function getFieldListWithProperties(string $object = 'lead'): array
     {
         return $this->getFieldsProperties(['object' => $object]);
     }

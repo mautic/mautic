@@ -971,7 +971,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @param Company $entity
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         $this->dispatchEvent('pre_delete', $entity);
         $entity->setDeleted(new \DateTime());

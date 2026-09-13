@@ -1,5 +1,6 @@
 includes:
     - phpstan-baseline.neon
+    - phpstan-model-param-type-ignore.neon
 
 parameters:
     tmpDir: ./var/phpstan-cache
@@ -296,6 +297,7 @@ rules:
     - Utils\PHPStan\Rule\NoServiceGetterRule
     - Utils\PHPStan\Rule\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
+    - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
     # enable later, might not be needed
     - Utils\PHPStan\Rule\NoDuplicateNonRepeatableAttributeRule
 

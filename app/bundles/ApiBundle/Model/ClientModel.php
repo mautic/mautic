@@ -137,7 +137,7 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function revokeAccess($entity): void
+    public function revokeAccess(object $entity): void
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);

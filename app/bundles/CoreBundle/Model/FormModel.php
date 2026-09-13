@@ -38,10 +38,8 @@ class FormModel extends AbstractCommonModel
 
     /**
      * Lock an entity to prevent multiple people from editing.
-     *
-     * @param object $entity
      */
-    public function lockEntity($entity): void
+    public function lockEntity(object $entity): void
     {
         // lock the row if applicable
         if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
@@ -56,10 +54,8 @@ class FormModel extends AbstractCommonModel
 
     /**
      * Check to see if the entity is locked.
-     *
-     * @param object $entity
      */
-    public function isLocked($entity): bool
+    public function isLocked(object $entity): bool
     {
         if (method_exists($entity, 'getCheckedOut')) {
             $checkedOut = $entity->getCheckedOut();
@@ -189,7 +185,7 @@ class FormModel extends AbstractCommonModel
      *
      * @param mixed $entity
      */
-    public function isNewEntity($entity): bool
+    public function isNewEntity(object $entity): bool
     {
         if (method_exists($entity, 'isNew')) {
             return $entity->isNew();
@@ -205,11 +201,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Toggles entity publish status.
      *
-     * @param object $entity
-     *
      * @return bool Force browser refresh
      */
-    public function togglePublishStatus($entity): bool
+    public function togglePublishStatus(object $entity): bool
     {
         if (method_exists($entity, 'setIsPublished')) {
             $status = $entity->getPublishStatus();
@@ -300,10 +294,7 @@ class FormModel extends AbstractCommonModel
         }
     }
 
-    /**
-     * @param object $entity
-     */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         // take note of ID before doctrine wipes it out
         $id    = $entity->getId();
@@ -327,7 +318,7 @@ class FormModel extends AbstractCommonModel
      *
      * @return mixed[]
      */
-    public function deleteEntities($ids): array
+    public function deleteEntities(array $ids): array
     {
         $deleted        = [];
         $unableToDelete = [];

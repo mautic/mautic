@@ -225,7 +225,7 @@ class WebhookModel extends FormModel
      *
      * @return array
      */
-    public function getEventWebooksByType($type)
+    public function getEventWebooksByType(string $type)
     {
         return $this->eventRepository->getEntitiesByEventType($type);
     }

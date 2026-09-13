@@ -300,7 +300,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @param Email $entity
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         if ($entity->isVariant() && $entity->getIsPublished()) {
             $this->resetVariants($entity);
@@ -1744,10 +1744,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Remove a Lead's EMAIL DNC entry.
-     *
-     * @param string $email
      */
-    public function removeDoNotContact($email): void
+    public function removeDoNotContact(string $email): void
     {
         $leadId = (array) $this->leadRepository->getLeadByEmail($email, true);
 

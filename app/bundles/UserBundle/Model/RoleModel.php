@@ -99,7 +99,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws PreconditionRequiredHttpException
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');

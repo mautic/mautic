@@ -275,11 +275,9 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param string $context
-     *
      * @return mixed
      */
-    public function getGraphData($context = 'all')
+    public function getGraphData(string $context = 'all')
     {
         $data = $this->buildAvailableReports($context);
 
@@ -319,7 +317,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      *
      * return \stdClass{filterList: mixed[], definitions: mixed[], operatorChoices: mixed[], operatorHtml: mixed[], filterListHtml: string}
      */
-    public function getFilterList($context = 'all'): \stdClass
+    public function getFilterList(string $context = 'all'): \stdClass
     {
         $tableData = $this->getTableData($context);
 
@@ -350,11 +348,9 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param string $context
-     *
      * @return \stdClass ['choices' => [], choiceHtml = '']
      */
-    public function getGraphList($context = 'all'): \stdClass
+    public function getGraphList(string $context = 'all'): \stdClass
     {
         $graphData          = $this->getGraphData($context);
         $return             = new \stdClass();
@@ -809,10 +805,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         return (int) $countQb->executeQuery()->fetchOne();
     }
 
-    /**
-     * @param int $segmentId
-     */
-    public function getReportsIdsWithDependenciesOnSegment($segmentId): array
+    public function getReportsIdsWithDependenciesOnSegment(int $segmentId): array
     {
         $search = 'lll.leadlist_id';
         $filter = [

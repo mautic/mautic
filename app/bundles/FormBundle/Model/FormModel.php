@@ -551,10 +551,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    /**
-     * @param object $entity
-     */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         /** @var Form $entity */
         $this->deleteFormFiles($entity);

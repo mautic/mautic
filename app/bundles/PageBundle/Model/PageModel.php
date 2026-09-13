@@ -213,7 +213,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Page $entity
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         if ($entity->isVariant() && $entity->getIsPublished()) {
             $this->resetVariants($entity);
