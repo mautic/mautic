@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class CustomAssetsEvent extends Event
 {
     public function __construct(
-        protected AssetsHelper $assetsHelper,
+        private readonly AssetsHelper $assetsHelper,
     ) {
     }
 
