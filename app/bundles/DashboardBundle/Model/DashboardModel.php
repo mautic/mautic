@@ -104,7 +104,7 @@ class DashboardModel extends FormModel
      * Creates an array that represents the dashboard and all its widgets.
      * Useful for dashboard exports.
      *
-     * @return array<string, string|mixed[]>
+     * @return array{name: string, description: string, widgets: array<int, mixed[]>}
      */
     public function toArray(string $name): array
     {
@@ -304,7 +304,7 @@ class DashboardModel extends FormModel
     /**
      * Generate default date range filter and time unit.
      *
-     * @return array<string, \DateTime>
+     * @return array{dateFrom: \DateTime, dateTo: \DateTime}
      */
     public function getDefaultFilter(): array
     {

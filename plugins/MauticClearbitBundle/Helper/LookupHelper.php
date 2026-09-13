@@ -118,7 +118,7 @@ final class LookupHelper
     }
 
     /**
-     * @return array{notify: mixed, entity: mixed}|false
+     * @return array{notify: string|false, entity: Lead|Company}|false
      */
     public function validateRequest($oid, $type): array|false
     {

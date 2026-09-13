@@ -283,7 +283,7 @@ trait LeadDetailsTrait
     /**
      * Get an array with engagements and points of a contact.
      *
-     * @return array<string, mixed[]>
+     * @return array{engagements: array<string, mixed>, points: array<string, mixed>}
      */
     protected function getStatsCount(Lead $lead, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
@@ -313,7 +313,7 @@ trait LeadDetailsTrait
      *
      * @param array $contacts
      *
-     * @return array<string, list<(float|int)>>
+     * @return array{engagements: list<float|int>, points: list<float|int>}
      */
     protected function getCompanyEngagementData($contacts): array
     {

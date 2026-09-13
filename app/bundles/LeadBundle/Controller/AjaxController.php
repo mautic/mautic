@@ -786,7 +786,7 @@ final class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{html: string, className: string, leadCount: int}
      */
     private function prepareJsonResponse(int $leadCount, bool $needsRebuild): array
     {

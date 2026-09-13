@@ -25,6 +25,9 @@ final class CampaignEventHelper
     ) {
     }
 
+    /**
+     * @return array{failed: int, response: mixed, reason?: string}|array{timeline: string|string[], response: mixed}|false
+     */
     public function sendTweetAction(Lead $lead, Event $event): array|false
     {
         $tweetSent   = false;

@@ -31,7 +31,7 @@ final class MonitoringV2ApiTest extends MauticMysqlTestCase
      * @param array<string,mixed>  $data
      * @param array<string,string> $headers
      *
-     * @return array<string,?mixed>
+     * @return array{status: int, content: string|false}
      */
     private function sendRequest(
         string $method,

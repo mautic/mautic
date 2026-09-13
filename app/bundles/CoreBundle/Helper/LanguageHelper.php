@@ -57,6 +57,8 @@ class LanguageHelper
      * Extracts a downloaded package for the specified language.
      *
      * This will attempt to download the package if it is not found
+     *
+     * @return array{error: bool, message?: string, vars?: array<string, string|int>}
      */
     public function extractLanguagePackage($languageCode): array
     {
@@ -203,6 +205,8 @@ class LanguageHelper
 
     /**
      * Fetches a language package from the remote server.
+     *
+     * @return array{error: bool, message?: string, vars?: array<string, string|int>}
      */
     public function fetchPackage(?string $languageCode): array
     {

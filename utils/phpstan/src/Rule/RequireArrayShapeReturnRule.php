@@ -8,28 +8,31 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Return_;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\MethodReflection;
-use PHPStan\Reflection\ParametersAcceptor;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\Constant\ConstantArrayType;
-use PHPStan\Type\VoidType;
+use PHPStan\Type\MixedType;
+use PHPStan\Type\Type;
+use PHPStan\Type\UnionType;
 
 /**
  * A method that returns a keyed array of 2-3 named values should declare that shape in its @return, so the caller
  * knows each key and its type instead of reading an opaque array.
  *
- * Only literal returns of 2 or 3 elements where every element has a string key are flagged - single values,
- * positional arrays and larger config/option maps are left alone. Static data maps whose values are all nested
- * arrays or constants are skipped too, as those are config/definition tables rather than packed results.
- * A @return that already declares an array shape is left alone. Anonymous classes are skipped as local one-off
- * implementations. Methods overriding a parent one are skipped too, as their shape is bound by the parent contract.
+ * Only methods whose every value-return is a literal keyed array of 2 or 3 string-keyed elements are flagged - the
+ * clean "packed result" case where a single shape can describe the return. Methods that also return a plain value,
+ * a variable, a call result or a general array are left alone, as a keyed shape cannot represent those and PHPStan
+ * would collapse it anyway. Single values, positional arrays and larger config/option maps are left alone, and so
+ * are static data maps whose values are all nested arrays or constants. A @return that already declares an array
+ * shape, a void or mixed return, anonymous classes and methods overriding a parent contract are skipped too.
  *
- * @implements Rule<Return_>
+ * @implements Rule<ClassMethod>
  */
 final readonly class RequireArrayShapeReturnRule implements Rule
 {
@@ -39,17 +42,17 @@ final readonly class RequireArrayShapeReturnRule implements Rule
 
     public function getNodeType(): string
     {
-        return Return_::class;
+        return ClassMethod::class;
     }
 
     /**
-     * @param Return_ $node
+     * @param ClassMethod $node
      *
      * @return list<\PHPStan\Rules\IdentifierRuleError>
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        if (!$node->expr instanceof Array_) {
+        if ($node->stmts === null) {
             return [];
         }
 
@@ -64,58 +67,124 @@ final readonly class RequireArrayShapeReturnRule implements Rule
             return [];
         }
 
-        $methodReflection = $scope->getFunction();
-        if (!$methodReflection instanceof MethodReflection) {
-            return [];
-        }
+        $methodName = $node->name->toString();
 
         // a method overriding a parent one is bound to that contract's shape, skip it
-        if ($this->isDeclaredInParent($scope, $methodReflection->getName())) {
+        if ($this->isDeclaredInParent($classReflection, $methodName)) {
             return [];
         }
 
-        $returnType = $methodReflection->getVariants()[0]->getReturnType();
-        if ($returnType->isVoid()) {
+        $returnType = $classReflection->getNativeMethod($methodName)->getVariants()[0]->getReturnType();
+        if ($returnType->isVoid()->yes()) {
+            return [];
+        }
+
+        // a mixed return cannot be pinned to an array shape, skip it
+        if ($returnType instanceof MixedType) {
             return [];
         }
 
         // @return already declares an array shape, the keys and types are documented
-        if ($returnType->isConstantArray()) {
+        if ($this->declaresArrayShape($returnType)) {
             return [];
         }
 
-        // a return inside a closure/callback is attributed to the enclosing method, so skip it
-        if ($scope->getAnonymousFunctionReflection() instanceof ParametersAcceptor) {
+        $valueReturns = array_filter(
+            $this->collectReturns($node->stmts),
+            static fn (Return_ $return): bool => $return->expr instanceof Node
+        );
+        if ($valueReturns === []) {
             return [];
         }
 
-        $valueCount = count($node->expr->items);
-        if ($valueCount < self::MIN_VALUE_COUNT || $valueCount > self::MAX_VALUE_COUNT) {
-            return [];
-        }
+        $firstKeyedArray = null;
+        foreach ($valueReturns as $valueReturn) {
+            $expr = $valueReturn->expr;
 
-        if (!$this->hasStringKeyOnEveryItem($node->expr)) {
-            return [];
-        }
+            // a return that is not a packed keyed array means no single shape fits, skip the method
+            if (!$expr instanceof Array_ || !$this->isPackedKeyedArray($expr)) {
+                return [];
+            }
 
-        if ($this->hasOnlyStaticDataValues($node->expr)) {
-            return [];
+            $firstKeyedArray ??= $expr;
         }
 
         $ruleError = RuleErrorBuilder::message(sprintf(
             'Method "%s()" returns a keyed array of %d values; declare its shape in @return, e.g. array{key: type}.',
-            $scope->getFunction()->getName(),
-            $valueCount
+            $methodName,
+            count($firstKeyedArray->items)
         ))
             ->identifier('mautic.requireArrayShapeReturn')
+            ->line($firstKeyedArray->getStartLine())
             ->build();
 
         return [$ruleError];
     }
 
-    private function isDeclaredInParent(Scope $scope, string $methodName): bool
+    private function isPackedKeyedArray(Array_ $expr): bool
     {
-        $parentClass = $scope->getClassReflection()->getParentClass();
+        $valueCount = count($expr->items);
+        if ($valueCount < self::MIN_VALUE_COUNT || $valueCount > self::MAX_VALUE_COUNT) {
+            return false;
+        }
+
+        if (!$this->hasStringKeyOnEveryItem($expr)) {
+            return false;
+        }
+
+        return !$this->hasOnlyStaticDataValues($expr);
+    }
+
+    /**
+     * Collect return statements in the given nodes, without descending into nested functions or classes.
+     *
+     * @param Node[] $nodes
+     *
+     * @return list<Return_>
+     */
+    private function collectReturns(array $nodes): array
+    {
+        $returns = [];
+        foreach ($nodes as $node) {
+            if ($node instanceof Return_) {
+                $returns[] = $node;
+                continue;
+            }
+
+            // nested closures, functions and anonymous classes have their own return context
+            if ($node instanceof FunctionLike || $node instanceof Class_) {
+                continue;
+            }
+
+            foreach ($node->getSubNodeNames() as $subNodeName) {
+                $child = $node->{$subNodeName};
+                if ($child instanceof Node) {
+                    $returns = [...$returns, ...$this->collectReturns([$child])];
+                } elseif (is_array($child)) {
+                    $returns = [...$returns, ...$this->collectReturns(array_filter($child, static fn ($item): bool => $item instanceof Node))];
+                }
+            }
+        }
+
+        return $returns;
+    }
+
+    // an array shape may be one member of a union (e.g. array{...}|null), so check each member
+    private function declaresArrayShape(Type $type): bool
+    {
+        $types = $type instanceof UnionType ? $type->getTypes() : [$type];
+        foreach ($types as $innerType) {
+            if ($innerType->isConstantArray()->yes()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isDeclaredInParent(ClassReflection $classReflection, string $methodName): bool
+    {
+        $parentClass = $classReflection->getParentClass();
         while ($parentClass instanceof ClassReflection) {
             if ($parentClass->hasMethod($methodName)) {
                 return true;

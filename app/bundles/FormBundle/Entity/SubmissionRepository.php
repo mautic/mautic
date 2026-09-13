@@ -209,7 +209,7 @@ class SubmissionRepository extends CommonRepository
      *
      * @param array<mixed> $args
      *
-     * @return array<mixed>
+     * @return array{count: int, results: list<array<string, mixed>>}
      */
     public function getEntitiesByPage(array $args = []): array
     {

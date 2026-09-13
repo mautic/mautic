@@ -473,7 +473,7 @@ final class RoleController extends FormController
     }
 
     /**
-     * @return array<string, array<string, non-empty-array<mixed>>>
+     * @return array{config: array<string, array{label: string, permissionObject: \Mautic\CoreBundle\Security\Permissions\AbstractPermissions, ratio: array{int, int}, data: mixed}>, list: array<string, array<string, list<int|string>>>}
      */
     private function getPermissionsConfig(Entity\Role $role): array
     {

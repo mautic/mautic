@@ -261,7 +261,7 @@ class Mailbox
     /**
      * @param array<string, mixed> $settings
      *
-     * @return array<string, string>
+     * @return array{path: string, full: string}
      */
     public function getImapPath(array $settings): array
     {

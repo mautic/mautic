@@ -36,7 +36,7 @@ final class ReferenceValueDAO implements \Stringable
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{value: int|null, types: string|null}
      */
     public function __serialize(): array
     {

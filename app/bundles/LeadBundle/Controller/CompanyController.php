@@ -1049,7 +1049,7 @@ final class CompanyController extends FormController
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{string: mixed, force: array<mixed>}
      */
     private function getCurrentCompanyListFilter(Request $request): array
     {
