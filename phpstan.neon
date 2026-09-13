@@ -299,6 +299,7 @@ rules:
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
     - Utils\PHPStan\Rule\PreferCustomRepositoryOverGetRepositoryRule
+    - Utils\PHPStan\Rule\PreferValueObjectOverArrayReturnRule
     # enable later, might not be needed
     - Utils\PHPStan\Rule\NoDuplicateNonRepeatableAttributeRule
 

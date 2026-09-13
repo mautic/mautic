@@ -671,9 +671,9 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      *
      * @param iterable<mixed> $orderBys
      *
-     * @return iterable<mixed>
+     * @return array{orderBy: iterable<mixed>, hasOrderBy: bool}
      */
-    private function getOrderBySanitized(iterable $orderBys, \stdClass $allowedColumns): iterable
+    private function getOrderBySanitized(iterable $orderBys, \stdClass $allowedColumns): array
     {
         $hasOrderBy  = false;
         $definitions = $allowedColumns->definitions ?? [];
