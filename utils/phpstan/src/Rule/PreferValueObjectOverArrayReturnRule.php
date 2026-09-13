@@ -11,11 +11,12 @@ use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Return_;
 use PHPStan\Analyser\Scope;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ParametersAcceptor;
-use PHPStan\Type\VoidType;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use PHPStan\Type\VoidType;
 
 /**
  * A method that returns a keyed array of 2-3 named values packs several results into one array for the caller to
@@ -24,7 +25,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * Only literal returns of 2 or 3 elements where every element has a string key are flagged - single values,
  * positional arrays and larger config/option maps are left alone. Static data maps whose values are all nested
  * arrays or constants are skipped too, as those are config/definition tables rather than packed results.
- * Test classes are skipped, as arrays there are simple fixtures.
+ * Test classes are skipped, as arrays there are simple fixtures. Methods overriding a parent one are skipped too,
+ * as their shape is bound by the parent contract.
  *
  * @implements Rule<Return_>
  */
@@ -64,6 +66,11 @@ final readonly class PreferValueObjectOverArrayReturnRule implements Rule
             return [];
         }
 
+        // a method overriding a parent one is bound to that contract's shape, skip it
+        if ($this->isDeclaredInParent($scope, $methodReflection->getName())) {
+            return [];
+        }
+
         $returnType = $methodReflection->getVariants()[0]->getReturnType();
         if ($returnType instanceof VoidType) {
             return [];
@@ -96,6 +103,20 @@ final readonly class PreferValueObjectOverArrayReturnRule implements Rule
             ->build();
 
         return [$ruleError];
+    }
+
+    private function isDeclaredInParent(Scope $scope, string $methodName): bool
+    {
+        $parentClass = $scope->getClassReflection()->getParentClass();
+        while ($parentClass instanceof ClassReflection) {
+            if ($parentClass->hasMethod($methodName)) {
+                return true;
+            }
+
+            $parentClass = $parentClass->getParentClass();
+        }
+
+        return false;
     }
 
     private function hasStringKeyOnEveryItem(Array_ $array): bool
