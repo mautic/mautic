@@ -3,6 +3,7 @@
 namespace Mautic\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
@@ -147,9 +148,9 @@ class DashboardModel extends FormModel
     /**
      * Fill widgets with their empty content.
      *
-     * @param array<mixed> $widgets
+     * @param array<mixed>|Paginator<mixed> $widgets
      */
-    public function populateWidgetPreviews(array &$widgets): void
+    public function populateWidgetPreviews(array|Paginator &$widgets): void
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
