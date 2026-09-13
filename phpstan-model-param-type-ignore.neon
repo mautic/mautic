@@ -1,10 +1,15 @@
-# Two *Model methods whose single param is genuinely loose, so left untyped:
-# IntegrationEntityModel::getRecordList (called with an extra arg + iterates ->getRecords())
+# *Model methods whose single param is genuinely loose, so left untyped:
+# CompanyModel/LeadModel::organizeFieldsByGroup (a Paginator or null is passed)
+# PageModel::generateSlug (a VariantEntityInterface is passed)
+# IntegrationEntityModel::getRecordList (extra arg + iterates ->getRecords())
 # ImportModel::isEmptyCsvRow (defensive mixed row from CSV parsing)
 parameters:
     ignoreErrors:
         -
             identifier: mautic.modelMethodSingleParamMustHaveType
             paths:
+                - app/bundles/LeadBundle/Model/CompanyModel.php
                 - app/bundles/LeadBundle/Model/ImportModel.php
+                - app/bundles/LeadBundle/Model/LeadModel.php
+                - app/bundles/PageBundle/Model/PageModel.php
                 - app/bundles/PluginBundle/Model/IntegrationEntityModel.php

@@ -746,7 +746,7 @@ class LeadModel extends FormModel
     /**
      * Reorganizes a field list to be keyed by field's group then alias.
      */
-    public function organizeFieldsByGroup(array $fields): array
+    public function organizeFieldsByGroup($fields): array
     {
         $array = [];
 
@@ -1179,7 +1179,7 @@ class LeadModel extends FormModel
         }
     }
 
-    public function removeFromCategories(array $categories): void
+    public function removeFromCategories(array|LeadCategory $categories): void
     {
         $deleteCats = [];
         if (is_array($categories)) {

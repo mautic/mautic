@@ -542,8 +542,6 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param mixed $form
-     *
      * @return array
      */
     public function getCampaignsByForm(Form|int $form)

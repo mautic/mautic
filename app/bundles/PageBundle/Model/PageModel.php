@@ -345,7 +345,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Generates slug string.
      */
-    public function generateSlug(Page $entity): string
+    public function generateSlug($entity): string
     {
         $pageSlug = $entity->getAlias();
 
