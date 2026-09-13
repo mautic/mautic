@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -15,6 +15,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 trait LeadDetailsTrait
 {
     private RequestStack $requestStack;
+
+    private LeadEventLogRepository $leadEventLogRepository;
 
     protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, int $page = 1, $limit = 25): array
     {
@@ -369,10 +371,7 @@ trait LeadDetailsTrait
     protected function getScheduledCampaignEvents(Lead $lead): array
     {
         // Upcoming events from Campaign Bundle
-        /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
-
-        return $leadEventLogRepository->getUpcomingEvents(
+        return $this->leadEventLogRepository->getUpcomingEvents(
             [
                 'lead'      => $lead,
                 'eventType' => ['action', 'condition'],
@@ -385,5 +384,12 @@ trait LeadDetailsTrait
         RequestStack $requestStack,
     ): void {
         $this->requestStack = $requestStack;
+    }
+
+    #[Required]
+    public function setLeadEventLogRepositoryLeadDetailsTrait(
+        LeadEventLogRepository $leadEventLogRepository,
+    ): void {
+        $this->leadEventLogRepository = $leadEventLogRepository;
     }
 }

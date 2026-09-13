@@ -69,7 +69,7 @@ final class PreferCustomRepositoryOverGetRepositoryRule implements Rule
         }
 
         // tests may fetch entities directly through getRepository() for convenience
-        if (str_contains($scope->getFile(), '/Tests/')) {
+        if (1 === preg_match('#/Tests?/#', $scope->getFile())) {
             return [];
         }
 
