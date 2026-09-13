@@ -29,8 +29,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\IntegrationsBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\IntegrationsBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('Mautic\\IntegrationsBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set(Mautic\IntegrationsBundle\EventListener\ControllerSubscriber::class)
         ->arg('$resolver', \Symfony\Component\DependencyInjection\Loader\Configurator\service('controller_resolver'));

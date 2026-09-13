@@ -25,8 +25,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\EmailBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php');
     $services->set(Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor::class)->tag('container.env_var_processor');
 
     $services->set(Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class);

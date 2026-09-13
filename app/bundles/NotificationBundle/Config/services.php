@@ -18,8 +18,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\NotificationBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\NotificationBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('Mautic\\NotificationBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set(Mautic\NotificationBundle\EventListener\CampaignSubscriber::class)
         ->arg('$notificationApi', service(Mautic\NotificationBundle\Api\OneSignalApi::class));

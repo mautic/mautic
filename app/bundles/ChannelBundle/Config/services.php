@@ -20,8 +20,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\ChannelBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\ChannelBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('Mautic\\ChannelBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set(Mautic\ChannelBundle\Helper\ChannelListHelper::class)
         ->tag('twig.helper', ['alias' => 'channel']);

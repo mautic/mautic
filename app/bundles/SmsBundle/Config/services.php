@@ -19,8 +19,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\SmsBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set(Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class)
         ->arg('$logger', service('monolog.logger.mautic'))

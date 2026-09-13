@@ -17,8 +17,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\ProjectBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\ProjectBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('Mautic\\ProjectBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set(Mautic\ProjectBundle\Security\Permissions\ProjectPermissions::class);
 };

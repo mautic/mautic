@@ -18,8 +18,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\PageBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\PageBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('Mautic\\PageBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->get(Mautic\PageBundle\Model\PageModel::class)->call('setCatInUrl', ['%mautic.cat_in_page_url%']);
     $services->set(Mautic\PageBundle\Security\Permissions\PagePermissions::class);

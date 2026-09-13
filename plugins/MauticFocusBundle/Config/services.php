@@ -18,8 +18,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('MauticPlugin\\MauticFocusBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('MauticPlugin\\MauticFocusBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('MauticPlugin\\MauticFocusBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set(MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions::class);
 };
