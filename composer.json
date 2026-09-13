@@ -30,6 +30,7 @@
     "codeception/module-asserts": "^3.3",
     "codeception/module-db": "^3.2",
     "codeception/module-webdriver": "^4.0",
+    "dg/bypass-finals": "^1.11",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.16",
     "liip/test-fixtures-bundle": "^3.9",
