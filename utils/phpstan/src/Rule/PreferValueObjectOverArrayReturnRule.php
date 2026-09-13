@@ -25,8 +25,8 @@ use PHPStan\Type\VoidType;
  * Only literal returns of 2 or 3 elements where every element has a string key are flagged - single values,
  * positional arrays and larger config/option maps are left alone. Static data maps whose values are all nested
  * arrays or constants are skipped too, as those are config/definition tables rather than packed results.
- * Test classes are skipped, as arrays there are simple fixtures. Methods overriding a parent one are skipped too,
- * as their shape is bound by the parent contract.
+ * Test classes are skipped, as arrays there are simple fixtures. Anonymous classes are skipped as local one-off
+ * implementations. Methods overriding a parent one are skipped too, as their shape is bound by the parent contract.
  *
  * @implements Rule<Return_>
  */
@@ -56,8 +56,15 @@ final readonly class PreferValueObjectOverArrayReturnRule implements Rule
             return [];
         }
 
+        $classReflection = $scope->getClassReflection();
+
+        // anonymous classes are local one-off implementations, skip them
+        if ($classReflection->isAnonymous()) {
+            return [];
+        }
+
         // arrays in tests are simple fixtures/data providers, skip them
-        if (str_ends_with($scope->getClassReflection()->getName(), 'Test')) {
+        if (str_ends_with($classReflection->getName(), 'Test')) {
             return [];
         }
 

@@ -538,8 +538,8 @@ class CampaignController extends AbstractStandardFormController
         $hasCampaignLeads = $this->campaignRepository->hasCampaignLeads($objectId, (int) $this->coreParametersHelper->get('campaign_event_cache_ttl'));
         $logCounts        = $this->processCampaignLogCounts($objectId, $dateFrom, $dateTo);
 
-        $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
-        $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
+        $campaignLogCounts          = $logCounts['campaignLogCounts'];
+        $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'];
 
         $this->processCampaignEvents($events, $hasCampaignLeads, $campaignLogCounts, $campaignLogCountsProcessed);
         $this->addSchedulingLabels($events);
@@ -1338,7 +1338,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @return array<string, array<int|string, array<int|string, int|string>>>
+     * @return array{campaignLogCounts: array<int|string, array<int|string, int|string>>, campaignLogCountsProcessed: array<int|string, array<int|string, int|string>>}
      *
      * @throws CacheException
      */

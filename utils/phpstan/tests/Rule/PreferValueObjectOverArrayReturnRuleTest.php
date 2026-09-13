@@ -37,6 +37,11 @@ final class PreferValueObjectOverArrayReturnRuleTest extends RuleTestCase
         $this->analyse([__DIR__.'/Fixture/MultiValueArrayReturnInTest.php'], []);
     }
 
+    public function testSkipsAnonymousClasses(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/MultiValueArrayReturnInAnonymousClass.php'], []);
+    }
+
     public function testSkipsMethodOverridingParent(): void
     {
         $this->analyse([
