@@ -21,7 +21,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\PluginBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\PluginBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->load('Mautic\\PluginBundle\\Entity\\', '../Entity/*Repository.php')
+        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->set(Mautic\PluginBundle\Security\Permissions\PluginPermissions::class);
 };

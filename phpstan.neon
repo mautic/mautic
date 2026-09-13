@@ -298,6 +298,7 @@ rules:
     - Utils\PHPStan\Rule\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
+    - Utils\PHPStan\Rule\PreferCustomRepositoryOverGetRepositoryRule
     # enable later, might not be needed
     - Utils\PHPStan\Rule\NoDuplicateNonRepeatableAttributeRule
 

@@ -34,11 +34,19 @@ final class RoleController extends FormController
 
     private RoleModel $roleModel;
 
+    private PermissionRepository $permissionRepository;
+
+    private UserRepository $userRepository;
+
     #[Required]
     public function autowireRoleController(
         RoleModel $roleModel,
+        PermissionRepository $permissionRepository,
+        UserRepository $userRepository,
     ): void {
-        $this->roleModel = $roleModel;
+        $this->roleModel            = $roleModel;
+        $this->permissionRepository = $permissionRepository;
+        $this->userRepository       = $userRepository;
     }
 
     #[Route(
@@ -470,10 +478,8 @@ final class RoleController extends FormController
     private function getPermissionsConfig(Entity\Role $role): array
     {
         $permissionObjects = $this->security->getPermissionObjects();
-        $permissionRepo    = $this->doctrine->getRepository(Entity\Permission::class);
-        \assert($permissionRepo instanceof PermissionRepository);
 
-        $permissionsArray = ($role->getId()) ? $permissionRepo->getPermissionsByRole($role, true) : [];
+        $permissionsArray = ($role->getId()) ? $this->permissionRepository->getPermissionsByRole($role, true) : [];
 
         $permissions     = [];
         $permissionsList = [];
@@ -602,13 +608,11 @@ final class RoleController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $ids       = json_decode($request->query->get('ids', ''));
             $deleteIds = [];
-            $userRepo  = $this->doctrine->getRepository(Entity\User::class);
-            \assert($userRepo instanceof UserRepository);
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
-                $users  = $userRepo->findByRole($entity);
+                $users  = $this->userRepository->findByRole($entity);
 
                 if (null === $entity) {
                     $flashes[] = [
