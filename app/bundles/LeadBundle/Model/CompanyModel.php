@@ -650,7 +650,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @return mixed
      */
-    public function companyMerge($mainCompany, $secCompany)
+    public function companyMerge($mainCompany, object $secCompany)
     {
         $this->logger->debug('COMPANY: Merging companies');
 
@@ -986,7 +986,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @return array<int,Company>
      */
-    public function deleteEntities($ids): array
+    public function deleteEntities(array $ids): array
     {
         $entities = [];
         foreach ($ids as $companyId) {

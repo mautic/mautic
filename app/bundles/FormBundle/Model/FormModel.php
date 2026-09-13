@@ -569,7 +569,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function deleteEntities($ids): array
+    public function deleteEntities(array $ids): array
     {
         $entities     = parent::deleteEntities($ids);
         foreach ($entities as $id => $entity) {

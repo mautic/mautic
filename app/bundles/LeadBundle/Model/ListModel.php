@@ -159,7 +159,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @return array<object>
      */
-    public function deleteEntities($ids): array
+    public function deleteEntities(array $ids): array
     {
         $deleted        = [];
         $unableToDelete = [];

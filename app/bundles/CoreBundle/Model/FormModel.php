@@ -182,8 +182,6 @@ class FormModel extends AbstractCommonModel
 
     /**
      * Determines if an entity is new or not.
-     *
-     * @param mixed $entity
      */
     public function isNewEntity(object $entity): bool
     {

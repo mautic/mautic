@@ -693,7 +693,7 @@ class FieldModel extends FormModel
      *
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function deleteEntities($ids): array
+    public function deleteEntities(array $ids): array
     {
         $entities = parent::deleteEntities($ids);
 
