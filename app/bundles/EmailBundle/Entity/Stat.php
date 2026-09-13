@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -590,7 +591,7 @@ class Stat
     }
 
     /**
-     * @return ArrayCollection<int, EmailReply>
+     * @return Collection<int, EmailReply>
      */
     public function getReplies()
     {
