@@ -24,6 +24,7 @@ use PHPStan\Rules\RuleErrorBuilder;
  * Only literal returns of 2 or 3 elements where every element has a string key are flagged - single values,
  * positional arrays and larger config/option maps are left alone. Static data maps whose values are all nested
  * arrays or constants are skipped too, as those are config/definition tables rather than packed results.
+ * Test classes are skipped, as arrays there are simple fixtures.
  *
  * @implements Rule<Return_>
  */
@@ -50,6 +51,11 @@ final readonly class PreferValueObjectOverArrayReturnRule implements Rule
         }
 
         if (!$scope->isInClass()) {
+            return [];
+        }
+
+        // arrays in tests are simple fixtures/data providers, skip them
+        if (str_ends_with($scope->getClassReflection()->getName(), 'Test')) {
             return [];
         }
 

@@ -31,4 +31,9 @@ final class PreferValueObjectOverArrayReturnRuleTest extends RuleTestCase
             ],
         ]);
     }
+
+    public function testSkipsTestClasses(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/MultiValueArrayReturnInTest.php'], []);
+    }
 }
