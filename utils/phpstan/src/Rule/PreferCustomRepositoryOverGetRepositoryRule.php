@@ -68,6 +68,11 @@ final class PreferCustomRepositoryOverGetRepositoryRule implements Rule
             return [];
         }
 
+        // tests may fetch entities directly through getRepository() for convenience
+        if (str_contains($scope->getFile(), '/Tests/')) {
+            return [];
+        }
+
         // only a Doctrine registry or entity manager exposes this getRepository()
         $callerType = $scope->getType($node->var);
         $isDoctrineCaller = new ObjectType(ManagerRegistry::class)->isSuperTypeOf($callerType)->yes()
