@@ -733,10 +733,6 @@ class FieldModel extends FormModel
      */
     public function reorderFieldsByEntity(LeadField $entity): void
     {
-        if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(['LeadEntity']);
-        }
-
         $fields = $this->leadFieldRepository->findBy([], ['order' => 'ASC']);
         $count  = 1;
         $order  = $entity->getOrder();
@@ -914,9 +910,6 @@ class FieldModel extends FormModel
         );
     }
 
-    /**
-     * @param string|bool $object
-     */
     public function getFieldListWithProperties(string|bool $object = 'lead'): array
     {
         return $this->getFieldsProperties(['object' => $object]);

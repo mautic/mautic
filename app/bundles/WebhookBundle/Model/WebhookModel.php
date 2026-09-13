@@ -284,8 +284,6 @@ class WebhookModel extends FormModel
 
     /**
      * Execute a list of webhooks to their specified endpoints.
-     *
-     * @param array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks
      */
     public function processWebhooks(array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks): void
     {

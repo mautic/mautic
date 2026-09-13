@@ -738,7 +738,7 @@ class LeadModel extends FormModel
             }
         }
 
-        $leadId = ($lead instanceof Lead) ? $lead->getId() : (int) $lead;
+        $leadId = ($lead instanceof Lead) ? $lead->getId() : $lead;
 
         return $this->getRepository()->getFieldValues($leadId);
     }
