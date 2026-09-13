@@ -648,7 +648,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @return Stat|null
      */
-    public function getEmailStatus($idHash)
+    public function getEmailStatus(string $idHash)
     {
         return $this->statRepository->getEmailStatus($idHash);
     }
@@ -2263,7 +2263,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $errors;
     }
 
-    public function getEmailsIdsWithDependenciesOnSegment($segmentId): array
+    public function getEmailsIdsWithDependenciesOnSegment(int $segmentId): array
     {
         $entities =  $this->getEntities(
             [

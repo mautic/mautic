@@ -494,7 +494,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     /**
      * @return Stat
      */
-    public function getSmsStatus($idHash)
+    public function getSmsStatus(string $idHash)
     {
         return $this->statRepository->getSmsStatus($idHash);
     }
@@ -518,7 +518,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     /**
      * Get an array of tracked links.
      */
-    public function getSmsClickStats($smsId): array
+    public function getSmsClickStats(int $smsId): array
     {
         return $this->pageTrackableModel->getTrackableList('sms', $smsId);
     }

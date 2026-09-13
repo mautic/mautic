@@ -236,7 +236,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     /**
      * @return Stat
      */
-    public function getNotificationStatus($idHash)
+    public function getNotificationStatus(string $idHash)
     {
         return $this->statRepository->getNotificationStatus($idHash);
     }
@@ -260,7 +260,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     /**
      * Get an array of tracked links.
      */
-    public function getNotificationClickStats($notificationId): array
+    public function getNotificationClickStats(int $notificationId): array
     {
         return $this->pageTrackableModel->getTrackableList('notification', $notificationId);
     }

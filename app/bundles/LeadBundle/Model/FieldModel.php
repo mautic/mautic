@@ -731,7 +731,7 @@ class FieldModel extends FormModel
     /**
      * Reorder fields based on passed entity position.
      */
-    public function reorderFieldsByEntity($entity): void
+    public function reorderFieldsByEntity(LeadField $entity): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -917,7 +917,7 @@ class FieldModel extends FormModel
     /**
      * @param string|bool $object
      */
-    public function getFieldListWithProperties($object = 'lead'): array
+    public function getFieldListWithProperties(string|bool $object = 'lead'): array
     {
         return $this->getFieldsProperties(['object' => $object]);
     }

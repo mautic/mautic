@@ -1,25 +1,10 @@
-# Existing single untyped params on *Model methods predating mautic.modelMethodSingleParamMustHaveType.
-# New code is still checked; add the missing types over time, trimming the list.
+# Two *Model methods whose single param is genuinely loose, so left untyped:
+# IntegrationEntityModel::getRecordList (called with an extra arg + iterates ->getRecords())
+# ImportModel::isEmptyCsvRow (defensive mixed row from CSV parsing)
 parameters:
     ignoreErrors:
         -
             identifier: mautic.modelMethodSingleParamMustHaveType
             paths:
-                - app/bundles/CampaignBundle/Model/CampaignModel.php
-                - app/bundles/ChannelBundle/Model/MessageModel.php
-                - app/bundles/ChannelBundle/Model/MessageQueueModel.php
-                - app/bundles/CoreBundle/Model/AbstractCommonModel.php
-                - app/bundles/EmailBundle/Model/EmailModel.php
-                - app/bundles/FormBundle/Model/FieldModel.php
-                - app/bundles/FormBundle/Model/FormModel.php
-                - app/bundles/LeadBundle/Model/CompanyModel.php
-                - app/bundles/LeadBundle/Model/FieldModel.php
                 - app/bundles/LeadBundle/Model/ImportModel.php
-                - app/bundles/LeadBundle/Model/LeadModel.php
-                - app/bundles/NotificationBundle/Model/NotificationModel.php
-                - app/bundles/PageBundle/Model/PageModel.php
-                - app/bundles/PageBundle/Model/RedirectModel.php
                 - app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-                - app/bundles/PointBundle/Model/TriggerModel.php
-                - app/bundles/SmsBundle/Model/SmsModel.php
-                - app/bundles/WebhookBundle/Model/WebhookModel.php

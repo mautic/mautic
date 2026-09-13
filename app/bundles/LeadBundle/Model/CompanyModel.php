@@ -178,7 +178,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Reorganizes a field list to be keyed by field's group then alias.
      */
-    public function organizeFieldsByGroup($fields): array
+    public function organizeFieldsByGroup(array $fields): array
     {
         $array = [];
 

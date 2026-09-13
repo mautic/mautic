@@ -287,7 +287,7 @@ class WebhookModel extends FormModel
      *
      * @param array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks
      */
-    public function processWebhooks($webhooks): void
+    public function processWebhooks(array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks): void
     {
         $this->startTime = microtime(true);
 

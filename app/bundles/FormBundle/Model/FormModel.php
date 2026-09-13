@@ -789,7 +789,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    public function getFilterExpressionFunctions($operator = null): array
+    public function getFilterExpressionFunctions(?string $operator = null): array
     {
         $operatorOptions = [
             '=' => [

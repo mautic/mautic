@@ -415,7 +415,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Get list of sources for a campaign.
      */
-    public function getLeadSources($campaign): array
+    public function getLeadSources(Campaign|int|string $campaign): array
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
 
@@ -546,7 +546,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return array
      */
-    public function getCampaignsByForm($form)
+    public function getCampaignsByForm(Form|int $form)
     {
         $formId = ($form instanceof Form) ? $form->getId() : $form;
 
@@ -775,7 +775,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return $this->membershipBuilder->build($campaign, $contactLimiter, $maxLeads, $output);
     }
 
-    public function getCampaignIdsWithDependenciesOnSegment($segmentId): array
+    public function getCampaignIdsWithDependenciesOnSegment(int $segmentId): array
     {
         $entities = $this->getRepository()->getEntities(
             [

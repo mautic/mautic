@@ -195,7 +195,7 @@ class MessageQueueModel extends FormModel
         return $counter;
     }
 
-    public function processMessageQueue($queue): int
+    public function processMessageQueue(array|MessageQueue $queue): int
     {
         if (!is_array($queue)) {
             if (!$queue instanceof MessageQueue) {

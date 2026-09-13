@@ -138,7 +138,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function setCatInUrl($catInUrl): void
+    public function setCatInUrl(bool $catInUrl): void
     {
         $this->catInUrl = $catInUrl;
     }
@@ -345,7 +345,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Generates slug string.
      */
-    public function generateSlug($entity): string
+    public function generateSlug(Page $entity): string
     {
         $pageSlug = $entity->getAlias();
 
