@@ -1052,7 +1052,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @param array<string, mixed> $filter
      *
-     * @return array<string, array<int|string, mixed>>
+     * @return array{labels: list<string>, datasets: list<array<string, mixed>>, options: array{xAxes: array<int, array{display: bool}>, yAxes: array<int, array{display: bool}>}}
      */
     public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
@@ -1114,7 +1114,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @param array<string, mixed> $filter
      *
-     * @return array<string, array<int|string, mixed>>
+     * @return array{labels: list<string>, datasets: list<array<string, mixed>>, options: array{xAxes: array<int, array{display: bool}>, yAxes: array<int, array{display: bool}>}}
      */
     public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {

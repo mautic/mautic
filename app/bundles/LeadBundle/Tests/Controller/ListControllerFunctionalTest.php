@@ -616,7 +616,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, mixed> $parameter
      *
-     * @return array<string, mixed>
+     * @return array{content: mixed, statusCode: int}
      */
     private function callGetLeadCountAjaxRequest(array $parameter): array
     {

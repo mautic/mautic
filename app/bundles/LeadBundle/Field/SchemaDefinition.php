@@ -18,6 +18,8 @@ class SchemaDefinition
      * Get the MySQL database type based on the field type
      * Use a static function so that it's accessible from DoctrineSubscriber
      * without causing a circular service injection error.
+     *
+     * @return array{name: string, type: string, options: array{notnull: bool, length?: int|null}}
      */
     public static function getSchemaDefinition(string $alias, string $type, bool $isUnique = false, ?int $length = null): array
     {

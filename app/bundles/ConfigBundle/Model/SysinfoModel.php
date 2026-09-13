@@ -130,7 +130,7 @@ final class SysinfoModel
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{version: mixed, driver: mixed, platform: class-string}
      */
     public function getDbInfo(): array
     {

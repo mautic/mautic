@@ -44,6 +44,8 @@ trait ChannelTrait
 
     /**
      * Get the name and/or view URL for a channel entity.
+     *
+     * @return array{name: mixed, url: string|null}|string|false
      */
     protected function getChannelEntityName(string $channel, $channelId, bool $returnWithViewUrl = false): false|array|string
     {

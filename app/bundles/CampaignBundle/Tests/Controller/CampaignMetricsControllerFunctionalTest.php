@@ -28,7 +28,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{campaign: \Mautic\CampaignBundle\Entity\Campaign, email: \Mautic\EmailBundle\Entity\Email}
      */
     private function setupEmailCampaignTestData(): array
     {

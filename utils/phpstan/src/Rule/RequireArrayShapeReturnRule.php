@@ -16,21 +16,22 @@ use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ParametersAcceptor;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\VoidType;
 
 /**
- * A method that returns a keyed array of 2-3 named values packs several results into one array for the caller to
- * read by key. A small value object names each value as a typed property, so prefer one over the loose array.
+ * A method that returns a keyed array of 2-3 named values should declare that shape in its @return, so the caller
+ * knows each key and its type instead of reading an opaque array.
  *
  * Only literal returns of 2 or 3 elements where every element has a string key are flagged - single values,
  * positional arrays and larger config/option maps are left alone. Static data maps whose values are all nested
  * arrays or constants are skipped too, as those are config/definition tables rather than packed results.
- * Test classes are skipped, as arrays there are simple fixtures. Anonymous classes are skipped as local one-off
+ * A @return that already declares an array shape is left alone. Anonymous classes are skipped as local one-off
  * implementations. Methods overriding a parent one are skipped too, as their shape is bound by the parent contract.
  *
  * @implements Rule<Return_>
  */
-final readonly class PreferValueObjectOverArrayReturnRule implements Rule
+final readonly class RequireArrayShapeReturnRule implements Rule
 {
     private const int MIN_VALUE_COUNT = 2;
 
@@ -63,11 +64,6 @@ final readonly class PreferValueObjectOverArrayReturnRule implements Rule
             return [];
         }
 
-        // arrays in tests are simple fixtures/data providers, skip them
-        if (str_ends_with($classReflection->getName(), 'Test')) {
-            return [];
-        }
-
         $methodReflection = $scope->getFunction();
         if (!$methodReflection instanceof MethodReflection) {
             return [];
@@ -79,7 +75,12 @@ final readonly class PreferValueObjectOverArrayReturnRule implements Rule
         }
 
         $returnType = $methodReflection->getVariants()[0]->getReturnType();
-        if ($returnType instanceof VoidType) {
+        if ($returnType->isVoid()) {
+            return [];
+        }
+
+        // @return already declares an array shape, the keys and types are documented
+        if ($returnType->isConstantArray()) {
             return [];
         }
 
@@ -102,11 +103,11 @@ final readonly class PreferValueObjectOverArrayReturnRule implements Rule
         }
 
         $ruleError = RuleErrorBuilder::message(sprintf(
-            'Method "%s()" returns a keyed array of %d values; consider a dedicated value object instead.',
+            'Method "%s()" returns a keyed array of %d values; declare its shape in @return, e.g. array{key: type}.',
             $scope->getFunction()->getName(),
             $valueCount
         ))
-            ->identifier('mautic.preferValueObjectOverArrayReturn')
+            ->identifier('mautic.requireArrayShapeReturn')
             ->build();
 
         return [$ruleError];

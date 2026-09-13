@@ -307,7 +307,7 @@ final readonly class CampaignShareService
      *
      * @return array{token: string, name: string}
      */
-    public function stashImage(UploadedFile $file): array
+    public function getResult(): array
     {
         $pendingDir = $this->getPendingDir();
         $this->filesystem->mkdir($pendingDir, 0775);

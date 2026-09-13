@@ -691,7 +691,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array<string, string|null>
+     * @return array{schedule_unit: string|null, schedule_day: string|null, schedule_month_frequency: string|null}
      */
     public function getSchedule(): array
     {
