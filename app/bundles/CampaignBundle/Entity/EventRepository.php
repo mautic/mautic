@@ -263,7 +263,7 @@ class EventRepository extends CommonRepository
      *
      * @param string[] $events
      */
-    public function nullEventRelationships($events): void
+    public function nullEventRelationships(array $events): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX.'campaign_events')
