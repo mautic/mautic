@@ -117,8 +117,10 @@ final class SysinfoModel
 
     /**
      * Method to tail (a few last rows) of a file.
+     *
+     * @param int $lines
      */
-    public function getLogTail(int $lines = 10): ?string
+    public function getLogTail($lines = 10): ?string
     {
         $log = $this->coreParametersHelper->get('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
 
@@ -143,8 +145,11 @@ final class SysinfoModel
 
     /**
      * Method to tail (a few last rows) of a file.
+     *
+     * @param int $lines
+     * @param int $buffer
      */
-    public function tail(string $filename, int $lines = 10, int $buffer = 4096): string
+    public function tail($filename, $lines = 10, $buffer = 4096): string
     {
         $f      = fopen($filename, 'rb');
         $output = '';

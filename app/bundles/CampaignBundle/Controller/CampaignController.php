@@ -538,8 +538,8 @@ class CampaignController extends AbstractStandardFormController
         $hasCampaignLeads = $this->campaignRepository->hasCampaignLeads($objectId, (int) $this->coreParametersHelper->get('campaign_event_cache_ttl'));
         $logCounts        = $this->processCampaignLogCounts($objectId, $dateFrom, $dateTo);
 
-        $campaignLogCounts          = $logCounts['campaignLogCounts'];
-        $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'];
+        $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
+        $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
 
         $this->processCampaignEvents($events, $hasCampaignLeads, $campaignLogCounts, $campaignLogCountsProcessed);
         $this->addSchedulingLabels($events);
