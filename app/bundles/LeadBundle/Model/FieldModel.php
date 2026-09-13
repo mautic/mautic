@@ -914,7 +914,10 @@ class FieldModel extends FormModel
         );
     }
 
-    public function getFieldListWithProperties(string $object = 'lead'): array
+    /**
+     * @param string|bool $object
+     */
+    public function getFieldListWithProperties($object = 'lead'): array
     {
         return $this->getFieldsProperties(['object' => $object]);
     }
