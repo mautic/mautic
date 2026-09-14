@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -32,6 +33,7 @@ final class ContentPreviewSettingsType extends AbstractType
         private readonly TranslatorInterface $translator,
         private readonly CorePermissions $security,
         private readonly UserHelper $userHelper,
+        private readonly UrlGeneratorInterface $router,
     ) {
     }
 
@@ -40,9 +42,10 @@ final class ContentPreviewSettingsType extends AbstractType
         $objectId     = $options['objectId'];
         $translations = $options['translations'];
         $variants     = $options['variants'];
+        $actionRoute  = $options['actionRoute'] ?? '';
 
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations, $objectId);
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants, $objectId);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations, $objectId, $actionRoute);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants, $objectId, $actionRoute);
 
         if ($this->security->isAdmin()
             || $this->security->hasEntityAccess(
@@ -80,6 +83,7 @@ final class ContentPreviewSettingsType extends AbstractType
                 'objectId'     => null,
                 'translations' => null,
                 'variants'     => null,
+                'actionRoute'  => null,
             ]
         );
 
@@ -96,6 +100,7 @@ final class ContentPreviewSettingsType extends AbstractType
         string $type,
         array $variants,
         int $objectId,
+        string $actionRoute,
     ): void {
         if (!count($variants['children'])) {
             return;
@@ -115,13 +120,22 @@ final class ContentPreviewSettingsType extends AbstractType
             $variantChoices[$this->addOrderNoToChoiceName($child, $type)] = $child->getId();
         }
 
+        if (self::CHOICE_TYPE_VARIANT === $type && '' !== $actionRoute) {
+            $onChange = sprintf(
+                "if(this.value){window.location='%s'.replace('__ID__', this.value);}",
+                $this->router->generate($actionRoute, ['objectAction' => 'view', 'objectId' => '__ID__'])
+            );
+        } else {
+            $onChange = "Mautic.contentPreviewUrlGenerator.regenerateUrl({$objectId}, this)";
+        }
+
         $builder->add(
             $type,
             ChoiceType::class,
             [
                 'choices' => $variantChoices,
                 'attr'    => [
-                    'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$objectId}, this)",
+                    'onChange' => $onChange,
                 ],
                 'placeholder'  => $this->translator->trans('mautic.core.form.chooseone'),
                 'data'         => (string) $objectId,
