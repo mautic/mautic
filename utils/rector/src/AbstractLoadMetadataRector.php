@@ -249,9 +249,11 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
             return;
         }
 
+        // Append after any trait uses and existing properties so redeclared properties form one
+        // block; with several rules each adding some, they land in rule order after the last one.
         $insertAt = 0;
         foreach ($node->stmts as $index => $stmt) {
-            if ($stmt instanceof TraitUse) {
+            if ($stmt instanceof TraitUse || $stmt instanceof Property) {
                 $insertAt = $index + 1;
             }
         }
@@ -1387,5 +1389,108 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
             $this->parentPropertyType($node, $propertyName),
             $attributeGroups,
         );
+    }
+
+    /**
+     * Shared body for the field/association rules: converts every segment headed by one of
+     * $ownedCreators into property attributes, trims those segments and leaves the rest.
+     *
+     * @param list<string> $ownedCreators
+     */
+    protected function refactorFieldCreators(Class_ $node, ClassMethod $loadMetadata, array $ownedCreators): ?Class_
+    {
+        $owned            = [];
+        $propertyResolved = [];
+        $newProperties    = [];
+
+        foreach ($loadMetadata->stmts as $stmt) {
+            if (!$stmt instanceof Expression || !$stmt->expr instanceof MethodCall) {
+                continue;
+            }
+
+            $calls    = $this->flattenChain($stmt->expr);
+            $segments = null === $calls ? null : $this->splitIntoSegments($calls);
+            if (null === $segments) {
+                continue;
+            }
+
+            foreach ($segments as $segment) {
+                if (!in_array($this->methodName($segment[0]), $ownedCreators, true)) {
+                    continue;
+                }
+
+                $fields = $this->handleFieldChain($segment);
+                if (null === $fields) {
+                    continue;
+                }
+
+                $resolved = $this->resolveFields($node, $fields);
+                if (null === $resolved) {
+                    continue;
+                }
+
+                [$resolvedProperties, $resolvedNewProperties] = $resolved;
+
+                $propertyResolved = array_merge($propertyResolved, $resolvedProperties);
+                $newProperties    = array_merge($newProperties, $resolvedNewProperties);
+                $owned            = array_merge($owned, $segment);
+            }
+        }
+
+        if ([] === $owned && [] === $newProperties) {
+            return null;
+        }
+
+        foreach ($propertyResolved as [$property, $attributeGroups]) {
+            $property->attrGroups = array_merge($property->attrGroups, $attributeGroups);
+        }
+
+        $this->removeOwnedCalls($loadMetadata, $owned);
+        $this->ensureEntityScaffolding($node, $loadMetadata);
+        $this->removeLoadMetadataIfEmpty($node, $loadMetadata);
+        $this->insertNewProperties($node, $newProperties);
+
+        return $node;
+    }
+
+    /**
+     * Resolves a segment's fields against the class body. Returns null - leaving the segment in
+     * loadMetadata - when the property is already attribute-mapped (a partially converted class), or
+     * when a property is missing and there is no parent to redeclare it from.
+     *
+     * @param array<string, list<AttributeGroup>> $fields
+     *
+     * @return array{0: list<array{0: Property|Param, 1: list<AttributeGroup>}>, 1: list<Property>}|null
+     */
+    private function resolveFields(Class_ $node, array $fields): ?array
+    {
+        $propertyResolved = [];
+        $newProperties    = [];
+
+        foreach ($fields as $fieldName => $attributeGroups) {
+            $property = $this->findProperty($node, $fieldName);
+
+            // The property already carries ORM mapping (its own #[ORM\Column]/relation attribute):
+            // leave the builder call be, so a class mid-conversion is not double-mapped.
+            if (null !== $property && $this->hasOrmMappingAttribute($property->attrGroups)) {
+                return null;
+            }
+
+            if ($property instanceof Property || $property instanceof Param) {
+                $propertyResolved[] = [$property, $attributeGroups];
+
+                continue;
+            }
+
+            // The property is not declared in this class. When it extends a parent, the mapped
+            // property lives there - often a vendor base class we cannot annotate - so redeclare it.
+            if (null === $node->extends) {
+                return null;
+            }
+
+            $newProperties[] = $this->redeclaredProperty($node, $fieldName, $attributeGroups);
+        }
+
+        return [$propertyResolved, $newProperties];
     }
 }
