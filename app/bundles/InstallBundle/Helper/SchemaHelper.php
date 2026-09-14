@@ -11,7 +11,6 @@ use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Index\IndexedColumn;
 use Doctrine\DBAL\Schema\Index\IndexType;
-use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -287,13 +286,14 @@ final class SchemaHelper
             foreach ($oldRestraints as $or) {
                 $foreignTable     = AssetName::fromName($or->getReferencedTableName());
                 $foreignTableName = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $foreignTable);
-                $r                = new ForeignKeyConstraint(
-                    $this->namesToStrings($or->getReferencingColumnNames()),
-                    $foreignTableName,
-                    $this->namesToStrings($or->getReferencedColumnNames()),
-                    $backupPrefix.$this->constraintName($or),
-                    null !== $or->getMatchType() ? ['match' => $or->getMatchType()] : []
-                );
+
+                // Editing the constraint carries over everything the backup copy has to keep -
+                // the match type and the ON DELETE / ON UPDATE actions among them - so only the
+                // name and the table it points at are changed here.
+                $r = $or->edit()
+                    ->setUnquotedName($backupPrefix.$this->constraintName($or))
+                    ->setUnquotedReferencedTableName($foreignTableName)
+                    ->create();
                 $sql[] = $this->platform->getCreateForeignKeySQL($r, $table);
             }
         }
@@ -388,13 +388,4 @@ final class SchemaHelper
         );
     }
 
-    /**
-     * @param list<UnqualifiedName> $names
-     *
-     * @return list<string>
-     */
-    private function namesToStrings(array $names): array
-    {
-        return array_map(AssetName::fromName(...), $names);
-    }
 }
