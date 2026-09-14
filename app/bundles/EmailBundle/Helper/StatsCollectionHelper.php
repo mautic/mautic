@@ -101,7 +101,7 @@ readonly class StatsCollectionHelper
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
     public function generateStats(
-        $statName,
+        string $statName,
         \DateTime $fromDateTime,
         \DateTime $toDateTime,
         EmailStatOptions $options,

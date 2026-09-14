@@ -64,12 +64,10 @@ class DynamicContentHelper
     }
 
     /**
-     * @param string     $slotName
      * @param Lead|array $lead
-     *
      * @return string
      */
-    public function getDynamicContentSlotForLead($slotName, $lead)
+    public function getDynamicContentSlotForLead(string $slotName, $lead)
     {
         $leadArray = [];
         if ($lead instanceof Lead) {

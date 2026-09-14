@@ -63,7 +63,7 @@ final class FetcherTest extends \PHPUnit\Framework\TestCase
         $mailbox = $this->createMock(Mailbox::class);
         $mailbox->method('getMailboxSettings')
             ->willReturnCallback(
-                fn ($mailbox): array => $this->mailboxes[$mailbox]
+                fn (?string $mailbox): array => $this->mailboxes[$mailbox]
             );
         $mailbox->method('searchMailBox')
             ->willReturn([1]);

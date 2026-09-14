@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -31,7 +33,7 @@ final class Fetcher
     public function __construct(
         private readonly IntegrationEntityRepository $repo,
         private readonly Organizer $organizer,
-        private int|string $campaignId,
+        private readonly int|string $campaignId,
     ) {
         $this->fetchLeads();
         $this->fetchContacts();

@@ -23,7 +23,7 @@ final class TokenHelper
      */
     public static function findLeadTokens($content, array $lead, bool $replace = false)
     {
-        if (!$lead) {
+        if ($lead === []) {
             return $replace ? $content : [];
         }
 

@@ -25,6 +25,7 @@ return RectorConfig::configure()
     )
     ->withPhpSets(php84: true)
     ->withCache(__DIR__.'/var/cache/rector')
+    ->withParallel(jobSize: 50)
     ->withRules([
         // to be used next on loadMetadata()
         // \Utils\Rector\LoadMetadataToDoctrineAttributeRector::class,

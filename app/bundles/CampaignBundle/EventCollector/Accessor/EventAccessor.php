@@ -25,14 +25,13 @@ final class EventAccessor
 
     /**
      * @param string $type
-     * @param string $key
      *
      * @return AbstractEventAccessor
      *
      * @throws TypeNotFoundException
      * @throws EventNotFoundException
      */
-    public function getEvent($type, $key)
+    public function getEvent($type, string $key)
     {
         return match ($type) {
             Event::TYPE_ACTION    => $this->getAction($key),

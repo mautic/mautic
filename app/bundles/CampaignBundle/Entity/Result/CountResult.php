@@ -6,17 +6,12 @@ namespace Mautic\CampaignBundle\Entity\Result;
 
 final readonly class CountResult
 {
-    private int $count;
-
-    private int $minId;
-
-    private int $maxId;
-
-    public function __construct(int $count, int $minId, int $maxId)
+    public function __construct(
+        private int $count,
+        private int $minId,
+        private int $maxId
+    )
     {
-        $this->count = (int) $count;
-        $this->minId = (int) $minId;
-        $this->maxId = (int) $maxId;
     }
 
     public function getCount(): int

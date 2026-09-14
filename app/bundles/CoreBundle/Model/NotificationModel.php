@@ -79,7 +79,7 @@ class NotificationModel extends FormModel
      */
     public function addNotification(
         $message,
-        $type = null,
+        ?string $type = null,
         bool $isRead = false,
         $header = null,
         $iconClass = null,

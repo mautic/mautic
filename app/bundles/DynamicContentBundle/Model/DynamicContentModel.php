@@ -178,9 +178,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
     /**
      * @param Lead|array $lead
-     * @param string     $source
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null): ?Stat
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, ?string $source = null): ?Stat
     {
         if (empty($lead)) {
             return null;

@@ -465,10 +465,10 @@ final class InputHelper
         $transId = 'Any-Latin; Latin-ASCII';
         if (function_exists('transliterator_transliterate') && $trans = \Transliterator::create($transId)) {
             // Use intl by default
-            return $trans->transliterate((string) $value);
+            return $trans->transliterate($value);
         }
 
-        return \URLify::transliterate((string) $value);
+        return \URLify::transliterate($value);
     }
 
     public static function transliterateFilename(string $filename): string

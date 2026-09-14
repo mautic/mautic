@@ -12,10 +12,7 @@ class DateTimeHelper
 
     private static ?string $defaultLocalTimezone = null;
 
-    /**
-     * @var string
-     */
-    private $string;
+    private ?string $string = null;
 
     private string $format;
 

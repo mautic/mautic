@@ -104,7 +104,7 @@ final class BuilderSubscriberTest extends TestCase
     {
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');
         $this->translator->method('trans')->willReturn('some translation');
-        $this->coreParametersHelper->method('get')->willReturnCallback(function ($key): string|false {
+        $this->coreParametersHelper->method('get')->willReturnCallback(function (string $key): string|false {
             if ('locale' === $key) {
                 return 'default_locale';
             }
@@ -277,7 +277,7 @@ final class BuilderSubscriberTest extends TestCase
             'ACME',
         ];
         $this->coreParametersHelper->method('get')
-            ->willReturnCallback(function ($key) use (&$callCount, $expectedKeys, $expectedResponses): ?string {
+            ->willReturnCallback(function (string $key) use (&$callCount, $expectedKeys, $expectedResponses): ?string {
                 if ($callCount < count($expectedKeys)) {
                     $this->assertSame($expectedKeys[$callCount], $key);
                 }

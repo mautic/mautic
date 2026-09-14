@@ -96,7 +96,7 @@ final class ReplyTest extends \PHPUnit\Framework\TestCase
 
         $this->contactFinder->method('findByHash')
             ->willReturnCallback(
-                function ($hash): Result {
+                function (string $hash): Result {
                     $stat = new Stat();
                     $stat->setTrackingHash($hash);
 

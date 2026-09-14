@@ -60,7 +60,7 @@ class LanguageHelper
      *
      * @return array{error: bool, message?: string, vars?: array<string, string|int>}
      */
-    public function extractLanguagePackage($languageCode): array
+    public function extractLanguagePackage(?string $languageCode): array
     {
         $packagePath = $this->pathsHelper->getSystemPath('cache').'/'.$languageCode.'.zip';
 

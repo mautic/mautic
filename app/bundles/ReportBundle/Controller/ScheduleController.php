@@ -26,7 +26,7 @@ final class ScheduleController extends CommonAjaxController
         name: 'mautic_report_schedule_preview',
         defaults: ['isScheduled' => 0, 'scheduleUnit' => '', 'scheduleDay' => '', 'scheduleMonthFrequency' => ''],
     )]
-    public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency): JsonResponse
+    public function indexAction(DateBuilder $dateBuilder, bool $isScheduled, string $scheduleUnit, string $scheduleDay, string $scheduleMonthFrequency): JsonResponse
     {
         $dates = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
 

@@ -60,10 +60,8 @@ class IntegrationHelper
      *
      * @param array|string $specificIntegrations
      * @param int|null     $pluginFilter
-     * @param bool|false   $publishedOnly
      *
      * @return array<AbstractIntegration>
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function getIntegrationObjects($specificIntegrations = null, ?array $withFeatures = null, bool $alphabetical = false, $pluginFilter = null, bool $publishedOnly = false): array

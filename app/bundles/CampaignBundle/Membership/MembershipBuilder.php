@@ -37,7 +37,7 @@ class MembershipBuilder
 
         $this->campaign       = $campaign;
         $this->contactLimiter = $contactLimiter;
-        $this->runLimit       = (int) $runLimit;
+        $this->runLimit       = $runLimit;
         $this->output         = $output;
 
         $contactsProcessed = 0;

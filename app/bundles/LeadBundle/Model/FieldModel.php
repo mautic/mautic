@@ -780,12 +780,10 @@ class FieldModel extends FormModel
      * Get list of custom field values for autopopulate fields.
      *
      * @param string $type
-     * @param string $filter
-     * @param int    $limit
      *
      * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults($type, string $filter = '', int $limit = 10)
     {
         return $this->leadRepository->getValueList($type, $filter, $limit);
     }

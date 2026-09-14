@@ -137,16 +137,13 @@ final class PluginController extends FormController
         );
     }
 
-    /**
-     * @param string $name
-     */
     #[Route(
         '/s/plugins/config/{name}/{page}',
         name: 'mautic_plugin_config',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
+    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, string $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();

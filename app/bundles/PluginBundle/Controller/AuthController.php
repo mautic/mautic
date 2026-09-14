@@ -13,9 +13,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class AuthController extends FormController
 {
-    /**
-     * @param string $integration
-     */
     #[Route(
         '/s/plugins/integrations/authcallback/{integration}',
         name: 'mautic_integration_auth_callback_secure',
@@ -24,7 +21,7 @@ final class AuthController extends FormController
         '/plugins/integrations/authcallback/{integration}',
         name: 'mautic_integration_auth_callback',
     )]
-    public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
+    public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, string $integration): JsonResponse|RedirectResponse
     {
         $isAjax  = $request->isXmlHttpRequest();
         $session = $request->getSession();
@@ -113,7 +110,7 @@ final class AuthController extends FormController
         '/plugins/integrations/authuser/{integration}',
         name: 'mautic_integration_auth_user',
     )]
-    public function authUserAction(IntegrationHelper $integrationHelper, $integration): RedirectResponse
+    public function authUserAction(IntegrationHelper $integrationHelper, string $integration): RedirectResponse
     {
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
 

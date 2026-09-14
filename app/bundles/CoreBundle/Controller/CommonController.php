@@ -605,12 +605,11 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * @param string       $message
      * @param array<mixed> $messageVars
      * @param string|null  $level
      * @param string|null  $domain
      */
-    public function addFlashMessage($message, array $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', ?bool $addNotification = false): void
+    public function addFlashMessage(string $message, array $messageVars = [], string $level = FlashBag::LEVEL_NOTICE, string|bool $domain = 'flashes', ?bool $addNotification = false): void
     {
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }

@@ -54,13 +54,10 @@ final class ZohoApi extends CrmApi
     }
 
     /**
-     * @param string $object
-     *
      * @return array
-     *
      * @throws ApiErrorException
      */
-    public function createLead(array $data, $object = 'Leads')
+    public function createLead(array $data, string $object = 'Leads')
     {
         $parameters['data'] = $data;
 
@@ -68,13 +65,10 @@ final class ZohoApi extends CrmApi
     }
 
     /**
-     * @param string $object
-     *
      * @return array
-     *
      * @throws ApiErrorException
      */
-    public function updateLead(array $data, $object = 'Leads')
+    public function updateLead(array $data, string $object = 'Leads')
     {
         $parameters['data'] = $data;
 
@@ -82,14 +76,12 @@ final class ZohoApi extends CrmApi
     }
 
     /**
-     * @param string               $object
      * @param array<string, mixed> $params
      *
      * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getLeads(array $params, $object, $id = null)
+    public function getLeads(array $params, string $object, $id = null)
     {
         if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';

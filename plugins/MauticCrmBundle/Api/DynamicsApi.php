@@ -90,7 +90,7 @@ final class DynamicsApi extends CrmApi
      * @param mixed[] $data
      * @param Lead    $lead
      */
-    public function createLead(array $data, $lead, $object = 'contacts'): ResponseInterface
+    public function createLead(array $data, $lead, string $object = 'contacts'): ResponseInterface
     {
         return $this->request('', $data, 'POST', $object);
     }
@@ -132,10 +132,9 @@ final class DynamicsApi extends CrmApi
      * Batch create leads.
      *
      * @param array  $data
-     * @param string $object
      * @param bool   $isUpdate
      */
-    public function createLeads($data, $object = 'contacts', $isUpdate = false): array
+    public function createLeads($data, string $object = 'contacts', $isUpdate = false): array
     {
         if (0 === count($data)) {
             return [];
@@ -194,7 +193,7 @@ final class DynamicsApi extends CrmApi
     /**
      * @param array $data
      */
-    public function updateLeads($data, $object = 'contacts'): array
+    public function updateLeads($data, string $object = 'contacts'): array
     {
         return $this->createLeads($data, $object, true);
     }

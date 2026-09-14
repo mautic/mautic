@@ -12,7 +12,7 @@ final class Mapper
 
     private array $mappedFields = [];
 
-    private $object;
+    private ?string $object = null;
 
     /**
      * @var array[]

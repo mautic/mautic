@@ -689,10 +689,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $thisUser === $thatUser;
     }
 
-    /**
-     * @return bool
-     */
-    public function isGuest()
+    public function isGuest(): bool
     {
         return $this->guest;
     }

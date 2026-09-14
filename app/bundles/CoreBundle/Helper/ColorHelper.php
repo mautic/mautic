@@ -81,7 +81,7 @@ final class ColorHelper
      */
     public function toRgba(float $alpha = 1): string
     {
-        return sprintf('rgba(%d,%d,%d,%g)', $this->red, $this->green, $this->blue, (float) $alpha);
+        return sprintf('rgba(%d,%d,%d,%g)', $this->red, $this->green, $this->blue, $alpha);
     }
 
     /**

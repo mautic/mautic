@@ -26,7 +26,7 @@ final class ReplyController extends AbstractController
         '/sms/{transport}/callback',
         name: 'mautic_sms_callback',
     )]
-    public function callbackAction(Request $request, $transport): Response
+    public function callbackAction(Request $request, string $transport): Response
     {
         define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 

@@ -104,7 +104,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $mockCoreParametersHelper
             ->method('get')
             ->willReturnCallback(
-                fn ($param, $defaultValue) => 'track_private_ip_ranges' === $param ? true : $defaultValue
+                fn (string $param, $defaultValue) => 'track_private_ip_ranges' === $param ? true : $defaultValue
             );
         $ip = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
 

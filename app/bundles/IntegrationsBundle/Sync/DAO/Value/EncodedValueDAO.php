@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Value;
 
-final class EncodedValueDAO
+final readonly class EncodedValueDAO
 {
     public const string STRING_TYPE   = 'string';
 
@@ -24,18 +24,12 @@ final class EncodedValueDAO
     ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }

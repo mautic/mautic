@@ -2620,9 +2620,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         foreach ($leadIds as $leadId) {
             $lead = $this->leadModel->getEntity($leadId);
 
-            if (true == $newDncValue) {
+            if ($newDncValue) {
                 $this->doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, 'Set by Salesforce', true, true, true);
-            } elseif (false == $newDncValue) {
+            } elseif (false === $newDncValue) {
                 $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
             }
         }

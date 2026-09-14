@@ -131,7 +131,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      *
      * @return mixed
      */
-    public function decodeArrayFromUrl($string, bool $urlDecode = true)
+    public function decodeArrayFromUrl(string $string, bool $urlDecode = true)
     {
         try {
             return ClickthroughHelper::decodeArrayFromUrl($string, $urlDecode);

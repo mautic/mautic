@@ -93,12 +93,12 @@ final class ContactLimiter
     public function setBatchMinContactId(int $id): static
     {
         // Prevent a never ending loop if the contact ID never changes due to being the last batch of contacts
-        if ($this->minContactId && $this->minContactId > (int) $id) {
+        if ($this->minContactId && $this->minContactId > $id) {
             throw new NoContactsFoundException();
         }
 
         // We've surpasssed the max so bai
-        if ($this->maxContactId && $this->maxContactId < (int) $id) {
+        if ($this->maxContactId && $this->maxContactId < $id) {
             throw new NoContactsFoundException();
         }
 
@@ -107,7 +107,7 @@ final class ContactLimiter
             throw new NoContactsFoundException();
         }
 
-        $this->batchMinContactId = (int) $id;
+        $this->batchMinContactId = $id;
 
         return $this;
     }

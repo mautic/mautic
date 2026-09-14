@@ -161,7 +161,7 @@ final class LookupHelper
     /**
      * @return array<int, string|non-empty-array<mixed>>
      */
-    private function getCache(Lead|Company $entity, $notify): array
+    private function getCache(Lead|Company $entity, bool $notify): array
     {
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);

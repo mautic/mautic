@@ -155,7 +155,7 @@ final class AssetsHelper
         $addScripts = function ($s) use ($location, &$assets, $async, $name): void {
             $name = $name ?: 'script_'.hash('sha1', uniqid((string) mt_rand()));
 
-            if ('head' == $location) {
+            if ('head' === $location) {
                 // special place for these so that declarations and scripts can be mingled
                 $assets['headDeclarations'][$name] = ['script' => [$s, $async]];
             } else {
@@ -183,7 +183,7 @@ final class AssetsHelper
      */
     public function addScriptDeclaration(string $script, string $location = 'head'): self
     {
-        if ('head' == $location) {
+        if ('head' === $location) {
             // special place for these so that declarations and scripts can be mingled
             $this->assets[$this->context]['headDeclarations'][] = ['declaration' => $script];
         } else {
@@ -244,7 +244,7 @@ final class AssetsHelper
      */
     public function addCustomDeclaration(string $declaration, string $location = 'head'): self
     {
-        if ('head' == $location) {
+        if ('head' === $location) {
             $this->assets[$this->context]['headDeclarations'][] = ['custom' => $declaration];
         } else {
             $this->assets[$this->context]['customDeclarations'][$location] ??= [];
@@ -459,7 +459,7 @@ final class AssetsHelper
      * @param string $onLoadCallback        Mautic namespaced function to call for the script onload
      * @param string $alreadyLoadedCallback Mautic namespaced function to call if the script has already been loaded
      */
-    public function includeScript($assetFilePath, string $onLoadCallback = '', string $alreadyLoadedCallback = ''): string
+    public function includeScript(string $assetFilePath, string $onLoadCallback = '', string $alreadyLoadedCallback = ''): string
     {
         return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '{$onLoadCallback}', '{$alreadyLoadedCallback}');</script>";
     }
@@ -467,7 +467,7 @@ final class AssetsHelper
     /**
      * @param string $assetFilePath the path to the file location. Can use full path or relative to mautic web root
      */
-    public function includeStylesheet($assetFilePath): string
+    public function includeStylesheet(string $assetFilePath): string
     {
         return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
     }
@@ -497,7 +497,7 @@ final class AssetsHelper
         }, $text);
 
         // Extract text links for each protocol
-        foreach ((array) $protocols as $protocol) {
+        foreach ($protocols as $protocol) {
             $text = match ($protocol) {
                 'http', 'https' => preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
                     if ($match[1]) {

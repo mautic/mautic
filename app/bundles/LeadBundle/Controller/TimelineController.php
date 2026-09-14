@@ -145,7 +145,7 @@ final class TimelineController extends CommonController
         requirements: ['integration' => Requirement::CATCH_ALL, 'leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function pluginViewAction(Request $request, $integration, $leadId, int $page = 1): Response
+    public function pluginViewAction(Request $request, string $integration, $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
             return $this->notFound();

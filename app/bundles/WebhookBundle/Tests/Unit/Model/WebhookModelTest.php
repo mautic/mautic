@@ -126,7 +126,7 @@ final class WebhookModelTest extends TestCase
         $queueMock->expects($this->exactly(2))->method('getId')->willReturn('12');
 
         $this->parametersHelperMock->expects($this->exactly(9))->method('get')
-            ->willReturnCallback(function ($param): string|int|null {
+            ->willReturnCallback(function (string $param): string|int|null {
                 if ('queue_mode' === $param) {
                     return WebhookModel::COMMAND_PROCESS;
                 }
@@ -168,7 +168,7 @@ final class WebhookModelTest extends TestCase
         $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
 
         $this->parametersHelperMock->expects($this->exactly(9))->method('get')
-            ->willReturnCallback(function ($param): ?string {
+            ->willReturnCallback(function (string $param): ?string {
                 if ('queue_mode' === $param) {
                     return WebhookModel::IMMEDIATE_PROCESS;
                 }

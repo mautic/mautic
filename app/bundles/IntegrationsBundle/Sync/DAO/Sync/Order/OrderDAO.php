@@ -118,14 +118,11 @@ class OrderDAO
 
     /**
      * Create a new mapping between the Mautic and Integration objects.
-     *
-     * @param string     $integrationObjectName
-     * @param string|int $integrationObjectId
      */
     public function addObjectMapping(
         ObjectChangeDAO $objectChangeDAO,
-        $integrationObjectName,
-        $integrationObjectId,
+        string $integrationObjectName,
+        string $integrationObjectId,
         ?\DateTimeInterface $objectModifiedDate = null,
     ): void {
         $objectModifiedDate ??= new \DateTime();

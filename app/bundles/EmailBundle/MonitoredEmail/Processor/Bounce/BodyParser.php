@@ -13,7 +13,7 @@ final class BodyParser
     /**
      * @throws BounceNotFound
      */
-    public function getBounce(Message $message, $contactEmail = null): BouncedEmail
+    public function getBounce(Message $message, ?string $contactEmail = null): BouncedEmail
     {
         $report = $this->parse($message->textPlain, $contactEmail);
 
