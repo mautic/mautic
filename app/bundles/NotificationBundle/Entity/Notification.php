@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: NotificationRepository::class)]
 #[ORM\Table(name: 'push_notifications')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -185,9 +185,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(NotificationRepository::class);
 
         $builder->addIdColumns();
 

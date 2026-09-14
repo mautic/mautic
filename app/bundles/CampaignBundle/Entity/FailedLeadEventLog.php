@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: FailedLeadEventLogRepository::class)]
 #[ORM\Table(name: 'campaign_lead_event_failed_log')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FailedLeadEventLog
@@ -33,7 +33,6 @@ class FailedLeadEventLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(FailedLeadEventLogRepository::class)
             ->addIndex(['date_added'], 'campaign_event_failed_date');
 
         $builder->createOneToOne('log', 'LeadEventLog')

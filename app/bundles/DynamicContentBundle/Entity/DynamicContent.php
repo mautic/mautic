@@ -36,7 +36,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: DynamicContentRepository::class)]
 #[ORM\Table(name: 'dynamic_content')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -169,7 +169,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $builder
             ->addIndex(['is_campaign_based'], 'is_campaign_based_index')
             ->addIndex(['slot_name'], 'slot_name_index')
-            ->setCustomRepositoryClass(DynamicContentRepository::class)
             ->addLifecycleEvent('cleanSlotName', Events::prePersist)
             ->addLifecycleEvent('cleanSlotName', Events::preUpdate);
 

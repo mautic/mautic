@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: GroupContactScoreRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class GroupContactScore extends CommonEntity
@@ -36,9 +36,6 @@ class GroupContactScore extends CommonEntity
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(GroupContactScoreRepository::class);
 
         $builder->addContact(false, 'CASCADE', true, 'groupScores');
 

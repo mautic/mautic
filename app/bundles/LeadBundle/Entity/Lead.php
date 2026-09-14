@@ -29,7 +29,7 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: LeadRepository::class)]
 #[ORM\Table(name: 'leads')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -299,7 +299,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(LeadRepository::class)
             ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')

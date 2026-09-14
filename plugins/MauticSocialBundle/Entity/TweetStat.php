@@ -10,7 +10,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead as TheLead;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: TweetStatRepository::class)]
 #[ORM\Table(name: 'tweet_stats')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class TweetStat
@@ -72,7 +72,6 @@ class TweetStat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(TweetStatRepository::class)
             ->addIndex(['tweet_id', 'lead_id'], 'stat_tweet_search')
             ->addIndex(['lead_id', 'tweet_id'], 'stat_tweet_search2')
             ->addIndex(['is_failed'], 'stat_tweet_failed_search')

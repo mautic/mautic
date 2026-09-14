@@ -32,7 +32,7 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: CampaignRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -167,9 +167,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(CampaignRepository::class);
 
         $builder->addIdColumns();
 

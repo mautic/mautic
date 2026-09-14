@@ -24,7 +24,7 @@ use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ReportRepository::class)]
 #[ORM\Table(name: 'reports')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -168,9 +168,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(ReportRepository::class);
 
         $builder->addIdColumns();
 

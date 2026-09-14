@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
@@ -84,7 +84,6 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['sms_id', 'lead_id'], 'stat_sms_search')
             ->addIndex(['tracking_hash'], 'stat_sms_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_sms_source_search')

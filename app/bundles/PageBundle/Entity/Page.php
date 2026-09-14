@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PageRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -235,7 +235,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(PageRepository::class)
             ->addIndex(['alias'], 'page_alias_search');
 
         $builder->addId();

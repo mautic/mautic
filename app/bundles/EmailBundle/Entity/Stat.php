@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
@@ -131,7 +131,6 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(StatRepository::class)
             ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
             ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
             ->addIndex(['is_failed'], 'stat_email_failed_search')

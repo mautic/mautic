@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UtmTagRepository::class)]
 #[ORM\Table(name: 'lead_utmtags')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class UtmTag
@@ -77,7 +77,6 @@ class UtmTag
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setCustomRepositoryClass(UtmTagRepository::class);
         $builder->addId();
         $builder->addDateAdded();
         $builder->addLead(false, 'CASCADE', false, 'utmtags');

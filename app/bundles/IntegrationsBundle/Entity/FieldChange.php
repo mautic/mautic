@@ -8,7 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: FieldChangeRepository::class)]
 #[ORM\Table(name: 'sync_object_field_change_report')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FieldChange
@@ -58,7 +58,6 @@ class FieldChange
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(FieldChangeRepository::class)
             ->addIndex(['object_type', 'object_id', 'column_name'], 'object_composite_key')
             ->addIndex(['integration', 'object_type', 'object_id', 'column_name'], 'integration_object_composite_key')
             ->addIndex(['integration', 'object_type', 'modified_at'], 'integration_object_type_modification_composite_key');

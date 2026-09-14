@@ -22,7 +22,7 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: FocusRepository::class)]
 #[ORM\Table(name: 'focus')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -159,7 +159,6 @@ class Focus extends FormEntity implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(FocusRepository::class)
             ->addIndex(['focus_type'], 'focus_type')
             ->addIndex(['style'], 'focus_style')
             ->addIndex(['form_id'], 'focus_form')

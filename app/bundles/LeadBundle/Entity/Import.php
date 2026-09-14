@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ImportRepository::class)]
 #[ORM\Table(name: 'imports')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Import extends FormEntity
@@ -141,7 +141,6 @@ class Import extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder
-            ->setCustomRepositoryClass(ImportRepository::class)
             ->addIndex(['object'], 'import_object')
             ->addIndex(['status'], 'import_status')
             ->addIndex(['priority'], 'import_priority')

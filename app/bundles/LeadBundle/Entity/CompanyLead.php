@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: CompanyLeadRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class CompanyLead
@@ -37,9 +37,6 @@ class CompanyLead
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(CompanyLeadRepository::class);
 
         $builder->createManyToOne('company', 'Company')
             ->makePrimaryKey()

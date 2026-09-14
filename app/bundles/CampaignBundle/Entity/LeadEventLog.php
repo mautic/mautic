@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: LeadEventLogRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog implements ChannelInterface, OptimisticLockInterface
@@ -113,7 +113,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(LeadEventLogRepository::class)
             ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
             ->addIndex(['campaign_id', 'is_scheduled', 'trigger_date'], 'campaign_event_schedule_counts')
             ->addIndex(['date_triggered'], 'campaign_date_triggered')

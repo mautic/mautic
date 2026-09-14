@@ -28,7 +28,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Sequentially;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: AssetRepository::class)]
 #[ORM\Table(name: 'assets')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -164,7 +164,6 @@ class Asset extends FormEntity implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
         $builder->addIdColumns('title');
