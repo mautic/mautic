@@ -1,0 +1,18 @@
+lightsaml_sp.metadata:
+    path: /metadata.xml
+    defaults: { _controller: LightSaml\SpBundle\Controller\DefaultController::metadataAction }
+
+lightsaml_sp.discovery:
+    path: /discovery
+    defaults: { _controller: LightSaml\SpBundle\Controller\DefaultController::discoveryAction }
+
+lightsaml_sp.login:
+    path: /login
+    defaults: { _controller: LightSaml\SpBundle\Controller\DefaultController::loginAction}
+
+lightsaml_sp.login_check:
+    path: /login_check
+
+lightsaml_sp.sessions:
+    path: /sessions
+    defaults: { _controller: LightSaml\SpBundle\Controller\DefaultController::sessionsAction }

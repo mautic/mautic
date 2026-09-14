@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "64c96493d78f4805beafff56df037c96",
+    "content-hash": "3519ae887804241e25ada550d0caa579",
     "packages": [
         {
             "name": "api-platform/core",
@@ -4446,8 +4446,8 @@
             "require": {
                 "php": ">=8.1",
                 "robrichards/xmlseclibs": "^3.0",
-                "symfony/event-dispatcher": "^5.4 || ^6.0 || ^7.0",
-                "symfony/http-foundation": "^5.4 || ^6.0 || ^7.0"
+                "symfony/event-dispatcher": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+                "symfony/http-foundation": "^5.4 || ^6.0 || ^7.0 || ^8.0"
             },
             "require-dev": {
                 "monolog/monolog": "^2.0 || ^3.0",
@@ -4503,30 +4503,24 @@
         {
             "name": "javer/sp-bundle",
             "version": "2.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/javer/SpBundle.git",
-                "reference": "1c90c5ba9e64396c47dc1ea1c492b675f0469768"
-            },
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/javer/SpBundle/zipball/1c90c5ba9e64396c47dc1ea1c492b675f0469768",
-                "reference": "1c90c5ba9e64396c47dc1ea1c492b675f0469768",
-                "shasum": ""
+                "type": "path",
+                "url": "packages/javer-sp-bundle",
+                "reference": "2eb6635b2569b1bfc20b4c33607b0c44387acc75"
             },
             "require": {
                 "javer/symfony-bridge": "^1.5",
                 "php": ">=8.1",
-                "symfony/framework-bundle": "^6.0 || ^7.0",
-                "symfony/security-bundle": "^6.0 || ^7.0"
+                "symfony/framework-bundle": "^6.0 || ^7.0 || ^8.0",
+                "symfony/security-bundle": "^6.0 || ^7.0 || ^8.0"
             },
             "require-dev": {
                 "ext-simplexml": "*",
                 "phpunit/phpunit": "^9.5",
-                "symfony/browser-kit": "^6.0 || ^7.0",
-                "symfony/css-selector": "^6.0 || ^7.0",
+                "symfony/browser-kit": "^6.0 || ^7.0 || ^8.0",
+                "symfony/css-selector": "^6.0 || ^7.0 || ^8.0",
                 "symfony/monolog-bundle": "^3.0 || ^4.0",
-                "symfony/twig-bundle": "^6.0 || ^7.0"
+                "symfony/twig-bundle": "^6.0 || ^7.0 || ^8.0"
             },
             "type": "symfony-bundle",
             "extra": {
@@ -4539,7 +4533,11 @@
                     "LightSaml\\SpBundle\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-0": {
+                    "LightSaml\\SpBundle\\Tests\\": "tests/"
+                }
+            },
             "license": [
                 "MIT"
             ],
@@ -4557,12 +4555,11 @@
                     "role": "Developer"
                 }
             ],
-            "description": "Light SAML2 SP Symfony Bundle",
+            "description": "Light SAML2 SP Symfony Bundle (Mautic fork: Symfony 8 support)",
             "homepage": "http://www.lightsaml.com/SP-Bundle/",
-            "support": {
-                "source": "https://github.com/javer/SpBundle/tree/2.1.0"
-            },
-            "time": "2024-01-09T17:15:53+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "javer/symfony-bridge",
@@ -4581,9 +4578,9 @@
             "require": {
                 "javer/lightsaml": "^1.7",
                 "php": ">=8.1",
-                "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0",
-                "symfony/framework-bundle": "^5.4 || ^6.0 || ^7.0",
-                "symfony/yaml": "^5.4 || ^6.0 || ^7.0"
+                "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+                "symfony/framework-bundle": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+                "symfony/yaml": "^5.4 || ^6.0 || ^7.0 || ^8.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^9.5",
@@ -6244,7 +6241,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "89e77188884265789b33eed3a0f695b34c6d7f09"
+                "reference": "a8eada7f072d2a9dbff3a5c41213af0d1bd72427"
             },
             "require": {
                 "api-platform/core": "^4.3.0",

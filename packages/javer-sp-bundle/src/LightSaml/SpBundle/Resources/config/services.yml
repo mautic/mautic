@@ -1,0 +1,21 @@
+parameters:
+    lightsaml_sp.route.discovery: lightsaml_sp.discovery
+    lightsaml.route.login_check: lightsaml_sp.login_check
+
+services:
+    lightsaml_sp.username_mapper.simple:
+        class: LightSaml\SpBundle\Security\User\SimpleUsernameMapper
+        arguments:
+            - []
+
+    lightsaml_sp.attribute_mapper.simple:
+            class: LightSaml\SpBundle\Security\User\SimpleAttributeMapper
+
+    lightsaml_sp.token_factory:
+        class: LightSaml\SpBundle\Security\Authentication\Token\SamlSpTokenFactory
+
+    LightSaml\SpBundle\Security\User\UsernameMapperInterface: '@lightsaml_sp.username_mapper.simple'
+    LightSaml\Provider\TimeProvider\TimeProviderInterface: '@lightsaml.system.time_provider'
+    LightSaml\Builder\Profile\WebBrowserSso\Sp\SsoSpSendAuthnRequestProfileBuilderFactory: '@ligthsaml.profile.login_factory'
+    LightSaml\Builder\Profile\WebBrowserSso\Sp\SsoSpReceiveResponseProfileBuilder: '@ligthsaml.profile.acs'
+    LightSaml\Builder\Profile\Metadata\MetadataProfileBuilder: '@ligthsaml.profile.metadata'

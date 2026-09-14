@@ -1,0 +1,55 @@
+{
+    "name": "javer/sp-bundle",
+    "license": "MIT",
+    "type": "symfony-bundle",
+    "description": "Light SAML2 SP Symfony Bundle (Mautic fork: Symfony 8 support)",
+    "homepage": "http://www.lightsaml.com/SP-Bundle/",
+    "authors": [
+        {
+            "name": "Milos Tomic",
+            "email": "tmilos@gmail.com",
+            "homepage": "http://github.com/tmilos",
+            "role": "Developer"
+        },
+        {
+            "name": "Vadim Borodavko",
+            "email": "vaidm.borodavko@gmail.com",
+            "homepage": "https://github.com/javer",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "LightSaml\\SpBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-0": {
+            "LightSaml\\SpBundle\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=8.1",
+        "javer/symfony-bridge": "^1.5",
+        "symfony/framework-bundle": "^6.0 || ^7.0 || ^8.0",
+        "symfony/security-bundle": "^6.0 || ^7.0 || ^8.0"
+    },
+    "require-dev": {
+        "ext-simplexml": "*",
+        "phpunit/phpunit": "^9.5",
+        "symfony/browser-kit": "^6.0 || ^7.0 || ^8.0",
+        "symfony/css-selector": "^6.0 || ^7.0 || ^8.0",
+        "symfony/monolog-bundle": "^3.0 || ^4.0",
+        "symfony/twig-bundle": "^6.0 || ^7.0 || ^8.0"
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "prefer-stable": true,
+    "minimum-stability": "stable",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.x-dev"
+        }
+    }
+}

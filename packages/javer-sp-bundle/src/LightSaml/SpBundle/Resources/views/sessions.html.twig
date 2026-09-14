@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+<h1>SAML Sessions</h1>
+{% for session in sessions %}
+    <ul data-session>
+        <li data-idp="{{ session.idpEntityId }}">IDP: {{ session.idpEntityId }}</li>
+        <li data-sp="{{ session.spEntityId }}">SP: {{ session.spEntityId }}</li>
+        <li>NameID: {{ session.nameId }}</li>
+        <li>NameIDFormat: {{ session.nameIdFormat }}</li>
+        <li>SessionIndex: {{ session.sessionIndex }}</li>
+        <li>AuthnInstant: {{ session.sessionInstant|date('Y-m-d H:i:s P') }}</li>
+        <li>FirstAuthOn: {{ session.firstAuthOn|date('Y-m-d H:i:s P') }}</li>
+        <li>LastAuthOn: {{ session.lastAuthOn|date('Y-m-d H:i:s P') }}</li>
+    </ul>
+{% else %}
+    <p>There are no SAML sessions established</p>
+{% endfor %}
+</body>
+</html>

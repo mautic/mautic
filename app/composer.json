@@ -115,6 +115,74 @@
     {
       "type": "git",
       "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
+    },
+    {
+      "type": "path",
+      "url": "../packages/javer-sp-bundle",
+      "options": {
+        "versions": {
+          "javer/sp-bundle": "2.1.0"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "javer/symfony-bridge",
+        "version": "1.6.0",
+        "type": "symfony-bundle",
+        "source": {
+          "type": "git",
+          "url": "https://github.com/javer/SymfonyBridgeBundle.git",
+          "reference": "9d65dc277278b19ba29c7589ddb1f01d59603ed5"
+        },
+        "dist": {
+          "type": "zip",
+          "url": "https://api.github.com/repos/javer/SymfonyBridgeBundle/zipball/9d65dc277278b19ba29c7589ddb1f01d59603ed5",
+          "reference": "9d65dc277278b19ba29c7589ddb1f01d59603ed5"
+        },
+        "require": {
+          "php": ">=8.1",
+          "javer/lightsaml": "^1.7",
+          "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+          "symfony/framework-bundle": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+          "symfony/yaml": "^5.4 || ^6.0 || ^7.0 || ^8.0"
+        },
+        "autoload": {
+          "psr-0": {
+            "LightSaml\\SymfonyBridgeBundle\\": "src/"
+          }
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "javer/lightsaml",
+        "version": "1.9.0",
+        "type": "library",
+        "source": {
+          "type": "git",
+          "url": "https://github.com/javer/lightSAML.git",
+          "reference": "b2b6129ac705539639debf94532484fdbaa4493a"
+        },
+        "dist": {
+          "type": "zip",
+          "url": "https://api.github.com/repos/javer/lightSAML/zipball/b2b6129ac705539639debf94532484fdbaa4493a",
+          "reference": "b2b6129ac705539639debf94532484fdbaa4493a"
+        },
+        "require": {
+          "php": ">=8.1",
+          "robrichards/xmlseclibs": "^3.0",
+          "symfony/event-dispatcher": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+          "symfony/http-foundation": "^5.4 || ^6.0 || ^7.0 || ^8.0"
+        },
+        "autoload": {
+          "psr-0": {
+            "LightSaml\\": "src/"
+          }
+        }
+      }
     }
   ],
   "minimum-stability": "dev",

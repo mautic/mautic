@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+<h1>Following IDPs are configured</h1>
+<p><small>Choose one</small></p>
+{% for idp in parties %}
+    {% if idp.allIdpSsoDescriptors %}
+        <p><a data-idp="{{ idp.entityID }}" href="{{ path('lightsaml_sp.login', {idp: idp.entityID}) }}">{{ idp.entityID }}</a></p>
+    {% endif %}
+{% else %}
+    <p>There is no IDP configured</p>
+{% endfor %}
+</body>
+</html>

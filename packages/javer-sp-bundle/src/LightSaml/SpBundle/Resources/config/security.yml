@@ -1,0 +1,16 @@
+services:
+    security.authenticator.lightsaml_sp:
+        class: LightSaml\SpBundle\Security\Authenticator\LightSamlSpAuthenticator
+        abstract: true
+        arguments:
+            - ~ # firewall name
+            - '@security.http_utils'
+            - '@ligthsaml.profile.acs'
+            - ~ # user provider
+            - '@lightsaml_sp.username_mapper.simple' # username mapper
+            - ~ # user creator
+            - '@lightsaml_sp.attribute_mapper.simple' # attribute mapper
+            - ~ # token factory
+            - ~ # success handler
+            - ~ # failure handler
+            - [] # options
