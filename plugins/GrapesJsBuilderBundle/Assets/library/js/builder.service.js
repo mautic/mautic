@@ -1680,13 +1680,14 @@ export default class BuilderService {
     const headingTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
     const inlineHeadingTags = ['span'];
 
-    if (headingTags.includes(tagName)) {
-      this.wrapHeadingComponentWithDiv(component, tagName);
-      return;
-    }
-
-    if (inlineHeadingTags.includes(tagName)) {
-      this.wrapHeadingComponentWithDiv(component, tagName);
+    if (headingTags.includes(tagName) || inlineHeadingTags.includes(tagName)) {
+      // [ee-patch-2026-09-09] disabled wrapper insertion: inserting
+      // gjs-heading-wrapper divs rewrote emails.custom_mjml/custom_html via
+      // the save path (setComponents -> getEditorMjmlContent) for every
+      // email opened in the builder, including emails created by a UI clone
+      // (the creation itself performs a builder save). Headings and styled
+      // spans stay unwrapped in the canvas, so the saved bytes keep the
+      // shipped structure; see upstream issue on builder content mutation.
       return;
     }
 
@@ -1694,11 +1695,9 @@ export default class BuilderService {
       return;
     }
 
-    if (this.isPageContext() && this.isInsideDataSlotText(component)) {
-      return;
-    }
-
-    component.set('tagName', 'div');
+    // [ee-patch-2026-09-09] disabled p->div re-tagging for the same reason
+    // as above: the retag persisted into the stored email whenever the
+    // builder page was saved, so plain paragraphs keep their <p> element.
   }
 
   hasTextComponentAncestor(component) {
