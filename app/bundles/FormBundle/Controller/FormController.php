@@ -96,6 +96,8 @@ class FormController extends CommonFormController
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
+        $filter['force'][] = ['column' => 'f.translationParent', 'expr' => 'isNull'];
+
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
         $forms      = $this->formModel->getEntities(
@@ -248,6 +250,14 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
+        $translations = $activeForm->getTranslations();
+        if (is_array($translations)) {
+            [$translationParent, $translationChildren] = $translations;
+        } else {
+            $translationParent   = $activeForm;
+            $translationChildren = [];
+        }
+
         $submissionCounts = $this->submissionRepository->getSubmissionCounts($activeForm);
 
         return $this->delegateView(
@@ -267,6 +277,10 @@ class FormController extends CommonFormController
                     'formScript'        => htmlspecialchars($this->formModel->getFormScript($activeForm), ENT_QUOTES, 'UTF-8'),
                     'formContent'       => htmlspecialchars($this->formModel->getContent($activeForm, false), ENT_QUOTES, 'UTF-8'),
                     'availableActions'  => $customComponents['actions'],
+                    'translations'      => [
+                        'parent'   => $translationParent,
+                        'children' => $translationChildren,
+                    ],
                 ],
                 'contentTemplate' => '@MauticForm/Form/details.html.twig',
                 'passthroughVars' => [
