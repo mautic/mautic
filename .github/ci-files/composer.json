@@ -106,7 +106,7 @@
     },
     {
       "type": "path",
-      "url": "../../packages/javer-sp-bundle",
+      "url": "../packages/javer-sp-bundle",
       "options": {
         "versions": {
           "javer/sp-bundle": "2.1.0"

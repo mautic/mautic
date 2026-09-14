@@ -28,12 +28,6 @@ class SimpleAttributeMapper implements AttributeMapperInterface
         return array_reduce($assertions, [$this, 'resolveAttributesFromAssertion'], []);
     }
 
-    /**
-     * @param array     $attributes
-     * @param Assertion $assertion
-     *
-     * @return array
-     */
     private function resolveAttributesFromAssertion(array $attributes, Assertion $assertion): array
     {
         $attributeStatements = $assertion->getAllAttributeStatements();
@@ -41,12 +35,6 @@ class SimpleAttributeMapper implements AttributeMapperInterface
         return array_reduce($attributeStatements, [$this, 'resolveAttributesFromAttributeStatement'], $attributes);
     }
 
-    /**
-     * @param array              $attributes
-     * @param AttributeStatement $attributeStatement
-     *
-     * @return array
-     */
     private function resolveAttributesFromAttributeStatement(
         array $attributes,
         AttributeStatement $attributeStatement,
@@ -57,12 +45,6 @@ class SimpleAttributeMapper implements AttributeMapperInterface
         return array_reduce($statementAttributes, [$this, 'mapAttributeValues'], $attributes);
     }
 
-    /**
-     * @param array     $attributes
-     * @param Attribute $attribute
-     *
-     * @return array
-     */
     private function mapAttributeValues(array $attributes, Attribute $attribute): array
     {
         $key = $attribute->getName();

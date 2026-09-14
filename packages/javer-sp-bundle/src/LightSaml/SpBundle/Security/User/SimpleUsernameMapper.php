@@ -43,21 +43,38 @@ class SimpleUsernameMapper implements UsernameMapperInterface
     private function getUsernameFromAssertion(Assertion $assertion): ?string
     {
         foreach ($this->attributes as $attributeName) {
-            if (self::NAME_ID == $attributeName) {
-                if ($assertion->getSubject() &&
-                    $assertion->getSubject()->getNameID() &&
-                    $assertion->getSubject()->getNameID()->getValue() &&
-                    SamlConstants::NAME_ID_FORMAT_TRANSIENT != $assertion->getSubject()->getNameID()->getFormat()
-                ) {
-                    return $assertion->getSubject()->getNameID()->getValue();
-                }
-            } else {
-                foreach ($assertion->getAllAttributeStatements() as $attributeStatement) {
-                    $attribute = $attributeStatement->getFirstAttributeByName($attributeName);
-                    if ($attribute && $attribute->getFirstAttributeValue()) {
-                        return $attribute->getFirstAttributeValue();
-                    }
-                }
+            $username = self::NAME_ID === $attributeName
+                ? $this->getUsernameFromNameId($assertion)
+                : $this->getUsernameFromAttribute($assertion, $attributeName);
+
+            if ($username) {
+                return $username;
+            }
+        }
+
+        return null;
+    }
+
+    private function getUsernameFromNameId(Assertion $assertion): ?string
+    {
+        $nameId = $assertion->getSubject()?->getNameID();
+        if (
+            $nameId
+            && $nameId->getValue()
+            && SamlConstants::NAME_ID_FORMAT_TRANSIENT !== $nameId->getFormat()
+        ) {
+            return $nameId->getValue();
+        }
+
+        return null;
+    }
+
+    private function getUsernameFromAttribute(Assertion $assertion, string $attributeName): ?string
+    {
+        foreach ($assertion->getAllAttributeStatements() as $attributeStatement) {
+            $attribute = $attributeStatement->getFirstAttributeByName($attributeName);
+            if ($attribute && $attribute->getFirstAttributeValue()) {
+                return $attribute->getFirstAttributeValue();
             }
         }
 

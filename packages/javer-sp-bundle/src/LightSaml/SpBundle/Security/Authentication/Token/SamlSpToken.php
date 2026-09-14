@@ -17,10 +17,8 @@ use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 class SamlSpToken extends PostAuthenticationToken
 {
     /**
-     * @param UserInterface $user
-     * @param string        $firewallName
-     * @param string[]      $roles
-     * @param mixed[]       $attributes
+     * @param string[] $roles
+     * @param mixed[]  $attributes
      */
     public function __construct(
         UserInterface $user,

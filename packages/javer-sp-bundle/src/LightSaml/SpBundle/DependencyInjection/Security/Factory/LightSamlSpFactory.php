@@ -11,7 +11,7 @@
 
 namespace LightSaml\SpBundle\DependencyInjection\Security\Factory;
 
-use Exception;
+use LogicException;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class LightSamlSpFactory extends AbstractFactory implements AuthenticatorFactoryInterface
 {
+    private const string UNSUPPORTED_LEGACY_AUTH = 'The old authentication system is not supported with light_saml_sp.';
+
     public function addConfiguration(NodeDefinition $node): void
     {
         parent::addConfiguration($node);
@@ -51,12 +53,7 @@ class LightSamlSpFactory extends AbstractFactory implements AuthenticatorFactory
     }
 
     /**
-     * @param ContainerBuilder $container
-     * @param string           $firewallName
-     * @param mixed[]          $config
-     * @param string           $userProviderId
-     *
-     * @return string
+     * @param mixed[] $config
      */
     public function createAuthenticator(
         ContainerBuilder $container,
@@ -84,16 +81,16 @@ class LightSamlSpFactory extends AbstractFactory implements AuthenticatorFactory
 
     protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
     {
-        throw new Exception('The old authentication system is not supported with light_saml_sp.');
+        throw new LogicException(self::UNSUPPORTED_LEGACY_AUTH);
     }
 
     protected function getListenerId()
     {
-        throw new Exception('The old authentication system is not supported with light_saml_sp.');
+        throw new LogicException(self::UNSUPPORTED_LEGACY_AUTH);
     }
 
     protected function createEntryPoint($container, $id, $config, $defaultEntryPointId)
     {
-        throw new Exception('The old authentication system is not supported with light_saml_sp.');
+        throw new LogicException(self::UNSUPPORTED_LEGACY_AUTH);
     }
 }
