@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
@@ -736,7 +737,7 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         foreach ($parameters as $key => $value) {
-            $q->setParameter($key, $value, is_array($value) ? ArrayParameterType::STRING : null);
+            $q->setParameter($key, $value, is_array($value) ? ArrayParameterType::STRING : ParameterType::STRING);
         }
 
         // Published only
