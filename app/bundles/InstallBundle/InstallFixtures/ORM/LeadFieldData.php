@@ -62,6 +62,7 @@ final class LeadFieldData extends AbstractFixture implements OrderedFixtureInter
                 ++$order;
             }
         }
+
     }
 
     public function getOrder(): int
