@@ -27,8 +27,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\UserBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set(Mautic\UserBundle\ApiPlatform\UserProcessor::class)
         ->args([

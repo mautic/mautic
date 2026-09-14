@@ -26,7 +26,7 @@ use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -53,7 +53,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Model\NoteModel;
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
-use Mautic\PluginBundle\Entity\IntegrationEntity;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\StageBundle\Model\StageModel;
@@ -105,6 +105,10 @@ final class LeadController extends FormController
 
     private EmailRepository $emailRepository;
 
+    private IntegrationEntityRepository $integrationEntityRepository;
+
+    private LeadDeviceRepository $leadDeviceRepository;
+
     #[Required]
     public function autowireLeadController(
         LeadModel $leadModel,
@@ -122,6 +126,8 @@ final class LeadController extends FormController
         UserRepository $userRepository,
         DoNotContactRepository $doNotContactRepository,
         EmailRepository $emailRepository,
+        IntegrationEntityRepository $integrationEntityRepository,
+        LeadDeviceRepository $leadDeviceRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
@@ -138,6 +144,8 @@ final class LeadController extends FormController
         $this->userRepository = $userRepository;
         $this->doNotContactRepository = $doNotContactRepository;
         $this->emailRepository = $emailRepository;
+        $this->integrationEntityRepository = $integrationEntityRepository;
+        $this->leadDeviceRepository = $leadDeviceRepository;
     }
 
     #[Route(
@@ -511,11 +519,7 @@ final class LeadController extends FormController
 
         $dncSms = $this->doNotContactRepository->getEntriesByLeadAndChannel($lead, 'sms');
 
-        $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
-
         $lists = $this->leadListRepository->getLeadLists([$lead], true, true);
-
-        $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
         return $this->delegateView(
             [
@@ -533,8 +537,8 @@ final class LeadController extends FormController
                     'upcomingEvents'         => $this->getScheduledCampaignEvents($lead),
                     'engagementData'         => $this->getEngagementData($lead),
                     'noteCount'              => $this->noteModel->getNoteCount($lead, true),
-                    'integrations'           => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
-                    'devices'                => $leadDeviceRepository->getLeadDevices($lead),
+                    'integrations'           => $this->integrationEntityRepository->getIntegrationEntityByLead($lead->getId()),
+                    'devices'                => $this->leadDeviceRepository->getLeadDevices($lead),
                     'auditlog'               => $this->getAuditlogs($lead),
                     'doNotContact'           => end($dnc),
                     'doNotContactSms'        => end($dncSms),

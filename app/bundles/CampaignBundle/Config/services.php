@@ -23,8 +23,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\CampaignBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set(Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class)->tag('kernel.reset', ['method' => 'reset']);
 

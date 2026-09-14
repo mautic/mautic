@@ -22,8 +22,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\AssetBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\AssetBundle\\Entity\\', '../Entity/*Repository.php')
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+    $services->load('Mautic\\AssetBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set(Mautic\AssetBundle\Security\Permissions\AssetPermissions::class)->tag('mautic.permissions');
     $services->alias(Oneup\UploaderBundle\Templating\Helper\UploaderHelper::class, 'oneup_uploader.templating.uploader_helper');

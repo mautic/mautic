@@ -3,12 +3,22 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait EntityContactsTrait
 {
+    private DoNotContactRepository $doNotContactRepository;
+
+    #[Required]
+    public function setDoNotContactRepositoryEntityContactsTrait(
+        DoNotContactRepository $doNotContactRepository,
+    ): void {
+        $this->doNotContactRepository = $doNotContactRepository;
+    }
+
     /**
      * @param string|int              $entityId
      * @param int                     $page
@@ -160,7 +170,7 @@ trait EntityContactsTrait
         // Get DNC for the contact
         $dnc = [];
         if ($dncChannel && $count > 0) {
-            $dnc = $this->doctrine->getManager()->getRepository(DoNotContact::class)->getChannelList(
+            $dnc = $this->doNotContactRepository->getChannelList(
                 $dncChannel,
                 array_keys($contacts['results'])
             );
