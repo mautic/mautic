@@ -11,13 +11,14 @@ final class EmailLookupIndex
 {
     public function __construct(
         private Connection $connection,
-        private string $tablePrefix,
+        private ?string $tablePrefix,
     ) {
     }
 
     public function ensure(): void
     {
-        $tableName     = $this->tablePrefix.'leads';
+        $tablePrefix   = $this->tablePrefix ?? '';
+        $tableName     = $tablePrefix.'leads';
         $schemaManager = $this->connection->createSchemaManager();
 
         if (!$schemaManager->tablesExist([$tableName])) {
@@ -31,7 +32,7 @@ final class EmailLookupIndex
             }
         }
 
-        $index = new Index($this->tablePrefix.'email_search', ['email']);
+        $index = new Index($tablePrefix.'email_search', ['email']);
         $this->connection->executeStatement(
             $this->connection->getDatabasePlatform()->getCreateIndexSQL($index, $tableName),
         );
