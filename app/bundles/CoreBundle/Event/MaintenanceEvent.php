@@ -24,7 +24,7 @@ class MaintenanceEvent extends Event
      * @param int $daysOld
      */
     public function __construct(
-        $daysOld,
+        int $daysOld,
         protected bool $dryRun,
         protected bool $gdpr,
     ) {

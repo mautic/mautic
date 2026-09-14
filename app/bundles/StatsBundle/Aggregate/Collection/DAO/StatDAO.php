@@ -8,7 +8,7 @@ final class StatDAO
 {
     private array $stats = [];
 
-    public function addStat($key, $value): static
+    public function addStat($key, int $value): static
     {
         $this->stats[$key] ??= 0;
 

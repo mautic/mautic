@@ -32,7 +32,7 @@ readonly class FieldsBuilder
      * @param string $prefix
      * @param string $segmentPrefix
      */
-    public function getLeadFilter($prefix, $segmentPrefix): array
+    public function getLeadFilter(string $prefix, string $segmentPrefix): array
     {
         $filters = $this->getLeadFieldsColumns($prefix);
 

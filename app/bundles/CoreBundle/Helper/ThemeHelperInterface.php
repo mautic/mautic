@@ -88,7 +88,7 @@ interface ThemeHelperInterface
      *
      * @return array<string[]>|string[]
      */
-    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true);
+    public function getInstalledThemes(string $specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true);
 
     /**
      * @param string $theme
@@ -98,7 +98,7 @@ interface ThemeHelperInterface
      * @throws FileNotFoundException
      * @throws BadConfigurationException
      */
-    public function getTheme($theme = 'current', bool $throwException = false);
+    public function getTheme(string $theme = 'current', bool $throwException = false);
 
     /**
      * Install a theme from a zip package.

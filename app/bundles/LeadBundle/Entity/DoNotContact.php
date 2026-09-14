@@ -165,7 +165,7 @@ class DoNotContact
     /**
      * @param int $reason
      */
-    public function setReason($reason): static
+    public function setReason(int $reason): static
     {
         $this->reason = $reason;
 
@@ -198,7 +198,7 @@ class DoNotContact
     /**
      * @param string $channel
      */
-    public function setChannel($channel): static
+    public function setChannel(string $channel): static
     {
         $this->channel = $channel;
 
@@ -216,7 +216,7 @@ class DoNotContact
     /**
      * @param mixed $channelId
      */
-    public function setChannelId($channelId): static
+    public function setChannelId(int $channelId): static
     {
         $this->channelId = $channelId;
 

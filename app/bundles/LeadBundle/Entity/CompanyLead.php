@@ -64,7 +64,7 @@ class CompanyLead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded($date): void
+    public function setDateAdded(\DateTime $date): void
     {
         $this->dateAdded = $date;
     }
@@ -80,7 +80,7 @@ class CompanyLead
     /**
      * @param mixed $lead
      */
-    public function setLead($lead): void
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -104,7 +104,7 @@ class CompanyLead
     /**
      * @param Company $company
      */
-    public function setCompany($company): void
+    public function setCompany(\Mautic\LeadBundle\Entity\Company $company): void
     {
         $this->company = $company;
     }
@@ -112,7 +112,7 @@ class CompanyLead
     /**
      * @param bool $primary
      */
-    public function setPrimary($primary): void
+    public function setPrimary(bool $primary): void
     {
         $this->primary = $primary;
     }

@@ -61,7 +61,7 @@ trait TwigIntegrationTestTrait
      * @param string                $deprecation
      */
     #[DataProvider('integrationTestDataProvider')]
-    public function testIntegration($file, $message, $condition, $templates, $exception, $outputs, $deprecation = ''): void
+    public function testIntegration($file, $message, $condition, $templates, $exception, $outputs, string $deprecation = ''): void
     {
         $this->doIntegrationTest($file, $message, $condition, $templates, $exception, $outputs, $deprecation);
     }
@@ -78,7 +78,7 @@ trait TwigIntegrationTestTrait
      * @param mixed $outputs
      * @param mixed $deprecation
      */
-    public function testLegacyIntegration($file = null, $message = null, $condition = null, $templates = null, $exception = null, $outputs = null, $deprecation = ''): void
+    public function testLegacyIntegration($file = null, $message = null, $condition = null, $templates = null, $exception = null, $outputs = null, string $deprecation = ''): void
     {
         $this->markTestSkipped('Legacy Twig tests are not applicable to this project');
     }

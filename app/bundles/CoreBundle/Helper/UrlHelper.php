@@ -104,7 +104,7 @@ final class UrlHelper
      *
      * @return string[]
      */
-    public static function getUrlsFromPlaintext($text, array $contactUrlFields = []): array
+    public static function getUrlsFromPlaintext(string $text, array $contactUrlFields = []): array
     {
         $urls = [];
         // Check if there are any tokens that URL based fields
@@ -252,7 +252,7 @@ final class UrlHelper
      *
      * @param string $url
      */
-    public static function isValidUrl($url): bool
+    public static function isValidUrl(string $url): bool
     {
         $path = parse_url($url, PHP_URL_PATH);
         if (null !== $path) {

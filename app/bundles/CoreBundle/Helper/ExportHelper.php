@@ -58,7 +58,7 @@ readonly class ExportHelper
      *
      * @param array|\Iterator $data
      */
-    public function exportDataAs($data, string $type, string $filename): StreamedResponse
+    public function exportDataAs(array $data, string $type, string $filename): StreamedResponse
     {
         if (is_array($data)) {
             $data = new \ArrayIterator($data);

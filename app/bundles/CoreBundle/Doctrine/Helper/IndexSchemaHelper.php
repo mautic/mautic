@@ -78,7 +78,7 @@ class IndexSchemaHelper
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function addIndex($columns, $name, $options = []): static
+    public function addIndex($columns, $name, array $options = []): static
     {
         $textColumns = $this->getTextColumns($columns);
 
@@ -106,7 +106,7 @@ class IndexSchemaHelper
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function dropIndex($columns, $name, $options = []): static
+    public function dropIndex($columns, $name, array $options = []): static
     {
         $textColumns = $this->getTextColumns($columns);
 

@@ -53,7 +53,7 @@ class RealTimeExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute(string $type, $passthrough = null, ?string $channel = null, ?int $channelId = null): ?Responses
+    public function execute(string $type, ?\Mautic\SmsBundle\Event\ReplyEvent $passthrough = null, ?string $channel = null, ?int $channelId = null): ?Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();

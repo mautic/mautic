@@ -39,13 +39,13 @@ final class ContactLimiter
      * @param int|null $campaignLimit
      */
     public function __construct(
-        $batchLimit,
-        $contactId = null,
-        $minContactId = null,
-        $maxContactId = null,
+        ?int $batchLimit,
+        ?int $contactId = null,
+        ?int $minContactId = null,
+        ?int $maxContactId = null,
         private readonly array $contactIdList = [],
-        $threadId = null,
-        $maxThreads = null,
+        ?int $threadId = null,
+        ?int $maxThreads = null,
         $campaignLimit = null,
     ) {
         $this->batchLimit    = ($batchLimit) ? (int) $batchLimit : 100;
@@ -98,7 +98,7 @@ final class ContactLimiter
      *
      * @throws NoContactsFoundException
      */
-    public function setBatchMinContactId($id): static
+    public function setBatchMinContactId(int $id): static
     {
         // Prevent a never ending loop if the contact ID never changes due to being the last batch of contacts
         if ($this->minContactId && $this->minContactId > (int) $id) {
@@ -165,7 +165,7 @@ final class ContactLimiter
     /**
      * @throws \Exception
      */
-    public function reduceCampaignLimitRemaining($reduction): static
+    public function reduceCampaignLimitRemaining(int $reduction): static
     {
         if (!$this->hasCampaignLimit()) {
             throw new \Exception('Campaign Limit was not set');

@@ -24,7 +24,7 @@ final class PRedisConnectionHelper
      *
      * @param mixed $configuredUrls a string or an array of redis endpoints to connect to
      */
-    public static function getRedisEndpoints($configuredUrls): iterable
+    public static function getRedisEndpoints(string $configuredUrls): iterable
     {
         if (is_iterable($configuredUrls)) {
             // assume arrays are already in the correct format

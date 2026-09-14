@@ -65,7 +65,7 @@ class LeadPointLog
     /**
      * @param mixed $dateFired
      */
-    public function setDateFired($dateFired): void
+    public function setDateFired(\DateTime $dateFired): void
     {
         $this->dateFired = $dateFired;
     }
@@ -81,7 +81,7 @@ class LeadPointLog
     /**
      * @param IpAddress $ipAddress
      */
-    public function setIpAddress($ipAddress): void
+    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }
@@ -97,7 +97,7 @@ class LeadPointLog
     /**
      * @param mixed $lead
      */
-    public function setLead($lead): void
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -113,7 +113,7 @@ class LeadPointLog
     /**
      * @param mixed $point
      */
-    public function setPoint($point): void
+    public function setPoint(\Mautic\PointBundle\Entity\Point $point): void
     {
         $this->point = $point;
     }

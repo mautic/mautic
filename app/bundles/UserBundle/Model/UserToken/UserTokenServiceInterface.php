@@ -13,7 +13,7 @@ interface UserTokenServiceInterface
      *
      * @return UserToken
      */
-    public function generateSecret(UserToken $token, $secretLength = 32);
+    public function generateSecret(UserToken $token, int $secretLength = 32);
 
     /**
      * @return bool

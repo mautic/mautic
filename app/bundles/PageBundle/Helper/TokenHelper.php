@@ -13,7 +13,7 @@ class TokenHelper
     ) {
     }
 
-    public function findPageTokens($content, $clickthrough = []): array
+    public function findPageTokens($content, array $clickthrough = []): array
     {
         preg_match_all(self::REGEX, $content, $matches);
 

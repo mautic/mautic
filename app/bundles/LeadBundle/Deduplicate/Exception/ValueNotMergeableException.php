@@ -12,7 +12,7 @@ final class ValueNotMergeableException extends \Exception
      */
     public function __construct(
         private $newerValue,
-        private $olderValue,
+        private bool $olderValue,
     ) {
         parent::__construct();
     }

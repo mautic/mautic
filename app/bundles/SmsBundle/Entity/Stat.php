@@ -231,7 +231,7 @@ class Stat
     /**
      * @param \DateTime $dateSent
      */
-    public function setDateSent($dateSent): static
+    public function setDateSent(\DateTime $dateSent): static
     {
         $this->dateSent = $dateSent;
 
@@ -249,7 +249,7 @@ class Stat
     /**
      * @param string $trackingHash
      */
-    public function setTrackingHash($trackingHash): static
+    public function setTrackingHash(string $trackingHash): static
     {
         $this->trackingHash = $trackingHash;
 
@@ -267,7 +267,7 @@ class Stat
     /**
      * @param string $source
      */
-    public function setSource($source): static
+    public function setSource(?string $source): static
     {
         $this->source = $source;
 
@@ -285,7 +285,7 @@ class Stat
     /**
      * @param int $sourceId
      */
-    public function setSourceId($sourceId): static
+    public function setSourceId(?int $sourceId): static
     {
         $this->sourceId = $sourceId;
 
@@ -310,7 +310,7 @@ class Stat
     /**
      * @param bool $isFailed
      */
-    public function setIsFailed($isFailed): static
+    public function setIsFailed(bool $isFailed): static
     {
         $this->isFailed = $isFailed;
 

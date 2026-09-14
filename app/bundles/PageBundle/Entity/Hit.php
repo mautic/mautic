@@ -295,7 +295,7 @@ class Hit
     /**
      * @param \DateTime $dateHit
      */
-    public function setDateHit($dateHit): static
+    public function setDateHit(\DateTime $dateHit): static
     {
         $this->dateHit = $dateHit;
 
@@ -321,7 +321,7 @@ class Hit
     /**
      * @param \DateTime $dateLeft
      */
-    public function setDateLeft($dateLeft): static
+    public function setDateLeft(\DateTime $dateLeft): static
     {
         $this->dateLeft = $dateLeft;
 
@@ -421,7 +421,7 @@ class Hit
     /**
      * @param int $code
      */
-    public function setCode($code): static
+    public function setCode(int $code): static
     {
         $this->code = $code;
 
@@ -439,7 +439,7 @@ class Hit
     /**
      * @param string $referer
      */
-    public function setReferer($referer): static
+    public function setReferer(string $referer): static
     {
         $this->referer = $referer;
 
@@ -457,7 +457,7 @@ class Hit
     /**
      * @param string $url
      */
-    public function setUrl($url): static
+    public function setUrl(string $url): static
     {
         $this->url = $url;
 
@@ -475,7 +475,7 @@ class Hit
     /**
      * @param string $urlTitle
      */
-    public function setUrlTitle($urlTitle): static
+    public function setUrlTitle(string $urlTitle): static
     {
         $urlTitle       = mb_strlen($urlTitle) <= 191 ? $urlTitle : mb_substr($urlTitle, 0, 191);
         $this->urlTitle = $urlTitle;
@@ -557,7 +557,7 @@ class Hit
     /**
      * @param string $trackingId
      */
-    public function setTrackingId($trackingId): static
+    public function setTrackingId(string $trackingId): static
     {
         $this->trackingId = $trackingId;
 
@@ -634,7 +634,7 @@ class Hit
     /**
      * @param string $source
      */
-    public function setSource($source): static
+    public function setSource(string $source): static
     {
         $this->source = $source;
 
@@ -695,7 +695,7 @@ class Hit
     /**
      * @param array $query
      */
-    public function setQuery($query): static
+    public function setQuery(array $query): static
     {
         $this->query = $query;
 

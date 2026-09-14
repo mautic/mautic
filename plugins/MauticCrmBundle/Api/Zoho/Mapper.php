@@ -34,7 +34,7 @@ final class Mapper
     ) {
     }
 
-    public function setObject($object): static
+    public function setObject(string $object): static
     {
         $this->object = $object;
 
@@ -104,7 +104,7 @@ final class Mapper
      *
      * @throws MatchingKeyNotFoundException
      */
-    public function getContactIdByKey($key)
+    public function getContactIdByKey(int $key)
     {
         if (isset($this->contactMapper[$key])) {
             return $this->contactMapper[$key];

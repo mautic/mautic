@@ -19,7 +19,7 @@ final class DateRelativeInterval implements FilterDecoratorInterface
      */
     public function __construct(
         private readonly DateDecorator $dateDecorator,
-        private $originalValue,
+        private string $originalValue,
         private readonly DateOptionParameters $dateOptionParameters,
     ) {
     }

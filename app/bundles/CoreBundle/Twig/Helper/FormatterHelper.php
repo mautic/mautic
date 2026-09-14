@@ -25,7 +25,7 @@ final readonly class FormatterHelper
      *
      * @return string
      */
-    public function _($val, $type = 'html', bool $textOnly = false, $round = 1)
+    public function _($val, string $type = 'html', bool $textOnly = false, int $round = 1)
     {
         if (empty($val) && 'bool' !== $type && 'float' !== $type) {
             return $val;
@@ -103,7 +103,7 @@ final readonly class FormatterHelper
      *
      * @return string
      */
-    public function arrayToString($array, $delimiter = ', ')
+    public function arrayToString($array, string $delimiter = ', ')
     {
         if (is_array($array)) {
             $replacements = [
@@ -127,7 +127,7 @@ final readonly class FormatterHelper
      * @param string                $delimeter
      * @param array<string, string> $array
      */
-    public function simpleArrayToHtml(array $array, $delimeter = '<br />'): string
+    public function simpleArrayToHtml(array $array, string $delimeter = '<br />'): string
     {
         $pairs = [];
         foreach ($array as $key => $value) {
@@ -145,7 +145,7 @@ final readonly class FormatterHelper
      *
      * @return array<string, string>|array<int, string>
      */
-    public function simpleCsvToArray($csv, $type = null): array
+    public function simpleCsvToArray($csv, ?string $type = null): array
     {
         if (!$csv) {
             return [];

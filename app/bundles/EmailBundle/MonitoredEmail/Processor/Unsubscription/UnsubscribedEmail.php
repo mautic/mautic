@@ -11,8 +11,8 @@ final class UnsubscribedEmail
      * @param string $unsubscriptionAddress
      */
     public function __construct(
-        private $contactEmail,
-        private $unsubscriptionAddress,
+        private string $contactEmail,
+        private string $unsubscriptionAddress,
     ) {
     }
 

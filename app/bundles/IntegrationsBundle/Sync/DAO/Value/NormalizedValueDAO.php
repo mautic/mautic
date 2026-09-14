@@ -53,7 +53,7 @@ final class NormalizedValueDAO
      * @param mixed  $normalizedValue
      */
     public function __construct(
-        private $type,
+        private string $type,
         private $value,
         $normalizedValue = null,
     ) {

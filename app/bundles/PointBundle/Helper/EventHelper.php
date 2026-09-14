@@ -14,7 +14,7 @@ final class EventHelper
      *
      * @return int
      */
-    public static function engagePointAction($lead, array $action)
+    public static function engagePointAction(\Mautic\LeadBundle\Entity\Lead $lead, array $action)
     {
         static $initiated = [];
 

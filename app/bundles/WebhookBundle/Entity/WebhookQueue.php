@@ -109,7 +109,7 @@ class WebhookQueue
     /**
      * @param string $payload
      */
-    public function setPayload($payload): static
+    public function setPayload(string $payload): static
     {
         $this->payloadCompressed = gzcompress($payload, 9);
 

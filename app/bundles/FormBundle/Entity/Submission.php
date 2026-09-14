@@ -140,7 +140,7 @@ class Submission
     /**
      * @param \DateTime $dateSubmitted
      */
-    public function setDateSubmitted($dateSubmitted): static
+    public function setDateSubmitted(\DateTime $dateSubmitted): static
     {
         $this->dateSubmitted = $dateSubmitted;
 
@@ -158,7 +158,7 @@ class Submission
     /**
      * @param string $referer
      */
-    public function setReferer($referer): static
+    public function setReferer(string $referer): static
     {
         $this->referer = $referer;
 
@@ -211,7 +211,7 @@ class Submission
         return $this->results;
     }
 
-    public function setResults($results): static
+    public function setResults(array $results): static
     {
         $this->results = $results;
 

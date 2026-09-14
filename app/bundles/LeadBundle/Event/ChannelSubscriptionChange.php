@@ -15,7 +15,7 @@ final class ChannelSubscriptionChange extends Event
      */
     public function __construct(
         private readonly Lead $lead,
-        private $channel,
+        private string $channel,
         private readonly int $oldStatus,
         private readonly int $newStatus,
     ) {

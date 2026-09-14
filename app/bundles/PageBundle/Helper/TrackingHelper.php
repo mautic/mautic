@@ -86,7 +86,7 @@ class TrackingHelper
         return (array) $cacheValue;
     }
 
-    public function displayInitCode($service): mixed
+    public function displayInitCode(string $service): mixed
     {
         $pixelId = $this->coreParametersHelper->get($service.'_id');
 

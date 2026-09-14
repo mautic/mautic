@@ -36,7 +36,7 @@ final class BodyParser
      *
      * @param string $knownEmail
      */
-    public function parse($body, $knownEmail = ''): array
+    public function parse($body, string $knownEmail = ''): array
     {
         // initialize the result array
         $result = [

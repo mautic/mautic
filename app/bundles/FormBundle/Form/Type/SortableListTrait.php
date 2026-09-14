@@ -15,7 +15,7 @@ trait SortableListTrait
     /**
      * @param array<string, mixed> $options
      */
-    public function addSortableList(FormBuilderInterface $builder, array $options, $listName = 'list', $listData = null, $formName = 'formfield'): void
+    public function addSortableList(FormBuilderInterface $builder, array $options, string $listName = 'list', $listData = null, string $formName = 'formfield'): void
     {
         $listOptions = [
             'with_labels' => true,

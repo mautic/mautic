@@ -98,7 +98,7 @@ final class ReportDataResult
      *
      * @return string
      */
-    public function getType($column)
+    public function getType(string $column)
     {
         return $this->types[$column] ?? 'string';
     }

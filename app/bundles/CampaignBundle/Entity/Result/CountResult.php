@@ -12,7 +12,7 @@ final readonly class CountResult
 
     private int $maxId;
 
-    public function __construct($count, $minId, $maxId)
+    public function __construct(int $count, int $minId, int $maxId)
     {
         $this->count = (int) $count;
         $this->minId = (int) $minId;

@@ -26,7 +26,7 @@ class ExportHandler
      *
      * @throws FileIOException
      */
-    public function getHandler($fileName)
+    public function getHandler(string $fileName)
     {
         $path = $this->getPath($fileName);
 

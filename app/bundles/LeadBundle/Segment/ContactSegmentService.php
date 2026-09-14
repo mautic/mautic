@@ -102,7 +102,7 @@ readonly class ContactSegmentService
      * @throws \Doctrine\DBAL\Exception
      * @throws Exception\SegmentQueryException
      */
-    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000): array
+    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, int $limit = 1000): array
     {
         $queryBuilder = $this->getNewLeadListLeadsQueryBuilder($segment, $batchLimiters);
         $queryBuilder->setMaxResults($limit);
@@ -209,7 +209,7 @@ readonly class ContactSegmentService
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], $limit = null): array
+    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], ?int $limit = null): array
     {
         $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters, $limit);
 

@@ -11,7 +11,7 @@ final class ExportResponse
     /**
      * @param string $fileName
      */
-    public static function setResponseHeaders(Response $response, $fileName): void
+    public static function setResponseHeaders(Response $response, string $fileName): void
     {
         $response->headers->set('Content-Type', 'application/octet-stream');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$fileName.'"');

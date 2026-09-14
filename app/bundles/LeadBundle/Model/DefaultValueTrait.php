@@ -14,7 +14,7 @@ trait DefaultValueTrait
     /**
      * @param string $object
      */
-    protected function setEntityDefaultValues(CustomFieldEntityInterface $entity, $object = 'lead'): void
+    protected function setEntityDefaultValues(CustomFieldEntityInterface $entity, string $object = 'lead'): void
     {
         if ($entity->getId()) {
             return;

@@ -165,7 +165,7 @@ class LeadEventLog
     /**
      * @param string $object
      */
-    public function setObject($object): static
+    public function setObject(string $object): static
     {
         $this->object = $object;
 
@@ -201,7 +201,7 @@ class LeadEventLog
     /**
      * @param string $action
      */
-    public function setAction($action): static
+    public function setAction(string $action): static
     {
         $this->action = $action;
 
@@ -229,7 +229,7 @@ class LeadEventLog
      * @param string $key
      * @param string $value
      */
-    public function addProperty($key, $value): static
+    public function addProperty(string $key, $value): static
     {
         $this->properties[$key] = $value;
 
@@ -247,7 +247,7 @@ class LeadEventLog
     /**
      * @param \DateTime $dateAdded
      */
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -265,7 +265,7 @@ class LeadEventLog
     /**
      * @param string $bundle
      */
-    public function setBundle($bundle): static
+    public function setBundle(string $bundle): static
     {
         $this->bundle = $bundle;
 

@@ -46,7 +46,7 @@ class ContactSegmentFilterDictionary
      *
      * @throws FilterNotFoundException
      */
-    public function getFilter($filterKey)
+    public function getFilter(string $filterKey)
     {
         if (array_key_exists($filterKey, $this->getFilters())) {
             return $this->filters[$filterKey];
@@ -63,7 +63,7 @@ class ContactSegmentFilterDictionary
      *
      * @throws FilterNotFoundException
      */
-    public function getFilterProperty($filterKey, $property)
+    public function getFilterProperty(string $filterKey, string $property)
     {
         $filter = $this->getFilter($filterKey);
 

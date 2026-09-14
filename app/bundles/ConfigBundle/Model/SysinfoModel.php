@@ -147,7 +147,7 @@ final class SysinfoModel
      * @param int $lines
      * @param int $buffer
      */
-    public function tail($filename, $lines = 10, $buffer = 4096): string
+    public function tail($filename, int $lines = 10, int $buffer = 4096): string
     {
         $f      = fopen($filename, 'rb');
         $output = '';

@@ -25,7 +25,7 @@ final class CustomFieldHelper
      *
      * @return mixed
      */
-    public static function fixValueType($type, $value)
+    public static function fixValueType(string $type, $value)
     {
         if (null === $value) {
             // do not transform null values

@@ -39,7 +39,7 @@ abstract class AbstractFormatter
      *
      * @return mixed
      */
-    abstract public function toDateTime($field, $format = 'Y-m-d H:i:s');
+    abstract public function toDateTime($field, string $format = 'Y-m-d H:i:s');
 
     /**
      * Format field to date.
@@ -48,7 +48,7 @@ abstract class AbstractFormatter
      *
      * @return mixed
      */
-    abstract public function toDate($field, $format = 'Y-m-d');
+    abstract public function toDate($field, string $format = 'Y-m-d');
 
     /**
      * Format field to time.
@@ -57,7 +57,7 @@ abstract class AbstractFormatter
      *
      * @return mixed
      */
-    abstract public function toTime($field, $format = 'H:i:s');
+    abstract public function toTime($field, string $format = 'H:i:s');
 
     /**
      * Format field to a numeric.

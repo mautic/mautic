@@ -17,5 +17,5 @@ interface RandomHelperInterface
      *
      * @return string
      */
-    public function generate($length = 10, $charlist = '0-9a-z');
+    public function generate(int $length = 10, string $charlist = '0-9a-z');
 }

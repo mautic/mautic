@@ -11,7 +11,7 @@ final class FieldNotFoundException extends \Exception
      */
     public function __construct(
         string $field,
-        $object,
+        string $object,
         int $code = 0,
         ?\Throwable $previous = null,
     ) {

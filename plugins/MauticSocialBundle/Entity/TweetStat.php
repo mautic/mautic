@@ -188,7 +188,7 @@ class TweetStat
     /**
      * @param \DateTime|null $dateSent
      */
-    public function setDateSent($dateSent): void
+    public function setDateSent(\DateTime $dateSent): void
     {
         $this->dateSent = $dateSent;
     }

@@ -48,7 +48,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          * @param mixed               $log
          * @param string|array<mixed> $context
          */
-        public static function logDebugEntry($log, $context = 'null', bool $backtrace = false): void
+        public static function logDebugEntry($log, string $context = 'null', bool $backtrace = false): void
         {
             if ($debugLogger = self::$handler->getDebugLogger()) {
                 if (!is_array($context)) {
@@ -117,7 +117,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          *
          * @throws \ErrorException
          */
-        public function handleError($level, $message, $file = 'unknown', $line = 0, array $context = []): bool
+        public function handleError($level, $message, string $file = 'unknown', int $line = 0, array $context = []): bool
         {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {
@@ -151,7 +151,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return false;
         }
 
-        public function handleException($exception, bool $returnContent = false, bool $inTemplate = false): false|string
+        public function handleException(\Symfony\Component\ErrorHandler\Error\FatalError $exception, bool $returnContent = false, bool $inTemplate = false): false|string
         {
             if (!$error = self::prepareExceptionForOutput($exception)) {
                 return false;
@@ -299,7 +299,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         /**
          * @param string $environment
          */
-        public static function register($environment = 'prod'): self
+        public static function register(string $environment = 'prod'): self
         {
             if ('dev' === $environment) {
                 Debug::enable();

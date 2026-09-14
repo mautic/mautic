@@ -49,7 +49,7 @@ final class EventAccessor
      *
      * @throws EventNotFoundException
      */
-    public function getAction($key)
+    public function getAction(string $key)
     {
         if (!isset($this->actions[$key])) {
             throw new EventNotFoundException("Action {$key} is not valid");
@@ -70,7 +70,7 @@ final class EventAccessor
      *
      * @throws EventNotFoundException
      */
-    public function getCondition($key)
+    public function getCondition(string $key)
     {
         if (!isset($this->conditions[$key])) {
             throw new EventNotFoundException("Condition {$key} is not valid");
@@ -91,7 +91,7 @@ final class EventAccessor
      *
      * @throws EventNotFoundException
      */
-    public function getDecision($key)
+    public function getDecision(string $key)
     {
         if (!isset($this->decisions[$key])) {
             throw new EventNotFoundException("Decision {$key} is not valid");

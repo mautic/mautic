@@ -18,7 +18,7 @@ final readonly class IdentifyCompanyHelper
     /**
      * @param mixed $lead
      */
-    public function identifyLeadsCompany(array $data, $lead): array
+    public function identifyLeadsCompany(array $data, \Mautic\LeadBundle\Entity\Lead $lead): array
     {
         $addContactToCompany = true;
 

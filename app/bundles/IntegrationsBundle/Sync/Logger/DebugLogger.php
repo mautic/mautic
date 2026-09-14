@@ -23,7 +23,7 @@ final class DebugLogger
      * @param string               $urgency
      * @param array<string, mixed> $context
      */
-    public static function log($integration, $message, $loggedFrom = null, array $context = [], $urgency = LogLevel::DEBUG): void
+    public static function log(string $integration, string $message, $loggedFrom = null, array $context = [], $urgency = LogLevel::DEBUG): void
     {
         if (!self::$logger) {
             return;

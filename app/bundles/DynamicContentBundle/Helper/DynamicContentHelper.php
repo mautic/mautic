@@ -69,7 +69,7 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getDynamicContentSlotForLead($slotName, $lead)
+    public function getDynamicContentSlotForLead($slotName, \Mautic\LeadBundle\Entity\Lead $lead)
     {
         $leadArray = [];
         if ($lead instanceof Lead) {
@@ -183,7 +183,7 @@ class DynamicContentHelper
      *
      * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getDwcsBySlotName($slotName, $publishedOnly = false)
+    public function getDwcsBySlotName(string $slotName, bool $publishedOnly = false)
     {
         $filter = [
             'where' => [

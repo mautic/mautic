@@ -120,7 +120,7 @@ class LeadCategory
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded($date): void
+    public function setDateAdded(\DateTime $date): void
     {
         $this->dateAdded = $date;
     }
@@ -136,7 +136,7 @@ class LeadCategory
     /**
      * @param mixed $lead
      */
-    public function setLead($lead): void
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -152,7 +152,7 @@ class LeadCategory
     /**
      * @param Category $category
      */
-    public function setCategory($category): void
+    public function setCategory(\Mautic\CategoryBundle\Entity\Category $category): void
     {
         $this->category = $category;
     }
@@ -168,7 +168,7 @@ class LeadCategory
     /**
      * @param bool $manuallyRemoved
      */
-    public function setManuallyRemoved($manuallyRemoved): void
+    public function setManuallyRemoved(bool $manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }

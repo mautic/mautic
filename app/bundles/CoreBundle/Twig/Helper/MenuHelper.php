@@ -27,7 +27,7 @@ final readonly class MenuHelper
      * @param array<string, mixed> $attributes
      * @param array<string, mixed> $overrides
      */
-    public function parseAttributes($attributes, $overrides = []): string
+    public function parseAttributes($attributes, array $overrides = []): string
     {
         if (!is_array($attributes)) {
             $attributes = [];
@@ -72,7 +72,7 @@ final readonly class MenuHelper
     /**
      * @param ItemInterface $menu
      */
-    public function invisibleChildSelected($menu, MatcherInterface $matcher): bool
+    public function invisibleChildSelected(\Knp\Menu\ItemInterface $menu, MatcherInterface $matcher): bool
     {
         /** @var ItemInterface $item */
         foreach ($menu as $item) {

@@ -224,7 +224,7 @@ class Stat
     /**
      * @param mixed $dateSent
      */
-    public function setDateSent($dateSent): void
+    public function setDateSent(\DateTime $dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -297,7 +297,7 @@ class Stat
     /**
      * @param mixed $trackingHash
      */
-    public function setTrackingHash($trackingHash): void
+    public function setTrackingHash(string $trackingHash): void
     {
         $this->trackingHash = $trackingHash;
     }
@@ -329,7 +329,7 @@ class Stat
     /**
      * @param mixed $retryCount
      */
-    public function setRetryCount($retryCount): void
+    public function setRetryCount(int $retryCount): void
     {
         $this->retryCount = $retryCount;
     }
@@ -350,7 +350,7 @@ class Stat
     /**
      * @param mixed $source
      */
-    public function setSource($source): void
+    public function setSource(?string $source): void
     {
         $this->source = $source;
     }
@@ -366,7 +366,7 @@ class Stat
     /**
      * @param mixed $sourceId
      */
-    public function setSourceId($sourceId): void
+    public function setSourceId(?int $sourceId): void
     {
         $this->sourceId = (int) $sourceId;
     }
@@ -467,7 +467,7 @@ class Stat
     /**
      * @param \DateTime $dateRead
      */
-    public function setDateRead($dateRead): static
+    public function setDateRead(\DateTime $dateRead): static
     {
         $this->dateRead = $dateRead;
 

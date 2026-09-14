@@ -56,7 +56,7 @@ final class CustomFieldValueHelper
      *
      * @return string
      */
-    public static function setValueFromPropertiesList(array $properties, $value)
+    public static function setValueFromPropertiesList(array $properties, string $value)
     {
         if (isset($properties['list']) && is_array($properties['list'])) {
             $list = $properties['list'];
@@ -83,7 +83,7 @@ final class CustomFieldValueHelper
      *
      * @return mixed|string
      */
-    public static function normalize($value, $type, $properties)
+    public static function normalize($value, string $type, $properties)
     {
         if ('' !== $value && $type && $properties) {
             if (!is_array($properties)) {

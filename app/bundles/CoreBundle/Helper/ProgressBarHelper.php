@@ -14,7 +14,7 @@ final class ProgressBarHelper
      *
      * @param int $maxCount
      */
-    public static function init(OutputInterface $output, $maxCount = 0): ProgressBar
+    public static function init(OutputInterface $output, int $maxCount = 0): ProgressBar
     {
         $output = $output instanceof StreamOutput ? new StreamOutput($output->getStream()) : $output;
 

@@ -18,7 +18,7 @@ trait LeadDetailsTrait
 
     private LeadEventLogRepository $leadEventLogRepository;
 
-    protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, int $page = 1, $limit = 25): array
+    protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 

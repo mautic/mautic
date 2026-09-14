@@ -182,7 +182,7 @@ trait CustomFieldRepositoryTrait
     /**
      * @param string $object
      */
-    public function getFieldValues($id, bool $byGroup = true, $object = 'lead'): array
+    public function getFieldValues($id, bool $byGroup = true, string $object = 'lead'): array
     {
         // use DBAL to get entity fields
         $q = $this->getEntitiesDbalQueryBuilder();
@@ -209,7 +209,7 @@ trait CustomFieldRepositoryTrait
      *
      * @return array
      */
-    public function getValueList($field, $search = '', $limit = 10, $start = 0)
+    public function getValueList($field, string $search = '', int $limit = 10, int $start = 0)
     {
         // Includes prefix
         $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
@@ -300,7 +300,7 @@ trait CustomFieldRepositoryTrait
      * @param array  $values
      * @param string $object
      */
-    protected function formatFieldValues($values, bool $byGroup = true, $object = 'lead'): array
+    protected function formatFieldValues($values, bool $byGroup = true, string $object = 'lead'): array
     {
         [$fields, $fixedFields] = $this->getCustomFieldList($object);
 

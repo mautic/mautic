@@ -179,7 +179,7 @@ class LeadDevice
     /**
      * @param mixed $clientInfo
      */
-    public function setClientInfo($clientInfo): void
+    public function setClientInfo(string $clientInfo): void
     {
         $this->clientInfo = $clientInfo;
     }
@@ -195,7 +195,7 @@ class LeadDevice
     /**
      * @param mixed $device
      */
-    public function setDevice($device): void
+    public function setDevice(string $device): void
     {
         $this->device = $device;
     }
@@ -208,7 +208,7 @@ class LeadDevice
         return $this->deviceBrand;
     }
 
-    public function setDeviceBrand($brand): void
+    public function setDeviceBrand(string $brand): void
     {
         $this->deviceBrand = $brand;
     }
@@ -224,7 +224,7 @@ class LeadDevice
     /**
      * @param mixed $deviceModel
      */
-    public function setDeviceModel($deviceModel): void
+    public function setDeviceModel(string $deviceModel): void
     {
         $this->deviceModel = $deviceModel;
     }
@@ -240,7 +240,7 @@ class LeadDevice
     /**
      * @param string $deviceOsName
      */
-    public function setDeviceOsName($deviceOsName): static
+    public function setDeviceOsName(string $deviceOsName): static
     {
         $this->deviceOsName = $deviceOsName;
 
@@ -339,7 +339,7 @@ class LeadDevice
     /**
      * @param string $trackingId
      */
-    public function setTrackingId($trackingId): static
+    public function setTrackingId(string $trackingId): static
     {
         $this->trackingId = $trackingId;
 
@@ -372,7 +372,7 @@ class LeadDevice
     /**
      * @param mixed $dateAdded
      */
-    public function setDateAdded($dateAdded): void
+    public function setDateAdded(\DateTime $dateAdded): void
     {
         $this->dateAdded = $dateAdded;
     }

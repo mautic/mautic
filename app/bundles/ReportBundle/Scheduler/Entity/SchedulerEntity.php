@@ -13,7 +13,7 @@ final class SchedulerEntity implements SchedulerInterface
      * @param bool $isScheduled
      */
     public function __construct(
-        private $isScheduled,
+        private bool $isScheduled,
         private readonly ?string $scheduleUnit,
         private readonly ?string $scheduleDay,
         private readonly ?string $scheduleMonthFrequency,

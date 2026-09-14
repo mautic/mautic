@@ -113,7 +113,7 @@ class Lead
     /**
      * @param \DateTime $date
      */
-    public function setDateAdded($date): void
+    public function setDateAdded(\DateTime $date): void
     {
         $this->dateAdded = $date;
     }
@@ -155,7 +155,7 @@ class Lead
     /**
      * @param bool $manuallyRemoved
      */
-    public function setManuallyRemoved($manuallyRemoved): void
+    public function setManuallyRemoved(bool $manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
     }
@@ -179,7 +179,7 @@ class Lead
     /**
      * @param bool $manuallyAdded
      */
-    public function setManuallyAdded($manuallyAdded): void
+    public function setManuallyAdded(bool $manuallyAdded): void
     {
         $this->manuallyAdded = $manuallyAdded;
     }
@@ -203,7 +203,7 @@ class Lead
     /**
      * @param int $rotation
      */
-    public function setRotation($rotation): static
+    public function setRotation(int $rotation): static
     {
         $this->rotation = (int) $rotation;
 

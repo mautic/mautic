@@ -160,7 +160,7 @@ class CompanyChangeLog
     /**
      * @param \DateTime $dateAdded
      */
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 

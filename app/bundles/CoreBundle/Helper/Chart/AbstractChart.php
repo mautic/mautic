@@ -112,7 +112,7 @@ abstract class AbstractChart
      *
      * @return string
      */
-    public static function truncate($string, $length = 100, $append = '...')
+    public static function truncate($string, int $length = 100, string $append = '...')
     {
         $string = trim($string);
 

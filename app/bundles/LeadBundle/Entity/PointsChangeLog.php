@@ -98,7 +98,7 @@ class PointsChangeLog
     /**
      * @param string $type
      */
-    public function setType($type): static
+    public function setType(string $type): static
     {
         $this->type = $type;
 
@@ -134,7 +134,7 @@ class PointsChangeLog
     /**
      * @param string $actionName
      */
-    public function setActionName($actionName): static
+    public function setActionName(string $actionName): static
     {
         $this->actionName = $actionName;
 
@@ -170,7 +170,7 @@ class PointsChangeLog
     /**
      * @param \DateTime $dateAdded
      */
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 

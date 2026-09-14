@@ -23,7 +23,7 @@ final class Installer
      * @param string $sourceDirectory
      * @param string $languageCode
      */
-    public function install($sourceDirectory, $languageCode): static
+    public function install($sourceDirectory, string $languageCode): static
     {
         $this->sourceDirectory  = $sourceDirectory.'/'.$languageCode;
         $this->installDirectory = $this->translationsDirectory.'/'.$languageCode;

@@ -34,7 +34,7 @@ class TokenReplacementEvent extends CommonEvent
      */
     public function __construct(
         $content,
-        protected $lead = null,
+        protected ?\Mautic\LeadBundle\Entity\Lead $lead = null,
         protected array $clickthrough = [],
         protected $passthrough = null,
         private readonly bool $internalSend = false,

@@ -10,7 +10,7 @@ final class NumberNotFoundException extends \Exception
      * @param string $number
      */
     public function __construct(
-        private $number,
+        private string $number,
         string $message = '',
         int $code = 0,
         ?\Throwable $previous = null,

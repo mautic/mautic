@@ -11,7 +11,7 @@ readonly class ExportOption
     /**
      * @param int|null $reportId
      */
-    public function __construct($reportId)
+    public function __construct(?int $reportId)
     {
         if (null !== $reportId && !is_numeric($reportId)) {
             throw new \InvalidArgumentException();

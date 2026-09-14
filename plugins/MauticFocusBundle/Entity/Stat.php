@@ -91,7 +91,7 @@ class Stat
     /**
      * @param mixed $focus
      */
-    public function setFocus($focus): static
+    public function setFocus(\MauticPlugin\MauticFocusBundle\Entity\Focus $focus): static
     {
         $this->focus = $focus;
 
@@ -145,7 +145,7 @@ class Stat
     /**
      * @param mixed $dateAdded
      */
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 

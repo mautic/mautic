@@ -132,7 +132,7 @@ class Notification
     /**
      * @param string|null $type
      */
-    public function setType($type): void
+    public function setType(string $type): void
     {
         $this->type = $type;
     }
@@ -148,7 +148,7 @@ class Notification
     /**
      * @param string|null $message
      */
-    public function setMessage($message): void
+    public function setMessage(string $message): void
     {
         $this->message = $message;
     }
@@ -164,7 +164,7 @@ class Notification
     /**
      * @param \DateTime|null $dateAdded
      */
-    public function setDateAdded($dateAdded): void
+    public function setDateAdded(\DateTime $dateAdded): void
     {
         $this->dateAdded = $dateAdded;
     }

@@ -84,7 +84,7 @@ final class AssetsHelper
      *
      * @param string $path
      */
-    public function getOverridableUrl($path, bool $absolute = false): false|string
+    public function getOverridableUrl(string $path, bool $absolute = false): false|string
     {
         $mediaPath  = $this->pathsHelper->getSystemPath('media', false);
         $assetsPath = $this->pathsHelper->getSystemPath('assets', false);
@@ -107,7 +107,7 @@ final class AssetsHelper
      *
      * @param string $path
      */
-    public function getUrl($path, ?string $packageName = null, ?string $version = null, bool $absolute = false, bool $ignorePrefix = false): string
+    public function getUrl(string $path, ?string $packageName = null, ?string $version = null, bool $absolute = false, bool $ignorePrefix = false): string
     {
         // if we have http in the url it is absolute and we can just return it
         if (str_starts_with($path, 'http')) {
@@ -155,7 +155,7 @@ final class AssetsHelper
      * @param string                       $location
      * @param string                       $name
      */
-    public function addScript($script, $location = 'head', bool $async = false, $name = null): self
+    public function addScript($script, string $location = 'head', bool $async = false, ?string $name = null): self
     {
         $assets     = &$this->assets[$this->context];
         $addScripts = function ($s) use ($location, &$assets, $async, $name): void {
@@ -190,7 +190,7 @@ final class AssetsHelper
      * @param string $script
      * @param string $location
      */
-    public function addScriptDeclaration($script, $location = 'head'): self
+    public function addScriptDeclaration(string $script, string $location = 'head'): self
     {
         if ('head' == $location) {
             // special place for these so that declarations and scripts can be mingled
@@ -211,7 +211,7 @@ final class AssetsHelper
      *
      * @param string|array<string, string> $stylesheet
      */
-    public function addStylesheet($stylesheet): self
+    public function addStylesheet(string $stylesheet): self
     {
         $addSheet = function ($s): void {
             $this->assets[$this->context]['stylesheets'] ??= [];
@@ -254,7 +254,7 @@ final class AssetsHelper
      * @param string $declaration
      * @param string $location
      */
-    public function addCustomDeclaration($declaration, $location = 'head'): self
+    public function addCustomDeclaration(string $declaration, string $location = 'head'): self
     {
         if ('head' == $location) {
             $this->assets[$this->context]['headDeclarations'][] = ['custom' => $declaration];
@@ -305,7 +305,7 @@ final class AssetsHelper
      *
      * @param string $location
      */
-    public function outputScripts($location): void
+    public function outputScripts(string $location): void
     {
         if (isset($this->assets[$this->context]['scripts'][$location])) {
             foreach (array_reverse($this->assets[$this->context]['scripts'][$location]) as $s) {
@@ -473,7 +473,7 @@ final class AssetsHelper
      * @param string $onLoadCallback        Mautic namespaced function to call for the script onload
      * @param string $alreadyLoadedCallback Mautic namespaced function to call if the script has already been loaded
      */
-    public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = ''): string
+    public function includeScript($assetFilePath, string $onLoadCallback = '', string $alreadyLoadedCallback = ''): string
     {
         return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '{$onLoadCallback}', '{$alreadyLoadedCallback}');</script>";
     }
@@ -492,7 +492,7 @@ final class AssetsHelper
      * @param array<string>         $protocols  http/https, ftp, mail, twitter
      * @param array<string, string> $attributes
      */
-    public function makeLinks(string $text, $protocols = ['http', 'mail'], array $attributes = []): ?string
+    public function makeLinks(string $text, array $protocols = ['http', 'mail'], array $attributes = []): ?string
     {
         // clear tags in text
         $text = InputHelper::url($text, false, $protocols);
@@ -567,7 +567,7 @@ final class AssetsHelper
      * @param string $country
      * @param string $class
      */
-    public function getCountryFlag($country, bool $urlOnly = true, $class = ''): string
+    public function getCountryFlag($country, bool $urlOnly = true, string $class = ''): string
     {
         $country  = ucwords(iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(' ', '-', $country)));
         $flagImg  = (string) $this->getOverridableUrl('images/flags/'.$country.'.png');

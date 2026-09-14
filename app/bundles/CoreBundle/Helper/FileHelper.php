@@ -35,7 +35,7 @@ final class FileHelper
     /**
      * @param string $sSize
      */
-    public static function convertPHPSizeToBytes($sSize): int
+    public static function convertPHPSizeToBytes(string $sSize): int
     {
         $sSize = trim($sSize);
 

@@ -49,7 +49,7 @@ abstract class AbstractPermissions
      *
      * @return bool
      */
-    public function isSupported($name, $level = '')
+    public function isSupported($name, string $level = '')
     {
         [$name, $level] = $this->getSynonym($name, $level);
 

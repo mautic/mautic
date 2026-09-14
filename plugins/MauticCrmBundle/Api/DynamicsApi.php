@@ -24,7 +24,7 @@ final class DynamicsApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    private function request(string $operation, array $parameters = [], string $method = 'GET', $moduleobject = 'contacts', array $settings = [])
+    private function request(string $operation, array $parameters = [], string $method = 'GET', string $moduleobject = 'contacts', array $settings = [])
     {
         if ('company' === $moduleobject) {
             $moduleobject = 'accounts';

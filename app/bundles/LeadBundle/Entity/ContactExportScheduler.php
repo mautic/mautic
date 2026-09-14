@@ -110,7 +110,7 @@ class ContactExportScheduler
     /**
      * @param mixed $value
      */
-    private function addChange(string $property, $value): void
+    private function addChange(string $property, \DateTimeImmutable $value): void
     {
         $this->changes[$property] = $value;
     }

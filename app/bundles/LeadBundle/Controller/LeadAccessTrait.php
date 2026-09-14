@@ -14,7 +14,7 @@ trait LeadAccessTrait
      *
      * @return Response|Lead
      */
-    protected function checkLeadAccess($leadId, $action, bool $isPlugin = false, $integration = '')
+    protected function checkLeadAccess($leadId, $action, bool $isPlugin = false, string $integration = '')
     {
         if (!$leadId instanceof Lead) {
             // make sure the user has view access to this lead

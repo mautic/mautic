@@ -21,7 +21,7 @@ final readonly class TransportCallback
      * @param string $hashId
      * @param int    $dncReason
      */
-    public function addFailureByHashId($hashId, ?string $comments, $dncReason = DNC::BOUNCED): void
+    public function addFailureByHashId(string $hashId, ?string $comments, $dncReason = DNC::BOUNCED): void
     {
         $result = $this->finder->findByHash($hashId);
 
