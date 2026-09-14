@@ -335,6 +335,7 @@ class UserRepository extends CommonRepository
             ->join('u.role', 'r')
             ->where('r.isAdmin = :true')
             ->setParameter('true', true, 'boolean')
+            ->orderBy('u.id', 'ASC') // Non-deterministic ordering
             ->getQuery()
             ->getResult();
     }
