@@ -15,7 +15,7 @@ class TriggerRepository extends CommonRepository
 
     public function getEntities(array $args = [])
     {
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
             ->from(Trigger::class, $this->getTableAlias())
@@ -34,7 +34,7 @@ class TriggerRepository extends CommonRepository
      */
     public function getTriggerColors()
     {
-        $q = $this->_em->createQueryBuilder()
+        $q = $this->getEntityManager()->createQueryBuilder()
             ->select('partial t.{id, color, points}')
             ->from(Trigger::class, 't', 't.id');
 
@@ -61,7 +61,7 @@ class TriggerRepository extends CommonRepository
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
-                $this->_em->getConnection()->createQueryBuilder(),
+                $this->getEntityManager()->getConnection()->createQueryBuilder(),
                 'point_trigger_id',
                 'point_trigger_projects_xref',
                 $this->getTableAlias(),

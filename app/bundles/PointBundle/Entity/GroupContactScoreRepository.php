@@ -13,7 +13,7 @@ class GroupContactScoreRepository extends CommonRepository
 {
     public function compareScore(int $leadId, int $groupId, int $score, string $operatorExpr): bool
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('lcs.contact_id')
             ->from(MAUTIC_TABLE_PREFIX.GroupContactScore::TABLE_NAME, 'lcs');
 

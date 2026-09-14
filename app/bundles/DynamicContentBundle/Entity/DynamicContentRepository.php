@@ -21,7 +21,7 @@ final class DynamicContentRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
-        $q = $this->_em
+        $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('e')
             ->from(DynamicContent::class, 'e', 'e.id');
@@ -66,7 +66,7 @@ final class DynamicContentRepository extends CommonRepository
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
                 return $this->handleProjectFilter(
-                    $this->_em->getConnection()->createQueryBuilder(),
+                    $this->getEntityManager()->getConnection()->createQueryBuilder(),
                     'dynamic_content_id',
                     'dynamic_content_projects_xref',
                     $this->getTableAlias(),
@@ -126,7 +126,7 @@ final class DynamicContentRepository extends CommonRepository
      */
     public function upSentCount($id, $increaseBy = 1): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content')
             ->set('sent_count', 'sent_count + '.(int) $increaseBy)
@@ -194,7 +194,7 @@ final class DynamicContentRepository extends CommonRepository
 
     public function getDynamicContentForSlotFromCampaign($slot): DynamicContent|false
     {
-        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $qb->select('ce.properties')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'ce')

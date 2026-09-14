@@ -25,7 +25,7 @@ class WebhookQueueRepository extends CommonRepository
             return;
         }
 
-        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->delete(MAUTIC_TABLE_PREFIX.'webhook_queue')
             ->where(
                 $qb->expr()->in('id', ':ids')
@@ -43,7 +43,7 @@ class WebhookQueueRepository extends CommonRepository
             return;
         }
 
-        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX.'webhook_queue')
             ->where(
                 $qb->expr()->in('id', ':ids')
@@ -60,7 +60,7 @@ class WebhookQueueRepository extends CommonRepository
      */
     public function exists(int $id): bool
     {
-        $qb     = $this->_em->getConnection()->createQueryBuilder();
+        $qb     = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $result = $qb->select($this->getTableAlias().'.id')
             ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
             ->where($this->getTableAlias().'.webhook_id = :id')

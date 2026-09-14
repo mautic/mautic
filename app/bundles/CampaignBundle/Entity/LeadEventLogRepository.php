@@ -148,7 +148,7 @@ class LeadEventLogRepository extends CommonRepository
     {
         $leadIps = [];
 
-        $query = new QueryBuilder($this->_em->getConnection());
+        $query = new QueryBuilder($this->getEntityManager()->getConnection());
 
         $joinCondition = 'e.id = ll.event_id';
         if (isset($options['type'])) {
@@ -232,7 +232,7 @@ class LeadEventLogRepository extends CommonRepository
     ): array {
         $join = $all ? 'leftJoin' : 'innerJoin';
 
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
         $q->{$join}(
             'o',
@@ -297,8 +297,8 @@ class LeadEventLogRepository extends CommonRepository
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
 
-        if ($this->_em->getConnection()->getConfiguration()->getResultCache()) {
-            $results  = $this->_em->getConnection()->executeCacheQuery(
+        if ($this->getEntityManager()->getConnection()->getConfiguration()->getResultCache()) {
+            $results  = $this->getEntityManager()->getConnection()->executeCacheQuery(
                 $q->getSQL(),
                 $q->getParameters(),
                 $q->getParameterTypes(),
@@ -334,7 +334,7 @@ class LeadEventLogRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cl.event_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
             ->where('cl.lead_id = '.$toLeadId)
@@ -345,7 +345,7 @@ class LeadEventLogRepository extends CommonRepository
             $exists[] = $r['event_id'];
         }
 
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
@@ -358,7 +358,7 @@ class LeadEventLogRepository extends CommonRepository
                 ->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
-            $this->_em->getConnection()->createQueryBuilder()
+            $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
                 ->where('lead_id = '.(int) $fromLeadId)
                 ->executeStatement();

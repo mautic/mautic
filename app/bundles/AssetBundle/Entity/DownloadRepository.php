@@ -144,7 +144,7 @@ class DownloadRepository extends CommonRepository
      */
     public function getDownloadCountsByPage(int|array $pageId, ?\DateTime $fromDate = null): array
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('count(distinct(a.tracking_id)) as count, a.source_id as id, p.title as name, p.hits as total')
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'a')
             ->join('a', MAUTIC_TABLE_PREFIX.'pages', 'p', 'a.source_id = p.id');
@@ -188,7 +188,7 @@ class DownloadRepository extends CommonRepository
     public function getDownloadCountsByEmail(int|array $emailId, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
         // link email to page hit tracking id to download tracking id
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('count(distinct(a.tracking_id)) as count, e.id, e.subject as name, e.variant_sent_count as total')
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'a')
             ->join('a', MAUTIC_TABLE_PREFIX.'emails', 'e', 'a.email_id = e.id');
@@ -228,7 +228,7 @@ class DownloadRepository extends CommonRepository
 
     public function updateLeadByTrackingId(int $leadId, ?string $newTrackingId, string $oldTrackingId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
             ->set('lead_id', (string) $leadId)
             ->set('tracking_id', ':newTrackingId')
@@ -247,7 +247,7 @@ class DownloadRepository extends CommonRepository
      */
     public function updateLead(int $fromLeadId, int $toLeadId): void
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
             ->set('lead_id', (string) $toLeadId)
             ->where('lead_id = '.$fromLeadId)
