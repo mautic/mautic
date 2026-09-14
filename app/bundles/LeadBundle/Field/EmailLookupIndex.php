@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Field;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Index;
 
-final class EmailLookupIndex
+final readonly class EmailLookupIndex
 {
     public function __construct(
         private Connection $connection,

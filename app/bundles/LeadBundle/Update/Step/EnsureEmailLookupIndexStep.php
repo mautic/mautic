@@ -10,7 +10,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class EnsureEmailLookupIndexStep implements StepInterface
+final readonly class EnsureEmailLookupIndexStep implements StepInterface
 {
     public function __construct(
         private EmailLookupIndex $emailLookupIndex,
