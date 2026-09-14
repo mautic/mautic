@@ -4,33 +4,24 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Controller;
 
-use LightSaml\SpBundle\Controller\DefaultController;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\HttpFoundation\Response;
 
-final class SamlControllerTest extends TestCase
+final class SamlControllerTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        $this->clientServer = [];
+        parent::setUp();
+        $this->client->followRedirects(false);
+    }
+
     public function testLoginRedirectsToDiscoveryWhenIdpIsMissing(): void
     {
-        $router = $this->createMock(RouterInterface::class);
-        $router->expects($this->once())
-            ->method('generate')
-            ->with('lightsaml_sp.discovery')
-            ->willReturn('/s/saml/discovery');
+        $this->client->request(Request::METHOD_GET, '/s/saml/login');
 
-        $container = new Container();
-        $container->set('router', $router);
-        $container->setParameter('lightsaml_sp.route.discovery', 'lightsaml_sp.discovery');
-
-        $controller = new DefaultController();
-        $controller->setContainer($container);
-
-        $response = $controller->loginAction(new Request());
-
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertSame('/s/saml/discovery', $response->getTargetUrl());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        self::assertResponseRedirects('/saml/discovery');
     }
 }
