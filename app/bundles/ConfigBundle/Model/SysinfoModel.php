@@ -117,10 +117,8 @@ final class SysinfoModel
 
     /**
      * Method to tail (a few last rows) of a file.
-     *
-     * @param int $lines
      */
-    public function getLogTail($lines = 10): ?string
+    public function getLogTail(int $lines = 10): ?string
     {
         $log = $this->coreParametersHelper->get('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
 
