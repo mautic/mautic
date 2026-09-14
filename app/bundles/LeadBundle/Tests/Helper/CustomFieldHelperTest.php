@@ -226,4 +226,25 @@ final class CustomFieldHelperTest extends TestCase
             date_default_timezone_set($originalTimezone);
         }
     }
+
+    public function testFieldValueTransformerPreservesLocalDateForCampaignComparison(): void
+    {
+        $originalTimezone             = date_default_timezone_get();
+        $reflection                   = new \ReflectionClass(DateTimeHelper::class);
+        $property                     = $reflection->getProperty('defaultLocalTimezone');
+        $originalDefaultLocalTimezone = $property->getValue();
+
+        $property->setValue(null, 'Etc/GMT-2');
+        date_default_timezone_set('UTC');
+
+        try {
+            $field = ['type' => 'date'];
+            $value = '2025-01-24 00:30:00';
+
+            $this->assertSame('2025-01-24', CustomFieldHelper::fieldValueTransfomer($field, $value, null, true));
+        } finally {
+            $property->setValue(null, $originalDefaultLocalTimezone);
+            date_default_timezone_set($originalTimezone);
+        }
+    }
 }

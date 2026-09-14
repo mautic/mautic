@@ -45,7 +45,7 @@ final class CustomFieldHelper
      *
      * @return mixed|string|null
      */
-    public static function fieldValueTransfomer(array $field, $value, ?DateTimeHelper $dateTimeHelper = null)
+    public static function fieldValueTransfomer(array $field, $value, ?DateTimeHelper $dateTimeHelper = null, bool $preserveLocalDate = false)
     {
         if (null === $value) {
             // do not transform null values
@@ -74,7 +74,9 @@ final class CustomFieldHelper
                         $value = $dtHelper->toUtcString('Y-m-d H:i:s');
                         break;
                     case 'date':
-                        $value = $dtHelper->toUtcString('Y-m-d');
+                        // A date field is a calendar value. Campaign comparisons must retain
+                        // the instance-local day, while stored values keep their UTC behavior.
+                        $value = $preserveLocalDate ? $dtHelper->toLocalString('Y-m-d') : $dtHelper->toUtcString('Y-m-d');
                         break;
                     case 'time':
                         $value = $dtHelper->toUtcString('H:i:s');
