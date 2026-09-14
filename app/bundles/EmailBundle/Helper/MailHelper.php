@@ -2016,7 +2016,7 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend && null !== $emailToSend->getFromAddress()) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
@@ -2043,7 +2043,7 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set and global reply-to is not configured.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend && null !== $emailToSend->getFromAddress()) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
