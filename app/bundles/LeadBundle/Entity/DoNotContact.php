@@ -9,6 +9,12 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 
+#[ORM\Entity(repositoryClass: DoNotContactRepository::class)]
+#[ORM\Table(name: 'lead_donotcontact')]
+#[ORM\Index(columns: ['lead_id', 'channel', 'reason'], name: 'leadid_reason_channel')]
+#[ORM\Index(columns: ['reason'], name: 'dnc_reason_search')]
+#[ORM\Index(columns: ['date_added'], name: 'dnc_date_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class DoNotContact
 {
     /**
@@ -49,16 +55,19 @@ class DoNotContact
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $reason = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $comments;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
     private $channelId;
@@ -67,29 +76,13 @@ class DoNotContact
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_donotcontact')
-            ->setCustomRepositoryClass(DoNotContactRepository::class)
-            ->addIndex(['lead_id', 'channel', 'reason'], 'leadid_reason_channel')
-            ->addIndex(['reason'], 'dnc_reason_search')
-            ->addIndex(['date_added'], 'dnc_date_added');
-
         $builder->addId();
 
         $builder->addLead(true, 'CASCADE', false, 'doNotContact');
 
         $builder->addDateAdded();
 
-        $builder->createField('reason', 'smallint')
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->build();
-
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
-
-        $builder->createField('comments', 'text')
-            ->nullable()
-            ->build();
     }
 
     /**

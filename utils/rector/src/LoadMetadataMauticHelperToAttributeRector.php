@@ -76,6 +76,13 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
             return null;
         }
 
+        // Entities extending a FOS OAuth server model keep their loadMetadata() mapping untouched.
+        if ($node->extends instanceof Name
+            && str_starts_with((string) $this->getName($node->extends), 'FOS\\OAuthServerBundle\\Model\\')
+        ) {
+            return null;
+        }
+
         // In an already attribute-mapped class the leftover field helpers are redundant; leave them
         // (and the class) alone. Class-level index helpers are still rewritten below.
         $isHybrid = $this->hasClassLevelOrmAttribute($node);

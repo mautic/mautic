@@ -10,6 +10,12 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
+#[ORM\Entity(repositoryClass: VideoHitRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['date_hit'], name: 'video_date_hit')]
+#[ORM\Index(columns: ['channel', 'channel_id'], name: 'video_channel_search')]
+#[ORM\Index(columns: ['guid', 'lead_id'], name: 'video_guid_lead_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class VideoHit
 {
     public const TABLE_NAME = 'video_hits';
@@ -22,26 +28,31 @@ class VideoHit
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $guid;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_hit', type: 'datetime')]
     private $dateHit;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_left', type: 'datetime', nullable: true)]
     private $dateLeft;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'time_watched', type: 'integer', nullable: true)]
     private $timeWatched;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $duration;
 
     /**
@@ -62,65 +73,79 @@ class VideoHit
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $country;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $region;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $city;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $isp;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $organization;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $code;
 
+    #[ORM\Column(type: 'text', nullable: true)]
     private $referer;
 
+    #[ORM\Column(type: 'text', nullable: true)]
     private $url;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'user_agent', type: 'text', nullable: true)]
     private $userAgent;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'remote_host', type: 'string', length: 191, nullable: true)]
     private $remoteHost;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'page_language', type: 'string', length: 191, nullable: true)]
     private $pageLanguage;
 
     /**
      * @var array<string>
      */
+    #[ORM\Column(name: 'browser_languages', type: 'array', nullable: true)]
     private $browserLanguages = [];
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $channel;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'channel_id', type: 'integer', nullable: true)]
     private $channelId;
 
     /**
@@ -132,99 +157,11 @@ class VideoHit
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(VideoHitRepository::class)
-            ->addIndex(['date_hit'], 'video_date_hit')
-            ->addIndex(['channel', 'channel_id'], 'video_channel_search')
-            ->addIndex(['guid', 'lead_id'], 'video_guid_lead_search');
-
         $builder->addId();
-
-        $builder->createField('dateHit', 'datetime')
-            ->columnName('date_hit')
-            ->build();
-
-        $builder->createField('dateLeft', 'datetime')
-            ->columnName('date_left')
-            ->nullable()
-            ->build();
 
         $builder->addLead(true, 'SET NULL');
 
         $builder->addIpAddress(true);
-
-        $builder->createField('country', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('region', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('city', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isp', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('organization', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->addField('code', 'integer');
-
-        $builder->createField('referer', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('url', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('userAgent', 'text')
-            ->columnName('user_agent')
-            ->nullable()
-            ->build();
-
-        $builder->createField('remoteHost', 'string')
-            ->columnName('remote_host')
-            ->nullable()
-            ->build();
-
-        $builder->createField('guid', 'string')
-            ->columnName('guid')
-            ->build();
-
-        $builder->createField('pageLanguage', 'string')
-            ->columnName('page_language')
-            ->nullable()
-            ->build();
-
-        $builder->createField('browserLanguages', 'array')
-            ->columnName('browser_languages')
-            ->nullable()
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('channelId', 'integer')
-            ->columnName('channel_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('timeWatched', 'integer')
-            ->columnName('time_watched')
-            ->nullable()
-            ->build();
-
-        $builder->createField('duration', 'integer')
-            ->columnName('duration')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('query', 'array');
     }

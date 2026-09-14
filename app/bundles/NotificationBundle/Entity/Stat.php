@@ -11,6 +11,13 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
+#[ORM\Entity(repositoryClass: StatRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['notification_id', 'lead_id'], name: 'stat_notification_search')]
+#[ORM\Index(columns: ['is_clicked'], name: 'stat_notification_clicked_search')]
+#[ORM\Index(columns: ['tracking_hash'], name: 'stat_notification_hash_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_notification_source_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     public const TABLE_NAME = 'push_notification_stats';
@@ -23,6 +30,8 @@ class Stat
     /**
      * @var Notification|null
      */
+    #[ORM\ManyToOne(targetEntity: Notification::class, inversedBy: 'stats')]
+    #[ORM\JoinColumn(name: 'notification_id', onDelete: 'SET NULL')]
     private $notification;
 
     /**
@@ -33,6 +42,8 @@ class Stat
     /**
      * @var LeadList|null
      */
+    #[ORM\ManyToOne(targetEntity: LeadList::class)]
+    #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
     private $list;
 
     private ?IpAddress $ipAddress = null;
@@ -40,46 +51,55 @@ class Stat
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private $dateSent;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_read', type: 'datetime', nullable: true)]
     private $dateRead;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_clicked', type: 'boolean')]
     private $isClicked = false;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_clicked', type: 'datetime', nullable: true)]
     private $dateClicked;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_hash', type: 'string', length: 191, nullable: true)]
     private $trackingHash;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'retry_count', type: 'integer', nullable: true)]
     private $retryCount = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
 
     /**
@@ -101,68 +121,11 @@ class Stat
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(StatRepository::class)
-            ->addIndex(['notification_id', 'lead_id'], 'stat_notification_search')
-            ->addIndex(['is_clicked'], 'stat_notification_clicked_search')
-            ->addIndex(['tracking_hash'], 'stat_notification_hash_search')
-            ->addIndex(['source', 'source_id'], 'stat_notification_source_search');
-
         $builder->addBigIntIdField();
-
-        $builder->createManyToOne('notification', 'Notification')
-            ->inversedBy('stats')
-            ->addJoinColumn('notification_id', 'id', true, false, 'SET NULL')
-            ->build();
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createManyToOne('list', LeadList::class)
-            ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
-            ->build();
-
         $builder->addIpAddress(true);
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('dateRead', 'datetime')
-            ->columnName('date_read')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isClicked', 'boolean')
-            ->columnName('is_clicked')
-            ->build();
-
-        $builder->createField('dateClicked', 'datetime')
-            ->columnName('date_clicked')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingHash', 'string')
-            ->columnName('tracking_hash')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retryCount', 'integer')
-            ->columnName('retry_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('clickCount', 'integer', 'click_count');
 

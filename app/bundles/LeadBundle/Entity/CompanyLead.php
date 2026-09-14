@@ -7,6 +7,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: CompanyLeadRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class CompanyLead
 {
     public const TABLE_NAME = 'companies_leads';
@@ -14,6 +17,9 @@ class CompanyLead
     /**
      * @var Company
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+    #[ORM\JoinColumn(name: 'company_id', nullable: false, onDelete: 'CASCADE')]
     private $company;
 
     /**
@@ -29,28 +35,16 @@ class CompanyLead
     /**
      * @var bool|null
      */
+    #[ORM\Column(name: 'is_primary', type: 'boolean', nullable: true)]
     private $primary = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(CompanyLeadRepository::class);
-
-        $builder->createManyToOne('company', 'Company')
-            ->makePrimaryKey()
-            ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
-            ->build();
-
         $builder->addLead(false, 'CASCADE', true);
 
         $builder->addDateAdded();
-
-        $builder->createField('primary', 'boolean')
-            ->columnName('is_primary')
-            ->nullable()
-            ->build();
     }
 
     /**

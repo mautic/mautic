@@ -8,11 +8,20 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: LeadRepository::class)]
+#[ORM\Table(name: 'campaign_leads')]
+#[ORM\Index(columns: ['date_added'], name: 'campaign_leads_date_added')]
+#[ORM\Index(columns: ['date_last_exited'], name: 'campaign_leads_date_exited')]
+#[ORM\Index(columns: ['campaign_id', 'manually_removed', 'lead_id', 'rotation'], name: 'campaign_leads')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Lead
 {
     /**
      * @var Campaign
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Campaign::class, inversedBy: 'leads')]
+    #[ORM\JoinColumn(name: 'campaign_id', nullable: false, onDelete: 'CASCADE')]
     private $campaign;
 
     /**
@@ -33,49 +42,30 @@ class Lead
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'manually_removed', type: 'boolean')]
     private $manuallyRemoved = false;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'manually_added', type: 'boolean')]
     private $manuallyAdded = false;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $rotation = 1;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('campaign_leads')
-            ->setCustomRepositoryClass(LeadRepository::class)
-            ->addIndex(['date_added'], 'campaign_leads_date_added')
-            ->addIndex(['date_last_exited'], 'campaign_leads_date_exited')
-            ->addIndex(['campaign_id', 'manually_removed', 'lead_id', 'rotation'], 'campaign_leads');
-
-        $builder->createManyToOne('campaign', 'Campaign')
-            ->makePrimaryKey()
-            ->inversedBy('leads')
-            ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
-            ->build();
-
         $builder->addLead(false, 'CASCADE', true);
 
         $builder->addDateAdded();
 
-        $builder->createField('manuallyRemoved', 'boolean')
-            ->columnName('manually_removed')
-            ->build();
-
-        $builder->createField('manuallyAdded', 'boolean')
-            ->columnName('manually_added')
-            ->build();
-
         $builder->addNamedField('dateLastExited', 'datetime', 'date_last_exited', true);
-
-        $builder->addField('rotation', 'integer');
     }
 
     /**

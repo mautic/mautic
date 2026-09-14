@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ORM\Table(name: 'webhook_events')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Event
 {
     /**
@@ -19,16 +22,20 @@ class Event
     /**
      * @var Webhook
      */
+    #[ORM\ManyToOne(targetEntity: Webhook::class, cascade: ['detach', 'merge'], inversedBy: 'events')]
+    #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private $webhook;
 
     /**
      * @var ArrayCollection<int, WebhookQueue>
      */
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: WebhookQueue::class, cascade: ['detach', 'merge'], fetch: 'EXTRA_LAZY')]
     private $queues;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_type', type: 'string', length: 50)]
     private $eventType;
 
     public function __construct()
@@ -39,29 +46,8 @@ class Event
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('webhook_events')
-            ->setCustomRepositoryClass(EventRepository::class);
 
         $builder->addId();
-
-        $builder->createManyToOne('webhook', 'Webhook')
-            ->inversedBy('events')
-            ->cascadeDetach()
-            ->cascadeMerge()
-            ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->createOneToMany('queues', 'WebhookQueue')
-            ->mappedBy('event')
-            ->cascadeDetach()
-            ->cascadeMerge()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createField('eventType', 'string')
-            ->columnName('event_type')
-            ->length(50)
-            ->build();
     }
 
     /**

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\RuntimeReflectionService;
+use Mautic\CoreBundle\Doctrine\Mapping\AttributeAndStaticPhpDriver;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use PHPUnit\Framework\TestCase;
 
@@ -34,8 +36,12 @@ final class ObjectMappingTest extends TestCase
 
     public function testLoadMetadata(): void
     {
+        // The mapping is split between Doctrine attributes and the legacy loadMetadata(); the combined
+        // driver reads both, so the resolved metadata must expose every field and index.
         $metadata = new ClassMetadata(ObjectMapping::class);
-        ObjectMapping::loadMetadata($metadata);
+        $metadata->initializeReflection(new RuntimeReflectionService());
+
+        new AttributeAndStaticPhpDriver([])->loadMetadataForClass(ObjectMapping::class, $metadata);
 
         $expectedFieldNames = [
             'id',
@@ -50,7 +56,7 @@ final class ObjectMappingTest extends TestCase
             'isDeleted',
             'integrationReferenceId',
         ];
-        $this->assertEquals($expectedFieldNames, $metadata->getFieldNames());
+        $this->assertEqualsCanonicalizing($expectedFieldNames, $metadata->getFieldNames());
 
         $referenceIdMapping = $metadata->table['indexes']['integration_reference'];
         $this->assertEquals(

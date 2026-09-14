@@ -9,6 +9,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
+#[ORM\Entity(repositoryClass: IntegrationEntityRepository::class)]
+#[ORM\Table(name: 'integration_entity')]
+#[ORM\Index(columns: ['integration', 'integration_entity', 'integration_entity_id'], name: 'integration_external_entity')]
+#[ORM\Index(columns: ['integration', 'internal_entity', 'internal_entity_id'], name: 'integration_internal_entity')]
+#[ORM\Index(columns: ['integration', 'internal_entity', 'integration_entity'], name: 'integration_entity_match')]
+#[ORM\Index(columns: ['integration', 'last_sync_date'], name: 'integration_last_sync_date')]
+#[ORM\Index(columns: ['internal_entity_id', 'integration_entity_id', 'internal_entity', 'integration_entity'], name: 'internal_integration_entity')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class IntegrationEntity extends CommonEntity
 {
     /**
@@ -24,11 +32,13 @@ class IntegrationEntity extends CommonEntity
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'integration_entity', type: 'string', length: 191, nullable: true)]
     private $integrationEntity;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'integration_entity_id', type: 'string', length: 191, nullable: true)]
     private $integrationEntityId;
 
     /**
@@ -39,16 +49,19 @@ class IntegrationEntity extends CommonEntity
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'last_sync_date', type: 'datetime', nullable: true)]
     private $lastSyncDate;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'internal_entity', type: 'string', length: 191, nullable: true)]
     private $internalEntity;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'internal_entity_id', type: 'integer', nullable: true)]
     private $internalEntityId;
 
     /**
@@ -65,41 +78,11 @@ class IntegrationEntity extends CommonEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('integration_entity')
-            ->setCustomRepositoryClass(IntegrationEntityRepository::class)
-            ->addIndex(['integration', 'integration_entity', 'integration_entity_id'], 'integration_external_entity')
-            ->addIndex(['integration', 'internal_entity', 'internal_entity_id'], 'integration_internal_entity')
-            ->addIndex(['integration', 'internal_entity', 'integration_entity'], 'integration_entity_match')
-            ->addIndex(['integration', 'last_sync_date'], 'integration_last_sync_date')
-            ->addIndex(['internal_entity_id', 'integration_entity_id', 'internal_entity', 'integration_entity'], 'internal_integration_entity');
-
         $builder->addId();
 
         $builder->addDateAdded();
 
         $builder->addNullableField('integration', 'string');
-
-        $builder->createField('integrationEntity', 'string')
-            ->columnName('integration_entity')
-            ->nullable()
-            ->build();
-        $builder->createField('integrationEntityId', 'string')
-            ->columnName('integration_entity_id')
-            ->nullable()
-            ->build();
-        $builder->createField('internalEntity', 'string')
-            ->columnName('internal_entity')
-            ->nullable()
-            ->build();
-        $builder->createField('internalEntityId', 'integer')
-            ->columnName('internal_entity_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastSyncDate', 'datetime')
-            ->columnName('last_sync_date')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('internal', 'array');
     }
