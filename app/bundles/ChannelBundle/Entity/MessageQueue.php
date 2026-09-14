@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: MessageQueueRepository::class)]
 #[ORM\Table(name: 'message_queue')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class MessageQueue
@@ -119,7 +119,6 @@ class MessageQueue
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(MessageQueueRepository::class)
             ->addIndex(['status'], 'message_status_search')
             ->addIndex(['date_sent'], 'message_date_sent')
             ->addIndex(['scheduled_date'], 'message_scheduled_date')

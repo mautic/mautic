@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UserTokenRepository::class)]
 #[ORM\Table(name: 'user_tokens')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class UserToken
@@ -45,9 +45,6 @@ class UserToken
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(UserTokenRepository::class);
 
         $builder->addId();
 

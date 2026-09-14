@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PointInsightRepository::class)]
 #[ORM\Table(name: 'point_insights')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PointInsight extends FormEntity
@@ -66,9 +66,6 @@ class PointInsight extends FormEntity
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(PointInsightRepository::class);
 
         $builder->addIdColumns();
 

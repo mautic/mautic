@@ -9,7 +9,7 @@ use FOS\OAuthServerBundle\Model\AccessToken as BaseAccessToken;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: AccessTokenRepository::class)]
 #[ORM\Table(name: 'oauth2_accesstokens')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class AccessToken extends BaseAccessToken
@@ -19,7 +19,6 @@ class AccessToken extends BaseAccessToken
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(AccessTokenRepository::class)
             ->addIndex(['token'], 'oauth2_access_token_search');
 
         $builder->createField('id', 'integer')

@@ -9,7 +9,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: FrequencyRuleRepository::class)]
 #[ORM\Table(name: 'lead_frequencyrules')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FrequencyRule extends CommonEntity
@@ -67,7 +67,6 @@ class FrequencyRule extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(FrequencyRuleRepository::class)
             ->addIndex(['channel'], 'channel_frequency')
             ->addIndex(['lead_id', 'date_added'], 'idx_frequency_date_added');
 

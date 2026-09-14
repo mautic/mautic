@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: TrackableRepository::class)]
 #[ORM\Table(name: 'channel_url_trackables')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Trackable
@@ -43,7 +43,6 @@ class Trackable
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(TrackableRepository::class)
             ->addIndex(['channel', 'channel_id'], 'channel_url_trackable_search');
 
         $builder->createManyToOne('redirect', Redirect::class)

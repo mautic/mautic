@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ActionRepository::class)]
 #[ORM\Table(name: 'form_actions')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -103,7 +103,6 @@ class Action implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(ActionRepository::class)
             ->addIndex(['type'], 'form_action_type_search');
 
         $builder->addIdColumns();

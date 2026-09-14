@@ -9,7 +9,7 @@ use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: EmailDraftRepository::class)]
 #[ORM\Table(name: 'emails_draft')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class EmailDraft
@@ -32,7 +32,6 @@ class EmailDraft
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(EmailDraftRepository::class)
             ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
             ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
 

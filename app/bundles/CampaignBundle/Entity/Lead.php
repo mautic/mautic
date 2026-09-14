@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: LeadRepository::class)]
 #[ORM\Table(name: 'campaign_leads')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Lead
@@ -53,7 +53,6 @@ class Lead
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(LeadRepository::class)
             ->addIndex(['date_added'], 'campaign_leads_date_added')
             ->addIndex(['date_last_exited'], 'campaign_leads_date_exited')
             ->addIndex(['campaign_id', 'manually_removed', 'lead_id', 'rotation'], 'campaign_leads');
