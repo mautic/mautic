@@ -10,6 +10,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: ObjectMappingRepository::class)]
 #[ORM\Table(name: 'sync_object_mapping')]
+#[ORM\Index(columns: ['internal_object_id'], name: 'internal_object_id_idx')]
+#[ORM\Index(columns: ['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'], name: 'integration_object')]
+#[ORM\Index(columns: ['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'], name: 'integration_reference')]
+#[ORM\Index(columns: ['integration', 'internal_object_name', 'last_sync_date'], name: 'integration_integration_object_name_last_sync_date')]
+#[ORM\Index(columns: ['integration', 'last_sync_date'], name: 'integration_last_sync_date')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ObjectMapping
 {
@@ -65,13 +70,6 @@ class ObjectMapping
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['internal_object_id'], 'internal_object_id_idx')
-            ->addIndex(['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'], 'integration_object')
-            ->addIndex(['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'], 'integration_reference')
-            ->addIndex(['integration', 'internal_object_name', 'last_sync_date'], 'integration_integration_object_name_last_sync_date')
-            ->addIndex(['integration', 'last_sync_date'], 'integration_last_sync_date');
 
         $builder->addId();
 

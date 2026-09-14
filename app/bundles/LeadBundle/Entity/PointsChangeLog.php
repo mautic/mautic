@@ -11,6 +11,7 @@ use Mautic\PointBundle\Entity\Group;
 
 #[ORM\Entity(repositoryClass: PointsChangeLogRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['date_added'], name: 'point_date_added')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PointsChangeLog
 {
@@ -61,9 +62,6 @@ class PointsChangeLog
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['date_added'], 'point_date_added');
 
         $builder->addBigIntIdField();
 

@@ -13,6 +13,10 @@ use Mautic\LeadBundle\Entity\LeadList;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['notification_id', 'lead_id'], name: 'stat_notification_search')]
+#[ORM\Index(columns: ['is_clicked'], name: 'stat_notification_clicked_search')]
+#[ORM\Index(columns: ['tracking_hash'], name: 'stat_notification_hash_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_notification_source_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
@@ -103,12 +107,6 @@ class Stat
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['notification_id', 'lead_id'], 'stat_notification_search')
-            ->addIndex(['is_clicked'], 'stat_notification_clicked_search')
-            ->addIndex(['tracking_hash'], 'stat_notification_hash_search')
-            ->addIndex(['source', 'source_id'], 'stat_notification_source_search');
 
         $builder->addBigIntIdField();
 

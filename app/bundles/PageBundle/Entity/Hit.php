@@ -13,6 +13,10 @@ use Mautic\PageBundle\Validator\PageHit;
 
 #[ORM\Entity(repositoryClass: HitRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['tracking_id'], name: 'page_hit_tracking_search')]
+#[ORM\Index(columns: ['code'], name: 'page_hit_code_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'page_hit_source_search')]
+#[ORM\Index(columns: ['date_hit', 'date_left'], name: 'date_hit_left_index')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[PageHit]
 class Hit
@@ -142,10 +146,6 @@ class Hit
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->addIndex(['tracking_id'], 'page_hit_tracking_search')
-            ->addIndex(['code'], 'page_hit_code_search')
-            ->addIndex(['source', 'source_id'], 'page_hit_source_search')
-            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index')
             ->addIndexWithOptions(['url'], 'page_hit_url', ['lengths' => [0 => 128]]);
 
         $builder->addBigIntIdField();

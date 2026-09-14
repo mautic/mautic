@@ -35,6 +35,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: PageRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['alias'], name: 'page_alias_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -233,9 +234,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['alias'], 'page_alias_search');
 
         $builder->addId();
 

@@ -10,6 +10,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: 'focus_stats')]
+#[ORM\Index(columns: ['type'], name: 'focus_type')]
+#[ORM\Index(columns: ['type', 'type_id'], name: 'focus_type_id')]
+#[ORM\Index(columns: ['date_added'], name: 'focus_date_added')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
@@ -53,11 +56,6 @@ class Stat
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['type'], 'focus_type')
-            ->addIndex(['type', 'type_id'], 'focus_type_id')
-            ->addIndex(['date_added'], 'focus_date_added');
 
         $builder->addId();
 

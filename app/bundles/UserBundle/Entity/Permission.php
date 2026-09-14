@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: PermissionRepository::class)]
 #[ORM\Table(name: 'permissions')]
+#[ORM\UniqueConstraint(name: 'unique_perm', columns: ['bundle', 'name', 'role_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -78,9 +79,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addUniqueConstraint(['bundle', 'name', 'role_id'], 'unique_perm');
 
         $builder->addId();
 

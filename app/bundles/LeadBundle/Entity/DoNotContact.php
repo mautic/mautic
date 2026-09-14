@@ -11,6 +11,9 @@ use Mautic\CoreBundle\Helper\InputHelper;
 
 #[ORM\Entity(repositoryClass: DoNotContactRepository::class)]
 #[ORM\Table(name: 'lead_donotcontact')]
+#[ORM\Index(columns: ['lead_id', 'channel', 'reason'], name: 'leadid_reason_channel')]
+#[ORM\Index(columns: ['reason'], name: 'dnc_reason_search')]
+#[ORM\Index(columns: ['date_added'], name: 'dnc_date_added')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class DoNotContact
 {
@@ -69,11 +72,6 @@ class DoNotContact
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['lead_id', 'channel', 'reason'], 'leadid_reason_channel')
-            ->addIndex(['reason'], 'dnc_reason_search')
-            ->addIndex(['date_added'], 'dnc_date_added');
 
         $builder->addId();
 

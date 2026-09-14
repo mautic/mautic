@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: UtmTagRepository::class)]
 #[ORM\Table(name: 'lead_utmtags')]
+#[ORM\Index(columns: ['date_added'], name: 'utm_date_added')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class UtmTag
 {
@@ -90,7 +91,6 @@ class UtmTag
         $builder->addNullableField('utmMedium', Types::STRING, 'utm_medium');
         $builder->addNullableField('utmSource', Types::STRING, 'utm_source');
         $builder->addNullableField('utmTerm', Types::STRING, 'utm_term');
-        $builder->addIndex(['date_added'], 'utm_date_added');
     }
 
     /**

@@ -24,6 +24,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: FocusRepository::class)]
 #[ORM\Table(name: 'focus')]
+#[ORM\Index(columns: ['focus_type'], name: 'focus_type')]
+#[ORM\Index(columns: ['style'], name: 'focus_style')]
+#[ORM\Index(columns: ['form_id'], name: 'focus_form')]
+#[ORM\Index(columns: ['name'], name: 'focus_name')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -157,12 +161,6 @@ class Focus extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['focus_type'], 'focus_type')
-            ->addIndex(['style'], 'focus_style')
-            ->addIndex(['form_id'], 'focus_form')
-            ->addIndex(['name'], 'focus_name');
 
         $builder->addIdColumns();
 

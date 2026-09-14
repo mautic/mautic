@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: CompanyChangeLogRepository::class)]
 #[ORM\Table(name: 'lead_companies_change_log')]
+#[ORM\Index(columns: ['date_added'], name: 'company_date_added')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class CompanyChangeLog
 {
@@ -50,9 +51,6 @@ class CompanyChangeLog
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['date_added'], 'company_date_added');
 
         $builder->addId();
 

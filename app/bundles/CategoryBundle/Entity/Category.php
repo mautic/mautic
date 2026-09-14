@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[ORM\Table(name: 'categories')]
+#[ORM\Index(columns: ['alias'], name: 'category_alias_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -86,9 +87,6 @@ class Category extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['alias'], 'category_alias_search');
 
         $builder->addIdColumns('title');
 

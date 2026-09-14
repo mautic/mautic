@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints\Sequentially;
 
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
 #[ORM\Table(name: 'assets')]
+#[ORM\Index(columns: ['alias'], name: 'asset_alias_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -162,9 +163,6 @@ class Asset extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['alias'], 'asset_alias_search');
 
         $builder->addIdColumns('title');
 

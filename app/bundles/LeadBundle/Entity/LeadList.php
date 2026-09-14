@@ -27,6 +27,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LeadListRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['alias'], name: 'lead_list_alias')]
+#[ORM\Index(columns: ['deleted'], name: 'segment_deleted')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     shortName: 'Segments',
@@ -139,10 +141,6 @@ class LeadList extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['alias'], 'lead_list_alias')
-            ->addIndex(['deleted'], 'segment_deleted');
 
         $builder->addIdColumns();
 

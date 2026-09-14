@@ -38,6 +38,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: DynamicContentRepository::class)]
 #[ORM\Table(name: 'dynamic_content')]
+#[ORM\Index(columns: ['is_campaign_based'], name: 'is_campaign_based_index')]
+#[ORM\Index(columns: ['slot_name'], name: 'slot_name_index')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -167,8 +169,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->addIndex(['is_campaign_based'], 'is_campaign_based_index')
-            ->addIndex(['slot_name'], 'slot_name_index')
             ->addLifecycleEvent('cleanSlotName', Events::prePersist)
             ->addLifecycleEvent('cleanSlotName', Events::preUpdate);
 

@@ -14,6 +14,12 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 #[ORM\Entity(repositoryClass: LeadEventLogRepository::class)]
 #[ORM\Table(name: 'lead_event_log')]
+#[ORM\Index(columns: ['lead_id'], name: 'lead_id_index')]
+#[ORM\Index(columns: ['object', 'object_id'], name: 'lead_object_index')]
+#[ORM\Index(columns: ['bundle', 'object', 'action', 'object_id'], name: 'lead_timeline_index')]
+#[ORM\Index(columns: ['bundle', 'object', 'action', 'object_id', 'date_added'], name: self::INDEX_SEARCH)]
+#[ORM\Index(columns: ['action'], name: 'lead_timeline_action_index')]
+#[ORM\Index(columns: ['date_added'], name: 'lead_date_added_index')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog
 {
@@ -81,12 +87,6 @@ class LeadEventLog
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder
-            ->addIndex(['lead_id'], 'lead_id_index')
-            ->addIndex(['object', 'object_id'], 'lead_object_index')
-            ->addIndex(['bundle', 'object', 'action', 'object_id'], 'lead_timeline_index')
-            ->addIndex(['bundle', 'object', 'action', 'object_id', 'date_added'], self::INDEX_SEARCH)
-            ->addIndex(['action'], 'lead_timeline_action_index')
-            ->addIndex(['date_added'], 'lead_date_added_index')
             ->addBigIntIdField()
             ->addNullableField('userId', Types::INTEGER, 'user_id')
             ->addNullableField('userName', Types::STRING, 'user_name')

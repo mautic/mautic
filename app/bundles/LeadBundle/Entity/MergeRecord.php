@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: MergeRecordRepository::class)]
 #[ORM\Table(name: 'contact_merge_records')]
+#[ORM\Index(columns: ['date_added'], name: 'contact_merge_date_added')]
+#[ORM\Index(columns: ['merged_id'], name: 'contact_merge_ids')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class MergeRecord
 {
@@ -40,10 +42,6 @@ class MergeRecord
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['date_added'], 'contact_merge_date_added')
-            ->addIndex(['merged_id'], 'contact_merge_ids');
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()

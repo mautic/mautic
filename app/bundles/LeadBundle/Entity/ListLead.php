@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: ListLeadRepository::class)]
 #[ORM\Table(name: 'lead_lists_leads')]
+#[ORM\Index(columns: ['manually_removed'], name: 'manually_removed')]
+#[ORM\Index(columns: ['lead_id', 'leadlist_id', 'manually_removed'], name: 'lead_id_lists_id_removed')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ListLead
 {
@@ -63,9 +65,6 @@ class ListLead
         $builder->createField('manuallyAdded', 'boolean')
             ->columnName('manually_added')
             ->build();
-
-        $builder->addIndex(['manually_removed'], 'manually_removed');
-        $builder->addIndex(['lead_id', 'leadlist_id', 'manually_removed'], 'lead_id_lists_id_removed');
     }
 
     /**

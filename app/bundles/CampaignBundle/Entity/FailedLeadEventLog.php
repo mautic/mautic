@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: FailedLeadEventLogRepository::class)]
 #[ORM\Table(name: 'campaign_lead_event_failed_log')]
+#[ORM\Index(columns: ['date_added'], name: 'campaign_event_failed_date')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FailedLeadEventLog
 {
@@ -31,9 +32,6 @@ class FailedLeadEventLog
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['date_added'], 'campaign_event_failed_date');
 
         $builder->createOneToOne('log', 'LeadEventLog')
             ->makePrimaryKey()

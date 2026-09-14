@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 
 #[ORM\Entity(repositoryClass: StatDeviceRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['date_opened'], name: 'date_opened_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class StatDevice
 {
@@ -39,9 +40,6 @@ class StatDevice
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['date_opened'], 'date_opened_search');
 
         $builder->addBigIntIdField();
 

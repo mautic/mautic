@@ -10,6 +10,14 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: LeadDeviceRepository::class)]
 #[ORM\Table(name: 'lead_devices')]
+#[ORM\Index(columns: ['date_added'], name: 'date_added_search')]
+#[ORM\Index(columns: ['device'], name: 'device_search')]
+#[ORM\Index(columns: ['device_os_name'], name: 'device_os_name_search')]
+#[ORM\Index(columns: ['device_os_shortname'], name: 'device_os_shortname_search')]
+#[ORM\Index(columns: ['device_os_version'], name: 'device_os_version_search')]
+#[ORM\Index(columns: ['device_os_platform'], name: 'device_os_platform_search')]
+#[ORM\Index(columns: ['device_brand'], name: 'device_brand_search')]
+#[ORM\Index(columns: ['device_model'], name: 'device_model_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadDevice
 {
@@ -76,16 +84,6 @@ class LeadDevice
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndex(['date_added'], 'date_added_search')
-            ->addIndex(['device'], 'device_search')
-            ->addIndex(['device_os_name'], 'device_os_name_search')
-            ->addIndex(['device_os_shortname'], 'device_os_shortname_search')
-            ->addIndex(['device_os_version'], 'device_os_version_search')
-            ->addIndex(['device_os_platform'], 'device_os_platform_search')
-            ->addIndex(['device_brand'], 'device_brand_search')
-            ->addIndex(['device_model'], 'device_model_search');
 
         $builder->addBigIntIdField();
 
