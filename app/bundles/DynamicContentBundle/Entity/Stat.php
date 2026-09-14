@@ -174,9 +174,6 @@ class Stat
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
@@ -190,9 +187,6 @@ class Stat
         return $this->dateSent;
     }
 
-    /**
-     * @param \DateTime $dateSent
-     */
     public function setDateSent(\DateTime $dateSent): void
     {
         $this->dateSent = $dateSent;
@@ -254,9 +248,6 @@ class Stat
         return $this->source;
     }
 
-    /**
-     * @param string $source
-     */
     public function setSource(?string $source): void
     {
         $this->source = $source;
@@ -270,9 +261,6 @@ class Stat
         return $this->sourceId;
     }
 
-    /**
-     * @param int $sourceId
-     */
     public function setSourceId(?int $sourceId): void
     {
         $this->sourceId = $sourceId;

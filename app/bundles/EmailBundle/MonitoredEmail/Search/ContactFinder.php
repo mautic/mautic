@@ -18,8 +18,6 @@ class ContactFinder
     }
 
     /**
-     * @param string $returnPathEmail
-     *
      * @return Result
      */
     public function find($contactEmail, ?string $returnPathEmail = null)

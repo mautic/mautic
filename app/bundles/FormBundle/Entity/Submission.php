@@ -137,9 +137,6 @@ class Submission
         return (int) $this->id;
     }
 
-    /**
-     * @param \DateTime $dateSubmitted
-     */
     public function setDateSubmitted(\DateTime $dateSubmitted): static
     {
         $this->dateSubmitted = $dateSubmitted;
@@ -155,9 +152,6 @@ class Submission
         return $this->dateSubmitted;
     }
 
-    /**
-     * @param string $referer
-     */
     public function setReferer(string $referer): static
     {
         $this->referer = $referer;

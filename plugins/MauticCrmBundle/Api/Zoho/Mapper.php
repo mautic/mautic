@@ -98,8 +98,6 @@ final class Mapper
     }
 
     /**
-     * @param int $key
-     *
      * @return int
      *
      * @throws MatchingKeyNotFoundException

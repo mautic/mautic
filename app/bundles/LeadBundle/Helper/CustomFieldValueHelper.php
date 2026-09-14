@@ -51,7 +51,6 @@ final class CustomFieldValueHelper
     }
 
     /**
-     * @param string               $value
      * @param array<string, mixed> $properties
      *
      * @return string

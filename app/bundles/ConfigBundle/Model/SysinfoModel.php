@@ -143,9 +143,6 @@ final class SysinfoModel
 
     /**
      * Method to tail (a few last rows) of a file.
-     *
-     * @param int $lines
-     * @param int $buffer
      */
     public function tail($filename, int $lines = 10, int $buffer = 4096): string
     {

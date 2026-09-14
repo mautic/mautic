@@ -74,7 +74,6 @@ class IndexSchemaHelper
 
     /**
      * @param string $name
-     * @param array  $options
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
@@ -102,7 +101,6 @@ class IndexSchemaHelper
     /**
      * @param mixed  $columns
      * @param string $name
-     * @param array  $options
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */

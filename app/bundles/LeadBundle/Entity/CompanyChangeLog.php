@@ -157,9 +157,6 @@ class CompanyChangeLog
         return $this->company;
     }
 
-    /**
-     * @param \DateTime $dateAdded
-     */
     public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;

@@ -50,9 +50,6 @@ final class SearchStringHelper
         }
     }
 
-    /**
-     * @param string $input
-     */
     public static function parseSearchString(string $input, ?array $needsParsing = null, ?array $needsClosing = null, ?array $closingChars = null): \stdClass
     {
         $input = trim(strip_tags($input));

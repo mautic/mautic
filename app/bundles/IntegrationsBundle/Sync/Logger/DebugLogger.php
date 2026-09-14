@@ -17,9 +17,7 @@ final class DebugLogger
     }
 
     /**
-     * @param string               $integration
      * @param string               $loggedFrom
-     * @param string               $message
      * @param string               $urgency
      * @param array<string, mixed> $context
      */

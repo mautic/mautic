@@ -48,7 +48,6 @@ final class PhoneNumberHelper
 
     /**
      * @param string $number
-     * @param string $delimiter
      */
     public function formatDelimitedNational($number, string $delimiter = '-'): ?string
     {

@@ -11,8 +11,6 @@ final class Serializer
      * This helper method is secure for PHP >= 7 by default and handle all PHP versions.
      *
      * PHP does not recommend untrusted user input even with ['allowed_classes' => false]
-     *
-     * @param string $serializedString
      */
     public static function decode(string $serializedString, array $options = ['allowed_classes' => false]): mixed
     {

@@ -31,20 +31,16 @@ class DateTimeHelper
     private $datetime;
 
     /**
-     * @param \DateTimeInterface|string $string
      * @param string|null               $fromFormat Format the string is in
      * @param string|null               $timezone   Timezone the string is in
      */
-    public function __construct(string $string = '', ?string $fromFormat = self::FORMAT_DB, ?string $timezone = 'UTC')
+    public function __construct(string|\DateTimeInterface $string = '', ?string $fromFormat = self::FORMAT_DB, ?string $timezone = 'UTC')
     {
         $this->setDefaultTimezone();
         $this->setDateTime($string, $fromFormat, $timezone);
     }
 
-    /**
-     * @param \DateTimeInterface|string $datetime
-     */
-    public function setDateTime(string $datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local'): void
+    public function setDateTime(string|\DateTimeInterface $datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local'): void
     {
         if ('local' === $timezone) {
             $timezone = self::$defaultLocalTimezone;
@@ -114,8 +110,6 @@ class DateTimeHelper
     }
 
     /**
-     * @param string $format
-     *
      * @return string
      */
     public function toLocalString(?string $format = null)
@@ -263,9 +257,6 @@ class DateTimeHelper
     /**
      * Returns interval based on $interval number and $unit.
      *
-     * @param int    $interval
-     * @param string $unit
-     *
      * @throws \Exception
      */
     public function buildInterval(int $interval, string $unit): \DateInterval
@@ -357,8 +348,6 @@ class DateTimeHelper
     }
 
     /**
-     * @param string $unit
-     *
      * @throws \InvalidArgumentException
      */
     public static function validateMysqlDateTimeUnit(string $unit): void

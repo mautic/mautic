@@ -12,9 +12,6 @@ final class DateDefault implements FilterDecoratorInterface
 {
     use ParseDateFilterValueTrait;
 
-    /**
-     * @param string $originalValue
-     */
     public function __construct(
         private readonly DateDecorator $dateDecorator,
         private string $originalValue,

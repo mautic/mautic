@@ -40,8 +40,6 @@ class ContactSegmentFilterDictionary
     }
 
     /**
-     * @param string $filterKey
-     *
      * @return mixed[]
      *
      * @throws FilterNotFoundException
@@ -56,9 +54,6 @@ class ContactSegmentFilterDictionary
     }
 
     /**
-     * @param string $filterKey
-     * @param string $property
-     *
      * @return string|int
      *
      * @throws FilterNotFoundException

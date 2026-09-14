@@ -58,8 +58,6 @@ trait VariantModelTrait
 
     /**
      * Run post saving a variant aware entity.
-     *
-     * @param array $relatedIds
      */
     protected function postVariantSaveEntity(VariantEntityInterface $entity, bool $resetVariants = false, array $relatedIds = [], ?\DateTime $variantStartDate = null): void
     {

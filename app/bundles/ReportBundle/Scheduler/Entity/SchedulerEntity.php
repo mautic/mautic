@@ -9,9 +9,6 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 
 final class SchedulerEntity implements SchedulerInterface
 {
-    /**
-     * @param bool $isScheduled
-     */
     public function __construct(
         private bool $isScheduled,
         private readonly ?string $scheduleUnit,

@@ -31,9 +31,6 @@ class MembershipBuilder
     ) {
     }
 
-    /**
-     * @param int $runLimit
-     */
     public function build(Campaign $campaign, ContactLimiter $contactLimiter, int $runLimit, ?OutputInterface $output = null): int
     {
         defined('MAUTIC_REBUILDING_CAMPAIGNS') || define('MAUTIC_REBUILDING_CAMPAIGNS', 1);

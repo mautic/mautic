@@ -16,8 +16,6 @@ final readonly class Calculator
     }
 
     /**
-     * @param string $labelFormat
-     *
      * @throws \Exception
      */
     public function getSumsByYear(string $labelFormat = 'Y'): StatDAO
@@ -44,8 +42,6 @@ final readonly class Calculator
     }
 
     /**
-     * @param string $labelFormat
-     *
      * @throws \Exception
      */
     public function getSumsByMonth(string $labelFormat = 'Y-m'): StatDAO
@@ -72,8 +68,6 @@ final readonly class Calculator
     }
 
     /**
-     * @param string $labelFormat
-     *
      * @throws \Exception
      */
     public function getSumsByDay(string $labelFormat = 'Y-m-d'): StatDAO
@@ -100,8 +94,6 @@ final readonly class Calculator
     }
 
     /**
-     * @param string $labelFormat
-     *
      * @throws \Exception
      */
     public function getSumsByWeek(string $labelFormat = 'Y-W'): StatDAO
@@ -132,8 +124,6 @@ final readonly class Calculator
     }
 
     /**
-     * @param string $labelFormat
-     *
      * @throws \Exception
      */
     public function getCountsByHour(string $labelFormat = 'Y-m-d H'): StatDAO

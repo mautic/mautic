@@ -78,9 +78,6 @@ class LeadTriggerLog
         return $this->ipAddress;
     }
 
-    /**
-     * @param IpAddress $ipAddress
-     */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress): void
     {
         $this->ipAddress = $ipAddress;

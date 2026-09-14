@@ -52,9 +52,6 @@ class IdEntry
         return $this->entityId;
     }
 
-    /**
-     * @param string $entityId
-     */
     public function setEntityId(string $entityId): static
     {
         $this->entityId = $entityId;
@@ -85,9 +82,6 @@ class IdEntry
         return $this->id;
     }
 
-    /**
-     * @param string $id
-     */
     public function setId(string $id): static
     {
         $this->id =  $id;

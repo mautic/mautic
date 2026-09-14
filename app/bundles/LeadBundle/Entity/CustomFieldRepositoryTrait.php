@@ -179,9 +179,6 @@ trait CustomFieldRepositoryTrait
             ] : $results;
     }
 
-    /**
-     * @param string $object
-     */
     public function getFieldValues($id, bool $byGroup = true, string $object = 'lead'): array
     {
         // use DBAL to get entity fields
@@ -202,10 +199,6 @@ trait CustomFieldRepositoryTrait
 
     /**
      * Gets a list of unique values from fields for autocompletes.
-     *
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
      *
      * @return array
      */
@@ -298,7 +291,6 @@ trait CustomFieldRepositoryTrait
 
     /**
      * @param array  $values
-     * @param string $object
      */
     protected function formatFieldValues($values, bool $byGroup = true, string $object = 'lead'): array
     {

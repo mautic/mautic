@@ -69,9 +69,6 @@ final readonly class MenuHelper
         $item->setAttribute('class', trim($classes));
     }
 
-    /**
-     * @param ItemInterface $menu
-     */
     public function invisibleChildSelected(\Knp\Menu\ItemInterface $menu, MatcherInterface $matcher): bool
     {
         /** @var ItemInterface $item */

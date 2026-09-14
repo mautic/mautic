@@ -20,9 +20,6 @@ class MaintenanceEvent extends Event
      */
     protected $debug = [];
 
-    /**
-     * @param int $daysOld
-     */
     public function __construct(
         int $daysOld,
         protected bool $dryRun,

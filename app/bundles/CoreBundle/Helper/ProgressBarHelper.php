@@ -11,8 +11,6 @@ final class ProgressBarHelper
     /**
      * Avoid printing progress bar to stderr
      * https://github.com/symfony/symfony/issues/18744.
-     *
-     * @param int $maxCount
      */
     public static function init(OutputInterface $output, int $maxCount = 0): ProgressBar
     {

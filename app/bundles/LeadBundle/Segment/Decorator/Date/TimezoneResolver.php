@@ -14,9 +14,6 @@ readonly class TimezoneResolver
     ) {
     }
 
-    /**
-     * @param bool $hasTimePart
-     */
     public function getDefaultDate(bool $hasTimePart): DateTimeHelper
     {
         /**

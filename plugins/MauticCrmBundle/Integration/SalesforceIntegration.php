@@ -2612,7 +2612,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param int|int[] $leadId
-     * @param bool      $newDncValue
      */
     private function updateMauticDNC($leadId, bool $newDncValue): void
     {

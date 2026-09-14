@@ -6,9 +6,6 @@ namespace Mautic\SmsBundle\Exception;
 
 final class NumberNotFoundException extends \Exception
 {
-    /**
-     * @param string $number
-     */
     public function __construct(
         private string $number,
         string $message = '',

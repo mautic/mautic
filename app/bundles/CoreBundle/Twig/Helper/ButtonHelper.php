@@ -160,10 +160,6 @@ final class ButtonHelper
         return $this->buttonCount;
     }
 
-    /**
-     * @param string $dropdownHtml
-     * @param string $closingDropdownHtml
-     */
     public function renderButtons(string $dropdownHtml = '', string $closingDropdownHtml = ''): string
     {
         $this->fetchCustomButtons();

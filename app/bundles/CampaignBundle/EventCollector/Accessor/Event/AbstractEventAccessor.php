@@ -116,7 +116,6 @@ abstract class AbstractEventAccessor
     }
 
     /**
-     * @param string $property
      * @param mixed  $default
      *
      * @return mixed

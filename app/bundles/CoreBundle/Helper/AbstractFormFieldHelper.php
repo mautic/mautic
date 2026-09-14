@@ -62,9 +62,6 @@ abstract class AbstractFormFieldHelper
         $this->translator = $translator;
     }
 
-    /**
-     * @param array $customFields
-     */
     public function getChoiceList(array $customFields = []): array
     {
         $choices = [];

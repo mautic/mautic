@@ -59,8 +59,6 @@ class IntegrationHelper
      * Get a list of integration helper classes.
      *
      * @param array|string $specificIntegrations
-     * @param array        $withFeatures
-     * @param bool         $alphabetical
      * @param int|null     $pluginFilter
      * @param bool|false   $publishedOnly
      *
@@ -394,11 +392,7 @@ class IntegrationHelper
      * Get the user's social profile data from cache or integrations if indicated.
      *
      * @param Lead   $lead
-     * @param array  $fields
-     * @param bool   $refresh
      * @param string $specificIntegration
-     * @param bool   $persistLead
-     * @param bool   $returnSettings
      *
      * @return array
      */
@@ -471,8 +465,6 @@ class IntegrationHelper
     }
 
     /**
-     * @param bool $integration
-     *
      * @return array
      */
     public function clearIntegrationCache(object $lead, bool $integration = false)

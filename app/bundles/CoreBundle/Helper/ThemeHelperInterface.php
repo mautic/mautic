@@ -81,7 +81,6 @@ interface ThemeHelperInterface
     public function checkForTwigTemplate($template);
 
     /**
-     * @param string $specificFeature
      * @param bool   $extended        returns extended information about the themes
      * @param bool   $ignoreCache     true to get the fresh info
      * @param bool   $includeDirs     true to get the theme dir details
@@ -91,8 +90,6 @@ interface ThemeHelperInterface
     public function getInstalledThemes(string $specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true);
 
     /**
-     * @param string $theme
-     *
      * @return twigThemeHelper
      *
      * @throws FileNotFoundException

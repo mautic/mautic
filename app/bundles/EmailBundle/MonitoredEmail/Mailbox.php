@@ -214,8 +214,6 @@ class Mailbox
     /**
      * Switch to another configured monitored mailbox.
      *
-     * @param string $mailbox
-     *
      * @throws MailboxException
      */
     public function switchMailbox($bundle, string $mailbox = ''): void
@@ -291,8 +289,6 @@ class Mailbox
     /**
      * Get settings.
      *
-     * @param string $mailbox
-     *
      * @return mixed
      *
      * @throws MailboxException
@@ -322,9 +318,6 @@ class Mailbox
 
     /**
      * Set custom connection arguments of imap_open method. See http://php.net/imap_open.
-     *
-     * @param int $options
-     * @param int $retriesNum
      */
     public function setConnectionArgs(int $options = 0, int $retriesNum = 0, ?array $params = null): void
     {
@@ -536,8 +529,6 @@ class Mailbox
 
     /**
      * Save mail body.
-     *
-     * @param string $filename
      */
     public function saveMail($mailId, string $filename = 'email.eml'): bool
     {
@@ -708,8 +699,6 @@ class Mailbox
      *  SORTTO - mailbox in first To address
      *  SORTCC - mailbox in first cc address
      *  SORTSIZE - size of mail in octets
-     *
-     * @param int $criteria
      *
      * @return array Mails ids
      */
@@ -997,9 +986,6 @@ class Mailbox
         return $params;
     }
 
-    /**
-     * @param string $charset
-     */
     protected function decodeMimeStr($string, string $charset = 'utf-8'): string
     {
         $newString = '';
@@ -1024,8 +1010,6 @@ class Mailbox
     }
 
     /**
-     * @param string $charset
-     *
      * @return string
      */
     protected function decodeRFC2231($string, string $charset = 'utf-8')

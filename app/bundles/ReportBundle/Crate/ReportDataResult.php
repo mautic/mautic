@@ -94,8 +94,6 @@ final class ReportDataResult
     }
 
     /**
-     * @param string $column
-     *
      * @return string
      */
     public function getType(string $column)

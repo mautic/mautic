@@ -43,8 +43,6 @@ final class EventAccessor
     }
 
     /**
-     * @param string $key
-     *
      * @return ActionAccessor
      *
      * @throws EventNotFoundException
@@ -64,8 +62,6 @@ final class EventAccessor
     }
 
     /**
-     * @param string $key
-     *
      * @return mixed
      *
      * @throws EventNotFoundException
@@ -85,8 +81,6 @@ final class EventAccessor
     }
 
     /**
-     * @param string $key
-     *
      * @return DecisionAccessor
      *
      * @throws EventNotFoundException

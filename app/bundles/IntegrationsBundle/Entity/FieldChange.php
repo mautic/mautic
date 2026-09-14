@@ -108,9 +108,6 @@ class FieldChange
         return $this->integration;
     }
 
-    /**
-     * @param string $integration
-     */
     public function setIntegration(string $integration): static
     {
         $this->integration = $integration;

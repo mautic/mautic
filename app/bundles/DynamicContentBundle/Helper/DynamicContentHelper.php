@@ -178,9 +178,6 @@ class DynamicContentHelper
     }
 
     /**
-     * @param string $slotName
-     * @param bool   $publishedOnly
-     *
      * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function getDwcsBySlotName(string $slotName, bool $publishedOnly = false)

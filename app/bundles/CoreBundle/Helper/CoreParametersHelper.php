@@ -22,7 +22,6 @@ class CoreParametersHelper
     }
 
     /**
-     * @param string $name
      * @param mixed  $default
      *
      * @return mixed

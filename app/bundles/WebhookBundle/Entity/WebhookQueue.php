@@ -106,9 +106,6 @@ class WebhookQueue
         return gzuncompress($payloadCompressed);
     }
 
-    /**
-     * @param string $payload
-     */
     public function setPayload(string $payload): static
     {
         $this->payloadCompressed = gzcompress($payload, 9);

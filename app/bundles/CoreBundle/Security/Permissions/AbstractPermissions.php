@@ -45,7 +45,6 @@ abstract class AbstractPermissions
      * Checks to see if the requested permission is supported by the bundle.
      *
      * @param string $name
-     * @param string $level
      *
      * @return bool
      */

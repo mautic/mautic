@@ -42,8 +42,6 @@ class UpdateHelper
     /**
      * Fetches a download package from the remote server.
      *
-     * @param string $package
-     *
      * @return array{error: bool, message?: string}
      */
     public function fetchPackage(string $package): array

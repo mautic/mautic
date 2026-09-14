@@ -62,9 +62,6 @@ class LeadPointLog
         return $this->dateFired;
     }
 
-    /**
-     * @param mixed $dateFired
-     */
     public function setDateFired(\DateTime $dateFired): void
     {
         $this->dateFired = $dateFired;
@@ -78,9 +75,6 @@ class LeadPointLog
         return $this->ipAddress;
     }
 
-    /**
-     * @param IpAddress $ipAddress
-     */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress): void
     {
         $this->ipAddress = $ipAddress;

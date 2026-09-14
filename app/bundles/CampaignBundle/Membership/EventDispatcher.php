@@ -15,9 +15,6 @@ readonly class EventDispatcher
     ) {
     }
 
-    /**
-     * @param string $action
-     */
     public function dispatchMembershipChange(Lead $contact, Campaign $campaign, string $action): void
     {
         $this->dispatcher->dispatch(

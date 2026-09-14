@@ -12,9 +12,6 @@ interface RandomHelperInterface
     /**
      * Generate random string.
      *
-     * @param int    $length
-     * @param string $charlist
-     *
      * @return string
      */
     public function generate(int $length = 10, string $charlist = '0-9a-z');

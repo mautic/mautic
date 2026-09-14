@@ -35,8 +35,6 @@ abstract class AbstractFormatter
     /**
      * Format field to datetime.
      *
-     * @param string $format
-     *
      * @return mixed
      */
     abstract public function toDateTime($field, string $format = 'Y-m-d H:i:s');
@@ -44,16 +42,12 @@ abstract class AbstractFormatter
     /**
      * Format field to date.
      *
-     * @param string $format
-     *
      * @return mixed
      */
     abstract public function toDate($field, string $format = 'Y-m-d');
 
     /**
      * Format field to time.
-     *
-     * @param string $format
      *
      * @return mixed
      */

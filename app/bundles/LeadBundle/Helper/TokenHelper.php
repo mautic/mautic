@@ -16,7 +16,6 @@ final class TokenHelper
 
     /**
      * @param string $content
-     * @param array  $lead
      * @param bool   $replace If true, search/replace will be executed on $content and the modified $content returned
      *                        rather than an array of found matches
      *

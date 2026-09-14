@@ -47,9 +47,6 @@ readonly class FormUploader
         }
     }
 
-    /**
-     * @param string $fileName
-     */
     public function getCompleteFilePath(Field $field, string $fileName): string
     {
         $uploadDir = $this->getUploadDir($field);

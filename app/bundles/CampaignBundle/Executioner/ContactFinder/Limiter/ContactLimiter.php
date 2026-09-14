@@ -30,12 +30,6 @@ final class ContactLimiter
     private ?int $campaignLimitUsed = null;
 
     /**
-     * @param int      $batchLimit
-     * @param int|null $contactId
-     * @param int|null $minContactId
-     * @param int|null $maxContactId
-     * @param int|null $threadId
-     * @param int|null $maxThreads
      * @param int|null $campaignLimit
      */
     public function __construct(
@@ -94,8 +88,6 @@ final class ContactLimiter
     }
 
     /**
-     * @param int $id
-     *
      * @throws NoContactsFoundException
      */
     public function setBatchMinContactId(int $id): static

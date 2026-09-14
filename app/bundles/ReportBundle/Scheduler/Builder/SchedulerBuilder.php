@@ -29,8 +29,6 @@ readonly class SchedulerBuilder
     }
 
     /**
-     * @param int $count
-     *
      * @return \Recurr\RecurrenceCollection
      *
      * @throws InvalidSchedulerException

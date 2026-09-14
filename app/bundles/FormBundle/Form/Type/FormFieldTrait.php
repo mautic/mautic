@@ -21,9 +21,6 @@ trait FormFieldTrait
         $this->formModel = $formModel;
     }
 
-    /**
-     * @param bool $asTokens
-     */
     protected function getFormFields($formId, bool $asTokens = true): array
     {
         $fields   = $this->fieldModel->getSessionFields($formId);

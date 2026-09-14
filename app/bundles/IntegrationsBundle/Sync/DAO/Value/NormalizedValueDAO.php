@@ -48,7 +48,6 @@ final class NormalizedValueDAO
     private $normalizedValue;
 
     /**
-     * @param string $type
      * @param mixed  $value
      * @param mixed  $normalizedValue
      */

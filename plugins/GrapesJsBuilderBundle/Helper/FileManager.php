@@ -81,9 +81,6 @@ final readonly class FileManager
             .$fileName;
     }
 
-    /**
-     * @param string $separator
-     */
     private function getGrapesJsImagesPath(bool $fullPath = false, string $separator = '/'): string
     {
         return $this->pathsHelper->getSystemPath('images', $fullPath)

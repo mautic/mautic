@@ -14,7 +14,6 @@ trait FilterTrait
 
     /**
      * @param int|null $companyId
-     * @param string   $fromAlias
      */
     protected function addCompanyFilter(QueryBuilder $q, $companyId = null, string $fromAlias = 't'): void
     {
@@ -38,7 +37,6 @@ trait FilterTrait
 
     /**
      * @param int|null $campaignId
-     * @param string   $fromAlias
      */
     protected function addCampaignFilter(QueryBuilder $q, $campaignId = null, string $fromAlias = 't'): void
     {
@@ -50,7 +48,6 @@ trait FilterTrait
 
     /**
      * @param int|null $campaignId
-     * @param string   $fromAlias
      */
     protected function addCampaignFilterForEmailSource(QueryBuilder $q, $campaignId = null, string $fromAlias = 't'): void
     {
@@ -62,7 +59,6 @@ trait FilterTrait
 
     /**
      * @param int|null $segmentId
-     * @param string   $fromAlias
      */
     protected function addSegmentFilter(QueryBuilder $q, $segmentId = null, string $fromAlias = 't'): void
     {

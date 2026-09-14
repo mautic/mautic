@@ -19,7 +19,6 @@ class CsvExporter
 
     /**
      * @param resource $handle
-     * @param int      $page
      */
     public function export(ReportDataResult $reportDataResult, $handle, int $page = 1): void
     {

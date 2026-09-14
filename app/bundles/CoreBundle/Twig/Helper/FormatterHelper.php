@@ -20,8 +20,6 @@ final readonly class FormatterHelper
      * Format a string.
      *
      * @param mixed  $val
-     * @param string $type
-     * @param int    $round
      *
      * @return string
      */
@@ -99,7 +97,6 @@ final readonly class FormatterHelper
      * instead of simple implode to cover multidimensional arrays.
      *
      * @param mixed  $array
-     * @param string $delimiter
      *
      * @return string
      */
@@ -124,7 +121,6 @@ final readonly class FormatterHelper
     }
 
     /**
-     * @param string                $delimeter
      * @param array<string, string> $array
      */
     public function simpleArrayToHtml(array $array, string $delimeter = '<br />'): string
@@ -141,7 +137,6 @@ final readonly class FormatterHelper
      * Takes a simple csv list like 1,2,3,4 and returns as an array.
      *
      * @param mixed       $csv
-     * @param string|null $type
      *
      * @return array<string, string>|array<int, string>
      */

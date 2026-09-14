@@ -22,11 +22,6 @@ class TransportChain
     ) {
     }
 
-    /**
-     * @param string $alias
-     * @param string $translatableAlias
-     * @param string $integrationAlias
-     */
     public function addTransport(string $alias, TransportInterface $transport, string $translatableAlias, string $integrationAlias): static
     {
         $this->transports[$alias]['alias']            = $translatableAlias;
@@ -119,8 +114,6 @@ class TransportChain
     }
 
     /**
-     * @param string $content
-     *
      * @return mixed
      *
      * @throws \Exception

@@ -177,9 +177,9 @@ class LeadDevice
     }
 
     /**
-     * @param mixed $clientInfo
+     * @param mixed[]|string $clientInfo
      */
-    public function setClientInfo(string $clientInfo): void
+    public function setClientInfo(string|array $clientInfo): void
     {
         $this->clientInfo = $clientInfo;
     }
@@ -237,9 +237,6 @@ class LeadDevice
         return $this->deviceOsName;
     }
 
-    /**
-     * @param string $deviceOsName
-     */
     public function setDeviceOsName(string $deviceOsName): static
     {
         $this->deviceOsName = $deviceOsName;
@@ -336,9 +333,6 @@ class LeadDevice
         return $this->trackingId;
     }
 
-    /**
-     * @param string $trackingId
-     */
     public function setTrackingId(string $trackingId): static
     {
         $this->trackingId = $trackingId;

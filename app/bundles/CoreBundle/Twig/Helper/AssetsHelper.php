@@ -81,8 +81,6 @@ final class AssetsHelper
      * This function is meant for assets that may be overridden in the media folder.
      * This could be logo's, country flags, ...
      * So to be able to override an asset, it has to exist in the assets folder.
-     *
-     * @param string $path
      */
     public function getOverridableUrl(string $path, bool $absolute = false): false|string
     {
@@ -104,8 +102,6 @@ final class AssetsHelper
 
     /**
      * Set asset url path.
-     *
-     * @param string $path
      */
     public function getUrl(string $path, ?string $packageName = null, ?string $version = null, bool $absolute = false, bool $ignorePrefix = false): string
     {
@@ -152,8 +148,6 @@ final class AssetsHelper
      * Adds a JS script to the template.
      *
      * @param string|array<string, string> $script
-     * @param string                       $location
-     * @param string                       $name
      */
     public function addScript($script, string $location = 'head', bool $async = false, ?string $name = null): self
     {
@@ -186,9 +180,6 @@ final class AssetsHelper
 
     /**
      * Adds JS script declarations to the template.
-     *
-     * @param string $script
-     * @param string $location
      */
     public function addScriptDeclaration(string $script, string $location = 'head'): self
     {
@@ -250,9 +241,6 @@ final class AssetsHelper
 
     /**
      * Adds a custom declaration to <head />.
-     *
-     * @param string $declaration
-     * @param string $location
      */
     public function addCustomDeclaration(string $declaration, string $location = 'head'): self
     {
@@ -302,8 +290,6 @@ final class AssetsHelper
 
     /**
      * Outputs the script files and declarations.
-     *
-     * @param string $location
      */
     public function outputScripts(string $location): void
     {
@@ -565,7 +551,6 @@ final class AssetsHelper
 
     /**
      * @param string $country
-     * @param string $class
      */
     public function getCountryFlag($country, bool $urlOnly = true, string $class = ''): string
     {

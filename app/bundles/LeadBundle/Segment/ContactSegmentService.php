@@ -95,8 +95,6 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param int $limit
-     *
      * @return array<int,mixed[]>
      *
      * @throws \Doctrine\DBAL\Exception
@@ -204,8 +202,6 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param int|null $limit
-     *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */

@@ -170,8 +170,6 @@ class PathsHelper
      * Get the path to specified area.  Returns relative by default with the exception of cache and log
      * which will be absolute regardless of $fullPath setting.
      *
-     * @param string $name
-     *
      * @return string
      *
      * @throws \InvalidArgumentException

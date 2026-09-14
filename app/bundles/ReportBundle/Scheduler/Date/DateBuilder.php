@@ -16,12 +16,6 @@ readonly class DateBuilder
     ) {
     }
 
-    /**
-     * @param bool   $isScheduled
-     * @param string $scheduleUnit
-     * @param string $scheduleDay
-     * @param string $scheduleMonthFrequency
-     */
     public function getPreviewDays(bool $isScheduled, string $scheduleUnit, string $scheduleDay, string $scheduleMonthFrequency): array
     {
         $entity = new SchedulerEntity($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);

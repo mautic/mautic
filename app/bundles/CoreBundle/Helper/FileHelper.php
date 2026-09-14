@@ -32,9 +32,6 @@ final class FileHelper
         return self::convertBytesToMegabytes($maxUploadSizeInBytes);
     }
 
-    /**
-     * @param string $sSize
-     */
     public static function convertPHPSizeToBytes(string $sSize): int
     {
         $sSize = trim($sSize);

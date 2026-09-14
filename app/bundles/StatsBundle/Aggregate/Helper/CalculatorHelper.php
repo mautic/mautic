@@ -109,7 +109,6 @@ final class CalculatorHelper
 
     /**
      * @param string $date
-     * @param string $labelFormat
      *
      * @throws \Exception
      */

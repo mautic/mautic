@@ -16,7 +16,6 @@ final class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param string                                               $moduleobject
      * @param array<string, mixed>                                 $parameters
      * @param array<string, string|array<string|int, string|bool>> $settings
      *

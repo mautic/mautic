@@ -317,9 +317,6 @@ class Stat
         return $this->isRead;
     }
 
-    /**
-     * @param bool $isRead
-     */
     public function setIsRead(bool $isRead): void
     {
         $this->addChange('isRead', $this->isRead, $isRead);
@@ -379,9 +376,6 @@ class Stat
         return $this->retryCount;
     }
 
-    /**
-     * @param int $retryCount
-     */
     public function setRetryCount(int $retryCount): void
     {
         $this->addChange('retryCount', $this->retryCount, $retryCount);
@@ -405,9 +399,6 @@ class Stat
         return $this->isFailed;
     }
 
-    /**
-     * @param bool $isFailed
-     */
     public function setIsFailed(bool $isFailed): void
     {
         $this->addChange('isFailed', $this->isFailed, $isFailed);
@@ -447,9 +438,6 @@ class Stat
         return $this->viewedInBrowser;
     }
 
-    /**
-     * @param bool $viewedInBrowser
-     */
     public function setViewedInBrowser(bool $viewedInBrowser): void
     {
         $this->addChange('viewedInBrowser', $this->viewedInBrowser, $viewedInBrowser);
@@ -464,9 +452,6 @@ class Stat
         return $this->source;
     }
 
-    /**
-     * @param string|null $source
-     */
     public function setSource(?string $source): void
     {
         $this->addChange('source', $this->source, $source);
@@ -481,9 +466,6 @@ class Stat
         return $this->sourceId;
     }
 
-    /**
-     * @param int|null $sourceId
-     */
     public function setSourceId(?int $sourceId): void
     {
         $this->addChange('sourceId', $this->sourceId, (int) $sourceId);
@@ -511,9 +493,6 @@ class Stat
         return $this->openCount;
     }
 
-    /**
-     * @param int $openCount
-     */
     public function setOpenCount(int $openCount): static
     {
         $this->addChange('openCount', $this->openCount, $openCount);
@@ -522,9 +501,6 @@ class Stat
         return $this;
     }
 
-    /**
-     * @param string $details
-     */
     public function addOpenDetails(string $details): void
     {
         if (self::MAX_OPEN_DETAILS > $this->openCount) {

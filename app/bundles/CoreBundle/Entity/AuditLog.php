@@ -110,9 +110,6 @@ class AuditLog
         return (int) $this->id;
     }
 
-    /**
-     * @param int $userId
-     */
     public function setUserId(int $userId): static
     {
         $this->userId = $userId;
@@ -128,9 +125,6 @@ class AuditLog
         return $this->userId;
     }
 
-    /**
-     * @param string $object
-     */
     public function setObject(string $object): static
     {
         $this->object = $object;
@@ -161,9 +155,6 @@ class AuditLog
         return (int) $this->objectId;
     }
 
-    /**
-     * @param string $action
-     */
     public function setAction(string $action): static
     {
         $this->action = $action;
@@ -194,9 +185,6 @@ class AuditLog
         return $this->details;
     }
 
-    /**
-     * @param \DateTime $dateAdded
-     */
     public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
@@ -212,9 +200,6 @@ class AuditLog
         return $this->dateAdded;
     }
 
-    /**
-     * @param string $ipAddress
-     */
     public function setIpAddress(string $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
@@ -230,9 +215,6 @@ class AuditLog
         return $this->ipAddress;
     }
 
-    /**
-     * @param string $bundle
-     */
     public function setBundle(string $bundle): static
     {
         $this->bundle = $bundle;
@@ -248,9 +230,6 @@ class AuditLog
         return $this->bundle;
     }
 
-    /**
-     * @param string $userName
-     */
     public function setUserName(string $userName): static
     {
         $this->userName = $userName;

@@ -23,9 +23,6 @@ final class Counter
         return $this->eventCount;
     }
 
-    /**
-     * @param int $step
-     */
     public function advanceEventCount(int $step = 1): void
     {
         $this->eventCount += $step;
@@ -46,9 +43,6 @@ final class Counter
         return $this->evaluated;
     }
 
-    /**
-     * @param int $step
-     */
     public function advanceEvaluated(int $step = 1): void
     {
         $this->evaluated += $step;
@@ -60,9 +54,6 @@ final class Counter
         return $this->executed;
     }
 
-    /**
-     * @param int $step
-     */
     public function advanceExecuted(int $step = 1): void
     {
         $this->executed += $step;
@@ -77,9 +68,6 @@ final class Counter
         return $this->totalEvaluated;
     }
 
-    /**
-     * @param int $step
-     */
     public function advanceTotalEvaluated(int $step = 1): void
     {
         $this->totalEvaluated += $step;
@@ -93,9 +81,6 @@ final class Counter
         return $this->totalExecuted;
     }
 
-    /**
-     * @param int $step
-     */
     public function advanceTotalExecuted(int $step = 1): void
     {
         $this->totalExecuted += $step;
@@ -106,9 +91,6 @@ final class Counter
         return $this->totalScheduled;
     }
 
-    /**
-     * @param int $step
-     */
     public function advanceTotalScheduled(int $step = 1): void
     {
         $this->totalScheduled += $step;

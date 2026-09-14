@@ -76,9 +76,6 @@ class ListLead
         return $this->dateAdded;
     }
 
-    /**
-     * @param \DateTime $date
-     */
     public function setDateAdded(\DateTime $date): void
     {
         $this->dateAdded = $date;
@@ -108,9 +105,6 @@ class ListLead
         return $this->list;
     }
 
-    /**
-     * @param LeadList $leadList
-     */
     public function setList(\Mautic\LeadBundle\Entity\LeadList $leadList): void
     {
         $this->list = $leadList;
@@ -124,9 +118,6 @@ class ListLead
         return $this->manuallyRemoved;
     }
 
-    /**
-     * @param bool $manuallyRemoved
-     */
     public function setManuallyRemoved(bool $manuallyRemoved): void
     {
         $this->manuallyRemoved = $manuallyRemoved;
@@ -148,9 +139,6 @@ class ListLead
         return $this->manuallyAdded;
     }
 
-    /**
-     * @param bool $manuallyAdded
-     */
     public function setManuallyAdded(bool $manuallyAdded): void
     {
         $this->manuallyAdded = $manuallyAdded;

@@ -10,9 +10,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class ChannelSubscriptionChange extends Event
 {
-    /**
-     * @param string $channel
-     */
     public function __construct(
         private readonly Lead $lead,
         private string $channel,

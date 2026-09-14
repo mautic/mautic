@@ -24,10 +24,6 @@ final class MenuHelper
 
     /**
      * Converts menu config into something KNP menus expects.
-     *
-     * @param int    $depth
-     * @param int    $defaultPriority
-     * @param string $type
      */
     public function createMenuStructure(array &$items, int $depth = 0, int $defaultPriority = 9999, string $type = 'main'): void
     {
@@ -113,8 +109,6 @@ final class MenuHelper
     /**
      * Get and reset orphaned menu items.
      *
-     * @param string $type
-     *
      * @return mixed
      */
     public function resetOrphans(string $type = 'main')
@@ -127,8 +121,6 @@ final class MenuHelper
 
     /**
      * Give orphaned menu items a home.
-     *
-     * @param int $depth
      */
     public function placeOrphans(array &$menuItems, bool $appendOrphans = false, int $depth = 1, string $type = 'main'): void
     {

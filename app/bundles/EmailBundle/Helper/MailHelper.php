@@ -688,7 +688,6 @@ class MailHelper
      *
      * @param string $filePath
      * @param string $fileName
-     * @param string $contentType
      */
     public function attachFile($filePath, $fileName = null, ?string $contentType = null, bool $inline = false): void
     {
@@ -786,9 +785,6 @@ class MailHelper
         $this->plainTextSet = true;
     }
 
-    /**
-     * @param string $contentType
-     */
     public function setBody($content, string $contentType = 'text/html', $charset = null, bool $ignoreTrackingPixel = false): void
     {
         if (!$ignoreTrackingPixel && $this->coreParametersHelper->get('mailer_append_tracking_pixel')) {
@@ -1039,9 +1035,6 @@ class MailHelper
     }
 
     /**
-     * @param int    $toBeAdded
-     * @param string $type
-     *
      * @throws BatchQueueMaxException
      */
     protected function checkBatchMaxRecipients(int $toBeAdded = 1, string $type = 'to'): void

@@ -6,10 +6,6 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription;
 
 final class UnsubscribedEmail
 {
-    /**
-     * @param string $contactEmail
-     * @param string $unsubscriptionAddress
-     */
     public function __construct(
         private string $contactEmail,
         private string $unsubscriptionAddress,

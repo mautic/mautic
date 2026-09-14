@@ -194,9 +194,6 @@ class MessageQueue
         return $this->attempts;
     }
 
-    /**
-     * @param int $attempts
-     */
     public function setAttempts(int $attempts): void
     {
         $this->attempts = $attempts;
@@ -226,9 +223,6 @@ class MessageQueue
         return $this->channel;
     }
 
-    /**
-     * @param string $channel
-     */
     public function setChannel(string $channel): void
     {
         $this->channel = $channel;
@@ -275,9 +269,6 @@ class MessageQueue
         return $this->datePublished;
     }
 
-    /**
-     * @param \DateTime $datePublished
-     */
     public function setDatePublished(\DateTime $datePublished): void
     {
         $this->datePublished = $datePublished;
@@ -336,9 +327,6 @@ class MessageQueue
         return $this->maxAttempts;
     }
 
-    /**
-     * @param int $maxAttempts
-     */
     public function setMaxAttempts(int $maxAttempts): void
     {
         $this->maxAttempts = $maxAttempts;
@@ -352,9 +340,6 @@ class MessageQueue
         return $this->priority;
     }
 
-    /**
-     * @param int $priority
-     */
     public function setPriority(int $priority): void
     {
         $this->priority = $priority;
@@ -384,9 +369,6 @@ class MessageQueue
         return $this->status;
     }
 
-    /**
-     * @param string $status
-     */
     public function setStatus(string $status): void
     {
         $this->status = $status;

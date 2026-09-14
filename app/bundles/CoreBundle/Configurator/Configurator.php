@@ -60,8 +60,6 @@ class Configurator
 
     /**
      * Add a step to the configurator.
-     *
-     * @param int $priority
      */
     public function addStep(StepInterface $step, int $priority = 0): void
     {
@@ -73,8 +71,6 @@ class Configurator
 
     /**
      * Retrieves the specified step.
-     *
-     * @param int $index
      *
      * @return StepInterface[]
      *
@@ -214,7 +210,6 @@ class Configurator
 
     /**
      * @param array<mixed> $array
-     * @param int          $level
      */
     protected function renderArray($array, int $level = 1): string
     {
