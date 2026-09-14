@@ -127,7 +127,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return array<int,Campaign>
      */
-    public function deleteEntities($campaignIds): array
+    public function deleteEntities(array $campaignIds): array
     {
         $entities = [];
         foreach ($campaignIds as $campaignId) {
@@ -141,7 +141,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return $entities;
     }
 
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->eventRepository->nullEventParents($entity->getId());
@@ -415,7 +415,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Get list of sources for a campaign.
      */
-    public function getLeadSources($campaign): array
+    public function getLeadSources(Campaign|int|string $campaign): array
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
 
@@ -542,11 +542,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param mixed $form
-     *
      * @return array
      */
-    public function getCampaignsByForm($form)
+    public function getCampaignsByForm(Form|int $form)
     {
         $formId = ($form instanceof Form) ? $form->getId() : $form;
 
@@ -775,7 +773,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return $this->membershipBuilder->build($campaign, $contactLimiter, $maxLeads, $output);
     }
 
-    public function getCampaignIdsWithDependenciesOnSegment($segmentId): array
+    public function getCampaignIdsWithDependenciesOnSegment(int $segmentId): array
     {
         $entities = $this->getRepository()->getEntities(
             [

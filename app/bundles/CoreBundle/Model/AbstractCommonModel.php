@@ -121,9 +121,9 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      *
      * @return string
      */
-    public function encodeArrayForUrl($array)
+    public function encodeArrayForUrl(array $array)
     {
-        return ClickthroughHelper::encodeArrayForUrl((array) $array);
+        return ClickthroughHelper::encodeArrayForUrl($array);
     }
 
     /**

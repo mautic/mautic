@@ -3,6 +3,7 @@
 namespace Mautic\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
@@ -103,11 +104,9 @@ class DashboardModel extends FormModel
      * Creates an array that represents the dashboard and all its widgets.
      * Useful for dashboard exports.
      *
-     * @param string $name
-     *
      * @return array<string, string|mixed[]>
      */
-    public function toArray($name): array
+    public function toArray(string $name): array
     {
         return [
             'name'        => $name,
@@ -122,11 +121,9 @@ class DashboardModel extends FormModel
     /**
      * Saves the dashboard snapshot to the user folder.
      *
-     * @param string $name
-     *
      * @throws IOException
      */
-    public function saveSnapshot($name): void
+    public function saveSnapshot(string $name): void
     {
         $dir      = $this->pathsHelper->getSystemPath('dashboard.user');
         $filename = InputHelper::filename($name, 'json');
@@ -151,9 +148,9 @@ class DashboardModel extends FormModel
     /**
      * Fill widgets with their empty content.
      *
-     * @param array<mixed> $widgets
+     * @param array<mixed>|Paginator<mixed> $widgets
      */
-    public function populateWidgetPreviews(&$widgets): void
+    public function populateWidgetPreviews(array|Paginator &$widgets): void
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {

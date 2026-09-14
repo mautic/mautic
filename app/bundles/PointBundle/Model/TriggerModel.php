@@ -423,7 +423,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return string
      */
-    public function getColorForLeadPoints($points)
+    public function getColorForLeadPoints(int $points)
     {
         if (!$this->triggers) {
             $this->triggers = $this->triggerRepository->getTriggerColors();

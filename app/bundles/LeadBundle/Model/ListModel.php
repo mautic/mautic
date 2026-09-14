@@ -159,7 +159,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @return array<object>
      */
-    public function deleteEntities($ids): array
+    public function deleteEntities(array $ids): array
     {
         $deleted        = [];
         $unableToDelete = [];
@@ -187,7 +187,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @param LeadList $entity
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         $id    = $entity->getId();
         $event = $this->dispatchEvent('pre_delete', $entity);
@@ -334,11 +334,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param string $alias
-     *
      * @return array
      */
-    public function getUserLists($alias = '')
+    public function getUserLists(string $alias = '')
     {
         $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : null;
 
@@ -1329,10 +1327,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get segments which are used as a dependent by other segments to prevent batch deletion of them.
-     *
-     * @param array $segmentIds
      */
-    public function canNotBeDeleted($segmentIds): array
+    public function canNotBeDeleted(array $segmentIds): array
     {
         $entities = $this->getEntities(
             [

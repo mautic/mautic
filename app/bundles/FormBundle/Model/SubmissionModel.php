@@ -414,7 +414,7 @@ final class SubmissionModel extends CommonFormModel
     /**
      * @param Submission $submission
      */
-    public function deleteEntity($submission): void
+    public function deleteEntity(object $submission): void
     {
         $this->formUploader->deleteUploadedFiles($submission);
 
@@ -433,9 +433,9 @@ final class SubmissionModel extends CommonFormModel
      *
      * @return array<int,mixed>
      */
-    public function deleteEntities($ids): array
+    public function deleteEntities(array $ids): array
     {
-        if (!empty($ids)) {
+        if ($ids !== []) {
             // deleting form submission record in form results table
             try {
                 $this->submissionRepository->batchDeleteFormResultsTableRecord($ids);

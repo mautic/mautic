@@ -138,7 +138,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function setCatInUrl($catInUrl): void
+    public function setCatInUrl(bool $catInUrl): void
     {
         $this->catInUrl = $catInUrl;
     }
@@ -213,7 +213,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Page $entity
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         if ($entity->isVariant() && $entity->getIsPublished()) {
             $this->resetVariants($entity);

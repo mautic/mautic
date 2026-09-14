@@ -551,10 +551,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    /**
-     * @param object $entity
-     */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         /** @var Form $entity */
         $this->deleteFormFiles($entity);
@@ -572,7 +569,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function deleteEntities($ids): array
+    public function deleteEntities(array $ids): array
     {
         $entities     = parent::deleteEntities($ids);
         foreach ($entities as $id => $entity) {
@@ -792,7 +789,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    public function getFilterExpressionFunctions($operator = null): array
+    public function getFilterExpressionFunctions(?string $operator = null): array
     {
         $operatorOptions = [
             '=' => [

@@ -225,12 +225,12 @@ class WebhookModel extends FormModel
      *
      * @return array
      */
-    public function getEventWebooksByType($type)
+    public function getEventWebooksByType(string $type)
     {
         return $this->eventRepository->getEntitiesByEventType($type);
     }
 
-    public function queueWebhooksByType($type, $payload, array $groups = []): void
+    public function queueWebhooksByType(string $type, $payload, array $groups = []): void
     {
         $this->queueWebhooks(
             $this->getEventWebooksByType($type),
@@ -284,10 +284,8 @@ class WebhookModel extends FormModel
 
     /**
      * Execute a list of webhooks to their specified endpoints.
-     *
-     * @param array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks
      */
-    public function processWebhooks($webhooks): void
+    public function processWebhooks(array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks): void
     {
         $this->startTime = microtime(true);
 

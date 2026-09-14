@@ -163,7 +163,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         return $results;
     }
 
-    public function getMessageChannels($messageId): array
+    public function getMessageChannels(int $messageId): array
     {
         return $this->messageRepository->getMessageChannels($messageId);
     }
@@ -171,7 +171,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     /**
      * @return array
      */
-    public function getChannelMessageByChannelId($channelId)
+    public function getChannelMessageByChannelId(int $channelId)
     {
         return $this->messageRepository->getChannelMessageByChannelId($channelId);
     }

@@ -461,7 +461,7 @@ class LeadModel extends FormModel
     /**
      * @param Lead $entity
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         // Delete custom avatar if one exists
         $imageDir = $this->pathsHelper->getSystemPath('images', true);
@@ -638,7 +638,7 @@ class LeadModel extends FormModel
     /**
      * Disassociates a user from leads.
      */
-    public function disassociateOwner($userId): void
+    public function disassociateOwner(int $userId): void
     {
         $leads = $this->getRepository()->findByOwner($userId);
         foreach ($leads as $lead) {
@@ -694,7 +694,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadsByIp($ip)
+    public function getLeadsByIp(string $ip)
     {
         return $this->getRepository()->getLeadsByIp($ip);
     }
@@ -729,7 +729,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadDetails($lead)
+    public function getLeadDetails(Lead|int $lead)
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields();
@@ -738,7 +738,7 @@ class LeadModel extends FormModel
             }
         }
 
-        $leadId = ($lead instanceof Lead) ? $lead->getId() : (int) $lead;
+        $leadId = ($lead instanceof Lead) ? $lead->getId() : $lead;
 
         return $this->getRepository()->getFieldValues($leadId);
     }
@@ -790,7 +790,7 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function getLead($leadId)
+    public function getLead(int $leadId)
     {
         return $this->getRepository()->getLead($leadId);
     }
@@ -1179,7 +1179,7 @@ class LeadModel extends FormModel
         }
     }
 
-    public function removeFromCategories($categories): void
+    public function removeFromCategories(array|LeadCategory $categories): void
     {
         $deleteCats = [];
         if (is_array($categories)) {

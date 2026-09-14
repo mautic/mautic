@@ -300,7 +300,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @param Email $entity
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         if ($entity->isVariant() && $entity->getIsPublished()) {
             $this->resetVariants($entity);
@@ -648,7 +648,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @return Stat|null
      */
-    public function getEmailStatus($idHash)
+    public function getEmailStatus(string $idHash)
     {
         return $this->statRepository->getEmailStatus($idHash);
     }
@@ -1744,10 +1744,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Remove a Lead's EMAIL DNC entry.
-     *
-     * @param string $email
      */
-    public function removeDoNotContact($email): void
+    public function removeDoNotContact(string $email): void
     {
         $leadId = (array) $this->leadRepository->getLeadByEmail($email, true);
 
@@ -2265,7 +2263,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $errors;
     }
 
-    public function getEmailsIdsWithDependenciesOnSegment($segmentId): array
+    public function getEmailsIdsWithDependenciesOnSegment(int $segmentId): array
     {
         $entities =  $this->getEntities(
             [

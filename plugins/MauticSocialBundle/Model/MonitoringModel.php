@@ -157,11 +157,9 @@ final class MonitoringModel extends FormModel
     }
 
     /**
-     * @param string $type
-     *
      * @return string|null
      */
-    public function getFormByType($type)
+    public function getFormByType(string $type)
     {
         return array_key_exists($type, $this->networkTypes) ? $this->networkTypes[$type]['form'] : null;
     }

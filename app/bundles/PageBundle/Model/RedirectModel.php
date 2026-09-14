@@ -41,7 +41,7 @@ class RedirectModel extends FormModel
     /**
      * @return Redirect|null
      */
-    public function getRedirectById($identifier)
+    public function getRedirectById(string $identifier)
     {
         return $this->redirectRepository->findOneBy(['redirectId' => $identifier]);
     }
@@ -75,7 +75,7 @@ class RedirectModel extends FormModel
     /**
      * Generate UTMs params for url.
      */
-    public function getUtmTagsForUrl($rawUtmTags): array
+    public function getUtmTagsForUrl(array $rawUtmTags): array
     {
         $utmTags = [];
         foreach ($rawUtmTags as $utmTag => $value) {
@@ -92,7 +92,7 @@ class RedirectModel extends FormModel
      *
      * @return Redirect|null
      */
-    public function getRedirectByUrl($url)
+    public function getRedirectByUrl(string $url)
     {
         // Ensure the URL saved to the database does not have encoded ampersands
         $url = UrlHelper::decodeAmpersands($url);
@@ -154,7 +154,7 @@ class RedirectModel extends FormModel
     /**
      * Create a Redirect entity for URL.
      */
-    public function createRedirectEntity($url): Redirect
+    public function createRedirectEntity(string $url): Redirect
     {
         $redirect = new Redirect();
         $redirect->setUrl($url);

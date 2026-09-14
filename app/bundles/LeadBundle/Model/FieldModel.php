@@ -668,7 +668,7 @@ class FieldModel extends FormModel
      * @throws SchemaException
      * @throws DeleteEntityDependencyException
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -693,7 +693,7 @@ class FieldModel extends FormModel
      *
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function deleteEntities($ids): array
+    public function deleteEntities(array $ids): array
     {
         $entities = parent::deleteEntities($ids);
 
@@ -731,12 +731,8 @@ class FieldModel extends FormModel
     /**
      * Reorder fields based on passed entity position.
      */
-    public function reorderFieldsByEntity($entity): void
+    public function reorderFieldsByEntity(LeadField $entity): void
     {
-        if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(['LeadEntity']);
-        }
-
         $fields = $this->leadFieldRepository->findBy([], ['order' => 'ASC']);
         $count  = 1;
         $order  = $entity->getOrder();
@@ -888,11 +884,9 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param string $object
-     *
      * @return array
      */
-    public function getPublishedFieldArrays($object = 'lead')
+    public function getPublishedFieldArrays(string $object = 'lead')
     {
         return $this->getEntities(
             [
@@ -916,10 +910,7 @@ class FieldModel extends FormModel
         );
     }
 
-    /**
-     * @param string $object
-     */
-    public function getFieldListWithProperties($object = 'lead'): array
+    public function getFieldListWithProperties(string|bool $object = 'lead'): array
     {
         return $this->getFieldsProperties(['object' => $object]);
     }

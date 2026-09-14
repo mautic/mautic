@@ -33,11 +33,9 @@ class IpAddressModel
     }
 
     /**
-     * @param string $ip
-     *
      * @return IpAddress|null
      */
-    public function findOneByIpAddress($ip)
+    public function findOneByIpAddress(string $ip)
     {
         return $this->ipAddressRepository->findOneByIpAddress($ip);
     }

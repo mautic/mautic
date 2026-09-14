@@ -590,6 +590,76 @@
     ```
 
 - `Mautic\CoreBundle\Entity\CommonRepository::getIdsExpr()` return type was narrowed from `mixed` to `Doctrine\ORM\Query\Expr\Func|string|false`. Overrides must return a compatible type.
+- Single-parameter public methods on `*Model` classes now carry native parameter types instead of docblock-only types. This matters if you extend a model - most notably `Mautic\CoreBundle\Model\AbstractCommonModel` or `Mautic\CoreBundle\Model\FormModel` - and override one of the methods below: the override must stay compatible with the parent, so either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type, e.g. `null` to `deleteEntity()` or a non-numeric string to an `int` parameter, now hit a `TypeError`. A new PHPStan rule (`mautic.modelMethodSingleParamMustHaveType`) enforces the type on new model methods.
+
+    Base classes:
+
+    ```diff
+     # Mautic\CoreBundle\Model\AbstractCommonModel
+    -    public function encodeArrayForUrl($array)
+    +    public function encodeArrayForUrl(array $array)
+
+     # Mautic\CoreBundle\Model\FormModel
+    -    public function lockEntity($entity): void
+    +    public function lockEntity(object $entity): void
+    -    public function isLocked($entity): bool
+    +    public function isLocked(object $entity): bool
+    -    public function isNewEntity($entity): bool
+    +    public function isNewEntity(object $entity): bool
+    -    public function togglePublishStatus($entity): bool
+    +    public function togglePublishStatus(object $entity): bool
+    -    public function deleteEntity($entity): void
+    +    public function deleteEntity(object $entity): void
+    -    public function deleteEntities($ids): array
+    +    public function deleteEntities(array $ids): array
+    ```
+
+    The `deleteEntity()` / `deleteEntities()` overrides in `CampaignModel`, `EmailModel`, `Form\FormModel`, `SubmissionModel`, `CompanyModel`, `Lead\FieldModel`, `LeadModel`, `ListModel`, `PageModel` and `RoleModel` use the same `object` / `array` types (the concrete entity stays in the `@param` docblock). Other typed methods per model:
+
+    | Model | Method | New parameter type |
+    | --- | --- | --- |
+    | `ApiBundle\Model\ClientModel` | `revokeAccess()` | `object` |
+    | `CampaignBundle\Model\CampaignModel` | `getLeadSources()` | `Campaign\|int\|string` |
+    | `CampaignBundle\Model\CampaignModel` | `getCampaignsByForm()` | `Form\|int` |
+    | `CampaignBundle\Model\CampaignModel` | `getCampaignIdsWithDependenciesOnSegment()` | `int` |
+    | `ChannelBundle\Model\MessageModel` | `getMessageChannels()`, `getChannelMessageByChannelId()` | `int` |
+    | `ChannelBundle\Model\MessageQueueModel` | `processMessageQueue()` | `array\|MessageQueue` |
+    | `ConfigBundle\Model\SysinfoModel` | `getLogTail()` | `int` |
+    | `CoreBundle\Model\NotificationModel` | `setDisableUpdates()` | `bool` |
+    | `DashboardBundle\Model\DashboardModel` | `toArray()`, `saveSnapshot()` | `string` |
+    | `DashboardBundle\Model\DashboardModel` | `populateWidgetPreviews()` | `array\|Paginator` |
+    | `EmailBundle\Model\EmailModel` | `getEmailStatus()`, `removeDoNotContact()` | `string` |
+    | `EmailBundle\Model\EmailModel` | `getEmailsIdsWithDependenciesOnSegment()` | `int` |
+    | `FormBundle\Model\ActionModel` | `getFormsIdsWithDependenciesOnSegment()` | `int` |
+    | `FormBundle\Model\FieldModel` | `getSessionFields()` | `int\|string` |
+    | `FormBundle\Model\FormModel` | `getFilterExpressionFunctions()` | `?string` |
+    | `LeadBundle\Model\CompanyModel` | `companyMerge()` (second parameter) | `object` |
+    | `LeadBundle\Model\FieldModel` | `reorderFieldsByEntity()` | `LeadField` |
+    | `LeadBundle\Model\FieldModel` | `getPublishedFieldArrays()` | `string` |
+    | `LeadBundle\Model\FieldModel` | `getFieldListWithProperties()` | `string\|bool` |
+    | `LeadBundle\Model\ImportModel` | `getParallelImportLimit()` | `int` |
+    | `LeadBundle\Model\IpAddressModel` | `findOneByIpAddress()` | `string` |
+    | `LeadBundle\Model\LeadModel` | `disassociateOwner()`, `getLead()` | `int` |
+    | `LeadBundle\Model\LeadModel` | `getLeadsByIp()` | `string` |
+    | `LeadBundle\Model\LeadModel` | `getLeadDetails()` | `Lead\|int` |
+    | `LeadBundle\Model\LeadModel` | `removeFromCategories()` | `array\|LeadCategory` |
+    | `LeadBundle\Model\ListModel` | `getUserLists()` | `string` |
+    | `LeadBundle\Model\ListModel` | `canNotBeDeleted()` | `array` |
+    | `NotificationBundle\Model\NotificationModel` | `getNotificationStatus()` | `string` |
+    | `NotificationBundle\Model\NotificationModel` | `getNotificationClickStats()` | `int` |
+    | `PageBundle\Model\PageModel` | `setCatInUrl()` | `bool` |
+    | `PageBundle\Model\RedirectModel` | `getRedirectById()`, `getRedirectByUrl()`, `createRedirectEntity()` | `string` |
+    | `PageBundle\Model\RedirectModel` | `getUtmTagsForUrl()` | `array` |
+    | `PluginBundle\Model\IntegrationEntityModel` | `formatListOfContacts()` | `array\|string` |
+    | `PointBundle\Model\TriggerEventModel` | `getReportIdsWithDependenciesOnSegment()` | `int` |
+    | `PointBundle\Model\TriggerModel` | `getColorForLeadPoints()` | `int` |
+    | `ReportBundle\Model\ReportModel` | `getGraphData()`, `getFilterList()`, `getGraphList()` | `string` |
+    | `ReportBundle\Model\ReportModel` | `getReportsIdsWithDependenciesOnSegment()` | `int` |
+    | `SmsBundle\Model\SmsModel` | `getSmsStatus()` | `string` |
+    | `SmsBundle\Model\SmsModel` | `getSmsClickStats()` | `int` |
+    | `WebhookBundle\Model\WebhookModel` | `getEventWebooksByType()`, `queueWebhooksByType()` (first parameter) | `string` |
+    | `WebhookBundle\Model\WebhookModel` | `processWebhooks()` | `array\|Paginator` |
+    | `MauticPlugin\MauticSocialBundle\Model\MonitoringModel` | `getFormByType()` | `string` |
 - The `Mautic\CoreBundle\DependencyInjection\Compiler\ServicePass` compiler pass was removed. It used to read the `services > menus` array from a bundle's `Config/config.php` and wire the menu item (`knp_menu.menu`) and its renderer (`knp_menu.renderer`) automatically. A bundle that registered its own menu must now declare both services explicitly in its `Config/services.php`.
 
     Before — `Config/config.php`:

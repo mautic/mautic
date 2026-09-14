@@ -70,10 +70,8 @@ class ActionModel extends CommonFormModel
 
     /**
      * Get segments which are dependent on given segment.
-     *
-     * @param int $segmentId
      */
-    public function getFormsIdsWithDependenciesOnSegment($segmentId): array
+    public function getFormsIdsWithDependenciesOnSegment(int $segmentId): array
     {
         $filter = [
             'force'  => [

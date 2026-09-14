@@ -53,10 +53,7 @@ class NotificationModel extends FormModel
         return $this->requestStack->getSession();
     }
 
-    /**
-     * @param bool $disableUpdates
-     */
-    public function setDisableUpdates($disableUpdates): void
+    public function setDisableUpdates(bool $disableUpdates): void
     {
         $this->disableUpdates = $disableUpdates;
     }

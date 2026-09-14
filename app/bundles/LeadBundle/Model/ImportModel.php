@@ -93,11 +93,9 @@ class ImportModel extends FormModel
     /**
      * Returns parallel import limit from the configuration.
      *
-     * @param int $default
-     *
      * @return int
      */
-    public function getParallelImportLimit($default = 1)
+    public function getParallelImportLimit(int $default = 1)
     {
         return $this->config->get('parallel_import_limit', $default);
     }
