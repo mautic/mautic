@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRector\Fixture;
+namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules\Fixture;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -36,7 +36,7 @@ class MixedChainEntity
 -----
 <?php
 
-namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRector\Fixture;
+namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules\Fixture;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

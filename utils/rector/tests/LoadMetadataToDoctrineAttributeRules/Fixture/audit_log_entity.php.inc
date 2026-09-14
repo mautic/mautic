@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRector\Fixture;
+namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -64,7 +64,7 @@ class AuditLog
 -----
 <?php
 
-namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRector\Fixture;
+namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;

@@ -32,8 +32,8 @@ use Rector\Rector\AbstractRector;
 /**
  * Converts the static mapping helpers in loadMetadata (self::addUuidField, self::addProjectsField,
  * ...) into Doctrine attributes. Native ClassMetadataBuilder calls are left behind in a trimmed
- * loadMetadata for LoadMetadataToDoctrineAttributeRector. A class is left untouched when no static
- * helper could be converted.
+ * loadMetadata for the per-concern LoadMetadata*ToDoctrineAttributeRector rules. A class is left
+ * untouched when no static helper could be converted.
  *
  * When both rules are configured together, order this one first: it treats a class that already
  * carries ORM attributes as hybrid and then leaves addProjectsField behind, so it must see the

@@ -25,10 +25,10 @@ use Rector\Rector\AbstractRector;
 /**
  * Rewrites Mautic's ClassMetadataBuilder convenience helpers in loadMetadata (addId,
  * addBigIntIdField, addPublishDates, addContact, addFulltextIndex, ...) into the equivalent native
- * builder calls they wrap. LoadMetadataToDoctrineAttributeRector then turns those native calls into
- * attributes, so only vanilla Doctrine vocabulary reaches the first rule.
+ * builder calls they wrap. The per-concern LoadMetadata*ToDoctrineAttributeRector rules then turn
+ * those native calls into attributes, so only vanilla Doctrine vocabulary reaches them.
  *
- * Run this rule before LoadMetadataToDoctrineAttributeRector.
+ * Run this rule before the LoadMetadata*ToDoctrineAttributeRector rules.
  */
 final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
 {
