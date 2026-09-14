@@ -22,6 +22,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'stages')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('stage:stages:viewown')"),
@@ -111,7 +114,7 @@ class Stage extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('stages')
+        $builder
             ->setCustomRepositoryClass(StageRepository::class);
 
         $builder->addIdColumns();

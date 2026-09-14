@@ -46,6 +46,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ORM\Entity]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('email:emails:viewown')"),
@@ -374,7 +377,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
+        $builder
             ->setCustomRepositoryClass(EmailRepository::class)
             ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
             ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);

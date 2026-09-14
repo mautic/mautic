@@ -10,6 +10,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'lead_notes')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadNote extends FormEntity
 {
     /**
@@ -42,7 +45,7 @@ class LeadNote extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_notes')
+        $builder
             ->setCustomRepositoryClass(LeadNoteRepository::class);
 
         $builder->addId();

@@ -9,6 +9,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class WebhookQueue
 {
     public const TABLE_NAME = 'webhook_queue';
@@ -33,7 +36,7 @@ class WebhookQueue
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable(self::TABLE_NAME)
+        $builder
             ->setCustomRepositoryClass(WebhookQueueRepository::class);
         $builder->addBigIntIdField();
         $builder->createManyToOne('webhook', 'Webhook')

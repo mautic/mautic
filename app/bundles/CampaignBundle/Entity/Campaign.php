@@ -32,6 +32,9 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('campaign:campaigns:viewown')"),
@@ -165,7 +168,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
+        $builder
             ->setCustomRepositoryClass(CampaignRepository::class);
 
         $builder->addIdColumns();

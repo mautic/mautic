@@ -23,6 +23,9 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'roles')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('user:roles:viewown')"),
@@ -100,7 +103,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('roles')
+        $builder
             ->setCustomRepositoryClass(RoleRepository::class);
 
         $builder->addIdColumns();

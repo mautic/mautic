@@ -7,6 +7,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'plugin_integration_settings')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Integration extends CommonEntity implements CacheInvalidateInterface
 {
     public const CACHE_NAMESPACE = 'IntegrationSettings';
@@ -50,7 +53,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('plugin_integration_settings')
+        $builder
             ->setCustomRepositoryClass(IntegrationRepository::class);
 
         $builder->createField('id', 'integer')

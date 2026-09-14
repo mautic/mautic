@@ -10,6 +10,9 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ORM\Entity]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('lead:leads:viewown')"),
@@ -50,7 +53,7 @@ class IpAddress
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
+        $builder
             ->setCustomRepositoryClass(IpAddressRepository::class)
             ->addIndex(['ip_address'], 'ip_search');
 

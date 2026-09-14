@@ -8,6 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 
+#[ORM\Entity]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadStageLog
 {
     public const TABLE_NAME = 'stage_lead_action_log';
@@ -36,7 +39,7 @@ class LeadStageLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
+        $builder
             ->setCustomRepositoryClass(LeadStageLogRepository::class);
 
         $builder->createManyToOne('stage', 'Stage')

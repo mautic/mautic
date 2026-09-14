@@ -13,6 +13,9 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ORM\Entity]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('asset:assets:viewown')"),
@@ -106,7 +109,7 @@ class Download
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
+        $builder
             ->setCustomRepositoryClass(DownloadRepository::class)
             ->addIndex(['tracking_id'], 'download_tracking_search')
             ->addIndex(['source', 'source_id'], 'download_source_search')
