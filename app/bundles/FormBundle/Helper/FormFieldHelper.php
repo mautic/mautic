@@ -57,6 +57,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'radiogrp'  => [
             'filter' => 'raw',
         ],
+        'boolean'   => [],
         'select'    => [
             'filter' => 'raw',
         ],
@@ -218,6 +219,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 break;
             case 'radiogrp':
+            case 'boolean':
             case 'rating':
                 $value        = $this->sanitizeValue($value);
                 if (preg_match_all('/<input(.*?)id="mauticform_radiogrp_radio_'.$escapedAlias.'(.*?)"(.*?)value="([^"]*)"'.$inputClosePattern.'/i', $formHtml, $matches, PREG_SET_ORDER)) {
