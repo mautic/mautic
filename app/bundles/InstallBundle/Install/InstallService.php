@@ -28,6 +28,8 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -186,6 +188,31 @@ class InstallService
         $messages = $step->checkOptionalSettings();
 
         return $this->translateMessages($messages);
+    }
+
+    /**
+     * Creates the directories the requirements check tests, so a fresh Composer install
+     * does not fail purely because they have not been created yet.
+     *
+     * is_writable() returns false for a path that does not exist, and a project built
+     * from mautic/recommended-project has no var/logs until something writes a log line.
+     *
+     * This lives here rather than in CheckStep::checkRequirements() because that method
+     * also backs the System Info page, and CheckStep's path properties are bound form
+     * fields on the installer's check step.
+     */
+    public function prepareDirectories(): void
+    {
+        $filesystem = new Filesystem();
+
+        try {
+            $filesystem->mkdir([
+                $this->pathsHelper->getCachePath(),
+                $this->pathsHelper->getLogsPath(),
+            ]);
+        } catch (IOException) {
+            // Nothing to do here. The requirements check reports the path as unwritable.
+        }
     }
 
     public function saveConfiguration($params, ?StepInterface $step = null, $clearCache = false): array
