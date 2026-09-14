@@ -173,7 +173,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     /**
      * @param string $url
      *
-     * @return array
+     * @return string|array{focus: string, form: string}
      */
     public function getContent(array $focus, bool $isPreview = false, $url = '#')
     {

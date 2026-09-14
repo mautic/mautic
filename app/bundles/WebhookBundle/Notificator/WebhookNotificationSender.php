@@ -61,7 +61,7 @@ final readonly class WebhookNotificationSender
     }
 
     /**
-     * @return array<string,mixed>
+     * @return array{toUsers: list<User>, ccUser: User|null}
      *
      * @throws \Doctrine\ORM\Exception\ORMException
      */

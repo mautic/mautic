@@ -43,6 +43,8 @@ class UpdateHelper
      * Fetches a download package from the remote server.
      *
      * @param string $package
+     *
+     * @return array{error: bool, message?: string}
      */
     public function fetchPackage($package): array
     {
@@ -77,6 +79,8 @@ class UpdateHelper
 
     /**
      * Retrieves the update data from our home server.
+     *
+     * @return array{error: bool, message?: string, version?: string, announcement?: string, package?: string, stability?: string, checkedTime?: int, metadata?: Metadata}
      */
     public function fetchData(bool $overrideCache = false): array
     {

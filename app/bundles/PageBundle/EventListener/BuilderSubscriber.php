@@ -421,7 +421,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array<string,string>
+     * @return array{lang: string, url: string}
      */
     private function buildRelatedArrayForPage(Page $page): array
     {

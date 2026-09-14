@@ -324,7 +324,7 @@ final class Fixtures
     }
 
     /**
-     * @return array<float>
+     * @return array{'SUM es.is_read': int, 'AVG es.is_read': float, 'COUNT l.id': int}
      */
     public static function getValidReportDataAggregatedTotals(): array
     {

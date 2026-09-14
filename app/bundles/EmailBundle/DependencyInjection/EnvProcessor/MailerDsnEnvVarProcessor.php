@@ -21,6 +21,9 @@ final class MailerDsnEnvVarProcessor implements EnvVarProcessorInterface
         }
     }
 
+    /**
+     * @return array{mailer: string, 'urlencoded-dsn': string}
+     */
     public static function getProvidedTypes(): array
     {
         return [

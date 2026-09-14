@@ -173,7 +173,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
      *
      * @param array<string, mixed> $log
      *
-     * @return array<string, mixed>
+     * @return array{path: string, properties: array<string, mixed>}
      */
     private function getCampaignEventDetails(array $log): array
     {

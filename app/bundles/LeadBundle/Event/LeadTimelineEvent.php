@@ -282,7 +282,7 @@ final class LeadTimelineEvent extends Event
     /**
      * Fetch start/limit for queries.
      *
-     * @return array<string, int|null>
+     * @return array{leadId: int|null, limit: int, start: int}
      */
     public function getEventLimit(): array
     {
@@ -360,6 +360,8 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Get the date range to get counts by.
+     *
+     * @return array{from: \DateTime|null, to: \DateTime|null}
      */
     public function getCountDateRange(): array
     {

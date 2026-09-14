@@ -1338,7 +1338,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @return array<string, array<int|string, array<int|string, int|string>>>
+     * @return array{campaignLogCounts: array<int|string, array<int|string, int|string>>, campaignLogCountsProcessed: array<int|string, array<int|string, int|string>>}
      *
      * @throws CacheException
      */

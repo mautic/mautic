@@ -297,7 +297,7 @@ final class PublicController extends CommonFormController
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{callbackResponses: mixed[], response?: Response}
      */
     private function dispatchPostSubmitCallbacks(SubmissionEvent $submissionEvent, bool $messengerMode, bool $isAjax): array
     {

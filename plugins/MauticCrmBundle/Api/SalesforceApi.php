@@ -313,7 +313,7 @@ final class SalesforceApi extends CrmApi
      * @param mixed  $query  String for a SOQL query or array to build query
      * @param string $object
      *
-     * @return mixed|string
+     * @return array{totalSize: int, records: array<mixed>}|mixed|string
      *
      * @throws ApiErrorException
      */

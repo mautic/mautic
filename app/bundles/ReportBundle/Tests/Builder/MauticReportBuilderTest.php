@@ -634,7 +634,7 @@ final class MauticReportBuilderTest extends TestCase
     }
 
     /**
-     * @return array<string, string>
+     * @return array{label: string, type: string, alias: string}
      */
     private function buildFilterDefinition(string $label, string $type, string $alias): array
     {
@@ -646,7 +646,7 @@ final class MauticReportBuilderTest extends TestCase
     }
 
     /**
-     * @return array<string, array<string, string>>
+     * @return array{'a.isPublished': array{label: string, type: string, alias: string}, 'a.name': array{label: string, type: string, alias: string}}
      */
     private function buildPublishedAndNameFilterDefinitions(): array
     {

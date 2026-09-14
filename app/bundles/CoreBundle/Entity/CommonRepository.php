@@ -625,7 +625,7 @@ class CommonRepository extends ServiceEntityRepository
      * @param int $start
      * @param int $limit
      *
-     * @return array<string, mixed>
+     * @return array{total: mixed, results: list<array<string, mixed>>}
      */
     public function getRows($start = 0, $limit = 100, array $order = [], array $where = [], ?array $select = null, array $allowedJoins = []): array
     {

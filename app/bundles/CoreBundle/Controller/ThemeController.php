@@ -308,7 +308,7 @@ final class ThemeController extends FormController
     /**
      * A helper method to keep the code DRY.
      *
-     * @return array<string, string|array<string, string>>
+     * @return array{returnUrl: string, contentTemplate: string, passthroughVars: array{activeLink: string, mauticContent: string}}
      */
     public function getIndexPostActionVars(): array
     {

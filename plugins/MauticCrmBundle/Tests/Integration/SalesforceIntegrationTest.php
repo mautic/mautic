@@ -1186,7 +1186,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      *
      * @param list<string> $emails
      *
-     * @return array<string, mixed>
+     * @return array{totalSize: int, done: bool, records: list<array<string, mixed>>}
      */
     protected function getSalesforceObjects(array $emails, int $maxContacts, int $maxLeads): array
     {
@@ -1239,7 +1239,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * Mock SF response.
      *
-     * @return array<string, mixed>
+     * @return array{totalSize: int, done: int, records: list<array<string, mixed>>}
      */
     protected function getSalesforceDNCHistory(string $object, string $priority): array
     {

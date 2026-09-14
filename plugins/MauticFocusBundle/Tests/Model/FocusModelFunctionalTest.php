@@ -43,7 +43,7 @@ final class FocusModelFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, int>
+     * @return array{view: int, click: int}
      */
     private function setTestsData(Lead $lead, Focus $focus): array
     {

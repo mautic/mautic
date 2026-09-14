@@ -783,6 +783,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * Get a stats for email by list.
      *
      * @param Email|int $email
+     * @return array{labels: mixed[], datasets: mixed[]}
      */
     public function getEmailDeviceStats($email, bool $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {

@@ -189,7 +189,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     }
 
     /**
-     * @return string[]
+     * @return array{HTTP_Content-Type: string, HTTP_X-Requested-With: string, HTTP_X-CSRF-Token: string}
      */
     protected function createAjaxHeaders(): array
     {

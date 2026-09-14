@@ -20,7 +20,7 @@ trait TimelineTrait
      * @param mixed|null   $resultsParserCallback Callback to custom parse results
      * @param string|null  $secondaryOrdering     Name of column for secondary sort
      *
-     * @return array<mixed>
+     * @return array{total: mixed, results: list<array<string, mixed>>}|array<mixed>
      */
     private function getTimelineResults(
         QueryBuilder $query,

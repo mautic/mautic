@@ -222,7 +222,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
     }
 
     /**
-     * @return array<string, array<int, string>>
+     * @return array{successPercent: list<string>, completed: list<string>, pending: list<string>}
      */
     private function getActionCounts(int $campaignId): array
     {

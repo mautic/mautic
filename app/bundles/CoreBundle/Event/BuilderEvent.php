@@ -164,7 +164,7 @@ class BuilderEvent extends Event
     /**
      * Get text of the search filter.
      *
-     * @return array<string, string|string[]>
+     * @return array{target: string, filter: string|string[]}
      */
     public function getTokenFilter(): array
     {
