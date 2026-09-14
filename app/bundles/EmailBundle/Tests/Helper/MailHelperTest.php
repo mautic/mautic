@@ -611,7 +611,7 @@ final class MailHelperTest extends TestCase
     #[DataProvider('emailReplyToProvider')]
     public function testEmailReplyTo(string $expected, ?string $configFrom = null, ?string $configReplyTo = null, ?string $advancedFrom = null, ?string $advancedReplyTo = null): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
             ['mailer_from_email', null, $configFrom],
             ['mailer_from_name', null, 'No Body'],
             ['mailer_reply_to_email', null, $configReplyTo],
@@ -631,38 +631,35 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * @return array<string, array<int, string|null>>
+     * @return \Iterator<string, array<int, (string | null)>>
      */
-    public static function emailReplyToProvider(): array
+    public static function emailReplyToProvider(): \Iterator
     {
         $systemFromAddress    = 'system.from@nowhere.com';
         $systemReplyAddress   = 'system.reply@nowhere.com';
         $advancedFromAddress  = 'advanced.from@nowhere.com';
         $advancedReplyAddress = 'advanced.reply@nowhere.com';
-
-        return [
-            'Default to system from address' => [
-                'expected' => $systemFromAddress,
-                'configFrom' => $systemFromAddress,
-            ],
-            'Prefer system reply to address over system from address' => [
-                'expected' => $systemReplyAddress,
-                'configFrom' => $systemFromAddress,
-                'configReplyTo' => $systemReplyAddress,
-            ],
-            'Prefer advanced from address over system reply to address' => [
-                'expected' => $advancedFromAddress,
-                'configFrom' => $systemFromAddress,
-                'configReplyTo' => $systemReplyAddress,
-                'advancedFrom' => $advancedFromAddress,
-            ],
-            'Prefer advanced reply address over advanced from address' => [
-                'expected' => $advancedReplyAddress,
-                'configFrom' => $systemFromAddress,
-                'configReplyTo' => $systemReplyAddress,
-                'advancedFrom' => $advancedFromAddress,
-                'advancedReplyTo' => $advancedReplyAddress,
-            ],
+        yield 'Default to system from address' => [
+            'expected' => $systemFromAddress,
+            'configFrom' => $systemFromAddress,
+        ];
+        yield 'Prefer system reply to address over system from address' => [
+            'expected' => $systemReplyAddress,
+            'configFrom' => $systemFromAddress,
+            'configReplyTo' => $systemReplyAddress,
+        ];
+        yield 'Prefer advanced from address over system reply to address' => [
+            'expected' => $advancedFromAddress,
+            'configFrom' => $systemFromAddress,
+            'configReplyTo' => $systemReplyAddress,
+            'advancedFrom' => $advancedFromAddress,
+        ];
+        yield 'Prefer advanced reply address over advanced from address' => [
+            'expected' => $advancedReplyAddress,
+            'configFrom' => $systemFromAddress,
+            'configReplyTo' => $systemReplyAddress,
+            'advancedFrom' => $advancedFromAddress,
+            'advancedReplyTo' => $advancedReplyAddress,
         ];
     }
 

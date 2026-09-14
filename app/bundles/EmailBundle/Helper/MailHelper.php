@@ -1913,7 +1913,7 @@ class MailHelper
     {
         return [
             'name'        => $name,
-            'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
+            'leadId'      => $this->lead['id'] ?? null,
             'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
             'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
             'hashId'      => $this->idHash,
