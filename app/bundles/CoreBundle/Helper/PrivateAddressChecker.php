@@ -22,9 +22,6 @@ final class PrivateAddressChecker
      */
     private array $allowedPrivateAddresses = [];
 
-    /**
-     * @param callable|null $dnsResolver
-     */
     public function __construct(
         private \Closure|string|null $dnsResolver = null,
     ) {

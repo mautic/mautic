@@ -47,7 +47,7 @@ final class CorePermissionsTest extends MauticMysqlTestCase
                 return 'test';
             }
 
-            public function isSupported($name, $level = ''): bool
+            public function isSupported($name, string $level = ''): bool
             {
                 Assert::assertSame('group', $name);
                 Assert::assertSame('action', $level);

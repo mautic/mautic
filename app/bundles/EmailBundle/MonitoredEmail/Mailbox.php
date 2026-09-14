@@ -836,7 +836,7 @@ class Mailbox
         return $mail;
     }
 
-    protected function initMailPart(Message $mail, $partStructure, int $partNum, bool $markAsSeen = true, bool $isDsn = false, bool $isFbl = false): void
+    protected function initMailPart(Message $mail, $partStructure, $partNum, bool $markAsSeen = true, bool $isDsn = false, bool $isFbl = false): void
     {
         $options = FT_UID;
         if (!$markAsSeen) {

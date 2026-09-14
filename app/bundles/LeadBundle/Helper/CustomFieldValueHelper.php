@@ -77,7 +77,6 @@ final class CustomFieldValueHelper
 
     /**
      * @param mixed                          $value
-     * @param string|null                    $type
      * @param string|array<int, string>|null $properties
      *
      * @return mixed|string

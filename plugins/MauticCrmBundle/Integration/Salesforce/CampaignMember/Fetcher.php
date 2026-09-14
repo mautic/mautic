@@ -28,13 +28,10 @@ final class Fetcher
 
     private array $knownCampaignMembers = [];
 
-    /**
-     * @param string|int $campaignId
-     */
     public function __construct(
         private readonly IntegrationEntityRepository $repo,
         private readonly Organizer $organizer,
-        private string $campaignId,
+        private int|string $campaignId,
     ) {
         $this->fetchLeads();
         $this->fetchContacts();

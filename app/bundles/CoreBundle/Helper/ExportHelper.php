@@ -55,8 +55,6 @@ readonly class ExportHelper
 
     /**
      * Exports data as the given export type. You can get available export types with getSupportedExportTypes().
-     *
-     * @param array|\Iterator $data
      */
     public function exportDataAs(array $data, string $type, string $filename): StreamedResponse
     {

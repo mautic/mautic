@@ -22,7 +22,7 @@ class BuilderEvent extends Event
     public function __construct(
         protected TranslatorInterface $translator,
         protected $entity = null,
-        protected string $requested = 'all',
+        protected $requested = 'all',
         protected string $tokenFilter = '',
     ) {
         $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';

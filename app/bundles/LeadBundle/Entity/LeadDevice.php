@@ -192,9 +192,6 @@ class LeadDevice
         return $this->device;
     }
 
-    /**
-     * @param mixed $device
-     */
     public function setDevice(string $device): void
     {
         $this->device = $device;
@@ -221,9 +218,6 @@ class LeadDevice
         return $this->deviceModel;
     }
 
-    /**
-     * @param mixed $deviceModel
-     */
     public function setDeviceModel(string $deviceModel): void
     {
         $this->deviceModel = $deviceModel;
@@ -363,9 +357,6 @@ class LeadDevice
         return $this->dateAdded;
     }
 
-    /**
-     * @param mixed $dateAdded
-     */
     public function setDateAdded(\DateTime $dateAdded): void
     {
         $this->dateAdded = $dateAdded;

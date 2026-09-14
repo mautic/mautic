@@ -62,9 +62,6 @@ class LeadTriggerLog
         return $this->dateFired;
     }
 
-    /**
-     * @param mixed $dateFired
-     */
     public function setDateFired(\DateTime $dateFired): void
     {
         $this->dateFired = $dateFired;
@@ -91,9 +88,6 @@ class LeadTriggerLog
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
@@ -107,9 +101,6 @@ class LeadTriggerLog
         return $this->event;
     }
 
-    /**
-     * @param mixed $event
-     */
     public function setEvent(\Mautic\PointBundle\Entity\TriggerEvent $event): void
     {
         $this->event = $event;

@@ -192,7 +192,7 @@ class DateTimeHelper
      *
      * @return bool|\DateInterval|string
      */
-    public function getDiff(string $compare = 'now', ?string $format = null, bool $resetTime = false)
+    public function getDiff($compare = 'now', ?string $format = null, bool $resetTime = false)
     {
         if ('now' == $compare) {
             $compare = new \DateTime('now', $this->datetime->getTimezone());

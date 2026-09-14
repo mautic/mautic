@@ -1099,7 +1099,7 @@ class MailHelper
      *
      * @param string|array $fromEmail
      */
-    public function setFrom(string $fromEmail, ?string $fromName = null): void
+    public function setFrom($fromEmail, ?string $fromName = null): void
     {
         if (is_array($fromEmail)) {
             $this->from = AddressDTO::fromAddressArray($fromEmail);
@@ -1155,7 +1155,7 @@ class MailHelper
     /**
      * @param array|Lead $lead
      */
-    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead, bool $interalSend = false): void
+    public function setLead($lead, bool $interalSend = false): void
     {
         $this->lead         = $lead;
         $this->internalSend = $interalSend;

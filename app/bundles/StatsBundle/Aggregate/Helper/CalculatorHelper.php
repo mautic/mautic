@@ -14,7 +14,7 @@ final class CalculatorHelper
         return new \DateTime(self::getYearDateString($year))->format($labelFormat);
     }
 
-    public static function getYearDateString(\DateTime $year): string
+    public static function getYearDateString($year): string
     {
         return "{$year}-01-01 00:00:00";
     }
@@ -53,7 +53,7 @@ final class CalculatorHelper
         return new \DateTime(self::getMonthDateString($month))->format($labelFormat);
     }
 
-    public static function getMonthDateString(\DateTime $month): string
+    public static function getMonthDateString($month): string
     {
         return "{$month}-01 00:00:00";
     }
@@ -92,7 +92,7 @@ final class CalculatorHelper
         return new \DateTime(self::getDayDateString($day))->format($labelFormat);
     }
 
-    public static function getDayDateString(\DateTime $day): string
+    public static function getDayDateString($day): string
     {
         return "{$day} 00:00:00";
     }
@@ -117,7 +117,7 @@ final class CalculatorHelper
         return new \DateTime(self::getWeekDateString($date))->format($labelFormat);
     }
 
-    public static function getWeekDateString(\DateTime $date): string
+    public static function getWeekDateString($date): string
     {
         if (!preg_match('/^([0-9]{4})-([0-9]{2})$/', $date, $matches)) {
             throw new \InvalidArgumentException('Invalid argument, Y-W format is required.');
@@ -180,7 +180,7 @@ final class CalculatorHelper
         return new \DateTime(self::getHourDateString($hour))->format($labelFormat);
     }
 
-    public static function getHourDateString(\DateTime $hour): string
+    public static function getHourDateString($hour): string
     {
         return "{$hour}:00:00";
     }

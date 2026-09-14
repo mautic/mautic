@@ -110,7 +110,7 @@ final class InputHelper
      *
      * @return mixed
      */
-    public static function _($value, string $mask = 'clean', bool $urldecode = false)
+    public static function _($value, $mask = 'clean', bool $urldecode = false)
     {
         if (is_array($value)) {
             foreach ($value as $k => &$v) {
@@ -247,7 +247,6 @@ final class InputHelper
      * Removes all characters except those allowed in URLs.
      *
      * @param array<string>|null $allowedProtocols
-     * @param mixed              $defaultProtocol
      * @param array<string>      $removeQuery
      */
     public static function url(?string $value, ?bool $urldecode = false, $allowedProtocols = null, ?array $defaultProtocol = null, array $removeQuery = [], bool $ignoreFragment = false): string|false

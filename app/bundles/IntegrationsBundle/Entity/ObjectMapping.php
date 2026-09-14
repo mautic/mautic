@@ -291,9 +291,6 @@ class ObjectMapping
         return $this->integrationReferenceId;
     }
 
-    /**
-     * @param string|null $integrationReferenceId
-     */
     public function setIntegrationReferenceId(string $integrationReferenceId): static
     {
         $this->integrationReferenceId = $integrationReferenceId;

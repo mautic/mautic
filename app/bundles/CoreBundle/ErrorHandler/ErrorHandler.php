@@ -48,7 +48,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          * @param mixed               $log
          * @param string|array<mixed> $context
          */
-        public static function logDebugEntry($log, string $context = 'null', bool $backtrace = false): void
+        public static function logDebugEntry($log, $context = 'null', bool $backtrace = false): void
         {
             if ($debugLogger = self::$handler->getDebugLogger()) {
                 if (!is_array($context)) {
@@ -148,7 +148,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return false;
         }
 
-        public function handleException(\Symfony\Component\ErrorHandler\Error\FatalError $exception, bool $returnContent = false, bool $inTemplate = false): false|string
+        public function handleException($exception, bool $returnContent = false, bool $inTemplate = false): false|string
         {
             if (!$error = self::prepareExceptionForOutput($exception)) {
                 return false;

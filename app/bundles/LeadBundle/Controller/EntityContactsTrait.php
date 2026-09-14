@@ -48,7 +48,7 @@ trait EntityContactsTrait
         $sessionVar,
         $entityJoinTable,
         $dncChannel = null,
-        string $entityIdColumnName = 'id',
+        ?string $entityIdColumnName = 'id',
         ?array $contactFilter = null,
         ?array $additionalJoins = null,
         $contactColumnName = null,

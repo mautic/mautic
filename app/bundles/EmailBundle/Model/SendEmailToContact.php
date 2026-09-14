@@ -210,7 +210,7 @@ class SendEmailToContact
      *
      * @throws FailedToSendToContactException
      */
-    protected function failContact(bool $hasBadEmail = true, ?string $errorMessages = null)
+    protected function failContact(bool $hasBadEmail = true, $errorMessages = null)
     {
         if (null === $errorMessages) {
             // Clear the errors so it doesn't stop the next send

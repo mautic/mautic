@@ -89,9 +89,6 @@ class ListLead
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;

@@ -91,11 +91,9 @@ trait CustomFieldEntityTrait
     /**
      * Add an updated field to persist to the DB and to note changes.
      *
-     * @param string $oldValue
-     *
      * @return $this
      */
-    public function addUpdatedField($alias, $value, $oldValue = null)
+    public function addUpdatedField($alias, $value, string $oldValue = '')
     {
         // Don't allow overriding ID
         if ('id' === $alias) {

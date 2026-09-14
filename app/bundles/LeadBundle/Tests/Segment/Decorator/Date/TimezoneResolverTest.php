@@ -21,7 +21,7 @@ final class TimezoneResolverTest extends TestCase
             ) {
             }
 
-            public function get($name, $default = null): ?string
+            public function get(string $name, $default = null): ?string
             {
                 Assert::assertSame('default_timezone', $name);
 

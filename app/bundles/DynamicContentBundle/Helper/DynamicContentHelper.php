@@ -69,7 +69,7 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getDynamicContentSlotForLead($slotName, \Mautic\LeadBundle\Entity\Lead $lead)
+    public function getDynamicContentSlotForLead($slotName, $lead)
     {
         $leadArray = [];
         if ($lead instanceof Lead) {

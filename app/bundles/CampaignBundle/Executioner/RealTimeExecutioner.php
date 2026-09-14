@@ -18,7 +18,6 @@ use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Mautic\PageBundle\Entity\Hit;
 use Psr\Log\LoggerInterface;
 
 class RealTimeExecutioner
@@ -54,7 +53,7 @@ class RealTimeExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute(string $type, \Mautic\SmsBundle\Event\ReplyEvent|Hit|null $passthrough = null, ?string $channel = null, ?int $channelId = null): ?Responses
+    public function execute(string $type, $passthrough = null, ?string $channel = null, ?int $channelId = null): ?Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();

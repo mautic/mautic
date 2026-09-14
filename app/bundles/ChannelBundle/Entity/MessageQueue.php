@@ -353,9 +353,6 @@ class MessageQueue
         return $this->scheduledDate;
     }
 
-    /**
-     * @param mixed $scheduledDate
-     */
     public function setScheduledDate(\DateTime $scheduledDate): void
     {
         $this->scheduledDate = $scheduledDate;

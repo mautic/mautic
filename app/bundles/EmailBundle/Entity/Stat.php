@@ -344,9 +344,6 @@ class Stat
         return $this->trackingHash;
     }
 
-    /**
-     * @param string|null $trackingHash
-     */
     public function setTrackingHash(string $trackingHash): void
     {
         $this->trackingHash = $trackingHash;
@@ -421,9 +418,6 @@ class Stat
         return $this->emailAddress;
     }
 
-    /**
-     * @param string|null $emailAddress
-     */
     public function setEmailAddress(string $emailAddress): void
     {
         $this->addChange('emailAddress', $this->emailAddress, $emailAddress);

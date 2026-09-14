@@ -88,9 +88,6 @@ class LeadPointLog
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
@@ -104,9 +101,6 @@ class LeadPointLog
         return $this->point;
     }
 
-    /**
-     * @param mixed $point
-     */
     public function setPoint(\Mautic\PointBundle\Entity\Point $point): void
     {
         $this->point = $point;

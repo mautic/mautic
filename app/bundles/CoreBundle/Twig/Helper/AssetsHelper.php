@@ -202,7 +202,7 @@ final class AssetsHelper
      *
      * @param string|array<string, string> $stylesheet
      */
-    public function addStylesheet(string $stylesheet): self
+    public function addStylesheet($stylesheet): self
     {
         $addSheet = function ($s): void {
             $this->assets[$this->context]['stylesheets'] ??= [];

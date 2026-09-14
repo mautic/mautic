@@ -62,9 +62,6 @@ class LeadStageLog
         return $this->dateFired;
     }
 
-    /**
-     * @param mixed $dateFired
-     */
     public function setDateFired(\DateTime $dateFired): void
     {
         $this->dateFired = $dateFired;
@@ -91,9 +88,6 @@ class LeadStageLog
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
@@ -107,9 +101,6 @@ class LeadStageLog
         return $this->stage;
     }
 
-    /**
-     * @param mixed $stage
-     */
     public function setStage(\Mautic\StageBundle\Entity\Stage $stage): void
     {
         $this->stage = $stage;
