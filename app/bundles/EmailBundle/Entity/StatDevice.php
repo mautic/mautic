@@ -55,6 +55,7 @@ class StatDevice
 
         $builder->createField('dateOpened', 'datetime')
             ->columnName('date_opened')
+            ->precision(3)
             ->build();
     }
 
