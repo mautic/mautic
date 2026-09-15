@@ -35,6 +35,7 @@ class StatDevice
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_opened', type: 'datetime')]
     private $dateOpened;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -52,10 +53,6 @@ class StatDevice
             ->build();
 
         $builder->addIpAddress(true);
-
-        $builder->createField('dateOpened', 'datetime')
-            ->columnName('date_opened')
-            ->build();
     }
 
     /**

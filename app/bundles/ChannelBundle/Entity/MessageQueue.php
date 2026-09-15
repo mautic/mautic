@@ -41,6 +41,7 @@ class MessageQueue
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
     private $channelId;
@@ -58,51 +59,61 @@ class MessageQueue
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $priority = 2;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'max_attempts', type: 'smallint')]
     private $maxAttempts = 3;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $attempts = 0;
 
     /**
      * @var bool
      */
+    #[ORM\Column(type: 'boolean')]
     private $success = false;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $status = self::STATUS_PENDING;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_published', type: 'datetime', nullable: true)]
     private $datePublished;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'scheduled_date', type: 'datetime', nullable: true)]
     private $scheduledDate;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'last_attempt', type: 'datetime', nullable: true)]
     private $lastAttempt;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'date_sent', type: 'datetime', nullable: true)]
     private $dateSent;
 
     /**
      * @var mixed[][]
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private array $options = [];
 
     /**
@@ -126,8 +137,6 @@ class MessageQueue
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');
 
         $builder->createManyToOne('event', Event::class)
@@ -135,50 +144,6 @@ class MessageQueue
             ->build();
 
         $builder->addLead(false, 'CASCADE', false);
-
-        $builder->createField('priority', 'smallint')
-            ->columnName('priority')
-            ->build();
-
-        $builder->createField('maxAttempts', 'smallint')
-            ->columnName('max_attempts')
-            ->build();
-
-        $builder->createField('attempts', 'smallint')
-            ->columnName('attempts')
-            ->build();
-
-        $builder->createField('success', 'boolean')
-            ->columnName('success')
-            ->build();
-
-        $builder->createField('status', 'string')
-            ->columnName('status')
-            ->build();
-
-        $builder->createField('datePublished', 'datetime')
-            ->columnName('date_published')
-            ->nullable()
-            ->build();
-
-        $builder->createField('scheduledDate', 'datetime')
-            ->columnName('scheduled_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastAttempt', 'datetime')
-            ->columnName('last_attempt')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->nullable()
-            ->build();
-
-        $builder->createField('options', 'array')
-            ->nullable()
-            ->build();
     }
 
     public function getId(): int

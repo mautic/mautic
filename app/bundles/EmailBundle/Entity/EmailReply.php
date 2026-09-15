@@ -18,6 +18,7 @@ class EmailReply
 {
     private readonly string $id;
 
+    #[ORM\Column(name: 'date_replied', type: 'datetime')]
     private readonly \DateTimeInterface $dateReplied;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -29,14 +30,6 @@ class EmailReply
         $builder->createManyToOne('stat', Stat::class)
             ->inversedBy('replies')
             ->addJoinColumn('stat_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('dateReplied', 'datetime')
-            ->columnName('date_replied')
-            ->build();
-
-        $builder->createField('messageId', 'string')
-            ->columnName('message_id')
             ->build();
     }
 
@@ -58,6 +51,7 @@ class EmailReply
 
     public function __construct(
         private readonly Stat $stat,
+        #[ORM\Column(name: 'message_id', type: 'string', length: 191)]
         private readonly ?string $messageId,
         ?\DateTime $dateReplied = null,
     ) {

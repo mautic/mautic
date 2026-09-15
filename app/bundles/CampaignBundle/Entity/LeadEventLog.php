@@ -59,26 +59,31 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'date_triggered', type: 'datetime', nullable: true)]
     private $dateTriggered;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_scheduled', type: 'boolean')]
     private $isScheduled = false;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'trigger_date', type: 'datetime', nullable: true)]
     private $triggerDate;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'system_triggered', type: 'boolean')]
     private $systemTriggered = false;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $metadata = [];
 
     /**
@@ -89,6 +94,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $channel;
 
     /**
@@ -104,6 +110,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $rotation = 1;
 
     /**
@@ -116,6 +123,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
      */
     private ?\DateInterval $rescheduleInterval = null;
 
+    #[ORM\Column(name: 'date_queued', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateQueued = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -131,39 +139,11 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
         $builder->addLead(false, 'CASCADE');
 
-        $builder->addField('rotation', 'integer');
-
         $builder->createManyToOne('campaign', 'Campaign')
             ->addJoinColumn('campaign_id', 'id')
             ->build();
 
         $builder->addIpAddress(true);
-
-        $builder->createField('dateTriggered', 'datetime')
-            ->columnName('date_triggered')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isScheduled', 'boolean')
-            ->columnName('is_scheduled')
-            ->build();
-
-        $builder->createField('triggerDate', 'datetime')
-            ->columnName('trigger_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('systemTriggered', 'boolean')
-            ->columnName('system_triggered')
-            ->build();
-
-        $builder->createField('metadata', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->createField('channel', 'string')
-                ->nullable()
-                ->build();
 
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
@@ -173,11 +153,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
             ->mappedBy('log')
             ->fetchExtraLazy()
             ->cascadeAll()
-            ->build();
-
-        $builder->createField('dateQueued', Types::DATETIME_MUTABLE)
-            ->columnName('date_queued')
-            ->nullable()
             ->build();
 
         self::addVersionField($builder);

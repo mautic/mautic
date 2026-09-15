@@ -25,21 +25,25 @@ class UserToken
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 32)]
     private $authorizator;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 120, unique: true)]
     private $secret;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $expiration;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'one_time_only', type: 'boolean')]
     private $oneTimeOnly = true;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -50,23 +54,6 @@ class UserToken
 
         $builder->createManyToOne('user', User::class)
             ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('authorizator', 'string')
-            ->length(32)
-            ->build();
-
-        $builder->createField('secret', 'string')
-            ->length(120)
-            ->unique()
-            ->build();
-
-        $builder->createField('expiration', 'datetime')
-            ->nullable()
-            ->build();
-
-        $builder->createField('oneTimeOnly', 'boolean')
-            ->columnName('one_time_only')
             ->build();
     }
 

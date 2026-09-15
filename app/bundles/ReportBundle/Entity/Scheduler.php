@@ -27,15 +27,11 @@ class Scheduler
         $builder->createManyToOne('report', Report::class)
             ->addJoinColumn('report_id', 'id', false, false, 'CASCADE')
             ->build();
-
-        $builder->createField('scheduleDate', Types::DATETIME_MUTABLE)
-            ->columnName('schedule_date')
-            ->nullable(false)
-            ->build();
     }
 
     public function __construct(
         private readonly Report $report,
+        #[ORM\Column(name: 'schedule_date', type: Types::DATETIME_MUTABLE)]
         private readonly \DateTimeInterface $scheduleDate,
     ) {
     }

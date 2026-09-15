@@ -20,14 +20,19 @@ class UserInvite
 {
     private ?int $id = null;
 
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private ?string $email = null;
 
+    #[ORM\Column(name: 'token_selector', type: Types::STRING, length: 32)]
     private ?string $tokenSelector = null;
 
+    #[ORM\Column(name: 'token_verifier_hash', type: Types::STRING, length: 255)]
     private ?string $tokenVerifierHash = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $expiration = null;
 
+    #[ORM\Column(type: Types::BOOLEAN)]
     private bool $used = false;
 
     public function __construct(
@@ -39,26 +44,6 @@ class UserInvite
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->addId();
-
-        $builder->createField('email', Types::STRING)
-            ->length(191)
-            ->build();
-
-        $builder->createField('tokenSelector', Types::STRING)
-            ->columnName('token_selector')
-            ->length(32)
-            ->build();
-
-        $builder->createField('tokenVerifierHash', Types::STRING)
-            ->columnName('token_verifier_hash')
-            ->length(255)
-            ->build();
-
-        $builder->createField('expiration', Types::DATETIME_MUTABLE)
-            ->build();
-
-        $builder->createField('used', Types::BOOLEAN)
-            ->build();
 
         $builder->createManyToOne('role', Role::class)
             ->addJoinColumn('role_id', 'id', false, false, 'CASCADE')

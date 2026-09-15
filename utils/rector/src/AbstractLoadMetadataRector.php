@@ -1036,12 +1036,14 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
             $args[] = $this->namedArg('length', new Int_($length));
         }
 
-        if ($nullable) {
-            $args[] = $this->namedArg('nullable', new ConstFetch(new Name('true')));
-        }
-
+        // unique before nullable, matching the ORM\Column constructor parameter order that
+        // SortAttributeNamedArgsRector enforces.
         if ($unique) {
             $args[] = $this->namedArg('unique', new ConstFetch(new Name('true')));
+        }
+
+        if ($nullable) {
+            $args[] = $this->namedArg('nullable', new ConstFetch(new Name('true')));
         }
 
         if ([] !== $options) {
@@ -1382,11 +1384,17 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
      */
     protected function redeclaredProperty(Class_ $node, string $propertyName, array $attributeGroups): Property
     {
+        $type = $this->parentPropertyType($node, $propertyName);
+
+        // A nullable typed property gets an explicit null default, matching the codebase default and
+        // RestoreDefaultNullToNullableTypePropertyRector, so it stays initialized rather than unset.
+        $default = $type instanceof NullableType ? new ConstFetch(new Name('null')) : null;
+
         return new Property(
             Modifiers::PROTECTED,
-            [new PropertyItem($propertyName)],
+            [new PropertyItem($propertyName, $default)],
             [],
-            $this->parentPropertyType($node, $propertyName),
+            $type,
             $attributeGroups,
         );
     }

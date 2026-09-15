@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\ClassMetadata as OrmClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -22,6 +23,8 @@ use Mautic\ProjectBundle\Validator\Constraints\UniqueName;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[ORM\Entity]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('project:projects:view')"),
@@ -61,6 +64,7 @@ class Project extends FormEntity implements UuidInterface
      * @var mixed[]
      */
     #[Groups(['project:read', 'project:write'])]
+    #[ORM\Column(type: Types::JSON)]
     private array $properties = [];
 
     /**
@@ -85,8 +89,6 @@ class Project extends FormEntity implements UuidInterface
             ->addUniqueConstraint(['name'], 'unique_project_name');
 
         $builder->addIdColumns();
-
-        $builder->addField('properties', Types::JSON);
 
         static::addUuidField($builder);
     }

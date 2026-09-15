@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ContactExportScheduler
 {
     private ?int $id = null;
@@ -17,6 +20,7 @@ class ContactExportScheduler
     private ?User $user = null; // Created by
 
     #[Assert\NotBlank()]
+    #[ORM\Column(name: 'scheduled_datetime', type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $scheduledDateTime;
 
     /**
@@ -42,9 +46,6 @@ class ContactExportScheduler
         $builder->addId();
         $builder->createManyToOne('user', User::class)
             ->addJoinColumn('user_id', 'id', true, false, 'CASCADE')
-            ->build();
-        $builder->createField('scheduledDateTime', Types::DATETIME_IMMUTABLE)
-            ->columnName('scheduled_datetime')
             ->build();
         $builder->addNullableField('data', Types::ARRAY);
     }

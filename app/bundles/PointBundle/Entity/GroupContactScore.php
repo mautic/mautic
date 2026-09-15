@@ -22,6 +22,7 @@ class GroupContactScore extends CommonEntity
 
     private Group $group;
 
+    #[ORM\Column(type: Types::INTEGER)]
     private int $score = 0;
 
     public function __construct()
@@ -42,9 +43,6 @@ class GroupContactScore extends CommonEntity
         $builder->createManyToOne('group', Group::class)
             ->isPrimaryKey()
             ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('score', Types::INTEGER)
             ->build();
     }
 

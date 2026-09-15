@@ -45,23 +45,28 @@ class FrequencyRule extends CommonEntity
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'frequency_time', type: 'string', length: 25, nullable: true)]
     private $frequencyTime;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
+    #[ORM\Column(name: 'preferred_channel', type: 'boolean')]
     private bool $preferredChannel = false;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'pause_from_date', type: 'datetime', nullable: true)]
     private $pauseFromDate;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'pause_to_date', type: 'datetime', nullable: true)]
     private $pauseToDate;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -75,29 +80,6 @@ class FrequencyRule extends CommonEntity
         $builder->addDateAdded();
 
         $builder->addNamedField('frequencyNumber', 'smallint', 'frequency_number', true);
-
-        $builder->createField('frequencyTime', 'string')
-            ->columnName('frequency_time')
-            ->nullable()
-            ->length(25)
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->build();
-
-        $builder->createField('preferredChannel', 'boolean')
-            ->columnName('preferred_channel')
-            ->build();
-
-        $builder->createField('pauseFromDate', 'datetime')
-            ->columnName('pause_from_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('pauseToDate', 'datetime')
-            ->columnName('pause_to_date')
-            ->nullable()
-            ->build();
     }
 
     /**

@@ -24,6 +24,7 @@ class FieldChange
     /**
      * @var string
      */
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $integration;
 
     /**
@@ -34,26 +35,31 @@ class FieldChange
     /**
      * @var string
      */
+    #[ORM\Column(name: 'object_type', type: Types::STRING, length: 191)]
     private $objectType;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'modified_at', type: Types::DATETIME_MUTABLE)]
     private $modifiedAt;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'column_name', type: Types::STRING, length: 191)]
     private $columnName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'column_type', type: Types::STRING, length: 191)]
     private $columnType;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'column_value', type: Types::TEXT)]
     private $columnValue;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -62,36 +68,7 @@ class FieldChange
 
         $builder->addId();
 
-        $builder
-            ->createField('integration', Types::STRING)
-            ->build();
-
         $builder->addBigIntIdField('objectId', 'object_id', false);
-
-        $builder
-            ->createField('objectType', Types::STRING)
-            ->columnName('object_type')
-            ->build();
-
-        $builder
-            ->createField('modifiedAt', Types::DATETIME_MUTABLE)
-            ->columnName('modified_at')
-            ->build();
-
-        $builder
-            ->createField('columnName', Types::STRING)
-            ->columnName('column_name')
-            ->build();
-
-        $builder
-            ->createField('columnType', Types::STRING)
-            ->columnName('column_type')
-            ->build();
-
-        $builder
-            ->createField('columnValue', Types::TEXT)
-            ->columnName('column_value')
-            ->build();
     }
 
     /**

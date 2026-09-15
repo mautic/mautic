@@ -14,14 +14,21 @@ use Mautic\UserBundle\Entity\User;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class AuthCode extends BaseAuthCode
 {
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
+    protected $id;
+    #[ORM\Column(type: 'string', length: 191, unique: true)]
+    protected string $token;
+    #[ORM\Column(name: 'expires_at', type: 'bigint', nullable: true)]
+    protected ?int $expiresAt = null;
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
+    protected ?string $scope = null;
+    #[ORM\Column(name: 'redirect_uri', type: 'text')]
+    protected string $redirectUri;
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
 
         $builder->createManyToOne('client', 'Client')
             ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
@@ -29,23 +36,6 @@ class AuthCode extends BaseAuthCode
 
         $builder->createManyToOne('user', User::class)
             ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('token', 'string')
-            ->unique()
-            ->build();
-
-        $builder->createField('expiresAt', 'bigint')
-            ->columnName('expires_at')
-            ->nullable()
-            ->build();
-
-        $builder->createField('scope', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('redirectUri', 'text')
-            ->columnName('redirect_uri')
             ->build();
     }
 }

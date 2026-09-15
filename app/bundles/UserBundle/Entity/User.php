@@ -61,11 +61,13 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.username.notblank')]
+    #[ORM\Column(type: 'string', length: 191, unique: true)]
     protected ?string $username = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 64)]
     protected $password;
 
     /**
@@ -91,6 +93,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.firstname.notblank')]
+    #[ORM\Column(name: 'first_name', type: 'string', length: 191)]
     private $firstName;
 
     /**
@@ -98,6 +101,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.lastname.notblank')]
+    #[ORM\Column(name: 'last_name', type: 'string', length: 191)]
     private $lastName;
 
     /**
@@ -106,6 +110,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.email.valid')]
     #[Assert\Email(message: 'mautic.user.user.email.valid', groups: ['SecondPass'])]
+    #[ORM\Column(type: 'string', length: 191, unique: true)]
     private $email;
 
     /**
@@ -113,6 +118,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     #[Groups(['user:read', 'user:write'])]
     #[Assert\Length(max: 191, maxMessage: 'mautic.user.user.position.toolong')]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $position;
 
     /**
@@ -126,24 +132,28 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * @var string|null
      */
     #[Groups(['user:read', 'user:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $timezone = '';
 
     /**
      * @var string|null
      */
     #[Groups(['user:read', 'user:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $locale = '';
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['user:read'])]
+    #[ORM\Column(name: 'last_login', type: 'datetime', nullable: true)]
     private $lastLogin;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['user:read'])]
+    #[ORM\Column(name: 'last_active', type: 'datetime', nullable: true)]
     private $lastActive;
 
     /**
@@ -155,12 +165,14 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * @var mixed[]
      */
     #[Groups(['user:read', 'user:write'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private array $preferences = [];
 
     /**
      * @var string|null
      */
     #[Groups(['user:read', 'user:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $signature;
 
     /**
@@ -177,65 +189,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
 
         $builder->addId();
 
-        $builder->createField('username', 'string')
-            ->length(191)
-            ->unique()
-            ->build();
-
-        $builder->createField('password', 'string')
-            ->length(64)
-            ->build();
-
-        $builder->createField('firstName', 'string')
-            ->columnName('first_name')
-            ->length(191)
-            ->build();
-
-        $builder->createField('lastName', 'string')
-            ->columnName('last_name')
-            ->length(191)
-            ->build();
-
-        $builder->createField('email', 'string')
-            ->length(191)
-            ->unique()
-            ->build();
-
-        $builder->createField('position', 'string')
-            ->length(191)
-            ->nullable()
-            ->build();
-
         $builder->createManyToOne('role', 'Role')
             ->inversedBy('users')
             ->cascadeMerge()
             ->addJoinColumn('role_id', 'id', false)
-            ->build();
-
-        $builder->createField('timezone', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('locale', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastLogin', 'datetime')
-            ->columnName('last_login')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastActive', 'datetime')
-            ->columnName('last_active')
-            ->nullable()
-            ->build();
-
-        $builder->createField('preferences', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->createField('signature', 'text')
-            ->nullable()
             ->build();
     }
 

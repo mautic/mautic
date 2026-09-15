@@ -36,6 +36,7 @@ class Stat
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $type;
 
     /**
@@ -62,8 +63,6 @@ class Stat
         $builder->createManyToOne('focus', 'Focus')
             ->addJoinColumn('focus_id', 'id', false, false, 'CASCADE')
             ->build();
-
-        $builder->addField('type', 'string');
 
         $builder->addNamedField('typeId', 'integer', 'type_id', true);
 

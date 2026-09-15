@@ -32,11 +32,13 @@ class StagesChangeLog
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_name', type: 'string', length: 191)]
     private $eventName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'action_name', type: 'string', length: 191)]
     private $actionName;
 
     /**
@@ -51,14 +53,6 @@ class StagesChangeLog
         $builder->addId();
 
         $builder->addLead(false, 'CASCADE', false, 'stageChangeLog');
-
-        $builder->createField('eventName', 'string')
-            ->columnName('event_name')
-            ->build();
-
-        $builder->createField('actionName', 'string')
-            ->columnName('action_name')
-            ->build();
 
         $builder->createManyToOne('stage', Stage::class)
             ->inversedBy('log')
