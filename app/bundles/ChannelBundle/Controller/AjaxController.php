@@ -16,12 +16,18 @@ final class AjaxController extends CommonAjaxController
     use AjaxLookupControllerTrait;
 
     private MessageQueueModel $messageQueueModel;
+    private MessageModel $messageModel;
+    private EmailModel $emailModel;
 
     #[Required]
     public function autowireChannelAjaxController(
         MessageQueueModel $messageQueueModel,
+        MessageModel $messageModel,
+        EmailModel $emailModel,
     ): void {
         $this->messageQueueModel = $messageQueueModel;
+        $this->messageModel      = $messageModel;
+        $this->emailModel        = $emailModel;
     }
 
     public function cancelQueuedMessageEventAction(Request $request): JsonResponse
@@ -42,20 +48,15 @@ final class AjaxController extends CommonAjaxController
     {
         $dataArray = [];
 
-        /** @var MessageModel $model */
-        $model    = $this->getModel('channel.message');
-        $objectId = $request->get('id');
+        $objectId = $request->request->get('id');
 
-        if ($objectId && $entity = $model->getEntity($objectId)) {
-            /** @var EmailModel $model */
-            $emailModel = $this->getModel('email');
-
+        if ($objectId && $entity = $this->messageModel->getEntity($objectId)) {
             foreach ($entity->getChannels() as $channel) {
                 if ('email' !== $channel->getChannel() || empty($channel->getChannelId())) {
                     continue;
                 }
 
-                if ($email = $emailModel->getEntity($channel->getChannelId())) {
+                if ($email = $this->emailModel->getEntity($channel->getChannelId())) {
                     $yesOrNo = $email->getSendToDnc() ? 'yes' : 'no';
 
                     $dataArray['sendToDncText']      = $this->translator->trans("mautic.core.form.{$yesOrNo}");

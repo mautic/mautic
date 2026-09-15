@@ -8,14 +8,11 @@ use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @dataProvider sendToDncProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('sendToDncProvider')]
     public function testGetMarketingMessageSendToDncStatusAction(bool $sendToDnc): void
     {
         $email   = $this->createEmail($sendToDnc);
@@ -45,10 +42,6 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         yield [false];
     }
 
-    /**
-     * @throws \Doctrine\ORM\Exception\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
     private function createEmail(bool $sendToDnc): Email
     {
         $email = new Email();
@@ -60,9 +53,6 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         return $email;
     }
 
-    /**
-     * @throws \Doctrine\ORM\Exception\ORMException
-     */
     private function createChannel(?Email $email): Channel
     {
         $channel = new Channel();
@@ -74,9 +64,6 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         return $channel;
     }
 
-    /**
-     * @throws \Doctrine\ORM\Exception\ORMException
-     */
     private function createMessage(Channel $channel): Message
     {
         $message = new Message();
@@ -95,15 +82,15 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(Request::METHOD_POST, '/s/ajax', $payload, [], $this->createAjaxHeaders());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertTrue($this->client->getResponse()->isOk());
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
         if (null !== $email) {
-            Assert::assertSame($email->getSendToDnc() ? 'Yes' : 'No', $response['sendToDncText']);
-            Assert::assertSame($email->getSendToDnc(), $response['sendToDncStatus']);
+            $this->assertSame($email->getSendToDnc() ? 'Yes' : 'No', $response['sendToDncText']);
+            $this->assertSame($email->getSendToDnc(), $response['sendToDncStatus']);
         } else {
-            Assert::assertArrayNotHasKey('sendToDncText', $response);
-            Assert::assertArrayNotHasKey('sendToDncStatus', $response);
+            $this->assertArrayNotHasKey('sendToDncText', $response);
+            $this->assertArrayNotHasKey('sendToDncStatus', $response);
         }
     }
 }
