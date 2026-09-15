@@ -561,7 +561,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * @param array<mixed>|Paginator<TEntity> $results
-     * @param callable|null                   $callback
      *
      * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
      */
