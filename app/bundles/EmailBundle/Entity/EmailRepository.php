@@ -333,6 +333,32 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * Useful to get next batch of contacts to send email to.
+     *
+     * Returns 0 if there are no rows.
+     */
+    public function getBatchMaxContactId(Email $email, int $minId, int $batchSize): int
+    {
+        $pq = $this->getEmailPendingQuery(
+            $email->getId(),
+            $email->getRelatedEntityIds()
+        );
+
+        $pq->select('l.id');
+        $pq->andWhere('l.id >= :minId');
+        $pq->setParameter('minId', $minId);
+        $pq->orderBy('l.id', 'ASC');
+        $pq->setMaxResults($batchSize);
+
+        $outerQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $outerQb->select('MAX(id)');
+        $outerQb->from("({$pq->getSQL()})", 'subquery');
+        $outerQb->setParameters($pq->getParameters());
+
+        return (int) $outerQb->executeQuery()->fetchOne();
+    }
+
+    /**
      * @param int        $emailId
      * @param int[]|null $variantIds
      * @param int[]|null $listIds
@@ -841,15 +867,15 @@ class EmailRepository extends CommonRepository
     /**
      * @return iterable<Email>
      */
-    public function getPublishedBroadcastsIterable(?int $id = null): iterable
+    public function getPublishedBroadcastsIterable(?int $id = null, bool $allowNullForPublishedUp = false): iterable
     {
-        return $this->getPublishedBroadcastsQuery($id)->toIterable();
+        return $this->getPublishedBroadcastsQuery($id, $allowNullForPublishedUp)->toIterable();
     }
 
-    private function getPublishedBroadcastsQuery(?int $id = null): Query
+    private function getPublishedBroadcastsQuery(?int $id = null, bool $allowNullForPublishedUp = false): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
-        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, false);
+        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, $allowNullForPublishedUp);
 
         $expr->add(
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))

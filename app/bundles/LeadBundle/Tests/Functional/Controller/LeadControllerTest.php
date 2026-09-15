@@ -318,6 +318,29 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(200, (string) $this->client->getResponse()->getStatusCode());
     }
 
+    public function testBatchOwnersCanRemoveOwner(): void
+    {
+        $this->setAdminUser();
+        $owner = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $owner);
+        $contact = new Lead();
+        $contact->setFirstname('Owned')->setEmail('owned@example.com')->setOwner($owner);
+        self::getContainer()->get(LeadModel::class)->saveEntity($contact);
+
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchOwners', [
+            'lead_batch_owner' => [
+                'ids'      => json_encode([$contact->getId()]),
+                'addowner' => '__none__',
+            ],
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $this->em->clear();
+        $updatedContact = $this->em->getRepository(Lead::class)->find($contact->getId());
+        $this->assertInstanceOf(Lead::class, $updatedContact);
+        $this->assertNotInstanceOf(User::class, $updatedContact->getOwner());
+    }
+
     private function createAndLoginUser(): User
     {
         // Create non-admin role
