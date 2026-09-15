@@ -161,7 +161,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     private $signature;
 
     public function __construct(
-        private $guest = false,
+        private ?bool $guest = false,
     ) {
     }
 
@@ -689,7 +689,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $thisUser === $thatUser;
     }
 
-    public function isGuest(): bool
+    public function isGuest(): ?bool
     {
         return $this->guest;
     }
