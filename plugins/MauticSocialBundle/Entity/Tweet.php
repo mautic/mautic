@@ -15,6 +15,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'tweets')]
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
+#[ORM\Index(columns: ['sent_count'], name: 'sent_count_index')]
+#[ORM\Index(columns: ['favorite_count'], name: 'favorite_count_index')]
+#[ORM\Index(columns: ['retweet_count'], name: 'retweet_count_index')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Tweet extends FormEntity
 {
     /**
@@ -121,10 +125,7 @@ class Tweet extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('tweets')
-            ->setCustomRepositoryClass(TweetRepository::class)
-            ->addIndex(['sent_count'], 'sent_count_index')
-            ->addIndex(['favorite_count'], 'favorite_count_index')
-            ->addIndex(['retweet_count'], 'retweet_count_index');
+            ->setCustomRepositoryClass(TweetRepository::class);
 
         $builder->addIdColumns();
         $builder->addCategory();
