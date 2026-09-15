@@ -68,7 +68,7 @@ $firewalls = [
     ],
     'main' => [
         'pattern'       => '^/(s/|elfinder|efconnect)',
-        'light_saml_sp' => [
+        'saml' => [
             'provider'        => 'user_provider',
             'success_handler' => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
             'failure_handler' => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,

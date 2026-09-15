@@ -249,8 +249,8 @@ parameters:
 
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
-        - vendor/javer/sp-bundle/src
-        - vendor/javer/symfony-bridge/src
+        - vendor/lightsaml2/sp-bundle/src
+        - vendor/lightsaml2/symfony-bridge/src
     scanFiles:
         # This is here because a few functions in the global namespace are defined in this file
         - vendor/twig/twig/src/Extension/EscaperExtension.php
