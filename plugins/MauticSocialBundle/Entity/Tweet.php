@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'tweets')]
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Tweet extends FormEntity
 {
     /**
@@ -51,6 +52,7 @@ class Tweet extends FormEntity
      * @var string
      */
     #[Assert\Length(max: 280)]
+    #[ORM\Column(type: Types::STRING, length: 280)]
     private $text;
 
     /**
@@ -130,7 +132,6 @@ class Tweet extends FormEntity
         $builder->addCategory();
         $builder->addNullableField('mediaId', Types::STRING, 'media_id');
         $builder->addNullableField('mediaPath', Types::STRING, 'media_path');
-        $builder->addField('text', Types::STRING, ['length' => 280]);
         $builder->addNullableField('sentCount', Types::INTEGER, 'sent_count');
         $builder->addNullableField('favoriteCount', Types::INTEGER, 'favorite_count');
         $builder->addNullableField('retweetCount', Types::INTEGER, 'retweet_count');

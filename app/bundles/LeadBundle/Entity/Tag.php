@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -20,6 +21,8 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ORM\Entity]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('tagManager:tagManager:view')"),
@@ -52,6 +55,7 @@ class Tag implements UuidInterface
      * @var string
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $tag;
 
     /**
@@ -75,7 +79,6 @@ class Tag implements UuidInterface
             ->addIndex(['tag'], 'lead_tag_search');
 
         $builder->addId();
-        $builder->addField('tag', Types::STRING);
         $builder->addNamedField('description', Types::TEXT, 'description', true);
         static::addUuidField($builder);
     }

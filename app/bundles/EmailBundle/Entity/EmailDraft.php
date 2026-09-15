@@ -23,6 +23,7 @@ class EmailDraft
         private Email $email,
         private ?string $html,
         private ?string $template,
+        #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, options: ['default' => 1])]
         private ?bool $publicPreview = true,
     ) {
     }
@@ -38,11 +39,6 @@ class EmailDraft
         $builder->addId();
         $builder->addNullableField('html', Types::TEXT);
         $builder->addNullableField('template', Types::STRING);
-        $builder->createField('publicPreview', Types::BOOLEAN)
-            ->columnName('public_preview')
-            ->nullable(false)
-            ->option('default', 1)
-            ->build();
 
         $builder->createOneToOne('email', Email::class)
             ->inversedBy('draft')

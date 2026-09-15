@@ -33,22 +33,26 @@ class PointInsight extends FormEntity
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.point.insight.type.required')]
+    #[ORM\Column(name: 'insight_type', type: Types::STRING, length: 191)]
     private $insightType = self::INSIGHT_TYPE_COMPARE_POINT_GROUPS;
 
     /**
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.point.insight.action.required')]
+    #[ORM\Column(name: 'insight_action', type: Types::STRING, length: 191)]
     private $insightAction = self::INSIGHT_ACTION_SET_CUSTOM_FIELD;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'custom_field', type: Types::STRING, length: 191, nullable: true)]
     private $customField;
 
     /**
      * @var array<int>
      */
+    #[ORM\Column(name: 'point_groups', type: Types::JSON)]
     private $pointGroups = [];
 
     /**
@@ -68,23 +72,6 @@ class PointInsight extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns();
-
-        $builder->createField('insightType', Types::STRING)
-            ->columnName('insight_type')
-            ->build();
-
-        $builder->createField('insightAction', Types::STRING)
-            ->columnName('insight_action')
-            ->build();
-
-        $builder->createField('customField', Types::STRING)
-            ->columnName('custom_field')
-            ->nullable()
-            ->build();
-
-        $builder->createField('pointGroups', Types::JSON)
-            ->columnName('point_groups')
-            ->build();
 
         $builder->addCategory();
     }

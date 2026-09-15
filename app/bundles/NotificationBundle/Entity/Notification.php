@@ -75,30 +75,35 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $url;
 
     /**
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text')]
     private $heading;
 
     /**
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text')]
     private $message;
 
     /**
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $button;
 
     /**
      * @var array
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(name: 'utm_tags', type: 'array', nullable: true)]
     private $utmTags = [];
 
     /**
@@ -117,12 +122,14 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
      * @var int
      */
     #[Groups(['notification:read'])]
+    #[ORM\Column(name: 'read_count', type: 'integer')]
     private $readCount = 0;
 
     /**
      * @var int
      */
     #[Groups(['notification:read'])]
+    #[ORM\Column(name: 'sent_count', type: 'integer')]
     private $sentCount = 0;
 
     /**
@@ -146,18 +153,21 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(name: 'notification_type', type: 'text', nullable: true)]
     private $notificationType = 'template';
 
     /**
      * @var bool
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'boolean')]
     private $mobile = false;
 
     /**
      * @var ?array
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'array')]
     private $mobileSettings;
 
     public function __clone()
@@ -188,39 +198,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
         $builder->addIdColumns();
 
-        $builder->createField('url', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('heading', 'text')
-            ->build();
-
-        $builder->createField('message', 'text')
-            ->build();
-
-        $builder->createField('button', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTags', 'array')
-            ->columnName('utm_tags')
-            ->nullable()
-            ->build();
-
-        $builder->createField('notificationType', 'text')
-            ->columnName('notification_type')
-            ->nullable()
-            ->build();
-
         $builder->addPublishDates();
-
-        $builder->createField('readCount', 'integer')
-            ->columnName('read_count')
-            ->build();
-
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->build();
 
         $builder->addCategory();
 
@@ -238,10 +216,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
-
-        $builder->createField('mobile', 'boolean')->build();
-
-        $builder->createField('mobileSettings', 'array')->build();
 
         static::addUuidField($builder);
 

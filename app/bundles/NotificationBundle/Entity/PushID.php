@@ -16,6 +16,9 @@ class PushID
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -26,39 +29,29 @@ class PushID
     /**
      * @var string
      */
+    #[ORM\Column(name: 'push_id', type: 'string', length: 191)]
     private $pushID;
 
     /**
      * @var bool
      */
+    #[ORM\Column(type: 'boolean')]
     private $enabled;
 
     /**
      * @var bool
      */
+    #[ORM\Column(type: 'boolean')]
     private $mobile;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
-
-        $builder->createField('pushID', 'string')
-            ->columnName('push_id')
-            ->nullable(false)
-            ->build();
-
         $builder->createManyToOne('lead', Lead::class)
             ->addJoinColumn('lead_id', 'id', true, false, 'SET NULL')
             ->inversedBy('pushIds')
             ->build();
-
-        $builder->createField('enabled', 'boolean')->build();
-        $builder->createField('mobile', 'boolean')->build();
     }
 
     /**

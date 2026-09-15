@@ -32,6 +32,7 @@ class Event
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_type', type: 'string', length: 50)]
     private $eventType;
 
     public function __construct()
@@ -57,11 +58,6 @@ class Event
             ->cascadeDetach()
             ->cascadeMerge()
             ->fetchExtraLazy()
-            ->build();
-
-        $builder->createField('eventType', 'string')
-            ->columnName('event_type')
-            ->length(50)
             ->build();
     }
 

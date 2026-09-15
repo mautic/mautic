@@ -40,6 +40,7 @@ class DynamicContentLeadData extends CommonEntity
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text')]
     private $slot;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -54,10 +55,6 @@ class DynamicContentLeadData extends CommonEntity
 
         $builder->createManyToOne('dynamicContent', 'DynamicContent')
             ->addJoinColumn('dynamic_content_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createField('slot', 'text')
-            ->columnName('slot')
             ->build();
     }
 

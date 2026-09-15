@@ -46,21 +46,25 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_missing', type: 'boolean')]
     private $isMissing = false;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 50)]
     private $bundle;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $version;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $author;
 
     /**
@@ -78,22 +82,6 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns();
-
-        $builder->createField('isMissing', 'boolean')
-            ->columnName('is_missing')
-            ->build();
-
-        $builder->createField('bundle', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('version', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('author', 'string')
-            ->nullable()
-            ->build();
 
         $builder->createOneToMany('integrations', 'Integration')
             ->setIndexBy('id')

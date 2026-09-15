@@ -30,6 +30,7 @@ class PageDraft
         private Page $page,
         private ?string $html = null,
         private ?string $template = null,
+        #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, options: ['default' => 1])]
         private bool $publicPreview = true,
     ) {
     }
@@ -45,11 +46,6 @@ class PageDraft
         $builder->addId();
         $builder->addNullableField('html', Types::TEXT);
         $builder->addNullableField('template', Types::STRING);
-        $builder->createField('publicPreview', Types::BOOLEAN)
-            ->columnName('public_preview')
-            ->nullable(false)
-            ->option('default', 1)
-            ->build();
 
         $builder->createOneToOne('page', Page::class)
             ->inversedBy('draft')

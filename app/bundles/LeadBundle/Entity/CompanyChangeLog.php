@@ -26,21 +26,25 @@ class CompanyChangeLog
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text', length: 50)]
     private $type;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_name', type: 'string', length: 191)]
     private $eventName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'action_name', type: 'string', length: 191)]
     private $actionName;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'company_id', type: 'integer')]
     private $company;
 
     /**
@@ -55,22 +59,6 @@ class CompanyChangeLog
         $builder->addId();
 
         $builder->addLead(false, 'CASCADE', false, 'companyChangeLog');
-
-        $builder->createField('type', 'text')
-            ->length(50)
-            ->build();
-
-        $builder->createField('eventName', 'string')
-            ->columnName('event_name')
-            ->build();
-
-        $builder->createField('actionName', 'string')
-            ->columnName('action_name')
-            ->build();
-
-        $builder->createField('company', 'integer')
-            ->columnName('company_id')
-            ->build();
 
         $builder->addDateAdded();
     }

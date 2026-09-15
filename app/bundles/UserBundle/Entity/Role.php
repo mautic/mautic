@@ -74,6 +74,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * @var bool
      */
     #[Groups(['role:read', 'role:write'])]
+    #[ORM\Column(name: 'is_admin', type: 'boolean')]
     private $isAdmin = false;
 
     /**
@@ -86,6 +87,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * @var array
      */
     #[Groups(['role:read', 'role:write'])]
+    #[ORM\Column(name: 'readable_permissions', type: 'array')]
     private $rawPermissions;
 
     /**
@@ -105,20 +107,12 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 
         $builder->addIdColumns();
 
-        $builder->createField('isAdmin', 'boolean')
-            ->columnName('is_admin')
-            ->build();
-
         $builder->createOneToMany('permissions', 'Permission')
             ->orphanRemoval()
             ->mappedBy('role')
             ->cascadePersist()
             ->cascadeRemove()
             ->fetchExtraLazy()
-            ->build();
-
-        $builder->createField('rawPermissions', 'array')
-            ->columnName('readable_permissions')
             ->build();
 
         $builder->createOneToMany('users', 'User')

@@ -85,6 +85,7 @@ class Monitoring extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(type: 'integer')]
     private $revision = 1;
 
     /**
@@ -126,8 +127,6 @@ class Monitoring extends FormEntity implements UuidInterface
         $builder->addNullableField('lists', 'array');
 
         $builder->addNamedField('networkType', 'string', 'network_type', true);
-
-        $builder->addField('revision', 'integer');
 
         $builder->addNullableField('stats', 'array');
 

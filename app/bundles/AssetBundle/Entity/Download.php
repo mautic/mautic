@@ -48,6 +48,7 @@ class Download
      * @var \DateTimeInterface
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'date_download', type: 'datetime')]
     private $dateDownload;
 
     /**
@@ -69,43 +70,53 @@ class Download
      * @var int
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'integer')]
     private $code;
 
     /**
      * @var string|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $referer;
 
     /**
      * @var string
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191)]
     private $trackingId;
 
     /**
      * @var string|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     #[Groups(['download:read', 'download:write'])]
     private ?Email $email = null;
 
+    #[ORM\Column(name: 'utm_campaign', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmCampaign = null;
 
+    #[ORM\Column(name: 'utm_content', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmContent = null;
 
+    #[ORM\Column(name: 'utm_medium', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmMedium = null;
 
+    #[ORM\Column(name: 'utm_source', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmSource = null;
 
+    #[ORM\Column(name: 'utm_term', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmTerm = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -113,10 +124,6 @@ class Download
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->createField('dateDownload', 'datetime')
-            ->columnName('date_download')
-            ->build();
 
         $builder->createManyToOne('asset', 'Asset')
             ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
@@ -127,52 +134,8 @@ class Download
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->addField('code', 'integer');
-
-        $builder->createField('referer', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
         $builder->createManyToOne('email', Email::class)
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createField('utmCampaign', Types::STRING)
-            ->columnName('utm_campaign')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmContent', Types::STRING)
-            ->columnName('utm_content')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmMedium', Types::STRING)
-            ->columnName('utm_medium')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmSource', Types::STRING)
-            ->columnName('utm_source')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTerm', Types::STRING)
-            ->columnName('utm_term')
-            ->nullable()
             ->build();
     }
 

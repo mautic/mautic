@@ -73,6 +73,7 @@ class Stage extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(type: 'integer')]
     private $weight = 0;
 
     /**
@@ -116,9 +117,6 @@ class Stage extends FormEntity implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns();
-
-        $builder->createField('weight', 'integer')
-            ->build();
 
         $builder->addPublishDates();
 

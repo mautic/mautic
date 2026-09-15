@@ -82,6 +82,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ?string
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $secret;
 
     /**
@@ -173,7 +174,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
             ->build();
 
         $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
-        $builder->addField('secret', Types::STRING);
         $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
         $builder->addNullableField('markedUnhealthyAt', Types::DATETIME_IMMUTABLE, 'marked_unhealthy_at');
         $builder->addNullableField('unHealthySince', Types::DATETIME_IMMUTABLE, 'unhealthy_since');

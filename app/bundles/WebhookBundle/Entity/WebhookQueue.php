@@ -31,6 +31,7 @@ class WebhookQueue
 
     private ?Event $event = null;
 
+    #[ORM\Column(type: Types::SMALLINT, options: ['unsigned' => true, 'default' => 0])]
     private int $retries = 0;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -50,11 +51,6 @@ class WebhookQueue
         $builder->createManyToOne('event', 'Event')
             ->inversedBy('queues')
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
-            ->build();
-        $builder->createField('retries', Types::SMALLINT)
-            ->columnName('retries')
-            ->option('unsigned', true)
-            ->option('default', 0)
             ->build();
     }
 
