@@ -7,6 +7,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'contact_merge_records')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class MergeRecord
 {
     /**
@@ -38,7 +41,7 @@ class MergeRecord
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('contact_merge_records')
+        $builder
             ->setCustomRepositoryClass(MergeRecordRepository::class)
             ->addIndex(['date_added'], 'contact_merge_date_added')
             ->addIndex(['merged_id'], 'contact_merge_ids');

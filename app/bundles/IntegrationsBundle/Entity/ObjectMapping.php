@@ -8,6 +8,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'sync_object_mapping')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ObjectMapping
 {
     /**
@@ -64,7 +67,6 @@ class ObjectMapping
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setTable('sync_object_mapping')
             ->setCustomRepositoryClass(ObjectMappingRepository::class)
             ->addIndex(['internal_object_id'], 'internal_object_id_idx')
             ->addIndex(['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'], 'integration_object')

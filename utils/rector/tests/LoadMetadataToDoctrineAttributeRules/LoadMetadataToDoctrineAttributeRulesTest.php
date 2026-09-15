@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRector;
+namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
-final class LoadMetadataToDoctrineAttributeRectorTest extends AbstractRectorTestCase
+final class LoadMetadataToDoctrineAttributeRulesTest extends AbstractRectorTestCase
 {
     #[DataProvider('provideData')]
     public function test(string $filePath): void

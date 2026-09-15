@@ -11,6 +11,9 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'imports')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Import extends FormEntity
 {
     /** ===== Statuses: ===== */
@@ -137,7 +140,7 @@ class Import extends FormEntity
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('imports')
+        $builder
             ->setCustomRepositoryClass(ImportRepository::class)
             ->addIndex(['object'], 'import_object')
             ->addIndex(['status'], 'import_status')

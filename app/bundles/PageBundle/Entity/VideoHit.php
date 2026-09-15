@@ -10,6 +10,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
+#[ORM\Entity]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class VideoHit
 {
     public const TABLE_NAME = 'video_hits';
@@ -132,7 +135,7 @@ class VideoHit
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
+        $builder
             ->setCustomRepositoryClass(VideoHitRepository::class)
             ->addIndex(['date_hit'], 'video_date_hit')
             ->addIndex(['channel', 'channel_id'], 'video_channel_search')

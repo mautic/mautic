@@ -7,6 +7,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'lead_lists_leads')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ListLead
 {
     /**
@@ -43,7 +46,7 @@ class ListLead
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_lists_leads')
+        $builder
             ->setCustomRepositoryClass(ListLeadRepository::class);
 
         $builder->createManyToOne('list', 'LeadList')

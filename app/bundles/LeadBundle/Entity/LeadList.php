@@ -25,6 +25,9 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     shortName: 'Segments',
     operations: [
@@ -137,7 +140,7 @@ class LeadList extends FormEntity implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable(self::TABLE_NAME)
+        $builder
             ->setCustomRepositoryClass(LeadListRepository::class)
             ->addIndex(['alias'], 'lead_list_alias')
             ->addIndex(['deleted'], 'segment_deleted');

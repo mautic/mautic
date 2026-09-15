@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity]
+#[ORM\Table(name: 'saml_id_entry')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class IdEntry
 {
     /**
@@ -26,8 +28,6 @@ class IdEntry
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('saml_id_entry');
 
         $builder->createField('id', 'string')
              ->makePrimaryKey()

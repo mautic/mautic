@@ -8,6 +8,9 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'page_redirects')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Redirect extends FormEntity
 {
     /**
@@ -46,7 +49,7 @@ class Redirect extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('page_redirects')
+        $builder
             ->setCustomRepositoryClass(RedirectRepository::class);
 
         $builder->addBigIntIdField();

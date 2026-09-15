@@ -12,6 +12,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 /**
  * Store here contact events.
  */
+#[ORM\Entity]
+#[ORM\Table(name: 'lead_event_log')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog
 {
     /**
@@ -77,7 +80,7 @@ class LeadEventLog
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('lead_event_log')
+        $builder
             ->setCustomRepositoryClass(LeadEventLogRepository::class)
             ->addIndex(['lead_id'], 'lead_id_index')
             ->addIndex(['object', 'object_id'], 'lead_object_index')

@@ -5,6 +5,9 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'email_copies')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Copy
 {
     /**
@@ -35,7 +38,7 @@ class Copy
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('email_copies')
+        $builder
             ->setCustomRepositoryClass(CopyRepository::class);
 
         $builder->createField('id', 'string')

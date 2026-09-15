@@ -9,13 +9,16 @@ use FOS\OAuthServerBundle\Model\RefreshToken as BaseRefreshToken;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'oauth2_refreshtokens')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class RefreshToken extends BaseRefreshToken
 {
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('oauth2_refreshtokens')
+        $builder
             ->addIndex(['token'], 'oauth2_refresh_token_search');
 
         $builder->createField('id', 'integer')

@@ -7,6 +7,9 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'monitor_post_count')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PostCount
 {
     /**
@@ -33,7 +36,7 @@ class PostCount
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('monitor_post_count')
+        $builder
             ->setCustomRepositoryClass(PostCountRepository::class);
 
         $builder->addId();

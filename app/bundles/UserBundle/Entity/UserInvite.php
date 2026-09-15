@@ -8,6 +8,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'user_invites')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class UserInvite
 {
     private ?int $id = null;
@@ -31,7 +34,7 @@ class UserInvite
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('user_invites')
+        $builder
             ->setCustomRepositoryClass(UserInviteRepository::class)
             ->addIndex(['email'], 'IDX_USER_INVITES_EMAIL')
             ->addIndex(['expiration'], 'IDX_USER_INVITES_EXPIRATION')

@@ -8,6 +8,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'reports_schedulers')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Scheduler
 {
     /**
@@ -19,7 +22,7 @@ class Scheduler
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('reports_schedulers')
+        $builder
             ->setCustomRepositoryClass(SchedulerRepository::class);
 
         $builder->addId();

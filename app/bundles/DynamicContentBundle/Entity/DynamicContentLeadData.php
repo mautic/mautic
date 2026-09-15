@@ -7,6 +7,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'dynamic_content_lead_data')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class DynamicContentLeadData extends CommonEntity
 {
     /**
@@ -43,7 +46,7 @@ class DynamicContentLeadData extends CommonEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('dynamic_content_lead_data')
+        $builder
             ->setCustomRepositoryClass(DynamicContentLeadDataRepository::class);
 
         $builder->addIdColumns(false, false);

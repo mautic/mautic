@@ -24,6 +24,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'users')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     shortName: 'User',
     operations: [
@@ -172,7 +175,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('users')
+        $builder
             ->setCustomRepositoryClass(UserRepository::class);
 
         $builder->addId();
