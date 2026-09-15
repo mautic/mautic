@@ -20,7 +20,9 @@
 {% endblock %}
 
 {% block content %}
-  {% set groups = fields|keys|sort %}
+  {% set fields = fieldGroupSortedFields(fields, 'lead') %}
+  {% set translatedGroups = fieldGroupLabels('lead') %}
+  {% set groups = fields|keys %}{# order follows the configured group order #}
   {% set img = leadGetAvatar(lead) %}
   {{ form_start(form) }}
   <!-- start: box layout -->
@@ -54,7 +56,7 @@
                       {% if fields[g] is not empty %}
                           <li class="list-group-item {% if loop.first %}active{% endif %}">
                               <a href="#{{ g }}" class="list-group-item-heading steps" data-toggle="tab">
-                                  {{ ('mautic.lead.field.group.'~g)|trans }}
+                                  {{ translatedGroups[g] ?? ('mautic.lead.field.group.'~g)|trans }}
                               </a>
                           </li>
                       {% endif %}
@@ -85,7 +87,7 @@
                                     }) }}
                                 {% endif %}
 
-                                  <h4 class="fw-sb mt-md">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
+                                  <h4 class="fw-sb mt-md">{{ translatedGroups[group] ?? ('mautic.lead.field.group.'~group)|trans }}</h4>
                               </div>
                               <div class="col-lg-12 pa-md">
                                   {% if 'core' == group %}

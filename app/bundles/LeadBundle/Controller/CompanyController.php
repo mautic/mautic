@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Helper\CompanySearchScopeProvider;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldGroupModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Services\CompanyColumnsDictionary;
@@ -39,18 +40,22 @@ final class CompanyController extends FormController
 
     private LeadModel $leadModel;
 
+    private FieldGroupModel $fieldGroupModel;
+
     #[Required]
     public function autowireCompanyController(
         LeadModel $leadModel,
         CompanyModel $companyModel,
         FieldModel $fieldModel,
         CompanyRepository $companyRepository,
+        FieldGroupModel $fieldGroupModel,
         \Mautic\UserBundle\Entity\UserRepository $userRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
         $this->fieldModel = $fieldModel;
         $this->companyRepository = $companyRepository;
+        $this->fieldGroupModel = $fieldGroupModel;
         $this->userRepository = $userRepository;
     }
 
@@ -342,19 +347,19 @@ final class CompanyController extends FormController
             }
         }
 
-        $fields = $this->companyModel->organizeFieldsByGroup($fields);
-        $groups = array_keys($fields);
-        sort($groups);
+        $fields   = $this->fieldGroupModel->sortGroupedFields($this->companyModel->organizeFieldsByGroup($fields), 'company');
+        $groups   = array_keys($fields);
         $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
-                    'fields' => $fields,
-                    'groups' => $groups,
+                    'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'entity'           => $entity,
+                    'form'             => $form->createView(),
+                    'fields'           => $fields,
+                    'groups'           => $groups,
+                    'translatedGroups' => $this->fieldGroupModel->getTranslatedGroups('company'),
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
@@ -527,19 +532,19 @@ final class CompanyController extends FormController
             $this->companyModel->lockEntity($entity);
         }
 
-        $fields = $this->companyModel->organizeFieldsByGroup($fields);
-        $groups = array_keys($fields);
-        sort($groups);
+        $fields   = $this->fieldGroupModel->sortGroupedFields($this->companyModel->organizeFieldsByGroup($fields), 'company');
+        $groups   = array_keys($fields);
         $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
-                    'fields' => $fields,
-                    'groups' => $groups,
+                    'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'entity'           => $entity,
+                    'form'             => $form->createView(),
+                    'fields'           => $fields,
+                    'groups'           => $groups,
+                    'translatedGroups' => $this->fieldGroupModel->getTranslatedGroups('company'),
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
@@ -561,7 +566,7 @@ final class CompanyController extends FormController
     /**
      * Loads a specific company into the detailed panel.
      */
-    public function viewAction($objectId): Response
+    public function viewAction($objectId, FieldGroupModel $fieldGroupModel): Response
     {
         $company = $this->companyModel->getEntity($objectId);
 
@@ -620,13 +625,15 @@ final class CompanyController extends FormController
             $this->throwAccessDenied();
         }
 
-        $fields = $company->getFields();
+        $translatedGroups = $fieldGroupModel->getTranslatedGroups('company');
+        $fields           = $fieldGroupModel->sortGroupedFields($company->getFields(), 'company');
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'company'           => $company,
                     'fields'            => $fields,
+                    'translatedGroups'  => $translatedGroups,
                     'permissions'       => $permissions,
                     'security'          => $this->security,
                 ],
