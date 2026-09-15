@@ -17,10 +17,10 @@ use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use PHPUnit\Framework\Assert;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -91,7 +91,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
-            $this->createStub(Router::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $this->getTranslator(),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
@@ -198,7 +198,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
-            $this->createStub(Router::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $this->getTranslator(),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),

@@ -65,7 +65,6 @@ final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
             ->with();
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
-        $scheduleIsValidValidator->initialize($executionContextInterfaceMock);
 
         $report = new Report();
         $report->setIsScheduled(true);
@@ -74,7 +73,7 @@ final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
         $schedulerBuilderMock->expects($this->never())
             ->method('getNextEvent');
 
-        $scheduleIsValidValidator->validate($report, $constraintMock);
+        $scheduleIsValidValidator->validateInContext($report, $constraintMock, $executionContextInterfaceMock);
     }
 
     public function testValidDailySchedule(): void
@@ -189,7 +188,6 @@ final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('getNextEvent');
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
-        $scheduleIsValidValidator->initialize($executionContextInterfaceMock);
 
         $report = new Report();
         $report->setIsScheduled(true);
@@ -198,7 +196,7 @@ final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
         $report->setScheduleDay(SchedulerEnum::DAY_MO);
         $report->setScheduleMonthFrequency('Invalid frequency');
 
-        $scheduleIsValidValidator->validate($report, $constraintMock);
+        $scheduleIsValidValidator->validateInContext($report, $constraintMock, $executionContextInterfaceMock);
     }
 
     public function testInvalidEvent(): void
@@ -226,7 +224,6 @@ final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
             ->with();
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
-        $scheduleIsValidValidator->initialize($executionContextInterfaceMock);
 
         $report = new Report();
         $report->setIsScheduled(true);
@@ -240,7 +237,7 @@ final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
             ->with($report)
             ->willThrowException(new InvalidSchedulerException());
 
-        $scheduleIsValidValidator->validate($report, $constraintMock);
+        $scheduleIsValidValidator->validateInContext($report, $constraintMock, $executionContextInterfaceMock);
     }
 
     public function testNotSupportedScheduleType(): void
@@ -268,7 +265,6 @@ final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
             ->with();
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
-        $scheduleIsValidValidator->initialize($executionContextInterfaceMock);
 
         $report = new Report();
         $report->setIsScheduled(true);
@@ -282,6 +278,6 @@ final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
             ->with($report)
             ->willThrowException(new NotSupportedScheduleTypeException());
 
-        $scheduleIsValidValidator->validate($report, $constraintMock);
+        $scheduleIsValidValidator->validateInContext($report, $constraintMock, $executionContextInterfaceMock);
     }
 }

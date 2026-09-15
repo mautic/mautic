@@ -134,8 +134,7 @@ final class PageHitValidatorTest extends TestCase
 
         $pageHitValidator = new PageHitValidator($this->coreParametersHelperMock);
 
-        $pageHitValidator->initialize($context);
 
-        $pageHitValidator->validate($hitMock, $this->constraintMock);
+        $pageHitValidator->validateInContext($hitMock, $this->constraintMock, $context);
     }
 }

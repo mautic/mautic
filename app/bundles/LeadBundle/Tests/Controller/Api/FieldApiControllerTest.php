@@ -16,11 +16,11 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 final class FieldApiControllerTest extends TestCase
@@ -73,7 +73,7 @@ final class FieldApiControllerTest extends TestCase
             $this->createStub(CorePermissions::class),
             $this->createStub(Translator::class),
             $this->createStub(EntityResultHelper::class),
-            $this->createStub(Router::class),
+            $this->createStub(RouterInterface::class),
             $this->createStub(FormFactoryInterface::class),
             $this->createStub(AppVersion::class),
             $requestStack,
