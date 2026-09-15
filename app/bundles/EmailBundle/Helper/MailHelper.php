@@ -98,7 +98,7 @@ class MailHelper
     protected $errors = [];
 
     /**
-     * @var array<string, mixed>
+     * @var array<string, mixed>|null
      */
     protected $lead;
 
@@ -1169,7 +1169,7 @@ class MailHelper
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null
      */
     public function getLead()
     {

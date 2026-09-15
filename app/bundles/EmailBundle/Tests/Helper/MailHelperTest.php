@@ -631,7 +631,7 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * @return \Iterator<string, array<int, (string | null)>>
+     * @return \Iterator<string, array<string, string>>
      */
     public static function emailReplyToProvider(): \Iterator
     {
@@ -984,11 +984,9 @@ final class MailHelperTest extends TestCase
         $email = new Email();
         $email->setSubject('Test');
         $email->setCustomHtml('<html>{unsubscribe_url}</html>');
-        $lead = new Lead();
-        $lead->setEmail('someemail@email.test');
         $mailer->setIdHash('hash');
         $mailer->setEmail($email);
-        $mailer->setLead($lead);
+        $mailer->setLead(['id' => 1, 'email' => 'someemail@email.test']);
 
         $email->setSendToDnc(false);
         $headers = $mailer->getCustomHeaders();
@@ -1049,11 +1047,9 @@ final class MailHelperTest extends TestCase
         $email->setSubject('Test');
         $email->setCustomHtml('<html>{unsubscribe_url}</html>');
         $email->setSendToDnc(false);
-        $lead = new Lead();
-        $lead->setEmail('someemail@email.test');
         $mailer->setIdHash('hash');
         $mailer->setEmail($email);
-        $mailer->setLead($lead);
+        $mailer->setLead(['id' => 1, 'email' => 'someemail@email.test']);
 
         $headers = $mailer->getCustomHeaders();
 
