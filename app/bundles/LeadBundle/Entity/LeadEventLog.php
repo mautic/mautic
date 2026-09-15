@@ -14,12 +14,12 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 #[ORM\Entity(repositoryClass: LeadEventLogRepository::class)]
 #[ORM\Table(name: 'lead_event_log')]
-#[ORM\Index(columns: ['lead_id'], name: 'lead_id_index')]
-#[ORM\Index(columns: ['object', 'object_id'], name: 'lead_object_index')]
-#[ORM\Index(columns: ['bundle', 'object', 'action', 'object_id'], name: 'lead_timeline_index')]
-#[ORM\Index(columns: ['bundle', 'object', 'action', 'object_id', 'date_added'], name: self::INDEX_SEARCH)]
-#[ORM\Index(columns: ['action'], name: 'lead_timeline_action_index')]
-#[ORM\Index(columns: ['date_added'], name: 'lead_date_added_index')]
+#[ORM\Index(name: 'lead_id_index', columns: ['lead_id'])]
+#[ORM\Index(name: 'lead_object_index', columns: ['object', 'object_id'])]
+#[ORM\Index(name: 'lead_timeline_index', columns: ['bundle', 'object', 'action', 'object_id'])]
+#[ORM\Index(name: self::INDEX_SEARCH, columns: ['bundle', 'object', 'action', 'object_id', 'date_added'])]
+#[ORM\Index(name: 'lead_timeline_action_index', columns: ['action'])]
+#[ORM\Index(name: 'lead_date_added_index', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog
 {

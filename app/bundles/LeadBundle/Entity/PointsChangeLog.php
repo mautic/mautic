@@ -11,7 +11,7 @@ use Mautic\PointBundle\Entity\Group;
 
 #[ORM\Entity(repositoryClass: PointsChangeLogRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['date_added'], name: 'point_date_added')]
+#[ORM\Index(name: 'point_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PointsChangeLog
 {

@@ -16,9 +16,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DownloadRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['tracking_id'], name: 'download_tracking_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'download_source_search')]
-#[ORM\Index(columns: ['date_download'], name: 'asset_date_download')]
+#[ORM\Index(name: 'download_tracking_search', columns: ['tracking_id'])]
+#[ORM\Index(name: 'download_source_search', columns: ['source', 'source_id'])]
+#[ORM\Index(name: 'asset_date_download', columns: ['date_download'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [

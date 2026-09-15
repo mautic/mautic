@@ -14,10 +14,10 @@ use Mautic\LeadBundle\Entity\LeadList;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['sms_id', 'lead_id'], name: 'stat_sms_search')]
-#[ORM\Index(columns: ['tracking_hash'], name: 'stat_sms_hash_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_sms_source_search')]
-#[ORM\Index(columns: ['is_failed'], name: 'stat_sms_failed_search')]
+#[ORM\Index(name: 'stat_sms_search', columns: ['sms_id', 'lead_id'])]
+#[ORM\Index(name: 'stat_sms_hash_search', columns: ['tracking_hash'])]
+#[ORM\Index(name: 'stat_sms_source_search', columns: ['source', 'source_id'])]
+#[ORM\Index(name: 'stat_sms_failed_search', columns: ['is_failed'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {

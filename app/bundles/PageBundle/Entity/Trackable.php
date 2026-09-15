@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: TrackableRepository::class)]
 #[ORM\Table(name: 'channel_url_trackables')]
-#[ORM\Index(columns: ['channel', 'channel_id'], name: 'channel_url_trackable_search')]
+#[ORM\Index(name: 'channel_url_trackable_search', columns: ['channel', 'channel_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Trackable
 {

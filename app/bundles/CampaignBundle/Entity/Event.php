@@ -26,9 +26,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['type', 'event_type'], name: 'campaign_event_search')]
-#[ORM\Index(columns: ['event_type'], name: 'campaign_event_type')]
-#[ORM\Index(columns: ['channel', 'channel_id'], name: 'campaign_event_channel')]
+#[ORM\Index(name: 'campaign_event_search', columns: ['type', 'event_type'])]
+#[ORM\Index(name: 'campaign_event_type', columns: ['event_type'])]
+#[ORM\Index(name: 'campaign_event_channel', columns: ['channel', 'channel_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [

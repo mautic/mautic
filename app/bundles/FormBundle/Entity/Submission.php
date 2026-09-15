@@ -13,8 +13,8 @@ use Mautic\PageBundle\Entity\Page;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['tracking_id'], name: 'form_submission_tracking_search')]
-#[ORM\Index(columns: ['date_submitted'], name: 'form_date_submitted')]
+#[ORM\Index(name: 'form_submission_tracking_search', columns: ['tracking_id'])]
+#[ORM\Index(name: 'form_date_submitted', columns: ['date_submitted'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Submission
 {

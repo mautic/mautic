@@ -10,14 +10,14 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: LeadDeviceRepository::class)]
 #[ORM\Table(name: 'lead_devices')]
-#[ORM\Index(columns: ['date_added'], name: 'date_added_search')]
-#[ORM\Index(columns: ['device'], name: 'device_search')]
-#[ORM\Index(columns: ['device_os_name'], name: 'device_os_name_search')]
-#[ORM\Index(columns: ['device_os_shortname'], name: 'device_os_shortname_search')]
-#[ORM\Index(columns: ['device_os_version'], name: 'device_os_version_search')]
-#[ORM\Index(columns: ['device_os_platform'], name: 'device_os_platform_search')]
-#[ORM\Index(columns: ['device_brand'], name: 'device_brand_search')]
-#[ORM\Index(columns: ['device_model'], name: 'device_model_search')]
+#[ORM\Index(name: 'date_added_search', columns: ['date_added'])]
+#[ORM\Index(name: 'device_search', columns: ['device'])]
+#[ORM\Index(name: 'device_os_name_search', columns: ['device_os_name'])]
+#[ORM\Index(name: 'device_os_shortname_search', columns: ['device_os_shortname'])]
+#[ORM\Index(name: 'device_os_version_search', columns: ['device_os_version'])]
+#[ORM\Index(name: 'device_os_platform_search', columns: ['device_os_platform'])]
+#[ORM\Index(name: 'device_brand_search', columns: ['device_brand'])]
+#[ORM\Index(name: 'device_model_search', columns: ['device_model'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadDevice
 {

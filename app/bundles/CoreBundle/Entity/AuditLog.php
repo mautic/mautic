@@ -9,9 +9,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: AuditLogRepository::class)]
 #[ORM\Table(name: 'audit_log')]
-#[ORM\Index(columns: ['object', 'object_id'], name: 'object_search')]
-#[ORM\Index(columns: ['bundle', 'object', 'action', 'object_id'], name: 'timeline_search')]
-#[ORM\Index(columns: ['date_added'], name: 'date_added_index')]
+#[ORM\Index(name: 'object_search', columns: ['object', 'object_id'])]
+#[ORM\Index(name: 'timeline_search', columns: ['bundle', 'object', 'action', 'object_id'])]
+#[ORM\Index(name: 'date_added_index', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class AuditLog
 {

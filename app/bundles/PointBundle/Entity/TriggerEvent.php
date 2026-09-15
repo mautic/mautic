@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TriggerEventRepository::class)]
 #[ORM\Table(name: 'point_trigger_events')]
-#[ORM\Index(columns: ['type'], name: 'trigger_type_search')]
+#[ORM\Index(name: 'trigger_type_search', columns: ['type'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [

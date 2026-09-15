@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ActionRepository::class)]
 #[ORM\Table(name: 'form_actions')]
-#[ORM\Index(columns: ['type'], name: 'form_action_type_search')]
+#[ORM\Index(name: 'form_action_type_search', columns: ['type'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
