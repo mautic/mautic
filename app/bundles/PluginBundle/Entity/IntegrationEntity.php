@@ -9,8 +9,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: IntegrationEntityRepository::class)]
 #[ORM\Table(name: 'integration_entity')]
+#[ORM\Index(columns: ['integration', 'integration_entity', 'integration_entity_id'], name: 'integration_external_entity')]
+#[ORM\Index(columns: ['integration', 'internal_entity', 'internal_entity_id'], name: 'integration_internal_entity')]
+#[ORM\Index(columns: ['integration', 'internal_entity', 'integration_entity'], name: 'integration_entity_match')]
+#[ORM\Index(columns: ['integration', 'last_sync_date'], name: 'integration_last_sync_date')]
+#[ORM\Index(columns: ['internal_entity_id', 'integration_entity_id', 'internal_entity', 'integration_entity'], name: 'internal_integration_entity')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class IntegrationEntity extends CommonEntity
 {
@@ -67,14 +72,6 @@ class IntegrationEntity extends CommonEntity
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(IntegrationEntityRepository::class)
-            ->addIndex(['integration', 'integration_entity', 'integration_entity_id'], 'integration_external_entity')
-            ->addIndex(['integration', 'internal_entity', 'internal_entity_id'], 'integration_internal_entity')
-            ->addIndex(['integration', 'internal_entity', 'integration_entity'], 'integration_entity_match')
-            ->addIndex(['integration', 'last_sync_date'], 'integration_last_sync_date')
-            ->addIndex(['internal_entity_id', 'integration_entity_id', 'internal_entity', 'integration_entity'], 'internal_integration_entity');
 
         $builder->addId();
 

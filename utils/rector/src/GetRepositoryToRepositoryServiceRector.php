@@ -47,9 +47,9 @@ use Rector\Rector\AbstractRector;
  *        $this->em->getRepository(Hit::class)  ->  $this->hitRepository
  *      with "private readonly HitRepository $hitRepository" added to the constructor.
  *
- * The entity -> repository mapping is read from the entity's own loadMetadata(), which is
- * where Mautic declares it via $builder->setCustomRepositoryClass(...). Entities that do
- * not declare a custom repository class are skipped - there is no concrete service to
+ * The entity -> repository mapping is read from the entity's #[ORM\Entity(repositoryClass: ...)]
+ * attribute, or the legacy $builder->setCustomRepositoryClass(...) in loadMetadata(). Entities
+ * that do not declare a custom repository class are skipped - there is no concrete service to
  * depend on, so the generic EntityRepository is already correct.
  */
 final class GetRepositoryToRepositoryServiceRector extends AbstractRector
@@ -160,14 +160,22 @@ final class GetRepositoryToRepositoryServiceRector extends AbstractRector
     }
 
     /**
-     * Finds the repository class the entity declares via
-     * $builder->setCustomRepositoryClass(SomeRepository::class) inside loadMetadata().
+     * Finds the repository class the entity declares, either via #[ORM\Entity(repositoryClass: ...)]
+     * or the legacy $builder->setCustomRepositoryClass(SomeRepository::class) inside loadMetadata().
      */
     private function resolveRepositoryClass(MethodCall $methodCall): ?string
     {
         $entityClass = $this->resolveEntityClass($methodCall);
         if (null === $entityClass) {
             return null;
+        }
+
+        $class = $this->astResolver->resolveClassFromName($entityClass);
+        if ($class instanceof Class_) {
+            $fromAttribute = $this->repositoryClassFromEntityAttribute($class);
+            if (null !== $fromAttribute) {
+                return $fromAttribute;
+            }
         }
 
         $loadMetadataClassMethod = $this->astResolver->resolveClassMethod($entityClass, 'loadMetadata');
@@ -191,6 +199,37 @@ final class GetRepositoryToRepositoryServiceRector extends AbstractRector
             $repositoryClass = $this->getName($firstArg->value->class);
             if ('' !== (string) $repositoryClass) {
                 return $repositoryClass;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The repositoryClass argument of the entity's #[ORM\Entity(repositoryClass: SomeRepository::class)].
+     */
+    private function repositoryClassFromEntityAttribute(Class_ $class): ?string
+    {
+        foreach ($class->attrGroups as $attrGroup) {
+            foreach ($attrGroup->attrs as $attr) {
+                if ('Entity' !== $attr->name->getLast()) {
+                    continue;
+                }
+
+                foreach ($attr->args as $arg) {
+                    if (!$arg instanceof Arg || !$arg->name instanceof Identifier || 'repositoryClass' !== $arg->name->toString()) {
+                        continue;
+                    }
+
+                    if (!$arg->value instanceof ClassConstFetch) {
+                        continue;
+                    }
+
+                    $repositoryClass = $this->getName($arg->value->class);
+                    if ('' !== (string) $repositoryClass) {
+                        return $repositoryClass;
+                    }
+                }
             }
         }
 

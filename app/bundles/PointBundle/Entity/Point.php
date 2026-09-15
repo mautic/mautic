@@ -24,8 +24,9 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PointRepository::class)]
 #[ORM\Table(name: 'points')]
+#[ORM\Index(columns: ['type'], name: 'point_type_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -141,10 +142,6 @@ class Point extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(PointRepository::class)
-            ->addIndex(['type'], 'point_type_search');
 
         $builder->addIdColumns();
 

@@ -8,8 +8,9 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UtmTagRepository::class)]
 #[ORM\Table(name: 'lead_utmtags')]
+#[ORM\Index(columns: ['date_added'], name: 'utm_date_added')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class UtmTag
 {
@@ -78,7 +79,6 @@ class UtmTag
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setCustomRepositoryClass(UtmTagRepository::class);
         $builder->addId();
         $builder->addDateAdded();
         $builder->addLead(false, 'CASCADE', false, 'utmtags');
@@ -92,7 +92,6 @@ class UtmTag
         $builder->addNullableField('utmMedium', Types::STRING, 'utm_medium');
         $builder->addNullableField('utmSource', Types::STRING, 'utm_source');
         $builder->addNullableField('utmTerm', Types::STRING, 'utm_term');
-        $builder->addIndex(['date_added'], 'utm_date_added');
     }
 
     /**

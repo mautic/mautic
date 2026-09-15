@@ -10,8 +10,16 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead as TheLead;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: TweetStatRepository::class)]
 #[ORM\Table(name: 'tweet_stats')]
+#[ORM\Index(columns: ['tweet_id', 'lead_id'], name: 'stat_tweet_search')]
+#[ORM\Index(columns: ['lead_id', 'tweet_id'], name: 'stat_tweet_search2')]
+#[ORM\Index(columns: ['is_failed'], name: 'stat_tweet_failed_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_tweet_source_search')]
+#[ORM\Index(columns: ['favorite_count'], name: 'favorite_count_index')]
+#[ORM\Index(columns: ['retweet_count'], name: 'retweet_count_index')]
+#[ORM\Index(columns: ['date_sent'], name: 'tweet_date_sent')]
+#[ORM\Index(columns: ['twitter_tweet_id'], name: 'twitter_tweet_id_index')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class TweetStat
 {
@@ -70,17 +78,6 @@ class TweetStat
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(TweetStatRepository::class)
-            ->addIndex(['tweet_id', 'lead_id'], 'stat_tweet_search')
-            ->addIndex(['lead_id', 'tweet_id'], 'stat_tweet_search2')
-            ->addIndex(['is_failed'], 'stat_tweet_failed_search')
-            ->addIndex(['source', 'source_id'], 'stat_tweet_source_search')
-            ->addIndex(['favorite_count'], 'favorite_count_index')
-            ->addIndex(['retweet_count'], 'retweet_count_index')
-            ->addIndex(['date_sent'], 'tweet_date_sent')
-            ->addIndex(['twitter_tweet_id'], 'twitter_tweet_id_index');
 
         $builder->addId();
 

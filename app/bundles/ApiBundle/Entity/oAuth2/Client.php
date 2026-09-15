@@ -11,8 +11,9 @@ use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ClientRepository::class)]
 #[ORM\Table(name: 'oauth2_clients')]
+#[ORM\Index(columns: ['random_id'], name: 'client_id_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Client extends BaseClient
 {
@@ -70,10 +71,6 @@ class Client extends BaseClient
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(ClientRepository::class)
-            ->addIndex(['random_id'], 'client_id_search');
 
         $builder->addIdColumns('name', false);
 

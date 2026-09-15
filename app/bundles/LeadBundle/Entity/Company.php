@@ -21,7 +21,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: CompanyRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -181,8 +181,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder
-            ->setCustomRepositoryClass(CompanyRepository::class);
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()

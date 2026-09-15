@@ -11,8 +11,10 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['tracking_id'], name: 'form_submission_tracking_search')]
+#[ORM\Index(columns: ['date_submitted'], name: 'form_date_submitted')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Submission
 {
@@ -66,11 +68,6 @@ class Submission
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(SubmissionRepository::class)
-            ->addIndex(['tracking_id'], 'form_submission_tracking_search')
-            ->addIndex(['date_submitted'], 'form_date_submitted');
 
         $builder->addBigIntIdField();
 

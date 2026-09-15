@@ -11,8 +11,18 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['email_id', 'lead_id'], name: 'stat_email_search')]
+#[ORM\Index(columns: ['lead_id', 'email_id'], name: 'stat_email_search2')]
+#[ORM\Index(columns: ['is_failed'], name: 'stat_email_failed_search')]
+#[ORM\Index(columns: ['is_read', 'date_sent'], name: 'is_read_date_sent')]
+#[ORM\Index(columns: ['tracking_hash'], name: 'stat_email_hash_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_email_source_search')]
+#[ORM\Index(columns: ['date_sent'], name: 'email_date_sent')]
+#[ORM\Index(columns: ['date_read', 'lead_id'], name: 'email_date_read_lead')]
+#[ORM\Index(columns: ['lead_id', 'date_sent'], name: 'stat_email_lead_id_date_sent')]
+#[ORM\Index(columns: ['email_id', 'is_read'], name: 'stat_email_email_id_is_read')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
@@ -129,19 +139,6 @@ class Stat
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(StatRepository::class)
-            ->addIndex(['email_id', 'lead_id'], 'stat_email_search')
-            ->addIndex(['lead_id', 'email_id'], 'stat_email_search2')
-            ->addIndex(['is_failed'], 'stat_email_failed_search')
-            ->addIndex(['is_read', 'date_sent'], 'is_read_date_sent')
-            ->addIndex(['tracking_hash'], 'stat_email_hash_search')
-            ->addIndex(['source', 'source_id'], 'stat_email_source_search')
-            ->addIndex(['date_sent'], 'email_date_sent')
-            ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead')
-            ->addIndex(['lead_id', 'date_sent'], 'stat_email_lead_id_date_sent')
-            ->addIndex(['email_id', 'is_read'], 'stat_email_email_id_is_read');
 
         $builder->addBigIntIdField();
 

@@ -9,8 +9,15 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: MessageQueueRepository::class)]
 #[ORM\Table(name: 'message_queue')]
+#[ORM\Index(columns: ['status'], name: 'message_status_search')]
+#[ORM\Index(columns: ['date_sent'], name: 'message_date_sent')]
+#[ORM\Index(columns: ['scheduled_date'], name: 'message_scheduled_date')]
+#[ORM\Index(columns: ['priority'], name: 'message_priority')]
+#[ORM\Index(columns: ['success'], name: 'message_success')]
+#[ORM\Index(columns: ['channel', 'channel_id'], name: 'message_channel_search')]
+#[ORM\Index(columns: ['date_published'], name: 'message_queue_date_published')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class MessageQueue
 {
@@ -117,16 +124,6 @@ class MessageQueue
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(MessageQueueRepository::class)
-            ->addIndex(['status'], 'message_status_search')
-            ->addIndex(['date_sent'], 'message_date_sent')
-            ->addIndex(['scheduled_date'], 'message_scheduled_date')
-            ->addIndex(['priority'], 'message_priority')
-            ->addIndex(['success'], 'message_success')
-            ->addIndex(['channel', 'channel_id'], 'message_channel_search')
-            ->addIndex(['date_published'], 'message_queue_date_published');
 
         $builder->addBigIntIdField();
 

@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PushIDRepository::class)]
 #[ORM\Table(name: 'push_ids')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PushID
@@ -41,9 +41,6 @@ class PushID
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(PushIDRepository::class);
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()

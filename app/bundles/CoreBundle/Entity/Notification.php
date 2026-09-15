@@ -7,8 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: NotificationRepository::class)]
 #[ORM\Table(name: 'notifications')]
+#[ORM\Index(columns: ['is_read'], name: 'notification_read_status')]
+#[ORM\Index(columns: ['type'], name: 'notification_type')]
+#[ORM\Index(columns: ['is_read', 'user_id'], name: 'notification_user_read_status')]
+#[ORM\Index(columns: ['deduplicate', 'date_added'], name: 'deduplicate_date_added')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Notification
 {
@@ -60,13 +64,6 @@ class Notification
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(NotificationRepository::class)
-            ->addIndex(['is_read'], 'notification_read_status')
-            ->addIndex(['type'], 'notification_type')
-            ->addIndex(['is_read', 'user_id'], 'notification_user_read_status')
-            ->addIndex(['deduplicate', 'date_added'], 'deduplicate_date_added');
 
         $builder->addId();
 

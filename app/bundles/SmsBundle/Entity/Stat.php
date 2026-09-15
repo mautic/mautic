@@ -12,8 +12,12 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['sms_id', 'lead_id'], name: 'stat_sms_search')]
+#[ORM\Index(columns: ['tracking_hash'], name: 'stat_sms_hash_search')]
+#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_sms_source_search')]
+#[ORM\Index(columns: ['is_failed'], name: 'stat_sms_failed_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
@@ -82,13 +86,6 @@ class Stat
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(StatRepository::class)
-            ->addIndex(['sms_id', 'lead_id'], 'stat_sms_search')
-            ->addIndex(['tracking_hash'], 'stat_sms_hash_search')
-            ->addIndex(['source', 'source_id'], 'stat_sms_source_search')
-            ->addIndex(['is_failed'], 'stat_sms_failed_search');
 
         $builder->addBigIntIdField();
 

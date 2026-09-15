@@ -8,8 +8,13 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UserInviteRepository::class)]
 #[ORM\Table(name: 'user_invites')]
+#[ORM\Index(columns: ['email'], name: 'IDX_USER_INVITES_EMAIL')]
+#[ORM\Index(columns: ['expiration'], name: 'IDX_USER_INVITES_EXPIRATION')]
+#[ORM\Index(columns: ['role_id'], name: 'IDX_USER_INVITES_ROLE')]
+#[ORM\Index(columns: ['used'], name: 'IDX_USER_INVITES_USED')]
+#[ORM\UniqueConstraint(name: 'UNIQ_USER_INVITES_TOKEN_SELECTOR', columns: ['token_selector'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class UserInvite
 {
@@ -33,14 +38,6 @@ class UserInvite
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(UserInviteRepository::class)
-            ->addIndex(['email'], 'IDX_USER_INVITES_EMAIL')
-            ->addIndex(['expiration'], 'IDX_USER_INVITES_EXPIRATION')
-            ->addIndex(['role_id'], 'IDX_USER_INVITES_ROLE')
-            ->addIndex(['used'], 'IDX_USER_INVITES_USED')
-            ->addUniqueConstraint(['token_selector'], 'UNIQ_USER_INVITES_TOKEN_SELECTOR');
         $builder->addId();
 
         $builder->createField('email', Types::STRING)
