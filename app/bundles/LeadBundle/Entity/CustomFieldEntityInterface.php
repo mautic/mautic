@@ -29,7 +29,7 @@ interface CustomFieldEntityInterface
      *
      * @return mixed
      */
-    public function addUpdatedField($alias, $value, string $oldValue = '');
+    public function addUpdatedField($alias, $value, string|null $oldValue = '');
 
     /**
      * @return mixed
