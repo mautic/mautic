@@ -29,8 +29,12 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: LeadRepository::class)]
 #[ORM\Table(name: 'leads')]
+#[ORM\Index(columns: ['date_added'], name: 'lead_date_added')]
+#[ORM\Index(columns: ['date_modified'], name: 'lead_date_modified')]
+#[ORM\Index(columns: ['date_identified'], name: 'date_identified')]
+#[ORM\Index(columns: ['last_active'], name: 'last_active')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     shortName: 'Contacts',
@@ -299,16 +303,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(LeadRepository::class)
             ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
             ->addLifecycleEvent('checkAttributionDate', 'prePersist')
-            ->addLifecycleEvent('checkDateAdded', 'prePersist')
-            ->addIndex(['date_added'], 'lead_date_added')
-            ->addIndex(['date_modified'], 'lead_date_modified')
-            ->addIndex(['date_identified'], 'date_identified')
-            ->addIndex(['last_active'], 'last_active');
+            ->addLifecycleEvent('checkDateAdded', 'prePersist');
 
         $builder->addBigIntIdField();
 

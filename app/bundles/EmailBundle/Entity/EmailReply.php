@@ -9,8 +9,10 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Ramsey\Uuid\Uuid;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: EmailReplyRepository::class)]
 #[ORM\Table(name: 'email_stat_replies')]
+#[ORM\Index(columns: ['stat_id', 'message_id'], name: 'email_replies')]
+#[ORM\Index(columns: ['date_replied'], name: 'date_email_replied')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class EmailReply
 {
@@ -21,11 +23,6 @@ class EmailReply
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(EmailReplyRepository::class)
-            ->addIndex(['stat_id', 'message_id'], 'email_replies')
-            ->addIndex(['date_replied'], 'date_email_replied');
 
         $builder->addUuid();
 

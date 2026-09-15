@@ -23,8 +23,11 @@ use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['type', 'event_type'], name: 'campaign_event_search')]
+#[ORM\Index(columns: ['event_type'], name: 'campaign_event_type')]
+#[ORM\Index(columns: ['channel', 'channel_id'], name: 'campaign_event_channel')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -268,12 +271,6 @@ class Event implements ChannelInterface, UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(EventRepository::class)
-            ->addIndex(['type', 'event_type'], 'campaign_event_search')
-            ->addIndex(['event_type'], 'campaign_event_type')
-            ->addIndex(['channel', 'channel_id'], 'campaign_event_channel');
 
         $builder->addIdColumns();
 

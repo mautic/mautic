@@ -8,8 +8,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: SummaryRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\UniqueConstraint(name: 'campaign_event_date_triggered', columns: ['campaign_id', 'event_id', 'date_triggered'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Summary
 {
@@ -60,10 +61,6 @@ class Summary
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(SummaryRepository::class)
-            ->addUniqueConstraint(['campaign_id', 'event_id', 'date_triggered'], 'campaign_event_date_triggered');
 
         $builder->addId();
 

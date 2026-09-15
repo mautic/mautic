@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: LeadTriggerLogRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadTriggerLog
@@ -38,9 +38,6 @@ class LeadTriggerLog
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(LeadTriggerLogRepository::class);
 
         $builder->createManyToOne('event', 'TriggerEvent')
             ->isPrimaryKey()

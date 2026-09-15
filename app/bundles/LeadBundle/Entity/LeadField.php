@@ -26,8 +26,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: LeadFieldRepository::class)]
 #[ORM\Table(name: 'lead_fields')]
+#[ORM\Index(columns: ['object', 'field_order', 'is_published'], name: 'idx_object_field_order_is_published')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -220,10 +221,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->addLifecycleEvent('identifierWorkaround', 'postLoad');
-
-        $builder
-            ->setCustomRepositoryClass(LeadFieldRepository::class)
-            ->addIndex(['object', 'field_order', 'is_published'], 'idx_object_field_order_is_published');
 
         $builder->addId();
 

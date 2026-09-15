@@ -19,8 +19,9 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: TriggerEventRepository::class)]
 #[ORM\Table(name: 'point_trigger_events')]
+#[ORM\Index(columns: ['type'], name: 'trigger_type_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -109,10 +110,6 @@ class TriggerEvent implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(TriggerEventRepository::class)
-            ->addIndex(['type'], 'trigger_type_search');
 
         $builder->addIdColumns();
 

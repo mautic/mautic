@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: MonitoringRepository::class)]
 #[ORM\Table(name: 'monitoring')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -116,7 +116,6 @@ class Monitoring extends FormEntity implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder
-            ->setCustomRepositoryClass(MonitoringRepository::class)
             ->addLifecycleEvent('cleanMonitorData', 'preUpdate')
             ->addLifecycleEvent('cleanMonitorData', 'prePersist');
 

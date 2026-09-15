@@ -10,8 +10,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: VideoHitRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\Index(columns: ['date_hit'], name: 'video_date_hit')]
+#[ORM\Index(columns: ['channel', 'channel_id'], name: 'video_channel_search')]
+#[ORM\Index(columns: ['guid', 'lead_id'], name: 'video_guid_lead_search')]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class VideoHit
 {
@@ -134,12 +137,6 @@ class VideoHit
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->setCustomRepositoryClass(VideoHitRepository::class)
-            ->addIndex(['date_hit'], 'video_date_hit')
-            ->addIndex(['channel', 'channel_id'], 'video_channel_search')
-            ->addIndex(['guid', 'lead_id'], 'video_guid_lead_search');
 
         $builder->addId();
 
