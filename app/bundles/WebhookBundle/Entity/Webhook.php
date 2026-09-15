@@ -75,7 +75,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      */
     #[Groups(['webhook:read', 'webhook:write'])]
     #[NotBlank(message: 'mautic.core.valid_url_required')]
-    #[Assert\Url(message: 'mautic.core.valid_url_required')]
+    #[Assert\Url(message: 'mautic.core.valid_url_required', requireTld: false)]
     private $webhookUrl;
 
     /**
