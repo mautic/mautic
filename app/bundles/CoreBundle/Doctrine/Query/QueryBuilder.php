@@ -139,20 +139,39 @@ class QueryBuilder extends BaseQueryBuilder
 
     /**
      * Compatibility shim for DBAL 3's add(). Mautic uses it to attach MySQL index hints
-     * to a FROM clause, which the fluent API has never been able to express.
+     * to a FROM clause, which the fluent API has never been able to express, and to put
+     * a detached join back under the alias it belongs to.
+     *
+     * The branches mirror DBAL 3 because callers depend on the shapes it produced: the
+     * flat parts take each element, a part keyed by an alias - ['l' => $join] - appends
+     * beneath that alias rather than beside it, and anything else is appended whole.
      */
     public function add(string $sqlPartName, mixed $value, bool $append = false): static
     {
+        $isArray    = is_array($value);
+        $isMultiple = is_array($this->queryParts[$sqlPartName] ?? null);
+
+        if ($isMultiple && !$isArray) {
+            $value = [$value];
+        }
+
         if (!$append) {
             $this->queryParts[$sqlPartName] = $value;
 
             return $this;
         }
 
-        if (is_array($this->queryParts[$sqlPartName] ?? null)) {
+        if (in_array($sqlPartName, ['orderBy', 'groupBy', 'select', 'set'], true)) {
+            foreach ($value as $part) {
+                $this->queryParts[$sqlPartName][] = $part;
+            }
+        } elseif ($isArray && [] !== $value && is_array($value[key($value)])) {
+            $key                                    = key($value);
+            $this->queryParts[$sqlPartName][$key][] = $value[$key];
+        } elseif ($isMultiple) {
             $this->queryParts[$sqlPartName][] = $value;
         } else {
-            $this->queryParts[$sqlPartName] = [$value];
+            $this->queryParts[$sqlPartName] = $value;
         }
 
         return $this;

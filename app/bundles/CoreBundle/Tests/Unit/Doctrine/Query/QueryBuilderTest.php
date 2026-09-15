@@ -61,4 +61,70 @@ final class QueryBuilderTest extends TestCase
 
         $this->assertSame('DELETE FROM leads WHERE id = 1', $queryBuilder->getSQL());
     }
+
+    /**
+     * DBAL 3 appended a join under the alias it was keyed by. Losing that key drops the
+     * join from the generated SQL while the WHERE clause still references its alias.
+     *
+     * @see \Mautic\LeadBundle\EventListener\ReportSubscriber which detaches the joins of
+     *      an alias and puts back the ones the WHERE clause still needs
+     */
+    public function testAddAppendsAJoinUnderItsAlias(): void
+    {
+        $queryBuilder = new QueryBuilder($this->getMockedConnection());
+        $queryBuilder->select('l.id')
+            ->from('leads', 'l')
+            ->leftJoin('l', 'lead_lists_leads', 'lll', 'lll.lead_id = l.id');
+
+        $join = $queryBuilder->getQueryPart('join');
+        $queryBuilder->resetQueryPart('join');
+
+        $queryBuilder->add('join', ['l' => $join['l'][0]], true);
+
+        $this->assertSame($join, $queryBuilder->getQueryPart('join'));
+        $this->assertStringContainsString(
+            'LEFT JOIN lead_lists_leads lll ON lll.lead_id = l.id',
+            $queryBuilder->getSQL()
+        );
+    }
+
+    public function testAddAppendsSeveralJoinsUnderTheSameAlias(): void
+    {
+        $queryBuilder = new QueryBuilder($this->getMockedConnection());
+        $queryBuilder->select('l.id')->from('leads', 'l');
+
+        $first  = ['joinType' => 'left', 'joinTable' => 'lead_lists_leads', 'joinAlias' => 'lll', 'joinCondition' => 'lll.lead_id = l.id'];
+        $second = ['joinType' => 'inner', 'joinTable' => 'lead_lists', 'joinAlias' => 'll', 'joinCondition' => 'll.id = lll.leadlist_id'];
+
+        $queryBuilder->add('join', ['l' => $first], true);
+        $queryBuilder->add('join', ['l' => $second], true);
+
+        $this->assertSame(['l' => [$first, $second]], $queryBuilder->getQueryPart('join'));
+    }
+
+    /**
+     * These parts are flat lists, so DBAL appended each element rather than the array.
+     */
+    public function testAddAppendsEachElementOfAFlatPart(): void
+    {
+        $queryBuilder = new QueryBuilder($this->getMockedConnection());
+        $queryBuilder->select('l.id');
+
+        $queryBuilder->add('select', ['l.name', 'l.email'], true);
+
+        $this->assertSame(['l.id', 'l.name', 'l.email'], $queryBuilder->getQueryPart('select'));
+    }
+
+    /**
+     * The index-hint use case: a scalar appended to a part that holds a list gets wrapped.
+     */
+    public function testAddWrapsAScalarAppendedToAListPart(): void
+    {
+        $queryBuilder = new QueryBuilder($this->getMockedConnection());
+        $queryBuilder->select('l.id')->from('leads', 'l');
+
+        $queryBuilder->add('from', ['table' => 'leads USE INDEX (date_added)', 'alias' => 'l'], false);
+
+        $this->assertSame(['table' => 'leads USE INDEX (date_added)', 'alias' => 'l'], $queryBuilder->getQueryPart('from'));
+    }
 }
