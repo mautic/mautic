@@ -17,8 +17,8 @@ use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Tests\PageTestAbstract;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 final class RedirectModelTest extends PageTestAbstract
@@ -52,7 +52,7 @@ final class RedirectModelTest extends PageTestAbstract
         $url          = 'https://mautic.org';
         $clickthrough = ['foo' => 'bar'];
 
-        $router = $this->createMock(Router::class);
+        $router = $this->createMock(UrlGeneratorInterface::class);
         $router->expects($this->exactly(2))
             ->method('generate')
             ->willReturn($url);

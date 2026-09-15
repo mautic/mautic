@@ -40,7 +40,6 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->request);
 
         $this->validator = new CircularDependencyValidator($this->mockListModel, $requestStack);
-        $this->validator->initialize($this->context);
     }
 
     /**
@@ -54,7 +53,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         $this->mockListModel->expects($this->never())
             ->method('getEntity');
 
-        $this->validator->validate([], new CircularDependency());
+        $this->validator->validateInContext([], new CircularDependency(), $this->context);
     }
 
     /**
@@ -157,7 +156,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidateOnInvalid(?string $message, int $currentSegmentId, array $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)
-            ->validate($filters, new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists'));
+            ->validateInContext($filters, new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists'), $this->context);
     }
 
     /**
