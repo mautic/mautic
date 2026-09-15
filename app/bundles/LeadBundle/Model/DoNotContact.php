@@ -77,7 +77,7 @@ class DoNotContact implements MauticModelInterface
     public function addDncForContact(
         $contact,
         $channel,
-        $reason = DNC::BOUNCED,
+        int $reason = DNC::BOUNCED,
         ?string $comments = '',
         bool $persist = true,
         bool $checkCurrentStatus = true,
