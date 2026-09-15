@@ -1232,6 +1232,21 @@ class PageModel extends FormModel implements GlobalSearchInterface
     private function cleanQuery(array $query): array
     {
         foreach ($query as $key => $value) {
+            if (is_array($value)) {
+                // Recurse so nested array params (e.g. the `ct` clickthrough
+                // payload) get the same sanitization instead of bypassing it.
+                $query[$key] = $this->cleanQuery($value);
+                continue;
+            }
+
+            if (!is_string($value)) {
+                continue;
+            }
+
+            // Strip invalid UTF-8 sequences to prevent database encoding errors
+            // (e.g. raw \xAD soft hyphen bytes from copy-pasted Word content)
+            $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+
             if (filter_var($value, FILTER_VALIDATE_URL)) {
                 $query[$key] = InputHelper::url($value);
             } else {
