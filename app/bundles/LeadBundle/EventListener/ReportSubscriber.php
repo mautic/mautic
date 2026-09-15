@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -282,9 +283,9 @@ final class ReportSubscriber implements EventSubscriberInterface
                     ->andWhere(
                         $qb->expr()->and(
                             $qb->expr()->eq('e.event_type', $qb->expr()->literal('decision')),
-                            $qb->expr()->eq('log.is_scheduled', 0),
+                            $qb->expr()->eq('log.is_scheduled', (string) (0)),
                             $qb->expr()->isNotNull('l.attribution'),
-                            $qb->expr()->neq('l.attribution', 0),
+                            $qb->expr()->neq('l.attribution', (string) (0)),
                             $qb->expr()->lte("DATE({$localDateTriggered})", 'DATE(l.attribution_date)')
                         )
                     );
@@ -306,6 +307,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 $subQ = clone $qb;
+                \assert($subQ instanceof TrackingQueryBuilder);
                 $subQ->resetQueryParts();
 
                 $alias = str_replace('contact.attribution.', '', $context);
@@ -401,6 +403,7 @@ final class ReportSubscriber implements EventSubscriberInterface
 
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
+            \assert($queryBuilder instanceof TrackingQueryBuilder);
             if ('lp' === $queryBuilder->getQueryPart('from')[0]['alias']) {
                 $join = $queryBuilder->getQueryPart('join');
                 $queryBuilder->resetQueryPart('join');
@@ -421,6 +424,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                 case 'mautic.lead.graph.pie.attribution_campaigns':
                 case 'mautic.lead.graph.pie.attribution_actions':
                 case 'mautic.lead.graph.pie.attribution_channels':
+                    \assert($attributionQb instanceof TrackingQueryBuilder);
                     $attributionQb->resetQueryParts(['select', 'orderBy']);
                     $outerQb = clone $attributionQb;
                     $outerQb->resetQueryParts()
@@ -478,7 +482,7 @@ final class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.lead.graph.line.leads':
                     $chart          = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $parametersKeys = array_keys($queryBuilder->getParameters() ?? []);
+                    $parametersKeys = array_keys($queryBuilder->getParameters());
                     $leadListFilter = preg_grep('/leadlistid/', $parametersKeys);
                     $tablePrefix    = $leadListFilter ? 's' : 'l';
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', $tablePrefix);

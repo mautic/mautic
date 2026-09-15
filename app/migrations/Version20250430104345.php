@@ -27,7 +27,7 @@ final class Version20250430104345 extends PreUpAssertionMigration
         $table = $schema->createTable($this->prefix.'focus_projects_xref');
         $table->addColumn('focus_id', 'integer', ['unsigned' => 'UNSIGNED' === $targetIdDataType, 'notnull' => true]);
         $table->addColumn('project_id', 'integer', ['unsigned' => 'UNSIGNED' === $projectIdDataType, 'notnull' => true]);
-        $table->setPrimaryKey(['focus_id', 'project_id']);
+        $this->setPrimaryKey($table, ['focus_id', 'project_id']);
         $table->addForeignKeyConstraint($this->prefix.'focus', ['focus_id'], ['id'], ['onDelete' => 'CASCADE']);
         $table->addForeignKeyConstraint($this->prefix.'projects', ['project_id'], ['id'], ['onDelete' => 'CASCADE']);
     }

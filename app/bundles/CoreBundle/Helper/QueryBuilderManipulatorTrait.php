@@ -14,7 +14,9 @@ trait QueryBuilderManipulatorTrait
     {
         foreach ($fromQueryBuilder->getParameters() as $key => $value) {
             $paramType = $fromQueryBuilder->getParameterType($key);
-            if (is_array($value) && (!is_int($paramType) || $paramType < Connection::ARRAY_PARAM_OFFSET)) {
+            // DBAL 4 expresses array parameter types with the ArrayParameterType enum
+            // rather than an int above Connection::ARRAY_PARAM_OFFSET.
+            if (is_array($value) && !$paramType instanceof ArrayParameterType) {
                 $paramType = ArrayParameterType::STRING;
             }
             $toQueryBuilder->setParameter($key, $value, $paramType);

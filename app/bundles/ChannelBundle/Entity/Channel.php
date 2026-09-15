@@ -15,6 +15,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -39,6 +40,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent('message')]
 class Channel extends CommonEntity implements UuidInterface
 {
     use UuidTrait;
@@ -106,7 +108,6 @@ class Channel extends CommonEntity implements UuidInterface
         $builder->createManyToOne('message', Message::class)
                 ->addJoinColumn('message_id', 'id', false, false, 'CASCADE')
                 ->inversedBy('channels')
-                ->isOwnershipParent()
                 ->build();
 
         static::addUuidField($builder);

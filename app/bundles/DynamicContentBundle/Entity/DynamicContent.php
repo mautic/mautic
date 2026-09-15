@@ -37,8 +37,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: DynamicContentRepository::class)]
 #[ORM\Table(name: 'dynamic_content')]
-#[ORM\Index(columns: ['is_campaign_based'], name: 'is_campaign_based_index')]
-#[ORM\Index(columns: ['slot_name'], name: 'slot_name_index')]
+#[ORM\Index(name: 'is_campaign_based_index', columns: ['is_campaign_based'])]
+#[ORM\Index(name: 'slot_name_index', columns: ['slot_name'])]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(

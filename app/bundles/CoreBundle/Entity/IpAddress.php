@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: IpAddressRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['ip_address'], name: 'ip_search')]
+#[ORM\Index(name: 'ip_search', columns: ['ip_address'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [

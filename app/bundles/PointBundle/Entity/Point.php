@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PointRepository::class)]
 #[ORM\Table(name: 'points')]
-#[ORM\Index(columns: ['type'], name: 'point_type_search')]
+#[ORM\Index(name: 'point_type_search', columns: ['type'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [

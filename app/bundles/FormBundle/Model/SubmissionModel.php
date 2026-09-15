@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
@@ -450,7 +450,7 @@ final class SubmissionModel extends CommonFormModel
     /**
      * @param array<string,mixed> $args
      *
-     * @return Submission[]|array<int,Submission>|iterable<Submission>|\Doctrine\ORM\Internal\Hydration\IterableResult<Submission>|Paginator<Submission>|SimplePaginator<Submission>
+     * @return Submission[]|array<int,Submission>|iterable<Submission>|Paginator<Submission>|SimplePaginator<Submission>
      */
     public function getEntities(array $args = [])
     {
@@ -827,12 +827,11 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of top submission referrers.
      *
-     * @param int    $limit
      * @param string $dateFrom
      * @param string $dateTo
      * @param array  $filters
      */
-    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmissionReferrers(?int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -857,12 +856,11 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of the most submisions per lead.
      *
-     * @param int    $limit
      * @param string $dateFrom
      * @param string $dateTo
      * @param array  $filters
      */
-    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmitters(?int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')

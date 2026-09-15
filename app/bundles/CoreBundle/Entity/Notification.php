@@ -9,10 +9,10 @@ use Mautic\UserBundle\Entity\User;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 #[ORM\Table(name: 'notifications')]
-#[ORM\Index(columns: ['is_read'], name: 'notification_read_status')]
-#[ORM\Index(columns: ['type'], name: 'notification_type')]
-#[ORM\Index(columns: ['is_read', 'user_id'], name: 'notification_user_read_status')]
-#[ORM\Index(columns: ['deduplicate', 'date_added'], name: 'deduplicate_date_added')]
+#[ORM\Index(name: 'notification_read_status', columns: ['is_read'])]
+#[ORM\Index(name: 'notification_type', columns: ['type'])]
+#[ORM\Index(name: 'notification_user_read_status', columns: ['is_read', 'user_id'])]
+#[ORM\Index(name: 'deduplicate_date_added', columns: ['deduplicate', 'date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Notification
 {

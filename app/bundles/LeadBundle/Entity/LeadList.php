@@ -27,8 +27,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LeadListRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['alias'], name: 'lead_list_alias')]
-#[ORM\Index(columns: ['deleted'], name: 'segment_deleted')]
+#[ORM\Index(name: 'lead_list_alias', columns: ['alias'])]
+#[ORM\Index(name: 'segment_deleted', columns: ['deleted'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     shortName: 'Segments',

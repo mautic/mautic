@@ -6,6 +6,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -536,7 +537,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.email.graph.pie.ignored.read.failed':
-                    $queryBuilder->resetQueryPart('groupBy');
+                    $queryBuilder->resetGroupBy();
                     $counts = $this->statRepository->getIgnoredReadFailed($queryBuilder);
                     $chart  = new PieChart();
                     $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $counts['read']);
@@ -633,7 +634,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
                     );
                     $this->addDNCTableForEmails($queryBuilder);
-                    $queryBuilder->resetQueryPart('groupBy');
+                    $queryBuilder->resetGroupBy();
                     $counts = $queryBuilder->executeQuery()->fetchAssociative();
                     $chart  = new PieChart();
                     $chart->setDataset(
@@ -895,6 +896,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
     private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
+        \assert($query instanceof TrackingQueryBuilder);
         $joins = $query->getQueryParts()['join'];
         if (empty($joins) || empty($joins[$fromAlias])) {
             return false;

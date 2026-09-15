@@ -113,7 +113,6 @@ class Message extends FormEntity implements UuidInterface
             ->setIndexBy('channel')
             ->orphanRemoval()
             ->mappedBy('message')
-            ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
             ->build();

@@ -11,8 +11,8 @@ use Ramsey\Uuid\Uuid;
 
 #[ORM\Entity(repositoryClass: EmailReplyRepository::class)]
 #[ORM\Table(name: 'email_stat_replies')]
-#[ORM\Index(columns: ['stat_id', 'message_id'], name: 'email_replies')]
-#[ORM\Index(columns: ['date_replied'], name: 'date_email_replied')]
+#[ORM\Index(name: 'email_replies', columns: ['stat_id', 'message_id'])]
+#[ORM\Index(name: 'date_email_replied', columns: ['date_replied'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class EmailReply
 {

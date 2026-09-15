@@ -21,7 +21,7 @@ final class SegmentStatCommandTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function testSegmentStatCommandWithSegment(): void

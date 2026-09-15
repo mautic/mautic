@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 class Redirect extends FormEntity
 {
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

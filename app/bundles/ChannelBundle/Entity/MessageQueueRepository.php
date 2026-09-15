@@ -33,7 +33,7 @@ class MessageQueueRepository extends CommonRepository
     /**
      * @return array<int, MessageQueue>
      */
-    public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null)
+    public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null): mixed
     {
         $q = $this->createQueryBuilder('mq');
 

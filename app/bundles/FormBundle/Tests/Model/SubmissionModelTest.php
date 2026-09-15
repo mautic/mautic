@@ -165,9 +165,6 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $schemaManager = $this->createMock(AbstractSchemaManager::class);
         $schemaManager->method('tablesExist')->willReturn(true);
         $connection->method('createSchemaManager')->willReturn($schemaManager);
-        $connection->method('beginTransaction')->willReturn(true);
-        $connection->method('commit')->willReturn(true);
-        $connection->method('rollBack')->willReturn(true);
         $connection->method('executeStatement')->willReturn(1);
         $classMetadata = $this->createMock(ClassMetadata::class);
         $classMetadata->method('getTableName')->willReturn('forms');

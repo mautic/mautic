@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
@@ -35,7 +36,7 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
             ->with(
                 $expectedQuery,
                 ['contacts' => [6, 8]],
-                ['contacts' => 101]
+                ['contacts' => ArrayParameterType::INTEGER]
             )
             ->willReturn($this->result);
 

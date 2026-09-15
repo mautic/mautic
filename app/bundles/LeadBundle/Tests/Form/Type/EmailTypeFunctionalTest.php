@@ -14,7 +14,7 @@ final class EmailTypeFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Exception
      */
     public function testEmailWithJapanese(): void

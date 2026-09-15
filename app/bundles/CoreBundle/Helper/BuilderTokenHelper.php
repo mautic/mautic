@@ -93,7 +93,7 @@ final class BuilderTokenHelper
 
         if ($expr instanceof CompositeExpression && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
-                $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
+                $exprBuilder->eq($prefix.'created_by', (string) ($this->userHelper->getUser()->getId()))
             );
         }
 

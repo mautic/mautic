@@ -13,10 +13,10 @@ use Mautic\PageBundle\Validator\PageHit;
 
 #[ORM\Entity(repositoryClass: HitRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['tracking_id'], name: 'page_hit_tracking_search')]
-#[ORM\Index(columns: ['code'], name: 'page_hit_code_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'page_hit_source_search')]
-#[ORM\Index(columns: ['date_hit', 'date_left'], name: 'date_hit_left_index')]
+#[ORM\Index(name: 'page_hit_tracking_search', columns: ['tracking_id'])]
+#[ORM\Index(name: 'page_hit_code_search', columns: ['code'])]
+#[ORM\Index(name: 'page_hit_source_search', columns: ['source', 'source_id'])]
+#[ORM\Index(name: 'date_hit_left_index', columns: ['date_hit', 'date_left'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[PageHit]
 class Hit
@@ -24,7 +24,7 @@ class Hit
     public const TABLE_NAME = 'page_hits';
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

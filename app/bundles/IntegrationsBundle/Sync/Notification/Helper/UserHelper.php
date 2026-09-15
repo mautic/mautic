@@ -24,9 +24,9 @@ readonly class UserHelper
             ->join('u', MAUTIC_TABLE_PREFIX.'roles', 'r', 'r.id = u.role_id')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('r.is_published', 1),
-                    $qb->expr()->eq('r.is_admin', 1),
-                    $qb->expr()->eq('u.is_published', 1)
+                    $qb->expr()->eq('r.is_published', (string) (1)),
+                    $qb->expr()->eq('r.is_admin', (string) (1)),
+                    $qb->expr()->eq('u.is_published', (string) (1))
                 )
             )
             ->executeQuery()
