@@ -22,7 +22,7 @@ final class NotificationSendTypeTest extends TypeTestCase
     /**
      * @return array<mixed>
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new ValidatorExtension(Validation::createValidator()),
