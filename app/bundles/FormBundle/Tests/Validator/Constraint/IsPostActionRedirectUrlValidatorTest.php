@@ -197,7 +197,7 @@ final class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTest
         $violation->method('getParameters')->willReturn($violationParameters);
 
         $violationList = new ConstraintViolationList([$violation]);
-        $urlConstraint = new Url(message: 'mautic.form.form.postactionproperty_redirect.url');
+        $urlConstraint = new Url(message: 'mautic.form.form.postactionproperty_redirect.url', requireTld: false);
 
         $this
             ->urlValidator
@@ -225,7 +225,7 @@ final class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTest
     public function testUrlWithTokens(string $url, string $dummyDataUrl): void
     {
         $violationList = new ConstraintViolationList();
-        $urlConstraint = new Url(message: 'mautic.form.form.postactionproperty_redirect.url');
+        $urlConstraint = new Url(message: 'mautic.form.form.postactionproperty_redirect.url', requireTld: false);
 
         $this
             ->urlValidator
