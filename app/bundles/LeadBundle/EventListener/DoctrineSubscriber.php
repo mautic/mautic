@@ -36,10 +36,6 @@ final readonly class DoctrineSubscriber
             foreach ($objects as $object => $tableName) {
                 $table = $schema->getTable(MAUTIC_TABLE_PREFIX.$tableName);
 
-                if ('lead' === $object && defined('MAUTIC_INSTALLER') && !$table->hasIndex(MAUTIC_TABLE_PREFIX.'email_search')) {
-                    $table->addIndex(['email'], MAUTIC_TABLE_PREFIX.'email_search');
-                }
-
                 // get a list of fields
                 $fields = $args->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select('f.alias, f.is_unique_identifer as is_unique, f.is_index, f.type, f.object')
