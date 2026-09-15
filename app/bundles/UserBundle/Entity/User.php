@@ -364,11 +364,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $roles;
     }
 
-    #[\Deprecated]
-    public function eraseCredentials(): void
-    {
-    }
-
     /**
      * @return array<int, mixed>
      */
