@@ -36,7 +36,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertAjaxResponse($message, null);
     }
 
-    public function sendToDncProvider(): \Generator
+    public static function sendToDncProvider(): \Generator
     {
         yield [true];
         yield [false];
