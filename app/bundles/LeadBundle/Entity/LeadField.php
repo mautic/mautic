@@ -29,6 +29,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 #[ORM\Entity(repositoryClass: LeadFieldRepository::class)]
 #[ORM\Table(name: 'lead_fields')]
 #[ORM\Index(columns: ['object', 'field_order', 'is_published'], name: 'idx_object_field_order_is_published')]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -220,7 +221,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->addLifecycleEvent('identifierWorkaround', 'postLoad');
 
         $builder->addId();
 
@@ -782,6 +782,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * Workaround for mispelled isUniqueIdentifer.
      */
+    #[ORM\PostLoad]
     public function identifierWorkaround(): void
     {
         $this->isUniqueIdentifier = $this->isUniqueIdentifer;

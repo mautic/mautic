@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Index(columns: ['date_modified'], name: 'lead_date_modified')]
 #[ORM\Index(columns: ['date_identified'], name: 'date_identified')]
 #[ORM\Index(columns: ['last_active'], name: 'last_active')]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     shortName: 'Contacts',
@@ -301,13 +302,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addLifecycleEvent('checkDateIdentified', 'preUpdate')
-            ->addLifecycleEvent('checkDateIdentified', 'prePersist')
-            ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
-            ->addLifecycleEvent('checkAttributionDate', 'prePersist')
-            ->addLifecycleEvent('checkDateAdded', 'prePersist');
 
         $builder->addBigIntIdField();
 
@@ -1381,6 +1375,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * If there is an attribution amount but no date, insert today's date.
      */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function checkAttributionDate(): void
     {
         $attribution     = $this->getFieldValue('attribution');
@@ -1396,6 +1392,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set date identified.
      */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function checkDateIdentified(): void
     {
         if ($this->wasAnonymous()) {
@@ -1407,6 +1405,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Set date added if not already set.
      */
+    #[ORM\PrePersist]
     public function checkDateAdded(): void
     {
         if (null === $this->getDateAdded()) {
