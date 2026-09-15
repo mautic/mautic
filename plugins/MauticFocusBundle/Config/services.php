@@ -13,6 +13,7 @@ return function (ContainerConfigurator $configurator): void {
         ->public();
 
     $excludes = [
+        'Enum',
     ];
 
     $services->load('MauticPlugin\\MauticFocusBundle\\', '../')
