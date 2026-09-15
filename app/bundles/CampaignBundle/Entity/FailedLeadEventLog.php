@@ -17,6 +17,9 @@ class FailedLeadEventLog
     /**
      * @var LeadEventLog
      */
+    #[ORM\Id]
+    #[ORM\OneToOne(targetEntity: LeadEventLog::class, inversedBy: 'failedLog')]
+    #[ORM\JoinColumn(name: 'log_id', nullable: false, onDelete: 'CASCADE')]
     private $log;
 
     /**
@@ -32,12 +35,6 @@ class FailedLeadEventLog
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createOneToOne('log', 'LeadEventLog')
-            ->makePrimaryKey()
-            ->inversedBy('failedLog')
-            ->addJoinColumn('log_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->addDateAdded();
 

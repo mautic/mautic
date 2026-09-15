@@ -7,11 +7,15 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Table(name: 'monitoring_leads')]
 #[ORM\Entity(repositoryClass: LeadRepository::class)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Lead
 {
     /**
      * @var Monitoring
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Monitoring::class)]
+    #[ORM\JoinColumn(name: 'monitor_id', nullable: false, onDelete: 'CASCADE')]
     private $monitor;
 
     /**
@@ -30,11 +34,6 @@ class Lead
 
         $builder->setTable('monitoring_leads')
             ->setCustomRepositoryClass(LeadRepository::class);
-
-        $builder->createManyToOne('monitor', 'Monitoring')
-            ->isPrimaryKey()
-            ->addJoinColumn('monitor_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->addLead(false, 'CASCADE', true);
 

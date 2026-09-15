@@ -15,6 +15,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'tweets')]
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
+#[ORM\Index(columns: ['sent_count'], name: 'sent_count_index')]
+#[ORM\Index(columns: ['favorite_count'], name: 'favorite_count_index')]
+#[ORM\Index(columns: ['retweet_count'], name: 'retweet_count_index')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Tweet extends FormEntity
 {
     /**
@@ -83,11 +87,15 @@ class Tweet extends FormEntity
     /**
      * @var Page|null
      */
+    #[ORM\ManyToOne(targetEntity: Page::class)]
+    #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
     private $page;
 
     /**
      * @var Asset|null
      */
+    #[ORM\ManyToOne(targetEntity: Asset::class)]
+    #[ORM\JoinColumn(name: 'asset_id', onDelete: 'SET NULL')]
     private $asset;
 
     /**
@@ -98,6 +106,7 @@ class Tweet extends FormEntity
     /**
      * @var ArrayCollection<int, TweetStat>
      */
+    #[ORM\OneToMany(mappedBy: 'tweet', targetEntity: TweetStat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     public function __construct()
@@ -121,10 +130,7 @@ class Tweet extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('tweets')
-            ->setCustomRepositoryClass(TweetRepository::class)
-            ->addIndex(['sent_count'], 'sent_count_index')
-            ->addIndex(['favorite_count'], 'favorite_count_index')
-            ->addIndex(['retweet_count'], 'retweet_count_index');
+            ->setCustomRepositoryClass(TweetRepository::class);
 
         $builder->addIdColumns();
         $builder->addCategory();
@@ -135,21 +141,6 @@ class Tweet extends FormEntity
         $builder->addNullableField('favoriteCount', Types::INTEGER, 'favorite_count');
         $builder->addNullableField('retweetCount', Types::INTEGER, 'retweet_count');
         $builder->addNullableField('language', Types::STRING, 'lang');
-
-        $builder->createManyToOne('page', Page::class)
-            ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createManyToOne('asset', Asset::class)
-            ->addJoinColumn('asset_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createOneToMany('stats', 'TweetStat')
-            ->setIndexBy('id')
-            ->mappedBy('tweet')
-            ->cascadePersist()
-            ->fetchExtraLazy()
-            ->build();
     }
 
     /**

@@ -20,6 +20,9 @@ class GroupContactScore extends CommonEntity
 
     private Lead $contact;
 
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Group::class)]
+    #[ORM\JoinColumn(name: 'group_id', onDelete: 'CASCADE')]
     private Group $group;
 
     private int $score = 0;
@@ -38,11 +41,6 @@ class GroupContactScore extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addContact(false, 'CASCADE', true, 'groupScores');
-
-        $builder->createManyToOne('group', Group::class)
-            ->isPrimaryKey()
-            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
-            ->build();
 
         $builder->createField('score', Types::INTEGER)
             ->build();

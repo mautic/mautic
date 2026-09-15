@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -20,6 +21,10 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ORM\Entity(repositoryClass: TagRepository::class)]
+#[ORM\Table(name: 'lead_tags')]
+#[ORM\Index(columns: ['tag'], name: 'lead_tag_search')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('tagManager:tagManager:view')"),
@@ -70,9 +75,6 @@ class Tag implements UuidInterface
     public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('lead_tags')
-            ->setCustomRepositoryClass(TagRepository::class)
-            ->addIndex(['tag'], 'lead_tag_search');
 
         $builder->addId();
         $builder->addField('tag', Types::STRING);

@@ -66,6 +66,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     /**
      * @var ArrayCollection<int, Integration>
      */
+    #[ORM\OneToMany(mappedBy: 'plugin', targetEntity: Integration::class, fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $integrations;
 
     public function __construct()
@@ -93,12 +94,6 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
 
         $builder->createField('author', 'string')
             ->nullable()
-            ->build();
-
-        $builder->createOneToMany('integrations', 'Integration')
-            ->setIndexBy('id')
-            ->mappedBy('plugin')
-            ->fetchExtraLazy()
             ->build();
     }
 

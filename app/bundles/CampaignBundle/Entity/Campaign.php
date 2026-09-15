@@ -115,12 +115,15 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @var Collection<int, Event>|ArrayCollection<int, Event>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\OneToMany(mappedBy: 'campaign', targetEntity: Event::class, cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OrderBy(['order' => 'ASC'])]
     private $events;
 
     /**
      * @var ArrayCollection<int, Lead>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\OneToMany(mappedBy: 'campaign', targetEntity: Lead::class, fetch: 'EXTRA_LAZY')]
     private Collection $leads;
 
     /**
@@ -179,19 +182,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
             ->build();
 
         $builder->addCategory();
-
-        $builder->createOneToMany('events', Event::class)
-            ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
-            ->mappedBy('campaign')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('leads', Lead::class)
-            ->mappedBy('campaign')
-            ->fetchExtraLazy()
-            ->build();
 
         $builder->createManyToMany('lists', LeadList::class)
             ->setJoinTable('campaign_leadlist_xref')

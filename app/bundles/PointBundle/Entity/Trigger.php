@@ -109,9 +109,13 @@ class Trigger extends FormEntity implements UuidInterface
      * @var ArrayCollection<int, TriggerEvent>
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\OneToMany(mappedBy: 'trigger', targetEntity: TriggerEvent::class, cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OrderBy(['order' => 'ASC'])]
     private $events;
 
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\ManyToOne(targetEntity: Group::class)]
+    #[ORM\JoinColumn(name: 'group_id', onDelete: 'CASCADE')]
     private ?Group $group = null;
 
     public function __clone()
@@ -146,18 +150,6 @@ class Trigger extends FormEntity implements UuidInterface
             ->build();
 
         $builder->addCategory();
-
-        $builder->createOneToMany('events', 'TriggerEvent')
-            ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
-            ->mappedBy('trigger')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createManyToOne('group', Group::class)
-            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
-            ->build();
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'point_trigger_projects_xref', 'point_trigger_id');

@@ -26,11 +26,6 @@ class EmailReply
 
         $builder->addUuid();
 
-        $builder->createManyToOne('stat', Stat::class)
-            ->inversedBy('replies')
-            ->addJoinColumn('stat_id', 'id', false, false, 'CASCADE')
-            ->build();
-
         $builder->createField('dateReplied', 'datetime')
             ->columnName('date_replied')
             ->build();
@@ -57,6 +52,8 @@ class EmailReply
     }
 
     public function __construct(
+        #[ORM\ManyToOne(targetEntity: Stat::class, inversedBy: 'replies')]
+        #[ORM\JoinColumn(name: 'stat_id', nullable: false, onDelete: 'CASCADE')]
         private readonly Stat $stat,
         private readonly ?string $messageId,
         ?\DateTime $dateReplied = null,

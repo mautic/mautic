@@ -20,6 +20,8 @@ class UserToken
     /**
      * @var User
      */
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', nullable: false, onDelete: 'CASCADE')]
     private $user;
 
     /**
@@ -47,10 +49,6 @@ class UserToken
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createManyToOne('user', User::class)
-            ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->createField('authorizator', 'string')
             ->length(32)

@@ -120,6 +120,8 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.role.notblank')]
+    #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: 'users', cascade: ['merge'])]
+    #[ORM\JoinColumn(name: 'role_id', nullable: false)]
     private $role;
 
     /**
@@ -204,12 +206,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $builder->createField('position', 'string')
             ->length(191)
             ->nullable()
-            ->build();
-
-        $builder->createManyToOne('role', 'Role')
-            ->inversedBy('users')
-            ->cascadeMerge()
-            ->addJoinColumn('role_id', 'id', false)
             ->build();
 
         $builder->createField('timezone', 'string')

@@ -180,12 +180,16 @@ class Event implements ChannelInterface, UuidInterface
      * @var ArrayCollection<int, Event>
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, indexBy: 'id')]
+    #[ORM\OrderBy(['order' => 'ASC'])]
     private $children;
 
     /**
      * @var Event|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'parent_id')]
     private $parent;
 
     /**
@@ -202,6 +206,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @var ArrayCollection<int, LeadEventLog>
      */
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: LeadEventLog::class, cascade: ['persist'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**
@@ -232,6 +237,8 @@ class Event implements ChannelInterface, UuidInterface
     private int $failedCount = 0;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'redirectingEvents', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'redirect_event_id', onDelete: 'SET NULL')]
     private ?Event $redirectEvent = null;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
@@ -242,6 +249,7 @@ class Event implements ChannelInterface, UuidInterface
      *
      * @var ArrayCollection<int, Event>
      */
+    #[ORM\OneToMany(mappedBy: 'redirectEvent', targetEntity: self::class, fetch: 'EXTRA_LAZY')]
     private Collection $redirectingEvents;
 
     public function __construct(?\DateTime $dateAdded = null)
@@ -290,17 +298,6 @@ class Event implements ChannelInterface, UuidInterface
         $builder->addField('properties', 'array');
 
         $builder->addNullableField('deleted', 'datetime');
-
-        $builder->createManyToOne('redirectEvent', 'Event')
-            ->inversedBy('redirectingEvents')
-            ->cascadePersist()
-            ->addJoinColumn('redirect_event_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createOneToMany('redirectingEvents', 'Event')
-            ->mappedBy('redirectEvent')
-            ->fetchExtraLazy()
-            ->build();
 
         $builder->createField('triggerDate', 'datetime')
             ->columnName('trigger_date')
@@ -355,18 +352,6 @@ class Event implements ChannelInterface, UuidInterface
             ->isOwnershipParent()
             ->build();
 
-        $builder->createOneToMany('children', 'Event')
-            ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
-            ->mappedBy('parent')
-            ->build();
-
-        $builder->createManyToOne('parent', 'Event')
-            ->inversedBy('children')
-            ->cascadePersist()
-            ->addJoinColumn('parent_id', 'id')
-            ->build();
-
         $builder->createField('decisionPath', 'string')
             ->columnName('decision_path')
             ->nullable()
@@ -375,12 +360,6 @@ class Event implements ChannelInterface, UuidInterface
         $builder->createField('tempId', 'string')
             ->columnName('temp_id')
             ->nullable()
-            ->build();
-
-        $builder->createOneToMany('log', 'LeadEventLog')
-            ->mappedBy('event')
-            ->cascadePersist()
-            ->fetchExtraLazy()
             ->build();
 
         $builder->createField('channel', 'string')

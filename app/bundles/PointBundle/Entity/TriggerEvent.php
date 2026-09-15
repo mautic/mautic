@@ -90,6 +90,7 @@ class TriggerEvent implements UuidInterface
     /**
      * @var ArrayCollection<int,LeadTriggerLog>
      */
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: LeadTriggerLog::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**
@@ -127,13 +128,6 @@ class TriggerEvent implements UuidInterface
             ->inversedBy('events')
             ->addJoinColumn('trigger_id', 'id', false, false, 'CASCADE')
             ->isOwnershipParent()
-            ->build();
-
-        $builder->createOneToMany('log', 'LeadTriggerLog')
-            ->mappedBy('event')
-            ->cascadePersist()
-            ->cascadeRemove()
-            ->fetchExtraLazy()
             ->build();
 
         static::addUuidField($builder);

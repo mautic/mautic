@@ -22,6 +22,9 @@ class ListLead
     /**
      * @var LeadList
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: LeadList::class, inversedBy: 'leads')]
+    #[ORM\JoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
     private $list;
 
     /**
@@ -47,12 +50,6 @@ class ListLead
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createManyToOne('list', 'LeadList')
-            ->isPrimaryKey()
-            ->inversedBy('leads')
-            ->addJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->addLead(false, 'CASCADE', true);
 
