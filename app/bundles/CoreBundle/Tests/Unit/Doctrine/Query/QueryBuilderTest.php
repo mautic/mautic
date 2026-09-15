@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Query;
 
+use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -126,5 +127,54 @@ final class QueryBuilderTest extends TestCase
         $queryBuilder->add('from', ['table' => 'leads USE INDEX (date_added)', 'alias' => 'l'], false);
 
         $this->assertSame(['table' => 'leads USE INDEX (date_added)', 'alias' => 'l'], $queryBuilder->getQueryPart('from'));
+    }
+
+    /**
+     * symfony/doctrine-messenger asks for the lock and then reads the SQL back, so losing
+     * it here hands the transport a query it believes is locked when it is not.
+     */
+    public function testForUpdateReachesTheGeneratedSql(): void
+    {
+        $queryBuilder = new QueryBuilder($this->getMockedConnection());
+        $queryBuilder->select('id')->from('messenger_messages', 'm')->forUpdate();
+
+        $this->assertSame('SELECT id FROM messenger_messages m FOR UPDATE', $queryBuilder->getSQL());
+    }
+
+    public function testForUpdateSkipLockedReachesTheGeneratedSql(): void
+    {
+        $queryBuilder = new QueryBuilder($this->getMockedConnection());
+        $queryBuilder->select('id')
+            ->from('messenger_messages', 'm')
+            ->forUpdate(ConflictResolutionMode::SKIP_LOCKED);
+
+        $this->assertSame('SELECT id FROM messenger_messages m FOR UPDATE SKIP LOCKED', $queryBuilder->getSQL());
+    }
+
+    /**
+     * @return iterable<string, array{string, array<mixed>}>
+     */
+    public static function provideUnsupportedMethods(): iterable
+    {
+        yield 'union'     => ['union', ['SELECT 1']];
+        yield 'addUnion'  => ['addUnion', ['SELECT 1']];
+        yield 'with'      => ['with', ['cte', 'SELECT 1']];
+    }
+
+    /**
+     * These restructure the whole query, which a builder generating SELECT from tracked
+     * parts cannot express. Failing loudly beats quietly dropping them from the SQL.
+     *
+     * @param array<mixed> $arguments
+     */
+    #[DataProvider('provideUnsupportedMethods')]
+    public function testUnsupportedMethodsThrowInsteadOfBeingIgnored(string $method, array $arguments): void
+    {
+        $queryBuilder = new QueryBuilder($this->getMockedConnection());
+        $queryBuilder->select('id')->from('leads', 'l');
+
+        $this->expectException(\LogicException::class);
+
+        $queryBuilder->{$method}(...$arguments);
     }
 }

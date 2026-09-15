@@ -6,7 +6,12 @@ namespace Mautic\CoreBundle\Doctrine\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\ForUpdate;
+use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
+use Doctrine\DBAL\Query\Limit;
 use Doctrine\DBAL\Query\QueryBuilder as BaseQueryBuilder;
+use Doctrine\DBAL\Query\SelectQuery;
+use Doctrine\DBAL\Query\UnionType;
 use Mautic\CoreBundle\Exception\DbalException;
 
 /**
@@ -46,6 +51,11 @@ class QueryBuilder extends BaseQueryBuilder
      * Only SELECT is generated here; see the class docblock.
      */
     protected string $statementType = 'select';
+
+    /**
+     * The parent keeps its own copy private, so the requested row lock is tracked here.
+     */
+    protected ?ForUpdate $forUpdateLock = null;
 
     /**
      * DBAL keeps its own connection private, so this class holds its own reference for
@@ -345,6 +355,11 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
+    /**
+     * The tracked parts are handed to the platform's own SELECT builder rather than
+     * concatenated here, so the row lock, the limit and the platform-specific spellings
+     * of all three come out the way DBAL would write them.
+     */
     public function getSQL(): string
     {
         if ('select' !== $this->statementType) {
@@ -353,24 +368,66 @@ class QueryBuilder extends BaseQueryBuilder
 
         $sqlParts = $this->queryParts;
 
-        $query = 'SELECT '.($sqlParts['distinct'] ? 'DISTINCT ' : '').
-            implode(', ', (array) $sqlParts['select']);
+        return $this->connection->getDatabasePlatform()->createSelectSQLBuilder()->buildSQL(
+            new SelectQuery(
+                (bool) $sqlParts['distinct'],
+                (array) $sqlParts['select'],
+                $sqlParts['from'] ? array_values($this->getFromClauses()) : [],
+                null !== $sqlParts['where'] ? (string) $sqlParts['where'] : null,
+                (array) $sqlParts['groupBy'],
+                null !== $sqlParts['having'] ? (string) $sqlParts['having'] : null,
+                (array) $sqlParts['orderBy'],
+                new Limit($this->getMaxResults(), $this->getFirstResult()),
+                $this->forUpdateLock,
+            )
+        );
+    }
 
-        $query .= ($sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
-            .(null !== $sqlParts['where'] ? ' WHERE '.$sqlParts['where'] : '')
-            .($sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', (array) $sqlParts['groupBy']) : '')
-            .(null !== $sqlParts['having'] ? ' HAVING '.$sqlParts['having'] : '')
-            .($sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', (array) $sqlParts['orderBy']) : '');
+    /**
+     * DBAL keeps the requested lock private, so it is tracked here as well; without it
+     * getSQL() would hand back a query the caller believes is locked when it is not.
+     */
+    public function forUpdate(ConflictResolutionMode $conflictResolutionMode = ConflictResolutionMode::ORDINARY): static
+    {
+        parent::forUpdate($conflictResolutionMode);
 
-        if (null !== $this->getMaxResults() || 0 !== $this->getFirstResult()) {
-            return $this->connection->getDatabasePlatform()->modifyLimitQuery(
-                $query,
-                $this->getMaxResults(),
-                $this->getFirstResult()
-            );
-        }
+        $this->forUpdateLock = new ForUpdate($conflictResolutionMode);
 
-        return $query;
+        return $this;
+    }
+
+    /**
+     * UNION and common table expressions restructure the whole statement, which a builder
+     * that generates SELECT from tracked parts cannot express. They are refused rather
+     * than dropped silently, and deliberately not as a DBAL exception - callers catch
+     * those to fall back, which would hide the refusal again.
+     */
+    public function union(string|BaseQueryBuilder $part): static
+    {
+        throw $this->unsupported(__FUNCTION__);
+    }
+
+    public function addUnion(string|BaseQueryBuilder $part, UnionType $type = UnionType::DISTINCT): static
+    {
+        throw $this->unsupported(__FUNCTION__);
+    }
+
+    /**
+     * @param string[]|null $columns
+     */
+    public function with(string $name, string|BaseQueryBuilder $part, ?array $columns = null): static
+    {
+        throw $this->unsupported(__FUNCTION__);
+    }
+
+    private function unsupported(string $method): \LogicException
+    {
+        return new \LogicException(sprintf(
+            '%s::%s() is not supported. This query builder generates SELECT from the parts it tracks, which cannot express UNION or common table expressions. Build such a query with %s instead.',
+            self::class,
+            $method,
+            BaseQueryBuilder::class
+        ));
     }
 
     /**
