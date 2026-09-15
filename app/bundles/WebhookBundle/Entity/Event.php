@@ -22,7 +22,7 @@ class Event
     /**
      * @var Webhook
      */
-    #[ORM\ManyToOne(targetEntity: Webhook::class, inversedBy: 'events', cascade: ['detach', 'merge'])]
+    #[ORM\ManyToOne(targetEntity: Webhook::class, cascade: ['detach', 'merge'], inversedBy: 'events')]
     #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private $webhook;
 

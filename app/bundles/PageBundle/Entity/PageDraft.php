@@ -27,7 +27,7 @@ class PageDraft
     private ?int $id = null;
 
     public function __construct(
-        #[ORM\OneToOne(targetEntity: Page::class, inversedBy: 'draft')]
+        #[ORM\OneToOne(inversedBy: 'draft', targetEntity: Page::class)]
         #[ORM\JoinColumn(name: 'page_id', nullable: false)]
         private Page $page,
         private ?string $html = null,

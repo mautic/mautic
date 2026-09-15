@@ -20,7 +20,7 @@ class EmailDraft
     private int $id;
 
     public function __construct(
-        #[ORM\OneToOne(targetEntity: Email::class, inversedBy: 'draft')]
+        #[ORM\OneToOne(inversedBy: 'draft', targetEntity: Email::class)]
         #[ORM\JoinColumn(name: 'email_id', nullable: false)]
         private Email $email,
         private ?string $html,

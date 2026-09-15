@@ -18,7 +18,7 @@ class FailedLeadEventLog
      * @var LeadEventLog
      */
     #[ORM\Id]
-    #[ORM\OneToOne(targetEntity: LeadEventLog::class, inversedBy: 'failedLog')]
+    #[ORM\OneToOne(inversedBy: 'failedLog', targetEntity: LeadEventLog::class)]
     #[ORM\JoinColumn(name: 'log_id', nullable: false, onDelete: 'CASCADE')]
     private $log;
 

@@ -188,7 +188,7 @@ class Event implements ChannelInterface, UuidInterface
      * @var Event|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children', cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'children')]
     #[ORM\JoinColumn(name: 'parent_id')]
     private $parent;
 
@@ -237,7 +237,7 @@ class Event implements ChannelInterface, UuidInterface
     private int $failedCount = 0;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'redirectingEvents', cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'redirectingEvents')]
     #[ORM\JoinColumn(name: 'redirect_event_id', onDelete: 'SET NULL')]
     private ?Event $redirectEvent = null;
 

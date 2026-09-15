@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\UniqueConstraint(columns: ['name'], name: 'unique_project_name')]
+#[ORM\UniqueConstraint(name: 'unique_project_name', columns: ['name'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
