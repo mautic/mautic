@@ -10,6 +10,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'point_insights')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PointInsight extends FormEntity
 {
     public const INSIGHT_TYPE_COMPARE_POINT_GROUPS = 'compare_point_groups';
@@ -64,7 +67,7 @@ class PointInsight extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('point_insights')
+        $builder
             ->setCustomRepositoryClass(PointInsightRepository::class);
 
         $builder->addIdColumns();

@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Utils\Rector\LoadMetadataMauticHelperToAttributeRector;
-use Utils\Rector\LoadMetadataStaticHelperToAttributeRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
@@ -27,9 +25,16 @@ return RectorConfig::configure()
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
         // to be used next on loadMetadata()
-        // \Utils\Rector\LoadMetadataToDoctrineAttributeRector::class,
-        // LoadMetadataStaticHelperToAttributeRector::class,
-        // LoadMetadataMauticHelperToAttributeRector::class
+        // \Utils\Rector\LoadMetadataMauticHelperToAttributeRector::class,
+        // \Utils\Rector\LoadMetadataStaticHelperToAttributeRector::class,
+        // \Utils\Rector\LoadMetadataColumnToDoctrineAttributeRector::class,
+        // \Utils\Rector\LoadMetadataAssociationToDoctrineAttributeRector::class,
+        // \Utils\Rector\LoadMetadataManyToManyToDoctrineAttributeRector::class,
+        // \Utils\Rector\LoadMetadataTableToDoctrineAttributeRector::class,
+        // \Utils\Rector\LoadMetadataRepositoryToDoctrineAttributeRector::class,
+        // \Utils\Rector\LoadMetadataIndexToDoctrineAttributeRector::class,
+        // \Utils\Rector\LoadMetadataLifecycleToDoctrineAttributeRector::class,
+        // \Utils\Rector\LoadMetadataClassToDoctrineAttributeRector::class,
 
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,

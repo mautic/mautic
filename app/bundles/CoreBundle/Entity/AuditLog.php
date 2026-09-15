@@ -7,6 +7,9 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'audit_log')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class AuditLog
 {
     /**
@@ -63,7 +66,7 @@ class AuditLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('audit_log')
+        $builder
             ->setCustomRepositoryClass(AuditLogRepository::class)
             ->addIndex(['object', 'object_id'], 'object_search')
             ->addIndex(['bundle', 'object', 'action', 'object_id'], 'timeline_search')

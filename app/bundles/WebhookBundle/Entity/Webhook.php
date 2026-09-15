@@ -24,6 +24,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'webhooks')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     shortName: 'Webhooks',
     operations: [
@@ -147,7 +150,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('webhooks')
+        $builder
             ->setCustomRepositoryClass(WebhookRepository::class);
 
         $builder->addIdColumns();

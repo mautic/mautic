@@ -8,6 +8,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'plugins')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
     public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
@@ -73,7 +76,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('plugins')
+        $builder
             ->setCustomRepositoryClass(PluginRepository::class)
             ->addUniqueConstraint(['bundle'], 'unique_bundle');
 

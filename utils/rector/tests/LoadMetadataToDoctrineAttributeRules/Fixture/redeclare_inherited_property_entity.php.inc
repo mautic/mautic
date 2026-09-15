@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRector\Fixture;
+namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -36,7 +36,7 @@ class AccessTokenEntity extends BaseAccessToken
 -----
 <?php
 
-namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRector\Fixture;
+namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -49,11 +49,11 @@ class AccessTokenEntity extends BaseAccessToken
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue]
     protected $id;
-    #[ORM\ManyToOne(targetEntity: Client::class)]
-    #[ORM\JoinColumn(name: 'client_id', nullable: false, onDelete: 'CASCADE')]
-    protected $client;
     #[ORM\Column(type: 'string', length: 191, unique: true)]
     protected $token;
     #[ORM\Column(name: 'expires_at', type: 'bigint', nullable: true)]
     protected $expiresAt;
+    #[ORM\ManyToOne(targetEntity: Client::class)]
+    #[ORM\JoinColumn(name: 'client_id', nullable: false, onDelete: 'CASCADE')]
+    protected $client;
 }

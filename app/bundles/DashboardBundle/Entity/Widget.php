@@ -10,6 +10,9 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'widgets')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Widget extends FormEntity
 {
     /**
@@ -88,7 +91,6 @@ class Widget extends FormEntity
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('widgets');
         $builder->setCustomRepositoryClass(WidgetRepository::class);
         $builder->addIdColumns('name', false);
         $builder->addField('type', Types::STRING);

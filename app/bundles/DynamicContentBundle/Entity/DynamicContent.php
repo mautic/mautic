@@ -36,6 +36,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'dynamic_content')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('dynamiccontent:dynamiccontents:viewown')"),
@@ -163,7 +166,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('dynamic_content')
+        $builder
             ->addIndex(['is_campaign_based'], 'is_campaign_based_index')
             ->addIndex(['slot_name'], 'slot_name_index')
             ->setCustomRepositoryClass(DynamicContentRepository::class)

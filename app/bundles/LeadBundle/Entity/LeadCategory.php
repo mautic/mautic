@@ -15,6 +15,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'lead_categories')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     shortName: 'Contact Category',
     operations: [
@@ -78,7 +81,7 @@ class LeadCategory
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_categories')
+        $builder
             ->setCustomRepositoryClass(LeadCategoryRepository::class);
 
         $builder->addId();

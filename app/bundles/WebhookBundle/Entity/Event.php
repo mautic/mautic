@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'webhook_events')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Event
 {
     /**
@@ -39,7 +42,7 @@ class Event
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('webhook_events')
+        $builder
             ->setCustomRepositoryClass(EventRepository::class);
 
         $builder->addId();

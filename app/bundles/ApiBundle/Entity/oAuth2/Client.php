@@ -11,6 +11,9 @@ use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'oauth2_clients')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Client extends BaseClient
 {
     /**
@@ -68,7 +71,7 @@ class Client extends BaseClient
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('oauth2_clients')
+        $builder
             ->setCustomRepositoryClass(ClientRepository::class)
             ->addIndex(['random_id'], 'client_id_search');
 

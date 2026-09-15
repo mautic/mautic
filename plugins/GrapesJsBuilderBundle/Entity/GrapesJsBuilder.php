@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'bundle_grapesjsbuilder')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class GrapesJsBuilder
 {
     /**
@@ -31,7 +34,7 @@ class GrapesJsBuilder
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('bundle_grapesjsbuilder')
+        $builder
             ->setCustomRepositoryClass(GrapesJsBuilderRepository::class)
             ->addNamedField('customMjml', Types::TEXT, 'custom_mjml', true)
             ->addNamedField('draftCustomMjml', Types::TEXT, 'draft_custom_mjml', true)

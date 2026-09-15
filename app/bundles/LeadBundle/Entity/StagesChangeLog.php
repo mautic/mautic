@@ -8,6 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\StageBundle\Entity\Stage;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'lead_stages_change_log')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class StagesChangeLog
 {
     /**
@@ -44,7 +47,7 @@ class StagesChangeLog
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_stages_change_log')
+        $builder
             ->setCustomRepositoryClass(StagesChangeLogRepository::class)
             ->addIndex(['date_added'], 'lead_stages_change_log_date_added');
 

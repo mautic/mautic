@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'integration_entity')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class IntegrationEntity extends CommonEntity
 {
     /**
@@ -65,7 +68,7 @@ class IntegrationEntity extends CommonEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('integration_entity')
+        $builder
             ->setCustomRepositoryClass(IntegrationEntityRepository::class)
             ->addIndex(['integration', 'integration_entity', 'integration_entity_id'], 'integration_external_entity')
             ->addIndex(['integration', 'internal_entity', 'internal_entity_id'], 'integration_internal_entity')

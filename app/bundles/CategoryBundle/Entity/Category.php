@@ -20,6 +20,9 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'categories')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(),
@@ -84,7 +87,7 @@ class Category extends FormEntity implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('categories')
+        $builder
             ->setCustomRepositoryClass(CategoryRepository::class)
             ->addIndex(['alias'], 'category_alias_search');
 

@@ -9,6 +9,9 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'lead_donotcontact')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class DoNotContact
 {
     /**
@@ -67,7 +70,7 @@ class DoNotContact
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('lead_donotcontact')
+        $builder
             ->setCustomRepositoryClass(DoNotContactRepository::class)
             ->addIndex(['lead_id', 'channel', 'reason'], 'leadid_reason_channel')
             ->addIndex(['reason'], 'dnc_reason_search')

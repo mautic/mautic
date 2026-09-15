@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRector\Fixture;
+namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules\Fixture;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
@@ -49,7 +49,7 @@ class PageDraft
 -----
 <?php
 
-namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRector\Fixture;
+namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules\Fixture;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
