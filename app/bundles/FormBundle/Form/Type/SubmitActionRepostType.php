@@ -38,7 +38,8 @@ final class SubmitActionRepostType extends AbstractType
                         message: 'mautic.core.value.required'
                     ),
                     new Url(
-                        message: 'mautic.core.valid_url_required'
+                        message: 'mautic.core.valid_url_required',
+                        requireTld: false
                     ),
                 ],
             ]

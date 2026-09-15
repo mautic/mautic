@@ -24,7 +24,6 @@ final class ScheduleDateRangeValidatorTest extends TestCase
     {
         $this->context   = $this->createMock(ExecutionContextInterface::class);
         $this->validator = new ScheduleDateRangeValidator();
-        $this->validator->initialize($this->context);
     }
 
     public function testValidatePassesWhenContinueSendingIsFalse(): void
@@ -37,7 +36,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
         $this->context->expects($this->never())
             ->method('buildViolation');
 
-        $this->validator->validate($email, new ScheduleDateRange());
+        $this->validator->validateInContext($email, new ScheduleDateRange(), $this->context);
     }
 
     public function testValidatePassesWhenPublishUpIsNull(): void
@@ -50,7 +49,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
         $this->context->expects($this->never())
             ->method('buildViolation');
 
-        $this->validator->validate($email, new ScheduleDateRange());
+        $this->validator->validateInContext($email, new ScheduleDateRange(), $this->context);
     }
 
     public function testValidatePassesWhenPublishDownIsNull(): void
@@ -63,7 +62,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
         $this->context->expects($this->never())
             ->method('buildViolation');
 
-        $this->validator->validate($email, new ScheduleDateRange());
+        $this->validator->validateInContext($email, new ScheduleDateRange(), $this->context);
     }
 
     public function testValidatePassesWhenPublishDownIsAfterPublishUp(): void
@@ -76,7 +75,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
         $this->context->expects($this->never())
             ->method('buildViolation');
 
-        $this->validator->validate($email, new ScheduleDateRange());
+        $this->validator->validateInContext($email, new ScheduleDateRange(), $this->context);
     }
 
     public function testValidateFailsWhenPublishDownIsBeforeOrEqualToPublishUp(): void
@@ -99,7 +98,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
             ->with('mautic.form.date_time_range.invalid_range')
             ->willReturn($violationBuilder);
 
-        $this->validator->validate($email, new ScheduleDateRange());
+        $this->validator->validateInContext($email, new ScheduleDateRange(), $this->context);
     }
 
     public function testValidateFailsWhenPublishDownIsBeforePublishUp(): void
@@ -122,7 +121,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
             ->with('mautic.form.date_time_range.invalid_range')
             ->willReturn($violationBuilder);
 
-        $this->validator->validate($email, new ScheduleDateRange());
+        $this->validator->validateInContext($email, new ScheduleDateRange(), $this->context);
     }
 
     public function testValidateFormDataPassesWhenContinueSendingIsFalse(): void
@@ -136,7 +135,7 @@ final class ScheduleDateRangeValidatorTest extends TestCase
         $this->context->expects($this->never())
             ->method('buildViolation');
 
-        $this->validator->validate($formData, new ScheduleDateRange());
+        $this->validator->validateInContext($formData, new ScheduleDateRange(), $this->context);
     }
 
     public function testValidateFormDataFailsWhenPublishDownIsBeforePublishUp(): void
@@ -160,6 +159,6 @@ final class ScheduleDateRangeValidatorTest extends TestCase
             ->with('mautic.form.date_time_range.invalid_range')
             ->willReturn($violationBuilder);
 
-        $this->validator->validate($formData, new ScheduleDateRange());
+        $this->validator->validateInContext($formData, new ScheduleDateRange(), $this->context);
     }
 }

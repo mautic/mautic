@@ -6,10 +6,11 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 
 #[ORM\Entity(repositoryClass: UtmTagRepository::class)]
 #[ORM\Table(name: 'lead_utmtags')]
-#[ORM\Index(columns: ['date_added'], name: 'utm_date_added')]
+#[ORM\Index(name: 'utm_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class UtmTag
 {
@@ -81,7 +82,7 @@ class UtmTag
         $builder->addId();
         $builder->addDateAdded();
         $builder->addLead(false, 'CASCADE', false, 'utmtags');
-        $builder->addNullableField('query', Types::ARRAY);
+        $builder->addNullableField('query', ArrayType::ARRAY);
         $builder->addNullableField('referer', Types::TEXT);
         $builder->addNullableField('remoteHost', Types::STRING, 'remote_host');
         $builder->addNullableField('url', Types::TEXT);

@@ -31,10 +31,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: LeadRepository::class)]
 #[ORM\Table(name: 'leads')]
-#[ORM\Index(columns: ['date_added'], name: 'lead_date_added')]
-#[ORM\Index(columns: ['date_modified'], name: 'lead_date_modified')]
-#[ORM\Index(columns: ['date_identified'], name: 'date_identified')]
-#[ORM\Index(columns: ['last_active'], name: 'last_active')]
+#[ORM\Index(name: 'lead_date_added', columns: ['date_added'])]
+#[ORM\Index(name: 'lead_date_modified', columns: ['date_modified'])]
+#[ORM\Index(name: 'date_identified', columns: ['date_identified'])]
+#[ORM\Index(name: 'last_active', columns: ['last_active'])]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -84,7 +84,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $availableSocialFields = [];
 
     /**
-     * @var string
+     * @var int|string
      */
     #[Groups(['contact:read', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $id;
@@ -334,7 +334,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->mappedBy('lead')
             ->cascadePersist()
             ->cascadeDetach()
-            ->cascadeMerge()
             ->fetchExtraLazy()
             ->build();
 
@@ -344,7 +343,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('ipAddress')
             ->cascadeDetach()
-            ->cascadeMerge()
             ->cascadePersist()
             ->build();
 
@@ -358,7 +356,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder->createOneToMany('eventLog', LeadEventLog::class)
             ->mappedBy('lead')
             ->cascadePersist()
-            ->cascadeMerge()
             ->cascadeDetach()
             ->fetchExtraLazy()
             ->build();
@@ -387,7 +384,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->setOrderBy(['dateAdded' => 'DESC'])
             ->mappedBy('lead')
             ->cascadeDetach()
-            ->cascadeMerge()
             ->fetchExtraLazy()
             ->build();
 
@@ -403,14 +399,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->setOrderBy(['tag' => 'ASC'])
             ->setIndexBy('tag')
             ->fetchLazy()
-            ->cascadeMerge()
             ->cascadePersist()
             ->cascadeDetach()
             ->build();
 
         $builder->createManyToOne('stage', Stage::class)
             ->cascadePersist()
-            ->cascadeMerge()
             ->cascadeDetach()
             ->addJoinColumn('stage_id', 'id', true, false, 'SET NULL')
             ->build();

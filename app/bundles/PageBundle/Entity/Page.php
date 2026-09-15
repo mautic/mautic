@@ -35,7 +35,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: PageRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['alias'], name: 'page_alias_search')]
+#[ORM\Index(name: 'page_alias_search', columns: ['alias'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -330,7 +330,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                     $violations = $validator->validate(
                         $page->getRedirectUrl(),
                         [
-                            new Assert\Url(),
+                            new Assert\Url(requireTld: false),
                             new NotBlank(message: 'mautic.core.value.required'),
                         ],
                     );

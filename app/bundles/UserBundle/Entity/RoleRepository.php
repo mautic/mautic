@@ -56,11 +56,8 @@ class RoleRepository extends CommonRepository
      *
      * @param string $search
      * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
      */
-    public function getRoleList($search = '', $limit = 10, $start = 0)
+    public function getRoleList($search = '', $limit = 10, ?int $start = 0): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
 

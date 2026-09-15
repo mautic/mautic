@@ -11,8 +11,8 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
- * See @see https://github.com/doctrine/doctrine2/pull/1326/.
+ * Adds Mautic's shared column conventions on top of Doctrine's builder, and
+ * returns Mautic's AssociationBuilder so entities can use isPrimaryKey().
  */
 final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 {
@@ -33,13 +33,8 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * Creates a ManyToOne Association Builder.
      *
      * Note: This method does not add the association, you have to call build() on the AssociationBuilder.
-     *
-     * @param string $name
-     * @param string $targetEntity
-     *
-     * @return AssociationBuilder
      */
-    public function createManyToOne($name, $targetEntity)
+    public function createManyToOne(string $name, string $targetEntity): AssociationBuilder
     {
         return new AssociationBuilder(
             $this,
@@ -53,13 +48,8 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Creates a OneToOne Association Builder.
-     *
-     * @param string $name
-     * @param string $targetEntity
-     *
-     * @return AssociationBuilder
      */
-    public function createOneToOne($name, $targetEntity)
+    public function createOneToOne(string $name, string $targetEntity): AssociationBuilder
     {
         return new AssociationBuilder(
             $this,
@@ -68,46 +58,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
                 'targetEntity' => $targetEntity,
             ],
             ClassMetadata::ONE_TO_ONE
-        );
-    }
-
-    /**
-     * Creates a ManyToMany Association Builder.
-     *
-     * @param string $name
-     * @param string $targetEntity
-     *
-     * @return ManyToManyAssociationBuilder
-     */
-    public function createManyToMany($name, $targetEntity)
-    {
-        return new ManyToManyAssociationBuilder(
-            $this,
-            [
-                'fieldName'    => $name,
-                'targetEntity' => $targetEntity,
-            ],
-            ClassMetadata::MANY_TO_MANY
-        );
-    }
-
-    /**
-     * Creates a one to many association builder.
-     *
-     * @param string $name
-     * @param string $targetEntity
-     *
-     * @return OneToManyAssociationBuilder
-     */
-    public function createOneToMany($name, $targetEntity)
-    {
-        return new OneToManyAssociationBuilder(
-            $this,
-            [
-                'fieldName'    => $name,
-                'targetEntity' => $targetEntity,
-            ],
-            ClassMetadata::ONE_TO_MANY
         );
     }
 
@@ -195,7 +145,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     public function addCategory(): static
     {
         $this->createManyToOne('category', Category::class)
-            ->cascadeMerge()
             ->cascadeDetach()
             ->addJoinColumn('category_id', 'id', true, false, 'SET NULL')
             ->build();
@@ -241,10 +190,9 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a contact column.
      *
-     * @param string      $onDelete
      * @param string|null $inversedBy
      */
-    public function addContact(bool $nullable = false, $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
+    public function addContact(bool $nullable = false, ?string $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
     {
         $lead = $this->createManyToOne('contact', Lead::class);
 
@@ -266,11 +214,9 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a lead column.
      *
-     * @param string $onDelete
-     *
      * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
      */
-    public function addLead(bool $nullable = false, $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
+    public function addLead(bool $nullable = false, ?string $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
     {
         $lead = $this->createManyToOne('lead', Lead::class);
 
@@ -293,7 +239,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     {
         $this->createManyToOne('ipAddress', IpAddress::class)
             ->cascadePersist()
-            ->cascadeMerge()
             ->cascadeDetach()
             ->addJoinColumn('ip_id', 'id', $nullable, false, 'SET NULL')
             ->build();
@@ -347,13 +292,8 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Adds Field. Overridden for IDE suggestions when stringing methods in entity class.
-     *
-     * @param string $name
-     * @param string $type
-     *
-     * @return $this
      */
-    public function addField($name, $type, array $mapping = [])
+    public function addField(string $name, string $type, array $mapping = []): static
     {
         if ($this->isIndexedVarchar($name, $type)) {
             $mapping['length'] = self::MAX_VARCHAR_INDEXED_LENGTH;
@@ -362,7 +302,7 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
         return parent::addField($name, $type, $mapping);
     }
 
-    public function createField($name, $type)
+    public function createField(string $name, string $type): FieldBuilder
     {
         $mapping = [
             'fieldName' => $name,
@@ -377,11 +317,10 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * @param string  $name
      * @param mixed[] $flags
      * @param mixed[] $options
      */
-    public function addIndex(array $columns, $name, ?array $flags = null, ?array $options = null): self
+    public function addIndex(array $columns, string $name, ?array $flags = null, ?array $options = null): static
     {
         $cm = $this->getClassMetadata();
 
@@ -405,7 +344,7 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * @param mixed[] $columns
      */
-    public function addFulltextIndex(array $columns, string $name): self
+    public function addFulltextIndex(array $columns, string $name): static
     {
         return $this->addIndex($columns, $name, ['fulltext']);
     }
@@ -422,7 +361,7 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * @param list<string>         $columns
      * @param array<string, mixed> $options
      */
-    public function addIndexWithOptions(array $columns, string $name, array $options): self
+    public function addIndexWithOptions(array $columns, string $name, array $options): static
     {
         $cm = $this->getClassMetadata();
 

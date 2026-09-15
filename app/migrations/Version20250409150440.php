@@ -39,7 +39,7 @@ final class Version20250409150440 extends PreUpAssertionMigration
         $projectsTable->addColumn('modified_by', Types::INTEGER, ['notnull' => false]);
         $projectsTable->addColumn('modified_by_user', Types::STRING, ['length' => 191, 'notnull' => false]);
 
-        $projectsTable->setPrimaryKey(['id']);
+        $this->setPrimaryKey($projectsTable, ['id']);
         $projectsTable->addIndex(['name'], $this->prefix.'project_name');
     }
 

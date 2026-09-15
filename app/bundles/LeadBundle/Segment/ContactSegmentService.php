@@ -95,14 +95,12 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param int $limit
-     *
      * @return array<int,mixed[]>
      *
      * @throws \Doctrine\DBAL\Exception
      * @throws Exception\SegmentQueryException
      */
-    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000): array
+    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, ?int $limit = 1000): array
     {
         $queryBuilder = $this->getNewLeadListLeadsQueryBuilder($segment, $batchLimiters);
         $queryBuilder->setMaxResults($limit);
@@ -164,7 +162,7 @@ readonly class ContactSegmentService
         // Make sure that leads.id is the first column
         array_unshift($select, $distinct.$leadsTableAlias.'.id');
         $queryBuilder->resetQueryPart('select');
-        $queryBuilder->select($select);
+        $queryBuilder->select(...$select);
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
@@ -280,7 +278,7 @@ readonly class ContactSegmentService
         $qbO->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
         $qbO->setParameters($queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
         $qbO->andWhere($expr->eq('orp.leadlist_id', ':orpsegid'));
-        $qbO->andWhere($expr->eq('orp.manually_added', $expr->literal(0)));
+        $qbO->andWhere($expr->eq('orp.manually_added', $expr->literal('0')));
         $qbO->andWhere($expr->notIn('orp.lead_id', $queryBuilder->getSQL()));
         $qbO->setParameter('orpsegid', $segment->getId());
         $this->addLeadAndMinMaxLimiters($qbO, $batchLimiters, 'lead_lists_leads');
@@ -313,11 +311,9 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @return mixed
-     *
      * @throws \Exception
      */
-    private function timedFetch(QueryBuilder $qb, ?int $segmentId)
+    private function timedFetch(QueryBuilder $qb, ?int $segmentId): array|false
     {
         try {
             $start = microtime(true);

@@ -29,7 +29,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      *
      * @return bool|\Doctrine\Common\Proxy\Proxy|object|null
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function getUserRole()
     {

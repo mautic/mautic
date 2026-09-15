@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticTagManagerBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\Tag;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;

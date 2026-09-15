@@ -13,6 +13,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -175,29 +176,29 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
         $builder->addField('source', Types::STRING);
 
-        $builder->createField('columns', Types::ARRAY)
+        $builder->createField('columns', ArrayType::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('filters', Types::ARRAY)
+        $builder->createField('filters', ArrayType::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('tableOrder', Types::ARRAY)
+        $builder->createField('tableOrder', ArrayType::ARRAY)
             ->columnName('table_order')
             ->nullable()
             ->build();
 
-        $builder->createField('graphs', Types::ARRAY)
+        $builder->createField('graphs', ArrayType::ARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('groupBy', Types::ARRAY)
+        $builder->createField('groupBy', ArrayType::ARRAY)
             ->columnName('group_by')
             ->nullable()
             ->build();
 
-        $builder->createField('aggregators', Types::ARRAY)
+        $builder->createField('aggregators', ArrayType::ARRAY)
             ->columnName('aggregators')
             ->nullable()
             ->build();

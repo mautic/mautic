@@ -11,11 +11,11 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 
 #[ORM\Entity(repositoryClass: IntegrationEntityRepository::class)]
 #[ORM\Table(name: 'integration_entity')]
-#[ORM\Index(columns: ['integration', 'integration_entity', 'integration_entity_id'], name: 'integration_external_entity')]
-#[ORM\Index(columns: ['integration', 'internal_entity', 'internal_entity_id'], name: 'integration_internal_entity')]
-#[ORM\Index(columns: ['integration', 'internal_entity', 'integration_entity'], name: 'integration_entity_match')]
-#[ORM\Index(columns: ['integration', 'last_sync_date'], name: 'integration_last_sync_date')]
-#[ORM\Index(columns: ['internal_entity_id', 'integration_entity_id', 'internal_entity', 'integration_entity'], name: 'internal_integration_entity')]
+#[ORM\Index(name: 'integration_external_entity', columns: ['integration', 'integration_entity', 'integration_entity_id'])]
+#[ORM\Index(name: 'integration_internal_entity', columns: ['integration', 'internal_entity', 'internal_entity_id'])]
+#[ORM\Index(name: 'integration_entity_match', columns: ['integration', 'internal_entity', 'integration_entity'])]
+#[ORM\Index(name: 'integration_last_sync_date', columns: ['integration', 'last_sync_date'])]
+#[ORM\Index(name: 'internal_integration_entity', columns: ['internal_entity_id', 'integration_entity_id', 'internal_entity', 'integration_entity'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class IntegrationEntity extends CommonEntity
 {

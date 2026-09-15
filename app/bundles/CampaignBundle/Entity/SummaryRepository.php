@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
@@ -43,8 +44,8 @@ final class SummaryRepository extends CommonRepository
 
         if ($dateFrom && $dateTo) {
             $q->andWhere('cs.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), ParameterType::INTEGER)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), ParameterType::INTEGER);
         }
 
         $results = $q->executeQuery()->fetchAllAssociative();

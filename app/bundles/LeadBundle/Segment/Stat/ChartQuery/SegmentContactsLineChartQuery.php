@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Segment\Stat\ChartQuery;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -129,8 +130,9 @@ final class SegmentContactsLineChartQuery extends ChartQuery
         $this->removedEventLogStats = $this->getDataFromLeadEventLog('removed');
     }
 
-    private function optimizeSearchInLeadEventLog(QueryBuilder $qb): QueryBuilder
+    private function optimizeSearchInLeadEventLog(QueryBuilder $qb): \Mautic\CoreBundle\Doctrine\Query\QueryBuilder
     {
+        \assert($qb instanceof TrackingQueryBuilder);
         $fromPart             = $qb->getQueryPart('from');
         $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], MAUTIC_TABLE_PREFIX.LeadEventLog::INDEX_SEARCH);
         $qb->resetQueryPart('from');

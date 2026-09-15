@@ -409,7 +409,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
             ->delete(Permission::class, 'p')
             ->where('p.bundle = :bundle')
             ->andWhere('p.role = :role_id')
-            ->setParameters(['bundle' => 'asset', 'role_id' => $role->getId()])
+            ->setParameter('bundle', 'asset')
+            ->setParameter('role_id', $role->getId())
             ->getQuery()
             ->execute();
 

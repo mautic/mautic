@@ -41,7 +41,6 @@ use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\MessageBus;
@@ -58,7 +57,7 @@ abstract class PageTestAbstract extends TestCase
     protected string $mockTrackingId;
 
     /**
-     * @var Router|MockObject
+     * @var UrlGeneratorInterface|MockObject
      */
     protected ?MockObject $router = null;
 
@@ -77,7 +76,7 @@ abstract class PageTestAbstract extends TestCase
 
     protected function getPageModel(bool $transliterationEnabled = true, bool $validatePageHitRequiredData = true): PageModel
     {
-        $this->router = $this->createMock(Router::class);
+        $this->router = $this->createMock(UrlGeneratorInterface::class);
 
         $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);

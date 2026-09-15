@@ -18,11 +18,11 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 final class CommonApiControllerTest extends CampaignTestAbstract
@@ -94,7 +94,7 @@ final class CommonApiControllerTest extends CampaignTestAbstract
             $this->createStub(CorePermissions::class),
             $this->createStub(Translator::class),
             $this->createStub(EntityResultHelper::class),
-            $this->createStub(Router::class),
+            $this->createStub(RouterInterface::class),
             $this->createStub(FormFactoryInterface::class),
             $this->createStub(AppVersion::class),
             $this->createStub(RequestStack::class),
@@ -232,7 +232,7 @@ final class CommonApiControllerTest extends CampaignTestAbstract
             $this->createStub(CorePermissions::class),
             $this->createStub(Translator::class),
             $this->createStub(EntityResultHelper::class),
-            $this->createStub(Router::class),
+            $this->createStub(RouterInterface::class),
             $this->createStub(FormFactoryInterface::class),
             $this->createStub(AppVersion::class),
             $this->createStub(RequestStack::class),
@@ -249,7 +249,7 @@ final class CommonApiControllerTest extends CampaignTestAbstract
 
     public function testGetBatchEntities(): void
     {
-        $controller = new class($this->createStub(CorePermissions::class), $this->createStub(Translator::class), new EntityResultHelper(), $this->createStub(Router::class), $this->createStub(FormFactoryInterface::class), $this->createStub(AppVersion::class), $this->createStub(RequestStack::class), $this->createStub(ManagerRegistry::class), $this->createStub(ModelFactory::class), $this->createStub(EventDispatcherInterface::class), $this->createStub(CoreParametersHelper::class)) extends CommonApiController {
+        $controller = new class($this->createStub(CorePermissions::class), $this->createStub(Translator::class), new EntityResultHelper(), $this->createStub(RouterInterface::class), $this->createStub(FormFactoryInterface::class), $this->createStub(AppVersion::class), $this->createStub(RequestStack::class), $this->createStub(ManagerRegistry::class), $this->createStub(ModelFactory::class), $this->createStub(EventDispatcherInterface::class), $this->createStub(CoreParametersHelper::class)) extends CommonApiController {
             /**
              * @param mixed[]                   $parameters
              * @param mixed[]                   $errors

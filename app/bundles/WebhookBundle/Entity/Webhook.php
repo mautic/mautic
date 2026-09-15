@@ -75,7 +75,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      */
     #[Groups(['webhook:read', 'webhook:write'])]
     #[NotBlank(message: 'mautic.core.valid_url_required')]
-    #[Assert\Url(message: 'mautic.core.valid_url_required')]
+    #[Assert\Url(message: 'mautic.core.valid_url_required', requireTld: false)]
     private $webhookUrl;
 
     /**
@@ -128,7 +128,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var string|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
-    #[Assert\Choice([
+    #[Assert\Choice(choices: [
         null,
         Order::Ascending->value,
         Order::Descending->value,
@@ -160,7 +160,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
             ->setIndexBy('eventType')
             ->mappedBy('webhook')
             ->cascadePersist()
-            ->cascadeMerge()
             ->cascadeDetach()
             ->build();
 
@@ -168,7 +167,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
             ->fetchExtraLazy()
             ->mappedBy('webhook')
             ->cascadePersist()
-            ->cascadeMerge()
             ->cascadeDetach()
             ->build();
 

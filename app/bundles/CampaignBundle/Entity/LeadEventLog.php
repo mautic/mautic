@@ -14,15 +14,15 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
 #[ORM\Entity(repositoryClass: LeadEventLogRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['is_scheduled', 'lead_id'], name: 'campaign_event_upcoming_search')]
-#[ORM\Index(columns: ['campaign_id', 'is_scheduled', 'trigger_date'], name: 'campaign_event_schedule_counts')]
-#[ORM\Index(columns: ['date_triggered'], name: 'campaign_date_triggered')]
-#[ORM\Index(columns: ['campaign_id', 'lead_id', 'rotation'], name: 'campaign_leads')]
-#[ORM\Index(columns: ['channel', 'channel_id', 'lead_id'], name: 'campaign_log_channel')]
-#[ORM\Index(columns: ['campaign_id', 'event_id', 'date_triggered'], name: 'campaign_actions')]
-#[ORM\Index(columns: ['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], name: 'campaign_stats')]
-#[ORM\Index(columns: ['trigger_date'], name: 'campaign_trigger_date_order')]
-#[ORM\Index(columns: ['is_scheduled', 'event_id', 'trigger_date'], name: 'idx_scheduled_events')]
+#[ORM\Index(name: 'campaign_event_upcoming_search', columns: ['is_scheduled', 'lead_id'])]
+#[ORM\Index(name: 'campaign_event_schedule_counts', columns: ['campaign_id', 'is_scheduled', 'trigger_date'])]
+#[ORM\Index(name: 'campaign_date_triggered', columns: ['date_triggered'])]
+#[ORM\Index(name: 'campaign_leads', columns: ['campaign_id', 'lead_id', 'rotation'])]
+#[ORM\Index(name: 'campaign_log_channel', columns: ['channel', 'channel_id', 'lead_id'])]
+#[ORM\Index(name: 'campaign_actions', columns: ['campaign_id', 'event_id', 'date_triggered'])]
+#[ORM\Index(name: 'campaign_stats', columns: ['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'])]
+#[ORM\Index(name: 'campaign_trigger_date_order', columns: ['trigger_date'])]
+#[ORM\Index(name: 'idx_scheduled_events', columns: ['is_scheduled', 'event_id', 'trigger_date'])]
 #[ORM\UniqueConstraint(name: 'campaign_rotation', columns: ['event_id', 'lead_id', 'rotation'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog implements ChannelInterface, OptimisticLockInterface
@@ -32,7 +32,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     public const TABLE_NAME = 'campaign_lead_event_log';
 
     /**
-     * @var string|null
+     * @var int|string|null
      */
     private $id;
 

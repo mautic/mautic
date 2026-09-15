@@ -59,16 +59,14 @@ final class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilde
 
         switch ($filterOperator) {
             case 'empty':
-                $expression = new CompositeExpression(CompositeExpression::TYPE_OR,
-                    [
+                $expression = CompositeExpression::or(...[
                         $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
                         $queryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $queryBuilder->expr()->literal('')),
                     ]
                 );
                 break;
             case 'notEmpty':
-                $expression = new CompositeExpression(CompositeExpression::TYPE_AND,
-                    [
+                $expression = CompositeExpression::and(...[
                         $queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()),
                         $queryBuilder->expr()->neq($tableAlias.'.'.$filter->getField(), $queryBuilder->expr()->literal('')),
                     ]
