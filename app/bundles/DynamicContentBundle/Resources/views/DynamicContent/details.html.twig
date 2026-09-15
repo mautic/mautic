@@ -50,7 +50,7 @@
             'close' : securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:viewown'], permissions['dynamiccontent:dynamiccontents:viewother'], entity.createdBy),
         },
         'routeBase'       : 'dynamicContent',
-        'targetLabel'     : 'mautic.dynamicContent.dynamicContents'|trans
+        'targetLabel'     : 'mautic.dynamicContent.dynamicContent'|trans
     }
 ) -}}
 {{ include('@MauticCore/Modules/category--inline.html.twig', {'category': entity.category}) }}
@@ -182,6 +182,13 @@
                           {{ 'mautic.trackable.click_counts'|trans }}
                       </a>
                   </li>
+                  {% if not entity.isCampaignBased and entity.slotName and variations is defined and variations|length > 1 %}
+                  <li>
+                      <a href="#variations-container" role="tab" data-toggle="tab">
+                          {{ 'mautic.dynamicContent.variations'|trans }}
+                      </a>
+                  </li>
+                  {% endif %}
                   {% if showTranslations %}
                   <li class>
                       <a href="#translation-container" role="tab" data-toggle="tab">
@@ -194,10 +201,22 @@
           </div>
           <!-- start: tab-content -->
           <div class="tab-content pa-md">
-              <div class="tab-pane active active bdr-w-0" id="clicks-container">
+              <div class="tab-pane active bdr-w-0" id="clicks-container">
                   {{ include('@MauticPage/Trackable/click_counts.html.twig', {'trackables': trackables, 'entity': entity, 'channel': 'dynamicContent'}) }}
-
               </div>
+
+              <!-- #variations-container -->
+              {% if not entity.isCampaignBased and entity.slotName and variations is defined and variations|length > 1 %}
+                  <div class="tab-pane bdr-w-0" id="variations-container">
+                      {{ include('@MauticDynamicContent/DynamicContent/variations.html.twig', {
+                          'entity': entity,
+                          'variations': variations,
+                          'permissions': permissions,
+                      }) }}
+                  </div>
+              {% endif %}
+              <!--/ #variations-container -->
+
               <!-- #translation-container -->
               {% if showTranslations %}
                   <div class="tab-pane bdr-w-0" id="translation-container">

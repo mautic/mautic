@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\EventListener\TrackingSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
-use Mautic\SmsBundle\Entity\Sms;
-use Mautic\SmsBundle\Entity\Stat;
-use Mautic\SmsBundle\Entity\StatRepository;
-use Mautic\SmsBundle\EventListener\TrackingSubscriber;
+use Mautic\LeadBundle\Model\LeadModel;
 
 final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,13 +29,13 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         $ct = [
             'lead'    => 2,
             'channel' => [
-                'sms' => 1,
+                'email' => 1,
             ],
             'stat'    => 'abc123',
         ];
 
-        $sms = $this->createMock(Sms::class);
-        $sms->method('getId')
+        $email = $this->createMock(Email::class);
+        $email->method('getId')
             ->willReturn(1);
 
         $lead = $this->createMock(Lead::class);
@@ -42,7 +43,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(2);
 
         $stat = new Stat();
-        $stat->setSms($sms);
+        $stat->setEmail($email);
         $stat->setLead($lead);
 
         $this->statRepository->expects($this->once())
@@ -79,13 +80,13 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         $ct = [
             'lead'    => 2,
             'channel' => [
-                'sms' => 2,
+                'email' => 2,
             ],
             'stat'    => 'abc123',
         ];
 
-        $sms = $this->createMock(Sms::class);
-        $sms->method('getId')
+        $email = $this->createMock(Email::class);
+        $email->method('getId')
             ->willReturn(1);
 
         $lead = $this->createMock(Lead::class);
@@ -93,7 +94,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(2);
 
         $stat = new Stat();
-        $stat->setSms($sms);
+        $stat->setEmail($email);
         $stat->setLead($lead);
 
         $this->statRepository->expects($this->once())
@@ -113,17 +114,17 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         $ct = [
             'lead'    => 2,
             'channel' => [
-                'sms' => 2,
+                'email' => 2,
             ],
             'stat'    => 'abc123',
         ];
 
-        $sms = $this->createMock(Sms::class);
-        $sms->method('getId')
+        $email = $this->createMock(Email::class);
+        $email->method('getId')
             ->willReturn(1);
 
         $stat = new Stat();
-        $stat->setSms($sms);
+        $stat->setEmail($email);
 
         $this->statRepository->expects($this->once())
             ->method('findOneBy')
@@ -139,6 +140,9 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getSubscriber(): TrackingSubscriber
     {
-        return new TrackingSubscriber($this->statRepository);
+        return new TrackingSubscriber(
+            $this->statRepository,
+            $this->createStub(LeadModel::class)
+        );
     }
 }
