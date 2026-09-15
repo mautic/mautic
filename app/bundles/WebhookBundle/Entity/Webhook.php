@@ -131,7 +131,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var string|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
-    #[Assert\Choice([
+    #[Assert\Choice(choices: [
         null,
         Order::Ascending->value,
         Order::Descending->value,
