@@ -182,9 +182,14 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    
+    /**
+     * DBAL switches the builder back to a SELECT here, so the tracked type has to follow.
+     * Without it a builder reused after insert()/update()/delete() keeps generating that
+     * write statement, and the intended read executes it instead.
+     */
     public function select(string ...$expressions): static
     {
+        $this->statementType        = 'select';
         $this->queryParts['select'] = $expressions;
 
         return $this;
@@ -192,6 +197,7 @@ class QueryBuilder extends BaseQueryBuilder
 
     public function addSelect(string $expression, string ...$expressions): static
     {
+        $this->statementType        = 'select';
         $this->queryParts['select'] = array_merge($this->queryParts['select'], [$expression], $expressions);
 
         return $this;
