@@ -27,7 +27,7 @@ final class TaggedServiceWiringSmokeTest extends AbstractContainerSmokeTestCase
         'mautic.integrations.helper.sync_integrations'            => 0,
         'mautic.integrations.sync.notification.handler_container' => 2,
         'mautic.sms.callback_handler_container'                   => 1,
-        'mautic.update.step_provider'                             => 8,
+        'mautic.update.step_provider'                             => 7,
         Shortener::class                                          => 0,
     ];
 

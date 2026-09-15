@@ -109,10 +109,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\LeadBundle\Field\CustomFieldColumn::class, 'mautic.lead.field.custom_field_column');
     $services->set('mautic.lead.field.custom_field_index', Mautic\LeadBundle\Field\CustomFieldIndex::class);
     $services->alias(Mautic\LeadBundle\Field\CustomFieldIndex::class, 'mautic.lead.field.custom_field_index');
-
-    $services->set('mautic.lead.field.email_lookup_index', Mautic\LeadBundle\Field\EmailLookupIndex::class)
-        ->arg('$tablePrefix', '%mautic.db_table_prefix%');
-    $services->alias(Mautic\LeadBundle\Field\EmailLookupIndex::class, 'mautic.lead.field.email_lookup_index');
     $services->set('mautic.lead.repository.lead_segment_filter_descriptor', Mautic\LeadBundle\Services\ContactSegmentFilterDictionary::class);
     $services->alias(Mautic\LeadBundle\Services\ContactSegmentFilterDictionary::class, 'mautic.lead.repository.lead_segment_filter_descriptor');
     $services->set('mautic.lead.service.segment_dependency_tree_factory', Mautic\LeadBundle\Services\SegmentDependencyTreeFactory::class);
@@ -165,9 +161,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias(Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService::class, 'mautic.lead.service.device_tracking_service');
     $services->set('mautic.lead.field.schema_definition', Mautic\LeadBundle\Field\SchemaDefinition::class);
     $services->alias(Mautic\LeadBundle\Field\SchemaDefinition::class, 'mautic.lead.field.schema_definition');
-
-    $services->set(Mautic\LeadBundle\Update\Step\EnsureEmailLookupIndexStep::class)
-        ->tag('mautic.update_step');
     $services->set('mautic.lead.field.dispatcher.field_save_dispatcher', Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher::class);
     $services->alias(Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher::class, 'mautic.lead.field.dispatcher.field_save_dispatcher');
     $services->set('mautic.lead.field.dispatcher.field_column_dispatcher', Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher::class);
