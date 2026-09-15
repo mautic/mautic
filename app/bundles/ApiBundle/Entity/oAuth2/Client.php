@@ -53,6 +53,8 @@ class Client extends BaseClient
      */
     protected array $allowedGrantTypes;
 
+    #[ORM\ManyToOne(targetEntity: Role::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'role_id')]
     protected ?Role $role = null;
 
     public function __construct()
@@ -93,11 +95,6 @@ class Client extends BaseClient
 
         $builder->createField('allowedGrantTypes', 'array')
             ->columnName('allowed_grant_types')
-            ->build();
-
-        $builder->createManyToOne('role', Role::class)
-            ->addJoinColumn('role_id', 'id', true, false)
-            ->cascadePersist()
             ->build();
     }
 

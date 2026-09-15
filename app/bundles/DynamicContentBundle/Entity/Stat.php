@@ -25,6 +25,8 @@ class Stat
     /**
      * @var DynamicContent|null
      */
+    #[ORM\ManyToOne(targetEntity: DynamicContent::class, inversedBy: 'stats')]
+    #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'SET NULL')]
     private $dynamicContent;
 
     /**
@@ -72,11 +74,6 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->createManyToOne('dynamicContent', 'DynamicContent')
-            ->inversedBy('stats')
-            ->addJoinColumn('dynamic_content_id', 'id', true, false, 'SET NULL')
-            ->build();
 
         $builder->addLead(true, 'SET NULL');
 

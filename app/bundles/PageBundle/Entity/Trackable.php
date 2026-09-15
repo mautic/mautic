@@ -17,6 +17,9 @@ class Trackable
     /**
      * @var Redirect
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Redirect::class, cascade: ['persist'], inversedBy: 'trackables')]
+    #[ORM\JoinColumn(name: 'redirect_id', onDelete: 'CASCADE')]
     private $redirect;
 
     /**
@@ -42,13 +45,6 @@ class Trackable
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createManyToOne('redirect', Redirect::class)
-            ->addJoinColumn('redirect_id', 'id', true, false, 'CASCADE')
-            ->cascadePersist()
-            ->inversedBy('trackables')
-            ->isPrimaryKey()
-            ->build();
 
         $builder->createField('channelId', 'integer')
             ->columnName('channel_id')

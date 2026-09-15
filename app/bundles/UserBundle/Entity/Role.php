@@ -80,6 +80,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * @var ArrayCollection<int, Permission>
      */
     #[Groups(['role:read', 'role:write'])]
+    #[ORM\OneToMany(mappedBy: 'role', targetEntity: Permission::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     private $permissions;
 
     /**
@@ -91,6 +92,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * @var ArrayCollection<int, User>
      */
+    #[ORM\OneToMany(mappedBy: 'role', targetEntity: User::class, fetch: 'EXTRA_LAZY')]
     private $users;
 
     public function __construct()
@@ -109,21 +111,8 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
             ->columnName('is_admin')
             ->build();
 
-        $builder->createOneToMany('permissions', 'Permission')
-            ->orphanRemoval()
-            ->mappedBy('role')
-            ->cascadePersist()
-            ->cascadeRemove()
-            ->fetchExtraLazy()
-            ->build();
-
         $builder->createField('rawPermissions', 'array')
             ->columnName('readable_permissions')
-            ->build();
-
-        $builder->createOneToMany('users', 'User')
-            ->mappedBy('role')
-            ->fetchExtraLazy()
             ->build();
 
         static::addUuidField($builder);

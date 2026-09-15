@@ -22,6 +22,8 @@ class GrapesJsBuilder
     /**
      * @var Email|null
      */
+    #[ORM\ManyToOne(targetEntity: Email::class)]
+    #[ORM\JoinColumn(name: 'email_id', onDelete: 'CASCADE')]
     protected $email;
 
     /**
@@ -38,11 +40,6 @@ class GrapesJsBuilder
             ->addNamedField('customMjml', Types::TEXT, 'custom_mjml', true)
             ->addNamedField('draftCustomMjml', Types::TEXT, 'draft_custom_mjml', true)
             ->addId();
-
-        $builder->createManyToOne(
-            'email',
-            Email::class
-        )->addJoinColumn('email_id', 'id', true, false, 'CASCADE')->build();
     }
 
     /**

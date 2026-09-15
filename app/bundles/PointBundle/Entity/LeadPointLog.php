@@ -18,6 +18,9 @@ class LeadPointLog
     /**
      * @var Point
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Point::class, inversedBy: 'log')]
+    #[ORM\JoinColumn(name: 'point_id', onDelete: 'CASCADE')]
     private $point;
 
     /**
@@ -38,12 +41,6 @@ class LeadPointLog
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createManyToOne('point', 'Point')
-            ->isPrimaryKey()
-            ->addJoinColumn('point_id', 'id', true, false, 'CASCADE')
-            ->inversedBy('log')
-            ->build();
 
         $builder->addLead(false, 'CASCADE', true);
 

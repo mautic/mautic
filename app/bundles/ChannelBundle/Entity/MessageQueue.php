@@ -48,6 +48,8 @@ class MessageQueue
     /**
      * @var Event|null
      */
+    #[ORM\ManyToOne(targetEntity: Event::class)]
+    #[ORM\JoinColumn(name: 'event_id', onDelete: 'CASCADE')]
     private $event;
 
     /**
@@ -129,10 +131,6 @@ class MessageQueue
 
         $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');
-
-        $builder->createManyToOne('event', Event::class)
-            ->addJoinColumn('event_id', 'id', true, false, 'CASCADE')
-            ->build();
 
         $builder->addLead(false, 'CASCADE', false);
 

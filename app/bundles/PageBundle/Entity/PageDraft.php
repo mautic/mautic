@@ -27,6 +27,8 @@ class PageDraft
     private ?int $id = null;
 
     public function __construct(
+        #[ORM\OneToOne(inversedBy: 'draft', targetEntity: Page::class)]
+        #[ORM\JoinColumn(name: 'page_id', nullable: false)]
         private Page $page,
         private ?string $html = null,
         private ?string $template = null,
@@ -45,11 +47,6 @@ class PageDraft
             ->columnName('public_preview')
             ->nullable(false)
             ->option('default', 1)
-            ->build();
-
-        $builder->createOneToOne('page', Page::class)
-            ->inversedBy('draft')
-            ->addJoinColumn('page_id', 'id', false)
             ->build();
     }
 

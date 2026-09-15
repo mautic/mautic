@@ -31,6 +31,8 @@ class UserInvite
     private bool $used = false;
 
     public function __construct(
+        #[ORM\ManyToOne(targetEntity: Role::class)]
+        #[ORM\JoinColumn(name: 'role_id', nullable: false, onDelete: 'CASCADE')]
         private Role $role,
     ) {
     }
@@ -58,10 +60,6 @@ class UserInvite
             ->build();
 
         $builder->createField('used', Types::BOOLEAN)
-            ->build();
-
-        $builder->createManyToOne('role', Role::class)
-            ->addJoinColumn('role_id', 'id', false, false, 'CASCADE')
             ->build();
     }
 

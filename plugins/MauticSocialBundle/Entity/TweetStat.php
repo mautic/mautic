@@ -35,6 +35,8 @@ class TweetStat
      */
     private $twitterTweetId;
 
+    #[ORM\ManyToOne(targetEntity: Tweet::class, inversedBy: 'stats')]
+    #[ORM\JoinColumn(name: 'tweet_id', onDelete: 'SET NULL')]
     private ?Tweet $tweet = null;
 
     /**
@@ -80,11 +82,6 @@ class TweetStat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createManyToOne('tweet', 'Tweet')
-            ->inversedBy('stats')
-            ->addJoinColumn('tweet_id', 'id', true, false, 'SET NULL')
-            ->build();
 
         $builder->createField('twitterTweetId', 'string')
             ->columnName('twitter_tweet_id')

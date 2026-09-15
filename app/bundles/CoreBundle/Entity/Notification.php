@@ -24,6 +24,8 @@ class Notification
     /**
      * @var User|null
      */
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', nullable: false, onDelete: 'CASCADE')]
     protected $user;
 
     /**
@@ -66,10 +68,6 @@ class Notification
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createManyToOne('user', User::class)
-            ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->createField('type', Types::STRING)
             ->nullable()

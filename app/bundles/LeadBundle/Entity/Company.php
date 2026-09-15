@@ -67,6 +67,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     private $score = 0;
 
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\ManyToOne(targetEntity: User::class, cascade: ['merge'])]
+    #[ORM\JoinColumn(name: 'owner_id', onDelete: 'SET NULL')]
     private ?User $owner = null;
 
     /**
@@ -190,11 +192,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         $builder->createField('socialCache', 'array')
             ->columnName('social_cache')
             ->nullable()
-            ->build();
-
-        $builder->createManyToOne('owner', User::class)
-            ->cascadeMerge()
-            ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->createField('score', 'integer')
