@@ -67,14 +67,9 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\UserBundle\\Security\\SAML\Store\\Request\\', '../Security/SAML/Store/Request/*.php');
     $services->get(Mautic\UserBundle\Security\SAML\Store\Request\RequestStateStore::class)
         ->arg('$prefix', '%lightsaml.store.request_session_prefix%')
-        ->arg('$suffix', '%lightsaml.store.request_session_sufix%');
+        ->arg('$suffix', '%lightsaml.store.request_session_suffix%');
     $services->get(MainEntryPoint::class)->arg('$samlEnabled', '%env(MAUTIC_SAML_ENABLED)%');
     $services->get(ApiUserSubscriber::class)->arg('$userProvider', service('security.user_providers'));
-
-    // Below are fixes for autowiring of SAML SpBundle.
-    $services->alias(LightSaml\SymfonyBridgeBundle\Bridge\Container\BuildContainer::class, 'lightsaml.container.build');
-    $services->load('LightSaml\\SpBundle\\Controller\\', '%kernel.project_dir%/vendor/javer/sp-bundle/src/LightSaml/SpBundle/Controller/*.php')
-        ->tag('controller.service_arguments');
 
     $services->set(Mautic\UserBundle\Security\SAML\User\UserMapper::class)
         ->arg('$attributes', ['email' => param('mautic.saml_idp_email_attribute'), 'username' => param('mautic.saml_idp_username_attribute'), 'firstname' => param('mautic.saml_idp_firstname_attribute'), 'lastname' => param('mautic.saml_idp_lastname_attribute')]);

@@ -133,11 +133,40 @@
     },
     {
       "type": "git",
-      "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
+      "url": "https://github.com/mautic/oauth2-php"
     },
     {
-      "type": "git",
-      "url": "https://github.com/mautic/oauth2-php"
+      "type": "package",
+      "canonical": false,
+      "package": {
+        "name": "lightsaml2/lightsaml",
+        "version": "3.0.1.1",
+        "type": "library",
+        "source": {
+          "type": "git",
+          "url": "https://github.com/lightsaml2/lightSAML.git",
+          "reference": "b0743e4051ea9bc71d53024871526c930305a6c5"
+        },
+        "dist": {
+          "type": "zip",
+          "url": "https://api.github.com/repos/lightsaml2/lightSAML/zipball/b0743e4051ea9bc71d53024871526c930305a6c5",
+          "reference": "b0743e4051ea9bc71d53024871526c930305a6c5"
+        },
+        "require": {
+          "php": "^8.0",
+          "ext-dom": "*",
+          "ext-json": "*",
+          "psr/log": "^1 || ^2 || ^3",
+          "robrichards/xmlseclibs": "^3.0",
+          "symfony/event-dispatcher": "^6.4 || ^7.0 || ^8.0",
+          "symfony/http-foundation": "^6.4 || ^7.0 || ^8.0"
+        },
+        "autoload": {
+          "psr-0": {
+            "LightSaml\\": "src/"
+          }
+        }
+      }
     }
   ],
   "conflict": {
