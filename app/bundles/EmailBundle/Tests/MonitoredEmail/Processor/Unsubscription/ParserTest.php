@@ -28,8 +28,8 @@ final class ParserTest extends \PHPUnit\Framework\TestCase
 
         $unsubscribedEmail = $parser->parse();
 
-        $this->assertEquals('hello@hello.com', $unsubscribedEmail->getContactEmail());
-        $this->assertEquals('test+unsubscribe@test.com', $unsubscribedEmail->getUnsubscriptionAddress());
+        $this->assertSame('hello@hello.com', $unsubscribedEmail->getContactEmail());
+        $this->assertSame('test+unsubscribe@test.com', $unsubscribedEmail->getUnsubscriptionAddress());
     }
 
     #[TestDox('Test that an exeption is thrown if a unsubscription email is not found')]

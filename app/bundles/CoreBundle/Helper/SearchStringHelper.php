@@ -50,10 +50,7 @@ final class SearchStringHelper
         }
     }
 
-    /**
-     * @param string $input
-     */
-    public static function parseSearchString($input, ?array $needsParsing = null, ?array $needsClosing = null, ?array $closingChars = null): \stdClass
+    public static function parseSearchString(string $input, ?array $needsParsing = null, ?array $needsClosing = null, ?array $closingChars = null): \stdClass
     {
         $input = trim(strip_tags($input));
 
@@ -67,7 +64,7 @@ final class SearchStringHelper
         return $this->splitUpSearchString($input);
     }
 
-    public static function mergeCommands(&$filters, array $commands): void
+    public static function mergeCommands(\stdClass& $filters, array $commands): void
     {
         if (!isset($filters->commands)) {
             $filters->commands = $commands;

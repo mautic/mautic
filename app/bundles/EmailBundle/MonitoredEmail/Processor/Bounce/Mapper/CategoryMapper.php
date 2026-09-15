@@ -38,7 +38,7 @@ final class CategoryMapper
     /**
      * @throws CategoryNotFound
      */
-    public static function map($category): CategoryObject
+    public static function map(string $category): CategoryObject
     {
         if (!isset(self::$mappings[$category])) {
             throw new CategoryNotFound();

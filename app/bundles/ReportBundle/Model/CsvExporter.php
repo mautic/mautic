@@ -19,9 +19,8 @@ class CsvExporter
 
     /**
      * @param resource $handle
-     * @param int      $page
      */
-    public function export(ReportDataResult $reportDataResult, $handle, $page = 1): void
+    public function export(ReportDataResult $reportDataResult, $handle, int $page = 1): void
     {
         if (1 === $page) {
             $this->putHeader($reportDataResult, $handle);

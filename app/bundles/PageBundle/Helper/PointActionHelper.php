@@ -41,7 +41,7 @@ readonly class PointActionHelper
     /**
      * @param array<string, mixed> $action
      */
-    public function validateUrlHit($eventDetails, array $action): bool
+    public function validateUrlHit(Hit $eventDetails, array $action): bool
     {
         $changePoints = [];
         $url          = $eventDetails->getUrl();

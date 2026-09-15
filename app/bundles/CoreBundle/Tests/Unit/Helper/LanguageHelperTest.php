@@ -50,7 +50,7 @@ final class LanguageHelperTest extends TestCase
         $this->pathsHelper = $this->createMock(PathsHelper::class);
         $this->pathsHelper->method('getSystemPath')
             ->willReturnCallback(
-                function ($path) {
+                function (string $path) {
                     switch ($path) {
                         case 'translations_root':
                             return $this->translationsPath;

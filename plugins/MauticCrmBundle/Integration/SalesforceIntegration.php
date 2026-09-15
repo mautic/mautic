@@ -2612,18 +2612,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param int|int[] $leadId
-     * @param bool      $newDncValue
      */
-    private function updateMauticDNC($leadId, $newDncValue): void
+    private function updateMauticDNC($leadId, bool $newDncValue): void
     {
         $leadIds = is_array($leadId) ? $leadId : [$leadId];
 
         foreach ($leadIds as $leadId) {
             $lead = $this->leadModel->getEntity($leadId);
 
-            if (true == $newDncValue) {
+            if ($newDncValue) {
                 $this->doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, 'Set by Salesforce', true, true, true);
-            } elseif (false == $newDncValue) {
+            } elseif (false === $newDncValue) {
                 $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
             }
         }

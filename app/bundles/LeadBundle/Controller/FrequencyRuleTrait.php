@@ -30,11 +30,9 @@ trait FrequencyRuleTrait
     private RequestStack $requestStack;
 
     /**
-     * @param array $viewParameters
-     *
      * @return true|FormInterface
      */
-    protected function getFrequencyRuleForm(Lead $lead, &$viewParameters = [], &$data = null, bool $isPublic = false, $action = null, bool $isPreferenceCenter = false)
+    protected function getFrequencyRuleForm(Lead $lead,array & $viewParameters = [], &$data = null, bool $isPublic = false, $action = null, bool $isPreferenceCenter = false)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');

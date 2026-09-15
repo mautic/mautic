@@ -12,10 +12,7 @@ class DateTimeHelper
 
     private static ?string $defaultLocalTimezone = null;
 
-    /**
-     * @var string
-     */
-    private $string;
+    private ?string $string = null;
 
     private string $format;
 
@@ -31,20 +28,16 @@ class DateTimeHelper
     private $datetime;
 
     /**
-     * @param \DateTimeInterface|string $string
      * @param string|null               $fromFormat Format the string is in
      * @param string|null               $timezone   Timezone the string is in
      */
-    public function __construct($string = '', ?string $fromFormat = self::FORMAT_DB, ?string $timezone = 'UTC')
+    public function __construct(string|\DateTimeInterface $string = '', ?string $fromFormat = self::FORMAT_DB, ?string $timezone = 'UTC')
     {
         $this->setDefaultTimezone();
         $this->setDateTime($string, $fromFormat, $timezone);
     }
 
-    /**
-     * @param \DateTimeInterface|string $datetime
-     */
-    public function setDateTime($datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local'): void
+    public function setDateTime(string|\DateTimeInterface $datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local'): void
     {
         if ('local' === $timezone) {
             $timezone = self::$defaultLocalTimezone;
@@ -114,11 +107,9 @@ class DateTimeHelper
     }
 
     /**
-     * @param string $format
-     *
      * @return string
      */
-    public function toLocalString($format = null)
+    public function toLocalString(?string $format = null)
     {
         if ($this->datetime) {
             $dateTime = clone $this->datetime;
@@ -198,7 +189,7 @@ class DateTimeHelper
      *
      * @return bool|\DateInterval|string
      */
-    public function getDiff($compare = 'now', $format = null, bool $resetTime = false)
+    public function getDiff($compare = 'now', ?string $format = null, bool $resetTime = false)
     {
         if ('now' == $compare) {
             $compare = new \DateTime('now', $this->datetime->getTimezone());
@@ -263,12 +254,9 @@ class DateTimeHelper
     /**
      * Returns interval based on $interval number and $unit.
      *
-     * @param int    $interval
-     * @param string $unit
-     *
      * @throws \Exception
      */
-    public function buildInterval($interval, $unit): \DateInterval
+    public function buildInterval(int $interval, string $unit): \DateInterval
     {
         $possibleUnits = ['Y', 'M', 'D', 'I', 'H', 'S'];
         $unit          = strtoupper($unit);
@@ -301,7 +289,7 @@ class DateTimeHelper
      *
      * @return \DateTimeInterface
      */
-    public function modify($string, bool $clone = false)
+    public function modify(string $string, bool $clone = false)
     {
         if ($clone) {
             $dt = clone $this->datetime;
@@ -357,11 +345,9 @@ class DateTimeHelper
     }
 
     /**
-     * @param string $unit
-     *
      * @throws \InvalidArgumentException
      */
-    public static function validateMysqlDateTimeUnit($unit): void
+    public static function validateMysqlDateTimeUnit(string $unit): void
     {
         $possibleUnits   = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
 

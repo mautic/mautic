@@ -20,12 +20,10 @@ final readonly class FormatterHelper
      * Format a string.
      *
      * @param mixed  $val
-     * @param string $type
-     * @param int    $round
      *
      * @return string
      */
-    public function _($val, $type = 'html', bool $textOnly = false, $round = 1)
+    public function _($val, string $type = 'html', bool $textOnly = false, int $round = 1)
     {
         if (empty($val) && 'bool' !== $type && 'float' !== $type) {
             return $val;
@@ -99,11 +97,10 @@ final readonly class FormatterHelper
      * instead of simple implode to cover multidimensional arrays.
      *
      * @param mixed  $array
-     * @param string $delimiter
      *
      * @return string
      */
-    public function arrayToString($array, $delimiter = ', ')
+    public function arrayToString($array, string $delimiter = ', ')
     {
         if (is_array($array)) {
             $replacements = [
@@ -124,10 +121,9 @@ final readonly class FormatterHelper
     }
 
     /**
-     * @param string                $delimeter
      * @param array<string, string> $array
      */
-    public function simpleArrayToHtml(array $array, $delimeter = '<br />'): string
+    public function simpleArrayToHtml(array $array, string $delimeter = '<br />'): string
     {
         $pairs = [];
         foreach ($array as $key => $value) {
@@ -141,11 +137,10 @@ final readonly class FormatterHelper
      * Takes a simple csv list like 1,2,3,4 and returns as an array.
      *
      * @param mixed       $csv
-     * @param string|null $type
      *
      * @return array<string, string>|array<int, string>
      */
-    public function simpleCsvToArray($csv, $type = null): array
+    public function simpleCsvToArray($csv, ?string $type = null): array
     {
         if (!$csv) {
             return [];

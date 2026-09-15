@@ -6,11 +6,8 @@ final class RandomHelper implements RandomHelperInterface
 {
     /**
      * Based on \Nette\Utils\Random.
-     *
-     * @param int    $length
-     * @param string $charlist
      */
-    public function generate($length = 10, $charlist = '0-9a-z'): string
+    public function generate(int $length = 10, string $charlist = '0-9a-z'): string
     {
         $charlist = count_chars(preg_replace_callback('#.-.#', fn (array $m): string => implode('', range($m[0][0], $m[0][2])), $charlist), 3);
         $chLen    = strlen($charlist);

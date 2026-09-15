@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Membership;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -15,10 +17,7 @@ readonly class EventDispatcher
     ) {
     }
 
-    /**
-     * @param string $action
-     */
-    public function dispatchMembershipChange(Lead $contact, Campaign $campaign, $action): void
+    public function dispatchMembershipChange(Lead $contact, Campaign $campaign, string $action): void
     {
         $this->dispatcher->dispatch(
             new CampaignLeadChangeEvent($campaign, $contact, $action),
@@ -26,7 +25,7 @@ readonly class EventDispatcher
         );
     }
 
-    public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action): void
+    public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, string $action): void
     {
         $this->dispatcher->dispatch(
             new CampaignLeadChangeEvent($campaign, $contacts, $action),

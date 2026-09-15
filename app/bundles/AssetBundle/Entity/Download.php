@@ -181,10 +181,7 @@ class Download
         return (int) $this->id;
     }
 
-    /**
-     * @param \DateTime $dateDownload
-     */
-    public function setDateDownload($dateDownload): static
+    public function setDateDownload(\DateTime $dateDownload): static
     {
         $this->dateDownload = $dateDownload;
 
@@ -199,10 +196,7 @@ class Download
         return $this->dateDownload;
     }
 
-    /**
-     * @param int $code
-     */
-    public function setCode($code): static
+    public function setCode(int $code): static
     {
         $this->code = $code;
 
@@ -265,10 +259,7 @@ class Download
         return $this->ipAddress;
     }
 
-    /**
-     * @param string $trackingId
-     */
-    public function setTrackingId($trackingId): static
+    public function setTrackingId(string $trackingId): static
     {
         $this->trackingId = $trackingId;
 

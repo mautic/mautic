@@ -64,9 +64,9 @@ final class BuilderTokenHelper
      */
     public function getTokens(
         $tokenRegex,
-        $filter = '',
-        $labelColumn = 'name',
-        $valueColumn = 'id',
+        string $filter = '',
+        string $labelColumn = 'name',
+        string $valueColumn = 'id',
         ?CompositeExpression $expr = null,
     ): ?array {
         if (!$this->isConfigured) {

@@ -30,22 +30,16 @@ final class ContactLimiter
     private ?int $campaignLimitUsed = null;
 
     /**
-     * @param int      $batchLimit
-     * @param int|null $contactId
-     * @param int|null $minContactId
-     * @param int|null $maxContactId
-     * @param int|null $threadId
-     * @param int|null $maxThreads
      * @param int|null $campaignLimit
      */
     public function __construct(
-        $batchLimit,
-        $contactId = null,
-        $minContactId = null,
-        $maxContactId = null,
+        ?int $batchLimit,
+        ?int $contactId = null,
+        ?int $minContactId = null,
+        ?int $maxContactId = null,
         private readonly array $contactIdList = [],
-        $threadId = null,
-        $maxThreads = null,
+        ?int $threadId = null,
+        ?int $maxThreads = null,
         $campaignLimit = null,
     ) {
         $this->batchLimit    = ($batchLimit) ? (int) $batchLimit : 100;
@@ -94,19 +88,17 @@ final class ContactLimiter
     }
 
     /**
-     * @param int $id
-     *
      * @throws NoContactsFoundException
      */
-    public function setBatchMinContactId($id): static
+    public function setBatchMinContactId(int $id): static
     {
         // Prevent a never ending loop if the contact ID never changes due to being the last batch of contacts
-        if ($this->minContactId && $this->minContactId > (int) $id) {
+        if ($this->minContactId && $this->minContactId > $id) {
             throw new NoContactsFoundException();
         }
 
         // We've surpasssed the max so bai
-        if ($this->maxContactId && $this->maxContactId < (int) $id) {
+        if ($this->maxContactId && $this->maxContactId < $id) {
             throw new NoContactsFoundException();
         }
 
@@ -115,7 +107,7 @@ final class ContactLimiter
             throw new NoContactsFoundException();
         }
 
-        $this->batchMinContactId = (int) $id;
+        $this->batchMinContactId = $id;
 
         return $this;
     }
@@ -165,7 +157,7 @@ final class ContactLimiter
     /**
      * @throws \Exception
      */
-    public function reduceCampaignLimitRemaining($reduction): static
+    public function reduceCampaignLimitRemaining(int $reduction): static
     {
         if (!$this->hasCampaignLimit()) {
             throw new \Exception('Campaign Limit was not set');

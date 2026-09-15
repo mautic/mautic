@@ -444,7 +444,7 @@ class MailHelper
      *
      * @return bool|array
      */
-    public function queue(bool $dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO)
+    public function queue(bool $dispatchSendEvent = false, string $returnMode = self::QUEUE_RESET_TO)
     {
         if ($this->tokenizationEnabled) {
             // Dispatch event to get custom tokens from listeners
@@ -526,7 +526,7 @@ class MailHelper
      *
      * @return bool
      */
-    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
+    public function flushQueue(array $resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
@@ -688,9 +688,8 @@ class MailHelper
      *
      * @param string $filePath
      * @param string $fileName
-     * @param string $contentType
      */
-    public function attachFile($filePath, $fileName = null, $contentType = null, bool $inline = false): void
+    public function attachFile($filePath, $fileName = null, ?string $contentType = null, bool $inline = false): void
     {
         if ($inline) {
             $this->message->embedFromPath($filePath, $fileName, $contentType);
@@ -786,10 +785,7 @@ class MailHelper
         $this->plainTextSet = true;
     }
 
-    /**
-     * @param string $contentType
-     */
-    public function setBody($content, $contentType = 'text/html', $charset = null, bool $ignoreTrackingPixel = false): void
+    public function setBody($content, string $contentType = 'text/html', $charset = null, bool $ignoreTrackingPixel = false): void
     {
         if (!$ignoreTrackingPixel && $this->coreParametersHelper->get('mailer_append_tracking_pixel')) {
             // Append tracking pixel
@@ -1039,12 +1035,9 @@ class MailHelper
     }
 
     /**
-     * @param int    $toBeAdded
-     * @param string $type
-     *
      * @throws BatchQueueMaxException
      */
-    protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to'): void
+    protected function checkBatchMaxRecipients(int $toBeAdded = 1, string $type = 'to'): void
     {
         if ($this->queueEnabled && $this->transport instanceof TokenTransportInterface) {
             // Check if max batching has been hit
@@ -1209,7 +1202,7 @@ class MailHelper
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, bool $allowBcc = true, $assetAttachments = [], bool $ignoreTrackingPixel = false): bool
+    public function setEmail(Email $email, bool $allowBcc = true, array $assetAttachments = [], bool $ignoreTrackingPixel = false): bool
     {
         if ($this->coreParametersHelper->get(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
@@ -1253,7 +1246,7 @@ class MailHelper
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];
-        if (empty($assetAttachments)) {
+        if ($assetAttachments === []) {
             if ($assets = $email->getAssetAttachments()) {
                 foreach ($assets as $asset) {
                     $this->attachAsset($asset);
@@ -1473,7 +1466,7 @@ class MailHelper
     /**
      * Log exception.
      */
-    protected function logError($error, $context = null): void
+    protected function logError($error, ?string $context = null): void
     {
         if ($error instanceof \Exception) {
             $exceptionContext = ['exception' => $error];

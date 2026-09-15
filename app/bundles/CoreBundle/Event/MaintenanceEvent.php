@@ -6,8 +6,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MaintenanceEvent extends Event
 {
-    protected int $daysOld;
-
     protected \DateTimeInterface $date;
 
     /**
@@ -20,16 +18,12 @@ class MaintenanceEvent extends Event
      */
     protected $debug = [];
 
-    /**
-     * @param int $daysOld
-     */
     public function __construct(
-        $daysOld,
+        protected int $daysOld,
         protected bool $dryRun,
         protected bool $gdpr,
     ) {
-        $this->daysOld = (int) $daysOld;
-        $this->date    = new \DateTime("{$daysOld} days ago", new \DateTimeZone('UTC'));
+        $this->date    = new \DateTime("{$this->daysOld} days ago", new \DateTimeZone('UTC'));
     }
 
     /**

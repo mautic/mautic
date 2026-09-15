@@ -247,10 +247,9 @@ final class InputHelper
      * Removes all characters except those allowed in URLs.
      *
      * @param array<string>|null $allowedProtocols
-     * @param mixed              $defaultProtocol
      * @param array<string>      $removeQuery
      */
-    public static function url(?string $value, ?bool $urldecode = false, $allowedProtocols = null, $defaultProtocol = null, $removeQuery = [], bool $ignoreFragment = false): string|false
+    public static function url(?string $value, ?bool $urldecode = false, $allowedProtocols = null, ?array $defaultProtocol = null, array $removeQuery = [], bool $ignoreFragment = false): string|false
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -312,7 +311,7 @@ final class InputHelper
     /**
      * Removes all characters except those allowed in emails.
      */
-    public static function email($value, bool $urldecode = false): string
+    public static function email(string $value, bool $urldecode = false): string
     {
         if ($urldecode) {
             $value = urldecode($value);
@@ -461,15 +460,15 @@ final class InputHelper
     /**
      * Converts UTF8 into Latin.
      */
-    public static function transliterate($value): string|false
+    public static function transliterate(string $value): string|false
     {
         $transId = 'Any-Latin; Latin-ASCII';
         if (function_exists('transliterator_transliterate') && $trans = \Transliterator::create($transId)) {
             // Use intl by default
-            return $trans->transliterate((string) $value);
+            return $trans->transliterate($value);
         }
 
-        return \URLify::transliterate((string) $value);
+        return \URLify::transliterate($value);
     }
 
     public static function transliterateFilename(string $filename): string

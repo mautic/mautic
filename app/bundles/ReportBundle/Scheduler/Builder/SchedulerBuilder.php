@@ -29,14 +29,12 @@ readonly class SchedulerBuilder
     }
 
     /**
-     * @param int $count
-     *
      * @return \Recurr\RecurrenceCollection
      *
      * @throws InvalidSchedulerException
      * @throws NotSupportedScheduleTypeException
      */
-    public function getNextEvents(SchedulerInterface $scheduler, $count)
+    public function getNextEvents(SchedulerInterface $scheduler, int $count)
     {
         if (!$scheduler->isScheduled()) {
             throw new InvalidSchedulerException();

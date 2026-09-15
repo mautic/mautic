@@ -22,11 +22,8 @@ final class PrivateAddressChecker
      */
     private array $allowedPrivateAddresses = [];
 
-    /**
-     * @param callable|null $dnsResolver
-     */
     public function __construct(
-        private $dnsResolver = null,
+        private \Closure|string|null $dnsResolver = null,
     ) {
         $this->dnsResolver = $dnsResolver ?? 'gethostbynamel';
     }

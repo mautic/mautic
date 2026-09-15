@@ -12,11 +12,7 @@ final class ApiErrorException extends \Exception
 
     private string $shortMessage = '';
 
-    /**
-     * @param string $message
-     * @param int    $code
-     */
-    public function __construct($message = 'API error', $code = 0, ?\Exception $previous = null)
+    public function __construct(string $message = 'API error', int $code = 0, ?\Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

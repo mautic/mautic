@@ -28,12 +28,9 @@ readonly class FlashBag
     }
 
     /**
-     * @param string               $message
      * @param array<string, mixed> $messageVars
-     * @param string               $level
-     * @param string               $domain
      */
-    public function add($message, array $messageVars = [], $level = self::LEVEL_NOTICE, $domain = 'flashes', bool $addNotification = false): void
+    public function add(string $message, array $messageVars = [], string $level = self::LEVEL_NOTICE, string|false $domain = 'flashes', bool $addNotification = false): void
     {
         if (false === $domain) {
             // message is already translated

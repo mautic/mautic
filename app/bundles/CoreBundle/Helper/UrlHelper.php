@@ -100,11 +100,9 @@ final class UrlHelper
      * Takes a plaintext, finds all URLs in it and return the array of those URLs.
      * With exception of URLs used as a token default values.
      *
-     * @param string $text
-     *
      * @return string[]
      */
-    public static function getUrlsFromPlaintext($text, array $contactUrlFields = []): array
+    public static function getUrlsFromPlaintext(string $text, array $contactUrlFields = []): array
     {
         $urls = [];
         // Check if there are any tokens that URL based fields
@@ -249,10 +247,8 @@ final class UrlHelper
     /**
      *  This method return true with special characters in URL, for example https://domain.tld/é.pdf
      * filter_var($url, FILTER_VALIDATE_URL) allow only alphanumerics [0-9a-zA-Z], the special characters "$-_.+!*'()," [not including the quotes - ed].
-     *
-     * @param string $url
      */
-    public static function isValidUrl($url): bool
+    public static function isValidUrl(string $url): bool
     {
         $path = parse_url($url, PHP_URL_PATH);
         if (null !== $path) {

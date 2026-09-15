@@ -265,7 +265,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->findThemeWithTemplate($template);
     }
 
-    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true)
+    public function getInstalledThemes(string $specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true)
     {
         // Use a concatenated key since $includeDirs changes what's returned ($includeDirs used by API controller to prevent from exposing file paths)
         $key = $specificFeature.(int) $includeDirs;
@@ -280,7 +280,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $this->themes[$key];
     }
 
-    public function getTheme($theme = 'current', bool $throwException = false)
+    public function getTheme(string $theme = 'current', bool $throwException = false)
     {
         if (empty($this->themeHelpers[$theme])) {
             try {

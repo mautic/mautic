@@ -107,12 +107,10 @@ abstract class AbstractChart
      * Helper function to shorten/truncate a string.
      *
      * @param string $string
-     * @param int    $length
-     * @param string $append
      *
      * @return string
      */
-    public static function truncate($string, $length = 100, $append = '...')
+    public static function truncate($string, int $length = 100, string $append = '...')
     {
         $string = trim($string);
 

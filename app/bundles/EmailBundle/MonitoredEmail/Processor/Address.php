@@ -7,7 +7,7 @@ final class Address
     /**
      * @param string $addresses String of email address from an email header
      */
-    public static function parseList($addresses): array
+    public static function parseList(string $addresses): array
     {
         $results         = [];
         $parsedAddresses = imap_rfc822_parse_adrlist($addresses, 'default.domain.name');
@@ -26,7 +26,7 @@ final class Address
         return $results;
     }
 
-    public static function parseAddressForStatHash($address): ?string
+    public static function parseAddressForStatHash(string $address): ?string
     {
         if (preg_match('#^(.*?)\+(.*?)@(.*?)$#', $address, $parts)) {
             if (strstr($parts[2], '_')) {

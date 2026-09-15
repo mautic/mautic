@@ -8,11 +8,10 @@ class EntityResultHelper
 {
     /**
      * @param array<mixed>|Paginator<mixed> $results
-     * @param callable|null                 $callback
      *
      * @return array<mixed>|\ArrayObject<int,mixed>
      */
-    public function getArray($results, $callback = null): \ArrayObject|array
+    public function getArray($results, ?\Closure $callback = null): \ArrayObject|array
     {
         $entities = [];
 

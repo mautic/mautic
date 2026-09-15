@@ -39,13 +39,11 @@ readonly class BundleHelper
     /**
      * Gets an array of a specific bundle's config settings.
      *
-     * @param string $configKey
-     *
      * @return mixed
      *
      * @throws \Exception
      */
-    public function getBundleConfig($bundleName, $configKey = '', bool $includePlugins = false)
+    public function getBundleConfig($bundleName, string $configKey = '', bool $includePlugins = false)
     {
         // get the configs
         $configFiles = $this->getMauticBundles($includePlugins);

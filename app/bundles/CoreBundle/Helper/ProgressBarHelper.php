@@ -11,10 +11,8 @@ final class ProgressBarHelper
     /**
      * Avoid printing progress bar to stderr
      * https://github.com/symfony/symfony/issues/18744.
-     *
-     * @param int $maxCount
      */
-    public static function init(OutputInterface $output, $maxCount = 0): ProgressBar
+    public static function init(OutputInterface $output, int $maxCount = 0): ProgressBar
     {
         $output = $output instanceof StreamOutput ? new StreamOutput($output->getStream()) : $output;
 

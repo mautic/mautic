@@ -57,7 +57,7 @@ final class StatHelper
      *
      * @throws StatNotFoundException
      */
-    public function getStat($emailAddress)
+    public function getStat(string $emailAddress)
     {
         if (!isset($this->stats[$emailAddress])) {
             throw new StatNotFoundException();

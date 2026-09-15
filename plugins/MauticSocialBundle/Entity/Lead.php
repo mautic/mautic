@@ -49,7 +49,7 @@ class Lead
         return $this->dateAdded;
     }
 
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -64,7 +64,7 @@ class Lead
         return $this->lead;
     }
 
-    public function setLead($lead): static
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -79,7 +79,7 @@ class Lead
         return $this->monitor;
     }
 
-    public function setMonitor($monitor): static
+    public function setMonitor(\MauticPlugin\MauticSocialBundle\Entity\Monitoring $monitor): static
     {
         $this->monitor = $monitor;
 

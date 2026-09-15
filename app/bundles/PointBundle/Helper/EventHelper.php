@@ -9,12 +9,11 @@ use Mautic\LeadBundle\Entity\Lead;
 final class EventHelper
 {
     /**
-     * @param Lead                 $lead
      * @param array<string, mixed> $action
      *
      * @return int
      */
-    public static function engagePointAction($lead, array $action)
+    public static function engagePointAction(\Mautic\LeadBundle\Entity\Lead $lead, array $action)
     {
         static $initiated = [];
 

@@ -109,11 +109,10 @@ final class CalculatorHelper
 
     /**
      * @param string $date
-     * @param string $labelFormat
      *
      * @throws \Exception
      */
-    public static function getWeekLabel($date, $labelFormat = 'Y-W'): string
+    public static function getWeekLabel($date, string $labelFormat = 'Y-W'): string
     {
         return new \DateTime(self::getWeekDateString($date))->format($labelFormat);
     }

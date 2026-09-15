@@ -177,9 +177,9 @@ class LeadDevice
     }
 
     /**
-     * @param mixed $clientInfo
+     * @param mixed[]|string $clientInfo
      */
-    public function setClientInfo($clientInfo): void
+    public function setClientInfo(string|array $clientInfo): void
     {
         $this->clientInfo = $clientInfo;
     }
@@ -192,10 +192,7 @@ class LeadDevice
         return $this->device;
     }
 
-    /**
-     * @param mixed $device
-     */
-    public function setDevice($device): void
+    public function setDevice(string $device): void
     {
         $this->device = $device;
     }
@@ -208,7 +205,7 @@ class LeadDevice
         return $this->deviceBrand;
     }
 
-    public function setDeviceBrand($brand): void
+    public function setDeviceBrand(string $brand): void
     {
         $this->deviceBrand = $brand;
     }
@@ -221,10 +218,7 @@ class LeadDevice
         return $this->deviceModel;
     }
 
-    /**
-     * @param mixed $deviceModel
-     */
-    public function setDeviceModel($deviceModel): void
+    public function setDeviceModel(string $deviceModel): void
     {
         $this->deviceModel = $deviceModel;
     }
@@ -237,10 +231,7 @@ class LeadDevice
         return $this->deviceOsName;
     }
 
-    /**
-     * @param string $deviceOsName
-     */
-    public function setDeviceOsName($deviceOsName): static
+    public function setDeviceOsName(string $deviceOsName): static
     {
         $this->deviceOsName = $deviceOsName;
 
@@ -336,10 +327,7 @@ class LeadDevice
         return $this->trackingId;
     }
 
-    /**
-     * @param string $trackingId
-     */
-    public function setTrackingId($trackingId): static
+    public function setTrackingId(string $trackingId): static
     {
         $this->trackingId = $trackingId;
 
@@ -369,10 +357,7 @@ class LeadDevice
         return $this->dateAdded;
     }
 
-    /**
-     * @param mixed $dateAdded
-     */
-    public function setDateAdded($dateAdded): void
+    public function setDateAdded(\DateTime $dateAdded): void
     {
         $this->dateAdded = $dateAdded;
     }

@@ -9,11 +9,9 @@ use Mautic\UserBundle\Entity\UserToken;
 interface UserTokenServiceInterface
 {
     /**
-     * @param int $secretLength
-     *
      * @return UserToken
      */
-    public function generateSecret(UserToken $token, $secretLength = 32);
+    public function generateSecret(UserToken $token, int $secretLength = 32);
 
     /**
      * @return bool

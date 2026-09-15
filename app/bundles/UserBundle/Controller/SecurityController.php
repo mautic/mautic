@@ -80,7 +80,7 @@ final class SecurityController extends CommonController implements EventSubscrib
             }
 
             $messageVars = $error instanceof Exception\AuthenticationException ? $error->getMessageData() : [];
-            $this->addFlashMessage($msg, $messageVars, FlashBag::LEVEL_ERROR, null);
+            $this->addFlashMessage($msg, $messageVars, FlashBag::LEVEL_ERROR, false);
         }
         $request->query->set('tmpl', 'login');
 

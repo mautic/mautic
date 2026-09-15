@@ -246,7 +246,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $this->coreParametersHelper->method('get')->willReturnCallback(
-            fn ($param): string => match ($param) {
+            fn (string $param): string => match ($param) {
                 'mailer_from_email' => 'nobody@nowhere.com',
                 'secret_key'        => 'secret',
                 default             => '',
@@ -357,7 +357,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         // Mock factory to remove when factory is completely gone.
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn ($param): string => match ($param) {
+                fn (string $param): string => match ($param) {
                     default => '',
                 }
             );
@@ -462,7 +462,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn ($param): string => match ($param) {
+                fn (string $param): string => match ($param) {
                     default => '',
                 }
             );
@@ -582,7 +582,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn ($param): string => match ($param) {
+                fn (string $param): string => match ($param) {
                     default => '',
                 }
             );

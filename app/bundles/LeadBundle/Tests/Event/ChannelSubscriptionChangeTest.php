@@ -22,7 +22,7 @@ final class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
         $event = new ChannelSubscriptionChange($lead, $channel, $oldStatus, $newStatus);
 
         $this->assertEquals($lead, $event->getLead());
-        $this->assertEquals($channel, $event->getChannel());
+        $this->assertSame($channel, $event->getChannel());
         $this->assertSame($oldStatus, $event->getOldStatus());
         $this->assertSame($newStatus, $event->getNewStatus());
         $this->assertSame('contactable', $event->getOldStatusVerb());

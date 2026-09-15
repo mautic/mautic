@@ -60,10 +60,8 @@ class Configurator
 
     /**
      * Add a step to the configurator.
-     *
-     * @param int $priority
      */
-    public function addStep(StepInterface $step, $priority = 0): void
+    public function addStep(StepInterface $step, int $priority = 0): void
     {
         $this->steps[$priority] ??= [];
 
@@ -74,13 +72,11 @@ class Configurator
     /**
      * Retrieves the specified step.
      *
-     * @param int $index
-     *
      * @return StepInterface[]
      *
      * @throws \InvalidArgumentException
      */
-    public function getStep($index)
+    public function getStep(int $index)
     {
         if (isset($this->steps[$index])) {
             return $this->steps[$index];
@@ -214,9 +210,8 @@ class Configurator
 
     /**
      * @param array<mixed> $array
-     * @param int          $level
      */
-    protected function renderArray($array, $level = 1): string
+    protected function renderArray($array, int $level = 1): string
     {
         $string = "array(\n";
 

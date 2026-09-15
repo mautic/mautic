@@ -112,12 +112,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param string $file
-         * @param int    $line
-         *
          * @throws \ErrorException
          */
-        public function handleError($level, $message, $file = 'unknown', $line = 0, array $context = []): bool
+        public function handleError($level, $message, string $file = 'unknown', int $line = 0, array $context = []): bool
         {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {
@@ -296,10 +293,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             ];
         }
 
-        /**
-         * @param string $environment
-         */
-        public static function register($environment = 'prod'): self
+        public static function register(string $environment = 'prod'): self
         {
             if ('dev' === $environment) {
                 Debug::enable();

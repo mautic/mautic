@@ -2162,11 +2162,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param array                   $assetAttachments
      * @param array<string>|Lead|null $leadFields
      *
      * @return false|mixed[]
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function sendSampleEmailToUser(
@@ -2174,7 +2172,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $users,
         $leadFields = null,
         array $tokens = [],
-        $assetAttachments = [],
+        array $assetAttachments = [],
         bool $saveStat = true,
     ): false|array {
         if (!$emailId = $email->getId()) {

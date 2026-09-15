@@ -2177,11 +2177,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param string $fieldType
-     *
      * @return bool|float|string
      */
-    public function cleanPushData($value, $fieldType = self::FIELD_TYPE_STRING)
+    public function cleanPushData($value, string $fieldType = self::FIELD_TYPE_STRING)
     {
         return Cleaner::clean($value, $fieldType);
     }

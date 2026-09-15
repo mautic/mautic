@@ -81,24 +81,21 @@ interface ThemeHelperInterface
     public function checkForTwigTemplate($template);
 
     /**
-     * @param string $specificFeature
      * @param bool   $extended        returns extended information about the themes
      * @param bool   $ignoreCache     true to get the fresh info
      * @param bool   $includeDirs     true to get the theme dir details
      *
      * @return array<string[]>|string[]
      */
-    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true);
+    public function getInstalledThemes(string $specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true);
 
     /**
-     * @param string $theme
-     *
      * @return twigThemeHelper
      *
      * @throws FileNotFoundException
      * @throws BadConfigurationException
      */
-    public function getTheme($theme = 'current', bool $throwException = false);
+    public function getTheme(string $theme = 'current', bool $throwException = false);
 
     /**
      * Install a theme from a zip package.

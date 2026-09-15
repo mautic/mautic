@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -28,13 +30,10 @@ final class Fetcher
 
     private array $knownCampaignMembers = [];
 
-    /**
-     * @param string|int $campaignId
-     */
     public function __construct(
         private readonly IntegrationEntityRepository $repo,
         private readonly Organizer $organizer,
-        private $campaignId,
+        private readonly int|string $campaignId,
     ) {
         $this->fetchLeads();
         $this->fetchContacts();
@@ -46,7 +45,7 @@ final class Fetcher
      * @throws NoObjectsToFetchException
      * @throws InvalidObjectException
      */
-    public function getQueryForUnknownObjects(array $fields, $object): string
+    public function getQueryForUnknownObjects(array $fields, string $object): string
     {
         return match ($object) {
             Lead::OBJECT    => QueryBuilder::getLeadQuery($fields, $this->unknownLeadIds),

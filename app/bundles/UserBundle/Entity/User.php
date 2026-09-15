@@ -160,9 +160,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     #[Groups(['user:read', 'user:write'])]
     private $signature;
 
-    /**
-     * @param bool $guest
-     */
     public function __construct(
         private $guest = false,
     ) {
@@ -692,10 +689,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $thisUser === $thatUser;
     }
 
-    /**
-     * @return bool
-     */
-    public function isGuest()
+    public function isGuest(): ?bool
     {
         return $this->guest;
     }

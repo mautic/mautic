@@ -14,12 +14,9 @@ final class DateRelativeInterval implements FilterDecoratorInterface
 {
     use ParseDateFilterValueTrait;
 
-    /**
-     * @param string $originalValue
-     */
     public function __construct(
         private readonly DateDecorator $dateDecorator,
-        private $originalValue,
+        private string|array|null|bool $originalValue,
         private readonly DateOptionParameters $dateOptionParameters,
     ) {
     }

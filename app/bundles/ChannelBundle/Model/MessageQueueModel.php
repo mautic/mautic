@@ -62,8 +62,6 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param int   $attempts
-     * @param int   $priority
      * @param mixed $messageQueue
      */
     public function processFrequencyRules(
@@ -71,8 +69,8 @@ class MessageQueueModel extends FormModel
         $channel,
         $channelId,
         $campaignEventId = null,
-        $attempts = 3,
-        $priority = MessageQueue::PRIORITY_NORMAL,
+        int $attempts = 3,
+        int $priority = MessageQueue::PRIORITY_NORMAL,
         $messageQueue = null,
         string $statTableName = 'email_stats',
         string $statContactColumn = 'lead_id',
@@ -125,8 +123,6 @@ class MessageQueueModel extends FormModel
      * @param array    $leads
      * @param string   $channel
      * @param int      $channelId
-     * @param int      $maxAttempts
-     * @param int      $priority
      * @param int|null $campaignEventId
      * @param array    $options
      */
@@ -135,8 +131,8 @@ class MessageQueueModel extends FormModel
         $channel,
         $channelId,
         \DateInterval $scheduledInterval,
-        $maxAttempts = 1,
-        $priority = 1,
+        int $maxAttempts = 1,
+        int $priority = 1,
         $campaignEventId = null,
         $options = [],
     ): bool {

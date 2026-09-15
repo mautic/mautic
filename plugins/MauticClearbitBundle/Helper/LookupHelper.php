@@ -41,11 +41,7 @@ final class LookupHelper
         }
     }
 
-    /**
-     * @param bool $notify
-     * @param bool $checkAuto
-     */
-    public function lookupContact(Lead $lead, $notify = false, $checkAuto = false): void
+    public function lookupContact(Lead $lead, bool $notify = false, bool $checkAuto = false): void
     {
         if (!$lead->getEmail()) {
             return;
@@ -79,11 +75,7 @@ final class LookupHelper
         }
     }
 
-    /**
-     * @param bool $notify
-     * @param bool $checkAuto
-     */
-    public function lookupCompany(Company $company, $notify = false, $checkAuto = false): void
+    public function lookupCompany(Company $company, bool $notify = false, bool $checkAuto = false): void
     {
         if (!$website = $company->getFieldValue('companywebsite')) {
             return;
@@ -169,7 +161,7 @@ final class LookupHelper
     /**
      * @return array<int, string|non-empty-array<mixed>>
      */
-    private function getCache(Lead|Company $entity, $notify): array
+    private function getCache(Lead|Company $entity, bool $notify): array
     {
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);

@@ -7,7 +7,6 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 final class ZohoApi extends CrmApi
 {
     /**
-     * @param string                        $operation
      * @param array<string, string|mixed[]> $parameters
      * @param array<string, mixed>          $settings
      *
@@ -15,7 +14,7 @@ final class ZohoApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    private function request($operation, array $parameters = [], string $method = 'GET', bool $json = false, array $settings = [])
+    private function request(string $operation, array $parameters = [], string $method = 'GET', bool $json = false, array $settings = [])
     {
         $tokenData = $this->integration->getKeys();
 
@@ -55,13 +54,10 @@ final class ZohoApi extends CrmApi
     }
 
     /**
-     * @param string $object
-     *
      * @return array
-     *
      * @throws ApiErrorException
      */
-    public function createLead(array $data, $object = 'Leads')
+    public function createLead(array $data, string $object = 'Leads')
     {
         $parameters['data'] = $data;
 
@@ -69,13 +65,10 @@ final class ZohoApi extends CrmApi
     }
 
     /**
-     * @param string $object
-     *
      * @return array
-     *
      * @throws ApiErrorException
      */
-    public function updateLead(array $data, $object = 'Leads')
+    public function updateLead(array $data, string $object = 'Leads')
     {
         $parameters['data'] = $data;
 
@@ -83,14 +76,12 @@ final class ZohoApi extends CrmApi
     }
 
     /**
-     * @param string               $object
      * @param array<string, mixed> $params
      *
      * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getLeads(array $params, $object, $id = null)
+    public function getLeads(array $params, string $object, $id = null)
     {
         if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';

@@ -31,7 +31,7 @@ final class BounceTest extends \PHPUnit\Framework\TestCase
         $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
-                function ($email, $bounceAddress): Result {
+                function ($email, ?string $bounceAddress): Result {
                     $stat = new Stat();
 
                     $lead = new Lead();
@@ -78,7 +78,7 @@ final class BounceTest extends \PHPUnit\Framework\TestCase
         $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
-                function ($email, $bounceAddress): Result {
+                function ($email, ?string $bounceAddress): Result {
                     $stat = new Stat();
 
                     $lead = new Lead();

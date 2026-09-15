@@ -21,7 +21,7 @@ final class MaxMindDoNotSellDownloadHelper
     private $listPath;
 
     public function __construct(
-        $auth,
+        ?string $auth,
         private readonly LoggerInterface $logger,
         private readonly HttpClientInterface $httpClient,
         CoreParametersHelper $coreParametersHelper,

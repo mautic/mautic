@@ -23,7 +23,7 @@ class EmailValidator
      * @throws UnexpectedValueException
      * @throws InvalidEmailException
      */
-    public function validate($address, bool $doDnsCheck = false): void
+    public function validate(?string $address, bool $doDnsCheck = false): void
     {
         if (!is_string($address)) {
             throw new UnexpectedValueException($address, 'string');
@@ -77,7 +77,7 @@ class EmailValidator
      *
      * @throws InvalidEmailException
      */
-    public function doPluginValidation($address): void
+    public function doPluginValidation(string $address): void
     {
         $event = $this->dispatcher->dispatch(
             new EmailValidationEvent($address)

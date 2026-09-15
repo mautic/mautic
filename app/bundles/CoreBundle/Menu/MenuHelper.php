@@ -24,12 +24,8 @@ final class MenuHelper
 
     /**
      * Converts menu config into something KNP menus expects.
-     *
-     * @param int    $depth
-     * @param int    $defaultPriority
-     * @param string $type
      */
-    public function createMenuStructure(array &$items, $depth = 0, $defaultPriority = 9999, $type = 'main'): void
+    public function createMenuStructure(array &$items, int $depth = 0, int $defaultPriority = 9999, string $type = 'main'): void
     {
         foreach ($items as $k => &$i) {
             if (!is_array($i) || [] === $i) {
@@ -113,11 +109,9 @@ final class MenuHelper
     /**
      * Get and reset orphaned menu items.
      *
-     * @param string $type
-     *
      * @return mixed
      */
-    public function resetOrphans($type = 'main')
+    public function resetOrphans(string $type = 'main')
     {
         $orphans              = $this->orphans[$type] ?? [];
         $this->orphans[$type] = [];
@@ -127,10 +121,8 @@ final class MenuHelper
 
     /**
      * Give orphaned menu items a home.
-     *
-     * @param int $depth
      */
-    public function placeOrphans(array &$menuItems, bool $appendOrphans = false, $depth = 1, $type = 'main'): void
+    public function placeOrphans(array &$menuItems, bool $appendOrphans = false, int $depth = 1, string $type = 'main'): void
     {
         foreach ($menuItems as $key => &$items) {
             if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {
@@ -165,7 +157,7 @@ final class MenuHelper
     /**
      * Sort menu items by priority.
      */
-    public function sortByPriority(&$menuItems, $defaultPriority = 9999): void
+    public function sortByPriority(&$menuItems, int $defaultPriority = 9999): void
     {
         foreach ($menuItems as &$items) {
             $parentPriority = $items['priority'] ?? $defaultPriority;

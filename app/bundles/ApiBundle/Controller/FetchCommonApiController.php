@@ -561,11 +561,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * @param array<mixed>|Paginator<TEntity> $results
-     * @param callable|null                   $callback
      *
      * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
      */
-    protected function prepareEntityResultsToArray($results, $callback = null): array
+    protected function prepareEntityResultsToArray($results, ?\Closure $callback = null): array
     {
         if (is_array($results) && isset($results['count'])) {
             $totalCount = $results['count'];

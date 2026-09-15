@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper;
 
 final class Serializer
@@ -11,10 +13,8 @@ final class Serializer
      * This helper method is secure for PHP >= 7 by default and handle all PHP versions.
      *
      * PHP does not recommend untrusted user input even with ['allowed_classes' => false]
-     *
-     * @param string $serializedString
      */
-    public static function decode($serializedString, array $options = ['allowed_classes' => false]): mixed
+    public static function decode(string $serializedString, array $options = ['allowed_classes' => false]): mixed
     {
         if (1 === preg_match('/(^|;|{|})O:\+?[0-9]+:"/', $serializedString)) {
             throw new \InvalidArgumentException(sprintf('The string %s contains an object.', $serializedString));

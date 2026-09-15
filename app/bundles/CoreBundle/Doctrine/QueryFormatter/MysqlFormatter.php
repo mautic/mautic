@@ -11,30 +11,24 @@ final class MysqlFormatter extends AbstractFormatter
 {
     /**
      * Format field to datetime.
-     *
-     * @param string $format
      */
-    public function toDateTime($field, $format = '%Y-%m-%d %k:%i:%s'): string
+    public function toDateTime($field, string $format = '%Y-%m-%d %k:%i:%s'): string
     {
         return "STR_TO_DATE({$field}, '{$format}')";
     }
 
     /**
      * Format field to date.
-     *
-     * @param string $format
      */
-    public function toDate($field, $format = '%Y-%m-%d'): string
+    public function toDate($field, string $format = '%Y-%m-%d'): string
     {
         return "STR_TO_DATE({$field}, '{$format}')";
     }
 
     /**
      * Format field to time.
-     *
-     * @param string $format
      */
-    public function toTime($field, $format = '%k:%i:%s'): string
+    public function toTime($field, string $format = '%k:%i:%s'): string
     {
         return "STR_TO_DATE({$field}, '{$format}')";
     }

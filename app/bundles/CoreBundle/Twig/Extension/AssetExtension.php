@@ -96,11 +96,8 @@ final readonly class AssetExtension
         return $this->assetsHelper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
     }
 
-    /**
-     * @param string $path
-     */
     #[AsTwigFunction(name: 'getOverridableUrl', isSafe: ['html'])]
-    public function getOverridableUrl($path, bool $absolute = false): string
+    public function getOverridableUrl(string $path, bool $absolute = false): string
     {
         return $this->assetsHelper->getOverridableUrl($path, $absolute);
     }

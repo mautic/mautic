@@ -134,11 +134,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         $this->postTranslationEntitySave($entity);
     }
 
-    /**
-     * @param string $source
-     * @param int    $sourceId
-     */
-    public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null): void
+    public function createStatEntry(Notification $notification, Lead $lead, ?string $source = null, ?int $sourceId = null): void
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
