@@ -391,7 +391,7 @@ class TrackableModel extends AbstractCommonModel
         return $trackableUrls;
     }
 
-    protected function createTrackableEntity($url, $channel, $channelId): Trackable
+    protected function createTrackableEntity(string $url, $channel, $channelId): Trackable
     {
         $redirect = $this->redirectModel->createRedirectEntity($url);
 

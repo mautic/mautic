@@ -20,6 +20,12 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ORM\Entity]
+#[ORM\Table(name: 'message_channels')]
+#[ORM\Index(columns: ['channel', 'channel_id'], name: 'channel_entity_index')]
+#[ORM\Index(columns: ['channel', 'is_enabled'], name: 'channel_enabled_index')]
+#[ORM\UniqueConstraint(columns: ['message_id', 'channel'], name: 'channel_index')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('channel:messages:viewown')"),
@@ -88,11 +94,6 @@ class Channel extends CommonEntity implements UuidInterface
     public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('message_channels')
-                ->addIndex(['channel', 'channel_id'], 'channel_entity_index')
-                ->addIndex(['channel', 'is_enabled'], 'channel_enabled_index')
-                ->addUniqueConstraint(['message_id', 'channel'], 'channel_index');
 
         $builder
             ->addId()

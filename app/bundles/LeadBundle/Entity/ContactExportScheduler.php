@@ -10,6 +10,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity(repositoryClass: ContactExportSchedulerRepository::class)]
+#[ORM\Table(name: 'contact_export_scheduler')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ContactExportScheduler
 {
     private ?int $id = null;
@@ -37,8 +40,6 @@ class ContactExportScheduler
     public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('contact_export_scheduler');
-        $builder->setCustomRepositoryClass(ContactExportSchedulerRepository::class);
         $builder->addId();
         $builder->createManyToOne('user', User::class)
             ->addJoinColumn('user_id', 'id', true, false, 'CASCADE')

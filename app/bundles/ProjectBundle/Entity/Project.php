@@ -22,6 +22,10 @@ use Mautic\ProjectBundle\Validator\Constraints\UniqueName;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[ORM\Entity(repositoryClass: ProjectRepository::class)]
+#[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\UniqueConstraint(columns: ['name'], name: 'unique_project_name')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('project:projects:view')"),
@@ -79,10 +83,6 @@ class Project extends FormEntity implements UuidInterface
     public static function loadMetadata(OrmClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(ProjectRepository::class)
-            ->addUniqueConstraint(['name'], 'unique_project_name');
 
         $builder->addIdColumns();
 

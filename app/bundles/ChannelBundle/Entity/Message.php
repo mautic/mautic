@@ -24,6 +24,10 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\Table(name: 'messages')]
+#[ORM\Index(columns: ['date_added'], name: 'date_message_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('channel:messages:viewown')"),
@@ -99,10 +103,6 @@ class Message extends FormEntity implements UuidInterface
     public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('messages')
-            ->setCustomRepositoryClass(MessageRepository::class)
-            ->addIndex(['date_added'], 'date_message_added');
 
         $builder
             ->addIdColumns()

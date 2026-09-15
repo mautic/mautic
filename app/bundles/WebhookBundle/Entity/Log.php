@@ -6,6 +6,10 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+#[ORM\Entity(repositoryClass: LogRepository::class)]
+#[ORM\Table(name: 'webhook_logs')]
+#[ORM\Index(columns: ['webhook_id', 'date_added'], name: 'webhook_id_date_added')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Log
 {
     /**
@@ -38,9 +42,7 @@ class Log
     public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('webhook_logs')
-            ->setCustomRepositoryClass(LogRepository::class)
-            ->addIndex(['webhook_id', 'date_added'], 'webhook_id_date_added')
+        $builder
             ->addId();
 
         $builder->createManyToOne('webhook', 'Webhook')
