@@ -330,7 +330,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                     $violations = $validator->validate(
                         $page->getRedirectUrl(),
                         [
-                            new Assert\Url(),
+                            new Assert\Url(requireTld: false),
                             new NotBlank(message: 'mautic.core.value.required'),
                         ],
                     );
