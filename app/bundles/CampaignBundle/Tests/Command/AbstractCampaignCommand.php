@@ -16,7 +16,9 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 abstract class AbstractCampaignCommand extends MauticMysqlTestCase
 {
     public const SEND_EMAIL_SECONDS = 3;

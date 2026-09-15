@@ -37,6 +37,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 #[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[\PHPUnit\Framework\Attributes\Group('non-parallel')]
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use LeadFieldTestTrait;
