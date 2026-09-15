@@ -49,6 +49,7 @@ trait SegmentFilterIconTrait
             'state'                  => 'ri-map-pin-2-line',
             'globalcategory'         => 'ri-folder-2-line',
             'tags'                   => 'ri-hashtag',
+            'tiktok'                 => 'ri-tiktok-line',
             'title'                  => 'ri-user-star-line',
             'twitter'                => 'ri-twitter-x-line',
             'utm_campaign'           => 'ri-bookmark-2-line',
@@ -61,6 +62,7 @@ trait SegmentFilterIconTrait
             'dnc_manual_email'       => 'ri-mail-forbid-line',
             'dnc_manual_sms'         => 'ri-chat-off-line',
             'website'                => 'ri-global-line',
+            'youtube'                => 'ri-youtube-line',
             'zipcode'                => 'ri-mail-send-line',
             'linkedin'               => 'ri-linkedin-box-line',
 
