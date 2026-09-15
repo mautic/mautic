@@ -90,6 +90,13 @@ final class ArrayType extends Type
         $value = is_resource($value) ? stream_get_contents($value) : $value;
 
         set_error_handler(static function (int $code, string $message): bool {
+            // DBAL let deprecations through to the normal handler. Turning one into a
+            // conversion failure would discard the whole stored array, and since PHP 8.2
+            // unserializing a property the class no longer declares raises E_DEPRECATED.
+            if (E_DEPRECATED === $code || E_USER_DEPRECATED === $code) {
+                return false;
+            }
+
             throw new ConversionException('Could not convert database value to PHP array: '.$message);
         });
 
