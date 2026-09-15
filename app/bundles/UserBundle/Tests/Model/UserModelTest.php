@@ -27,7 +27,6 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -49,7 +48,7 @@ final class UserModelTest extends TestCase
     private MockObject $entityManager;
 
     /**
-     * @var MockObject&Router
+     * @var MockObject&UrlGeneratorInterface
      */
     private MockObject $router;
 
@@ -94,7 +93,7 @@ final class UserModelTest extends TestCase
         $this->userTokenService = $this->createMock(UserTokenServiceInterface::class);
         $this->entityManager    = $this->createMock(EntityManager::class);
         $this->user             = $this->createMock(User::class);
-        $this->router           = $this->createMock(Router::class);
+        $this->router           = $this->createMock(UrlGeneratorInterface::class);
         $this->translator       = $this->createMock(Translator::class);
         $this->logger           = $this->createMock(LoggerInterface::class);
         $this->twig             = $this->createMock(Environment::class);
