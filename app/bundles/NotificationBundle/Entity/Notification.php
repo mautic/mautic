@@ -280,9 +280,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
                         $notification->getLists(),
                         [
                             new LeadListAccess(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
+                                message: 'mautic.lead.lists.required'
                             ),
                             new NotBlank(
                                 message: 'mautic.lead.lists.required'
