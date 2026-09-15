@@ -134,7 +134,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
 
                 /** @var ConstraintViolationList $violations */
-                $violations = $this->validator->validate($value, new $constraint($opts));
+                $violations = $this->validator->validate($value, new $constraint(...$opts));
 
                 if (count($violations)) {
                     /** @var ConstraintViolation $v */
