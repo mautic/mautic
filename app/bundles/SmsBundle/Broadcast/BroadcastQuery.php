@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\Broadcast;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
@@ -22,24 +23,51 @@ final class BroadcastQuery
     ) {
     }
 
-    public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter): array
+    public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter, ?int $batchLimit = null): array
     {
+        if (null !== $batchLimit && $batchLimit <= 0) {
+            return [];
+        }
+
         $query = $this->getBasicQuery($sms);
-        $query->select('DISTINCT l.id, ll.id as listId');
+        $query->select('l.id', 'MIN(ll.id) AS listId')
+            ->groupBy('l.id');
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
+
+        if (null !== $batchLimit) {
+            $query->setMaxResults($batchLimit);
+        }
 
         return $query->executeQuery()->fetchAllAssociative();
     }
 
     /**
-     * @return bool|string
+     * @param int[] $contactIds
      */
-    public function getPendingCount(Sms $sms)
+    public function getPendingContactsForContactIds(Sms $sms, array $contactIds): array
+    {
+        $contactIds = array_values(array_unique(array_map(intval(...), $contactIds)));
+        if ([] === $contactIds) {
+            return [];
+        }
+
+        return $this->getPendingContacts(
+            $sms,
+            new ContactLimiter(count($contactIds), contactIdList: $contactIds),
+        );
+    }
+
+    public function getPendingCount(Sms $sms, ?ContactLimiter $contactLimiter = null): int
     {
         $query = $this->getBasicQuery($sms);
-        $query->select('COUNT(DISTINCT l.id)');
+        $query->select('COUNT(DISTINCT l.id)')
+            ->resetQueryPart('orderBy');
 
-        return $query->executeQuery()->fetchOne();
+        if (null !== $contactLimiter) {
+            $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter, true);
+        }
+
+        return (int) $query->executeQuery()->fetchOne();
     }
 
     public function getBasicQuery(Sms $sms): QueryBuilder
@@ -47,25 +75,30 @@ final class BroadcastQuery
         $this->query = $this->smsRepository->getSegmentsContactsQuery($sms->getId());
         $this->query->andWhere(
             $this->query->expr()->or(
-                $this->query->expr()->or(
+                $this->query->expr()->and(
                     $this->query->expr()->isNotNull('l.mobile'),
                     $this->query->expr()->neq('l.mobile', $this->query->expr()->literal(''))
                 ),
-                $this->query->expr()->or(
+                $this->query->expr()->and(
                     $this->query->expr()->isNotNull('l.phone'),
                     $this->query->expr()->neq('l.phone', $this->query->expr()->literal(''))
                 )
             )
         );
-        $this->excludeStatsRecords($sms->getId());
+        $this->excludeStatsRecords($this->getTranslationIds($sms));
         $this->excludeDnc();
         $this->excludeQueue();
 
         return $this->query;
     }
 
-    private function excludeStatsRecords(int $smsId): void
+    /**
+     * @param array<int, int|string> $smsIds
+     */
+    private function excludeStatsRecords(array $smsIds): void
     {
+        $smsIds = array_values(array_unique(array_map(intval(...), $smsIds)));
+
         // Do not include leads that have already received text message
         $statQb = $this->entityManager->getConnection()->createQueryBuilder();
         $statQb->select('null')
@@ -73,11 +106,30 @@ final class BroadcastQuery
             ->where(
                 $statQb->expr()->and(
                     $statQb->expr()->eq('stat.lead_id', 'l.id'),
-                    $statQb->expr()->eq('stat.sms_id', $smsId)
+                    $statQb->expr()->in('stat.sms_id', ':relatedSmsIds')
                 )
             );
 
-        $this->query->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()));
+        $this->query
+            ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
+            ->setParameter('relatedSmsIds', $smsIds, ArrayParameterType::INTEGER);
+    }
+
+    /**
+     * @return int[]
+     */
+    private function getTranslationIds(Sms $sms): array
+    {
+        [$translationParent, $translationChildren] = $sms->getTranslations();
+        $smsIds                                     = [];
+
+        foreach (array_merge([$sms, $translationParent], $translationChildren) as $translation) {
+            if ($translation instanceof Sms && $translation->getId()) {
+                $smsIds[] = $translation->getId();
+            }
+        }
+
+        return array_values(array_unique($smsIds));
     }
 
     private function excludeDnc(): void
