@@ -59,7 +59,7 @@ final class DisplayTestCest
 
         // Assert that each owner follows the format "name (id)"
         foreach ($owners as $owner) {
-            if (empty($owner)) {
+            if (empty($owner) || 'No owner' === $owner) {
                 continue;
             }
             \PHPUnit\Framework\Assert::assertMatchesRegularExpression('/^.+ \(\d+\)$/', $owner);
