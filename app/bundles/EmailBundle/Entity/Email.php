@@ -12,7 +12,6 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
@@ -48,6 +47,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: EmailRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -376,10 +376,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
-            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
 
         $builder->addIdColumns();
         $builder->addNullableField('subject', Types::TEXT);
@@ -1175,6 +1171,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Lifecycle callback to clean URLs in the content.
      */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function cleanUrlsInContent(): void
     {
         if (is_string($this->plainText)) {

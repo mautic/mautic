@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: PageDraftRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PageDraft
 {
@@ -38,10 +38,6 @@ class PageDraft
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder
-            ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
-            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
-
         $builder->addId();
         $builder->addNullableField('html', Types::TEXT);
         $builder->addNullableField('template', Types::STRING);
@@ -60,6 +56,8 @@ class PageDraft
     /**
      * Lifecycle callback to clean URLs in the content.
      */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function cleanUrlsInContent(): void
     {
         $this->html = $this->decodeAmpersands((string) $this->html);

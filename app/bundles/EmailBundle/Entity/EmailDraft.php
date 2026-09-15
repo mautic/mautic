@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: EmailDraftRepository::class)]
 #[ORM\Table(name: 'emails_draft')]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class EmailDraft
 {
@@ -31,10 +31,6 @@ class EmailDraft
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder
-            ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
-            ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
-
         $builder->addId();
         $builder->addNullableField('html', Types::TEXT);
         $builder->addNullableField('template', Types::STRING);
@@ -53,6 +49,8 @@ class EmailDraft
     /**
      * Lifecycle callback to clean URLs in the content.
      */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function cleanUrlsInContent(): void
     {
         $this->decodeAmpersands($this->html);
