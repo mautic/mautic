@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MonitoringRepository::class)]
 #[ORM\Table(name: 'monitoring')]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -114,10 +115,6 @@ class Monitoring extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addLifecycleEvent('cleanMonitorData', 'preUpdate')
-            ->addLifecycleEvent('cleanMonitorData', 'prePersist');
 
         $builder->addCategory();
 
@@ -347,6 +344,8 @@ class Monitoring extends FormEntity implements UuidInterface
     /**
      * Clear out old properties data.
      */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function cleanMonitorData(): void
     {
         $property = $this->properties;

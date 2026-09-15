@@ -11,7 +11,6 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -40,6 +39,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 #[ORM\Table(name: 'dynamic_content')]
 #[ORM\Index(name: 'is_campaign_based_index', columns: ['is_campaign_based'])]
 #[ORM\Index(name: 'slot_name_index', columns: ['slot_name'])]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -167,10 +167,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addLifecycleEvent('cleanSlotName', Events::prePersist)
-            ->addLifecycleEvent('cleanSlotName', Events::preUpdate);
 
         $builder->addIdColumns();
 
@@ -497,6 +493,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * Lifecycle callback to clear the slot name if is_campaign is true.
      */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
     public function cleanSlotName(): void
     {
         if ($this->isCampaignBased) {
