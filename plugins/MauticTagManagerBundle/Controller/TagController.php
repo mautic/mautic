@@ -208,7 +208,7 @@ final class TagController extends FormController
         if (!$cancelled = $this->isFormCancelled($form)) {
             if ($valid = $this->isFormValid($form)) {
                 // form is valid so process the data
-                $existingTag = $this->tagRepository->findOneBy(['tag' => $tag->getTag()]);
+                $existingTag = $this->tagRepository->getTagByName($tag->getTag());
                 if (null !== $existingTag) {
                     $valid = false;
                     $this->addFlashMessage('mautic.tagmanager.tag.already.exists', [
