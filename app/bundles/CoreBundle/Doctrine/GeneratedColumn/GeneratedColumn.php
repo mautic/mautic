@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
+
 final class GeneratedColumn implements GeneratedColumnInterface
 {
     private readonly string $tablePrefix;
@@ -72,15 +75,17 @@ final class GeneratedColumn implements GeneratedColumnInterface
         return $this->timeUnit;
     }
 
-    public function getAlterTableSql(): string
+    public function getAlterTableSql(?AbstractPlatform $platform = null): string
     {
-        return "ALTER TABLE {$this->getTableName()} {$this->getAddColumnSql()};
+        return "ALTER TABLE {$this->getTableName()} {$this->getAddColumnSql($platform)};
             ALTER TABLE {$this->getTableName()} {$this->getAddIndexSql()}";
     }
 
-    public function getAddColumnSql(): string
+    public function getAddColumnSql(?AbstractPlatform $platform = null): string
     {
-        return "ADD {$this->columnName} {$this->getColumnDefinition()}";
+        $add = DatabasePlatform::getAddColumnKeyword($platform);
+
+        return "{$add} {$this->columnName} {$this->getColumnDefinition($platform)}";
     }
 
     public function getAddIndexSql(): string
@@ -88,11 +93,9 @@ final class GeneratedColumn implements GeneratedColumnInterface
         return "ADD INDEX `{$this->getIndexName()}`({$this->indexColumnsToString()})";
     }
 
-    public function getColumnDefinition(): string
+    public function getColumnDefinition(?AbstractPlatform $platform = null): string
     {
-        $stored = $this->stored ? ' STORED' : '';
-
-        return "{$this->columnType} AS ({$this->as}){$stored} COMMENT '(DC2Type:generated)'";
+        return DatabasePlatform::getGeneratedColumnDefinition($platform, $this->columnType, $this->as, $this->stored);
     }
 
     public function getIndexColumns(): array

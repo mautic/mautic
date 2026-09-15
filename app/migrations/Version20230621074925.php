@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\BigIntType;
+use Doctrine\DBAL\Types\Type;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
@@ -72,93 +72,139 @@ final class Version20230621074925 extends PreUpAssertionMigration
     {
         $this->initTableNames();
 
-        $this->addSql("CREATE TABLE `{$this->groupTableName}`
-(
-    `id`                  INT UNSIGNED AUTO_INCREMENT NOT NULL,
-    `is_published`        TINYINT(1)                  NOT NULL,
-    `date_added`          DATETIME     DEFAULT NULL,
-    `created_by`          INT          DEFAULT NULL,
-    `created_by_user`     VARCHAR(191) DEFAULT NULL,
-    `date_modified`       DATETIME     DEFAULT NULL,
-    `modified_by`         INT          DEFAULT NULL,
-    `modified_by_user`    VARCHAR(191) DEFAULT NULL,
-    `checked_out`         DATETIME     DEFAULT NULL,
-    `checked_out_by`      INT          DEFAULT NULL,
-    `checked_out_by_user` VARCHAR(191) DEFAULT NULL,
-    `name`                VARCHAR(191)                NOT NULL,
-    `description`         LONGTEXT     DEFAULT NULL,
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4
-  COLLATE `utf8mb4_unicode_ci`
-  ENGINE = InnoDB
-  ROW_FORMAT = DYNAMIC;");
+        // Create point_groups table if it does not exist
+        if (!$schema->hasTable($this->groupTableName)) {
+            $groupTable = $schema->createTable($this->groupTableName);
+            $groupTable->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
+            $groupTable->addColumn('is_published', 'boolean', ['notnull' => true]);
+            $groupTable->addColumn('date_added', 'datetime', ['notnull' => false]);
+            $groupTable->addColumn('created_by', 'integer', ['notnull' => false]);
+            $groupTable->addColumn('created_by_user', 'string', ['length' => 191, 'notnull' => false]);
+            $groupTable->addColumn('date_modified', 'datetime', ['notnull' => false]);
+            $groupTable->addColumn('modified_by', 'integer', ['notnull' => false]);
+            $groupTable->addColumn('modified_by_user', 'string', ['length' => 191, 'notnull' => false]);
+            $groupTable->addColumn('checked_out', 'datetime', ['notnull' => false]);
+            $groupTable->addColumn('checked_out_by', 'integer', ['notnull' => false]);
+            $groupTable->addColumn('checked_out_by_user', 'string', ['length' => 191, 'notnull' => false]);
+            $groupTable->addColumn('name', 'string', ['length' => 191, 'notnull' => true]);
+            $groupTable->addColumn('description', 'text', ['notnull' => false]);
+            $groupTable->setPrimaryKey(['id']);
+        }
 
-        $this->addSql("CREATE TABLE `{$this->contactScoreTableName}`
-(
-    `contact_id`          {$this->getContactIdColumnType($schema)} NOT NULL,
-    `group_id`           INT UNSIGNED    NOT NULL,
-    `score`               INT             NOT NULL,
-    PRIMARY KEY (`contact_id`, `group_id`)
-) DEFAULT CHARACTER SET utf8mb4
-  COLLATE `utf8mb4_unicode_ci`
-  ENGINE = InnoDB
-  ROW_FORMAT = DYNAMIC;");
+        // Create point_group_contact_scores table if it does not exist
+        if (!$schema->hasTable($this->contactScoreTableName)) {
+            $contactScoreTable = $schema->createTable($this->contactScoreTableName);
 
-        $this->addSql("ALTER TABLE `{$this->pointsTableName}` ADD group_id INT UNSIGNED DEFAULT NULL");
-        $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` ADD group_id INT UNSIGNED DEFAULT NULL");
-        $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` ADD group_id INT UNSIGNED DEFAULT NULL");
+            $contactTable = $schema->getTable($this->contactTableName);
+            $idColumn     = $contactTable->getColumn('id');
+            $typeName     = Type::getTypeRegistry()->lookupName($idColumn->getType());
 
-        $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` ADD CONSTRAINT `{$this->contactScoreContactFk}` FOREIGN KEY (`contact_id`) REFERENCES `{$this->contactTableName}` (`id`) ON DELETE CASCADE");
-        $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` ADD CONSTRAINT `{$this->contactScoreGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$this->groupTableName}` (`id`) ON DELETE CASCADE");
+            $contactScoreTable->addColumn('contact_id', $typeName, [
+                'unsigned' => $idColumn->getUnsigned(),
+                'notnull'  => true,
+            ]);
+            $contactScoreTable->addColumn('group_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+            $contactScoreTable->addColumn('score', 'integer', ['notnull' => true]);
 
-        $this->addSql("ALTER TABLE `{$this->pointsTableName}` ADD CONSTRAINT `{$this->pointsGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$this->groupTableName}` (`id`) ON DELETE CASCADE");
-        $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` ADD CONSTRAINT `{$this->pointTriggersGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$this->groupTableName}` (`id`) ON DELETE CASCADE");
-        $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` ADD CONSTRAINT `{$this->leadPointsChangeLogGroupFk}` FOREIGN KEY (`group_id`) REFERENCES `{$this->groupTableName}` (`id`) ON DELETE CASCADE");
+            $contactScoreTable->setPrimaryKey(['contact_id', 'group_id']);
+        }
+
+        // Add foreign keys to point_group_contact_scores (idempotent, named)
+        $contactScoreTable = $schema->getTable($this->contactScoreTableName);
+        $groupTable        = $schema->getTable($this->groupTableName);
+        $contactTable      = $schema->getTable($this->contactTableName);
+
+        if (!$contactScoreTable->hasForeignKey($this->contactScoreContactFk)) {
+            $contactScoreTable->addForeignKeyConstraint(
+                $contactTable,
+                ['contact_id'],
+                ['id'],
+                ['onDelete' => 'CASCADE'],
+                $this->contactScoreContactFk
+            );
+        }
+
+        if (!$contactScoreTable->hasForeignKey($this->contactScoreGroupFk)) {
+            $contactScoreTable->addForeignKeyConstraint(
+                $groupTable,
+                ['group_id'],
+                ['id'],
+                ['onDelete' => 'CASCADE'],
+                $this->contactScoreGroupFk
+            );
+        }
+
+        // Add group_id column + named FK to points, point_triggers and lead_points_change_log (idempotent)
+        $tables = [
+            $this->pointsTableName              => $this->pointsGroupFk,
+            $this->pointTriggersTableName       => $this->pointTriggersGroupFk,
+            $this->leadPointsChangeLogTableName => $this->leadPointsChangeLogGroupFk,
+        ];
+
+        foreach ($tables as $tableName => $fkName) {
+            $table = $schema->getTable($tableName);
+
+            if (!$table->hasColumn('group_id')) {
+                $table->addColumn('group_id', 'integer', ['unsigned' => true, 'notnull' => false]);
+            }
+
+            if (!$table->hasForeignKey($fkName)) {
+                $table->addForeignKeyConstraint(
+                    $groupTable,
+                    ['group_id'],
+                    ['id'],
+                    ['onDelete' => 'CASCADE'],
+                    $fkName
+                );
+            }
+        }
     }
 
     public function down(Schema $schema): void
     {
         $this->initTableNames();
 
+        // Remove FKs from point_group_contact_scores if they exist
         if ($schema->hasTable($this->contactScoreTableName)) {
             $contactScoreTable = $schema->getTable($this->contactScoreTableName);
+
             if ($contactScoreTable->hasForeignKey($this->contactScoreContactFk)) {
-                $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreContactFk}`");
+                $contactScoreTable->removeForeignKey($this->contactScoreContactFk);
             }
+
             if ($contactScoreTable->hasForeignKey($this->contactScoreGroupFk)) {
-                $this->addSql("ALTER TABLE `{$this->contactScoreTableName}` DROP FOREIGN KEY `{$this->contactScoreGroupFk}`");
+                $contactScoreTable->removeForeignKey($this->contactScoreGroupFk);
             }
         }
 
-        $pointsTable              = $schema->getTable($this->pointsTableName);
-        $pointTriggersTable       = $schema->getTable($this->pointTriggersTableName);
-        $leadPointsChangeLogTable = $schema->getTable($this->leadPointsChangeLogTableName);
+        // Remove FK and column from points, point_triggers and lead_points_change_log
+        $tables = [
+            $this->pointsTableName              => $this->pointsGroupFk,
+            $this->pointTriggersTableName       => $this->pointTriggersGroupFk,
+            $this->leadPointsChangeLogTableName => $this->leadPointsChangeLogGroupFk,
+        ];
 
-        if ($pointsTable->hasForeignKey($this->pointsGroupFk)) {
-            $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP FOREIGN KEY `{$this->pointsGroupFk}`");
-        }
-        if ($pointTriggersTable->hasForeignKey($this->pointTriggersGroupFk)) {
-            $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP FOREIGN KEY `{$this->pointTriggersGroupFk}`");
-        }
-        if ($leadPointsChangeLogTable->hasForeignKey($this->leadPointsChangeLogGroupFk)) {
-            $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP FOREIGN KEY `{$this->leadPointsChangeLogGroupFk}`");
-        }
+        foreach ($tables as $tableName => $fkName) {
+            if ($schema->hasTable($tableName)) {
+                $table = $schema->getTable($tableName);
 
-        if ($pointsTable->hasColumn('group_id')) {
-            $this->addSql("ALTER TABLE `{$this->pointsTableName}` DROP group_id");
-        }
-        if ($pointTriggersTable->hasColumn('group_id')) {
-            $this->addSql("ALTER TABLE `{$this->pointTriggersTableName}` DROP group_id");
-        }
-        if ($leadPointsChangeLogTable->hasColumn('group_id')) {
-            $this->addSql("ALTER TABLE `{$this->leadPointsChangeLogTableName}` DROP group_id");
+                if ($table->hasForeignKey($fkName)) {
+                    $table->removeForeignKey($fkName);
+                }
+
+                if ($table->hasColumn('group_id')) {
+                    $table->dropColumn('group_id');
+                }
+            }
         }
 
+        // Drop tables if they exist (contact scores first due to FK)
         if ($schema->hasTable($this->contactScoreTableName)) {
-            $this->addSql("DROP TABLE {$this->contactScoreTableName}");
+            $schema->dropTable($this->contactScoreTableName);
         }
+
         if ($schema->hasTable($this->groupTableName)) {
-            $this->addSql("DROP TABLE {$this->groupTableName}");
+            $schema->dropTable($this->groupTableName);
         }
     }
 
@@ -170,7 +216,7 @@ final class Version20230621074925 extends PreUpAssertionMigration
     private function assertTableDoesNotExist(string $tableName): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->hasTable("{$tableName}"),
+            fn (Schema $schema) => $schema->hasTable($tableName),
             "Table {$tableName} already exists"
         );
     }
@@ -178,7 +224,7 @@ final class Version20230621074925 extends PreUpAssertionMigration
     private function assertColumnDoesNotExist(string $tableName, string $columnName): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable("{$tableName}")->hasColumn($columnName),
+            fn (Schema $schema) => $schema->getTable($tableName)->hasColumn($columnName),
             "Column {$tableName}.{$columnName} already exists"
         );
     }
@@ -186,16 +232,8 @@ final class Version20230621074925 extends PreUpAssertionMigration
     private function assertForeignKeyDoesNotExist(string $tableName, string $fkName): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable("{$tableName}")->hasForeignKey($fkName),
+            fn (Schema $schema) => $schema->getTable($tableName)->hasForeignKey($fkName),
             "Foreign key {$fkName} already exists in {$tableName} table"
         );
-    }
-
-    private function getContactIdColumnType(Schema $schema): string
-    {
-        $contactTable    = $schema->getTable($this->contactTableName);
-        $contactIdColumn = $contactTable->getColumn('id');
-
-        return $contactIdColumn->getType() instanceof BigIntType ? 'BIGINT UNSIGNED' : 'INT';
     }
 }

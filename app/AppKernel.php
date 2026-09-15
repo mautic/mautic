@@ -221,8 +221,12 @@ class AppKernel extends Kernel
         $parameterLoader->loadIntoEnvironment();
         if (!defined('MAUTIC_TABLE_PREFIX')) {
             // Set the table prefix before boot.
+            $prefix = '';
+
             // Firstly look into environment variables.
-            $prefix = $_SERVER['MAUTIC_TABLE_PREFIX'];
+            if (isset($_SERVER['MAUTIC_TABLE_PREFIX'])) {
+                $prefix = $_SERVER['MAUTIC_TABLE_PREFIX'];
+            }
             // Secondly look into the local.php file.
             if (empty($prefix)) {
                 $prefix = $parameterLoader->getLocalParameterBag()->get('db_table_prefix', '');

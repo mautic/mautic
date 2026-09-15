@@ -272,7 +272,7 @@ final class MessageController extends AbstractStandardFormController
                     'from_alias' => 'entity',
                     'table'      => 'campaign_events',
                     'alias'      => 'event',
-                    'condition'  => "entity.event_id = event.id and event.channel = 'channel.message' and event.channel_id = ".(int) $objectId,
+                    'condition'  => "entity.event_id = event.id and event.channel = 'channel.message' and event.channel_id = '".(int) $objectId."'",
                 ],
             ],
             null,

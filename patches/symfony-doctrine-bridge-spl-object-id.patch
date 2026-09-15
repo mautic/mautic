@@ -1,0 +1,13 @@
+diff --git a/vendor/symfony/doctrine-bridge/ContainerAwareEventManager.php b/vendor/symfony/doctrine-bridge/ContainerAwareEventManager.php
+index 42cd254991..c86e6a3ab9 100644
+--- a/vendor/symfony/doctrine-bridge/ContainerAwareEventManager.php
++++ b/vendor/symfony/doctrine-bridge/ContainerAwareEventManager.php
+@@ -203,7 +203,7 @@ class ContainerAwareEventManager extends EventManager
+             return '_service_'.$listener;
+         }
+
+-        return spl_object_hash($listener);
++        return spl_object_id($listener);
+     }
+
+     private function getMethod(object $listener, string $event): string

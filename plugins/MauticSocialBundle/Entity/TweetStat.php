@@ -74,8 +74,8 @@ class TweetStat
             ->addIndex(['lead_id', 'tweet_id'], 'stat_tweet_search2')
             ->addIndex(['is_failed'], 'stat_tweet_failed_search')
             ->addIndex(['source', 'source_id'], 'stat_tweet_source_search')
-            ->addIndex(['favorite_count'], 'favorite_count_index')
-            ->addIndex(['retweet_count'], 'retweet_count_index')
+            ->addIndex(['favorite_count'], 'stat_favorite_count_index')
+            ->addIndex(['retweet_count'], 'stat_retweet_count_index')
             ->addIndex(['date_sent'], 'tweet_date_sent')
             ->addIndex(['twitter_tweet_id'], 'twitter_tweet_id_index');
 

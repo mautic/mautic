@@ -98,7 +98,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame($expectedResponseCode);
 
         if ($expectedErrorMessage) {
-            $this->assertStringContainsString($expectedErrorMessage, (string) json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'], $this->client->getResponse()->getContent());
+            $this->assertStringContainsStringIgnoringCase($expectedErrorMessage, (string) json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'], $this->client->getResponse()->getContent());
         }
     }
 
@@ -827,20 +827,22 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $segment = $this->createSegment($filters);
 
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
         $contactA = new Lead();
-        $contactA->setDateModified(new \DateTime('-1 hour'));
+        $contactA->setDateModified(\DateTime::createFromImmutable($now->modify('-1 hour')));
 
         $contactB = new Lead();
-        $contactB->setDateModified((new \DateTime())->modify('+1 day'));
+        $contactB->setDateModified(\DateTime::createFromImmutable($now->modify('+1 day')));
 
         $contactC = new Lead();
-        $contactC->setDateModified((new \DateTime())->modify('-1 day'));
+        $contactC->setDateModified(\DateTime::createFromImmutable($now->modify('-1 day')));
 
         $contactD = new Lead();
-        $contactD->setDateModified((new \DateTime())->modify('-2 day'));
+        $contactD->setDateModified(\DateTime::createFromImmutable($now->modify('-2 day')));
 
         $contactE = new Lead();
-        $contactE->setDateModified((new \DateTime())->modify('+2 day'));
+        $contactE->setDateModified(\DateTime::createFromImmutable($now->modify('+2 day')));
 
         $this->em->persist($contactA);
         $this->em->persist($contactB);

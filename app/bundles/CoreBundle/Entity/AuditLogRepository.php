@@ -214,7 +214,7 @@ class AuditLogRepository extends CommonRepository
                     $sqb->expr()->eq('l.action', $sqb->expr()->literal('ipadded'))
                 )
             )
-            ->groupBy('l.ip_address');
+            ->groupBy('l.ip_address', 'l.object_id');
 
         if ($lead instanceof Lead) {
             $dateTimeFormat = 'Y-m-d H:i:s';

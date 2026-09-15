@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\DTO\TokenLabelFormat;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -65,7 +66,7 @@ final class BuilderTokenHelper
     public function getTokens(
         $tokenRegex,
         $filter = '',
-        $labelColumn = 'name',
+        string $labelColumn = 'name',
         $valueColumn = 'id',
         ?CompositeExpression $expr = null,
     ): ?array {
@@ -98,7 +99,13 @@ final class BuilderTokenHelper
         }
 
         if (!empty($filter)) {
-            $filterExpr = $exprBuilder->like('LOWER('.$labelColumn.')', ':label');
+            $filterExpr = DatabasePlatform::getCaseInsensitiveLike(
+                $this->connection->getDatabasePlatform(),
+                $labelColumn,
+                ':label',
+                DatabasePlatform::FLAG_ENSURE_CAST | DatabasePlatform::FLAG_LOWER_COLUMN
+            );
+
             $expr       = $expr instanceof CompositeExpression ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
 
             $parameters = [

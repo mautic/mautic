@@ -10,27 +10,6 @@ use Mautic\LeadBundle\Entity\ListLead;
 
 final class Version20231205094436 extends PreUpAssertionMigration
 {
-    protected function preUpAssertions(): void
-    {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getTableName())->hasIndex($this->getIndexName());
-        }, sprintf('Index %s already exists', $this->getIndexName()));
-    }
-
-    public function up(Schema $schema): void
-    {
-        $this->addSql(sprintf(
-            'ALTER TABLE %s ADD INDEX %s (lead_id, leadlist_id, manually_removed)',
-            $this->getTableName(),
-            $this->getIndexName()
-        ));
-    }
-
-    public function down(Schema $schema): void
-    {
-        $this->addSql('ALTER TABLE '.$this->getTableName().' DROP INDEX '.$this->getIndexName());
-    }
-
     private function getTableName(): string
     {
         return $this->prefix.ListLead::TABLE_NAME;
@@ -39,5 +18,41 @@ final class Version20231205094436 extends PreUpAssertionMigration
     private function getIndexName(): string
     {
         return "{$this->prefix}lead_id_lists_id_removed";
+    }
+
+    protected function preUpAssertions(): void
+    {
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+
+        $this->skipAssertion(
+            fn (Schema $schema) => $this->indexExists($tableName, $indexName),
+            sprintf('Index %s already exists', $indexName)
+        );
+    }
+
+    public function up(Schema $schema): void
+    {
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+        $table     = $schema->getTable($tableName);
+
+        if (!$this->indexExists($tableName, $indexName)) {
+            $table->addIndex(
+                ['lead_id', 'leadlist_id', 'manually_removed'],
+                $this->getIndexName()
+            );
+        }
+    }
+
+    public function down(Schema $schema): void
+    {
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+        $table     = $schema->getTable($tableName);
+
+        if ($this->indexExists($tableName, $indexName)) {
+            $table->dropIndex($this->getIndexName());
+        }
     }
 }

@@ -333,7 +333,9 @@ class UserRepository extends CommonRepository
     {
         return $this->createQueryBuilder('u')
             ->join('u.role', 'r')
-            ->where('r.isAdmin = 1')
+            ->where('r.isAdmin = :true')
+            ->setParameter('true', true, 'boolean')
+            ->orderBy('u.id', 'ASC') // Fix non-deterministic ordering
             ->getQuery()
             ->getResult();
     }

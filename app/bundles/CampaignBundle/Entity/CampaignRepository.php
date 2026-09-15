@@ -10,6 +10,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -173,7 +174,7 @@ class CampaignRepository extends CommonRepository
         if ($id) {
             $q->select('cl.leadlist_id')
                 ->where(
-                    $q->expr()->eq('cl.campaign_id', $id)
+                    $q->expr()->eq('cl.campaign_id', (int) $id)
                 );
         } else {
             // Retrieve a list of unique IDs that are assigned to a campaign
@@ -200,7 +201,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 'l.id = cl.leadlist_id');
         $q->where(
-            $q->expr()->eq('cl.campaign_id', $id)
+            $q->expr()->eq('cl.campaign_id', (int) $id)
         );
 
         $lists   = [];
@@ -483,9 +484,9 @@ class CampaignRepository extends CommonRepository
         }
 
         if ($dateFrom && $dateTo) {
-            $q->andWhere('cl.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+            $q->andWhere('cl.date_added BETWEEN :dateFrom AND :dateTo')
+                ->setParameter('dateFrom', $dateFrom, Types::DATETIME_MUTABLE)
+                ->setParameter('dateTo', $dateTo, Types::DATETIME_MUTABLE);
         }
 
         if (count($pendingEvents) > 0) {
@@ -500,9 +501,9 @@ class CampaignRepository extends CommonRepository
                 );
 
             if ($dateFrom && $dateTo) {
-                $sq->andWhere('cl.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                    ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                    ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+                $sq->andWhere('cl.date_triggered BETWEEN :dateFrom AND :dateTo')
+                    ->setParameter('dateFrom', $dateFrom, Types::DATETIME_MUTABLE)
+                    ->setParameter('dateTo', $dateTo, Types::DATETIME_MUTABLE);
             }
 
             $q->andWhere(
@@ -611,17 +612,19 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignsSegmentShare(int $segmentId, array $campaignIds = []): array
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('c.id, c.name, ROUND(IFNULL(COUNT(DISTINCT t.lead_id)/COUNT(DISTINCT cl.lead_id)*100, 0),1) segmentCampaignShare');
-        $q->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
-            ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = 0')
+        $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+        $q          = $connection->createQueryBuilder();
+        $q->select('c.id, c.name, ROUND(COALESCE(COUNT(DISTINCT t.lead_id) * 100.0 / NULLIF(COUNT(DISTINCT cl.lead_id), 0), 0), 1) AS '.DatabasePlatform::quoteColumn($platform, 'segmentCampaignShare'))
+            ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
+            ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = FALSE')
             ->leftJoin('cl',
-                '(SELECT lll.lead_id AS ll, lll.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads lll WHERE lll.leadlist_id = '.$segmentId
-                .' AND lll.manually_removed = 0)',
+                '(SELECT lll.lead_id AS ll, lll.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads lll WHERE lll.leadlist_id = :segmentId AND lll.manually_removed = FALSE)',
                 't',
                 't.lead_id = cl.lead_id'
-            );
-        $q->groupBy('c.id');
+            )
+        ->setParameter('segmentId', $segmentId)
+        ->groupBy('c.id');
 
         if ([] !== $campaignIds) {
             $q->where($q->expr()->in('c.id', ':campaignIds'));
@@ -708,7 +711,17 @@ class CampaignRepository extends CommonRepository
     public function findStuckEventsToExecute(int $campaignId, int $limit = 100, ?int $minLeadId = 0,
         ?int $maxLeadId = 0, ?string $recordsAfter = null): array
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+        $query      = $connection->createQueryBuilder();
+
+        // Make sure we use platform dependent date construct
+        $dateConstructExpr = DatabasePlatform::getDateConstructExpression(
+            $platform,
+            'log.date_triggered',
+            'i',
+            true);
+
         $query->select(
             'log.lead_id AS contact_id',
             'ce.id AS next_event_id',
@@ -717,7 +730,7 @@ class CampaignRepository extends CommonRepository
             'ce.event_type AS next_event_event_type',
             'ce.event_order AS event_order',
             'parent.id AS parent_event_id',
-            'DATE_FORMAT(log.date_triggered, \'%Y-%m-%d %H:%i\') AS last_executed_date'
+            $dateConstructExpr.' AS last_executed_date'
         )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'clr')
             // Ensure the contact is still active in the campaign and get the latest rotation

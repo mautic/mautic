@@ -578,7 +578,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
                         $lead->getId(),
                         $field,
                         $fieldValue,
-                        $operators[$operator]['expr']
+                        $operators[$operator]['expr'],
+                        $fieldType
                     );
 
                     $log = $event->getLogEntry();
@@ -626,14 +627,14 @@ final class CampaignSubscriber implements EventSubscriberInterface
             ];
 
             if ($startDate) {
-                if (!is_a($startDate, 'DateTime')) {
+                if (!$startDate instanceof \DateTime) {
                     $startDate = new \DateTime($startDate);
                 }
                 $filter['dateFrom'] = $startDate;
             }
 
             if ($endDate) {
-                if (!is_a($endDate, 'DateTime')) {
+                if (!$endDate instanceof \DateTime) {
                     $endDate = new \DateTime($endDate);
                 }
                 $filter['dateTo'] = $endDate->modify('+1 minutes');
