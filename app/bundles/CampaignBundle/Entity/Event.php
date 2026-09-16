@@ -891,7 +891,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->tempId;
     }
 
-    public function setTempId(string $tempId): void
+    public function setTempId(?string $tempId): void
     {
         $this->isChanged('tempId', $tempId);
         $this->tempId = $tempId;
