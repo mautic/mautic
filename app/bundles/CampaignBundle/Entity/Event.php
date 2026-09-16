@@ -821,7 +821,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->triggerIntervalUnit;
     }
 
-    public function setTriggerIntervalUnit(string $triggerIntervalUnit): void
+    public function setTriggerIntervalUnit(string|null $triggerIntervalUnit): void
     {
         $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
         $this->triggerIntervalUnit = $triggerIntervalUnit;
