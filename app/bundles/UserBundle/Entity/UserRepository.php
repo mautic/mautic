@@ -48,10 +48,8 @@ class UserRepository extends CommonRepository
      * Checks to ensure that a username and/or email is unique.
      *
      * @param array<string, mixed> $params
-     *
-     * @return array
      */
-    public function checkUniqueUsernameEmail(array $params): mixed
+    public function checkUniqueUsernameEmail(array $params): array
     {
         $q = $this->createQueryBuilder('u');
 

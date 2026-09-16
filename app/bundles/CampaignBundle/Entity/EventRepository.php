@@ -50,10 +50,8 @@ class EventRepository extends CommonRepository
     /**
      * @param int    $contactId
      * @param string $type
-     *
-     * @return array
      */
-    public function getContactPendingEvents($contactId, $type): mixed
+    public function getContactPendingEvents($contactId, $type): array
     {
         // Limit to events that hasn't been executed or scheduled yet
         $eventQb = $this->getEntityManager()->createQueryBuilder();

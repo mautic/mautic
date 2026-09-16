@@ -22,11 +22,14 @@ class Event
     /**
      * @var Webhook
      */
+    #[ORM\ManyToOne(targetEntity: Webhook::class, cascade: ['detach'], inversedBy: 'events')]
+    #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private $webhook;
 
     /**
      * @var ArrayCollection<int, WebhookQueue>
      */
+    #[ORM\OneToMany(targetEntity: WebhookQueue::class, mappedBy: 'event', cascade: ['detach'], fetch: 'EXTRA_LAZY')]
     private $queues;
 
     /**
@@ -44,18 +47,6 @@ class Event
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createManyToOne('webhook', 'Webhook')
-            ->inversedBy('events')
-            ->cascadeDetach()
-            ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->createOneToMany('queues', 'WebhookQueue')
-            ->mappedBy('event')
-            ->cascadeDetach()
-            ->fetchExtraLazy()
-            ->build();
 
         $builder->createField('eventType', 'string')
             ->columnName('event_type')

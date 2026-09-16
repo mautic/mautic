@@ -87,11 +87,14 @@ class TriggerEvent implements UuidInterface
      * @var Trigger
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\ManyToOne(targetEntity: Trigger::class, inversedBy: 'events')]
+    #[ORM\JoinColumn(name: 'trigger_id', nullable: false, onDelete: 'CASCADE')]
     private $trigger;
 
     /**
      * @var ArrayCollection<int,LeadTriggerLog>
      */
+    #[ORM\OneToMany(targetEntity: LeadTriggerLog::class, mappedBy: 'event', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**
@@ -124,18 +127,6 @@ class TriggerEvent implements UuidInterface
             ->build();
 
         $builder->addField('properties', 'array');
-
-        $builder->createManyToOne('trigger', 'Trigger')
-            ->inversedBy('events')
-            ->addJoinColumn('trigger_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->createOneToMany('log', 'LeadTriggerLog')
-            ->mappedBy('event')
-            ->cascadePersist()
-            ->cascadeRemove()
-            ->fetchExtraLazy()
-            ->build();
 
         static::addUuidField($builder);
     }

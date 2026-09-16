@@ -64,10 +64,8 @@ class TrackableRepository extends CommonRepository
 
     /**
      * Get an array of Trackable entities by Redirect URLs.
-     *
-     * @return array
      */
-    public function findByUrls(array $urls, $channel, $channelId): mixed
+    public function findByUrls(array $urls, $channel, $channelId): array
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($alias)

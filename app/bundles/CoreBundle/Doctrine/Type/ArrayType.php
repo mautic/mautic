@@ -27,7 +27,7 @@ final class ArrayType extends Type
         return $platform->getClobTypeDeclarationSQL($column);
     }
 
-    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): string
     {
         if (!is_array($value)) {
             return (null === $value) ? 'N;' : 'a:0:{}';
@@ -44,7 +44,9 @@ final class ArrayType extends Type
     }
 
     /**
-     * @return array<mixed>
+     * Returns the unserialized array, or whatever unserialize() produced when the stored
+     * value was not an array - null for a NULL column, false for unreadable data - which
+     * is what DBAL's own ArrayType did.
      */
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {

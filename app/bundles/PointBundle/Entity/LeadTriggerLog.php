@@ -18,6 +18,9 @@ class LeadTriggerLog
     /**
      * @var TriggerEvent
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: TriggerEvent::class, inversedBy: 'log')]
+    #[ORM\JoinColumn(name: 'event_id', nullable: false, onDelete: 'CASCADE')]
     private $event;
 
     /**
@@ -38,12 +41,6 @@ class LeadTriggerLog
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createManyToOne('event', 'TriggerEvent')
-            ->isPrimaryKey()
-            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
-            ->inversedBy('log')
-            ->build();
 
         $builder->addLead(false, 'CASCADE', true);
 

@@ -38,6 +38,7 @@ class Redirect extends FormEntity
     /**
      * @var ArrayCollection<int, Trackable>
      */
+    #[ORM\OneToMany(targetEntity: Trackable::class, mappedBy: 'redirect', fetch: 'EXTRA_LAZY')]
     private $trackables;
 
     public function __construct()
@@ -62,11 +63,6 @@ class Redirect extends FormEntity
 
         $builder->createField('uniqueHits', 'integer')
             ->columnName('unique_hits')
-            ->build();
-
-        $builder->createOneToMany('trackables', 'Trackable')
-            ->mappedBy('redirect')
-            ->fetchExtraLazy()
             ->build();
     }
 

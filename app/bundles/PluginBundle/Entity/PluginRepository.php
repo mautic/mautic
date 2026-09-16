@@ -18,7 +18,7 @@ final class PluginRepository extends CommonRepository
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findByBundle($bundle): mixed
+    public function findByBundle($bundle): ?Plugin
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where($q->expr()->eq('p.bundle', ':bundle'))

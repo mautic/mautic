@@ -23,7 +23,7 @@ class SchedulerRepository extends CommonRepository
     /**
      * @return array|Scheduler[]
      */
-    public function getScheduledReportsForExport(ExportOption $exportOption): mixed
+    public function getScheduledReportsForExport(ExportOption $exportOption): array
     {
         $qb = $this->createQueryBuilder('scheduler');
         $qb->addSelect('report')

@@ -126,6 +126,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var ArrayCollection<Stat>
      */
     #[Groups(['dynamicContent:read'])]
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'dynamicContent', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
@@ -195,13 +196,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $builder->createField('utmTags', Types::JSON)
             ->columnName('utm_tags')
             ->nullable()
-            ->build();
-
-        $builder->createOneToMany('stats', 'Stat')
-            ->setIndexBy('id')
-            ->mappedBy('dynamicContent')
-            ->cascadePersist()
-            ->fetchExtraLazy()
             ->build();
 
         self::addTranslationMetadata($builder, self::class);

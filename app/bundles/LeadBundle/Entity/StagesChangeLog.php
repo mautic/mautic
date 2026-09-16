@@ -27,6 +27,8 @@ class StagesChangeLog
     /**
      * @var Stage|null
      */
+    #[ORM\ManyToOne(targetEntity: Stage::class)]
+    #[ORM\JoinColumn(name: 'stage_id', onDelete: 'CASCADE')]
     private $stage;
 
     /**
@@ -58,10 +60,6 @@ class StagesChangeLog
 
         $builder->createField('actionName', 'string')
             ->columnName('action_name')
-            ->build();
-
-        $builder->createManyToOne('stage', Stage::class)
-            ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->addDateAdded();

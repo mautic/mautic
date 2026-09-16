@@ -199,6 +199,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $sessionId;
 
+    #[ORM\OneToOne(targetEntity: PageDraft::class, mappedBy: 'page', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private ?PageDraft $draft = null;
 
     private bool $isCloned = false;
@@ -303,12 +304,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder->createField('noIndex', 'boolean')
             ->columnName('no_index')
             ->nullable()
-            ->build();
-
-        $builder->createOneToOne('draft', PageDraft::class)
-            ->mappedBy('page')
-            ->fetchExtraLazy()
-            ->cascadeAll()
             ->build();
 
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');

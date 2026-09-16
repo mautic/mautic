@@ -56,6 +56,8 @@ class Download
      * @var Asset|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\ManyToOne(targetEntity: Asset::class)]
+    #[ORM\JoinColumn(name: 'asset_id', onDelete: 'CASCADE')]
     private $asset;
 
     /**
@@ -98,6 +100,8 @@ class Download
     private $sourceId;
 
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\ManyToOne(targetEntity: Email::class)]
+    #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private ?Email $email = null;
 
     private ?string $utmCampaign = null;
@@ -118,10 +122,6 @@ class Download
 
         $builder->createField('dateDownload', 'datetime')
             ->columnName('date_download')
-            ->build();
-
-        $builder->createManyToOne('asset', 'Asset')
-            ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->addIpAddress(true);
@@ -145,10 +145,6 @@ class Download
         $builder->createField('sourceId', 'integer')
             ->columnName('source_id')
             ->nullable()
-            ->build();
-
-        $builder->createManyToOne('email', Email::class)
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->createField('utmCampaign', Types::STRING)

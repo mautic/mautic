@@ -18,6 +18,9 @@ class LeadStageLog
     /**
      * @var Stage
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Stage::class, inversedBy: 'log')]
+    #[ORM\JoinColumn(name: 'stage_id', onDelete: 'CASCADE')]
     private $stage;
 
     /**
@@ -38,12 +41,6 @@ class LeadStageLog
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createManyToOne('stage', 'Stage')
-            ->isPrimaryKey()
-            ->addJoinColumn('stage_id', 'id', true, false, 'CASCADE')
-            ->inversedBy('log')
-            ->build();
 
         $builder->addLead(false, 'CASCADE', true);
 

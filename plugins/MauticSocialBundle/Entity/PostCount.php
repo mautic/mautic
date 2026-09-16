@@ -20,6 +20,8 @@ class PostCount
     /**
      * @var Monitoring|null
      */
+    #[ORM\ManyToOne(targetEntity: Monitoring::class)]
+    #[ORM\JoinColumn(name: 'monitor_id', onDelete: 'CASCADE')]
     private $monitor;
 
     /**
@@ -37,10 +39,6 @@ class PostCount
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createManyToOne('monitor', 'Monitoring')
-            ->addJoinColumn('monitor_id', 'id', true, false, 'CASCADE')
-            ->build();
 
         $builder->addNamedField('postDate', 'date', 'post_date');
 

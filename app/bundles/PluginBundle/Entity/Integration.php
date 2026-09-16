@@ -22,6 +22,8 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     /**
      * @var Plugin|null
      */
+    #[ORM\ManyToOne(targetEntity: Plugin::class, inversedBy: 'integrations')]
+    #[ORM\JoinColumn(name: 'plugin_id', onDelete: 'CASCADE')]
     private $plugin;
 
     /**
@@ -56,11 +58,6 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         $builder->createField('id', 'integer')
             ->makePrimaryKey()
             ->generatedValue()
-            ->build();
-
-        $builder->createManyToOne('plugin', 'Plugin')
-            ->inversedBy('integrations')
-            ->addJoinColumn('plugin_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->addField('name', 'string');

@@ -135,12 +135,16 @@ class Form extends FormEntity implements UuidInterface
      * @var ArrayCollection<int, Field>
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\OneToMany(targetEntity: Field::class, mappedBy: 'form', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OrderBy(['order' => 'ASC', 'id' => 'ASC'])]
     private $fields;
 
     /**
      * @var ArrayCollection<string, Action>
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\OneToMany(targetEntity: Action::class, mappedBy: 'form', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OrderBy(['order' => 'ASC'])]
     private $actions;
 
     /**
@@ -165,6 +169,8 @@ class Form extends FormEntity implements UuidInterface
      * @var Collection<int, Submission>
      */
     #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
+    #[ORM\OrderBy(['dateSubmitted' => 'DESC'])]
     private Collection $submissions;
 
     #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
@@ -247,22 +253,6 @@ class Form extends FormEntity implements UuidInterface
 
         $builder->addPublishDates();
 
-        $builder->createOneToMany('fields', 'Field')
-            ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC', 'id' => 'ASC'])
-            ->mappedBy('form')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('actions', 'Action')
-            ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
-            ->mappedBy('form')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
         $builder->createField('template', 'string')
             ->nullable()
             ->build();
@@ -275,12 +265,6 @@ class Form extends FormEntity implements UuidInterface
         $builder->createField('renderStyle', 'boolean')
             ->columnName('render_style')
             ->nullable()
-            ->build();
-
-        $builder->createOneToMany('submissions', 'Submission')
-            ->setOrderBy(['dateSubmitted' => 'DESC'])
-            ->mappedBy('form')
-            ->fetchExtraLazy()
             ->build();
 
         $builder->addNullableField('submissionLimit', Types::INTEGER, 'submission_limit');

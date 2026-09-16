@@ -38,13 +38,19 @@ class Hit
      */
     private $dateLeft;
 
+    #[ORM\ManyToOne(targetEntity: Page::class)]
+    #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
     private ?Page $page = null;
 
     /**
      * @var Redirect|null
      */
+    #[ORM\ManyToOne(targetEntity: Redirect::class)]
+    #[ORM\JoinColumn(name: 'redirect_id', onDelete: 'SET NULL')]
     private $redirect;
 
+    #[ORM\ManyToOne(targetEntity: Email::class)]
+    #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private ?Email $email = null;
 
     /**
@@ -139,6 +145,8 @@ class Hit
     /**
      * @var LeadDevice|null
      */
+    #[ORM\ManyToOne(targetEntity: LeadDevice::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'device_id', onDelete: 'SET NULL')]
     private $device;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -157,18 +165,6 @@ class Hit
         $builder->createField('dateLeft', 'datetime')
             ->columnName('date_left')
             ->nullable()
-            ->build();
-
-        $builder->createManyToOne('page', 'Page')
-            ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createManyToOne('redirect', 'Redirect')
-            ->addJoinColumn('redirect_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createManyToOne('email', Email::class)
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->addLead(true, 'SET NULL');
@@ -244,11 +240,6 @@ class Hit
             ->build();
 
         $builder->addNullableField('query', 'array');
-
-        $builder->createManyToOne('device', LeadDevice::class)
-            ->addJoinColumn('device_id', 'id', true, false, 'SET NULL')
-            ->cascadePersist()
-            ->build();
     }
 
     /**

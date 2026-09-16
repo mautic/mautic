@@ -147,6 +147,8 @@ class Field implements UuidInterface
      * @var Form|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
+    #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'fields')]
+    #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private $form;
 
     /**
@@ -265,11 +267,6 @@ class Field implements UuidInterface
 
         $builder->addNullableField('parent', 'string', 'parent_id');
         $builder->addNullableField('conditions', 'json');
-
-        $builder->createManyToOne('form', 'Form')
-            ->inversedBy('fields')
-            ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->addNullableField('labelAttributes', Types::STRING, 'label_attr');
         $builder->addNullableField('inputAttributes', Types::STRING, 'input_attr');

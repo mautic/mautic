@@ -24,10 +24,6 @@ class Scheduler
 
         $builder->addId();
 
-        $builder->createManyToOne('report', Report::class)
-            ->addJoinColumn('report_id', 'id', false, false, 'CASCADE')
-            ->build();
-
         $builder->createField('scheduleDate', Types::DATETIME_MUTABLE)
             ->columnName('schedule_date')
             ->nullable(false)
@@ -35,6 +31,8 @@ class Scheduler
     }
 
     public function __construct(
+        #[ORM\ManyToOne(targetEntity: Report::class)]
+        #[ORM\JoinColumn(name: 'report_id', nullable: false, onDelete: 'CASCADE')]
         private readonly Report $report,
         private readonly \DateTimeInterface $scheduleDate,
     ) {

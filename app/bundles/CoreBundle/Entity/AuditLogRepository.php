@@ -17,10 +17,7 @@ class AuditLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    /**
-     * @return int
-     */
-    public function getAuditLogsCount(Lead $lead, ?array $filters = null): mixed
+    public function getAuditLogsCount(Lead $lead, ?array $filters = null): int
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'al')
@@ -44,7 +41,7 @@ class AuditLogRepository extends CommonRepository
             $query->andWhere('al.action not in ('.$excludeList.')');
         }
 
-        return $query->executeQuery()->fetchOne();
+        return (int) $query->executeQuery()->fetchOne();
     }
 
     /**

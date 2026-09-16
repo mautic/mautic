@@ -130,6 +130,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     /**
      * @var ArrayCollection<int, Stat>
      */
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'sms', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
@@ -211,13 +212,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
             ->addJoinColumn('sms_id', 'id', true, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('stats', 'Stat')
-            ->setIndexBy('id')
-            ->mappedBy('sms')
-            ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
 

@@ -38,6 +38,8 @@ class Stat
     /**
      * @var Email|null
      */
+    #[ORM\ManyToOne(targetEntity: Email::class, inversedBy: 'stats')]
+    #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private $email;
 
     /**
@@ -53,6 +55,8 @@ class Stat
     /**
      * @var LeadList|null
      */
+    #[ORM\ManyToOne(targetEntity: LeadList::class)]
+    #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
     private $list;
 
     private ?IpAddress $ipAddress = null;
@@ -107,6 +111,8 @@ class Stat
     /**
      * @var Copy|null
      */
+    #[ORM\ManyToOne(targetEntity: Copy::class)]
+    #[ORM\JoinColumn(name: 'copy_id', onDelete: 'SET NULL')]
     private $storedCopy;
 
     /**
@@ -124,6 +130,7 @@ class Stat
     /**
      * @var ArrayCollection|EmailReply[]
      */
+    #[ORM\OneToMany(targetEntity: EmailReply::class, mappedBy: 'stat', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private $replies;
 
     /**
@@ -142,19 +149,10 @@ class Stat
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('email', 'Email')
-            ->inversedBy('stats')
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
-            ->build();
-
         $builder->addLead(true, 'SET NULL');
 
         $builder->createField('emailAddress', 'string')
             ->columnName('email_address')
-            ->build();
-
-        $builder->createManyToOne('list', LeadList::class)
-            ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->addIpAddress(true);
@@ -203,21 +201,11 @@ class Stat
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('storedCopy', Copy::class)
-            ->addJoinColumn('copy_id', 'id', true, false, 'SET NULL')
-            ->build();
-
         $builder->addNullableField('openCount', 'integer', 'open_count');
 
         $builder->addNullableField('lastOpened', 'datetime', 'last_opened');
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
-
-        $builder->createOneToMany('replies', EmailReply::class)
-            ->mappedBy('stat')
-            ->fetchExtraLazy()
-            ->cascadeAll()
-            ->build();
     }
 
     /**
