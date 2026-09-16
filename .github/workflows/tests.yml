@@ -197,7 +197,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'Easy Coding Standard', 'Rector', 'Twig Lint', 'Class Leak', 'scaffolded files mismatch', 'composer install', 'composer lock check']
+        commands: ['PHPSTAN', 'Easy Coding Standard', 'Rector', 'Twig Lint', 'Class Leak', 'scaffolded files mismatch', 'composer install', 'composer lock check', 'Identifier order']
         php-versions: ['8.4']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
@@ -312,6 +312,18 @@ jobs:
             }
             echo \"OK: Webroot correctly auto-detected as {\$webrootDir}\n\";
           "
+        elif [[ "${{ matrix.commands }}" == "Identifier order" ]]; then
+          # Compare every entity's identifier against the base revision. Swapping only
+          # the mapped sources keeps vendor/ in place, so the base does not need its own
+          # composer install.
+          base=$(git merge-base origin/${{ github.base_ref || '8.x' }} HEAD)
+          rm -rf var/cache/prod
+          php .github/scripts/dump-identifiers.php > /tmp/identifiers-head.json
+          git checkout -q "$base" -- app plugins
+          rm -rf var/cache/prod
+          php .github/scripts/dump-identifiers.php > /tmp/identifiers-base.json
+          git checkout -q HEAD -- app plugins
+          php .github/scripts/compare-identifiers.php /tmp/identifiers-base.json /tmp/identifiers-head.json
         elif [[ "${{ matrix.commands }}" == "Class Leak" ]]; then
           # skip-type entries are false positives: Symfony autodiscovered services and test helpers class-leak cannot see referenced
           vendor/bin/class-leak check app \
