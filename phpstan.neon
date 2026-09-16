@@ -42,6 +42,10 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     ignoreErrors:
+        # SubmissionRepository::getEntities returns a count/results array shape used by SubmissionModel, incompatible with the base signature by design
+        -
+            identifier: method.childReturnType
+            path: app/bundles/FormBundle/Entity/SubmissionRepository.php
         # CompanyLeadRepository is only needed by the static IdentifyCompanyHelper, exposed via getter to avoid threading it through 9 call sites
         -
             identifier: mautic.noServiceGetter

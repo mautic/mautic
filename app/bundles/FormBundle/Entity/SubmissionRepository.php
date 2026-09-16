@@ -45,6 +45,11 @@ class SubmissionRepository extends CommonRepository
         }
     }
 
+    /**
+     * @param array<string, mixed> $args
+     *
+     * @return array{count: int, results: list<array<string, mixed>>}|list<array<string, Submission>>
+     */
     public function getEntities(array $args = []): array
     {
         $form = $args['form'];

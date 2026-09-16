@@ -4,7 +4,6 @@ namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
@@ -448,9 +447,9 @@ final class SubmissionModel extends CommonFormModel
     /**
      * @param array<string,mixed> $args
      *
-     * @return iterable<int, Submission>
+     * @return array<mixed>
      */
-    public function getEntities(array $args = []): iterable
+    public function getEntities(array $args = []): array
     {
         return $this->submissionRepository->getEntities($args);
     }
