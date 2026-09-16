@@ -16,7 +16,7 @@ final class MessageRepository extends CommonRepository
     /**
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $qb = $this->createQueryBuilder($this->getTableAlias());
         // Because of this inner join pagination is not working properly. Removing this doesn't seem to break any feature.
@@ -38,10 +38,8 @@ final class MessageRepository extends CommonRepository
      * @param string $search
      * @param int    $limit
      * @param int    $start
-     *
-     * @return array
      */
-    public function getMessageList($search = '', $limit = 10, $start = 0)
+    public function getMessageList($search = '', $limit = 10, $start = 0): array
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($this->getTableAlias());
@@ -90,7 +88,7 @@ final class MessageRepository extends CommonRepository
     /**
      * @return array
      */
-    public function getChannelMessageByChannelId($channelId)
+    public function getChannelMessageByChannelId($channelId): array|false
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')
