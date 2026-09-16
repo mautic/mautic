@@ -855,38 +855,29 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTriggerMode()
+    public function getTriggerMode(): ?string
     {
         return $this->triggerMode;
     }
 
-    public function setTriggerMode(string $triggerMode): void
+    public function setTriggerMode(?string $triggerMode): void
     {
         $this->isChanged('triggerMode', $triggerMode);
         $this->triggerMode = $triggerMode;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDecisionPath()
+    public function getDecisionPath(): ?string
     {
         return $this->decisionPath;
     }
 
-    public function setDecisionPath(string|null $decisionPath): void
+    public function setDecisionPath(?string $decisionPath): void
     {
         $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTempId()
+    public function getTempId(): ?string
     {
         return $this->tempId;
     }
@@ -897,10 +888,7 @@ class Event implements ChannelInterface, UuidInterface
         $this->tempId = $tempId;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getChannel()
+    public function getChannel(): ?string
     {
         return $this->channel;
     }
