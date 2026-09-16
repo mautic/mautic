@@ -419,14 +419,22 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $this->addDNCTableForEmailStats($qb);
                 }
 
-                if ($event->hasFilter('s.leadlist_id')) {
-                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
-                }
-
                 $event->addCategoryLeftJoin($qb, self::EMAILS_PREFIX)
                     ->addLeadLeftJoin($qb, self::EMAIL_STATS_PREFIX)
                     ->addIpAddressLeftJoin($qb, self::EMAIL_STATS_PREFIX)
                     ->applyDateFilters($qb, 'date_sent', self::EMAIL_STATS_PREFIX);
+
+                // Segment membership must join via email_stats (always present). Joining on
+                // leads alias `l` fails when that alias is missing or not yet joined — which
+                // is exactly the Contact Name / segment-filter path on Emails Sent reports.
+                if ($event->hasFilter('s.leadlist_id')) {
+                    $qb->join(
+                        self::EMAIL_STATS_PREFIX,
+                        MAUTIC_TABLE_PREFIX.'lead_lists_leads',
+                        's',
+                        's.lead_id = '.self::EMAIL_STATS_PREFIX.'.lead_id AND s.manually_removed = 0'
+                    );
+                }
                 if ($useClickColumns) {
                     $qbcut->select(
                         'COUNT(ph.id) AS hits',
