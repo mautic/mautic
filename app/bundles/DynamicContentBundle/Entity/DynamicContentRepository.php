@@ -19,7 +19,7 @@ final class DynamicContentRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()
             ->createQueryBuilder()
@@ -142,10 +142,8 @@ final class DynamicContentRepository extends CommonRepository
      * @param bool   $topLevel
      * @param array  $ignoreIds
      * @param string $where
-     *
-     * @return array
      */
-    public function getDynamicContentList($search = '', $limit = 10, $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $where = null)
+    public function getDynamicContentList($search = '', $limit = 10, $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $where = null): array
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
