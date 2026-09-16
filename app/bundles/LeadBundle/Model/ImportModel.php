@@ -123,7 +123,7 @@ class ImportModel extends FormModel
         $ghostDelay = 2;
         $imports    = $this->importRepository->getGhostImports($ghostDelay, 5);
 
-        if (empty($imports)) {
+        if ($imports === []) {
             return;
         }
 

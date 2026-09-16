@@ -24,10 +24,7 @@ class RealTimeExecutioner
 {
     private ?Lead $contact = null;
 
-    /**
-     * @var array
-     */
-    private $events;
+    private ?array $events = null;
 
     private ?Responses $responses = null;
 
