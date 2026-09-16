@@ -80,18 +80,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get a list of leads.
-     *
-     * @return array
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): array
     {
         return $this->getEntitiesWithCustomFields('company', $args);
     }
 
-    /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function getEntitiesDbalQueryBuilder()
+    public function getEntitiesDbalQueryBuilder(): \Doctrine\DBAL\Query\QueryBuilder
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -101,10 +96,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * @param mixed[] $args
-     *
-     * @return QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order, array $args=[])
+    public function getEntitiesOrmQueryBuilder($order, array $args=[]): QueryBuilder
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
@@ -231,10 +224,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * @param string $id
-     *
-     * @return array|mixed
      */
-    public function getCompanies(bool $user = false, $id = '')
+    public function getCompanies(bool $user = false, $id = ''): array
     {
         $q                = $this->getEntityManager()->getConnection()->createQueryBuilder();
         static $companies = [];
@@ -278,7 +269,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @return array
      */
-    public function getLeadCount($companyIds)
+    public function getLeadCount($companyIds): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -313,10 +304,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get a list of lists.
-     *
-     * @return array
      */
-    public function identifyCompany($companyName, $city = null, $country = null, $state = null)
+    public function identifyCompany($companyName, $city = null, $country = null, $state = null): ?array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if (empty($companyName)) {
@@ -409,10 +398,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param int $limit
      * @param int $offset
-     *
-     * @return mixed
      */
-    public function getMostCompanies($query, $limit = 10, $offset = 0)
+    public function getMostCompanies($query, $limit = 10, $offset = 0): array
     {
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
