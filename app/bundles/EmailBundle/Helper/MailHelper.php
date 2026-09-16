@@ -569,7 +569,7 @@ class MailHelper
                     if (!empty($contact['leadId'])) {
                         $this->queueAssetDownloadEntry($email, $contact);
                     }
-                    $this->message->addTo(new Address($email, $contact['name'] ?? ''));
+                    $this->message->addTo($this->limitAddressLength(new Address($email, $contact['name'] ?? '')));
                 }
 
                 $flushed = $this->send(false, true);
@@ -926,16 +926,7 @@ class MailHelper
         $this->checkBatchMaxRecipients();
 
         try {
-            $fullAddress          = (new AddressDTO($address, $name))->toMailerAddress();
-            $encodedAddressLength = strlen((new MailboxListHeader('To', [$fullAddress]))->getBodyAsString());
-
-            if ($encodedAddressLength > $this->addressLengthLimit) {
-                // When encoded address with name length doesn't meet the limit, use only the email
-                $shortAddress = (new AddressDTO($address))->toMailerAddress();
-                $this->message->addTo($shortAddress);
-            } else {
-                $this->message->addTo($fullAddress);
-            }
+            $this->message->addTo($this->limitAddressLength((new AddressDTO($address, $name))->toMailerAddress()));
             $this->queuedRecipients[$address] = $name;
 
             return true;
@@ -944,6 +935,25 @@ class MailHelper
 
             return false;
         }
+    }
+
+    /**
+     * Drops the display name when the encoded address exceeds the configured limit.
+     *
+     * Some transports reject an over-long To header outright, so the address has to be
+     * measured wherever it becomes a header. addTo() is not enough on its own: on a
+     * tokenized transport flushQueue() clears the recipients and rebuilds them from the
+     * message metadata, which carries the untruncated name.
+     */
+    private function limitAddressLength(Address $address): Address
+    {
+        $encodedAddressLength = strlen((new MailboxListHeader('To', [$address]))->getBodyAsString());
+
+        if ($encodedAddressLength > $this->addressLengthLimit) {
+            return new Address($address->getAddress());
+        }
+
+        return $address;
     }
 
     /**
