@@ -61,10 +61,8 @@ class HitRepository extends CommonRepository
      *
      * @param int|null             $leadId
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getLeadHits($leadId = null, array $options = [])
+    public function getLeadHits($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -92,10 +90,7 @@ class HitRepository extends CommonRepository
         return $this->getTimelineResults($query, $options, 'p.title', 'h.date_hit', ['query'], ['dateHit', 'dateLeft'], null, 'h.id');
     }
 
-    /**
-     * @return array
-     */
-    public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200)
+    public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200): array
     {
         $query = $this->createQueryBuilder('h');
         $query->select('count(distinct(h.trackingId)) as hitCount');
@@ -179,10 +174,7 @@ class HitRepository extends CommonRepository
         return count($results);
     }
 
-    /**
-     * @return int
-     */
-    public function countEmailClickthrough()
+    public function countEmailClickthrough(): int
     {
         $q = $this->createQueryBuilder('h');
         $q->select('COUNT(h.email) as clicks');
