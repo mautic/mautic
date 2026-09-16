@@ -116,7 +116,7 @@ class EmailRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()
             ->createQueryBuilder()
@@ -137,10 +137,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * Get amounts of sent and read emails.
-     *
-     * @return array
      */
-    public function getSentReadCount()
+    public function getSentReadCount(): array
     {
         // Get entities
         $q = $this->getEntityManager()->createQueryBuilder();
@@ -334,8 +332,6 @@ class EmailRepository extends CommonRepository
      * @param int|null   $limit
      * @param int|null   $minContactId
      * @param int|null   $maxContactId
-     *
-     * @return array|int
      */
     public function getEmailPendingLeads(
         $emailId,
@@ -349,7 +345,7 @@ class EmailRepository extends CommonRepository
         ?int $maxThreads = null,
         ?int $threadId = null,
         ?\DateTimeInterface $sendStopDate = null,
-    ) {
+    ): array|int {
         $q = $this->getEmailPendingQuery(
             $emailId,
             $variantIds,
