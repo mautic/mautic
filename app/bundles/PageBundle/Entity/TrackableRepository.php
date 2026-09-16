@@ -38,10 +38,8 @@ class TrackableRepository extends CommonRepository
 
     /**
      * Get a Trackable by Redirect URL.
-     *
-     * @return array
      */
-    public function findByUrl($url, $channel, $channelId)
+    public function findByUrl($url, $channel, $channelId): ?Trackable
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($alias)
@@ -64,10 +62,8 @@ class TrackableRepository extends CommonRepository
 
     /**
      * Get an array of Trackable entities by Redirect URLs.
-     *
-     * @return array
      */
-    public function findByUrls(array $urls, $channel, $channelId)
+    public function findByUrls(array $urls, $channel, $channelId): array
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($alias)
@@ -115,10 +111,8 @@ class TrackableRepository extends CommonRepository
      * Get hit count.
      *
      * @param string $countColumn
-     *
-     * @return array|int
      */
-    public function getCount($channel, $channelIds, $listId, ?ChartQuery $chartQuery = null, bool $combined = false, $countColumn = 'ph.id')
+    public function getCount($channel, $channelIds, $listId, ?ChartQuery $chartQuery = null, bool $combined = false, $countColumn = 'ph.id'): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('count('.$countColumn.') as click_count')
