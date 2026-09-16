@@ -232,10 +232,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         return $chart->render();
     }
 
-    /**
-     * @return Stat
-     */
-    public function getNotificationStatus(string $idHash)
+    public function getNotificationStatus(string $idHash): ?\Mautic\NotificationBundle\Entity\Stat
     {
         return $this->statRepository->getNotificationStatus($idHash);
     }

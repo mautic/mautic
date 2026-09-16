@@ -5,10 +5,8 @@ namespace Mautic\FormBundle\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -452,7 +450,7 @@ final class SubmissionModel extends CommonFormModel
      *
      * @return Submission[]|array<int,Submission>|iterable<Submission>|Paginator<Submission>|SimplePaginator<Submission>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         return $this->submissionRepository->getEntities($args);
     }

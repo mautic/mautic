@@ -376,7 +376,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         if (count($uniqueLeadFieldData)) {
             $existingLeads = $this->leadRepository->getLeadsByUniqueFields($uniqueLeadFieldData);
-            if (!empty($existingLeads)) {
+            if ($existingLeads !== []) {
                 $lead = array_shift($existingLeads);
             }
         }

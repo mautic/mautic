@@ -534,10 +534,8 @@ class ImportModel extends FormModel
      *
      * @param int    $importId
      * @param string $object
-     *
-     * @return array|null
      */
-    public function getFailedRows($importId = null, $object = 'lead')
+    public function getFailedRows($importId = null, $object = 'lead'): ?array
     {
         if (!$importId) {
             return null;

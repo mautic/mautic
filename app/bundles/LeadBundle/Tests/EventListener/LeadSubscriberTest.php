@@ -197,7 +197,7 @@ final class LeadSubscriberTest extends CommonMocks
         $matcher   = $this->exactly(2);
 
         $this->leadEventLogRepository->expects($matcher)
-            ->method('getEvents')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $leadEvent, $logs) {
+            ->method('getEvents')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $leadEvent, $logs): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($lead, $parameters[0]);
                     $this->assertSame('lead', $parameters[1]);
@@ -216,6 +216,8 @@ final class LeadSubscriberTest extends CommonMocks
 
                     return ['total' => 0, 'results' => []];
                 }
+
+                return [];
             });
 
         $subscriber = new LeadSubscriber(
