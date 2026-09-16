@@ -802,9 +802,9 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @param array<string,string>|string $triggerHour
+     * @param array<string,string>|string|null $triggerHour
      */
-    public function setTriggerHour(array|string $triggerHour): static
+    public function setTriggerHour(array|string|null $triggerHour): static
     {
         $triggerHour = $this->convertToDateTime($triggerHour);
         $this->isChanged('triggerHour', $triggerHour ? $triggerHour->format('H:i') : $triggerHour);
@@ -1009,7 +1009,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Set the value of triggerRestrictedStopHour.
      */
-    public function setTriggerRestrictedStopHour(string|\DateTime $triggerRestrictedStopHour): static
+    public function setTriggerRestrictedStopHour(string|\DateTime|null $triggerRestrictedStopHour): static
     {
         $triggerRestrictedStopHour = $this->convertToDateTime($triggerRestrictedStopHour);
 
