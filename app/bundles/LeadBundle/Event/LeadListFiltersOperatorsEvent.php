@@ -24,11 +24,8 @@ final class LeadListFiltersOperatorsEvent extends CommonEvent
      * Please refer to OperatorOptions::getFilterExpressionFunctions() for examples of operators.
      *
      * @see OperatorListTrait
-     *
-     * @param string $operatorKey
-     * @param array  $operatorConfig
      */
-    public function addOperator($operatorKey, $operatorConfig): void
+    public function addOperator(string $operatorKey, array $operatorConfig): void
     {
         if (!array_key_exists($operatorKey, $this->operators)) {
             $this->operators[$operatorKey] = $operatorConfig;

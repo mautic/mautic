@@ -531,11 +531,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         $this->id = null;
     }
-
-    /**
-     * @param int $order
-     */
-    public function setOrder($order): static
+    public function setOrder(int $order): static
     {
         $this->isChanged('order', $order);
 
@@ -551,11 +547,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->order;
     }
-
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -586,11 +578,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->campaign;
     }
-
-    /**
-     * @param string $type
-     */
-    public function setType($type): static
+    public function setType(string $type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -610,11 +598,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return get_object_vars($this);
     }
-
-    /**
-     * @param string $description
-     */
-    public function setDescription($description): static
+    public function setDescription(string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -629,11 +613,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->description;
     }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -751,11 +731,9 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @param string $type
-     *
      * @return ArrayCollection<int,Event>
      */
-    public function getChildrenByEventType($type)
+    public function getChildrenByEventType(string $type)
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
 
@@ -811,11 +789,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->triggerInterval;
     }
-
-    /**
-     * @param int $triggerInterval
-     */
-    public function setTriggerInterval($triggerInterval): void
+    public function setTriggerInterval(int $triggerInterval): void
     {
         $this->isChanged('triggerInterval', $triggerInterval);
         $this->triggerInterval = $triggerInterval;
@@ -832,7 +806,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @param \DateTime|string|array<string,string> $triggerHour
      */
-    public function setTriggerHour($triggerHour): static
+    public function setTriggerHour(array|string $triggerHour): static
     {
         $triggerHour = $this->convertToDateTime($triggerHour);
         $this->isChanged('triggerHour', $triggerHour ? $triggerHour->format('H:i') : $triggerHour);
@@ -852,7 +826,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @param mixed $triggerIntervalUnit
      */
-    public function setTriggerIntervalUnit($triggerIntervalUnit): void
+    public function setTriggerIntervalUnit(string $triggerIntervalUnit): void
     {
         $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
         $this->triggerIntervalUnit = $triggerIntervalUnit;
@@ -866,7 +840,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->eventType;
     }
 
-    public function setEventType($eventType): static
+    public function setEventType(string $eventType): static
     {
         $this->isChanged('eventType', $eventType);
         $this->eventType = $eventType;
@@ -897,7 +871,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @param mixed $triggerMode
      */
-    public function setTriggerMode($triggerMode): void
+    public function setTriggerMode(string $triggerMode): void
     {
         $this->isChanged('triggerMode', $triggerMode);
         $this->triggerMode = $triggerMode;
@@ -914,7 +888,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @param mixed $decisionPath
      */
-    public function setDecisionPath($decisionPath): void
+    public function setDecisionPath(string $decisionPath): void
     {
         $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
@@ -931,7 +905,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @param mixed $tempId
      */
-    public function setTempId($tempId): void
+    public function setTempId(string $tempId): void
     {
         $this->isChanged('tempId', $tempId);
         $this->tempId = $tempId;
@@ -1027,7 +1001,7 @@ class Event implements ChannelInterface, UuidInterface
      *
      * @param \DateTime|string|array<string,string>|null $triggerRestrictedStartHour
      */
-    public function setTriggerRestrictedStartHour($triggerRestrictedStartHour): static
+    public function setTriggerRestrictedStartHour(string $triggerRestrictedStartHour): static
     {
         $triggerRestrictedStartHour = $this->convertToDateTime($triggerRestrictedStartHour);
 
@@ -1053,7 +1027,7 @@ class Event implements ChannelInterface, UuidInterface
      *
      * @param \DateTime|string|array<string,string>|null $triggerRestrictedStopHour
      */
-    public function setTriggerRestrictedStopHour($triggerRestrictedStopHour): static
+    public function setTriggerRestrictedStopHour(string $triggerRestrictedStopHour): static
     {
         $triggerRestrictedStopHour = $this->convertToDateTime($triggerRestrictedStopHour);
 

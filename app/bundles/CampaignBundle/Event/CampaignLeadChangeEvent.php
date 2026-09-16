@@ -25,7 +25,7 @@ final class CampaignLeadChangeEvent extends Event
      */
     public function __construct(
         private readonly Campaign $campaign,
-        $leads,
+        array|\Mautic\LeadBundle\Entity\Lead $leads,
         private readonly ?string $action,
     ) {
         if (is_array($leads)) {

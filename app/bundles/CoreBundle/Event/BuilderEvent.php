@@ -22,7 +22,7 @@ class BuilderEvent extends Event
     public function __construct(
         protected TranslatorInterface $translator,
         protected $entity = null,
-        protected $requested = 'all',
+        protected string $requested = 'all',
         protected string $tokenFilter = '',
     ) {
         $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
@@ -213,7 +213,7 @@ class BuilderEvent extends Event
         return $this->getRequested('abTestWinnerCriteria');
     }
 
-    protected function getRequested($type): bool
+    protected function getRequested(string $type): bool
     {
         if (is_array($this->requested)) {
             return in_array($type, $this->requested);

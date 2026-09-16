@@ -218,7 +218,7 @@ class SubmissionEvent extends CommonEvent
     /**
      * @return mixed
      */
-    public function getPostSubmitCallback($key = null)
+    public function getPostSubmitCallback(?string $key = null)
     {
         return (null === $key) ? $this->callbacks : $this->callbacks[$key];
     }
@@ -239,7 +239,7 @@ class SubmissionEvent extends CommonEvent
     /**
      * @param mixed $callbackResponse
      */
-    public function setPostSubmitCallbackResponse($key, $callbackResponse): static
+    public function setPostSubmitCallbackResponse(string $key, \Symfony\Component\HttpFoundation\RedirectResponse $callbackResponse): static
     {
         $this->callbackResponses[$key] = $callbackResponse;
 
@@ -256,7 +256,7 @@ class SubmissionEvent extends CommonEvent
         return $this->postSubmitResponse;
     }
 
-    public function setPostSubmitResponse($response): void
+    public function setPostSubmitResponse(array|\Symfony\Component\HttpFoundation\Response $response): void
     {
         $this->postSubmitResponse = $response;
     }

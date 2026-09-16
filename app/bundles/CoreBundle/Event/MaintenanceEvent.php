@@ -19,12 +19,8 @@ class MaintenanceEvent extends Event
      * @var array
      */
     protected $debug = [];
-
-    /**
-     * @param int $daysOld
-     */
     public function __construct(
-        $daysOld,
+        int $daysOld,
         protected bool $dryRun,
         protected bool $gdpr,
     ) {
@@ -54,7 +50,7 @@ class MaintenanceEvent extends Event
      * @param string $key
      * @param int    $recordCount
      */
-    public function setStat($key, $recordCount, $sql = null, $parameters = []): void
+    public function setStat($key, $recordCount, $sql = null, array $parameters = []): void
     {
         $this->stats[$key] = (int) $recordCount;
 

@@ -33,7 +33,7 @@ final class TriggerBuilderEvent extends Event
      *
      * @throws InvalidArgumentException
      */
-    public function addEvent($key, array $event): void
+    public function addEvent(string $key, array $event): void
     {
         if (array_key_exists($key, $this->events)) {
             throw new InvalidArgumentException("The key, '{$key}' is already used by another action. Please use a different key.");

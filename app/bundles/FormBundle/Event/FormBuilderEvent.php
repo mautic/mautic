@@ -118,7 +118,7 @@ final class FormBuilderEvent extends Event
      * @throws \InvalidArgumentException
      * @throws BadConfigurationException
      */
-    public function addFormField($key, array $field): void
+    public function addFormField(string $key, array $field): void
     {
         if (array_key_exists($key, $this->fields)) {
             throw new \InvalidArgumentException("The key, '{$key}' is already used by another field. Please use a different key.");
@@ -158,7 +158,7 @@ final class FormBuilderEvent extends Event
      *                         will be sent through the validation event
      *                         ]
      */
-    public function addValidator($key, array $validator): void
+    public function addValidator(string $key, array $validator): void
     {
         if (array_key_exists($key, $this->fields)) {
             throw new \InvalidArgumentException("The key, '{$key}' is already used by another validator. Please use a different key.");

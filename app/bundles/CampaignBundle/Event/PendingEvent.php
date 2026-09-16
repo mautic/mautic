@@ -47,11 +47,7 @@ final class PendingEvent extends AbstractLogCollectionEvent
     {
         return $this->logs;
     }
-
-    /**
-     * @param string $reason
-     */
-    public function fail(LeadEventLog $log, $reason, ?\DateInterval $rescheduleInterval = null): void
+    public function fail(LeadEventLog $log, string $reason, ?\DateInterval $rescheduleInterval = null): void
     {
         if (!$failedLog = $log->getFailedLog()) {
             $failedLog = new FailedLeadEventLog();
@@ -78,11 +74,7 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
         $this->failures->set($log->getId(), $log);
     }
-
-    /**
-     * @param string $reason
-     */
-    public function failAll($reason): void
+    public function failAll(string $reason): void
     {
         foreach ($this->logs as $log) {
             $this->fail($log, $reason);
@@ -228,10 +220,9 @@ final class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @param string   $channel
      * @param int|null $channelId
      */
-    public function setChannel($channel, $channelId = null): void
+    public function setChannel(string $channel, $channelId = null): void
     {
         $this->channel   = $channel;
         $this->channelId = $channelId;

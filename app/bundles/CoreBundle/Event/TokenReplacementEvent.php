@@ -33,8 +33,8 @@ class TokenReplacementEvent extends CommonEvent
      * @param mixed                    $passthrough
      */
     public function __construct(
-        $content,
-        protected $lead = null,
+        \Mautic\LeadBundle\Entity\Lead|string|null $content,
+        protected ?\Mautic\LeadBundle\Entity\Lead $lead = null,
         protected array $clickthrough = [],
         protected $passthrough = null,
         private readonly bool $internalSend = false,
@@ -57,7 +57,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @param CommonEntity|string|null $content
      */
-    public function setContent($content): void
+    public function setContent(string $content): void
     {
         $this->content = $content;
     }

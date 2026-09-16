@@ -18,14 +18,9 @@ class LeadBuildSearchEvent extends CommonEvent
     protected bool $strict = false;
 
     protected array $parameters = [];
-
-    /**
-     * @param string $string
-     * @param string $command
-     */
     public function __construct(
-        protected $string,
-        protected $command,
+        protected string $string,
+        protected string $command,
         protected string $alias,
         protected bool $negate,
         protected QueryBuilder $queryBuilder,
