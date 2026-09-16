@@ -125,10 +125,8 @@ class TagRepository extends CommonRepository
 
     /**
      * @param string $name
-     *
-     * @return Tag
      */
-    public function getTagByNameOrCreateNewOne($name)
+    public function getTagByNameOrCreateNewOne($name): Tag
     {
         $tag = new Tag($name, true);
 
