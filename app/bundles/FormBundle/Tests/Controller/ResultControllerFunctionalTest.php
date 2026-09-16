@@ -154,6 +154,52 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $editButton, 'Edit button should be present on form results page');
     }
 
+    public function testResultSortLinksTargetTheViewedForm(): void
+    {
+        // Two forms, so the one under test cannot be ID 1 - the ID the JS fallback
+        // sorts by when no baseUrl reaches the template, which would let this pass
+        // while still broken.
+        $this->createFormViaApi('First sort form', 'firstsortform');
+        $formId = $this->createFormViaApi('Second sort form', 'secondsortform');
+        self::assertGreaterThan(1, $formId);
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
+        self::assertResponseIsSuccessful();
+
+        $sortLinks = $crawler->filter('a.table-sort');
+        self::assertGreaterThan(0, $sortLinks->count(), 'Expected at least one sortable column header.');
+
+        foreach ($sortLinks as $sortLink) {
+            self::assertStringContainsString(
+                "/s/forms/results/{$formId}/",
+                $sortLink->getAttribute('onclick'),
+                'Sort links must carry the viewed form ID so sorting cannot switch to another form.'
+            );
+        }
+    }
+
+    private function createFormViaApi(string $name, string $alias): int
+    {
+        $this->client->request('POST', '/api/forms/new', [
+            'name'        => $name,
+            'formType'    => 'standalone',
+            'alias'       => $alias,
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label' => 'Email',
+                    'alias' => 'email',
+                    'type'  => 'email',
+                ],
+            ],
+            'postAction'  => 'return',
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+
+        return (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+    }
+
     private function createFile(string $filename): void
     {
         $data = 'data:image/png;base64,AAAFBfj42Pj4';
