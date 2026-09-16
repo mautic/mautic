@@ -22,7 +22,6 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -42,6 +41,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[EntityEvent]
 class Event implements ChannelInterface, UuidInterface
 {
     use UuidTrait;
@@ -511,11 +511,6 @@ class Event implements ChannelInterface, UuidInterface
                 ]
             )
              ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addConstraint(new EntityEvent());
     }
 
     /**

@@ -10,8 +10,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[UniqueEntity(fields: ['alias'], message: 'mautic.lead.field_group.name.unique', errorPath: 'name')]
 class FieldGroup extends FormEntity
 {
     public const TABLE_NAME  = 'lead_field_groups';
@@ -30,6 +30,8 @@ class FieldGroup extends FormEntity
 
     private ?int $id = null;
 
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[Assert\Regex(pattern: '/^[\p{L}\p{N}\p{S}\s]+$/u', message: 'mautic.lead.field_group.name.help', match: true)]
     private ?string $name = null;
 
     private ?string $alias = null;
@@ -60,18 +62,6 @@ class FieldGroup extends FormEntity
             ->columnName('field_order')
             ->option('default', 0)
             ->build();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
-
-        $metadata->addPropertyConstraint('name', new Assert\Regex(pattern: '/^[\p{L}\p{N}\p{S}\s]+$/u', message: 'mautic.lead.field_group.name.help', match: true));
-
-        // The alias (auto-generated from the name) is unique in the DB; validate
-        // it here so a duplicate or near-duplicate name returns a form error on
-        // the name field instead of an unhandled UniqueConstraintViolationException.
-        $metadata->addConstraint(new UniqueEntity(fields: ['alias'], message: 'mautic.lead.field_group.name.unique', errorPath: 'name'));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

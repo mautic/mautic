@@ -65,6 +65,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[EmailLists]
+#[EntityEvent]
+#[ScheduleDateRange]
+#[ValidEmailLinks]
 /**
  * @use VariantEntityTrait<Email>
  * @use TranslationEntityTrait<Email>
@@ -96,6 +100,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var string
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[NotBlank(message: 'mautic.core.name.required')]
+    #[Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.name.length')]
     private $name;
 
     /**
@@ -108,6 +114,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[NotBlank(message: 'mautic.core.subject.required')]
+    #[Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.subject.length')]
+    #[TextOnlyDynamicContent]
     private $subject;
 
     /**
@@ -120,12 +129,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private bool $sendToDnc = false;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[Length(max: 130, maxMessage: 'mautic.email.preheader_text.length')]
     private ?string $preheaderText = null;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[EmailOrEmailTokenList(allowMultiple: false)]
     private $fromAddress;
 
     /**
@@ -138,12 +149,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[\Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
     private $replyToAddress;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[\Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
     private $bccAddress;
 
     /**
@@ -471,61 +484,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(
-                message: 'mautic.core.name.required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'name',
-            new Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.name.length')
-        );
-
-        $metadata->addPropertyConstraint(
-            'subject',
-            new NotBlank(
-                message: 'mautic.core.subject.required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'subject',
-            new Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.subject.length')
-        );
-
-        $metadata->addPropertyConstraint(
-            'preheaderText',
-            new Length(max: 130, maxMessage: 'mautic.email.preheader_text.length')
-        );
-
-        $metadata->addPropertyConstraint(
-            'fromAddress',
-            new EmailOrEmailTokenList(allowMultiple: false),
-        );
-
-        $metadata->addPropertyConstraint(
-            'replyToAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                message: 'mautic.core.email.required'
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'bccAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                message: 'mautic.core.email.required'
-            )
-        );
-
-        $metadata->addPropertyConstraint('subject', new TextOnlyDynamicContent());
-
-        $metadata->addConstraint(new EmailLists());
-        $metadata->addConstraint(new EntityEvent());
-        $metadata->addConstraint(new ScheduleDateRange());
-        $metadata->addConstraint(new ValidEmailLinks());
-
         $metadata->addConstraint(new Callback(
             function (Email $email, ExecutionContextInterface $context): void {
                 if ($email->isVariant()) {
