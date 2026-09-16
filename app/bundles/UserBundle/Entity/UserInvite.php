@@ -10,10 +10,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: UserInviteRepository::class)]
 #[ORM\Table(name: 'user_invites')]
-#[ORM\Index(columns: ['email'], name: 'IDX_USER_INVITES_EMAIL')]
-#[ORM\Index(columns: ['expiration'], name: 'IDX_USER_INVITES_EXPIRATION')]
-#[ORM\Index(columns: ['role_id'], name: 'IDX_USER_INVITES_ROLE')]
-#[ORM\Index(columns: ['used'], name: 'IDX_USER_INVITES_USED')]
+#[ORM\Index(name: 'IDX_USER_INVITES_EMAIL', columns: ['email'])]
+#[ORM\Index(name: 'IDX_USER_INVITES_EXPIRATION', columns: ['expiration'])]
+#[ORM\Index(name: 'IDX_USER_INVITES_ROLE', columns: ['role_id'])]
+#[ORM\Index(name: 'IDX_USER_INVITES_USED', columns: ['used'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_USER_INVITES_TOKEN_SELECTOR', columns: ['token_selector'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class UserInvite

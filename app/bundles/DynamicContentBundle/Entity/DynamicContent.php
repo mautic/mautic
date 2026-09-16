@@ -37,8 +37,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: DynamicContentRepository::class)]
 #[ORM\Table(name: 'dynamic_content')]
-#[ORM\Index(columns: ['is_campaign_based'], name: 'is_campaign_based_index')]
-#[ORM\Index(columns: ['slot_name'], name: 'slot_name_index')]
+#[ORM\Index(name: 'is_campaign_based_index', columns: ['is_campaign_based'])]
+#[ORM\Index(name: 'slot_name_index', columns: ['slot_name'])]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -126,7 +126,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var ArrayCollection<Stat>
      */
     #[Groups(['dynamicContent:read'])]
-    #[ORM\OneToMany(mappedBy: 'dynamicContent', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'dynamicContent', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**

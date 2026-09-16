@@ -13,9 +13,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ImportRepository::class)]
 #[ORM\Table(name: 'imports')]
-#[ORM\Index(columns: ['object'], name: 'import_object')]
-#[ORM\Index(columns: ['status'], name: 'import_status')]
-#[ORM\Index(columns: ['priority'], name: 'import_priority')]
+#[ORM\Index(name: 'import_object', columns: ['object'])]
+#[ORM\Index(name: 'import_status', columns: ['status'])]
+#[ORM\Index(name: 'import_priority', columns: ['priority'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Import extends FormEntity
 {

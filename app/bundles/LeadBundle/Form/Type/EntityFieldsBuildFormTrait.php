@@ -84,7 +84,7 @@ trait EntityFieldsBuildFormTrait
             }
 
             if ($field['charLengthLimit'] > 0) {
-                $constraints[] = new Length(['max' => $field['charLengthLimit']]);
+                $constraints[] = new Length(max: $field['charLengthLimit']);
             }
 
             switch ($type) {
@@ -196,7 +196,7 @@ trait EntityFieldsBuildFormTrait
                 case MultiselectType::class:
                 case BooleanType::class:
                     if (MultiselectType::class === $type) {
-                        $constraints[] = new Length(['max' => 65535]);
+                        $constraints[] = new Length(max: 65535);
                     }
 
                     $typeProperties = [
@@ -258,7 +258,7 @@ trait EntityFieldsBuildFormTrait
                     switch ($type) {
                         case LookupType::class:
                             $attr['data-target'] = $alias;
-                            $constraints[]       = new Length(['max' => 191]);
+                            $constraints[]       = new Length(max: 191);
                             if (!empty($properties['list'])) {
                                 $attr['data-options'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, array_keys(FormFieldHelper::parseList($properties['list'])));
                             }
@@ -269,11 +269,11 @@ trait EntityFieldsBuildFormTrait
                             $constraints[]         = new EmailAddress();
                             break;
                         case TextType::class:
-                            $constraints[] = new Length(['max' => 191]);
+                            $constraints[] = new Length(max: 191);
                             break;
 
                         case MultiselectType::class:
-                            $constraints[] = new Length(['max' => 65535]);
+                            $constraints[] = new Length(max: 65535);
                             break;
                         case HtmlType::class:
                             $cleaningRules[$field['alias']] = 'html';

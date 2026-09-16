@@ -10,9 +10,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: 'focus_stats')]
-#[ORM\Index(columns: ['type'], name: 'focus_type')]
-#[ORM\Index(columns: ['type', 'type_id'], name: 'focus_type_id')]
-#[ORM\Index(columns: ['date_added'], name: 'focus_date_added')]
+#[ORM\Index(name: 'focus_type', columns: ['type'])]
+#[ORM\Index(name: 'focus_type_id', columns: ['type', 'type_id'])]
+#[ORM\Index(name: 'focus_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {

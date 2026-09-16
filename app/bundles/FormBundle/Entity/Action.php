@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -19,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ActionRepository::class)]
 #[ORM\Table(name: 'form_actions')]
-#[ORM\Index(columns: ['type'], name: 'form_action_type_search')]
+#[ORM\Index(name: 'form_action_type_search', columns: ['type'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -39,6 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent('form')]
 class Action implements UuidInterface
 {
     use UuidTrait;
@@ -86,6 +88,8 @@ class Action implements UuidInterface
      * @var Form|null
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'actions')]
+    #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private $form;
 
     /**
@@ -114,12 +118,6 @@ class Action implements UuidInterface
             ->build();
 
         $builder->addField('properties', 'array');
-
-        $builder->createManyToOne('form', 'Form')
-            ->inversedBy('actions')
-            ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
-            ->build();
 
         static::addUuidField($builder);
     }

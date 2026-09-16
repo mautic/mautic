@@ -22,7 +22,7 @@ final class SafeUrlValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new SafeUrl();
 
-        $this->validator->validate($url, $constraint);
+        $this->validate($url, $constraint);
 
         if ($isValid) {
             $this->assertNoViolation();

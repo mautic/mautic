@@ -41,7 +41,7 @@ final class SlotNameTypeValidatorTest extends ConstraintValidatorTestCase
 
         $this->dynamicContentModel->method('checkEntityBySlotName')->willReturn(false);
 
-        $this->validator->validate($dynamicContent, new SlotNameType());
+        $this->validate($dynamicContent, new SlotNameType());
 
         $this->assertNoViolation();
     }
@@ -61,7 +61,7 @@ final class SlotNameTypeValidatorTest extends ConstraintValidatorTestCase
         $this->dynamicContentModel->method('checkEntityBySlotName')->willReturn(true);
 
         $constraint = new SlotNameType();
-        $this->validator->validate($dynamicContent, $constraint);
+        $this->validate($dynamicContent, $constraint);
 
         $this->buildViolation($constraint->message)
             ->atPath('property.path.type')

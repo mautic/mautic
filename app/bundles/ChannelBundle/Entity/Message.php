@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 #[ORM\Table(name: 'messages')]
-#[ORM\Index(columns: ['date_added'], name: 'date_message_added')]
+#[ORM\Index(name: 'date_message_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -94,7 +94,7 @@ class Message extends FormEntity implements UuidInterface
      * @var ArrayCollection<int,Channel>
      */
     #[Groups(['message:read', 'message:write'])]
-    #[ORM\OneToMany(mappedBy: 'message', targetEntity: Channel::class, cascade: ['merge', 'persist', 'detach'], orphanRemoval: true, indexBy: 'channel')]
+    #[ORM\OneToMany(targetEntity: Channel::class, mappedBy: 'message', cascade: ['persist', 'detach'], orphanRemoval: true, indexBy: 'channel')]
     private $channels;
 
     public function __clone()

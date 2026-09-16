@@ -11,9 +11,9 @@ use Mautic\CoreBundle\Helper\InputHelper;
 
 #[ORM\Entity(repositoryClass: DoNotContactRepository::class)]
 #[ORM\Table(name: 'lead_donotcontact')]
-#[ORM\Index(columns: ['lead_id', 'channel', 'reason'], name: 'leadid_reason_channel')]
-#[ORM\Index(columns: ['reason'], name: 'dnc_reason_search')]
-#[ORM\Index(columns: ['date_added'], name: 'dnc_date_added')]
+#[ORM\Index(name: 'leadid_reason_channel', columns: ['lead_id', 'channel', 'reason'])]
+#[ORM\Index(name: 'dnc_reason_search', columns: ['reason'])]
+#[ORM\Index(name: 'dnc_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class DoNotContact
 {

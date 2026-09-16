@@ -130,7 +130,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     /**
      * @var ArrayCollection<int, Stat>
      */
-    #[ORM\OneToMany(mappedBy: 'sms', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'sms', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**

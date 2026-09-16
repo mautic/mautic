@@ -75,7 +75,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      */
     #[Groups(['webhook:read', 'webhook:write'])]
     #[NotBlank(message: 'mautic.core.valid_url_required')]
-    #[Assert\Url(message: 'mautic.core.valid_url_required')]
+    #[Assert\Url(message: 'mautic.core.valid_url_required', requireTld: false)]
     private $webhookUrl;
 
     /**
@@ -94,13 +94,13 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var Collection<int, Event>
      */
     #[Groups(['webhook:read', 'webhook:write'])]
-    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: Event::class, cascade: ['persist', 'merge', 'detach'], orphanRemoval: true, indexBy: 'eventType')]
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'webhook', cascade: ['persist', 'detach'], orphanRemoval: true, indexBy: 'eventType')]
     private $events;
 
     /**
      * @var ArrayCollection<int, Log>
      */
-    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: Log::class, cascade: ['persist', 'merge', 'detach'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'webhook', cascade: ['persist', 'detach'], fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['dateAdded' => Order::Descending->value])]
     private $logs;
 
@@ -131,7 +131,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var string|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
-    #[Assert\Choice([
+    #[Assert\Choice(choices: [
         null,
         Order::Ascending->value,
         Order::Descending->value,

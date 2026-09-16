@@ -48,10 +48,8 @@ class UserRepository extends CommonRepository
      * Checks to ensure that a username and/or email is unique.
      *
      * @param array<string, mixed> $params
-     *
-     * @return array
      */
-    public function checkUniqueUsernameEmail(array $params)
+    public function checkUniqueUsernameEmail(array $params): array
     {
         $q = $this->createQueryBuilder('u');
 
@@ -90,12 +88,9 @@ class UserRepository extends CommonRepository
      *
      * @param string $search
      * @param int    $limit
-     * @param int    $start
      * @param array  $permissionLimiter
-     *
-     * @return array
      */
-    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
+    public function getUserList($search = '', $limit = 10, ?int $start = 0, $permissionLimiter = []): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
 
@@ -179,11 +174,8 @@ class UserRepository extends CommonRepository
     /**
      * @param string $search
      * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
      */
-    public function getPositionList($search = '', $limit = 10, $start = 0)
+    public function getPositionList($search = '', $limit = 10, ?int $start = 0): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('u.position')

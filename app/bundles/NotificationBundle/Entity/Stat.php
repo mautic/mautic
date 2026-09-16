@@ -13,17 +13,17 @@ use Mautic\LeadBundle\Entity\LeadList;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['notification_id', 'lead_id'], name: 'stat_notification_search')]
-#[ORM\Index(columns: ['is_clicked'], name: 'stat_notification_clicked_search')]
-#[ORM\Index(columns: ['tracking_hash'], name: 'stat_notification_hash_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_notification_source_search')]
+#[ORM\Index(name: 'stat_notification_search', columns: ['notification_id', 'lead_id'])]
+#[ORM\Index(name: 'stat_notification_clicked_search', columns: ['is_clicked'])]
+#[ORM\Index(name: 'stat_notification_hash_search', columns: ['tracking_hash'])]
+#[ORM\Index(name: 'stat_notification_source_search', columns: ['source', 'source_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     public const TABLE_NAME = 'push_notification_stats';
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

@@ -1,6 +1,6 @@
 {% extends '@MauticCore/FormTheme/form.html.twig' %}
 {% set hasRightColumn = block('rightFormContent') is defined %}
-{% set modalView      = app.getRequest().get('modal', false) or block('inModal') is defined %}
+{% set modalView      = (app.request.attributes.all()['modal'] ?? app.request.query.all()['modal'] ?? app.request.request.all()['modal'] ?? false) or block('inModal') is defined %}
 {% block mainFormContent %}
 <div class="box-layout">
     <div class="col-md-{{ hasRightColumn and not modalView ? 9 : 12 }} height-auto bdr-r">

@@ -44,7 +44,6 @@ final class ContactSegmentQueryBuilder
      */
     public function assembleContactsSegmentQueryBuilder(int $segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
-        /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
         if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             // Prefer a replica connection if available.
@@ -93,7 +92,6 @@ final class ContactSegmentQueryBuilder
      */
     public function wrapInCount(QueryBuilder $qb): QueryBuilder
     {
-        /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
         if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             // Prefer a replica connection if available.

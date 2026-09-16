@@ -4,8 +4,8 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 
@@ -56,7 +56,7 @@ class ColumnSchemaHelper
         $this->checkTableExists($this->tableName, true);
 
         // use the to schema to get table details so that changes will be calculated
-        $this->fromTable = $this->sm->introspectTable($this->tableName);
+        $this->fromTable = $this->sm->introspectTableByUnquotedName($this->tableName);
         $this->toTable   = clone $this->fromTable;
 
         return $this;
@@ -88,7 +88,10 @@ class ColumnSchemaHelper
     public function getColumns()
     {
         if (empty($this->columns)) {
-            $this->columns = $this->toTable->getColumns();
+            // DBAL 4 hands the columns back as a list, and they are looked up by name here
+            foreach ($this->toTable->getColumns() as $column) {
+                $this->columns[AssetName::of($column)] = $column;
+            }
         }
 
         return $this->columns;
@@ -183,7 +186,9 @@ class ColumnSchemaHelper
     public function executeChanges(): void
     {
         // create a table diff
-        $comparator = new Comparator();
+        // DBAL 4's Comparator needs the platform, so it is obtained from the schema
+        // manager rather than constructed directly.
+        $comparator = $this->sm->createComparator();
         $diff       = $comparator->compareTables($this->fromTable, $this->toTable);
 
         if (!$diff->isEmpty()) {

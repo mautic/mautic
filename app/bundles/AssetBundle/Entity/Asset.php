@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints\Sequentially;
 
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
 #[ORM\Table(name: 'assets')]
-#[ORM\Index(columns: ['alias'], name: 'asset_alias_search')]
+#[ORM\Index(name: 'asset_alias_search', columns: ['alias'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -77,7 +77,7 @@ class Asset extends FormEntity implements UuidInterface
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     #[Sequentially([
-        new Assert\Url(message: 'mautic.asset.validation.error.url'),
+        new Assert\Url(message: 'mautic.asset.validation.error.url', requireTld: false),
         new SafeRemoteUrl(),
     ])]
     private ?string $remotePath = null;

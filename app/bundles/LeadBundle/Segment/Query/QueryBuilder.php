@@ -4,10 +4,24 @@ namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\DBAL\Query\QueryBuilder as BaseQueryBuilder;
+use Doctrine\DBAL\Types\Type;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as BaseQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
+/**
+ * Segment query builder.
+ *
+ * DBAL 4 removed the query-part API (getQueryPart()/setQueryPart()/resetQueryPart())
+ * and made the underlying state private, so this class keeps its own record of the
+ * parts and generates the SELECT statement from it.
+ *
+ * That is not merely convenience: the segment engine rewrites joins after they have
+ * been added (addJoinCondition(), replaceJoinCondition()), which DBAL 4 offers no way
+ * to do. The part shapes are kept identical to DBAL 3's so the rest of the segment
+ * code reads them unchanged.
+ */
 class QueryBuilder extends BaseQueryBuilder
 {
     private ?ExpressionBuilder $_expr = null;
@@ -19,16 +33,8 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private array $logicStack = [];
 
-    public function __construct(
-        private readonly Connection $connection,
-    ) {
-        parent::__construct($connection);
-    }
 
-    /**
-     * @return ExpressionBuilder
-     */
-    public function expr()
+    public function expr(): ExpressionBuilder
     {
         if (null !== $this->_expr) {
             return $this->_expr;
@@ -39,107 +45,17 @@ class QueryBuilder extends BaseQueryBuilder
         return $this->_expr;
     }
 
-    public function setParameter($key, $value, $type = null)
+    public function setParameter(int|string $key, mixed $value, string|ParameterType|Type|ArrayParameterType|null $type = null): static
     {
         if (is_bool($value)) {
             $value = (int) $value;
         }
 
-        return parent::setParameter($key, $value, $type);
-    }
-
-    /**
-     * @param string $queryPartName
-     * @param mixed  $value
-     */
-    public function setQueryPart($queryPartName, $value): static
-    {
-        $this->resetQueryPart($queryPartName);
-        $this->add($queryPartName, $value);
+        parent::setParameter($key, $value, $type ?? ParameterType::STRING);
 
         return $this;
     }
 
-    public function getSQL()
-    {
-        $sql   = &$this->parentProperty('sql');
-        $state = &$this->parentProperty('state');
-
-        if (null !== $sql && 1 /* self::STATE_CLEAN */ === $state) {
-            return $sql;
-        }
-
-        $sql = match ($this->getType()) { /** @phpstan-ignore-line this method is deprecated. We'll have to find a way how to refactor this method. */
-            3 /* self::INSERT */ => $this->parentMethod('getSQLForInsert'),
-            1 /* self::DELETE */ => $this->parentMethod('getSQLForDelete'),
-            2 /* self::UPDATE */ => $this->parentMethod('getSQLForUpdate'),
-            default              => $this->getSQLForSelect(),
-        };
-
-        $state = 1 /* self::STATE_CLEAN */;
-
-        return $sql;
-    }
-
-    private function getSQLForSelect(): string
-    {
-        $sqlParts = $this->getQueryParts();
-
-        $query = 'SELECT '.($sqlParts['distinct'] ? 'DISTINCT ' : '').
-            implode(', ', $sqlParts['select']);
-
-        $query .= ($sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
-            .(null !== $sqlParts['where'] ? ' WHERE '.($sqlParts['where']) : '')
-            .($sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', $sqlParts['groupBy']) : '')
-            .(null !== $sqlParts['having'] ? ' HAVING '.($sqlParts['having']) : '')
-            .($sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', $sqlParts['orderBy']) : '');
-
-        if ($this->parentMethod('isLimitQuery')) {
-            return $this->connection->getDatabasePlatform()->modifyLimitQuery(
-                $query,
-                $this->getMaxResults(),
-                $this->getFirstResult()
-            );
-        }
-
-        return $query;
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getFromClauses(): array
-    {
-        $fromClauses  = [];
-        $knownAliases = [];
-
-        // Loop through all FROM clauses
-        foreach ($this->getQueryParts()['from'] as $from) {
-            if (null === $from['alias']) {
-                $tableSql       = $from['table'];
-                $tableReference = $from['table'];
-            } else {
-                $tableSql       = $from['table'].' '.$from['alias'];
-                $tableReference = $from['alias'];
-            }
-
-            if (isset($from['hint'])) {
-                $tableSql .= ' '.$from['hint'];
-            }
-
-            $knownAliases[$tableReference] = true;
-
-            $fromClauses[$tableReference] = $tableSql.\Closure::bind(
-                fn ($tableReference, &$knownAliases): string => $this->{'getSQLForJoins'}($tableReference, $knownAliases),
-                $this,
-                parent::class
-            )($tableReference, $knownAliases);
-        }
-
-        $this->parentMethod('verifyAllAliasesAreKnown', $knownAliases);
-
-        return $fromClauses;
-    }
 
     public function getJoinCondition(string $alias): string|false
     {
@@ -194,10 +110,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function setParametersPairs($parameters, $filterParameters)
+    public function setParametersPairs($parameters, $filterParameters): static
     {
         if (!is_array($parameters)) {
             return $this->setParameter($parameters, $filterParameters);
@@ -319,11 +232,9 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @return mixed|string
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getDebugOutput()
+    public function getDebugOutput(): string|array
     {
         $params = $this->getParameters();
         $sql    = $this->getSQL();
@@ -374,7 +285,7 @@ class QueryBuilder extends BaseQueryBuilder
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept). You may not use andWhere in filters!!!
      */
-    public function addLogic($expression, $glue): void
+    public function addLogic(string|\Doctrine\DBAL\Query\Expression\CompositeExpression $expression, $glue): void
     {
         // little setup
         $glue = strtolower($glue);
@@ -409,7 +320,7 @@ class QueryBuilder extends BaseQueryBuilder
     public function applyStackLogic(): static
     {
         if ($this->hasLogicStack()) {
-            $stackGroupExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack());
+            $stackGroupExpression = CompositeExpression::and(...$this->popLogicStack());
             $this->orWhere($stackGroupExpression);
         }
 
@@ -422,22 +333,21 @@ class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @return mixed
+     * Segment code catches QueryException specifically, so the alias errors keep raising it
+     * rather than the base class's generic database exception.
      *
-     * @noinspection PhpPassByRefInspection
+     * @param string[] $knownAliases
      */
-    private function &parentProperty(string $property)
+    protected function nonUniqueAliasException(string $alias, array $knownAliases): \Throwable
     {
-        return \Closure::bind(fn &() => $this->{$property}, $this, parent::class)();
+        return QueryException::nonUniqueAlias($alias, $knownAliases);
     }
 
     /**
-     * @param mixed ...$arguments
-     *
-     * @return mixed
+     * @param string[] $knownAliases
      */
-    private function parentMethod(string $method, ...$arguments)
+    protected function unknownAliasException(string $alias, array $knownAliases): \Throwable
     {
-        return \Closure::bind(fn () => $this->{$method}(...$arguments), $this, parent::class)();
+        return QueryException::unknownAlias($alias, $knownAliases);
     }
 }

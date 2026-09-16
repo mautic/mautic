@@ -27,7 +27,7 @@ final class PostCountRepository extends CommonRepository
         // Load points for selected periods
         $q = $chartQuery->prepareTimeDataQuery(MAUTIC_TABLE_PREFIX.'monitor_post_count', 'post_date', $options, 'post_count', 'sum');
         if (isset($options['monitor_id'])) {
-            $q->andwhere($q->expr()->eq('t.monitor_id', (int) $options['monitor_id']));
+            $q->andwhere($q->expr()->eq('t.monitor_id', (string) ((int) $options['monitor_id'])));
         }
 
         return $chartQuery->loadAndBuildTimeData($q);

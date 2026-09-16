@@ -226,10 +226,6 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
                 return [];
             }
 
-            public function eraseCredentials(): void
-            {
-            }
-
             public function getUserIdentifier(): string
             {
                 return (string) $this->id;
