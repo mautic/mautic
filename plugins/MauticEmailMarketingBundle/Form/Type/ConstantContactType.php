@@ -74,7 +74,7 @@ final class ConstantContactType extends AbstractType
 
         $builder->add('sendWelcome', YesNoButtonGroupType::class, [
             'label' => 'mautic.emailmarketing.send_welcome',
-            'data'  => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome'],
+            'data'  => $options['data']['sendWelcome'] ?? true,
         ]);
 
         if (!empty($error)) {

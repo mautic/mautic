@@ -6,8 +6,9 @@ namespace Mautic\EmailBundle\Helper;
 
 final readonly class EmailAddressLinkMatcher
 {
-    public function __construct(private MailHashHelper $mailHash)
-    {
+    public function __construct(
+        private MailHashHelper $mailHash,
+    ) {
     }
 
     public function matchesLink(string $value, string $secretHash, ?string $statEmailAddress = null): bool

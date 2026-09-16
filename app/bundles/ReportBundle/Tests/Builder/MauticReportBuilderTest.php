@@ -397,7 +397,7 @@ final class MauticReportBuilderTest extends TestCase
         // GROUP BY: its identifiers are aggregated or already covered by the
         // outer grouping key.
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', "
-            SELECT `e`.`id`, $formula GROUP BY e.id
+            SELECT `e`.`id`, {$formula} GROUP BY e.id
         ")), $query->getSql());
     }
 
@@ -424,7 +424,7 @@ final class MauticReportBuilderTest extends TestCase
         // a column: only the CASE's real column reference may be completed into
         // the outer GROUP BY.
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', "
-            SELECT `e`.`id`, $formula GROUP BY e.id, fs.type
+            SELECT `e`.`id`, {$formula} GROUP BY e.id, fs.type
         ")), $query->getSql());
     }
 
@@ -463,7 +463,7 @@ final class MauticReportBuilderTest extends TestCase
         // The CASE's base column is completed; nothing from the subquery scope is.
         $this->assertSame(
             trim(preg_replace('/\s{2,}/', ' ', "
-            SELECT `e`.`id`, $formula GROUP BY e.id, fs.type
+            SELECT `e`.`id`, {$formula} GROUP BY e.id, fs.type
         ")),
             trim(preg_replace('/\s{2,}/', ' ', $sql))
         );

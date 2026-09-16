@@ -151,11 +151,11 @@ final class MenuHelper
                 }
 
                 $items['children'] =
-                    (!isset($items['children']))
+                    (isset($items['children']))
                     ?
-                    $this->orphans[$type][$key]
+                    array_merge($items['children'], $this->orphans[$type][$key])
                     :
-                    array_merge($items['children'], $this->orphans[$type][$key]);
+                    $this->orphans[$type][$key];
                 unset($this->orphans[$type][$key]);
             } elseif (isset($items['children'])) {
                 foreach ($items['children'] as $subItems) {

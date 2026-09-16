@@ -22,8 +22,8 @@ final class SmsTransportPass implements CompilerPassInterface
             $definition->addMethodCall('addTransport', [
                 $id,
                 new Reference($id),
-                !empty($tags[0]['alias']) ? $tags[0]['alias'] : $id,
-                !empty($tags[0]['integrationAlias']) ? $tags[0]['integrationAlias'] : $id,
+                empty($tags[0]['alias']) ? $id : $tags[0]['alias'],
+                empty($tags[0]['integrationAlias']) ? $id : $tags[0]['integrationAlias'],
             ]);
         }
     }

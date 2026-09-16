@@ -440,7 +440,7 @@ class TrackableModel extends AbstractCommonModel
             $token = $match[1];
 
             // Tokenized hosts that are standalone tokens shouldn't use a scheme since the token value should contain it
-            if ($token === $tokenizedHost && $scheme = (!empty($urlParts['scheme'])) ? $urlParts['scheme'] : false) {
+            if ($token === $tokenizedHost && $scheme = (empty($urlParts['scheme'])) ? false : $urlParts['scheme']) {
                 // Token has a schema so let's get rid of it before replacing tokens
                 $this->contentReplacements['first_pass'][$scheme.'://'.$tokenizedHost] = $tokenizedHost;
                 $this->hasFirstPassReplacements                                        = true;
@@ -454,7 +454,7 @@ class TrackableModel extends AbstractCommonModel
 
             // Do not convert contact tokens
             if (!$this->isContactFieldToken($token)) {
-                $trackableUrl = (!empty($urlParts['query'])) ? $this->contentTokens[$token].'?'.$urlParts['query'] : $this->contentTokens[$token];
+                $trackableUrl = (empty($urlParts['query'])) ? $this->contentTokens[$token] : $this->contentTokens[$token].'?'.$urlParts['query'];
                 $trackableKey = $trackableUrl;
 
                 // Replace the URL token with the actual URL
@@ -532,7 +532,7 @@ class TrackableModel extends AbstractCommonModel
      */
     protected function isValidUrl($url, $forceScheme = true): bool
     {
-        $urlParts = (!is_array($url)) ? parse_url($url) : $url;
+        $urlParts = (is_array($url)) ? $url : parse_url($url);
 
         // Ensure a applicable URL (rule out URLs as just #)
         if (!isset($urlParts['host']) && !isset($urlParts['path'])) {

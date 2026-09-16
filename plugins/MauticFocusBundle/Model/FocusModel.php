@@ -214,7 +214,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         $displayManager     = $viewOnlyFields = null;
         if ($form) {
             $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
-            $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);
+            $displayManager = new DisplayManager($form, empty($viewOnlyFields) ? [] : $viewOnlyFields);
         }
         $formContent        = ($form instanceof \Mautic\FormBundle\Entity\Form) ? $this->twig->render(
             '@MauticFocus/Builder/form.html.twig',

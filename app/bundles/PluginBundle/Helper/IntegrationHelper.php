@@ -426,7 +426,7 @@ class IntegrationHelper
                 }
 
                 if ($identifierField && $settings->isPublished()) {
-                    $profile = (!isset($socialCache[$integration])) ? [] : $socialCache[$integration];
+                    $profile = $socialCache[$integration] ?? [];
 
                     // clear the cache
                     unset($profile['profile'], $profile['activity']);
@@ -444,8 +444,8 @@ class IntegrationHelper
                             $socialCache[$integration] = [];
                         }
 
-                        $socialCache[$integration]['profile']     = (!empty($profile['profile'])) ? $profile['profile'] : [];
-                        $socialCache[$integration]['activity']    = (!empty($profile['activity'])) ? $profile['activity'] : [];
+                        $socialCache[$integration]['profile']     = (empty($profile['profile'])) ? [] : $profile['profile'];
+                        $socialCache[$integration]['activity']    = (empty($profile['activity'])) ? [] : $profile['activity'];
                         $socialCache[$integration]['lastRefresh'] = $now->toUtcString();
                     }
                 } elseif (isset($socialCache[$integration])) {

@@ -161,8 +161,8 @@ final class EmailApiController extends CommonApiController
         }
 
         $post       = $request->request->all();
-        $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
-        $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
+        $tokens     = (empty($post['tokens'])) ? [] : $post['tokens'];
+        $assetsIds  = (empty($post['assetAttachments'])) ? [] : $post['assetAttachments'];
         $response   = ['success' => false];
 
         $cleanTokens = [];

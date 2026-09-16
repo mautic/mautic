@@ -71,7 +71,7 @@ final readonly class ReplyHelper
                     '%s: %s was not found. The message sent was "%s"',
                     $handler->getTransportName(),
                     $exception->getNumber(),
-                    !empty($message) ? $message : 'unknown'
+                    empty($message) ? 'unknown' : $message
                 )
             );
         }

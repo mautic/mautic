@@ -229,7 +229,7 @@ abstract class AbstractFormController extends CommonController
             return $vars;
         }
 
-        $returnUrl         = !empty($request->server->get('HTTP_REFERER')) ? $request->server->get('HTTP_REFERER') : '';
+        $returnUrl         = empty($request->server->get('HTTP_REFERER')) ? '' : $request->server->get('HTTP_REFERER');
         $vars['returnUrl'] = $returnUrl;
 
         $urlMatcher  = explode('/s/', $returnUrl);

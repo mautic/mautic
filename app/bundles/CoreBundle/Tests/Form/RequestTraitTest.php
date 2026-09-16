@@ -52,7 +52,7 @@ final class RequestTraitTest extends \PHPUnit\Framework\TestCase
                 'multiselect5' => ['first', 'second'],
             ];
 
-        foreach ($params as $alias => $value) {
+        foreach (array_keys($params) as $alias) {
             $this->form->add(
                 $alias,
                 ChoiceType::class,
@@ -220,7 +220,7 @@ final class RequestTraitTest extends \PHPUnit\Framework\TestCase
                 'datetime2' => '2023-01-01 21:00:10',
             ];
 
-        foreach ($params as $alias => $value) {
+        foreach (array_keys($params) as $alias) {
             $this->form->add(
                 $alias,
                 DateTimeType::class,

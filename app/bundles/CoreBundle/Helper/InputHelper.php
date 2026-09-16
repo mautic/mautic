@@ -300,18 +300,18 @@ final class InputHelper
 
         return
             // already clean due to the exclusion list above
-            (!empty($parts['scheme']) ? $parts['scheme'].'://' : '').
+            (empty($parts['scheme']) ? '' : $parts['scheme'].'://').
             // strip tags that could be embedded in the username or password
-            (!empty($parts['user']) ? strip_tags($parts['user']).':' : '').
-            (!empty($parts['pass']) ? strip_tags($parts['pass']).'@' : '').
+            (empty($parts['user']) ? '' : strip_tags($parts['user']).':').
+            (empty($parts['pass']) ? '' : strip_tags($parts['pass']).'@').
             // should be caught by FILTER_VALIDATE_URL if the host has invalid characters
-            (!empty($parts['host']) ? $parts['host'] : '').
+            (empty($parts['host']) ? '' : $parts['host']).
             // type cast to int
-            (!empty($parts['port']) ? ':'.$parts['port'] : '').
+            (empty($parts['port']) ? '' : ':'.$parts['port']).
             // strip tags that could be embedded in a path
-            (!empty($parts['path']) ? strip_tags($parts['path']) : '').
+            (empty($parts['path']) ? '' : strip_tags($parts['path'])).
             // cleaned through the parse_str (urldecode) and http_build_query (urlencode) above
-            (!empty($parts['query']) ? '?'.$parts['query'] : '').
+            (empty($parts['query']) ? '' : '?'.$parts['query']).
             // strip tags that could be embedded in the fragment
             (!$ignoreFragment && !empty($parts['fragment']) ? '#'.strip_tags($parts['fragment']) : '');
     }

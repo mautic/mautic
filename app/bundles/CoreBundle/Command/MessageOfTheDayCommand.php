@@ -154,8 +154,8 @@ final class MessageOfTheDayCommand extends Command
             }
 
             try {
-                $start = !empty($message['start']) ? new \DateTimeImmutable($message['start'], $utc) : null;
-                $end   = !empty($message['end']) ? new \DateTimeImmutable($message['end'], $utc) : null;
+                $start = empty($message['start']) ? null : new \DateTimeImmutable($message['start'], $utc);
+                $end   = empty($message['end']) ? null : new \DateTimeImmutable($message['end'], $utc);
             } catch (\Exception) {
                 continue;
             }

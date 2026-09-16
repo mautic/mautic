@@ -467,7 +467,7 @@ class FormController extends CommonFormController
                     'route'         => $this->generateUrl(
                         'mautic_form_action',
                         [
-                            'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
+                            'objectAction' => (empty($valid) ? 'new' : 'edit'), // valid means a new form was applied
                             'objectId'     => $entity->getId(),
                         ]
                     ),

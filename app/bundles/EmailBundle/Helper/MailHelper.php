@@ -1913,14 +1913,14 @@ class MailHelper
     {
         return [
             'name'        => $name,
-            'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
-            'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
-            'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
+            'leadId'      => (empty($this->lead)) ? null : $this->lead['id'],
+            'emailId'     => (empty($this->email)) ? null : $this->email->getId(),
+            'emailName'   => (empty($this->email)) ? null : $this->email->getName(),
             'hashId'      => $this->idHash,
             'hashIdState' => $this->idHashState,
             'source'      => $this->source,
             'tokens'      => $tokens,
-            'utmTags'     => (!empty($this->email)) ? $this->email->getUtmTags() : [],
+            'utmTags'     => (empty($this->email)) ? [] : $this->email->getUtmTags(),
             'includeDnc'  => !empty($this->email) && $this->email->getSendToDnc(),
         ];
     }

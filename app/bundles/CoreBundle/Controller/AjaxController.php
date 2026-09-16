@@ -161,13 +161,13 @@ class AjaxController extends CommonController
             if (is_array($c)) {
                 foreach ($c as $subc) {
                     $command = $this->translator->trans($k);
-                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
+                    $command = (str_contains($command, ':')) ? $command : $command.':';
 
                     $dataArray[$command.$this->translator->trans($subc)] = ['value' => $command.$this->translator->trans($subc)];
                 }
             } else {
                 $command = $this->translator->trans($c);
-                $command = (!str_contains($command, ':')) ? $command.':' : $command;
+                $command = (str_contains($command, ':')) ? $command : $command.':';
 
                 $dataArray[$command] = ['value' => $command];
             }
@@ -189,7 +189,7 @@ class AjaxController extends CommonController
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
                     $command = $this->translator->trans($k);
-                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
+                    $command = (str_contains($command, ':')) ? $command : $command.':';
 
                     foreach ($c as $subc) {
                         $subcommand = $command.$this->translator->trans($subc);
@@ -200,7 +200,7 @@ class AjaxController extends CommonController
                     }
                 } else {
                     $command = $this->translator->trans($k);
-                    $command = (!str_contains($command, ':')) ? $command.':' : $command;
+                    $command = (str_contains($command, ':')) ? $command : $command.':';
 
                     if (!in_array($command, $dupChecker)) {
                         $dataArray[]  = ['value' => $command];

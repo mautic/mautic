@@ -221,14 +221,14 @@ final class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.default_signature_text.tooltip',
                 ],
                 'required'   => false,
-                'data'       => (!empty($options['data']['default_signature_text']))
-                    ? $options['data']['default_signature_text']
-                    : $this->translator->trans(
+                'data'       => (empty($options['data']['default_signature_text']))
+                    ? $this->translator->trans(
                         'mautic.email.default.signature',
                         [
                             '%from_name%' => '|FROM_NAME|',
                         ]
-                    ),
+                    )
+                    : $options['data']['default_signature_text'],
             ]
         );
 

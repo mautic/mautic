@@ -16,7 +16,7 @@ final class Serializer
      */
     public static function decode($serializedString, array $options = ['allowed_classes' => false]): mixed
     {
-        if (1 === preg_match('/(^|;|{|})O:\+?[0-9]+:"/', $serializedString)) {
+        if (1 === preg_match('/(^|;|{|})O:\+?\d+:"/', $serializedString)) {
             throw new \InvalidArgumentException(sprintf('The string %s contains an object.', $serializedString));
         }
 

@@ -157,7 +157,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);
 
-        return $url.((!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '');
+        return $url.((empty($clickthrough)) ? '' : '?ct='.$this->encodeArrayForUrl($clickthrough));
     }
 
     /**

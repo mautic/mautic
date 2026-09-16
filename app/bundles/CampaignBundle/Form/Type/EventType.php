@@ -124,7 +124,7 @@ final class EventType extends AbstractType
                 ]
             );
 
-            $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';
+            $data = (empty($options['data']['triggerIntervalUnit'])) ? 'd' : $options['data']['triggerIntervalUnit'];
             $builder->add(
                 'triggerIntervalUnit',
                 ChoiceType::class,
@@ -326,9 +326,9 @@ final class EventType extends AbstractType
         }
 
         if (is_array($data[$name]) && array_key_exists('date', $data[$name])) {
-            $timezone = !empty($data[$name]['timezone'])
-                ? new \DateTimeZone($data[$name]['timezone'])
-                : null;
+            $timezone = empty($data[$name]['timezone'])
+                ? null
+                : new \DateTimeZone($data[$name]['timezone']);
 
             return $this->parseTimeValue($data[$name]['date'], $timezone);
         }

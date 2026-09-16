@@ -66,12 +66,12 @@ class FieldGroup extends FormEntity
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
 
-        $metadata->addPropertyConstraint('name', new Assert\Regex(pattern: '/^[\p{L}\p{N}\p{S}\s]+$/u', match: true, message: 'mautic.lead.field_group.name.help'));
+        $metadata->addPropertyConstraint('name', new Assert\Regex(pattern: '/^[\p{L}\p{N}\p{S}\s]+$/u', message: 'mautic.lead.field_group.name.help', match: true));
 
         // The alias (auto-generated from the name) is unique in the DB; validate
         // it here so a duplicate or near-duplicate name returns a form error on
         // the name field instead of an unhandled UniqueConstraintViolationException.
-        $metadata->addConstraint(new UniqueEntity(fields: ['alias'], errorPath: 'name', message: 'mautic.lead.field_group.name.unique'));
+        $metadata->addConstraint(new UniqueEntity(fields: ['alias'], message: 'mautic.lead.field_group.name.unique', errorPath: 'name'));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

@@ -88,7 +88,7 @@ final class TagController extends FormController
         $orderBy    = $session->get('mautic.tags.orderby', 'lt.tag');
         $orderByDir = $session->get('mautic.tags.orderbydir', 'ASC');
 
-        $filter = !empty($search) ? ['string' => $search] : '';
+        $filter = empty($search) ? '' : ['string' => $search];
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 

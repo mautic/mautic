@@ -91,7 +91,7 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
         $results = $crawler->filterXPath('//ul[contains(@class, "pa-0")]');
         $this->assertCount(2, $results->filter('li'));
 
-        foreach ($results->filter('li')->each(fn ($li) => $li->filter('a')->eq(0)->html()) as $i => $result) {
+        foreach (array_keys($results->filter('li')->each(fn ($li) => $li->filter('a')->eq(0)->html())) as $i) {
             $this->assertStringContainsString($contactData[$i]['firstname'], $results->text());
             $this->assertStringContainsString($contactData[$i]['lastname'], $results->text());
         }

@@ -1658,8 +1658,8 @@ final class LeadController extends FormController
                 }
             }
 
-            $add    = (!empty($data['add'])) ? $data['add'] : [];
-            $remove = (!empty($data['remove'])) ? $data['remove'] : [];
+            $add    = (empty($data['add'])) ? [] : $data['add'];
+            $remove = (empty($data['remove'])) ? [] : $data['remove'];
 
             if ($count = count($entities)) {
                 $campaigns = $this->campaignModel->getEntities(

@@ -39,7 +39,7 @@ final class BatchEmailController extends AbstractFormController
         return new JsonResponse([
             'closeModal'  => true,
             'flashes'     => $this->getFlashContent(),
-            'affected'    => !empty($affected) ? array_map(fn (Email $affected) => $affected->getId(), $affected) : [],
+            'affected'    => empty($affected) ? [] : array_map(fn (Email $affected) => $affected->getId(), $affected),
             'newCategory' => [
                 'name'  => $newCategory instanceof \Mautic\CategoryBundle\Entity\Category ? $newCategory->getTitle() : null,
                 'color' => $newCategory instanceof \Mautic\CategoryBundle\Entity\Category ? $newCategory->getColor() : null,

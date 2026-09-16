@@ -28,11 +28,11 @@ final class Cleaner
             case self::FIELD_TYPE_DATETIME:
                 $dateTimeValue = new \DateTime($value);
 
-                return (!empty($clean)) ? $dateTimeValue->format('c') : '';
+                return (empty($clean)) ? '' : $dateTimeValue->format('c');
             case self::FIELD_TYPE_DATE:
                 $dateTimeValue = new \DateTime($value);
 
-                return (!empty($clean)) ? $dateTimeValue->format('Y-m-d') : '';
+                return (empty($clean)) ? '' : $dateTimeValue->format('Y-m-d');
             default:
                 return $clean;
         }

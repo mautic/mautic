@@ -107,7 +107,7 @@ class FullObjectReportBuilder
 
         foreach ($foundObjects as $object) {
             $modifiedDateTime = new \DateTime(
-                !empty($object['date_modified']) ? $object['date_modified'] : $object['date_added'],
+                empty($object['date_modified']) ? $object['date_added'] : $object['date_modified'],
                 new \DateTimeZone('UTC')
             );
             $reportObjectDAO = new ReportObjectDAO($requestedObjectDAO->getObject(), $object['id'], $modifiedDateTime);

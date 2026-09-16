@@ -120,7 +120,7 @@ final class CalculatorHelper
 
     public static function getWeekDateString($date): string
     {
-        if (!preg_match('/^([0-9]{4})-([0-9]{2})$/', $date, $matches)) {
+        if (!preg_match('/^(\d{4})-(\d{2})$/', $date, $matches)) {
             throw new \InvalidArgumentException('Invalid argument, Y-W format is required.');
         }
         $year = $matches[1];

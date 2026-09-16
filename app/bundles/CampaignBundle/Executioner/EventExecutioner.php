@@ -293,7 +293,7 @@ class EventExecutioner
         foreach ($logs as $key => $log) {
             // Use the deleted ID if the contact was removed by the delete contact action
             $contact    = $log->getLead();
-            $contactId  = (!empty($contact->deletedId)) ? $contact->deletedId : $contact->getId();
+            $contactId  = (empty($contact->deletedId)) ? $contact->getId() : $contact->deletedId;
             $campaignId = $log->getCampaign()->getId();
 
             if ($this->removedContactTracker->wasContactRemoved($campaignId, $contactId)) {

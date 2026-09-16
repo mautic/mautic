@@ -1153,9 +1153,9 @@ class Event implements ChannelInterface, UuidInterface
         }
 
         if (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
-            $timezone = !empty($triggerDate['timezone'])
-                ? new \DateTimeZone($triggerDate['timezone'])
-                : null;
+            $timezone = empty($triggerDate['timezone'])
+                ? null
+                : new \DateTimeZone($triggerDate['timezone']);
 
             return new \DateTime($triggerDate['date'], $timezone);
         }
