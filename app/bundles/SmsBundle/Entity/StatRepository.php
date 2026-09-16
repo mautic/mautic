@@ -15,12 +15,10 @@ class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @return mixed
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getSmsStatus($trackingHash)
+    public function getSmsStatus($trackingHash): ?Stat
     {
         $q = $this->createQueryBuilder('s');
         $q->select('s')
@@ -65,10 +63,8 @@ class StatRepository extends CommonRepository
     /**
      * @param int|array $smsIds
      * @param int       $listId
-     *
-     * @return int
      */
-    public function getSentCount($smsIds = null, $listId = null)
+    public function getSentCount($smsIds = null, $listId = null): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -103,12 +99,10 @@ class StatRepository extends CommonRepository
      * @param int                  $leadId
      * @param array<string, mixed> $options
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($leadId, array $options = [])
+    public function getLeadStats($leadId, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 's')
