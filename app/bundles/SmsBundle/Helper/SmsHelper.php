@@ -44,7 +44,7 @@ class SmsHelper
 
         $leads = $this->leadRepository->getEntities($args);
 
-        if (!empty($leads)) {
+        if ($leads !== []) {
             $lead = array_shift($leads);
         } else {
             // Try to find the lead based on the given phone number
@@ -52,7 +52,7 @@ class SmsHelper
 
             $leads = $this->leadRepository->getEntities($args);
 
-            if (!empty($leads)) {
+            if ($leads !== []) {
                 $lead = array_shift($leads);
             } else {
                 return null;

@@ -146,7 +146,7 @@ class MessageQueueModel extends FormModel
 
         foreach ($leads as $lead) {
             $leadId = (is_array($lead)) ? $lead['id'] : $lead->getId();
-            if (!empty($this->messageQueueRepository->findMessage($channel, $channelId, $leadId))) {
+            if ($this->messageQueueRepository->findMessage($channel, $channelId, $leadId) instanceof \Mautic\ChannelBundle\Entity\MessageQueue) {
                 continue;
             }
 

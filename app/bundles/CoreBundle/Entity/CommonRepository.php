@@ -669,7 +669,7 @@ class CommonRepository extends ServiceEntityRepository
      * @param int    $id
      * @param string $column
      */
-    public function getValue($id, $column): ?string
+    public function getValue($id, $column): mixed
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select($this->getTableAlias().'.'.$column)

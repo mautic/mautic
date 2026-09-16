@@ -192,7 +192,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $contacts = $this->getLeadsByFieldValue('email', $email);
 
         // Attempt to search for contacts without a + suffix
-        if (empty($contacts) && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts)) {
+        if ($contacts === [] && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts)) {
             $email    = $parts[1].'@'.$parts[3];
             $contacts = $this->getLeadsByFieldValue('email', $email);
         }
@@ -1064,7 +1064,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Gets the ID of the latest ID.
      */
-    public function getMaxLeadId(): int
+    public function getMaxLeadId(): ?int
     {
         $result = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('max(id) as max_lead_id')

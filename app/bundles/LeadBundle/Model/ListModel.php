@@ -333,10 +333,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         return $choices;
     }
 
-    /**
-     * @return array
-     */
-    public function getUserLists(string $alias = '')
+    public function getUserLists(string $alias = ''): array
     {
         $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : null;
 
@@ -345,10 +342,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of global lead lists.
-     *
-     * @return mixed
      */
-    public function getGlobalLists()
+    public function getGlobalLists(): array
     {
         return $this->leadListRepository->getGlobalLists();
     }

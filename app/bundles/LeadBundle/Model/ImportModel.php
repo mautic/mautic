@@ -122,7 +122,7 @@ class ImportModel extends FormModel
         $ghostDelay = 2;
         $imports    = $this->importRepository->getGhostImports($ghostDelay, 5);
 
-        if (empty($imports)) {
+        if ($imports === []) {
             return;
         }
 
@@ -533,10 +533,8 @@ class ImportModel extends FormModel
      *
      * @param int    $importId
      * @param string $object
-     *
-     * @return array|null
      */
-    public function getFailedRows($importId = null, $object = 'lead')
+    public function getFailedRows($importId = null, $object = 'lead'): ?array
     {
         if (!$importId) {
             return null;

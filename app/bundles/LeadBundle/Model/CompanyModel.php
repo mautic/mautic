@@ -164,10 +164,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return parent::getEntity($id);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getUserCompanies()
+    public function getUserCompanies(): array
     {
         $user = (!$this->security->isGranted('lead:leads:viewother')) ?
             $this->userHelper->getUser() : false;

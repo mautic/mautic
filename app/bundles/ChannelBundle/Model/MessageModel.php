@@ -171,7 +171,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     /**
      * @return array
      */
-    public function getChannelMessageByChannelId(int $channelId)
+    public function getChannelMessageByChannelId(int $channelId): array|false
     {
         return $this->messageRepository->getChannelMessageByChannelId($channelId);
     }
