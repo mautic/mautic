@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Column;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 use Symfony\Component\HttpFoundation\Request;
 
 class FieldControllerTest extends MauticMysqlTestCase
@@ -56,28 +57,50 @@ class FieldControllerTest extends MauticMysqlTestCase
         $alias   = 'test_field_edit_exception';
         $form['leadfield[label]']->setValue($label);
         $form['leadfield[alias]']->setValue($alias);
-        $crawler = $this->client->submit($form);
 
-        // Check for successful response (2xx or 3xx status code)
+        $this->client->submit($form);
+
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isSuccessful() || $response->isRedirect());
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString('Your custom field is being created, we will notify you when complete', $response->getContent());
 
         // Get the created field
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['alias' => $alias]);
         $this->assertNotNull($field, 'Field was not created');
+        $this->assertSame($label, $field->getLabel());
+
+        // Now edit the field - just change the label, and check Mautic will "schedule" the update of the
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/edit/'.$field->getId());
+        $form    = $crawler->selectButton('Save & Close')->form([
+            'leadfield' => [
+                'label' => $label.'1',
+            ],
+        ]);
+        $this->client->submit($form);
+
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString($label, $response->getContent());
+        $this->assertStringContainsString('Your custom field is being updated, we will notify you when complete', $response->getContent());
 
         // Run the background command to create the column
-        $commandTester = $this->testSymfonyCommand('mautic:custom-field:create-column', ['--id' => $field->getId()]);
+        $commandTester = $this->testSymfonyCommand(CreateCustomFieldCommand::COMMAND_NAME, ['--id' => $field->getId()]);
         $this->assertEquals(0, $commandTester->getStatusCode());
 
-        // Now edit the field - just change the label
+        // Now edit the field again, see the Mautic reports a clean "was updated"
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/edit/'.$field->getId());
-        $form    = $crawler->selectButton('Save & Close')->form();
-        $crawler = $this->client->submit($form);
+        $form    = $crawler->selectButton('Save & Close')->form([
+            'leadfield' => [
+                'label' => $label.'2',
+            ],
+        ]);
 
-        // Check for successful response (2xx or 3xx status code)
+        $this->client->submit($form);
+
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isSuccessful() || $response->isRedirect());
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString($label, $response->getContent());
+        $this->assertStringContainsString('has been updated!', $response->getContent());
     }
 
     public function testCloneFieldSubmission(): void
