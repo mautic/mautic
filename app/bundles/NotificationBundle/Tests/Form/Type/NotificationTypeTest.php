@@ -27,6 +27,7 @@ final class NotificationTypeTest extends TypeTestCase
     {
         $validatorBuilder = Validation::createValidatorBuilder();
         $validatorBuilder->addMethodMapping('loadValidatorMetadata');
+        $validatorBuilder->enableAttributeMapping();
 
         return [
             new ValidatorExtension($validatorBuilder->getValidator()),
