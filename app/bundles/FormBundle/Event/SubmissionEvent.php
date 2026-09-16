@@ -236,9 +236,6 @@ class SubmissionEvent extends CommonEvent
         return (null === $key) ? $this->callbackResponses : $this->callbackResponses[$key];
     }
 
-    /**
-     * @param mixed $callbackResponse
-     */
     public function setPostSubmitCallbackResponse(string $key, \Symfony\Component\HttpFoundation\RedirectResponse $callbackResponse): static
     {
         $this->callbackResponses[$key] = $callbackResponse;

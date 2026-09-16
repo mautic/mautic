@@ -78,8 +78,6 @@ class ConfigEvent extends CommonEvent
     /**
      * Set fields such as passwords that will not overwrite existing values
      * if the current is empty.
-     *
-     * @param array|string $fields
      */
     public function unsetIfEmpty(string $fields): void
     {

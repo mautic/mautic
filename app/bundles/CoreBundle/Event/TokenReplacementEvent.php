@@ -28,9 +28,7 @@ class TokenReplacementEvent extends CommonEvent
     private ?Stat $stat = null;
 
     /**
-     * @param CommonEntity|string|null $content
-     * @param Lead|mixed[]|null        $lead
-     * @param mixed                    $passthrough
+     * @param mixed $passthrough
      */
     public function __construct(
         \Mautic\LeadBundle\Entity\Lead|string|null $content,
@@ -54,9 +52,6 @@ class TokenReplacementEvent extends CommonEvent
         return $this->content;
     }
 
-    /**
-     * @param CommonEntity|string|null $content
-     */
     public function setContent(string $content): void
     {
         $this->content = $content;

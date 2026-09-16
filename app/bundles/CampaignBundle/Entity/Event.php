@@ -804,7 +804,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @param \DateTime|string|array<string,string> $triggerHour
+     * @param array<string,string>|string $triggerHour
      */
     public function setTriggerHour(array|string $triggerHour): static
     {
@@ -823,9 +823,6 @@ class Event implements ChannelInterface, UuidInterface
         return $this->triggerIntervalUnit;
     }
 
-    /**
-     * @param mixed $triggerIntervalUnit
-     */
     public function setTriggerIntervalUnit(string $triggerIntervalUnit): void
     {
         $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
@@ -868,9 +865,6 @@ class Event implements ChannelInterface, UuidInterface
         return $this->triggerMode;
     }
 
-    /**
-     * @param mixed $triggerMode
-     */
     public function setTriggerMode(string $triggerMode): void
     {
         $this->isChanged('triggerMode', $triggerMode);
@@ -885,9 +879,6 @@ class Event implements ChannelInterface, UuidInterface
         return $this->decisionPath;
     }
 
-    /**
-     * @param mixed $decisionPath
-     */
     public function setDecisionPath(string $decisionPath): void
     {
         $this->isChanged('decisionPath', $decisionPath);
@@ -902,9 +893,6 @@ class Event implements ChannelInterface, UuidInterface
         return $this->tempId;
     }
 
-    /**
-     * @param mixed $tempId
-     */
     public function setTempId(string $tempId): void
     {
         $this->isChanged('tempId', $tempId);
@@ -998,8 +986,6 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Set the value of triggerRestrictedStartHour.
-     *
-     * @param \DateTime|string|array<string,string>|null $triggerRestrictedStartHour
      */
     public function setTriggerRestrictedStartHour(string $triggerRestrictedStartHour): static
     {
@@ -1024,8 +1010,6 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Set the value of triggerRestrictedStopHour.
-     *
-     * @param \DateTime|string|array<string,string>|null $triggerRestrictedStopHour
      */
     public function setTriggerRestrictedStopHour(string $triggerRestrictedStopHour): static
     {
