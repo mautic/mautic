@@ -16,7 +16,7 @@ final class MessageRepository extends CommonRepository
     /**
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $qb = $this->createQueryBuilder($this->getTableAlias());
         // Because of this inner join pagination is not working properly. Removing this doesn't seem to break any feature.
