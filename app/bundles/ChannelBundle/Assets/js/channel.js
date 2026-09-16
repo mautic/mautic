@@ -3,6 +3,28 @@ Mautic.messagesOnLoad = function(container) {
       // Move modals outside of the wrapper
       mQuery(this).closest('.panel').append(mQuery(this));
     });
+
+    const emailChannelSelect = mQuery(container + ' .message_channel_properties_email select[id$="_channelId"]');
+    if (emailChannelSelect.length) {
+        emailChannelSelect.on('change', function() {
+            Mautic.setMarketingMessageEmailChannelSendToDncStatus(mQuery(this).val());
+        });
+        if (emailChannelSelect.val()) {
+            Mautic.setMarketingMessageEmailChannelSendToDncStatus(emailChannelSelect.val());
+        }
+    }
+};
+
+Mautic.messageSendOnLoad = function(container) {
+    const marketingMessageSelect = mQuery(container + ' #campaignevent_properties_marketingMessage');
+    if (marketingMessageSelect.length) {
+        marketingMessageSelect.on('change', function() {
+            Mautic.setMarketingMessageSendToDncStatus(mQuery(this).val());
+        });
+        if (marketingMessageSelect.val()) {
+            Mautic.setMarketingMessageSendToDncStatus(marketingMessageSelect.val());
+        }
+    }
 };
 
 Mautic.toggleChannelFormDisplay = function (el, channel) {

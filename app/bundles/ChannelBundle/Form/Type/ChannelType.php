@@ -64,9 +64,7 @@ final class ChannelType extends AbstractType
                     [
                         'multiple'    => false,
                         'label'       => 'mautic.channel.message.form.message',
-                        'attr'        => 'email' === $channelName ? [
-                            'onchange' => 'Mautic.setMarketingMessageEmailChannelSendToDncStatus(mQuery(this).val());',
-                        ] : [],
+                        'attr'        => [],
                         'constraints' => ($enabled) ? [
                             new NotBlank(
                                 message: 'mautic.core.value.required'
