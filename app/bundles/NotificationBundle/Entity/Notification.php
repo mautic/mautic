@@ -140,6 +140,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @var ArrayCollection<int, Stat>
      */
+    #[ORM\OneToMany(mappedBy: 'notification', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
@@ -229,13 +230,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
             ->addJoinColumn('notification_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('stats', 'Stat')
-            ->setIndexBy('id')
-            ->mappedBy('notification')
-            ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
 

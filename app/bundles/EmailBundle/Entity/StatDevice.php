@@ -23,11 +23,15 @@ class StatDevice
      */
     private $id;
 
+    #[ORM\ManyToOne(targetEntity: Stat::class)]
+    #[ORM\JoinColumn(name: 'stat_id', onDelete: 'CASCADE')]
     private ?Stat $stat = null;
 
     /**
      * @var LeadDevice|null
      */
+    #[ORM\ManyToOne(targetEntity: LeadDevice::class)]
+    #[ORM\JoinColumn(name: 'device_id', onDelete: 'CASCADE')]
     private $device;
 
     private ?IpAddress $ipAddress = null;
@@ -42,14 +46,6 @@ class StatDevice
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->createManyToOne('device', LeadDevice::class)
-            ->addJoinColumn('device_id', 'id', true, false, 'CASCADE')
-            ->build();
-
-        $builder->createManyToOne('stat', 'Stat')
-            ->addJoinColumn('stat_id', 'id', true, false, 'CASCADE')
-            ->build();
 
         $builder->addIpAddress(true);
 

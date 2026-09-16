@@ -20,6 +20,8 @@ class EmailDraft
     private int $id;
 
     public function __construct(
+        #[ORM\OneToOne(inversedBy: 'draft', targetEntity: Email::class)]
+        #[ORM\JoinColumn(name: 'email_id', nullable: false)]
         private Email $email,
         private ?string $html,
         private ?string $template,
@@ -38,11 +40,6 @@ class EmailDraft
             ->columnName('public_preview')
             ->nullable(false)
             ->option('default', 1)
-            ->build();
-
-        $builder->createOneToOne('email', Email::class)
-            ->inversedBy('draft')
-            ->addJoinColumn('email_id', 'id', false)
             ->build();
     }
 

@@ -31,6 +31,8 @@ class Stat
     /**
      * @var Sms|null
      */
+    #[ORM\ManyToOne(targetEntity: Sms::class, inversedBy: 'stats')]
+    #[ORM\JoinColumn(name: 'sms_id', onDelete: 'SET NULL')]
     private $sms;
 
     /**
@@ -41,6 +43,8 @@ class Stat
     /**
      * @var LeadList|null
      */
+    #[ORM\ManyToOne(targetEntity: LeadList::class)]
+    #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
     private $list;
 
     /**
@@ -89,16 +93,7 @@ class Stat
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('sms', 'Sms')
-            ->inversedBy('stats')
-            ->addJoinColumn('sms_id', 'id', true, false, 'SET NULL')
-            ->build();
-
         $builder->addLead(true, 'SET NULL');
-
-        $builder->createManyToOne('list', LeadList::class)
-            ->addJoinColumn('list_id', 'id', true, false, 'SET NULL')
-            ->build();
 
         $builder->addIpAddress(true);
 

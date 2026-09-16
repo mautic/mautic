@@ -31,6 +31,8 @@ class Stat
     /**
      * @var Focus
      */
+    #[ORM\ManyToOne(targetEntity: Focus::class)]
+    #[ORM\JoinColumn(name: 'focus_id', nullable: false, onDelete: 'CASCADE')]
     private $focus;
 
     /**
@@ -58,10 +60,6 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createManyToOne('focus', 'Focus')
-            ->addJoinColumn('focus_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->addField('type', 'string');
 

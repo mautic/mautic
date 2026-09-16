@@ -94,11 +94,14 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var Collection<int, Event>
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: Event::class, cascade: ['persist', 'merge', 'detach'], orphanRemoval: true, indexBy: 'eventType')]
     private $events;
 
     /**
      * @var ArrayCollection<int, Log>
      */
+    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: Log::class, cascade: ['persist', 'merge', 'detach'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OrderBy(['dateAdded' => Order::Descending->value])]
     private $logs;
 
     /**
@@ -154,23 +157,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         $builder->addIdColumns();
 
         $builder->addCategory();
-
-        $builder->createOneToMany('events', 'Event')
-            ->orphanRemoval()
-            ->setIndexBy('eventType')
-            ->mappedBy('webhook')
-            ->cascadePersist()
-            ->cascadeMerge()
-            ->cascadeDetach()
-            ->build();
-
-        $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => Order::Descending->value])
-            ->fetchExtraLazy()
-            ->mappedBy('webhook')
-            ->cascadePersist()
-            ->cascadeMerge()
-            ->cascadeDetach()
-            ->build();
 
         $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
         $builder->addField('secret', Types::STRING);

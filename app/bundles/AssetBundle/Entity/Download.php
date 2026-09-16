@@ -96,6 +96,8 @@ class Download
     private $sourceId;
 
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\ManyToOne(targetEntity: Email::class)]
+    #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private ?Email $email = null;
 
     private ?string $utmCampaign = null;
@@ -144,10 +146,6 @@ class Download
         $builder->createField('sourceId', 'integer')
             ->columnName('source_id')
             ->nullable()
-            ->build();
-
-        $builder->createManyToOne('email', Email::class)
-            ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->createField('utmCampaign', Types::STRING)

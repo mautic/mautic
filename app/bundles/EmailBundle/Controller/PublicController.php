@@ -69,7 +69,7 @@ final class PublicController extends CommonFormController
         '/email/view/{idHash}',
         name: 'mautic_email_webview',
     )]
-    public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash): Response
+    public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, string $idHash): Response
     {
         $stat  = $this->emailModel->getEmailStatus($idHash);
 
@@ -145,7 +145,7 @@ final class PublicController extends CommonFormController
         name: 'mautic_email_unsubscribe',
         defaults: ['urlEmail' => null, 'secretHash' => null],
     )]
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, EmailDefaultsHelper $emailDefaultsHelper, $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, EmailDefaultsHelper $emailDefaultsHelper, string $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
     {
         $stat                   = $model->getEmailStatus($idHash);
         $message                = '';
@@ -365,7 +365,7 @@ final class PublicController extends CommonFormController
         '/email/resubscribe/{idHash}',
         name: 'mautic_email_resubscribe',
     )]
-    public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, $idHash): Response
+    public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, string $idHash): Response
     {
         $stat = $model->getEmailStatus($idHash);
 

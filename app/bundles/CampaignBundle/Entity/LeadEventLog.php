@@ -39,6 +39,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var Event
      */
+    #[ORM\ManyToOne(targetEntity: Event::class, inversedBy: 'log')]
+    #[ORM\JoinColumn(name: 'event_id', nullable: false)]
     private $event;
 
     /**
@@ -49,6 +51,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var Campaign|null
      */
+    #[ORM\ManyToOne(targetEntity: Campaign::class)]
+    #[ORM\JoinColumn(name: 'campaign_id')]
     private $campaign;
 
     /**
@@ -109,6 +113,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var FailedLeadEventLog|null
      */
+    #[ORM\OneToOne(mappedBy: 'log', targetEntity: FailedLeadEventLog::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private $failedLog;
 
     /**
@@ -124,18 +129,9 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('event', 'Event')
-            ->inversedBy('log')
-            ->addJoinColumn('event_id', 'id', false, false)
-            ->build();
-
         $builder->addLead(false, 'CASCADE');
 
         $builder->addField('rotation', 'integer');
-
-        $builder->createManyToOne('campaign', 'Campaign')
-            ->addJoinColumn('campaign_id', 'id')
-            ->build();
 
         $builder->addIpAddress(true);
 
@@ -168,12 +164,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
         $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
-
-        $builder->createOneToOne('failedLog', 'FailedLeadEventLog')
-            ->mappedBy('log')
-            ->fetchExtraLazy()
-            ->cascadeAll()
-            ->build();
 
         $builder->createField('dateQueued', Types::DATETIME_MUTABLE)
             ->columnName('date_queued')

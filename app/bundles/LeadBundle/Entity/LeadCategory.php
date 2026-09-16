@@ -49,6 +49,8 @@ class LeadCategory
      * @var Category
      */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
+    #[ORM\ManyToOne(targetEntity: Category::class)]
+    #[ORM\JoinColumn(name: 'category_id', nullable: false, onDelete: 'CASCADE')]
     private $category;
 
     /**
@@ -80,10 +82,6 @@ class LeadCategory
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createManyToOne('category', Category::class)
-            ->addJoinColumn('category_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->createManyToOne('lead', Lead::class)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')

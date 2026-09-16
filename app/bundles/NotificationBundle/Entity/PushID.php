@@ -21,6 +21,8 @@ class PushID
     /**
      * @var Lead|null
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'pushIds')]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private $lead;
 
     /**
@@ -50,11 +52,6 @@ class PushID
         $builder->createField('pushID', 'string')
             ->columnName('push_id')
             ->nullable(false)
-            ->build();
-
-        $builder->createManyToOne('lead', Lead::class)
-            ->addJoinColumn('lead_id', 'id', true, false, 'SET NULL')
-            ->inversedBy('pushIds')
             ->build();
 
         $builder->createField('enabled', 'boolean')->build();

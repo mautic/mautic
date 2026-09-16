@@ -121,6 +121,7 @@ class LeadList extends FormEntity implements UuidInterface
     /**
      * @var ArrayCollection<ListLead>
      */
+    #[ORM\OneToMany(mappedBy: 'list', targetEntity: ListLead::class, fetch: 'EXTRA_LAZY')]
     private $leads;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
@@ -160,11 +161,6 @@ class LeadList extends FormEntity implements UuidInterface
 
         $builder->createField('isPreferenceCenter', 'boolean')
             ->columnName('is_preference_center')
-            ->build();
-
-        $builder->createOneToMany('leads', 'ListLead')
-            ->mappedBy('list')
-            ->fetchExtraLazy()
             ->build();
 
         $builder->createField('lastBuiltDate', 'datetime')

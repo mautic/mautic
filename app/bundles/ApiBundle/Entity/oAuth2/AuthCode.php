@@ -14,6 +14,12 @@ use Mautic\UserBundle\Entity\User;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class AuthCode extends BaseAuthCode
 {
+    #[ORM\ManyToOne(targetEntity: Client::class)]
+    #[ORM\JoinColumn(name: 'client_id', nullable: false, onDelete: 'CASCADE')]
+    protected \FOS\OAuthServerBundle\Model\ClientInterface $client;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', nullable: false, onDelete: 'CASCADE')]
+    protected ?\Symfony\Component\Security\Core\User\UserInterface $user = null;
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -21,14 +27,6 @@ class AuthCode extends BaseAuthCode
         $builder->createField('id', 'integer')
             ->makePrimaryKey()
             ->generatedValue()
-            ->build();
-
-        $builder->createManyToOne('client', 'Client')
-            ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
-            ->build();
-
-        $builder->createManyToOne('user', User::class)
-            ->addJoinColumn('user_id', 'id', false, false, 'CASCADE')
             ->build();
 
         $builder->createField('token', 'string')
