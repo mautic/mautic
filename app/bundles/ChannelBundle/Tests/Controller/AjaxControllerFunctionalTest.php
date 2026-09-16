@@ -81,7 +81,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             'id'     => $message->getId(),
         ];
 
-        $this->client->request(Request::METHOD_POST, '/s/ajax', $payload, [], $this->createAjaxHeaders());
+        $this->client->request(Request::METHOD_GET, '/s/ajax', $payload, [], $this->createAjaxHeaders());
         $this->assertTrue($this->client->getResponse()->isOk());
         $response = json_decode($this->client->getResponse()->getContent(), true);
 

@@ -48,7 +48,7 @@ final class AjaxController extends CommonAjaxController
     {
         $dataArray = [];
 
-        $objectId = $request->request->get('id');
+        $objectId = $request->query->get('id');
 
         if ($objectId && $entity = $this->messageModel->getEntity($objectId)) {
             foreach ($entity->getChannels() as $channel) {
