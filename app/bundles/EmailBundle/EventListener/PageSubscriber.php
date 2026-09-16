@@ -32,6 +32,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
     {
         $hit      = $event->getHit();
         $redirect = $hit->getRedirect();
+        $stat     = null;
 
         if ($redirect && $email = $hit->getEmail()) {
             // click trigger condition
@@ -43,7 +44,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
                 $stat = $this->emailModel->getEmailStatus($clickthrough['stat']);
             }
 
-            if (empty($stat)) {
+            if (!$stat instanceof \Mautic\EmailBundle\Entity\Stat) {
                 if ($lead = $hit->getLead()) {
                     // Try searching by email and lead IDs
                     $stats = $this->emailModel->getEmailStati($hit->getSourceId(), $lead->getId());

@@ -224,7 +224,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function getIdHash()
     {
