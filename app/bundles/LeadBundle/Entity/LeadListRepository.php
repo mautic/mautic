@@ -85,10 +85,8 @@ class LeadListRepository extends CommonRepository
      * @param string $alias
      * @param string $id
      * @param bool   $justPublished if false, returns all published and unpublished segments
-     *
-     * @return array
      */
-    public function getLists(?User $user = null, $alias = '', $id = '', bool $justPublished = true)
+    public function getLists(?User $user = null, $alias = '', $id = '', bool $justPublished = true): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
@@ -128,10 +126,8 @@ class LeadListRepository extends CommonRepository
      * Get lists for a specific lead.
      *
      * @param int|Lead[] $lead Lead ID or array of Leads
-     *
-     * @return mixed
      */
-    public function getLeadLists($lead, bool $forList = false, bool $singleArrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false)
+    public function getLeadLists($lead, bool $forList = false, bool $singleArrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {
         if (is_array($lead)) {
             $q = $this->getEntityManager()->createQueryBuilder()
@@ -229,10 +225,8 @@ class LeadListRepository extends CommonRepository
 
     /**
      * Return a list of global lists.
-     *
-     * @return array
      */
-    public function getGlobalLists()
+    public function getGlobalLists(): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
