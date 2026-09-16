@@ -15,7 +15,7 @@ final class MonitoringRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getPublishedEntities(array $args = [])
+    public function getPublishedEntities(array $args = []): iterable
     {
         $q    = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($q);
