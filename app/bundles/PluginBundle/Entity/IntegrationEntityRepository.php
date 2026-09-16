@@ -132,7 +132,7 @@ class IntegrationEntityRepository extends CommonRepository
     /**
      * @return IntegrationEntity[]
      */
-    public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds): mixed
+    public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds): array
     {
         $q = $this->createQueryBuilder('i', 'i.internalEntityId');
 

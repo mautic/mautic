@@ -79,10 +79,8 @@ class TriggerEventRepository extends CommonRepository
      * Get array of published actions based on type.
      *
      * @param string $type
-     *
-     * @return array
      */
-    public function getPublishedByType($type): mixed
+    public function getPublishedByType($type): array
     {
         $q = $this->createQueryBuilder('e')
             ->select('partial e.{id, type, name, properties}, partial t.{id, name, points, color}')

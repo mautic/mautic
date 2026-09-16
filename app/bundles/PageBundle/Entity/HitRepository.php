@@ -292,7 +292,7 @@ class HitRepository extends CommonRepository
         $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $expr = $q->expr()->and(
             $q->expr()->{$inOrEq}('h.page_id', $pageIds),
-            $q->expr()->eq('h.code', (string) (200)),
+            $q->expr()->eq('h.code', '200'),
             $q->expr()->isNull('h.date_left')
         );
 

@@ -50,10 +50,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * Get leads for a specific campaign.
-     *
-     * @return array
      */
-    public function getLeads($campaignId, $eventId = null): mixed
+    public function getLeads($campaignId, $eventId = null): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Lead::class, 'lc')
@@ -176,7 +174,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('l.campaign_id', ':campaignId'),
-                    $q->expr()->eq('l.manually_removed', (string) (0))
+                    $q->expr()->eq('l.manually_removed', '0')
                 )
             )
             // Order by ID so we can query by greater than X contact ID when batching
@@ -270,7 +268,7 @@ class LeadRepository extends CommonRepository
                 ->where(
                     $q->expr()->and(
                         $q->expr()->eq('l.campaign_id', ':campaignId'),
-                        $q->expr()->eq('l.manually_removed', (string) (0))
+                        $q->expr()->eq('l.manually_removed', '0')
                     )
                 )
                 // Order by ID so we can query by greater than X contact ID when batching
@@ -364,7 +362,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('ll.manually_removed', (string) (0)),
+                    $qb->expr()->eq('ll.manually_removed', '0'),
                     $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
             )
@@ -403,7 +401,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->eq('ll.manually_removed', (string) (0)),
+                    $qb->expr()->eq('ll.manually_removed', '0'),
                     $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
             )
@@ -437,8 +435,8 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
-                    $qb->expr()->eq('cl.manually_removed', (string) (0)),
-                    $qb->expr()->eq('cl.manually_added', (string) (0))
+                    $qb->expr()->eq('cl.manually_removed', '0'),
+                    $qb->expr()->eq('cl.manually_added', '0')
                 )
             );
 
@@ -460,8 +458,8 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
-                    $qb->expr()->eq('cl.manually_removed', (string) (0)),
-                    $qb->expr()->eq('cl.manually_added', (string) (0))
+                    $qb->expr()->eq('cl.manually_removed', '0'),
+                    $qb->expr()->eq('cl.manually_added', '0')
                 )
             );
 
@@ -534,9 +532,9 @@ class LeadRepository extends CommonRepository
         );
 
         if ($campaignCanBeRestarted) {
-            $alreadyInCampaign           = $qb->expr()->eq('cl.manually_removed', (string) (0));
+            $alreadyInCampaign           = $qb->expr()->eq('cl.manually_removed', '0');
             $removedFromCampaignManually = $qb->expr()->and(
-                $qb->expr()->eq('cl.manually_removed', (string) (1)),
+                $qb->expr()->eq('cl.manually_removed', '1'),
                 $qb->expr()->isNull('cl.date_last_exited'),
             );
 
@@ -571,7 +569,7 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('ll.lead_id', 'cl.lead_id'),
-                    $qb->expr()->eq('ll.manually_removed', (string) (0)),
+                    $qb->expr()->eq('ll.manually_removed', '0'),
                     $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
             );

@@ -539,10 +539,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return (null == $sourceType) ? $choices : $choices[$sourceType];
     }
 
-    /**
-     * @return array
-     */
-    public function getCampaignsByForm(Form|int $form): mixed
+    public function getCampaignsByForm(Form|int $form): array
     {
         $formId = ($form instanceof Form) ? $form->getId() : $form;
 
@@ -632,7 +629,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param Campaign $campaign
      * @param array    $event
      */
-    public function getCampaignLeads($campaign, $event = null): mixed
+    public function getCampaignLeads($campaign, $event = null): array
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;

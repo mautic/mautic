@@ -11,10 +11,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class RedirectRepository extends CommonRepository
 {
-    /**
-     * @return array
-     */
-    public function findByUrls(array $urls): mixed
+    public function findByUrls(array $urls): array
     {
         $q = $this->createQueryBuilder('r');
 
@@ -118,7 +115,7 @@ class RedirectRepository extends CommonRepository
                     $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
-                        $sb->expr()->eq('lll.manually_removed', (string) (0))
+                        $sb->expr()->eq('lll.manually_removed', '0')
                     )
                 );
 

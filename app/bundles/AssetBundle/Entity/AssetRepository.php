@@ -206,12 +206,10 @@ class AssetRepository extends CommonRepository
     /**
      * @param int $categoryId
      *
-     * @return Asset
-     *
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getLatestAssetForCategory($categoryId): mixed
+    public function getLatestAssetForCategory($categoryId): Asset
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where($this->getTableAlias().'.category = :categoryId');

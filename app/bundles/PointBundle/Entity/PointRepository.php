@@ -35,10 +35,8 @@ class PointRepository extends CommonRepository
      * Get array of published actions based on type.
      *
      * @param string $type
-     *
-     * @return array
      */
-    public function getPublishedByType($type): mixed
+    public function getPublishedByType($type): array
     {
         $q = $this->createQueryBuilder('p')
             ->select('partial p.{id, type, name, delta, repeatable, properties}')

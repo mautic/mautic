@@ -231,10 +231,7 @@ class CampaignRepository extends CommonRepository
         return $forms;
     }
 
-    /**
-     * @return array
-     */
-    public function findByFormId($formId): mixed
+    public function findByFormId($formId): array
     {
         $q = $this->createQueryBuilder('c')
             ->join('c.forms', 'f');
@@ -622,12 +619,12 @@ class CampaignRepository extends CommonRepository
                         // version = 1 means the job was killed after the DB INSERT but before evaluation —
                         // children must NOT be picked up; the condition/decision itself must be re-executed.
                         $query->expr()->in('parent.event_type', ["'condition'", "'decision'"]),
-                        $query->expr()->gt('log.version', (string) (1)),
+                        $query->expr()->gt('log.version', '1'),
                         $query->expr()->or(
                             // "No" path taken
                             $query->expr()->and(
                                 $query->expr()->eq('ce.decision_path', $query->expr()->literal('no')),
-                                $query->expr()->eq('log.non_action_path_taken', (string) (1))
+                                $query->expr()->eq('log.non_action_path_taken', '1')
                             ),
                             // "Yes" path or default path taken
                             $query->expr()->and(
@@ -636,7 +633,7 @@ class CampaignRepository extends CommonRepository
                                     $query->expr()->isNull('ce.decision_path')
                                 ),
                                 $query->expr()->or(
-                                    $query->expr()->eq('log.non_action_path_taken', (string) (0)),
+                                    $query->expr()->eq('log.non_action_path_taken', '0'),
                                     $query->expr()->isNull('log.non_action_path_taken')
                                 )
                             )

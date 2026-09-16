@@ -31,15 +31,12 @@ final class BroadcastQuery
         return $query->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getPendingCount(Sms $sms): mixed
+    public function getPendingCount(Sms $sms): int
     {
         $query = $this->getBasicQuery($sms);
         $query->select('COUNT(DISTINCT l.id)');
 
-        return $query->executeQuery()->fetchOne();
+        return (int) $query->executeQuery()->fetchOne();
     }
 
     public function getBasicQuery(Sms $sms): QueryBuilder
