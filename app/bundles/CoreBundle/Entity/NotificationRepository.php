@@ -64,10 +64,7 @@ class NotificationRepository extends CommonRepository
         }
     }
 
-    /**
-     * @return mixed|null
-     */
-    public function getUpstreamLastDate()
+    public function getUpstreamLastDate(): ?\DateTimeInterface
     {
         $qb = $this->createQueryBuilder('n')
             ->select('partial n.{id, dateAdded}')
