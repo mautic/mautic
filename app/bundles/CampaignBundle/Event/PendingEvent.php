@@ -16,10 +16,7 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
     private readonly ArrayCollection $successful;
 
-    /**
-     * @var string|null
-     */
-    private $channel;
+    private ?string $channel = null;
 
     /**
      * @var int|null
@@ -83,10 +80,8 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * Fail all that have not passed yet.
-     *
-     * @param string $reason
      */
-    public function failRemaining($reason): void
+    public function failRemaining(string $reason): void
     {
         foreach ($this->logs as $log) {
             if (!$this->successful->contains($log)) {
@@ -97,10 +92,8 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * Fail all that have not passed or failed yet.
-     *
-     * @param string $reason
      */
-    public function failRemainingPending($reason): void
+    public function failRemainingPending(string $reason): void
     {
         foreach ($this->logs as $log) {
             if (!$this->failures->contains($log) && !$this->successful->contains($log)) {
@@ -111,9 +104,8 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * @param LeadEventLog[]|ArrayCollection $logs
-     * @param string                         $reason
      */
-    public function failLogs(ArrayCollection $logs, $reason): void
+    public function failLogs(ArrayCollection $logs, string $reason): void
     {
         foreach ($logs as $log) {
             $this->fail($log, $reason);

@@ -19,8 +19,8 @@ final class CustomContentEvent extends Event
     private array $templates = [];
 
     public function __construct(
-        private string $viewName,
-        private ?string $context = null,
+        private readonly string $viewName,
+        private readonly ?string $context = null,
         private readonly array $vars = [],
     ) {
     }
@@ -48,18 +48,12 @@ final class CustomContentEvent extends Event
         ];
     }
 
-    /**
-     * @return mixed
-     */
-    public function getViewName()
+    public function getViewName(): string
     {
         return $this->viewName;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getContext()
+    public function getContext(): ?string
     {
         return $this->context;
     }

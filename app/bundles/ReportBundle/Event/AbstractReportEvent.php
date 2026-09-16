@@ -42,10 +42,10 @@ abstract class AbstractReportEvent extends Event
 
             return count($res) > 0;
         }
-        if ($this->context == $context) {
+        if ($this->context === $context) {
             return true;
         }
 
-        return 0 === stripos($this->context, (string) $context);
+        return 0 === stripos($this->context, $context);
     }
 }

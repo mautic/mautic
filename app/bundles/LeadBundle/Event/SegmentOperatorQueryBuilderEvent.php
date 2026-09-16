@@ -20,7 +20,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
         private readonly ContactSegmentFilter $filter,
-        private array|string $parameterHolder,
+        private readonly array|string $parameterHolder,
     ) {
         $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
@@ -38,7 +38,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     /**
      * @return string|string[]
      */
-    public function getParameterHolder()
+    public function getParameterHolder(): string|array
     {
         return $this->parameterHolder;
     }
@@ -48,7 +48,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
         return in_array($this->filter->getOperator(), $operators, true);
     }
 
-    public function addExpression(\Doctrine\DBAL\Query\Expression\CompositeExpression|string $expression): void
+    public function addExpression(\Doctrine\DBAL\Query\Expression\CompositeExpression|string|null $expression): void
     {
         $this->queryBuilder->addLogic($expression, $this->filter->getGlue());
 

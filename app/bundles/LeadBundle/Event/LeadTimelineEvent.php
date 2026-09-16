@@ -53,10 +53,7 @@ final class LeadTimelineEvent extends Event
 
     private bool $fetchTypesOnly = false;
 
-    /**
-     * @var array
-     */
-    private $serializerGroups = [
+    private array $serializerGroups = [
         'ipAddressList',
     ];
 
@@ -423,7 +420,7 @@ final class LeadTimelineEvent extends Event
                 $this->totalEvents[$eventType] = array_sum($count);
             }
         } else {
-            $this->totalEvents[$eventType] += (int) $count;
+            $this->totalEvents[$eventType] += $count;
         }
     }
 
@@ -478,10 +475,7 @@ final class LeadTimelineEvent extends Event
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getSerializerGroups()
+    public function getSerializerGroups(): array
     {
         return $this->serializerGroups;
     }

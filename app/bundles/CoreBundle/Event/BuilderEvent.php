@@ -222,6 +222,6 @@ class BuilderEvent extends Event
             return in_array($type, $this->requested);
         }
 
-        return $this->requested == $type || 'all' == $this->requested;
+        return $this->requested === $type || 'all' === $this->requested;
     }
 }

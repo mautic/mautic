@@ -547,7 +547,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->order;
     }
-    public function setProperties(array $properties): static
+    public function setProperties(array|null $properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -598,7 +598,8 @@ class Event implements ChannelInterface, UuidInterface
     {
         return get_object_vars($this);
     }
-    public function setDescription(string $description): static
+
+    public function setDescription(?string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -606,10 +607,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }

@@ -36,7 +36,7 @@ class CompanyReportData
     {
         $companyColumns = $this->getCompanyData();
 
-        return array_any($companyColumns, fn ($column, $key): bool => $event->hasColumn($key));
+        return array_any($companyColumns, fn ($column, array|string $key): bool => $event->hasColumn($key));
     }
 
     /**

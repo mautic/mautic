@@ -72,7 +72,7 @@ final class ChannelBroadcastEvent extends Event
     {
         $this->results[$channelLabel] = [
             'success'                => (int) $successCount,
-            'failed'                 => (int) $failedCount,
+            'failed'                 => $failedCount,
             'failedRecipientsByList' => $failedRecipientsByList,
         ];
     }

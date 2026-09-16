@@ -61,7 +61,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @return Lead|mixed[]|null
      */
-    public function getLead()
+    public function getLead(): \Mautic\LeadBundle\Entity\Lead|array|null
     {
         return $this->lead;
     }
