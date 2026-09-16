@@ -3274,18 +3274,6 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/Email.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setVariantReadCount\(\) has parameter \$variantReadCount with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setVariantSentCount\(\) has parameter \$variantSentCount with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 1
