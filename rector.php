@@ -39,8 +39,6 @@ return RectorConfig::configure()
         Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
-        Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector::class,
-
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 
@@ -67,7 +65,6 @@ return RectorConfig::configure()
         ],
 
         // handle next
-        Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAnnotationRector::class,
         Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
@@ -118,13 +115,6 @@ return RectorConfig::configure()
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
-        ],
-
-        // properties are read before assignment when fetchLeads()/fetchContacts() return early;
-        // DebugLogger's static property may be read before any instance constructs it
-        Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector::class => [
-            __DIR__.'/plugins/MauticCrmBundle/Integration/Salesforce/CampaignMember/Fetcher.php',
-            __DIR__.'/app/bundles/IntegrationsBundle/Sync/Logger/DebugLogger.php',
         ],
     ])
     ->reportUnusedSkips();
