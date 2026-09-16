@@ -450,7 +450,7 @@ final class SubmissionModel extends CommonFormModel
      *
      * @return Submission[]|array<int,Submission>|iterable<Submission>|Paginator<Submission>|SimplePaginator<Submission>
      */
-    public function getEntities(array $args = []): iterable
+    public function getEntities(array $args = []): array
     {
         return $this->submissionRepository->getEntities($args);
     }
