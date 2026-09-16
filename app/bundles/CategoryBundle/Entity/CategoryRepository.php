@@ -15,7 +15,7 @@ class CategoryRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('c')
@@ -34,7 +34,7 @@ class CategoryRepository extends CommonRepository
      *
      * @return mixed[]
      */
-    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0, bool $includeGlobal = true)
+    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0, bool $includeGlobal = true): array
     {
         $q = $this->createQueryBuilder('c');
         $q->select('partial c.{id, title, alias, color, bundle}');
@@ -140,10 +140,8 @@ class CategoryRepository extends CommonRepository
      * @param string $bundle
      * @param string $alias
      * @param object $entity
-     *
-     * @return mixed
      */
-    public function checkUniqueCategoryAlias($bundle, $alias, $entity = null)
+    public function checkUniqueCategoryAlias($bundle, $alias, $entity = null): mixed
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as aliascount')
