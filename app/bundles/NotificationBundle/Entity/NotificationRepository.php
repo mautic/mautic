@@ -149,7 +149,7 @@ final class NotificationRepository extends CommonRepository
      * @param int    $limit
      * @param string $notificationType
      */
-    public function getNotificationList($search = '', $limit = 10, ?int $start = 0, bool $viewOther = false, $notificationType = null): array
+    public function getNotificationList($search = '', $limit = 10, int $start = 0, bool $viewOther = false, $notificationType = null): array
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');

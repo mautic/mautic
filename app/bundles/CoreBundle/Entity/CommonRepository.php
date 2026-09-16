@@ -625,7 +625,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @return array{total: mixed, results: list<array<string, mixed>>}
      */
-    public function getRows(int $start = 0, ?int $limit = 100, array $order = [], array $where = [], ?array $select = null, array $allowedJoins = []): array
+    public function getRows(int $start = 0, int $limit = 100, array $order = [], array $where = [], ?array $select = null, array $allowedJoins = []): array
     {
         $alias    = $this->getTableAlias();
         $metadata = $this->getClassMetadata();

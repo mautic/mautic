@@ -483,7 +483,7 @@ class HitRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers($query, ?int $limit = 10, int $offset = 0): array
+    public function getReferers($query, int $limit = 10, int $offset = 0): array
     {
         $query->select('ph.referer, count(ph.referer) as sessions')
             ->groupBy('ph.referer')
@@ -502,7 +502,7 @@ class HitRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostVisited($query, ?int $limit = 10, int $offset = 0, string $column = 'p.hits', $as = ''): array
+    public function getMostVisited($query, int $limit = 10, int $offset = 0, string $column = 'p.hits', $as = ''): array
     {
         if ($as) {
             $as = ' as "'.$as.'"';

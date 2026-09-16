@@ -2022,7 +2022,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getEmailStatList(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getEmailStatList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
         $q             = $this->em->getConnection()->createQueryBuilder();
@@ -2058,7 +2058,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getEmailList(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getEmailList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
         $q             = $this->em->getConnection()->createQueryBuilder();

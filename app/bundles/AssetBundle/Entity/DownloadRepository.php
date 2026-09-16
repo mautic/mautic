@@ -78,7 +78,7 @@ class DownloadRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostDownloaded($query, ?int $limit = 10, int $offset = 0): array
+    public function getMostDownloaded($query, int $limit = 10, int $offset = 0): array
     {
         $query->select('a.title, a.id, count(ad.id) as downloads')
             ->groupBy('a.id, a.title')
@@ -97,7 +97,7 @@ class DownloadRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getTopReferrers($query, ?int $limit = 10, int $offset = 0): array
+    public function getTopReferrers($query, int $limit = 10, int $offset = 0): array
     {
         $query->select('ad.referer, count(ad.referer) as downloads')
             ->groupBy('ad.referer')

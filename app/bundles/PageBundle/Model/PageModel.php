@@ -972,7 +972,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @param array $filters
      */
-    public function getPopularPages(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getPopularPages(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -999,7 +999,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @param array $filters
      */
-    public function getPageList(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getPageList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')

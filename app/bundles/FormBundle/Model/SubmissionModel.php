@@ -831,7 +831,7 @@ final class SubmissionModel extends CommonFormModel
      * @param string $dateTo
      * @param array  $filters
      */
-    public function getTopSubmissionReferrers(?int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmissionReferrers(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -860,7 +860,7 @@ final class SubmissionModel extends CommonFormModel
      * @param string $dateTo
      * @param array  $filters
      */
-    public function getTopSubmitters(?int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmitters(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')

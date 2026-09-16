@@ -858,7 +858,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getFormList(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getFormList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.name, t.date_added, t.date_modified')

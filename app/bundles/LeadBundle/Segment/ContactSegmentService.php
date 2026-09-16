@@ -100,7 +100,7 @@ readonly class ContactSegmentService
      * @throws \Doctrine\DBAL\Exception
      * @throws Exception\SegmentQueryException
      */
-    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, ?int $limit = 1000): array
+    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, int $limit = 1000): array
     {
         $queryBuilder = $this->getNewLeadListLeadsQueryBuilder($segment, $batchLimiters);
         $queryBuilder->setMaxResults($limit);

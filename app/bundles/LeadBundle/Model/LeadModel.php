@@ -648,7 +648,7 @@ class LeadModel extends FormModel
     /**
      * Get list of entities for autopopulate fields.
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, ?int $start = 0): array
+    public function getLookupResults($type, $filter = '', $limit = 10, int $start = 0): array
     {
         $results    = [];
 
@@ -2004,7 +2004,7 @@ class LeadModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      */
-    public function getTopOwners(?int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
+    public function getTopOwners(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
@@ -2029,7 +2029,7 @@ class LeadModel extends FormModel
      * @param string $dateTo
      * @param array  $filters
      */
-    public function getTopCreators(?int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
+    public function getTopCreators(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
@@ -2053,7 +2053,7 @@ class LeadModel extends FormModel
      * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getLeadList(?int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getLeadList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         if (!empty($options['canViewOthers'])) {
             $filter['owner_id'] = $this->userHelper->getUser()->getId();

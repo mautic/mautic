@@ -68,7 +68,7 @@ class PageRepository extends CommonRepository
      * @param array       $ignoreIds
      * @param array       $extraColumns
      */
-    public function getPageList($search = '', $limit = 10, ?int $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [], bool $publishedOnly = false): array
+    public function getPageList($search = '', $limit = 10, int $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [], bool $publishedOnly = false): array
     {
         $q = $this->createQueryBuilder('p');
         $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));

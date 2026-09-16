@@ -323,7 +323,7 @@ class CampaignRepository extends CommonRepository
     /**
      * Get a list of popular (by logs) campaigns.
      */
-    public function getPopularCampaigns(?int $limit = 10): array
+    public function getPopularCampaigns(int $limit = 10): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

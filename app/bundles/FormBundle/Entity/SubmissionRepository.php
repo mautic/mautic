@@ -313,7 +313,7 @@ class SubmissionRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getTopReferrers($query, ?int $limit = 10, int $offset = 0): array
+    public function getTopReferrers($query, int $limit = 10, int $offset = 0): array
     {
         $query->select('fs.referer, count(fs.referer) as sessions')
             ->groupBy('fs.referer')
@@ -332,7 +332,7 @@ class SubmissionRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostSubmitted($query, ?int $limit = 10, int $offset = 0, $column = 'fs.id', $as = 'submissions'): array
+    public function getMostSubmitted($query, int $limit = 10, int $offset = 0, $column = 'fs.id', $as = 'submissions'): array
     {
         $asSelect = ($as) ? ' as '.$as : '';
 

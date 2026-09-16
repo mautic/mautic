@@ -97,7 +97,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
      * @param int    $limit
      * @param array  $permissionLimiter
      */
-    public function getUserList($search = '', $limit = 10, ?int $start = 0, $permissionLimiter = []): array
+    public function getUserList($search = '', $limit = 10, int $start = 0, $permissionLimiter = []): array
     {
         return $this->userRepository->getUserList($search, $limit, $start, $permissionLimiter);
     }

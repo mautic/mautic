@@ -100,7 +100,7 @@ final class VideoHitRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers($query, ?int $limit = 10, int $offset = 0): array
+    public function getReferers($query, int $limit = 10, int $offset = 0): array
     {
         $query->select('h.referer, count(h.referer) as sessions')
             ->groupBy('h.referer')

@@ -90,7 +90,7 @@ class UserRepository extends CommonRepository
      * @param int    $limit
      * @param array  $permissionLimiter
      */
-    public function getUserList($search = '', $limit = 10, ?int $start = 0, $permissionLimiter = []): array
+    public function getUserList($search = '', $limit = 10, int $start = 0, $permissionLimiter = []): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
 
@@ -175,7 +175,7 @@ class UserRepository extends CommonRepository
      * @param string $search
      * @param int    $limit
      */
-    public function getPositionList($search = '', $limit = 10, ?int $start = 0): array
+    public function getPositionList($search = '', $limit = 10, int $start = 0): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('u.position')

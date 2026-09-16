@@ -919,7 +919,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      */
-    public function getTopLists(?int $limit = 10, $dateFrom = null, $dateTo = null, bool $canViewOthers = true): array
+    public function getTopLists(int $limit = 10, $dateFrom = null, $dateTo = null, bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')

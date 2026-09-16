@@ -142,7 +142,7 @@ final class DynamicContentRepository extends CommonRepository
      * @param array  $ignoreIds
      * @param string $where
      */
-    public function getDynamicContentList($search = '', $limit = 10, ?int $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $where = null): array
+    public function getDynamicContentList($search = '', $limit = 10, int $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $where = null): array
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');

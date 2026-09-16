@@ -192,7 +192,7 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
      *
      * @param string|null $inversedBy
      */
-    public function addContact(bool $nullable = false, ?string $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
+    public function addContact(bool $nullable = false, string $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
     {
         $lead = $this->createManyToOne('contact', Lead::class);
 
@@ -216,7 +216,7 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
      *
      * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
      */
-    public function addLead(bool $nullable = false, ?string $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
+    public function addLead(bool $nullable = false, string $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
     {
         $lead = $this->createManyToOne('lead', Lead::class);
 
