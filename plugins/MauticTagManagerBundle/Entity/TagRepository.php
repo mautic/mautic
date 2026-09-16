@@ -57,7 +57,7 @@ final class TagRepository extends BaseTagRepository
      *
      * @return int|array<int, int>
      */
-    public function countByLeads($tagIds)
+    public function countByLeads($tagIds): mixed
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
