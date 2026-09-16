@@ -9,10 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class RedirectRepository extends CommonRepository
 {
-    /**
-     * @return array
-     */
-    public function findByUrls(array $urls)
+    public function findByUrls(array $urls): array
     {
         $q = $this->createQueryBuilder('r');
 
