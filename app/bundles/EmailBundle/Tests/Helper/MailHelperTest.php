@@ -1647,4 +1647,59 @@ final class MailHelperTest extends TestCase
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(fn (string $name, $default = null) => $values[$name] ?? $default);
     }
+
+    public function testQueuedSendAppliesTheAddressLengthLimit(): void
+    {
+        $limit = 30;
+
+        $this->coreParametersHelper->expects($this->atLeast(3))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['mailer_address_length_limit', null, $limit],
+        ]);
+
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->enableQueue();
+
+        $email = new Email();
+        $email->setSubject('Hello');
+        $email->setCustomHtml('<html>content</html>');
+        $mailer->setEmail($email);
+
+        $longName = 'This is a very long name that exceeds the length limit';
+
+        $mailer->addTo($this->contacts[0]['email'], $longName);
+        $mailer->setLead($this->contacts[0]);
+        $mailer->queue();
+        $mailer->flushQueue();
+
+        $sent = $transport->getMessage();
+        $this->assertInstanceOf(\Mautic\EmailBundle\Mailer\Message\MauticMessage::class, $sent);
+
+        $to = $sent->getTo();
+        $this->assertCount(1, $to);
+        $this->assertSame($this->contacts[0]['email'], $to[0]->getAddress());
+
+        // The transport must not be handed an address longer than the configured limit.
+        // This is measured the same way addTo() measures it.
+        $encodedLength = strlen((new MailboxListHeader('To', [$to[0]]))->getBodyAsString());
+        $this->assertLessThanOrEqual(
+            $limit,
+            $encodedLength,
+            'The queued path must respect mailer_address_length_limit, as addTo() already does.'
+        );
+
+        $this->assertSame('', $to[0]->getName(), 'The display name should have been dropped on the queued path as well.');
+
+        // Only the header is shortened. Batch transports build their payloads from the
+        // metadata, so the name they receive must be unchanged.
+        $metadatas = $transport->getMetadatas();
+        $this->assertCount(1, $metadatas);
+        $this->assertSame(
+            $longName,
+            $metadatas[0][$this->contacts[0]['email']]['name'],
+            'The metadata the transport reads must keep the full name.'
+        );
+    }
 }
