@@ -17,10 +17,7 @@ class AuditLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    /**
-     * @return int
-     */
-    public function getAuditLogsCount(Lead $lead, ?array $filters = null)
+    public function getAuditLogsCount(Lead $lead, ?array $filters = null): int
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'al')
@@ -50,10 +47,8 @@ class AuditLogRepository extends CommonRepository
     /**
      * @param int $page
      * @param int $limit
-     *
-     * @return array
      */
-    public function getAuditLogs(Lead $lead, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25)
+    public function getAuditLogs(Lead $lead, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25): array
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -102,10 +97,7 @@ class AuditLogRepository extends CommonRepository
         return $query->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return array
-     */
-    public function getAuditLogsForLeads(array $listOfContacts, ?array $filters = null, ?array $orderBy = null, $dateAdded = null)
+    public function getAuditLogsForLeads(array $listOfContacts, ?array $filters = null, ?array $orderBy = null, $dateAdded = null): array
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -159,10 +151,8 @@ class AuditLogRepository extends CommonRepository
      * @param string|null $object
      * @param string|null $id
      * @param int         $limit
-     *
-     * @return array
      */
-    public function getLogForObject($object = null, $id = null, $limit = 10, $afterDate = null, $bundle = null)
+    public function getLogForObject($object = null, $id = null, $limit = 10, $afterDate = null, $bundle = null): array
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -196,10 +186,7 @@ class AuditLogRepository extends CommonRepository
         return $query->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadIpLogs(?Lead $lead = null, array $options = [])
+    public function getLeadIpLogs(?Lead $lead = null, array $options = []): array
     {
         $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sqb = $this->getEntityManager()->getConnection()->createQueryBuilder();
