@@ -23,7 +23,7 @@ class AssetRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('a')
@@ -39,10 +39,8 @@ class AssetRepository extends CommonRepository
      * @param string $search
      * @param int    $limit
      * @param int    $start
-     *
-     * @return array
      */
-    public function getAssetList($search = '', $limit = 10, $start = 0, bool $viewOther = false)
+    public function getAssetList($search = '', $limit = 10, $start = 0, bool $viewOther = false): array
     {
         $q = $this->createQueryBuilder('a');
         $q->select('partial a.{id, title, path, alias, language}');
@@ -209,12 +207,10 @@ class AssetRepository extends CommonRepository
     /**
      * @param int $categoryId
      *
-     * @return Asset
-     *
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getLatestAssetForCategory($categoryId)
+    public function getLatestAssetForCategory($categoryId): Asset
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where($this->getTableAlias().'.category = :categoryId');
