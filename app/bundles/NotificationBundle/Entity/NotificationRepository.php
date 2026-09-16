@@ -16,7 +16,7 @@ final class NotificationRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()
             ->createQueryBuilder()
@@ -33,10 +33,8 @@ final class NotificationRepository extends CommonRepository
 
     /**
      * Get amounts of sent and read notifications.
-     *
-     * @return array
      */
-    public function getSentReadCount()
+    public function getSentReadCount(): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
