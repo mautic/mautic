@@ -18,10 +18,8 @@ final class VideoHitRepository extends CommonRepository
      *
      * @param int|null             $leadId
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getTimelineStats($leadId = null, array $options = [])
+    public function getTimelineStats($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -43,10 +41,8 @@ final class VideoHitRepository extends CommonRepository
 
     /**
      * @param string $guid
-     *
-     * @return VideoHit
      */
-    public function getHitForLeadByGuid(Lead $lead, $guid)
+    public function getHitForLeadByGuid(Lead $lead, $guid): VideoHit
     {
         $result = $this->findOneBy(['guid' => $guid, 'lead' => $lead]);
 
@@ -59,12 +55,10 @@ final class VideoHitRepository extends CommonRepository
      * @param int                  $leadId
      * @param array<string, mixed> $options
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadHits($leadId, array $options = [])
+    public function getLeadHits($leadId, array $options = []): array
     {
         $query = $this->createQueryBuilder('h');
         $query->select('h.userAgent, h.dateHit, h.dateLeft, h.referer, h.channel, h.channelId, h.url, h.duration, h.query, h.timeWatched')
