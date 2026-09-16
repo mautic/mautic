@@ -9,13 +9,13 @@ use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -80,7 +80,8 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
             $this->validator,
             $this->createStub(UserPasswordHasher::class),
             $this->createStub(FixturesLoaderInterface::class),
-            $this->userRepository
+            $this->userRepository,
+            new Filesystem()
         );
     }
 

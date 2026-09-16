@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
@@ -29,7 +30,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -57,6 +57,7 @@ class InstallService
         private readonly UserPasswordHasherInterface $hasher,
         private readonly FixturesLoaderInterface $fixturesLoader,
         private readonly UserRepository $userRepository,
+        private readonly Filesystem $filesystem,
     ) {
     }
 
@@ -203,10 +204,8 @@ class InstallService
      */
     public function prepareDirectories(): void
     {
-        $filesystem = new Filesystem();
-
         try {
-            $filesystem->mkdir([
+            $this->filesystem->mkdir([
                 $this->pathsHelper->getCachePath(),
                 $this->pathsHelper->getLogsPath(),
             ]);
