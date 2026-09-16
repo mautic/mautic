@@ -22,8 +22,8 @@ final class ContactSearchFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search='.urlencode('email:'.$literalEmail));
         self::assertResponseIsSuccessful();
-        self::assertStringContainsString($literalEmail, $crawler->text());
-        self::assertStringNotContainsString($wildcardMatchEmail, $crawler->text());
+        $this->assertStringContainsString($literalEmail, $crawler->text());
+        $this->assertStringNotContainsString($wildcardMatchEmail, $crawler->text());
     }
 
     private function createContact(string $email): void
