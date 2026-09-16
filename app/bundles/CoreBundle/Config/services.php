@@ -37,7 +37,7 @@ return function (ContainerConfigurator $configurator): void {
         'ProcessSignal/ProcessSignalState.php',
         'Twig/Helper/ThemeHelper.php',
         'Twig/Helper/MenuHelper.php',
-        'Translation/TranslatorLoader.php',
+        'Translation/MauticResourceTranslator.php',
         'Helper/Dsn/Dsn.php',
         'Cache/ResultCacheOptions.php',
     ];
