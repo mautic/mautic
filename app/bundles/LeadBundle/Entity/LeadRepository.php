@@ -117,10 +117,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param string          $field
      * @param string[]|string $value
      * @param ?int            $ignoreId
-     *
-     * @return array
      */
-    public function getLeadsByFieldValue($field, $value, $ignoreId = null, bool $indexByColumn = false)
+    public function getLeadsByFieldValue($field, $value, $ignoreId = null, bool $indexByColumn = false): array
     {
         $results = $this->getEntities([
             'qb'               => $this->buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId),
@@ -189,7 +187,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @return Lead[]
      */
-    public function getContactsByEmail($email)
+    public function getContactsByEmail($email): array
     {
         $contacts = $this->getLeadsByFieldValue('email', $email);
 
@@ -226,10 +224,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Get a list of lead entities.
-     *
-     * @return array
      */
-    public function getLeadsByUniqueFields(iterable $uniqueFieldsWithData, ?int $leadId = null, ?int $limit = null)
+    public function getLeadsByUniqueFields(iterable $uniqueFieldsWithData, ?int $leadId = null, ?int $limit = null): array
     {
         $results = $this->getLeadFieldsByUniqueFields($uniqueFieldsWithData, 'l.*', $leadId, $limit);
 
@@ -314,10 +310,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param string $email
      * @param bool   $all   Set to true to return all matching lead id's
-     *
-     * @return array|null
      */
-    public function getLeadByEmail($email, bool $all = false)
+    public function getLeadByEmail($email, bool $all = false): ?array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
@@ -336,10 +330,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Get leads by IP address.
-     *
-     * @return array
      */
-    public function getLeadsByIp($ip, bool $byId = false)
+    public function getLeadsByIp($ip, bool $byId = false): array
     {
         $q = $this->createQueryBuilder('l')
             ->leftJoin('l.ipAddresses', 'i');
@@ -357,10 +349,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return $results;
     }
 
-    /**
-     * @return array
-     */
-    public function getLead($id)
+    public function getLead($id): array
     {
         $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $fq->select('l.*')
@@ -436,7 +425,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return mixed|null
      */
-    public function getEntityWithPrimaryCompany($entity)
+    public function getEntityWithPrimaryCompany($entity): mixed
     {
         if (is_int($entity)) {
             $entity = $this->getEntity($entity);
@@ -468,10 +457,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Get a list of leads.
-     *
-     * @return array
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): array
     {
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',
@@ -554,10 +541,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return ['core', 'social', 'personal', 'professional'];
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getEntitiesDbalQueryBuilder()
+    public function getEntitiesDbalQueryBuilder(): QueryBuilder
     {
         $alias = $this->getTableAlias();
 
@@ -567,10 +551,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * @param mixed[] $args
-     *
-     * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order, array $args=[])
+    public function getEntitiesOrmQueryBuilder($order, array $args=[]): \Doctrine\ORM\QueryBuilder
     {
         $alias           = $this->getTableAlias();
         $select          = [$alias, 'u', $order];
@@ -1081,10 +1063,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Gets the ID of the latest ID.
-     *
-     * @return int
      */
-    public function getMaxLeadId()
+    public function getMaxLeadId(): int
     {
         $result = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('max(id) as max_lead_id')
