@@ -29,7 +29,7 @@ return RectorConfig::configure()
         // \Utils\Rector\LoadMetadataStaticHelperToAttributeRector::class,
         // \Utils\Rector\LoadMetadataColumnToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataAssociationToDoctrineAttributeRector::class,
-        // \Utils\Rector\LoadMetadataManyToManyToDoctrineAttributeRector::class,
+        \Utils\Rector\LoadMetadataManyToManyToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataTableToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataRepositoryToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataIndexToDoctrineAttributeRector::class,
