@@ -88,6 +88,8 @@ class Action implements UuidInterface
      * @var Form|null
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'actions')]
+    #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private $form;
 
     /**
@@ -116,11 +118,6 @@ class Action implements UuidInterface
             ->build();
 
         $builder->addField('properties', 'array');
-
-        $builder->createManyToOne('form', 'Form')
-            ->inversedBy('actions')
-            ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         static::addUuidField($builder);
     }

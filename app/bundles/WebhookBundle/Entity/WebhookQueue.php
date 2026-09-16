@@ -18,6 +18,8 @@ class WebhookQueue
 
     private int|string|null $id = null;
 
+    #[ORM\ManyToOne(targetEntity: Webhook::class)]
+    #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private ?Webhook $webhook = null;
 
     private ?\DateTime $dateAdded = null;
@@ -29,6 +31,8 @@ class WebhookQueue
      */
     private $payloadCompressed;
 
+    #[ORM\ManyToOne(targetEntity: Event::class, inversedBy: 'queues')]
+    #[ORM\JoinColumn(name: 'event_id', nullable: false, onDelete: 'CASCADE')]
     private ?Event $event = null;
 
     private int $retries = 0;
@@ -37,19 +41,12 @@ class WebhookQueue
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->addBigIntIdField();
-        $builder->createManyToOne('webhook', 'Webhook')
-            ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
-            ->build();
         $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
         $builder->addNullableField('dateModified', Types::DATETIME_IMMUTABLE, 'date_modified');
         $builder->createField('payloadCompressed', Types::BLOB)
             ->columnName('payload_compressed')
             ->nullable()
             ->length(MySQLPlatform::LENGTH_LIMIT_MEDIUMBLOB)
-            ->build();
-        $builder->createManyToOne('event', 'Event')
-            ->inversedBy('queues')
-            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->build();
         $builder->createField('retries', Types::SMALLINT)
             ->columnName('retries')

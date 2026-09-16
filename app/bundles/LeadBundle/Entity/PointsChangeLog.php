@@ -57,6 +57,8 @@ class PointsChangeLog
      */
     private $dateAdded;
 
+    #[ORM\ManyToOne(targetEntity: Group::class)]
+    #[ORM\JoinColumn(name: 'group_id', onDelete: 'CASCADE')]
     private ?Group $group = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -82,10 +84,6 @@ class PointsChangeLog
             ->build();
 
         $builder->addField('delta', 'integer');
-
-        $builder->createManyToOne('group', Group::class)
-            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
-            ->build();
 
         $builder->addDateAdded();
     }

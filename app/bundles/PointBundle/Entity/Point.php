@@ -115,6 +115,7 @@ class Point extends FormEntity implements UuidInterface
     /**
      * @var ArrayCollection<int,LeadPointLog>
      */
+    #[ORM\OneToMany(targetEntity: LeadPointLog::class, mappedBy: 'point', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**
@@ -124,6 +125,8 @@ class Point extends FormEntity implements UuidInterface
     private $category;
 
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\ManyToOne(targetEntity: Group::class)]
+    #[ORM\JoinColumn(name: 'group_id', onDelete: 'CASCADE')]
     private ?Group $group = null;
 
     public function __clone()
@@ -158,18 +161,7 @@ class Point extends FormEntity implements UuidInterface
 
         $builder->addField('properties', 'array');
 
-        $builder->createOneToMany('log', 'LeadPointLog')
-            ->mappedBy('point')
-            ->cascadePersist()
-            ->cascadeRemove()
-            ->fetchExtraLazy()
-            ->build();
-
         $builder->addCategory();
-
-        $builder->createManyToOne('group', Group::class)
-            ->addJoinColumn('group_id', 'id', true, false, 'CASCADE')
-            ->build();
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'point_projects_xref', 'point_id');

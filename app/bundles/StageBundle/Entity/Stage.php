@@ -90,6 +90,7 @@ class Stage extends FormEntity implements UuidInterface
     /**
      * @var ArrayCollection<int,LeadStageLog>
      */
+    #[ORM\OneToMany(targetEntity: LeadStageLog::class, mappedBy: 'stage', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**
@@ -121,13 +122,6 @@ class Stage extends FormEntity implements UuidInterface
             ->build();
 
         $builder->addPublishDates();
-
-        $builder->createOneToMany('log', 'LeadStageLog')
-            ->mappedBy('stage')
-            ->cascadePersist()
-            ->cascadeRemove()
-            ->fetchExtraLazy()
-            ->build();
 
         $builder->addCategory();
 

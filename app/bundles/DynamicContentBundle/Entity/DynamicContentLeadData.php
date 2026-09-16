@@ -25,6 +25,8 @@ class DynamicContentLeadData extends CommonEntity
     /**
      * @var DynamicContent|null
      */
+    #[ORM\ManyToOne(targetEntity: DynamicContent::class)]
+    #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'CASCADE')]
     private $dynamicContent;
 
     /**
@@ -51,10 +53,6 @@ class DynamicContentLeadData extends CommonEntity
         $builder->addDateAdded(true);
 
         $builder->addLead();
-
-        $builder->createManyToOne('dynamicContent', 'DynamicContent')
-            ->addJoinColumn('dynamic_content_id', 'id', true, false, 'CASCADE')
-            ->build();
 
         $builder->createField('slot', 'text')
             ->columnName('slot')

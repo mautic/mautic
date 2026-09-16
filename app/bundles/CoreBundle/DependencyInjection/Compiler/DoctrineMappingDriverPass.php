@@ -14,11 +14,13 @@ final class DoctrineMappingDriverPass implements CompilerPassInterface
      * Swaps the staticphp driver for one that also reads Doctrine attributes, so entities
      * can be migrated from loadMetadata() to attributes field by field.
      *
-     * DoctrineBundle 3 dropped the doctrine.orm.metadata.staticphp.class parameter and
-     * hardcodes the driver class instead, so the swap is applied to the driver definition
-     * registered for each entity manager. Skipping it would leave the attributes unread,
-     * and an entity whose table mapping has already moved to #[ORM\Table] would fall back
-     * to its short class name - which the five entities named Stat then collide on.
+     * DoctrineBundle stopped resolving the driver class from the
+     * doctrine.orm.metadata.staticphp.class parameter in 2.13.1, and 3.0 removed the
+     * parameter altogether, so the swap is applied to the driver definition registered
+     * for each entity manager instead. Keying it off the parameter left the attributes
+     * unread, and an entity whose mapping has already moved to attributes then lost it
+     * silently: #[ORM\Table] falling back to the short class name, #[ORM\Id] leaving the
+     * entity with no identifier at all.
      */
     public function process(ContainerBuilder $container): void
     {

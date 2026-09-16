@@ -28,6 +28,8 @@ class Submission
     /**
      * @var Form
      */
+    #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'submissions')]
+    #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private $form;
 
     /**
@@ -58,6 +60,8 @@ class Submission
     /**
      * @var Page|null
      */
+    #[ORM\ManyToOne(targetEntity: Page::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
     private $page;
 
     /**
@@ -70,11 +74,6 @@ class Submission
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->createManyToOne('form', 'Form')
-            ->inversedBy('submissions')
-            ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
-            ->build();
 
         $builder->addIpAddress(true);
 
@@ -90,11 +89,6 @@ class Submission
             ->build();
 
         $builder->addField('referer', 'text');
-
-        $builder->createManyToOne('page', Page::class)
-            ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
-            ->fetchExtraLazy()
-            ->build();
     }
 
     /**

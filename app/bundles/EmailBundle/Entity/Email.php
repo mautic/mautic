@@ -254,6 +254,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var ArrayCollection<Stat>
      */
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'email', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
@@ -272,12 +273,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var Form|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\ManyToOne(targetEntity: Form::class)]
+    #[ORM\JoinColumn(name: 'unsubscribeform_id', onDelete: 'SET NULL')]
     private $unsubscribeForm;
 
     /**
      * @var Page|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\ManyToOne(targetEntity: Page::class)]
+    #[ORM\JoinColumn(name: 'preference_center_id', onDelete: 'SET NULL')]
     private $preferenceCenter;
 
     /**
@@ -308,6 +313,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'download:read'])]
     private $queuedCount = 0;
 
+    #[ORM\OneToOne(targetEntity: EmailDraft::class, mappedBy: 'email', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private ?EmailDraft $draft = null;
 
     private bool $isCloned = false;
@@ -429,24 +435,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('stats', 'Stat')
-            ->setIndexBy('id')
-            ->mappedBy('email')
-            ->cascadePersist()
-            ->fetchExtraLazy()
-            ->build();
-
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
         self::addDynamicContentMetadata($builder);
-
-        $builder->createManyToOne('unsubscribeForm', Form::class)
-            ->addJoinColumn('unsubscribeform_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createManyToOne('preferenceCenter', Page::class)
-            ->addJoinColumn('preference_center_id', 'id', true, false, 'SET NULL')
-            ->build();
 
         $builder->createManyToMany('assetAttachments', Asset::class)
             ->setJoinTable('email_assets_xref')
@@ -458,12 +449,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addField('headers', Types::JSON);
 
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
-
-        $builder->createOneToOne('draft', EmailDraft::class)
-            ->mappedBy('email')
-            ->fetchExtraLazy()
-            ->cascadeAll()
-            ->build();
 
         $builder->createField('settings', Types::JSON)
             ->columnName('settings')

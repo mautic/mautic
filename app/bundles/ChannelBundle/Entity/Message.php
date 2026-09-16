@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -24,6 +25,10 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+#[ORM\Entity(repositoryClass: MessageRepository::class)]
+#[ORM\Table(name: 'messages')]
+#[ORM\Index(name: 'date_message_added', columns: ['date_added'])]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('channel:messages:viewown')"),
@@ -89,6 +94,7 @@ class Message extends FormEntity implements UuidInterface
      * @var ArrayCollection<int,Channel>
      */
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\OneToMany(targetEntity: Channel::class, mappedBy: 'message', cascade: ['persist', 'detach'], orphanRemoval: true, indexBy: 'channel')]
     private $channels;
 
     public function __clone()
@@ -100,22 +106,10 @@ class Message extends FormEntity implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('messages')
-            ->setCustomRepositoryClass(MessageRepository::class)
-            ->addIndex(['date_added'], 'date_message_added');
-
         $builder
             ->addIdColumns()
             ->addPublishDates()
             ->addCategory();
-
-        $builder->createOneToMany('channels', Channel::class)
-            ->setIndexBy('channel')
-            ->orphanRemoval()
-            ->mappedBy('message')
-            ->cascadePersist()
-            ->cascadeDetach()
-            ->build();
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'message_projects_xref', 'message_id');

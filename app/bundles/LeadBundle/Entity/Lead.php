@@ -141,6 +141,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var User|null
      */
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\ManyToOne(targetEntity: User::class, fetch: 'LAZY')]
+    #[ORM\JoinColumn(name: 'owner_id', onDelete: 'SET NULL')]
     private $owner;
 
     /**
@@ -159,6 +161,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, PointsChangeLog>
      */
+    #[ORM\OneToMany(targetEntity: PointsChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $pointsChangeLog;
 
     private ?int $actualPoints = null;
@@ -166,11 +170,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, CompanyChangeLog>
      */
+    #[ORM\OneToMany(targetEntity: CompanyChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $companyChangeLog;
 
     /**
      * @var Collection<string, DoNotContact>
      */
+    #[ORM\OneToMany(targetEntity: DoNotContact::class, mappedBy: 'lead', cascade: ['persist', 'detach'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     private $doNotContact;
 
     /**
@@ -181,11 +188,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, PushID>
      */
+    #[ORM\OneToMany(targetEntity: PushID::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     private $pushIds;
 
     /**
      * @var ArrayCollection<int, LeadEventLog>
      */
+    #[ORM\OneToMany(targetEntity: LeadEventLog::class, mappedBy: 'lead', cascade: ['persist', 'detach'], fetch: 'EXTRA_LAZY')]
     private $eventLog;
 
     /**
@@ -230,6 +239,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, LeadNote>
      */
+    #[ORM\OneToMany(targetEntity: LeadNote::class, mappedBy: 'lead', cascade: ['detach'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $notes;
 
     /**
@@ -252,26 +263,34 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Stage|null
      */
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\ManyToOne(targetEntity: Stage::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'stage_id', onDelete: 'SET NULL')]
     private $stage;
 
     /**
      * @var Collection<int, StagesChangeLog>
      */
+    #[ORM\OneToMany(targetEntity: StagesChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $stageChangeLog;
 
     /**
      * @var Collection<int, UtmTag>
      */
+    #[ORM\OneToMany(targetEntity: UtmTag::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     private $utmtags;
 
     /**
      * @var Collection<int, FrequencyRule>
      */
+    #[ORM\OneToMany(targetEntity: FrequencyRule::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true, indexBy: 'channel')]
+    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $frequencyRules;
 
     /**
      * @var ArrayCollection<int,GroupContactScore>
      */
+    #[ORM\OneToMany(targetEntity: GroupContactScore::class, mappedBy: 'contact', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private $groupScores;
 
     private int $previousId = 0;
@@ -305,36 +324,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
         $builder->addBigIntIdField();
 
-        $builder->createManyToOne('owner', User::class)
-            ->fetchLazy()
-            ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
-            ->build();
-
         $builder->createField('points', 'integer')
-            ->build();
-
-        $builder->createOneToMany('pointsChangeLog', 'PointsChangeLog')
-            ->orphanRemoval()
-            ->setOrderBy(['dateAdded' => 'DESC'])
-            ->mappedBy('lead')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('companyChangeLog', 'CompanyChangeLog')
-            ->orphanRemoval()
-            ->setOrderBy(['dateAdded' => 'DESC'])
-            ->mappedBy('lead')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('doNotContact', DoNotContact::class)
-            ->orphanRemoval()
-            ->mappedBy('lead')
-            ->cascadePersist()
-            ->cascadeDetach()
-            ->fetchExtraLazy()
             ->build();
 
         $builder->createManyToMany('ipAddresses', IpAddress::class)
@@ -344,20 +334,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->setIndexBy('ipAddress')
             ->cascadeDetach()
             ->cascadePersist()
-            ->build();
-
-        $builder->createOneToMany('pushIds', PushID::class)
-            ->orphanRemoval()
-            ->mappedBy('lead')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('eventLog', LeadEventLog::class)
-            ->mappedBy('lead')
-            ->cascadePersist()
-            ->cascadeDetach()
-            ->fetchExtraLazy()
             ->build();
 
         $builder->createField('lastActive', 'datetime')
@@ -379,14 +355,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->nullable()
             ->build();
 
-        $builder->createOneToMany('notes', 'LeadNote')
-            ->orphanRemoval()
-            ->setOrderBy(['dateAdded' => 'DESC'])
-            ->mappedBy('lead')
-            ->cascadeDetach()
-            ->fetchExtraLazy()
-            ->build();
-
         $builder->createField('preferredProfileImage', 'string')
             ->columnName('preferred_profile_image')
             ->nullable()
@@ -401,42 +369,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->fetchLazy()
             ->cascadePersist()
             ->cascadeDetach()
-            ->build();
-
-        $builder->createManyToOne('stage', Stage::class)
-            ->cascadePersist()
-            ->cascadeDetach()
-            ->addJoinColumn('stage_id', 'id', true, false, 'SET NULL')
-            ->build();
-
-        $builder->createOneToMany('stageChangeLog', 'StagesChangeLog')
-            ->orphanRemoval()
-            ->setOrderBy(['dateAdded' => 'DESC'])
-            ->mappedBy('lead')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('utmtags', UtmTag::class)
-            ->orphanRemoval()
-            ->mappedBy('lead')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('frequencyRules', FrequencyRule::class)
-            ->orphanRemoval()
-            ->setIndexBy('channel')
-            ->setOrderBy(['dateAdded' => 'DESC'])
-            ->mappedBy('lead')
-            ->cascadeAll()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createOneToMany('groupScores', GroupContactScore::class)
-            ->mappedBy('contact')
-            ->cascadeAll()
-            ->fetchExtraLazy()
             ->build();
 
         self::loadFixedFieldMetadata(

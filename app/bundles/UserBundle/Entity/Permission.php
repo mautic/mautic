@@ -70,6 +70,8 @@ class Permission implements CacheInvalidateInterface, UuidInterface
      * @var Role
      */
     #[Groups(['permission:read', 'permission:write', 'role:read'])]
+    #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: 'permissions')]
+    #[ORM\JoinColumn(name: 'role_id', nullable: false, onDelete: 'CASCADE')]
     protected $role;
 
     /**
@@ -90,11 +92,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
 
         $builder->createField('name', 'string')
             ->length(50)
-            ->build();
-
-        $builder->createManyToOne('role', 'Role')
-            ->inversedBy('permissions')
-            ->addJoinColumn('role_id', 'id', false, false, 'CASCADE')
             ->build();
 
         $builder->addField('bitwise', 'integer');
