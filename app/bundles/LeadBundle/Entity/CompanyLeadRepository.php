@@ -151,10 +151,7 @@ class CompanyLeadRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return array
-     */
-    public function getLatestCompanyForLead($leadId)
+    public function getLatestCompanyForLead($leadId): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -190,10 +187,7 @@ class CompanyLeadRepository extends CommonRepository
         return $qb->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEntitiesByLead(Lead $lead)
+    public function getEntitiesByLead(Lead $lead): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('cl')
