@@ -151,10 +151,7 @@ class CompanyLeadRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return array
-     */
-    public function getLatestCompanyForLead($leadId)
+    public function getLatestCompanyForLead($leadId): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
