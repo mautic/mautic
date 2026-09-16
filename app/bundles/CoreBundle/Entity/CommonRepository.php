@@ -73,10 +73,8 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param string $alias
      * @param object $entity
-     *
-     * @return mixed
      */
-    public function checkUniqueAlias($alias, $entity = null)
+    public function checkUniqueAlias($alias, $entity = null): mixed
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as aliascount')
@@ -232,10 +230,7 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @return mixed|null
-     */
-    public function findOneBySlugs($alias, $catAlias = null, $lang = null)
+    public function findOneBySlugs($alias, $catAlias = null, $lang = null): ?object
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias())
@@ -299,10 +294,8 @@ class CommonRepository extends ServiceEntityRepository
      * Gets the properties of an ORM entity.
      *
      * @param string $entityClass
-     *
-     * @return array
      */
-    public function getBaseColumns($entityClass, bool $returnColumnNames = false)
+    public function getBaseColumns($entityClass, bool $returnColumnNames = false): array
     {
         static $baseCols = [true => [], false => []];
 
@@ -349,7 +342,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @return object[]|array<int,mixed>|iterable<object>|Paginator<object>|SimplePaginator<mixed>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $alias = $this->getTableAlias();
 
@@ -672,10 +665,8 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @param int    $id
      * @param string $column
-     *
-     * @return string|null
      */
-    public function getValue($id, $column)
+    public function getValue($id, $column): ?string
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select($this->getTableAlias().'.'.$column)
