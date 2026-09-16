@@ -6254,7 +6254,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "9f6eee56b973aa1148c866d658626eb6a2156675"
+                "reference": "5ec4b3f5cb40abf32dae4afcd2512c2d7988e4a3"
             },
             "require": {
                 "api-platform/core": "^4.1.0",
@@ -6368,6 +6368,7 @@
                         "[project-root]/bin/console": "assets/scaffold/files/console",
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[project-root]/config/.gitkeep": "assets/scaffold/files/gitkeep",
+                        "[project-root]/var/logs/.gitkeep": "assets/scaffold/files/gitkeep",
                         "[project-root]/patches/at.js+1.5.4.patch": "assets/scaffold/files/patches/at.js+1.5.4.patch",
                         "[project-root]/patches/chosen-js+1.8.7.patch": "assets/scaffold/files/patches/chosen-js+1.8.7.patch",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
