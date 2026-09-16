@@ -879,7 +879,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->decisionPath;
     }
 
-    public function setDecisionPath(string $decisionPath): void
+    public function setDecisionPath(string|null $decisionPath): void
     {
         $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
@@ -987,7 +987,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Set the value of triggerRestrictedStartHour.
      */
-    public function setTriggerRestrictedStartHour(string $triggerRestrictedStartHour): static
+    public function setTriggerRestrictedStartHour(string|\DateTimeInterface|null $triggerRestrictedStartHour): static
     {
         $triggerRestrictedStartHour = $this->convertToDateTime($triggerRestrictedStartHour);
 
@@ -1011,7 +1011,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Set the value of triggerRestrictedStopHour.
      */
-    public function setTriggerRestrictedStopHour(string $triggerRestrictedStopHour): static
+    public function setTriggerRestrictedStopHour(string|\DateTime $triggerRestrictedStopHour): static
     {
         $triggerRestrictedStopHour = $this->convertToDateTime($triggerRestrictedStopHour);
 
