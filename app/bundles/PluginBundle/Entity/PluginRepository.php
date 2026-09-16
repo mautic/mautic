@@ -25,7 +25,7 @@ final class PluginRepository extends CommonRepository
         return $q->getQuery()->getOneOrNullResult();
     }
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias())
