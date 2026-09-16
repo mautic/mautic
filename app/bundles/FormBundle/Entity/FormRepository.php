@@ -285,6 +285,29 @@ class FormRepository extends CommonRepository
     }
 
     /**
+     * @param string $alias
+     * @param int[]  $ignoreIds
+     */
+    public function checkFormUniqueAlias($alias, $ignoreIds = []): int
+    {
+        $q = $this->createQueryBuilder('e')
+            ->select('count(e.id) as alias_count')
+            ->where('e.alias = :alias');
+        $q->setParameter('alias', $alias);
+
+        if (!empty($ignoreIds)) {
+            $q->andWhere(
+                $q->expr()->notIn('e.id', ':ignoreIds')
+            )
+                ->setParameter('ignoreIds', $ignoreIds);
+        }
+
+        $results = $q->getQuery()->getSingleResult();
+
+        return (int) $results['alias_count'];
+    }
+
+    /**
      * Atomically increment the submission count for a form.
      */
     public function incrementSubmissionCount(int $formId): void

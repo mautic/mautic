@@ -330,8 +330,7 @@ class FormController extends CommonFormController
 
                         try {
                             // Set alias to prevent SQL errors
-                            $alias = $this->formModel->cleanAlias($entity->getName(), '', 10);
-                            $entity->setAlias($alias);
+                            $entity->setAlias($this->formModel->generateUniqueAlias($entity->getName()));
 
                             // Set timestamps
                             $this->formModel->setTimestamps($entity, true, false);
@@ -585,9 +584,11 @@ class FormController extends CommonFormController
 
                         $alias = $entity->getAlias();
 
-                        if (empty($alias)) {
-                            $alias = $this->formModel->cleanAlias($entity->getName(), '', 10);
-                            $entity->setAlias($alias);
+                        if (!$entity->getId()) {
+                            // A clone copies the source form's alias, so it always needs a fresh unique one
+                            $entity->setAlias($this->formModel->generateUniqueAlias($alias ?: $entity->getName()));
+                        } elseif (empty($alias)) {
+                            $entity->setAlias($this->formModel->generateUniqueAlias($entity->getName()));
                         }
 
                         if (!$entity->getId()) {

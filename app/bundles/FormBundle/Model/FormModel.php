@@ -316,13 +316,34 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    /**
+     * Builds an alias no other form is using, by appending a counter to the cleaned source string.
+     *
+     * Only call this while an alias is being generated for a form that has no alias yet, or for a clone
+     * (which copies the source form's alias). An existing form's alias must never change: it is part of
+     * its form_results_{id}_{alias} table name and createTableSchema() has no rename path, so changing it
+     * would orphan that form's results.
+     */
+    public function generateUniqueAlias(string $source): string
+    {
+        $alias     = $this->cleanAlias($source, '', 10);
+        $testAlias = $alias;
+        $aliasTag  = 1;
+
+        while ($this->getRepository()->checkFormUniqueAlias($testAlias)) {
+            $testAlias = $alias.$aliasTag;
+            ++$aliasTag;
+        }
+
+        return $testAlias;
+    }
+
     public function saveEntity($entity, $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 
         if ($isNew && !$entity->getAlias()) {
-            $alias = $this->cleanAlias($entity->getName(), '', 10);
-            $entity->setAlias($alias);
+            $entity->setAlias($this->generateUniqueAlias($entity->getName()));
         }
 
         $this->backfillReplacedPropertiesForBc($entity);
