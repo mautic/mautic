@@ -925,7 +925,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->reportBuilderEventMock
         ->method('checkContext')
-        ->willReturn($event);
+        ->willReturn(true);
 
         $this->fieldsBuilderMock
     ->method('getLeadFieldsColumns')
