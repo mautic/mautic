@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FieldModel;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -161,20 +162,22 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         // while still broken.
         $this->createFormViaApi('First sort form', 'firstsortform');
         $formId = $this->createFormViaApi('Second sort form', 'secondsortform');
-        self::assertGreaterThan(1, $formId);
+        $this->assertGreaterThan(1, $formId);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
-        self::assertResponseIsSuccessful();
+        $this->assertResponseIsSuccessful();
 
-        $sortLinks = $crawler->filter('a.table-sort');
-        self::assertGreaterThan(0, $sortLinks->count(), 'Expected at least one sortable column header.');
+        $onClickHandlers = $crawler->filter('a.table-sort')->each(
+            static fn (Crawler $sortLink): string => (string) $sortLink->attr('onclick')
+        );
+        $this->assertNotEmpty($onClickHandlers, 'Expected at least one sortable column header.');
 
-        foreach ($sortLinks as $sortLink) {
-            self::assertStringContainsString(
-                "/s/forms/results/{$formId}/",
-                $sortLink->getAttribute('onclick'),
-                'Sort links must carry the viewed form ID so sorting cannot switch to another form.'
-            );
+        // The quotes pin this to the whole baseUrl argument, so a link pointing at
+        // form 1 cannot satisfy it.
+        $expectedBaseUrl = "'/s/forms/results/{$formId}'";
+
+        foreach ($onClickHandlers as $onClickHandler) {
+            $this->assertStringContainsString($expectedBaseUrl, $onClickHandler, 'Sort links must carry the viewed form ID so sorting cannot switch to another form.');
         }
     }
 
