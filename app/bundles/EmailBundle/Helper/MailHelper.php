@@ -370,7 +370,7 @@ class MailHelper
 
                 // Set metadata if applicable
                 foreach ($this->queuedRecipients as $email => $name) {
-                    $this->message->addMetadata($email, $this->buildMetadata($name, $tokens));
+                    $this->message->addMetadata($email, $this->buildMetadata($email, $name, $tokens));
                 }
 
                 // Replace tokens
@@ -479,7 +479,7 @@ class MailHelper
                     ];
                 }
 
-                $this->metadata[$metadataKey]['contacts'][$email] = $this->buildMetadata($name, $tokens);
+                $this->metadata[$metadataKey]['contacts'][$email] = $this->buildMetadata($email, $name, $tokens);
             }
 
             // Reset recipients
@@ -941,9 +941,10 @@ class MailHelper
      * Drops the display name when the encoded address exceeds the configured limit.
      *
      * Some transports reject an over-long To header outright, so the address has to be
-     * measured wherever it becomes a header. addTo() is not enough on its own: on a
+     * measured everywhere it can become one. addTo() is not enough on its own. On a
      * tokenized transport flushQueue() clears the recipients and rebuilds them from the
-     * message metadata, which carries the untruncated name.
+     * message metadata, and a batch transport then builds its own recipient from that
+     * same metadata rather than from the header, so buildMetadata() measures it too.
      */
     private function limitAddressLength(Address $address): Address
     {
@@ -1919,10 +1920,16 @@ class MailHelper
         }
     }
 
-    private function buildMetadata(?string $name, array $tokens): array
+    /**
+     * The display name is measured here as well as in the To header, because a batch
+     * transport builds its own recipient from this field rather than from the header the
+     * message carries. Leaving it unmeasured lets an over-long name reach the provider
+     * whatever the header says.
+     */
+    private function buildMetadata(string $email, ?string $name, array $tokens): array
     {
         return [
-            'name'        => $name,
+            'name'        => $this->limitAddressLength(new Address($email, $name ?? ''))->getName() ?: null,
             'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
             'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
             'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,

@@ -1692,14 +1692,57 @@ final class MailHelperTest extends TestCase
 
         $this->assertSame('', $to[0]->getName(), 'The display name should have been dropped on the queued path as well.');
 
-        // Only the header is shortened. Batch transports build their payloads from the
-        // metadata, so the name they receive must be unchanged.
+        // The header is not the only place the name becomes a recipient. A batch transport
+        // builds its own To from this metadata rather than from the header, so the limit
+        // has to reach the metadata as well or the provider still sees the long name.
+        $metadatas = $transport->getMetadatas();
+        $this->assertCount(1, $metadatas);
+        $this->assertNull(
+            $metadatas[0][$this->contacts[0]['email']]['name'],
+            'The metadata a batch transport builds its recipient from must not carry an over-long name.'
+        );
+    }
+
+    public function testQueuedSendKeepsADisplayNameThatFitsTheLimit(): void
+    {
+        $limit = 30;
+
+        $this->coreParametersHelper->expects($this->atLeast(3))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['mailer_address_length_limit', null, $limit],
+        ]);
+
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->enableQueue();
+
+        $email = new Email();
+        $email->setSubject('Hello');
+        $email->setCustomHtml('<html>content</html>');
+        $mailer->setEmail($email);
+
+        // 'Al <contact1@somewhere.com>' encodes to 27 bytes, inside the limit above.
+        $shortName = 'Al';
+
+        $mailer->addTo($this->contacts[0]['email'], $shortName);
+        $mailer->setLead($this->contacts[0]);
+        $mailer->queue();
+        $mailer->flushQueue();
+
+        $sent = $transport->getMessage();
+        $this->assertInstanceOf(\Mautic\EmailBundle\Mailer\Message\MauticMessage::class, $sent);
+
+        // Nothing is dropped when it fits, otherwise the limit could be satisfied by
+        // throwing every display name away.
+        $this->assertSame($shortName, $sent->getTo()[0]->getName());
+
         $metadatas = $transport->getMetadatas();
         $this->assertCount(1, $metadatas);
         $this->assertSame(
-            $longName,
+            $shortName,
             $metadatas[0][$this->contacts[0]['email']]['name'],
-            'The metadata the transport reads must keep the full name.'
+            'A name inside the limit must reach the transport untouched.'
         );
     }
 }

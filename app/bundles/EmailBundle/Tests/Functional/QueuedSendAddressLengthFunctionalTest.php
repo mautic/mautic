@@ -40,10 +40,14 @@ use Twig\Environment;
 /**
  * End to end cover for #14726.
  *
- * A contact whose display name pushes the encoded To address past
+ * A contact whose display name pushes the encoded address past
  * mailer_address_length_limit is rejected by the transport on a tokenized send. The
  * batch failure deletes the contact's email_stats row and creates no DNC entry, so the
  * contact is pending again on the next run. That is the resend loop the issue reports.
+ *
+ * The transport here builds the recipient it measures from the message metadata, which is
+ * what a real batch transport does, so this covers the name a provider actually receives
+ * rather than the To header core assembled.
  */
 final class QueuedSendAddressLengthFunctionalTest extends MauticMysqlTestCase
 {
@@ -117,8 +121,9 @@ final class QueuedSendAddressLengthFunctionalTest extends MauticMysqlTestCase
             'The send must reach the transport, otherwise this test proves nothing.'
         );
 
-        // Metadata is only attached on a tokenized send, so this pins the test to the
-        // flushQueue() rebuild rather than the already guarded addTo() path.
+        // Metadata is only attached on a tokenized send, and it is also what the transport
+        // builds its recipient from, so this pins the test to the batch path rather than
+        // the already guarded addTo() one.
         $this->assertNotEmpty(
             $transport->getLastMetadata(),
             'The send must take the tokenized path, or it is not exercising the defect.'
@@ -134,11 +139,14 @@ final class QueuedSendAddressLengthFunctionalTest extends MauticMysqlTestCase
             'The contact must not still be pending after the send, or every run will retry it forever.'
         );
 
-        // And the limit under test really is the configured one.
+        // And the recipient the transport built for the provider, the way a batch transport
+        // builds it, carries no name.
+        $enforced = $transport->getLastEnforcedRecipients();
+        $this->assertCount(1, $enforced);
         $this->assertSame(
             '',
-            $transport->getLastTo()[0]->getName(),
-            'The display name must have been dropped before the transport saw the address.'
+            $enforced[0]->getName(),
+            'The display name must have been dropped before the transport built the recipient.'
         );
     }
 
