@@ -28,13 +28,12 @@ class TokenReplacementEvent extends CommonEvent
     private ?Stat $stat = null;
 
     /**
-     * @param CommonEntity|string|null $content
-     * @param Lead|mixed[]|null        $lead
-     * @param mixed                    $passthrough
+     * @param mixed $passthrough
+     * @param \Mautic\LeadBundle\Entity\Lead|mixed[]|string|null $content
      */
     public function __construct(
-        $content,
-        protected $lead = null,
+        \Mautic\LeadBundle\Entity\Lead|array|string|null $content,
+        protected \Mautic\LeadBundle\Entity\Lead|array|null $lead = null,
         protected array $clickthrough = [],
         protected $passthrough = null,
         private readonly bool $internalSend = false,
@@ -54,10 +53,7 @@ class TokenReplacementEvent extends CommonEvent
         return $this->content;
     }
 
-    /**
-     * @param CommonEntity|string|null $content
-     */
-    public function setContent($content): void
+    public function setContent(string $content): void
     {
         $this->content = $content;
     }
@@ -65,7 +61,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @return Lead|mixed[]|null
      */
-    public function getLead()
+    public function getLead(): \Mautic\LeadBundle\Entity\Lead|array|null
     {
         return $this->lead;
     }
