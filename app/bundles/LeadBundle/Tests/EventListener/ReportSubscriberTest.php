@@ -971,7 +971,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportDataEventMock->expects($this->once())
             ->method('checkContext')
-            ->willReturn($event);
+            ->with($event)
+            ->willReturn(true);
+
         $this->reportDataEventMock->expects($this->once())
             ->method('getData')
             ->willReturn([[
