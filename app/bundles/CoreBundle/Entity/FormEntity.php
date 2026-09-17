@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ORM\MappedSuperclass]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FormEntity extends CommonEntity
 {
     #[Groups([
@@ -131,8 +133,6 @@ class FormEntity extends CommonEntity
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setMappedSuperClass();
 
         $builder->createField('isPublished', 'boolean')
             ->columnName('is_published')
