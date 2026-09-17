@@ -250,7 +250,7 @@ class LeadEventLogRepository extends CommonRepository
 
         if ($eventId) {
             $expr = $expr->with(
-                $q->expr()->eq('o.event_id', (string) ($eventId))
+                $q->expr()->eq('o.event_id', (string) $eventId)
             );
         }
 

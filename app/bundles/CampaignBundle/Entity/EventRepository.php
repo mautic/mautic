@@ -213,7 +213,7 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('e.id')
             ->from(MAUTIC_TABLE_PREFIX.Event::TABLE_NAME, 'e')
-            ->where($q->expr()->eq('e.campaign_id', (string) ($campaignId)));
+            ->where($q->expr()->eq('e.campaign_id', (string) $campaignId));
 
         return array_column($q->executeQuery()->fetchAllAssociative(), 'id');
     }

@@ -879,7 +879,7 @@ class EmailRepository extends CommonRepository
         return $qb->select('lc.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc')
             ->innerJoin('lc', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.category_id = lc.category_id')
-            ->where($qb->expr()->eq('e.id', (string) ($emailId)))
+            ->where($qb->expr()->eq('e.id', (string) $emailId))
             ->andWhere('lc.manually_removed = 1');
     }
 

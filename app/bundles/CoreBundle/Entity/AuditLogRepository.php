@@ -212,7 +212,7 @@ class AuditLogRepository extends CommonRepository
 
             $sqb->andWhere(
                 $sqb->expr()->and(
-                    $sqb->expr()->eq('l.object_id', (string) ($lead->getId())),
+                    $sqb->expr()->eq('l.object_id', (string) $lead->getId()),
                     $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dateTimeHelper->toUtcString($dateTimeFormat)))
                 )
             );

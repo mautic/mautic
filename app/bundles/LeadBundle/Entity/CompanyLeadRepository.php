@@ -256,7 +256,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
         $qb->where(
-            $qb->expr()->eq('lead_id', (string) ($leadId))
+            $qb->expr()->eq('lead_id', (string) $leadId)
         )->andWhere(
             $qb->expr()->eq('is_primary', '1')
         )->executeStatement();
@@ -276,7 +276,7 @@ class CompanyLeadRepository extends CommonRepository
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
         $qb->where(
-            $qb->expr()->eq('lead_id', (string) ($leadId))
+            $qb->expr()->eq('lead_id', (string) $leadId)
         )->andWhere(
             $qb->expr()->eq('is_primary', '0')
         )->executeStatement();

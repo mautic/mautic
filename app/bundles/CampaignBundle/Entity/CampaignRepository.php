@@ -168,7 +168,7 @@ class CampaignRepository extends CommonRepository
         if ($id) {
             $q->select('cl.leadlist_id')
                 ->where(
-                    $q->expr()->eq('cl.campaign_id', (string) ($id))
+                    $q->expr()->eq('cl.campaign_id', (string) $id)
                 );
         } else {
             // Retrieve a list of unique IDs that are assigned to a campaign

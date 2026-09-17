@@ -554,7 +554,7 @@ class LeadListRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx')
             ->join('clx', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = clx.campaign_id');
         $q->where(
-            $q->expr()->eq('clx.leadlist_id', (string) ($segmentId))
+            $q->expr()->eq('clx.leadlist_id', (string) $segmentId)
         );
 
         $lists   = [];

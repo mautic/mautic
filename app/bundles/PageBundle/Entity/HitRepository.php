@@ -32,7 +32,7 @@ class HitRepository extends CommonRepository
 
         // If we know the lead, use that to determine uniqueness
         if (null !== $lead && $lead->getId()) {
-            $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', (string) ($lead->getId())));
+            $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', (string) $lead->getId()));
         } else {
             $expr = CompositeExpression::and($q2->expr()->eq('h.tracking_id', ':id'));
             $q->setParameter('id', $trackingId);
@@ -40,11 +40,11 @@ class HitRepository extends CommonRepository
 
         if ($page instanceof Page) {
             $expr = $expr->with(
-                $q2->expr()->eq('h.page_id', (string) ($page->getId()))
+                $q2->expr()->eq('h.page_id', (string) $page->getId())
             );
         } elseif ($page instanceof Redirect) {
             $expr = $expr->with(
-                $q2->expr()->eq('h.redirect_id', (string) ($page->getId()))
+                $q2->expr()->eq('h.redirect_id', (string) $page->getId())
             );
         }
 
@@ -235,7 +235,7 @@ class HitRepository extends CommonRepository
 
         if (isset($options['leadId'])) {
             $sq->andWhere(
-                $sq->expr()->eq('h.lead_id', (string) ($options['leadId']))
+                $sq->expr()->eq('h.lead_id', (string) $options['leadId'])
             );
         }
         if (isset($options['urls']) && $options['urls']) {
@@ -246,7 +246,7 @@ class HitRepository extends CommonRepository
             }
         }
         if (isset($options['second_to_last'])) {
-            $sq->andWhere($sq->expr()->neq('h.id', (string) ($options['second_to_last'])));
+            $sq->andWhere($sq->expr()->neq('h.id', (string) $options['second_to_last']));
         }
 
         $latestHit = $sq->executeQuery()->fetchOne();
