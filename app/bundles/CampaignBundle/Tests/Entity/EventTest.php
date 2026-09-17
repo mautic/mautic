@@ -46,7 +46,7 @@ final class EventTest extends TestCase
         $redirectEvent = $this->createEventWithId(99);
 
         $event->setRedirectEvent($redirectEvent);
-        $event->setRedirectEvent(null);
+        $event->setRedirectEvent();
 
         $changes = $event->getChanges();
         $this->assertArrayHasKey('redirectEvent', $changes);
