@@ -97,7 +97,7 @@ class DownloadRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getTopReferrers($query, int $limit = 10, int $offset = 0): array
+    public function getTopReferrers(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('ad.referer, count(ad.referer) as downloads')
             ->groupBy('ad.referer')
