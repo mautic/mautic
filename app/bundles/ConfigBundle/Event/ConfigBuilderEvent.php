@@ -87,7 +87,7 @@ class ConfigBuilderEvent extends Event
      *
      * @return array
      */
-    public function getParametersFromConfig($bundle)
+    public function getParametersFromConfig(string $bundle)
     {
         static $allBundles;
 

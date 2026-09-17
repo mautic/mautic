@@ -47,11 +47,9 @@ class ConfigEvent extends CommonEvent
     /**
      * Returns the config array.
      *
-     * @param string $key
-     *
      * @return array
      */
-    public function getConfig($key = null)
+    public function getConfig(?string $key = null)
     {
         if ($key) {
             return $this->config[$key] ?? [];
@@ -62,10 +60,8 @@ class ConfigEvent extends CommonEvent
 
     /**
      * Sets the config array.
-     *
-     * @param string $key
      */
-    public function setConfig(array $config, $key = null): void
+    public function setConfig(array $config, ?string $key = null): void
     {
         if ($key) {
             $this->config[$key] = $config;
@@ -83,9 +79,9 @@ class ConfigEvent extends CommonEvent
      * Set fields such as passwords that will not overwrite existing values
      * if the current is empty.
      *
-     * @param array|string $fields
+     * @param string|string[] $fields
      */
-    public function unsetIfEmpty($fields): void
+    public function unsetIfEmpty(string|array $fields): void
     {
         if (!is_array($fields)) {
             $fields = [$fields];
@@ -108,10 +104,8 @@ class ConfigEvent extends CommonEvent
      *
      * @param string      $message     (untranslated)
      * @param array       $messageVars for translation
-     * @param string|null $key
-     * @param string|null $field
      */
-    public function setError($message, $messageVars = [], $key = null, $field = null): static
+    public function setError(string $message, array $messageVars = [], ?string $key = null, ?string $field = null): static
     {
         if (!empty($key) && !empty($field)) {
             if (!isset($this->errors[$key])) {
