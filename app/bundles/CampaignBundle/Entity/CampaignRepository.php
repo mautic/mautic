@@ -188,7 +188,7 @@ class CampaignRepository extends CommonRepository
     /**
      * Get array of list IDs => name assigned to this campaign.
      */
-    public function getCampaignListSources(string $id): array
+    public function getCampaignListSources(int $id): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cl.leadlist_id, l.name')
