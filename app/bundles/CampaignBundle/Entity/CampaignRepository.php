@@ -157,10 +157,8 @@ class CampaignRepository extends CommonRepository
 
     /**
      * Get array of list IDs assigned to this campaign.
-     *
-     * @param int|null $id
      */
-    public function getCampaignListIds($id = null): array
+    public function getCampaignListIds(?int $id = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl');
