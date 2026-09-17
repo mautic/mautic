@@ -195,7 +195,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 'l.id = cl.leadlist_id');
         $q->where(
-            $q->expr()->eq('cl.campaign_id', $id)
+            $q->expr()->eq('cl.campaign_id', (string) $id)
         );
 
         $lists   = [];
@@ -218,7 +218,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_form_xref', 'cf')
             ->join('cf', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = cf.form_id');
         $q->where(
-            $q->expr()->eq('cf.campaign_id', $id)
+            $q->expr()->eq('cf.campaign_id', (string) $id)
         );
 
         $forms   = [];
