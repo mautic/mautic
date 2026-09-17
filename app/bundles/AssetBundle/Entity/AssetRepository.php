@@ -35,10 +35,6 @@ class AssetRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @param string $search
-     * @param int    $limit
-     */
     public function getAssetList(string $search = '', int $limit = 10, int $start = 0, bool $viewOther = false): array
     {
         $q = $this->createQueryBuilder('a');

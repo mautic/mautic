@@ -73,8 +73,6 @@ class DownloadRepository extends CommonRepository
     /**
      * Get list of assets ordered by it's download count.
      *
-     * @param QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -91,8 +89,6 @@ class DownloadRepository extends CommonRepository
 
     /**
      * Get list of asset referrals ordered by it's count.
-     *
-     * @param QueryBuilder $query
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
