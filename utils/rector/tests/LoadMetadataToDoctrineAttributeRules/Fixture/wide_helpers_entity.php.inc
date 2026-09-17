@@ -99,12 +99,6 @@ class WideEntity
 
     protected $uuid;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-    }
-
     public static function addUuidField(ClassMetadataBuilder $builder): void
     {
         $builder->createField('uuid', Types::GUID)
@@ -112,3 +106,4 @@ class WideEntity
             ->build();
     }
 }
+
