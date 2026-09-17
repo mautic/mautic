@@ -33,7 +33,7 @@ class ReportGraphEvent extends AbstractReportEvent
      * @param string $graph
      * @param array  $data  prepared for this chart
      */
-    public function setGraph($graph, $data): void
+    public function setGraph($graph, array $data): void
     {
         $this->requestedGraphs[$graph]['data'] ??= [];
         $this->requestedGraphs[$graph]['data'] = $data;
