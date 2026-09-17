@@ -64,7 +64,7 @@ class CampaignRepository extends CommonRepository
      * @param bool $forList   If true, returns ID and name only
      * @param bool $viewOther If true, returns all the campaigns
      */
-    public function getPublishedCampaigns($specificId = null, ?int $leadId = null, bool $forList = false, bool $viewOther = false): array
+    public function getPublishedCampaigns(?int $specificId = null, ?int $leadId = null, bool $forList = false, bool $viewOther = false): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Campaign::class, 'c', 'c.id');
