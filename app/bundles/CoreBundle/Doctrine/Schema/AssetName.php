@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Doctrine\Schema;
 
 use Doctrine\DBAL\Schema\Name;
+use Doctrine\DBAL\Schema\Name\GenericName;
 use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\NamedObject;
@@ -47,6 +48,15 @@ final class AssetName
 
         if ($name instanceof UnqualifiedName) {
             return $name->getIdentifier()->getValue();
+        }
+
+        if ($name instanceof GenericName) {
+            // Only Doctrine\DBAL\Schema\Identifier parses into one of these, which no
+            // caller here passes. Taking the last part keeps the promise of a plain name
+            // even so: toString() would render the identifier with its quotes.
+            $identifiers = $name->getIdentifiers();
+
+            return end($identifiers)->getValue();
         }
 
         return $name->toString();

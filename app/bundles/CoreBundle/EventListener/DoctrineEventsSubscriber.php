@@ -130,7 +130,7 @@ final class DoctrineEventsSubscriber
                 continue;
             }
 
-            $pkFirstColumn = $this->trimQuotes(strtolower(AssetName::fromName($primaryKey->getColumnNames()[0])));
+            $pkFirstColumn = strtolower(AssetName::fromName($primaryKey->getColumnNames()[0]));
 
             foreach ($table->getIndexes() as $id => $index) {
                 // getIndexes() still returns the primary key under the "primary" key, and
@@ -146,20 +146,12 @@ final class DoctrineEventsSubscriber
                     continue;
                 }
 
-                $indexFirstColumn = $this->trimQuotes(strtolower(AssetName::fromName($indexedColumns[0]->getColumnName())));
+                $indexFirstColumn = strtolower(AssetName::fromName($indexedColumns[0]->getColumnName()));
 
                 if ($indexFirstColumn === $pkFirstColumn) {
                     $table->dropIndex($id);
                 }
             }
         }
-    }
-
-    /**
-     * Trim quotes from the identifier.
-     */
-    private function trimQuotes(string $identifier): string
-    {
-        return str_replace(['`', '"', '[', ']'], '', $identifier);
     }
 }
