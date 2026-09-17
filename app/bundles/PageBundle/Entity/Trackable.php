@@ -25,16 +25,20 @@ class Trackable
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(name: 'channel_id', type: 'integer')]
     private $channelId;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $hits = 0;
 
     /**
@@ -45,15 +49,6 @@ class Trackable
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('channelId', 'integer')
-            ->columnName('channel_id')
-            ->makePrimaryKey()
-            ->build();
-
-        $builder->addField('channel', 'string');
-
-        $builder->addField('hits', 'integer');
 
         $builder->addNamedField('uniqueHits', 'integer', 'unique_hits');
     }

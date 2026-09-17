@@ -128,6 +128,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $useOwnerAsMailer;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'send_to_dnc', type: Types::BOOLEAN, options: ['default' => 0])]
     private bool $sendToDnc = false;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
@@ -230,6 +231,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var int
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::INTEGER)]
     private $revision = 1;
 
     /**
@@ -311,6 +313,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var array
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::JSON)]
     private $headers = [];
 
     /**
@@ -346,6 +349,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var mixed[]|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $settings = null;
 
     public function __clone()
@@ -404,11 +408,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('bccAddress', Types::STRING, 'bcc_address');
         $builder->addNullableField('useOwnerAsMailer', Types::BOOLEAN, 'use_owner_as_mailer');
 
-        $builder->createField('sendToDnc', Types::BOOLEAN)
-            ->columnName('send_to_dnc')
-            ->option('default', 0)
-            ->build();
-
         $builder->addNullableField('template', Types::STRING);
         $builder->addNullableField('content', Types::ARRAY);
         $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
@@ -427,21 +426,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNamedField('sentCount', Types::INTEGER, 'sent_count');
         $builder->addNamedField('variantSentCount', Types::INTEGER, 'variant_sent_count');
         $builder->addNamedField('variantReadCount', Types::INTEGER, 'variant_read_count');
-        $builder->addField('revision', Types::INTEGER);
         $builder->addCategory();
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
         self::addDynamicContentMetadata($builder);
 
-        $builder->addField('headers', Types::JSON);
-
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
-
-        $builder->createField('settings', Types::JSON)
-            ->columnName('settings')
-            ->nullable()
-            ->build();
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'email_projects_xref', 'email_id');

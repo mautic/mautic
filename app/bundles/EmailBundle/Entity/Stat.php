@@ -50,6 +50,7 @@ class Stat
     /**
      * @var string
      */
+    #[ORM\Column(name: 'email_address', type: 'string', length: 191)]
     private $emailAddress;
 
     /**
@@ -61,51 +62,61 @@ class Stat
 
     private ?IpAddress $ipAddress = null;
 
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private ?\DateTimeInterface $dateSent = null;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_read', type: 'boolean')]
     private $isRead = false;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_failed', type: 'boolean')]
     private $isFailed = false;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'viewed_in_browser', type: 'boolean')]
     private $viewedInBrowser = false;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'date_read', type: 'datetime', nullable: true)]
     private $dateRead;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_hash', type: 'string', length: 191, nullable: true)]
     private $trackingHash;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'retry_count', type: 'integer', nullable: true)]
     private $retryCount = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
 
     /**
@@ -151,55 +162,7 @@ class Stat
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createField('emailAddress', 'string')
-            ->columnName('email_address')
-            ->build();
-
         $builder->addIpAddress(true);
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('isRead', 'boolean')
-            ->columnName('is_read')
-            ->build();
-
-        $builder->createField('isFailed', 'boolean')
-            ->columnName('is_failed')
-            ->build();
-
-        $builder->createField('viewedInBrowser', 'boolean')
-            ->columnName('viewed_in_browser')
-            ->build();
-
-        $builder->createField('dateRead', 'datetime')
-            ->columnName('date_read')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingHash', 'string')
-            ->columnName('tracking_hash')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retryCount', 'integer')
-            ->columnName('retry_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('openCount', 'integer', 'open_count');
 
