@@ -151,7 +151,7 @@ abstract class StandardImportTestHelper extends CommonMocks
         $importRepository = $this->createMock(ImportRepository::class);
 
         $importRepository->method('getValue')
-            ->willReturn(true);
+            ->willReturn('some value');
 
         $this->entityManager
             ->method('getRepository')
