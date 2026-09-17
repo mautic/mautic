@@ -42,19 +42,23 @@ class Client extends BaseClient
      */
     protected $authCodes;
 
+    #[ORM\Column(name: 'random_id', type: 'string', length: 191)]
     protected ?string $randomId = null;
 
+    #[ORM\Column(type: 'string', length: 191)]
     protected ?string $secret = null;
 
     /**
      * @var array<string>
      */
     #[Assert\NotBlank(message: 'mautic.api.client.redirecturis.notblank')]
+    #[ORM\Column(name: 'redirect_uris', type: 'array')]
     protected array $redirectUris = [];
 
     /**
      * @var array<string>
      */
+    #[ORM\Column(name: 'allowed_grant_types', type: 'array')]
     protected array $allowedGrantTypes;
 
     #[ORM\ManyToOne(targetEntity: Role::class, cascade: ['persist'])]
@@ -79,20 +83,6 @@ class Client extends BaseClient
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns('name', false);
-
-        $builder->createField('randomId', 'string')
-            ->columnName('random_id')
-            ->build();
-
-        $builder->addField('secret', 'string');
-
-        $builder->createField('redirectUris', 'array')
-            ->columnName('redirect_uris')
-            ->build();
-
-        $builder->createField('allowedGrantTypes', 'array')
-            ->columnName('allowed_grant_types')
-            ->build();
     }
 
     /**

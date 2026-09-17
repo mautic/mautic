@@ -101,75 +101,88 @@ class Event implements ChannelInterface, UuidInterface
      * @var string
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var string
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'event_type', type: 'string', length: 50)]
     private $eventType;
 
     /**
      * @var int
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'event_order', type: 'integer')]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_date', type: 'datetime', nullable: true)]
     private $triggerDate;
 
     /**
      * @var int|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_interval', type: 'integer', nullable: true)]
     private $triggerInterval = 0;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_interval_unit', type: 'string', length: 1, nullable: true)]
     private $triggerIntervalUnit;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_hour', type: 'time', nullable: true)]
     private $triggerHour;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_restricted_start_hour', type: 'time', nullable: true)]
     private $triggerRestrictedStartHour;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_restricted_stop_hour', type: 'time', nullable: true)]
     private $triggerRestrictedStopHour;
 
     /**
      * @var array|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_restricted_dow', type: 'array', nullable: true)]
     private $triggerRestrictedDaysOfWeek = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_window', type: 'integer', nullable: true)]
     private ?int $triggerWindow = null;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_mode', type: 'string', length: 10, nullable: true)]
     private $triggerMode;
 
     /**
@@ -200,11 +213,13 @@ class Event implements ChannelInterface, UuidInterface
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'decision_path', type: 'string', length: 191, nullable: true)]
     private $decisionPath;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'temp_id', type: 'string', length: 191, nullable: true)]
     private $tempId;
 
     /**
@@ -225,12 +240,14 @@ class Event implements ChannelInterface, UuidInterface
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $channel;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'channel_id', type: Types::STRING, length: 64, nullable: true)]
     private $channelId;
 
     private array $changes = [];
@@ -238,6 +255,7 @@ class Event implements ChannelInterface, UuidInterface
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTimeInterface $deleted = null;
 
+    #[ORM\Column(name: 'failed_count', type: 'integer')]
     private int $failedCount = 0;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
@@ -246,6 +264,7 @@ class Event implements ChannelInterface, UuidInterface
     private ?Event $redirectEvent = null;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'date_linked', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateLinked = null;
 
     /**
@@ -286,104 +305,13 @@ class Event implements ChannelInterface, UuidInterface
 
         $builder->addIdColumns();
 
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('eventType', 'string')
-            ->columnName('event_type')
-            ->length(50)
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('event_order')
-            ->build();
-
-        $builder->addField('properties', 'array');
-
         $builder->addNullableField('deleted', 'datetime');
-
-        $builder->createField('triggerDate', 'datetime')
-            ->columnName('trigger_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerInterval', 'integer')
-            ->columnName('trigger_interval')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerIntervalUnit', 'string')
-            ->columnName('trigger_interval_unit')
-            ->length(1)
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerHour', 'time')
-            ->columnName('trigger_hour')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerRestrictedStartHour', 'time')
-            ->columnName('trigger_restricted_start_hour')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerRestrictedStopHour', 'time')
-            ->columnName('trigger_restricted_stop_hour')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerRestrictedDaysOfWeek', 'array')
-            ->columnName('trigger_restricted_dow')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerWindow', 'integer')
-            ->columnName('trigger_window')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerMode', 'string')
-            ->columnName('trigger_mode')
-            ->length(10)
-            ->nullable()
-            ->build();
-
-        $builder->createField('decisionPath', 'string')
-            ->columnName('decision_path')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tempId', 'string')
-            ->columnName('temp_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('channelId', Types::STRING)
-            ->columnName('channel_id')
-            ->length(64)
-            ->nullable()
-            ->build();
-
-        $builder->createField('failedCount', 'integer')
-            ->columnName('failed_count')
-            ->build();
 
         static::addUuidField($builder);
 
         $builder->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added')
             ->option('default', '1970-01-01 00:00:00')
-            ->build();
-
-        $builder->createField('dateLinked', Types::DATETIME_MUTABLE)
-            ->columnName('date_linked')
-            ->nullable()
             ->build();
     }
 

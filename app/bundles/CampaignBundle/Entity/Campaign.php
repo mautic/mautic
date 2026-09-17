@@ -103,6 +103,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     // see Mautic\CampaignBundle\Enum\RepublishBehavior for available values.
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'republish_behavior', type: Types::STRING, length: 32, nullable: true)]
     private ?string $republishBehavior = null;
 
     /**
@@ -150,6 +151,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @var array<string, mixed>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'canvas_settings', type: 'array', nullable: true)]
     private array $canvasSettings = [];
 
     #[Groups(['campaign:read', 'campaign:write'])]
@@ -183,18 +185,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
         $builder->addPublishDates();
 
-        $builder->createField('republishBehavior', Types::STRING)
-            ->columnName('republish_behavior')
-            ->nullable()
-            ->length(32)
-            ->build();
-
         $builder->addCategory();
-
-        $builder->createField('canvasSettings', 'array')
-            ->columnName('canvas_settings')
-            ->nullable()
-            ->build();
 
         $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
         $builder->addNullableField('deleted', 'datetime');
