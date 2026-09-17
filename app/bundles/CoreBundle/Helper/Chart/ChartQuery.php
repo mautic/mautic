@@ -120,11 +120,10 @@ class ChartQuery extends AbstractChart
     /**
      * Apply date filters to the query.
      *
-     * @param QueryBuilder $query
-     * @param string       $dateColumn
-     * @param string       $tablePrefix
+     * @param string $dateColumn
+     * @param string $tablePrefix
      */
-    public function applyDateFilters(&$query, $dateColumn, $tablePrefix = 't'): void
+    public function applyDateFilters(QueryBuilder $query, $dateColumn, $tablePrefix = 't'): void
     {
         // Check if the date filters have already been applied
         if ($parameters = $query->getParameters()) {
@@ -463,6 +462,8 @@ class ChartQuery extends AbstractChart
             $uniqueQuery->setParameters($query->getParameters());
 
             // Replace the new query with previous query
+            // Replacing the caller's builder is why this one still takes it by
+            // reference, where applyDateFilters() no longer needs to.
             $query = $uniqueQuery;
         }
 
@@ -528,7 +529,7 @@ class ChartQuery extends AbstractChart
      * @param int    $endSecond
      * @param string $tablePrefix
      */
-    public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
+    public function modifyCountDateDiffQuery(QueryBuilder $query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
     {
         $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
         $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');
@@ -592,6 +593,15 @@ class ChartQuery extends AbstractChart
             return null;
         }
 
+        if (!$query instanceof TrackingQueryBuilder) {
+            // Only Mautic's builder records its parts, and resolving an alias means
+            // reading the FROM clause back. Connections hand out that builder, so this
+            // is defensive - and it is checked here rather than on entry so that a
+            // plain DBAL builder still works for every query that needs no alias
+            // resolved, which is how this class has always behaved.
+            throw new \LogicException(sprintf('Cannot resolve the alias "%s": the query builder does not record its parts.', $tablePrefix));
+        }
+
         $tableName = $this->getTableNameByAlias($query, $tablePrefix);
 
         try {
@@ -602,14 +612,8 @@ class ChartQuery extends AbstractChart
         }
     }
 
-    private function getTableNameByAlias(QueryBuilder $query, string $alias): string
+    private function getTableNameByAlias(TrackingQueryBuilder $query, string $alias): string
     {
-        if (!$query instanceof TrackingQueryBuilder) {
-            // Only Mautic's builder records its parts; DBAL 4 offers no way to read a plain
-            // one back. Connections hand out the tracking builder, so this is defensive.
-            throw new \LogicException(sprintf('Cannot resolve the alias "%s": the query builder does not record its parts.', $alias));
-        }
-
         foreach ($query->getQueryPart('from') as $from) {
             $fromAlias = $from['alias'] ?? null;
             $fromTable = $from['table'] ?? null;
