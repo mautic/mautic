@@ -38,6 +38,7 @@ class Stat
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $type;
 
     /**
@@ -60,8 +61,6 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->addField('type', 'string');
 
         $builder->addNamedField('typeId', 'integer', 'type_id', true);
 

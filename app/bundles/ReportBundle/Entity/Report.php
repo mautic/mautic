@@ -73,54 +73,63 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var bool
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: '`system`', type: Types::BOOLEAN)]
     private $system = false;
 
     /**
      * @var string
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $source;
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private $columns = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private $filters = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'table_order', type: Types::ARRAY, nullable: true)]
     private $tableOrder = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private $graphs = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'group_by', type: Types::ARRAY, nullable: true)]
     private $groupBy = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private $aggregators = [];
 
     /**
      * @var array|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private $settings = [];
 
     /**
@@ -129,6 +138,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @ApiProperty(readable=true)
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'is_scheduled', type: Types::BOOLEAN)]
     private $isScheduled = false;
 
     /**
@@ -170,46 +180,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns();
-
-        $builder->addField('system', Types::BOOLEAN, ['columnName'=>'`system`']);
-
-        $builder->addField('source', Types::STRING);
-
-        $builder->createField('columns', Types::ARRAY)
-            ->nullable()
-            ->build();
-
-        $builder->createField('filters', Types::ARRAY)
-            ->nullable()
-            ->build();
-
-        $builder->createField('tableOrder', Types::ARRAY)
-            ->columnName('table_order')
-            ->nullable()
-            ->build();
-
-        $builder->createField('graphs', Types::ARRAY)
-            ->nullable()
-            ->build();
-
-        $builder->createField('groupBy', Types::ARRAY)
-            ->columnName('group_by')
-            ->nullable()
-            ->build();
-
-        $builder->createField('aggregators', Types::ARRAY)
-            ->columnName('aggregators')
-            ->nullable()
-            ->build();
-
-        $builder->createField('settings', Types::JSON)
-            ->columnName('settings')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isScheduled', Types::BOOLEAN)
-            ->columnName('is_scheduled')
-            ->build();
 
         $builder->addNullableField('scheduleUnit', Types::STRING, 'schedule_unit');
         $builder->addNullableField('toAddress', Types::STRING, 'to_address');

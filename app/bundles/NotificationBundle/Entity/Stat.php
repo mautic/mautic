@@ -51,46 +51,55 @@ class Stat
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private $dateSent;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_read', type: 'datetime', nullable: true)]
     private $dateRead;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_clicked', type: 'boolean')]
     private $isClicked = false;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_clicked', type: 'datetime', nullable: true)]
     private $dateClicked;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_hash', type: 'string', length: 191, nullable: true)]
     private $trackingHash;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'retry_count', type: 'integer', nullable: true)]
     private $retryCount = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
 
     /**
@@ -117,47 +126,6 @@ class Stat
         $builder->addLead(true, 'SET NULL');
 
         $builder->addIpAddress(true);
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('dateRead', 'datetime')
-            ->columnName('date_read')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isClicked', 'boolean')
-            ->columnName('is_clicked')
-            ->build();
-
-        $builder->createField('dateClicked', 'datetime')
-            ->columnName('date_clicked')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingHash', 'string')
-            ->columnName('tracking_hash')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retryCount', 'integer')
-            ->columnName('retry_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('clickCount', 'integer', 'click_count');
 

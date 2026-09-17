@@ -25,6 +25,7 @@ class GroupContactScore extends CommonEntity
     #[ORM\JoinColumn(name: 'group_id', onDelete: 'CASCADE')]
     private Group $group;
 
+    #[ORM\Column(type: Types::INTEGER)]
     private int $score = 0;
 
     public function __construct()
@@ -41,9 +42,6 @@ class GroupContactScore extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addContact(false, 'CASCADE', true, 'groupScores');
-
-        $builder->createField('score', Types::INTEGER)
-            ->build();
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
