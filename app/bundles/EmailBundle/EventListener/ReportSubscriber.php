@@ -351,7 +351,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
-        $qb         = $event->getQueryBuilder();
+        $qb         = $this->trackingBuilder($event->getQueryBuilder());
         $hasGroupBy = $event->hasGroupBy();
 
         $qbcut                  = $this->db->createQueryBuilder(); // channel_url_trackables subquery
@@ -498,7 +498,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $qb = $event->getQueryBuilder();
+        $qb = $this->trackingBuilder($event->getQueryBuilder());
+
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
@@ -830,7 +831,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         return $result;
     }
 
-    private function joinEmailsTableIfMissing(QueryBuilder $queryBuilder, ReportGraphEvent $event): void
+    private function joinEmailsTableIfMissing(TrackingQueryBuilder $queryBuilder, ReportGraphEvent $event): void
     {
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS) && !$this->isJoined($queryBuilder, MAUTIC_TABLE_PREFIX.'emails', self::EMAIL_STATS_PREFIX, self::EMAILS_PREFIX)) {
             $queryBuilder->leftJoin(self::EMAIL_STATS_PREFIX, MAUTIC_TABLE_PREFIX.'emails', self::EMAILS_PREFIX, 'e.id = es.email_id');
@@ -840,7 +841,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add the Do Not Contact table to the query builder.
      */
-    private function addDNCTableForEmails(QueryBuilder $qb): void
+    private function addDNCTableForEmails(TrackingQueryBuilder $qb): void
     {
         $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
 
@@ -854,7 +855,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTrackableTablesForEmailStats(QueryBuilder $qb): void
+    private function addTrackableTablesForEmailStats(TrackingQueryBuilder $qb): void
     {
         $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
         $prTable = MAUTIC_TABLE_PREFIX.'page_redirects';
@@ -880,7 +881,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add the Do Not Contact table to the query builder.
      */
-    private function addDNCTableForEmailStats(QueryBuilder $qb): void
+    private function addDNCTableForEmailStats(TrackingQueryBuilder $qb): void
     {
         $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
 
@@ -894,9 +895,23 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
+    /**
+     * Only Mautic's builder records its parts, and this subscriber reads a query back to
+     * see whether a table is already joined. Connections hand out the tracking builder,
+     * so this never fires in practice; it is here because the event types its builder as
+     * the DBAL one, which cannot be read back.
+     */
+    private function trackingBuilder(QueryBuilder $queryBuilder): TrackingQueryBuilder
     {
-        \assert($query instanceof TrackingQueryBuilder);
+        if (!$queryBuilder instanceof TrackingQueryBuilder) {
+            throw new \LogicException(sprintf('%s needs a query builder that records its parts, got %s.', self::class, $queryBuilder::class));
+        }
+
+        return $queryBuilder;
+    }
+
+    private function isJoined(TrackingQueryBuilder $query, string $table, string $fromAlias, string $alias): bool
+    {
         $joins = $query->getQueryParts()['join'];
         if (empty($joins) || empty($joins[$fromAlias])) {
             return false;
