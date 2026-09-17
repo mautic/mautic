@@ -470,14 +470,14 @@ class CampaignRepository extends CommonRepository
     /**
      * Get lead data of a campaign.
      *
-     * @param array $select
+     * @param string[] $select
      * @return mixed[]
      */
-    public function getCampaignLeads($campaignId, int $start = 0, bool $limit = false, $select = ['cl.lead_id']): array
+    public function getCampaignLeads($campaignId, int $start = 0, bool $limit = false, array $select = ['cl.lead_id']): array
     {
         $q = $this->getReplicaConnection()->createQueryBuilder();
 
-        $q->select(...(array) $select)
+        $q->select(...$select)
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(
