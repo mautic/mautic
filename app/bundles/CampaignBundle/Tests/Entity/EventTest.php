@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Entity;
 
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 
 final class EventTest extends TestCase
@@ -12,6 +13,53 @@ final class EventTest extends TestCase
     private const TEST_NAME = 'Test Name';
 
     private const DATE      = '2021-10-08 08:00:00';
+
+    public function testSetRedirectEventTracksChange(): void
+    {
+        $event         = new Event();
+        $redirectEvent = $this->createEventWithId(42);
+
+        $event->setRedirectEvent($redirectEvent);
+
+        $changes = $event->getChanges();
+        $this->assertArrayHasKey('redirectEvent', $changes);
+        $this->assertSame(['', 42], $changes['redirectEvent']);
+    }
+
+    public function testUpdateRedirectEventTracksChange(): void
+    {
+        $event          = new Event();
+        $firstRedirect  = $this->createEventWithId(10);
+        $secondRedirect = $this->createEventWithId(20);
+
+        $event->setRedirectEvent($firstRedirect);
+        $event->setRedirectEvent($secondRedirect);
+
+        $changes = $event->getChanges();
+        $this->assertArrayHasKey('redirectEvent', $changes);
+        $this->assertSame([10, 20], $changes['redirectEvent']);
+    }
+
+    public function testClearRedirectEventTracksChange(): void
+    {
+        $event         = new Event();
+        $redirectEvent = $this->createEventWithId(99);
+
+        $event->setRedirectEvent($redirectEvent);
+        $event->setRedirectEvent(null);
+
+        $changes = $event->getChanges();
+        $this->assertArrayHasKey('redirectEvent', $changes);
+        $this->assertSame([99, null], $changes['redirectEvent']);
+    }
+
+    private function createEventWithId(int $id): Event
+    {
+        $event = new Event();
+        ReflectionHelper::setValue($event, 'id', $id);
+
+        return $event;
+    }
 
     public function testSetTriggerHourWhenEmpty(): void
     {
