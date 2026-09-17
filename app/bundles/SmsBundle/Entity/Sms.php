@@ -125,6 +125,10 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      * @var ArrayCollection<int, LeadList>
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\ManyToMany(targetEntity: LeadList::class, fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\JoinTable(name: 'sms_message_list_xref')]
+    #[ORM\JoinColumn(name: 'sms_id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
     private $lists;
 
     /**
@@ -205,14 +209,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         $builder->createField('isMms', Types::BOOLEAN)
             ->columnName('is_mms')
             ->option('default', 0)
-            ->build();
-
-        $builder->createManyToMany('lists', LeadList::class)
-            ->setJoinTable('sms_message_list_xref')
-            ->setIndexBy('id')
-            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('sms_id', 'id', true, false, 'CASCADE')
-            ->fetchExtraLazy()
             ->build();
 
         self::addTranslationMetadata($builder, self::class);
