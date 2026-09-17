@@ -66,15 +66,13 @@ final class ChannelBroadcastEvent extends Event
     }
 
     /**
-     * @param string $channelLabel
      * @param int    $successCount
-     * @param int    $failedCount
      */
-    public function setResults($channelLabel, $successCount, $failedCount = 0, array $failedRecipientsByList = []): void
+    public function setResults(string $channelLabel, $successCount, int $failedCount = 0, array $failedRecipientsByList = []): void
     {
         $this->results[$channelLabel] = [
             'success'                => (int) $successCount,
-            'failed'                 => (int) $failedCount,
+            'failed'                 => $failedCount,
             'failedRecipientsByList' => $failedRecipientsByList,
         ];
     }
@@ -84,7 +82,7 @@ final class ChannelBroadcastEvent extends Event
         return $this->results;
     }
 
-    public function checkContext($channel): bool
+    public function checkContext(string $channel): bool
     {
         if ($this->channel && $this->channel !== $channel) {
             return false;
