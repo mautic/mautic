@@ -54,11 +54,9 @@ final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      * Add a new choice for list filters
      * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices.
      *
-     * @param string  $object
-     * @param string  $choiceKey
      * @param mixed[] $choiceConfig
      */
-    public function addChoice($object, $choiceKey, $choiceConfig): void
+    public function addChoice(string $object, string $choiceKey, array $choiceConfig): void
     {
         $this->choices[$object] ??= [];
         if (!array_key_exists($choiceKey, $this->choices[$object])) {

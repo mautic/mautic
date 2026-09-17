@@ -18,32 +18,21 @@ class LeadBuildSearchEvent extends CommonEvent
     protected bool $strict = false;
 
     protected array $parameters = [];
-
-    /**
-     * @param string $string
-     * @param string $command
-     */
     public function __construct(
-        protected $string,
-        protected $command,
+        protected string $string,
+        protected string $command,
         protected string $alias,
         protected bool $negate,
         protected QueryBuilder $queryBuilder,
     ) {
     }
 
-    /**
-     * @return string
-     */
-    public function getString()
+    public function getString(): string
     {
         return $this->string;
     }
 
-    /**
-     * @return string
-     */
-    public function getCommand()
+    public function getCommand(): string
     {
         return $this->command;
     }
@@ -85,10 +74,7 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->subQuery;
     }
 
-    /**
-     * @param array $string
-     */
-    public function setString($string): void
+    public function setString(string $string): void
     {
         $this->string = $string;
     }
