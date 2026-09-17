@@ -982,8 +982,20 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
                 // Support multiple Mautic instances: check against all registered domains
                 const allowedDomains = Form.getAllowedDomains();
+
+                // Only accept http: and https: origins
+                if (!event.origin || !(event.origin.startsWith('http:') || event.origin.startsWith('https:'))) {
+                    return;
+                }
+
+                // Use exact origin comparison to prevent prefix-based bypass
                 const isAllowed = allowedDomains.some(function(domain) {
-                    return typeof domain === 'string' && domain.indexOf(event.origin) === 0;
+                    if (typeof domain !== 'string') return false;
+                    try {
+                        return new URL(domain).origin === event.origin;
+                    } catch (e) {
+                        return false;
+                    }
                 });
 
                 if (!isAllowed) return;
