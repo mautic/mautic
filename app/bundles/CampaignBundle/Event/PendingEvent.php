@@ -16,10 +16,7 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
     private readonly ArrayCollection $successful;
 
-    /**
-     * @var string|null
-     */
-    private $channel;
+    private ?string $channel = null;
 
     /**
      * @var int|null
@@ -47,11 +44,7 @@ final class PendingEvent extends AbstractLogCollectionEvent
     {
         return $this->logs;
     }
-
-    /**
-     * @param string $reason
-     */
-    public function fail(LeadEventLog $log, $reason, ?\DateInterval $rescheduleInterval = null): void
+    public function fail(LeadEventLog $log, string $reason, ?\DateInterval $rescheduleInterval = null): void
     {
         if (!$failedLog = $log->getFailedLog()) {
             $failedLog = new FailedLeadEventLog();
@@ -78,11 +71,7 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
         $this->failures->set($log->getId(), $log);
     }
-
-    /**
-     * @param string $reason
-     */
-    public function failAll($reason): void
+    public function failAll(string $reason): void
     {
         foreach ($this->logs as $log) {
             $this->fail($log, $reason);
@@ -91,10 +80,8 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * Fail all that have not passed yet.
-     *
-     * @param string $reason
      */
-    public function failRemaining($reason): void
+    public function failRemaining(string $reason): void
     {
         foreach ($this->logs as $log) {
             if (!$this->successful->contains($log)) {
@@ -105,10 +92,8 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * Fail all that have not passed or failed yet.
-     *
-     * @param string $reason
      */
-    public function failRemainingPending($reason): void
+    public function failRemainingPending(string $reason): void
     {
         foreach ($this->logs as $log) {
             if (!$this->failures->contains($log) && !$this->successful->contains($log)) {
@@ -119,9 +104,8 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * @param LeadEventLog[]|ArrayCollection $logs
-     * @param string                         $reason
      */
-    public function failLogs(ArrayCollection $logs, $reason): void
+    public function failLogs(ArrayCollection $logs, string $reason): void
     {
         foreach ($logs as $log) {
             $this->fail($log, $reason);
@@ -228,10 +212,9 @@ final class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @param string   $channel
      * @param int|null $channelId
      */
-    public function setChannel($channel, $channelId = null): void
+    public function setChannel(string $channel, $channelId = null): void
     {
         $this->channel   = $channel;
         $this->channelId = $channelId;
