@@ -31,6 +31,10 @@ class Client extends BaseClient
     /**
      * @var ArrayCollection<int, User>
      */
+    #[ORM\ManyToMany(targetEntity: User::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\JoinTable(name: 'oauth2_user_client_xref')]
+    #[ORM\JoinColumn(name: 'client_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'user_id', nullable: false, onDelete: 'CASCADE')]
     protected $users;
 
     /**
@@ -75,13 +79,6 @@ class Client extends BaseClient
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns('name', false);
-
-        $builder->createManyToMany('users', User::class)
-            ->setJoinTable('oauth2_user_client_xref')
-            ->addInverseJoinColumn('user_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
 
         $builder->createField('randomId', 'string')
             ->columnName('random_id')

@@ -135,6 +135,10 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
      * @var ArrayCollection<int, LeadList>
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\ManyToMany(targetEntity: LeadList::class, fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\JoinTable(name: 'push_notification_list_xref')]
+    #[ORM\JoinColumn(name: 'notification_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
     private $lists;
 
     /**
@@ -224,14 +228,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
             ->build();
 
         $builder->addCategory();
-
-        $builder->createManyToMany('lists', LeadList::class)
-            ->setJoinTable('push_notification_list_xref')
-            ->setIndexBy('id')
-            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('notification_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
 
         $builder->createField('mobile', 'boolean')->build();
 
