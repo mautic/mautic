@@ -422,10 +422,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * The primary company data will be a flat array on the entity
      * with a key of `primaryCompany`
-     *
-     * @param mixed $entity
-     *
-     * @return mixed|null
      */
     public function getEntityWithPrimaryCompany(Lead|int $entity): ?Lead
     {
