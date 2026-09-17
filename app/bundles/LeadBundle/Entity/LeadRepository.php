@@ -427,7 +427,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return mixed|null
      */
-    public function getEntityWithPrimaryCompany($entity): mixed
+    public function getEntityWithPrimaryCompany(Lead|int $entity): ?Lead
     {
         if (is_int($entity)) {
             $entity = $this->getEntity($entity);
