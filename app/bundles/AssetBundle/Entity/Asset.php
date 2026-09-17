@@ -70,9 +70,11 @@ class Asset extends FormEntity implements UuidInterface
     private ?string $description = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'storage_location', type: Types::STRING, length: 191, nullable: true)]
     private ?string $storageLocation = 'local';
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $path = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
@@ -80,9 +82,11 @@ class Asset extends FormEntity implements UuidInterface
         new Assert\Url(message: 'mautic.asset.validation.error.url'),
         new SafeRemoteUrl(),
     ])]
+    #[ORM\Column(name: 'remote_path', type: Types::TEXT, nullable: true)]
     private ?string $remotePath = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'original_file_name', type: Types::TEXT, nullable: true)]
     private ?string $originalFileName = null;
 
     private ?File $file = null;
@@ -117,9 +121,11 @@ class Asset extends FormEntity implements UuidInterface
     private ?string $tempName = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $alias = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'lang', type: Types::STRING, length: 191)]
     private string $language = 'en';
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
@@ -129,30 +135,37 @@ class Asset extends FormEntity implements UuidInterface
     private ?\DateTimeInterface $publishDown = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'download_count', type: Types::INTEGER)]
     private int $downloadCount = 0;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'unique_download_count', type: Types::INTEGER)]
     private int $uniqueDownloadCount = 0;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::INTEGER)]
     private int $revision = 1;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private ?Category $category = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $extension = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $mime = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $size = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private ?string $downloadUrl = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
     private ?bool $disallow = true;
 
     public function __construct()
@@ -166,63 +179,9 @@ class Asset extends FormEntity implements UuidInterface
 
         $builder->addIdColumns('title');
 
-        $builder->createField('alias', Types::STRING)
-            ->columnName('alias')
-            ->nullable()
-            ->build();
-
-        $builder->createField('storageLocation', Types::STRING)
-            ->columnName('storage_location')
-            ->nullable()
-            ->build();
-
-        $builder->createField('path', Types::STRING)
-            ->nullable()
-            ->build();
-
-        $builder->createField('remotePath', Types::TEXT)
-            ->columnName('remote_path')
-            ->nullable()
-            ->build();
-
-        $builder->createField('originalFileName', Types::TEXT)
-            ->columnName('original_file_name')
-            ->nullable()
-            ->build();
-
-        $builder->createField('language', Types::STRING)
-            ->columnName('lang')
-            ->build();
-
         $builder->addPublishDates();
 
-        $builder->createField('downloadCount', Types::INTEGER)
-            ->columnName('download_count')
-            ->build();
-
-        $builder->createField('uniqueDownloadCount', Types::INTEGER)
-            ->columnName('unique_download_count')
-            ->build();
-
-        $builder->addField('revision', Types::INTEGER);
-
         $builder->addCategory();
-
-        $builder->createField('extension', Types::STRING)
-            ->nullable()
-            ->build();
-
-        $builder->createField('mime', Types::STRING)
-            ->nullable()
-            ->build();
-
-        $builder->createField('size', Types::INTEGER)
-            ->nullable()
-            ->build();
-
-        $builder->createField('disallow', Types::BOOLEAN)
-            ->nullable()
-            ->build();
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'asset_projects_xref', 'asset_id');

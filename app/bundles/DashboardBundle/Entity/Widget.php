@@ -27,11 +27,13 @@ class Widget extends FormEntity
     /**
      * @var int
      */
+    #[ORM\Column(type: Types::INTEGER)]
     private $width;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: Types::INTEGER)]
     private $height;
 
     /**
@@ -43,6 +45,7 @@ class Widget extends FormEntity
      * @var string
      */
     #[NotBlank(message: 'mautic.core.type.required')]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $type;
 
     /**
@@ -91,9 +94,6 @@ class Widget extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->addIdColumns('name', false);
-        $builder->addField('type', Types::STRING);
-        $builder->addField('width', Types::INTEGER);
-        $builder->addField('height', Types::INTEGER);
         $builder->addNullableField('cacheTimeout', Types::INTEGER, 'cache_timeout');
         $builder->addNullableField('ordering', Types::INTEGER);
         $builder->addNullableField('params', Types::ARRAY);
