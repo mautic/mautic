@@ -216,7 +216,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $builder->addNullableField('scheduleDay', Types::STRING, 'schedule_day');
         $builder->addNullableField('scheduleMonthFrequency', Types::STRING, 'schedule_month_frequency');
 
-        static::addUuidField($builder);
     }
 
     /**

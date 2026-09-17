@@ -45,7 +45,6 @@ class WideEntity
 
         $builder->addNullableField('scheduleUnit', Types::STRING, 'schedule_unit');
 
-        static::addUuidField($builder);
     }
 
     public static function addUuidField(ClassMetadataBuilder $builder): void
@@ -104,7 +103,6 @@ class WideEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        static::addUuidField($builder);
     }
 
     public static function addUuidField(ClassMetadataBuilder $builder): void

@@ -309,7 +309,6 @@ class Event implements ChannelInterface, UuidInterface
             ->isOwnershipParent()
             ->build();
 
-        static::addUuidField($builder);
 
         $builder->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added')

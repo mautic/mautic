@@ -130,7 +130,6 @@ class TriggerEvent implements UuidInterface
             ->isOwnershipParent()
             ->build();
 
-        static::addUuidField($builder);
     }
 
     /**

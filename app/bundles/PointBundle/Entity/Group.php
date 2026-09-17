@@ -35,7 +35,6 @@ class Group extends FormEntity implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        static::addUuidField($builder);
 
         $builder->addIdColumns();
     }

@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * This trait provides default implementation of OptimisticLockInterface.
@@ -44,9 +43,5 @@ trait OptimisticLockTrait
     public function getVersionField(): string
     {
         return 'version';
-    }
-
-    private static function addVersionField(ClassMetadataBuilder $builder): void
-    {
     }
 }

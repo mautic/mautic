@@ -291,7 +291,6 @@ class Field implements UuidInterface
             ->length(50)
             ->option('default', '100%')
             ->build();
-        static::addUuidField($builder);
     }
 
     /**

@@ -101,7 +101,6 @@ class Category extends FormEntity implements UuidInterface
             ->length(50)
             ->build();
 
-        static::addUuidField($builder);
     }
 
     /**

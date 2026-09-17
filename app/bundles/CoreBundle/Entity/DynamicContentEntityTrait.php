@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 trait DynamicContentEntityTrait
@@ -43,10 +42,6 @@ trait DynamicContentEntityTrait
     #[Groups(['email:read', 'email:write'])]
     #[ORM\Column(name: 'dynamic_content', type: 'array', nullable: true)]
     private $dynamicContent = [];
-
-    protected static function addDynamicContentMetadata(ClassMetadataBuilder $builder): void
-    {
-    }
 
     /**
      * @return array
