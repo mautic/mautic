@@ -35,6 +35,7 @@ return RectorConfig::configure()
         \Utils\Rector\LoadMetadataIndexToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataLifecycleToDoctrineAttributeRector::class,
         // \Utils\Rector\LoadMetadataClassToDoctrineAttributeRector::class,
+        // \Utils\Rector\AddDoctrineOrmMappingAliasImportRector::class,
 
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\AssertClassToThisAssertRector::class,
         Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
