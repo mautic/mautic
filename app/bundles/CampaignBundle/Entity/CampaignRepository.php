@@ -211,7 +211,7 @@ class CampaignRepository extends CommonRepository
     /**
      * Get array of form IDs => name assigned to this campaign.
      */
-    public function getCampaignFormSources(string $id): array
+    public function getCampaignFormSources(int $id): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cf.form_id, f.name')
