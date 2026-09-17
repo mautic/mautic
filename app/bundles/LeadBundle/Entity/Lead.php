@@ -149,6 +149,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var int
      */
     #[Groups(['contact:read', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'integer')]
     private $points = 0;
 
     private array $pointChanges = [];
@@ -205,16 +206,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var \DateTimeInterface
      */
     #[Groups(['contact:read'])]
+    #[ORM\Column(name: 'last_active', type: 'datetime', nullable: true)]
     private $lastActive;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $internal = [];
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'social_cache', type: 'array', nullable: true)]
     private $socialCache = [];
 
     /**
@@ -238,6 +242,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var \DateTimeInterface
      */
     #[Groups(['contact:read'])]
+    #[ORM\Column(name: 'date_identified', type: 'datetime', nullable: true)]
     private $dateIdentified;
 
     /**
@@ -250,6 +255,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'preferred_profile_image', type: 'string', length: 191, nullable: true)]
     private $preferredProfileImage = 'gravatar';
 
     /**
@@ -332,33 +338,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->createField('points', 'integer')
-            ->build();
-
-        $builder->createField('lastActive', 'datetime')
-            ->columnName('last_active')
-            ->nullable()
-            ->build();
-
-        $builder->createField('internal', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->createField('socialCache', 'array')
-            ->columnName('social_cache')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateIdentified', 'datetime')
-            ->columnName('date_identified')
-            ->nullable()
-            ->build();
-
-        $builder->createField('preferredProfileImage', 'string')
-            ->columnName('preferred_profile_image')
-            ->nullable()
-            ->build();
 
         self::loadFixedFieldMetadata(
             $builder,
