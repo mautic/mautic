@@ -20,7 +20,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
         private readonly ContactSegmentFilter $filter,
-        private $parameterHolder,
+        private readonly array|string $parameterHolder,
     ) {
         $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
@@ -38,7 +38,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     /**
      * @return string|string[]
      */
-    public function getParameterHolder()
+    public function getParameterHolder(): string|array
     {
         return $this->parameterHolder;
     }
