@@ -57,6 +57,9 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      * @var int
      */
     #[Groups(['company:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -64,6 +67,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     #[Groups(['company:read', 'company:write'])]
     #[Assert\Range(min: 0, max: 2147483647)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $score = 0;
 
     #[Groups(['company:read', 'company:write'])]
@@ -75,6 +79,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      * @var mixed[]
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'social_cache', type: 'array', nullable: true)]
     private $socialCache = [];
 
     /**
@@ -183,20 +188,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
-
-        $builder->createField('socialCache', 'array')
-            ->columnName('social_cache')
-            ->nullable()
-            ->build();
-
-        $builder->createField('score', 'integer')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('deleted', Types::DATETIME_MUTABLE);
 
