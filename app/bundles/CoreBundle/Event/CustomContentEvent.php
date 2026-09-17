@@ -19,7 +19,7 @@ final class CustomContentEvent extends Event
     private array $templates = [];
 
     public function __construct(
-        private readonly string $viewName,
+        private readonly ?string $viewName,
         private readonly ?string $context = null,
         private readonly array $vars = [],
     ) {
