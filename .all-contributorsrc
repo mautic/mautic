@@ -1850,6 +1850,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "dylanpulver",
+      "name": "Dylan Pulver",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35541198?v=4",
+      "profile": "https://dylanpulver.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "redbullpeter",
+      "name": "Peter",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7094955?v=4",
+      "profile": "https://github.com/redbullpeter",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
