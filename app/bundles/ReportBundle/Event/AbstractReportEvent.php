@@ -31,10 +31,7 @@ abstract class AbstractReportEvent extends Event
         return $this->context;
     }
 
-    /**
-     * @return bool
-     */
-    public function checkContext($context)
+    public function checkContext(array|string $context): bool
     {
         if (empty($this->context)) {
             return true;
@@ -45,10 +42,10 @@ abstract class AbstractReportEvent extends Event
 
             return count($res) > 0;
         }
-        if ($this->context == $context) {
+        if ($this->context === $context) {
             return true;
         }
 
-        return 0 === stripos($this->context, (string) $context);
+        return 0 === stripos($this->context, $context);
     }
 }
