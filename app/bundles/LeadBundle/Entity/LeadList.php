@@ -176,7 +176,6 @@ class LeadList extends FormEntity implements UuidInterface
         self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
         $builder->addNullableField('deleted', 'datetime');
 
-        static::addUuidField($builder);
     }
 
     /**

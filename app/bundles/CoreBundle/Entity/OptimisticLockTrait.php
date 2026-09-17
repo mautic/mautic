@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * This trait provides default implementation of OptimisticLockInterface.
  */
 trait OptimisticLockTrait
 {
+    #[ORM\Column(type: Types::INTEGER, options: ['default' => OptimisticLockInterface::INITIAL_VERSION, 'unsigned' => true])]
     private int $version = OptimisticLockInterface::INITIAL_VERSION;
 
     private ?int $currentVersion = null;
@@ -42,14 +43,5 @@ trait OptimisticLockTrait
     public function getVersionField(): string
     {
         return 'version';
-    }
-
-    private static function addVersionField(ClassMetadataBuilder $builder): void
-    {
-        $builder->createField('version', Types::INTEGER)
-            ->columnName('version')
-            ->option('default', OptimisticLockInterface::INITIAL_VERSION)
-            ->option('unsigned', true)
-            ->build();
     }
 }

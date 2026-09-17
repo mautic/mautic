@@ -233,7 +233,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
         $builder->createField('mobileSettings', 'array')->build();
 
-        static::addUuidField($builder);
 
         self::addTranslationMetadata($builder, self::class);
     }

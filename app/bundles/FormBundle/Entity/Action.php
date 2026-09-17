@@ -118,8 +118,6 @@ class Action implements UuidInterface
             ->build();
 
         $builder->addField('properties', 'array');
-
-        static::addUuidField($builder);
     }
 
     /**

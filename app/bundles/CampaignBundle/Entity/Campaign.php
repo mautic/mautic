@@ -190,8 +190,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
         $builder->addNullableField('deleted', 'datetime');
 
-        self::addVersionField($builder);
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'campaign_projects_xref', 'campaign_id');
     }
 

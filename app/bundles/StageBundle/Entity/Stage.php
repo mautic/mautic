@@ -125,7 +125,6 @@ class Stage extends FormEntity implements UuidInterface
 
         $builder->addCategory();
 
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'stage_projects_xref', 'stage_id');
     }
 

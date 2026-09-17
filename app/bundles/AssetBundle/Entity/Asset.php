@@ -224,7 +224,6 @@ class Asset extends FormEntity implements UuidInterface
             ->nullable()
             ->build();
 
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'asset_projects_xref', 'asset_id');
     }
 

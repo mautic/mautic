@@ -108,8 +108,6 @@ class Channel extends CommonEntity implements UuidInterface
             ->createField('isEnabled', 'boolean')
                 ->columnName('is_enabled')
                 ->build();
-
-        static::addUuidField($builder);
     }
 
     /**

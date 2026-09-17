@@ -310,9 +310,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'page_projects_xref', 'page_id');
-        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

@@ -144,8 +144,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
         $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
-
-        self::addVersionField($builder);
     }
 
     /**

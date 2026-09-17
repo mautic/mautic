@@ -163,7 +163,6 @@ class Point extends FormEntity implements UuidInterface
 
         $builder->addCategory();
 
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'point_projects_xref', 'point_id');
     }
 

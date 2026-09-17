@@ -307,8 +307,6 @@ class Event implements ChannelInterface, UuidInterface
 
         $builder->addNullableField('deleted', 'datetime');
 
-        static::addUuidField($builder);
-
         $builder->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added')
             ->option('default', '1970-01-01 00:00:00')

@@ -115,7 +115,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
             ->columnName('readable_permissions')
             ->build();
 
-        static::addUuidField($builder);
     }
 
     /**

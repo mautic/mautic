@@ -127,8 +127,6 @@ class TriggerEvent implements UuidInterface
             ->build();
 
         $builder->addField('properties', 'array');
-
-        static::addUuidField($builder);
     }
 
     /**
