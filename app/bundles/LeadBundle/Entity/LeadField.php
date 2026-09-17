@@ -309,7 +309,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
             ->option('default', false)
             ->build();
 
-        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

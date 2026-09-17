@@ -43,6 +43,22 @@ final class LoadMetadataStaticHelperToAttributeRector extends AbstractRector
 {
     private bool $isHybrid = false;
 
+    private ?string $className = null;
+
+    /**
+     * Properties each no-op helper maps; a call only drops when every one of them already carries a
+     * Doctrine ORM mapping attribute on the entity, so a still-loadMetadata trait keeps its call.
+     *
+     * @var array<string, string[]>
+     */
+    private const array NO_OP_HELPER_PROPERTIES = [
+        'addUuidField'              => ['uuid'],
+        'addVersionField'           => ['version'],
+        'addDynamicContentMetadata' => ['dynamicContent'],
+        'addTranslationMetadata'    => ['translationChildren', 'translationParent', 'language'],
+        'addVariantMetadata'        => ['variantParent', 'variantChildren', 'variantSettings', 'variantStartDate'],
+    ];
+
     /**
      * @return array<class-string<Node>>
      */
@@ -64,7 +80,8 @@ final class LoadMetadataStaticHelperToAttributeRector extends AbstractRector
 
         // A hybrid class already maps its own fields via attributes, so a property-emitting helper
         // is left behind; only known no-op helpers drop out of loadMetadata.
-        $this->isHybrid = $this->hasOrmMappingAttribute($node->attrGroups);
+        $this->isHybrid  = $this->hasOrmMappingAttribute($node->attrGroups);
+        $this->className = $this->getName($node);
 
         $builderAssignStatement = null;
         $keptStatements         = [];
@@ -168,10 +185,9 @@ final class LoadMetadataStaticHelperToAttributeRector extends AbstractRector
     }
 
     /**
-     * These helpers map trait properties (UuidTrait::$uuid, OptimisticLockTrait::$version,
-     * TranslationEntityTrait, VariantEntityTrait, DynamicContentEntityTrait) that carry their own
-     * mapping attributes. The properties are not in the class body, so no per-entity attribute is
-     * emitted; the call simply drops out of loadMetadata.
+     * These helpers map trait properties (UuidTrait::$uuid, OptimisticLockTrait::$version, ...) that
+     * carry their own ORM attributes, so the call drops out of loadMetadata - but only once the trait
+     * property is actually attribute-mapped, otherwise the call is kept to preserve the mapping.
      */
     private function isNoOpHelper(StaticCall $call): bool
     {
@@ -183,9 +199,42 @@ final class LoadMetadataStaticHelperToAttributeRector extends AbstractRector
             return false;
         }
 
-        $noOpHelpers = ['addUuidField', 'addVersionField', 'addTranslationMetadata', 'addVariantMetadata', 'addDynamicContentMetadata'];
+        $helper = $call->name->toString();
+        if (!isset(self::NO_OP_HELPER_PROPERTIES[$helper])) {
+            return false;
+        }
 
-        return in_array($call->name->toString(), $noOpHelpers, true);
+        // Guard against dropping a call whose trait still maps the property via loadMetadata: keep it
+        // when a mapped property is present on the entity but carries no ORM attribute yet.
+        return !$this->mapsUnattributedProperty(self::NO_OP_HELPER_PROPERTIES[$helper]);
+    }
+
+    /**
+     * @param string[] $propertyNames
+     */
+    private function mapsUnattributedProperty(array $propertyNames): bool
+    {
+        if (null === $this->className || !class_exists($this->className)) {
+            return false;
+        }
+
+        $reflectionClass = new \ReflectionClass($this->className);
+
+        foreach ($propertyNames as $propertyName) {
+            if (!$reflectionClass->hasProperty($propertyName)) {
+                continue;
+            }
+
+            foreach ($reflectionClass->getProperty($propertyName)->getAttributes() as $attribute) {
+                if (str_starts_with($attribute->getName(), 'Doctrine\\ORM\\Mapping\\')) {
+                    continue 2;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

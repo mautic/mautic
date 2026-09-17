@@ -194,7 +194,6 @@ class Focus extends FormEntity implements UuidInterface
 
         $builder->addNullableField('html', 'text');
 
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'focus_projects_xref', 'focus_id');
     }
 

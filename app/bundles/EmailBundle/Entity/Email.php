@@ -432,7 +432,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
-        self::addDynamicContentMetadata($builder);
 
         $builder->addField('headers', Types::JSON);
 
@@ -443,9 +442,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->nullable()
             ->build();
 
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'email_projects_xref', 'email_id');
-        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

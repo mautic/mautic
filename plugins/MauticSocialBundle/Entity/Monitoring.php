@@ -132,7 +132,6 @@ class Monitoring extends FormEntity implements UuidInterface
 
         $builder->addPublishDates();
 
-        static::addUuidField($builder);
     }
 
     /**

@@ -111,7 +111,6 @@ class Message extends FormEntity implements UuidInterface
             ->addPublishDates()
             ->addCategory();
 
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'message_projects_xref', 'message_id');
     }
 

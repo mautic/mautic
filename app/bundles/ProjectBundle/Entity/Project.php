@@ -89,7 +89,6 @@ class Project extends FormEntity implements UuidInterface
 
         $builder->addField('properties', Types::JSON);
 
-        static::addUuidField($builder);
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
