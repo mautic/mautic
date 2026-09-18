@@ -361,8 +361,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $roles;
     }
 
+    // final so Doctrine's proxy cannot override it: the generated override would not carry
+    // the #[\Deprecated] attribute, which is what Symfony reflects on to skip the call.
     #[\Deprecated]
-    public function eraseCredentials(): void
+    final public function eraseCredentials(): void
     {
     }
 

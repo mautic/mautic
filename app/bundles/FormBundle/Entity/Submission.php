@@ -21,6 +21,11 @@ class Submission
     public const TABLE_NAME = 'form_submissions';
 
     /**
+     * Set by FormModel::deleteEntity() so post_delete listeners can still read the id.
+     */
+    public ?int $deletedId = null;
+
+    /**
      * @var string
      */
     private $id;
