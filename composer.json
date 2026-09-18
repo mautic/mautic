@@ -259,6 +259,9 @@
     "patches": {
       "twig/twig": {
         "Make IntegrationTestCase data providers static for PHPUnit 11": "patches/twig-integration-testcase-static-data-providers.patch"
+      },
+      "lightsaml2/lightsaml": {
+        "Declare getIterator() return type for IteratorAggregate compatibility": "patches/lightsaml-getiterator-return-type.patch"
       }
     }
   }
