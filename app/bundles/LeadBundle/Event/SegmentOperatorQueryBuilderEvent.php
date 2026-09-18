@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -21,7 +20,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     public function __construct(
         private readonly QueryBuilder $queryBuilder,
         private readonly ContactSegmentFilter $filter,
-        private $parameterHolder,
+        private readonly array|string $parameterHolder,
     ) {
         $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
@@ -39,7 +38,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     /**
      * @return string|string[]
      */
-    public function getParameterHolder()
+    public function getParameterHolder(): string|array
     {
         return $this->parameterHolder;
     }
@@ -49,10 +48,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
         return in_array($this->filter->getOperator(), $operators, true);
     }
 
-    /**
-     * @param CompositeExpression|string $expression
-     */
-    public function addExpression($expression): void
+    public function addExpression(\Doctrine\DBAL\Query\Expression\CompositeExpression|string|null $expression): void
     {
         $this->queryBuilder->addLogic($expression, $this->filter->getGlue());
 

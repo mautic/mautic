@@ -53,10 +53,7 @@ final class LeadTimelineEvent extends Event
 
     private bool $fetchTypesOnly = false;
 
-    /**
-     * @var array
-     */
-    private $serializerGroups = [
+    private array $serializerGroups = [
         'ipAddressList',
     ];
 
@@ -244,7 +241,7 @@ final class LeadTimelineEvent extends Event
      * @param string $eventTypeKey  Identifier of the event type
      * @param string $eventTypeName Name of the event type for humans
      */
-    public function addEventType($eventTypeKey, $eventTypeName): void
+    public function addEventType(string $eventTypeKey, $eventTypeName): void
     {
         $this->eventTypes[$eventTypeKey] = $eventTypeName;
     }
@@ -329,7 +326,7 @@ final class LeadTimelineEvent extends Event
     /**
      * Determine if an event type should be included.
      */
-    public function isApplicable($eventType, bool $inclusive = false): bool
+    public function isApplicable(string $eventType, bool $inclusive = false): bool
     {
         if ($this->fetchTypesOnly) {
             return false;
@@ -403,10 +400,9 @@ final class LeadTimelineEvent extends Event
 
     /**
      * Add to the event counters.
-     *
-     * @param int|array $count
+     * @param int|int[] $count
      */
-    public function addToCounter($eventType, $count): void
+    public function addToCounter(string $eventType, int|array $count): void
     {
         $this->totalEvents[$eventType] ??= 0;
 
@@ -424,14 +420,14 @@ final class LeadTimelineEvent extends Event
                 $this->totalEvents[$eventType] = array_sum($count);
             }
         } else {
-            $this->totalEvents[$eventType] += (int) $count;
+            $this->totalEvents[$eventType] += $count;
         }
     }
 
     /**
      * Subtract from the total counter if there is an event that was skipped for whatever reason.
      */
-    public function subtractFromCounter(string $eventType, $count = 1): void
+    public function subtractFromCounter(string $eventType, int $count = 1): void
     {
         $this->totalEvents[$eventType] -= $count;
     }
@@ -467,7 +463,7 @@ final class LeadTimelineEvent extends Event
     /**
      * Add a serializer group for API formatting.
      */
-    public function addSerializerGroup($group): void
+    public function addSerializerGroup(array|string $group): void
     {
         if (is_array($group)) {
             $this->serializerGroups = array_merge(
@@ -479,10 +475,7 @@ final class LeadTimelineEvent extends Event
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getSerializerGroups()
+    public function getSerializerGroups(): array
     {
         return $this->serializerGroups;
     }

@@ -860,7 +860,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->reportGraphEventMock->expects($this->once())
             ->method('checkContext')
-            ->willReturn($event);
+            ->with($event)
+            ->willReturn(true);
 
         $this->reportGraphEventMock->expects($this->once())
             ->method('getRequestedGraphs')
@@ -922,21 +923,18 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('ReportGraphEventDataProvider')]
     public function testOnReportDisplay(string $event): void
     {
-        $this->reportBuilderEventMock
-        ->method('checkContext')
-        ->willReturn($event);
+        $this->reportBuilderEventMock->expects($this->atLeastOnce())
+            ->method('checkContext')
+            ->willReturn(true);
 
-        $this->fieldsBuilderMock
-    ->method('getLeadFieldsColumns')
-    ->willReturn($this->leadColumns);
+        $this->fieldsBuilderMock->method('getLeadFieldsColumns')
+            ->willReturn($this->leadColumns);
 
-        $this->fieldsBuilderMock
-        ->method('getLeadFilter')
-        ->willReturn($this->leadFilters);
+        $this->fieldsBuilderMock->method('getLeadFilter')
+            ->willReturn($this->leadFilters);
 
-        $this->companyReportDataMock
-    ->method('getCompanyData')
-    ->willReturn($this->companyColumns);
+        $this->companyReportDataMock->method('getCompanyData')
+            ->willReturn($this->companyColumns);
 
         $this->reportBuilderEventMock
         ->method('getCategoryColumns')
@@ -970,7 +968,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportDataEventMock->expects($this->once())
             ->method('checkContext')
-            ->willReturn($event);
+            ->with($event)
+            ->willReturn(true);
         $this->reportDataEventMock->expects($this->once())
             ->method('getData')
             ->willReturn([[
