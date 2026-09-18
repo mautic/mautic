@@ -402,7 +402,10 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @return int
+     * Counts the lead's integration entities, but returns an empty array when no
+     * integration is published or nothing matched - see getIntegrationEntityByLead().
+     *
+     * @return int|array<int, array<string, scalar|null>>
      */
     public function getIntegrationEntityCount($leadId, $integration = null, $integrationEntity = null, $internalEntity = null): int|array
     {

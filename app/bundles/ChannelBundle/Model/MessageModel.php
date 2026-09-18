@@ -169,7 +169,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     }
 
     /**
-     * @return array
+     * @return array<string, int|string|null>|false
      */
     public function getChannelMessageByChannelId(int $channelId): array|false
     {

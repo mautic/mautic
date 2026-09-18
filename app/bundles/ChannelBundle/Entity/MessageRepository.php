@@ -85,7 +85,7 @@ final class MessageRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return array<string, int|string|null>|false
      */
     public function getChannelMessageByChannelId($channelId): array|false
     {
