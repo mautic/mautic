@@ -705,3 +705,12 @@
     -[$company, $companyEntities] = IdentifyCompanyHelper::identifyLeadsCompany($data, $lead, $companyModel);
     +[$company, $companyEntities] = $this->identifyCompanyHelper->identifyLeadsCompany($data, $lead);
     ```
+
+- Public methods on the entity repositories now declare native return types, including the base `Mautic\CoreBundle\Entity\CommonRepository`. If you extend one of these repositories (or `CommonRepository` directly) and override one of the affected methods, add the matching return type to your override or PHP raises a fatal signature-mismatch error. For example `CommonRepository::getEntities()` now returns `iterable`, `getTableName()` returns `string`, `getValue()` returns `?string`, `getBaseColumns()` returns `array`, `checkUniqueAlias()` returns `mixed` and `findOneBySlugs()` returns `?object`:
+
+    ```diff
+    -    public function getEntities(array $args = [])
+    +    public function getEntities(array $args = []): iterable
+    ```
+
+    The same applies to the many bundle-specific repositories touched in this change (e.g. `LeadRepository`, `EmailRepository`, `StatRepository`); each affected public method gained the return type matching the value it already returned, so behaviour is unchanged for callers.
