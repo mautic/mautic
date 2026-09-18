@@ -8,7 +8,6 @@ use Doctrine\ORM\Mapping\Builder\FieldBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Adds Mautic's shared column conventions on top of Doctrine's builder, and
@@ -183,28 +182,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
         }
 
         $dateAdded->build();
-
-        return $this;
-    }
-
-    /**
-     * Add a contact column.
-     */
-    public function addContact(bool $nullable = false, string $onDelete = 'CASCADE', bool $isPrimaryKey = false, ?string $inversedBy = null): static
-    {
-        $lead = $this->createManyToOne('contact', Lead::class);
-
-        if ($isPrimaryKey) {
-            $lead->makePrimaryKey();
-        }
-
-        if ($inversedBy) {
-            $lead->inversedBy($inversedBy);
-        }
-
-        $lead
-            ->addJoinColumn('contact_id', 'id', $nullable, false, $onDelete)
-            ->build();
 
         return $this;
     }
