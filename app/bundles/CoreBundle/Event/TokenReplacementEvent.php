@@ -32,7 +32,7 @@ class TokenReplacementEvent extends CommonEvent
      * @param \Mautic\LeadBundle\Entity\Lead|mixed[]|string|null $content
      */
     public function __construct(
-        \Mautic\LeadBundle\Entity\Lead|array|string|null $content,
+        array|string $content,
         protected \Mautic\LeadBundle\Entity\Lead|array|null $lead = null,
         protected array $clickthrough = [],
         protected $passthrough = null,
