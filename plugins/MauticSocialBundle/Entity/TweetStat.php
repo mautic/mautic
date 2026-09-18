@@ -42,6 +42,8 @@ class TweetStat
     /**
      * @var TheLead|null
      */
+    #[ORM\ManyToOne(targetEntity: TheLead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private $lead;
 
     /**
@@ -87,8 +89,6 @@ class TweetStat
             ->columnName('twitter_tweet_id')
             ->nullable()
             ->build();
-
-        $builder->addLead(true, 'SET NULL');
 
         $builder->createField('handle', 'string')
             ->build();

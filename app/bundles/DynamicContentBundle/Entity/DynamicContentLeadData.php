@@ -32,6 +32,8 @@ class DynamicContentLeadData extends CommonEntity
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -51,8 +53,6 @@ class DynamicContentLeadData extends CommonEntity
         $builder->addIdColumns(false, false);
 
         $builder->addDateAdded(true);
-
-        $builder->addLead();
 
         $builder->createField('slot', 'text')
             ->columnName('slot')

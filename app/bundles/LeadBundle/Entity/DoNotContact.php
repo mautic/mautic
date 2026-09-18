@@ -45,6 +45,8 @@ class DoNotContact
     /**
      * @var Lead|null
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'doNotContact')]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -74,8 +76,6 @@ class DoNotContact
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->addLead(true, 'CASCADE', false, 'doNotContact');
 
         $builder->addDateAdded();
 

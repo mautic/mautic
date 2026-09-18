@@ -22,6 +22,8 @@ class StagesChangeLog
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'stageChangeLog')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -51,8 +53,6 @@ class StagesChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->addLead(false, 'CASCADE', false, 'stageChangeLog');
 
         $builder->createField('eventName', 'string')
             ->columnName('event_name')

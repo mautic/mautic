@@ -21,6 +21,8 @@ class CompanyChangeLog
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'companyChangeLog')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -53,8 +55,6 @@ class CompanyChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->addLead(false, 'CASCADE', false, 'companyChangeLog');
 
         $builder->createField('type', 'text')
             ->length(50)

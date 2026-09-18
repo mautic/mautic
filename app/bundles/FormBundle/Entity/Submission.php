@@ -40,6 +40,8 @@ class Submission
     /**
      * @var Lead|null
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private $lead;
 
     /**
@@ -76,8 +78,6 @@ class Submission
         $builder->addBigIntIdField();
 
         $builder->addIpAddress(true);
-
-        $builder->addLead(true, 'SET NULL');
 
         $builder->createField('trackingId', 'string')
             ->columnName('tracking_id')

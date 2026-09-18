@@ -29,6 +29,8 @@ class LeadDevice
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -86,8 +88,6 @@ class LeadDevice
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->addLead(false, 'CASCADE', false);
 
         $builder->addDateAdded();
 

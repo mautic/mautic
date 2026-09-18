@@ -38,6 +38,8 @@ class Stat
     /**
      * @var Lead|null
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private $lead;
 
     /**
@@ -92,8 +94,6 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->addLead(true, 'SET NULL');
 
         $builder->addIpAddress(true);
 

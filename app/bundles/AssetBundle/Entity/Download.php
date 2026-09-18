@@ -66,6 +66,8 @@ class Download
     #[Groups(['download:read', 'download:write'])]
     private $ipAddress;
 
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     #[Groups(['download:read', 'download:write'])]
     private ?Lead $lead = null;
 
@@ -125,8 +127,6 @@ class Download
             ->build();
 
         $builder->addIpAddress(true);
-
-        $builder->addLead(true, 'SET NULL');
 
         $builder->addField('code', 'integer');
 
