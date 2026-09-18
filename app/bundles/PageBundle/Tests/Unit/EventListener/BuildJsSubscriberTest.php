@@ -67,6 +67,8 @@ final class BuildJsSubscriberTest extends TestCase
         $this->assertStringContainsString("typeof events.focus_item !== 'undefined'", $js);
         $this->assertStringContainsString("MauticJS.insertScript(e[i]['js']);", $js);
         $this->assertStringContainsString('m.deliverPageEvent = function', $js);
+        $this->assertStringContainsString("m.dispatchEvent('mautic:tracking-enabled')", $js);
+        $this->assertStringContainsString('!m.trackingActivationDispatched', $js);
         $this->assertStringNotContainsString('MauticJS.serialize = function', $js);
     }
 }

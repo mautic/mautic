@@ -99,9 +99,12 @@
         }
     }
 </script>
-{% set formExtra %}
-  <input type="hidden" name="mauticform[focusId]" id="mauticform{{ formName }}_focus_id" value="{{ focusId }}"/>
-{% endset %}
+{% set formExtra = '' %}
+{% if trackingEnabled is not defined or trackingEnabled %}
+    {% set formExtra %}
+      <input type="hidden" name="mauticform[focusId]" id="mauticform{{ formName }}_focus_id" value="{{ focusId }}"/>
+    {% endset %}
+{% endif %}
 
 {{ include('@MauticForm/Builder/form.html.twig', {
         'form': form,
