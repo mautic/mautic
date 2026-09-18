@@ -1259,11 +1259,36 @@ class MailHelper
         if (empty($customHtml) && $template) {
             $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
-            $customHtml = $this->themeHelper->renderThemeTemplate($logicalName, [
+            $renderedHtml = $this->themeHelper->renderThemeTemplate($logicalName, [
                 'content'  => $email->getContent(),
                 'email'    => $email,
                 'template' => $template,
             ]);
+
+            // Bundled themes since Mautic 5 are MJML. GrapesJS compiles them into
+            // customHtml client-side; sending the raw theme template as text/html
+            // delivers uncompiled <mjml> markup to recipients.
+            if (str_contains($renderedHtml, '<mjml>')) {
+                $this->logger->warning(sprintf(
+                    'Email%s uses MJML theme "%s" with empty customHtml; skipping theme HTML fallback to avoid sending uncompiled MJML.',
+                    null !== $email->getId() ? ' ID '.$email->getId() : '',
+                    $template
+                ));
+                $customHtml = '';
+
+                // When the theme fallback is skipped and there is no plain text
+                // either, the message has no usable body. Hard-fail setEmail() so
+                // the send is aborted rather than delivering an empty email.
+                if (empty($plainText)) {
+                    $this->errors[] = sprintf(
+                        'Email%s uses MJML theme "%s" with empty customHtml and no plain text; the email has no usable body and cannot be sent.',
+                        null !== $email->getId() ? ' ID '.$email->getId() : '',
+                        $template
+                    );
+                }
+            } else {
+                $customHtml = $renderedHtml;
+            }
         }
 
         $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);

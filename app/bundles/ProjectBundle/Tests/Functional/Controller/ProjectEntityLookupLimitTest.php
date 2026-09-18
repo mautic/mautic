@@ -28,6 +28,7 @@ final class ProjectEntityLookupLimitTest extends MauticMysqlTestCase
             $email->setSubject('Subject '.$i);
             $email->setEmailType('template');
             $email->setTemplate('blank');
+            $email->setCustomHtml('<!DOCTYPE html><html><body>Test</body></html>');
             $emailModel->saveEntity($email);
         }
     }
