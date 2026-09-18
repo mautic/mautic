@@ -340,6 +340,6 @@ final class ChartQueryTest extends TestCase
 
         $this->createChartQuery();
         $query = $this->chartQuery->prepareTimeDataQuery($table, $column, $filters);
-        $this->assertInstanceOf(QueryBuilder::class, $query);
+        $this->assertSame($this->queryBuilder, $query);
     }
 }

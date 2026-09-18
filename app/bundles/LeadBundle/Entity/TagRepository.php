@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -53,7 +52,6 @@ class TagRepository extends CommonRepository
         $delete = $qb->executeQuery()->fetchFirstColumn();
 
         if (count($delete)) {
-            \assert($qb instanceof TrackingQueryBuilder);
             $qb->resetQueryParts();
             $qb->delete(MAUTIC_TABLE_PREFIX.'lead_tags')
                 ->where(

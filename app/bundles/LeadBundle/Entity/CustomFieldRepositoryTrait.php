@@ -5,10 +5,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
-use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
@@ -45,7 +44,6 @@ trait CustomFieldRepositoryTrait
         // Generate where clause first to know if we need to use distinct on primary ID or not
         $this->useDistinctCount = false;
         $this->buildWhereClause($dq, $args);
-        \assert($dq instanceof TrackingQueryBuilder);
         $groupBy = $dq->getQueryPart('groupBy');
 
         if (!empty($args['withTotalCount']) || !isset($args['count'])) {

@@ -711,10 +711,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Adds the command where clause to the QueryBuilder.
-     *
-     * @param QueryBuilder $queryBuilder
      */
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|TrackingQueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command             = $filter->command;
         $string              = $filter->string;
@@ -797,7 +795,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                             $queryBuilder->expr()->in('lla.leadlist_id', ":{$unique}")
                         )
                     );
-                \assert($queryBuilder instanceof TrackingQueryBuilder);
                 $from = $queryBuilder->getQueryPart('from')[0];
                 $queryBuilder->resetQueryPart('from');
                 $queryBuilder->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
@@ -1303,7 +1300,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param mixed             $whereExpression
      * @param mixed             $having
      */
-    public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null): void
+    public function applySearchQueryRelationship(TrackingQueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null): void
     {
         $primaryTable = $tables[0];
         unset($tables[0]);
@@ -1311,7 +1308,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
 
         $this->useDistinctCount = true;
-        \assert($q instanceof TrackingQueryBuilder);
         if (!preg_match('/"'.preg_quote($primaryTable['alias'], '/').'"/i', json_encode($q->getQueryPart('join')))) {
             $q->{$joinType}(
                 $primaryTable['from_alias'],

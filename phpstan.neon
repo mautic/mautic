@@ -307,6 +307,10 @@ rules:
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
     -
+        class: Utils\PHPStan\Type\ConnectionQueryBuilderReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
         class: Utils\PHPStan\Collector\ClassNameServiceAliasCollector
         tags:
             - phpstan.collector

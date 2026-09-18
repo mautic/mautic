@@ -1102,7 +1102,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @return array<int, Query\Expr\Func|string|mixed[]|bool>
      */
-    protected function addSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|TrackingQueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command = $filter->command;
         $expr    = false;
@@ -1123,7 +1123,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @return array<int, CompositeExpression|Query\Expr\Orx|Query\Expr\Andx|Query\Expr\Func|non-empty-array<string, mixed>>
      */
-    protected function addStandardCatchAllWhereClause(QueryBuilder|DbalQueryBuilder &$q, \stdClass $filter, array $columns): array
+    protected function addStandardCatchAllWhereClause(QueryBuilder|TrackingQueryBuilder $q, \stdClass $filter, array $columns): array
     {
         $unique = $this->generateRandomParameterName(); // ensure that the string has a unique parameter identifier
         $string = $filter->string;
@@ -1165,7 +1165,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @return array<int, Query\Expr\Func|Query\Expr\Comparison|Query\Expr\Orx|CompositeExpression|string|array<string, mixed>|bool>
      */
-    protected function addStandardSearchCommandWhereClause(QueryBuilder|DbalQueryBuilder &$queryBuilder, \stdClass $filter): array
+    protected function addStandardSearchCommandWhereClause(QueryBuilder|TrackingQueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
@@ -1428,7 +1428,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param array<string, mixed> $args
      */
-    protected function buildSelectClause(QueryBuilder|DbalQueryBuilder $q, array $args)
+    protected function buildSelectClause(QueryBuilder|TrackingQueryBuilder $q, array $args)
     {
         $isOrm = $q instanceof QueryBuilder;
         if (isset($args['select'])) {
@@ -1475,7 +1475,6 @@ class CommonRepository extends ServiceEntityRepository
                 if ($isOrm) {
                     $select = $q->getDQLPart('select');
                 } else {
-                    \assert($q instanceof TrackingQueryBuilder);
                     $select = $q->getQueryPart('select');
                 }
                 if ($isOrm) {
@@ -1497,7 +1496,6 @@ class CommonRepository extends ServiceEntityRepository
                 $q->select($this->getTableAlias());
             }
         } else {
-            \assert($q instanceof TrackingQueryBuilder);
             if (!$q->getQueryPart('select')) {
                 $q->select($this->getTableAlias().'.*');
             }

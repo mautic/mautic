@@ -88,7 +88,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return $this->getEntitiesWithCustomFields('company', $args);
     }
 
-    public function getEntitiesDbalQueryBuilder(): \Doctrine\DBAL\Query\QueryBuilder
+    public function getEntitiesDbalQueryBuilder(): \Mautic\CoreBundle\Doctrine\Query\QueryBuilder
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -166,7 +166,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         );
     }
 
-    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         $unique                  = $this->generateRandomParameterName();

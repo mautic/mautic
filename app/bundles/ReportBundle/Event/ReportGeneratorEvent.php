@@ -4,9 +4,8 @@ namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
-use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 
@@ -407,7 +406,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
-        \assert($query instanceof TrackingQueryBuilder);
         $queryParts = $query->getQueryParts();
         $joins      =   $queryParts !== [] && $queryParts['join'] ? $queryParts['join'] : null;
         if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) { // @phpstan-ignore-line

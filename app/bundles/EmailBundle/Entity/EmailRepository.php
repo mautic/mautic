@@ -468,10 +468,9 @@ class EmailRepository extends CommonRepository
     /**
      * @return array<string, int>
      */
-    public function getSentReadNotReadCount(QueryBuilder $queryBuilder): array
+    public function getSentReadNotReadCount(TrackingQueryBuilder $queryBuilder): array
     {
         $queryBuilder->resetGroupBy();
-        \assert($queryBuilder instanceof TrackingQueryBuilder);
         $queryBuilder->resetQueryParts(['join']);
 
         $queryBuilder->select('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count');
@@ -489,9 +488,8 @@ class EmailRepository extends CommonRepository
         return $results;
     }
 
-    public function getUnsubscribedCount(QueryBuilder $queryBuilder): int
+    public function getUnsubscribedCount(TrackingQueryBuilder $queryBuilder): int
     {
-        \assert($queryBuilder instanceof TrackingQueryBuilder);
         $queryBuilder->resetQueryParts(['join']);
         $this->addDNCTableForEmails($queryBuilder);
         $queryBuilder->select('e.id as email_id, dnc.lead_id');
@@ -500,7 +498,7 @@ class EmailRepository extends CommonRepository
         return $queryBuilder->executeQuery()->rowCount();
     }
 
-    public function getUniqueClicks(QueryBuilder $queryBuilder): int
+    public function getUniqueClicks(TrackingQueryBuilder $queryBuilder): int
     {
         $this->addTrackableTablesForEmailStats($queryBuilder);
         $queryBuilder->select('SUM( tr.unique_hits) as `unique_clicks`');
@@ -508,7 +506,7 @@ class EmailRepository extends CommonRepository
         return (int) $queryBuilder->executeQuery()->fetchOne();
     }
 
-    private function addTrackableTablesForEmailStats(QueryBuilder $qb): void
+    private function addTrackableTablesForEmailStats(TrackingQueryBuilder $qb): void
     {
         $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
         $prTable = MAUTIC_TABLE_PREFIX.'page_redirects';
@@ -534,7 +532,7 @@ class EmailRepository extends CommonRepository
     /**
      * Add the Do Not Contact table to the query builder.
      */
-    private function addDNCTableForEmails(QueryBuilder $qb): void
+    private function addDNCTableForEmails(TrackingQueryBuilder $qb): void
     {
         $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
 
@@ -548,9 +546,8 @@ class EmailRepository extends CommonRepository
         }
     }
 
-    private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
+    private function isJoined(TrackingQueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
-        \assert($query instanceof TrackingQueryBuilder);
         $joins = $query->getQueryParts()['join'][$fromAlias] ?? null;
 
         if (empty($joins)) {

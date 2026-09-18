@@ -111,15 +111,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * @return TrackingQueryBuilder
-     *
      * @throws InvalidReportQueryException
      */
-    public function getQuery(array $options)
+    public function getQuery(array $options): TrackingQueryBuilder
     {
         $queryBuilder = $this->configureBuilder($options);
 
-        \assert($queryBuilder instanceof TrackingQueryBuilder);
         if (!array_key_exists('select', $queryBuilder->getQueryParts())) {
             throw new InvalidReportQueryException('Only SELECT statements are valid');
         }
@@ -139,10 +136,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * This method configures the ReportBuilder. It has to return a configured Doctrine DBAL QueryBuilder.
      *
      * @param array<string, mixed> $options Options array
-     *
-     * @return QueryBuilder
      */
-    private function configureBuilder(array $options)
+    private function configureBuilder(array $options): TrackingQueryBuilder
     {
         $event = new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper);
 
@@ -281,7 +276,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         $selectColumns            = [];
         $aggregators              = $this->entity->getAggregators();
-        \assert($queryBuilder instanceof TrackingQueryBuilder);
         $groupByColumns           = $queryBuilder->getQueryPart('groupBy') ?? [];
         $groupByColumnsKeys       = array_flip($groupByColumns);
         $aggregatorFieldKeys      = $groupByOptions && $aggregators

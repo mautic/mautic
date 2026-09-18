@@ -81,10 +81,9 @@ class ChartQuery extends AbstractChart
     /**
      * Apply where filters to the query.
      *
-     * @param QueryBuilder $query
-     * @param array        $filters
+     * @param array $filters
      */
-    public function applyFilters(&$query, $filters): void
+    public function applyFilters(TrackingQueryBuilder $query, $filters): void
     {
         if ($filters && is_array($filters)) {
             foreach ($filters as $column => $value) {
@@ -123,7 +122,7 @@ class ChartQuery extends AbstractChart
      * @param string $dateColumn
      * @param string $tablePrefix
      */
-    public function applyDateFilters(QueryBuilder $query, $dateColumn, $tablePrefix = 't'): void
+    public function applyDateFilters(TrackingQueryBuilder $query, $dateColumn, $tablePrefix = 't'): void
     {
         // Check if the date filters have already been applied
         if ($parameters = $query->getParameters()) {
@@ -201,11 +200,9 @@ class ChartQuery extends AbstractChart
      *
      * @param string $table   without prefix
      * @param string $column  name. The column must be type of datetime
-     * @param array  $filters will be added to where claues
-     *
-     * @return QueryBuilder
+     * @param array $filters will be added to where claues
      */
-    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', bool|string $isEnumerable = true, bool|string $useSqlOrder = true)
+    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', bool|string $isEnumerable = true, bool|string $useSqlOrder = true): TrackingQueryBuilder
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
@@ -226,7 +223,7 @@ class ChartQuery extends AbstractChart
      * @param string      $countColumn
      * @param bool|string $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery(QueryBuilder $query, $column, $tablePrefix = 't', $countColumn = '*', bool|string $isEnumerable = true, bool $useSqlOrder = true): void
+    public function modifyTimeDataQuery(TrackingQueryBuilder $query, $column, $tablePrefix = 't', $countColumn = '*', bool|string $isEnumerable = true, bool $useSqlOrder = true): void
     {
         // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
@@ -418,10 +415,8 @@ class ChartQuery extends AbstractChart
      * @param string  $dateColumn   name
      * @param mixed[] $filters      will be added to where claues
      * @param mixed[] $options      for special behavior
-     *
-     * @return QueryBuilder
      */
-    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], array $options = [], string $tablePrefix = 't')
+    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], array $options = [], string $tablePrefix = 't'): TrackingQueryBuilder
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
@@ -438,7 +433,7 @@ class ChartQuery extends AbstractChart
      * @param string               $uniqueColumn name
      * @param array<string, mixed> $options      for special behavior
      */
-    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, array $options = [], string $tablePrefix = 't')
+    public function modifyCountQuery(TrackingQueryBuilder &$query, $uniqueColumn, array $options = [], string $tablePrefix = 't')
     {
         $query->select('COUNT('.$tablePrefix.'.'.$uniqueColumn.') AS count');
 
@@ -506,10 +501,8 @@ class ChartQuery extends AbstractChart
      * @param int    $endSecond
      * @param array  $filters     will be added to where claues
      * @param string $tablePrefix
-     *
-     * @return QueryBuilder
      */
-    public function getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = [], $tablePrefix = 't')
+    public function getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = [], $tablePrefix = 't'): TrackingQueryBuilder
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
@@ -529,7 +522,7 @@ class ChartQuery extends AbstractChart
      * @param int    $endSecond
      * @param string $tablePrefix
      */
-    public function modifyCountDateDiffQuery(QueryBuilder $query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
+    public function modifyCountDateDiffQuery(TrackingQueryBuilder $query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
     {
         $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
         $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');

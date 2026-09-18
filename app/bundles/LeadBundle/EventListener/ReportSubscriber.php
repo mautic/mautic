@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -307,7 +306,6 @@ final class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 $subQ = clone $qb;
-                \assert($subQ instanceof TrackingQueryBuilder);
                 $subQ->resetQueryParts();
 
                 $alias = str_replace('contact.attribution.', '', $context);
@@ -403,7 +401,6 @@ final class ReportSubscriber implements EventSubscriberInterface
 
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
-            \assert($queryBuilder instanceof TrackingQueryBuilder);
             if ('lp' === $queryBuilder->getQueryPart('from')[0]['alias']) {
                 $join = $queryBuilder->getQueryPart('join');
                 $queryBuilder->resetQueryPart('join');
@@ -424,7 +421,6 @@ final class ReportSubscriber implements EventSubscriberInterface
                 case 'mautic.lead.graph.pie.attribution_campaigns':
                 case 'mautic.lead.graph.pie.attribution_actions':
                 case 'mautic.lead.graph.pie.attribution_channels':
-                    \assert($attributionQb instanceof TrackingQueryBuilder);
                     $attributionQb->resetQueryParts(['select', 'orderBy']);
                     $outerQb = clone $attributionQb;
                     $outerQb->resetQueryParts()
