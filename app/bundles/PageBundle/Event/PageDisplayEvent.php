@@ -15,6 +15,8 @@ class PageDisplayEvent extends Event
      */
     private ?Lead $lead = null;
 
+    private bool $isPreview = false;
+
     public function __construct(
         private string $content,
         private readonly Page $page,
@@ -64,5 +66,15 @@ class PageDisplayEvent extends Event
     public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
+    }
+
+    public function getIsPreview(): bool
+    {
+        return $this->isPreview;
+    }
+
+    public function setIsPreview(bool $isPreview): void
+    {
+        $this->isPreview = $isPreview;
     }
 }

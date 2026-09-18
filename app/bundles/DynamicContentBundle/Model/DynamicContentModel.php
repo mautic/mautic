@@ -17,7 +17,9 @@ use Mautic\DynamicContentBundle\Entity\Stat;
 use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Event\PageDisplayEvent;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -179,24 +181,18 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     /**
-     * @param Lead|array $lead
-     * @param string     $source
+     * @param PageDisplayEvent|EmailSendEvent|string $source
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null): ?Stat
+    public function createStatEntry(DynamicContent $dynamicContent, Lead|array $lead, $source = null): ?Stat
     {
-        if (empty($lead)) {
-            return null;
-        }
-
-        if ($lead instanceof Lead && !$lead->getId()) {
+        if (empty($lead)
+            || ($lead instanceof Lead && !$lead->getId())
+            || (is_array($lead) && !isset($lead['id']))
+        ) {
             return null;
         }
 
         if (is_array($lead)) {
-            if (empty($lead['id'])) {
-                return null;
-            }
-
             $lead = $this->em->getReference(Lead::class, $lead['id']);
         }
 
@@ -204,7 +200,26 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         $stat->setDateSent(new \DateTime());
         $stat->setLead($lead);
         $stat->setDynamicContent($dynamicContent);
-        $stat->setSource($source);
+        $detail = [
+            'slotName' => $dynamicContent->getSlotName(),
+        ];
+
+        if ($source instanceof PageDisplayEvent || $source instanceof EmailSendEvent) {
+            $tokenPlacement = 'body';
+            if ($source instanceof EmailSendEvent) {
+                $stat->setSource('email');
+                $stat->setSourceId($source->getEmail()?->getId());
+                if ($source->getIsSubject()) {
+                    $tokenPlacement = 'subject';
+                }
+            } else {
+                $stat->setSource('page');
+                $stat->setSourceId($source->getPage()->getId());
+            }
+            $stat->setTokenPlacement($tokenPlacement);
+        }
+
+        $stat->setSentDetails($detail);
 
         $this->statRepository->saveEntity($stat);
 
@@ -315,21 +330,41 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
-        if ('dynamicContent' === $type) {
-            $entities = $this->getRepository()->getDynamicContentList(
-                $filter,
-                $limit,
-                $start,
-                $this->security->isGranted($this->getPermissionBase().':viewother'),
-                $options['top_level'] ?? false,
-                $options['ignore_ids'] ?? [],
-                $options['where'] ?? ''
-            );
-            foreach ($entities as $entity) {
-                $results[$entity['language']][$entity['id']] = $entity['name'];
-            }
-            // sort by language
-            ksort($results);
+        switch ($type) {
+            case 'dynamicContent':
+                $entities = $this->getRepository()->getDynamicContentList(
+                    $filter,
+                    $limit,
+                    $start,
+                    $this->security->isGranted($this->getPermissionBase().':viewother'),
+                    $options['top_level'] ?? false,
+                    $options['ignore_ids'] ?? [],
+                    $options['where'] ?? ''
+                );
+
+                foreach ($entities as $entity) {
+                    $results[$entity['language']][$entity['id']] = $entity['name'];
+                }
+
+                // sort by language
+                ksort($results);
+
+                break;
+
+            case 'slot_name':
+                $entities = $this->getRepository()->getSlotNamesList(
+                    $filter,
+                    $limit,
+                    $start
+                );
+                foreach ($entities as $entity) {
+                    $results[] = [
+                        'label' => $entity['slot_name'],
+                        'value' => $entity['slot_name'],
+                    ];
+                }
+
+                break;
         }
 
         return $results;
