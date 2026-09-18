@@ -15,10 +15,7 @@ class TokenReplacementEvent extends CommonEvent
      */
     protected $entity;
 
-    /**
-     * @var CommonEntity|string|null
-     */
-    protected array|string $content;
+    protected array|string|null $content;
 
     /**
      * @var array
@@ -47,7 +44,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @return CommonEntity|string|null
      */
-    public function getContent()
+    public function getContent(): string|array
     {
         return $this->content;
     }
