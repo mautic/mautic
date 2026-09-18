@@ -731,9 +731,8 @@ class LeadModel extends FormModel
                 $results = $this->userRepository->getUserList($filter, $limit, $start, ['lead' => 'leads']);
                 break;
             case 'contact':
+            case 'company':
                 $fetchResults = $this->getEntities(['start' => $start, 'limit' => $limit, 'filter' => $filter]);
-
-                $results = [];
 
                 /** @var Lead $fetchResult */
                 foreach ($fetchResults as $fetchResult) {

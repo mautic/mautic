@@ -32,6 +32,14 @@ class FakeContactHelper
     /**
      * @return array<int|string, int|string|array<int|string, mixed>|null>
      */
+    public function prepareFakeCompany(): array
+    {
+        return $this->prepareFakeEntity('company');
+    }
+
+    /**
+     * @return array<int|string, int|string|array<int|string, mixed>|null>
+     */
     private function prepareFakeEntity(string $object): array
     {
         $fields = $this->fieldList->getFieldList(false, false, [
@@ -40,7 +48,7 @@ class FakeContactHelper
         ]);
 
         array_walk($fields, function (&$field): void {
-            $field = "[{$field}]";
+            $field = "[$field]";
         });
 
         $fields['id'] = 0;

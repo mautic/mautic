@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 
 final class TokenHelper
 {
-    public const REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
+    public const REGEX = '/({|%7B)(contact|company)field=(.*?)(}|%7D)/';
 
     private const DATETIME_REGEX = '/({|%7B)datetime=(.*?)(}|%7D)/';
 
@@ -37,7 +37,7 @@ final class TokenHelper
         $foundDateMatches = preg_match_all(self::DATETIME_REGEX, $content, $dateMatches);
 
         if ($foundMatches || $foundDateMatches) {
-            foreach ($matches[2] as $key => $match) {
+            foreach ($matches[3] as $key => $match) {
                 $token = $matches[0][$key];
 
                 if (isset($tokenList[$token])) {
