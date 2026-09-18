@@ -860,7 +860,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->reportGraphEventMock->expects($this->once())
             ->method('checkContext')
-            ->willReturn($event);
+            ->with($event)
+            ->willReturn(true);
 
         $this->reportGraphEventMock->expects($this->once())
             ->method('getRequestedGraphs')
@@ -924,7 +925,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->reportBuilderEventMock
         ->method('checkContext')
-        ->willReturn($event);
+        ->willReturn(true);
 
         $this->fieldsBuilderMock
     ->method('getLeadFieldsColumns')
@@ -970,7 +971,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportDataEventMock->expects($this->once())
             ->method('checkContext')
-            ->willReturn($event);
+            ->with($event)
+            ->willReturn(true);
+
         $this->reportDataEventMock->expects($this->once())
             ->method('getData')
             ->willReturn([[
