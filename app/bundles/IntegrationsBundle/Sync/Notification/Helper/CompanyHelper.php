@@ -13,7 +13,7 @@ final readonly class CompanyHelper
     ) {
     }
 
-    public function getCompanyName(int $id): string|false
+    public function getCompanyName(int $id): string|false|null
     {
         return $this->connection->createQueryBuilder()
             ->select('c.companyname')
