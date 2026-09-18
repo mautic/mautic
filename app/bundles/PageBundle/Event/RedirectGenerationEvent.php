@@ -17,11 +17,8 @@ final class RedirectGenerationEvent extends CommonEvent
 
     /**
      * Set or overwrite a value in the clickthrough.
-     *
-     * @param string $key
-     * @param mixed  $value
      */
-    public function setInClickthrough($key, $value): void
+    public function setInClickthrough(string $key, string $value): void
     {
         $this->clickthrough[$key] = $value;
     }

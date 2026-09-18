@@ -28,9 +28,9 @@ final class MappedIntegrationObjectTokenEvent extends CommonEvent
         $integrationName,
         $objectName,
         $objectLink,
-        $title = '',
-        $linkText = 'Link Text',
-        $default = 'Default Value',
+        string $title = '',
+        string $linkText = 'Link Text',
+        string $default = 'Default Value',
     ): void {
         $this->tokens[$integrationName][$objectName] = [
             'base_url'    => $objectLink,

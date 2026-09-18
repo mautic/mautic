@@ -47,7 +47,7 @@ final class CampaignBuilderEvent extends Event
      *                                       ]
      *                                       ]
      */
-    public function addDecision($key, array $decision): void
+    public function addDecision(string $key, array $decision): void
     {
         if (array_key_exists($key, $this->decisions)) {
             throw new KeyAlreadyRegisteredException("The key, '{$key}' is already used by another contact action. Please use a different key.");
@@ -94,7 +94,7 @@ final class CampaignBuilderEvent extends Event
      *                                    ]
      *                                    ]
      */
-    public function addCondition($key, array $event): void
+    public function addCondition(string $key, array $event): void
     {
         if (array_key_exists($key, $this->conditions)) {
             throw new KeyAlreadyRegisteredException("The key, '{$key}' is already used by another contact action. Please use a different key.");
@@ -144,7 +144,7 @@ final class CampaignBuilderEvent extends Event
      *                                     ]
      *                                     ]
      */
-    public function addAction($key, array $action): void
+    public function addAction(string $key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
             throw new KeyAlreadyRegisteredException("The key, '{$key}' is already used by another action. Please use a different key.");
