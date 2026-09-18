@@ -116,7 +116,7 @@ final class WebhookControllerTest extends TestCase
         $client->expects($this->once())
             ->method('post')
             ->willReturnCallback(function (string $url, array $payload) use ($testPayload): GuzzleResponse {
-                $this->assertSame($payload, $testPayload, json_encode($payload, JSON_THROW_ON_ERROR));
+                $this->assertEquals($payload, $testPayload, json_encode($payload, JSON_THROW_ON_ERROR));
 
                 return new GuzzleResponse();
             });
@@ -161,7 +161,7 @@ final class WebhookControllerTest extends TestCase
                 $normalizedPayload                                      = $realTestPayload;
                 $normalizedPayload[$eventUnderTest][0]['timestamp']     = $callPayload[$eventUnderTest][0]['timestamp'];
 
-                $this->assertSame($normalizedPayload, $callPayload);
+                $this->assertEquals($normalizedPayload, $callPayload);
 
                 $this->assertSame($secret, $callSecret);
 
@@ -197,8 +197,8 @@ final class WebhookControllerTest extends TestCase
         // If you encounter error here - debug the \Mautic\WebhookBundle\Model\WebhookModel::processWebhook
         // in the catch part.
         $logRepository = $this->createMock(LogRepository::class);
-        $logRepository->expects($this->never())
-            ->method('getSuccessVsErrorStatusCodeRatio');
+        $logRepository->expects($this->never())->method('getSuccessVsErrorStatusCodeRatio');
+        $logRepository->expects($this->never())->method('removeLimitExceedLogs'); // because clean_webhook_logs_in_background = true
 
         $em = $this->createStub(EntityManager::class);
 

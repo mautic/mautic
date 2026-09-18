@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ProjectBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 trait ProjectRepositoryTrait
 {
@@ -21,10 +22,17 @@ trait ProjectRepositoryTrait
             'project',
             'project.id = projectxref.project_id'
         );
-        $queryBuilder->where($queryBuilder->expr()->eq('project.name', ':name'));
+
+        $connection = $queryBuilder->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
+        $platform   = $connection->getDatabasePlatform();
+
+        $queryBuilder->where(
+            DatabasePlatform::getCaseInsensitiveLike($platform, 'project.name', ':name')
+        );
+
         $queryBuilder->setParameter('name', $projectName);
         $ids = $queryBuilder->executeQuery()->fetchFirstColumn() ?: [0];
-        $ids = array_map(fn ($value): string => "'{$value}'", $ids);
+        $ids = array_map(fn ($id): string => (string) intval($id), $ids);
 
         if ($negation) {
             $expr = $queryBuilder->expr()->notIn("{$parentTableAlias}.id", $ids);

@@ -139,5 +139,28 @@ final class FieldApiController extends CommonApiController
                 return $this->returnError($this->translator->trans($result, [], 'validators'), Response::HTTP_BAD_REQUEST);
             }
         }
+
+        if ('new' == $action) {
+            // PostgreSQL will throw error if try to insert NULL into bool columns
+            $presetBooleanProperties = [
+                'isRequired',
+                'isFixed',
+                'isVisible',
+                'isShortVisible',
+                'isListable',
+                'isPubliclyUpdateable',
+                'isUniqueIdentifier',
+                'isIndex',
+            ];
+            foreach ($presetBooleanProperties as $presetBooleanProperty) {
+                if (isset($parameters[$presetBooleanProperty])) {
+                    $getter = ('isIndex' === $presetBooleanProperty ? 'is' : 'get').ucfirst($presetBooleanProperty);
+                    if (is_null($entity->$getter())) { /** @phpstan-ignore-line get magic method false positive */
+                        $setter = 'set'.ucfirst($presetBooleanProperty);
+                        $entity->$setter($parameters[$presetBooleanProperty]); /** @phpstan-ignore-line set magic method false positive */
+                    }
+                }
+            }
+        }
     }
 }

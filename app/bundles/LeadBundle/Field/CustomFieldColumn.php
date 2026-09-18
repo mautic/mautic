@@ -158,7 +158,6 @@ class CustomFieldColumn
         }
 
         $this->processUpdateLeadColumn($leadField);
-
         $this->processUpdateLeadColumnLength($leadField);
     }
 

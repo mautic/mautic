@@ -41,7 +41,8 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ForeignValueFilterQueryBuilder(
             $randomParameter,
-            $this->createStub(EventDispatcherInterface::class)
+            $this->createStub(EventDispatcherInterface::class),
+            $this->connectionMock,
         );
     }
 

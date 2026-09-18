@@ -53,7 +53,7 @@ class Lead
             ->setCustomRepositoryClass(LeadRepository::class)
             ->addIndex(['date_added'], 'campaign_leads_date_added')
             ->addIndex(['date_last_exited'], 'campaign_leads_date_exited')
-            ->addIndex(['campaign_id', 'manually_removed', 'lead_id', 'rotation'], 'campaign_leads');
+            ->addIndex(['campaign_id', 'manually_removed', 'lead_id', 'rotation'], 'campaign_lead_ids');
 
         $builder->createManyToOne('campaign', 'Campaign')
             ->makePrimaryKey()
