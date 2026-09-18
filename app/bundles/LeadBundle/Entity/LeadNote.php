@@ -23,6 +23,8 @@ class LeadNote extends FormEntity
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'notes')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -46,8 +48,6 @@ class LeadNote extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->addLead(false, 'CASCADE', false, 'notes');
 
         $builder->addField('text', 'text');
 

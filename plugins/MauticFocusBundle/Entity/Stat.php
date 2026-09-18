@@ -53,6 +53,8 @@ class Stat
     /**
      * @var ?Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private $lead;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -67,7 +69,6 @@ class Stat
 
         $builder->addNamedField('dateAdded', 'datetime', 'date_added');
 
-        $builder->addLead(true, 'SET NULL');
     }
 
     /**

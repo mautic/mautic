@@ -25,6 +25,8 @@ class PointsChangeLog
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'pointsChangeLog')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -66,8 +68,6 @@ class PointsChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->addLead(false, 'CASCADE', false, 'pointsChangeLog');
 
         $builder->addIpAddress(true);
 

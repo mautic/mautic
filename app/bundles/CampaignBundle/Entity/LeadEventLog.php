@@ -46,6 +46,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var LeadEntity
      */
+    #[ORM\ManyToOne(targetEntity: LeadEntity::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -136,8 +138,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->addLead(false, 'CASCADE');
 
         $builder->addIpAddress(true);
 
