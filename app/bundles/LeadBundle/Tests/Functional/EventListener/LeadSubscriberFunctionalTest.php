@@ -10,7 +10,9 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     public function testUpdateLead(): void

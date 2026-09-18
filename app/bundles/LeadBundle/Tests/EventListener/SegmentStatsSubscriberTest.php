@@ -12,7 +12,9 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\GetStatDataEvent;
 use Mautic\LeadBundle\EventListener\SegmentStatsSubscriber;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
 {
     private SegmentStatsSubscriber $subscriber;

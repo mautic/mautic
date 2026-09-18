@@ -14,12 +14,14 @@ use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\TestInactiveExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
  * Functional tests for decision event redirection scenarios.
  * Tests redirection FROM decision events TO other event types (actions/conditions).
  */
+#[Group('non-parallel')]
 final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
 {
     private InactiveExecutioner $inactiveExecutioner;
