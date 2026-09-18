@@ -30,19 +30,17 @@ final class BuildJsEvent extends Event
     }
 
     /**
-     * @param string $js
      * @param string $section The section name. Shows when in debug mode
      */
-    public function appendJs($js, $section = ''): static
+    public function appendJs(string $js, string $section = ''): static
     {
         return $this->appendJsForScope($js, BuildJsScope::TRACKING, $section);
     }
 
     /**
-     * @param string $js
      * @param string $section The section name. Shows when in debug mode
      */
-    public function appendJsForScope($js, BuildJsScope $scope, $section = ''): static
+    public function appendJsForScope(string $js, BuildJsScope $scope, string $section = ''): static
     {
         if (!$this->acceptsScope($scope)) {
             return $this;
