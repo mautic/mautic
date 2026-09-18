@@ -124,3 +124,9 @@ For UI changes, also run `ddev composer run e2e-test`.
 - Environment configs: `app/config/config_*.php`
 - Test environment: `APP_ENV=test`
 - DDEV auto-generates `config/local.php` from `.ddev/local.config.php.dist`
+
+## Agent Skills
+
+Deeper, task-specific guidance lives in `.agents/skills/`, the directory Codex, Cursor, Gemini CLI and Copilot scan. `.claude/skills/` is a symlink to it for Claude Code. Each skill is a `SKILL.md` with optional `references/`, following the [Agent Skills](https://agentskills.io) format, and is loaded on demand by agents that support it. Any agent can read the files directly.
+
+- `.agents/skills/mautic-dev/`: core and plugin development beyond this file. Target branch, Mautic's own PHPStan rules, CI gates, functional test traps, the plugin skeleton and DI extension, integration classes, campaign, form and segment extension points, permissions, GrapesJS builder extension.
