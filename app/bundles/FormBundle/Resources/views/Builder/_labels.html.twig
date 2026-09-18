@@ -166,6 +166,20 @@
         } %}
     {% endif %}
 
+    {% if field.validation.country is defined and field.validation.country is not empty %}
+    <!-- Country specific phone number -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.type.tel.country_validation',
+                    icon: 'ri-flag-fill',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
+        } %}
+    {% endif %}
+
     {% if field.validation.international is defined and field.validation.international == 1 %}
     <!-- International phone number -->
         {% include '@MauticCore/Helper/_tag.html.twig' with {
