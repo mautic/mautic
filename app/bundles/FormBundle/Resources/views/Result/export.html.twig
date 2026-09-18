@@ -31,8 +31,24 @@
                   <td>{{ item['leadId'] }}</td>
                   <td>{{ dateToFull(item['dateSubmitted'], 'UTC') }}</td>
                   <td>{{ item['ipAddress'] }}</td>
-                  {% for r in item.results %}
-                      <td>{{ r['value'] }}</td>
+                  {% for key, r in item.results %}
+                      {% set field = form.fields|filter(f => f.alias == key)|first %}
+                      {% if field and field.type == 'boolean' %}
+                          {% set properties = field.properties %}
+                          {% if r['value'] == '1' or r['value'] == 'true' or r['value'] == 'yes' %}
+                              <td>{{ properties.yes ?? 'Yes' }}</td>
+                          {% elseif r['value'] == '0' or r['value'] == 'false' or r['value'] == 'no' %}
+                              <td>{{ properties.no ?? 'No' }}</td>
+                          {% elseif properties.yes is defined and r['value'] == properties.yes %}
+                              <td>{{ properties.yes }}</td>
+                          {% elseif properties.no is defined and r['value'] == properties.no %}
+                              <td>{{ properties.no }}</td>
+                          {% else %}
+                              <td>{{ r['value'] }}</td>
+                          {% endif %}
+                      {% else %}
+                          <td>{{ r['value'] }}</td>
+                      {% endif %}
                   {% endfor %}
               </tr>
           {% endfor %}
