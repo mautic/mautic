@@ -11,6 +11,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\ApiBundle\Extension\OwnershipScopedCollectionExtension;
+use Mautic\ApiBundle\Tests\Extension\Fixture\OwnershipParentMissingAssociation;
+use Mautic\ApiBundle\Tests\Extension\Fixture\OwnershipParentWithoutOwnership;
+use Mautic\ApiBundle\Tests\Extension\Fixture\UnownedParent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -189,6 +192,74 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
             \stdClass::class,
             new GetCollection(security: "is_granted('company:ownleads:viewown')"),
         );
+    }
+
+    public function testThrowsWhenTheOwnershipParentAssociationDoesNotExist(): void
+    {
+        $this->grantViewOwnOnly();
+
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->method('hasField')->willReturn(false);
+        $metadata->method('hasAssociation')->willReturn(false);
+        $metadata->method('getAssociationNames')->willReturn(['form', 'category']);
+
+        $this->entityManager->method('getClassMetadata')->willReturn($metadata);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('declares #[OwnershipParent(\'nonexistent\')] but has no such association. Available: form, category.');
+
+        $this->extension->applyToCollection(
+            $this->createQueryBuilderWithRootAlias(),
+            $this->createNameGenerator(),
+            OwnershipParentMissingAssociation::class,
+            new GetCollection(security: "is_granted('form:forms:viewown')"),
+        );
+    }
+
+    public function testThrowsWhenTheOwnershipParentCarriesNoOwnership(): void
+    {
+        $this->grantViewOwnOnly();
+
+        $entityMetadata = $this->createMock(ClassMetadata::class);
+        $entityMetadata->method('hasField')->willReturn(false);
+        $entityMetadata->method('hasAssociation')->willReturnCallback(
+            fn (string $association): bool => 'parent' === $association
+        );
+        $entityMetadata->method('getAssociationTargetClass')->willReturn(UnownedParent::class);
+
+        // the parent has neither an owner nor a createdBy
+        $parentMetadata = $this->createMock(ClassMetadata::class);
+        $parentMetadata->method('hasField')->willReturn(false);
+        $parentMetadata->method('hasAssociation')->willReturn(false);
+
+        $this->entityManager->method('getClassMetadata')->willReturnCallback(
+            fn (string $class): ClassMetadata => UnownedParent::class === $class ? $parentMetadata : $entityMetadata
+        );
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('has neither an owner nor a createdBy field');
+
+        $this->extension->applyToCollection(
+            $this->createQueryBuilderWithRootAlias(),
+            $this->createNameGenerator(),
+            OwnershipParentWithoutOwnership::class,
+            new GetCollection(security: "is_granted('form:forms:viewown')"),
+        );
+    }
+
+    private function createQueryBuilderWithRootAlias(): QueryBuilder&MockObject
+    {
+        $queryBuilder = $this->createQueryBuilderExpectingNoCalls();
+        $queryBuilder->method('getRootAliases')->willReturn(['o']);
+
+        return $queryBuilder;
+    }
+
+    private function grantViewOwnOnly(): void
+    {
+        $this->security->method('isGranted')
+            ->willReturnCallback(fn (string $permission): bool => str_ends_with($permission, 'viewown'));
+        $this->security->method('getUser')->willReturn($this->createUserWithId(1));
     }
 
     private function createQueryBuilderExpectingNoCalls(): QueryBuilder&MockObject

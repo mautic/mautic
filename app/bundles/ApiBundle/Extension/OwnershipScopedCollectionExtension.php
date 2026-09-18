@@ -177,7 +177,20 @@ final readonly class OwnershipScopedCollectionExtension implements QueryCollecti
         // For entities without a direct ownership field, follow the association marked
         // by #[OwnershipParent] on the entity class.
         $associationName = $this->getOwnershipParentAssociation($resourceClass);
-        if (null !== $associationName && $metadata->hasAssociation($associationName)) {
+
+        if (null !== $associationName) {
+            // An attribute that cannot be resolved must not be passed over: returning null
+            // here drops the ownership filter entirely, so a misspelt association would
+            // widen a "view own" collection to every record instead of narrowing it.
+            if (!$metadata->hasAssociation($associationName)) {
+                throw new \LogicException(sprintf(
+                    '%s declares #[OwnershipParent(\'%s\')] but has no such association. Available: %s.',
+                    $resourceClass,
+                    $associationName,
+                    implode(', ', $metadata->getAssociationNames()) ?: 'none'
+                ));
+            }
+
             $targetClass    = $metadata->getAssociationTargetClass($associationName);
             /** @phpstan-var class-string $targetClass */
             $targetMetadata = $this->entityManager->getClassMetadata($targetClass);
@@ -196,9 +209,18 @@ final readonly class OwnershipScopedCollectionExtension implements QueryCollecti
 
                 return [sprintf('%s.createdBy', $parentAlias), false];
             }
+
+            // Same reasoning: the entity says its owner lives on the parent, so a parent
+            // that carries no ownership of its own leaves nothing to filter by.
+            throw new \LogicException(sprintf(
+                '%s declares #[OwnershipParent(\'%s\')] but %s has neither an owner nor a createdBy field.',
+                $resourceClass,
+                $associationName,
+                $targetClass
+            ));
         }
 
-        // Cannot determine ownership automatically - skip filtering for safety
+        // No ownership declared at all - nothing to filter on
         return null;
     }
 
