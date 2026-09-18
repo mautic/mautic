@@ -275,13 +275,13 @@ class Stat
     }
 
     /**
-     * DBAL 4 hydrates a bigint as int when it fits PHP's integer range, where DBAL 3
-     * always gave a string. The cast keeps this accessor's contract, which callers and
-     * tests rely on, rather than pushing the change out to them.
+     * The id is a bigint, so it comes back as int within PHP's integer range and as
+     * string beyond it - the union DBAL's BigIntType itself returns. DBAL 3 always gave
+     * a string; normalising back to one here would hide which of the two it is.
      */
-    public function getId(): ?string
+    public function getId(): int|string|null
     {
-        return null === $this->id ? null : (string) $this->id;
+        return $this->id;
     }
 
     public function getIpAddress(): ?IpAddress
