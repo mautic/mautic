@@ -22,6 +22,8 @@ class MergeRecord
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'contact_id', nullable: false, onDelete: 'CASCADE')]
     private $contact;
 
     /**
@@ -48,8 +50,7 @@ class MergeRecord
             ->generatedValue()
             ->build();
 
-        $builder->addContact()
-            ->addDateAdded()
+        $builder->addDateAdded()
             ->addNamedField('mergedId', 'integer', 'merged_id')
             ->addField('name', 'string');
     }

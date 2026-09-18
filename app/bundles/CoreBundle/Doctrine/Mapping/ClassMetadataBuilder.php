@@ -239,31 +239,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * Add a contact column.
-     *
-     * @param string      $onDelete
-     * @param string|null $inversedBy
-     */
-    public function addContact(bool $nullable = false, $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
-    {
-        $lead = $this->createManyToOne('contact', Lead::class);
-
-        if ($isPrimaryKey) {
-            $lead->makePrimaryKey();
-        }
-
-        if ($inversedBy) {
-            $lead->inversedBy($inversedBy);
-        }
-
-        $lead
-            ->addJoinColumn('contact_id', 'id', $nullable, false, $onDelete)
-            ->build();
-
-        return $this;
-    }
-
-    /**
      * Add a lead column.
      *
      * @param string $onDelete
