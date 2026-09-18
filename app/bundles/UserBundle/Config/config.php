@@ -157,7 +157,7 @@ return [
                     'mautic.user.model.user',
                     'mautic.user.model.role',
                     'mautic.security',
-                    'mautic.helper.templating',
+                    'mautic.helper.global_search',
                 ],
             ],
             'mautic.user.config.subscriber' => [
