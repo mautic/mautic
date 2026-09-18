@@ -9,10 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class EventRepository extends CommonRepository
 {
-    /**
-     * @return array
-     */
-    public function getEntitiesByEventType($type)
+    public function getEntitiesByEventType($type): array
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($alias)

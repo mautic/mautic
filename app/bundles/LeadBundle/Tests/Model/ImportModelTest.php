@@ -425,7 +425,7 @@ final class ImportModelTest extends StandardImportTestHelper
         $importRepository = $this->createMock(ImportRepository::class);
 
         $importRepository->expects($this->exactly(3))->method('getValue')
-            ->willReturnOnConsecutiveCalls(true, false, false);
+            ->willReturnOnConsecutiveCalls('some value', null, null);
 
         $this->entityManager
             ->method('isOpen')

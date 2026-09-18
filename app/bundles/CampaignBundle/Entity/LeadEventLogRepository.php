@@ -24,7 +24,7 @@ class LeadEventLogRepository extends CommonRepository
 
     public const LOG_DELETE_BATCH_SIZE = 5000;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $alias = $this->getTableAlias();
         $q     = $this
@@ -61,10 +61,8 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @param int|null             $leadId
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getLeadLogs($leadId = null, array $options = [])
+    public function getLeadLogs($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()
                       ->getConnection()

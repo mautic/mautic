@@ -15,7 +15,7 @@ class MessageQueueRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    public function findMessage($channel, $channelId, $leadId)
+    public function findMessage($channel, $channelId, $leadId): ?MessageQueue
     {
         $results = $this->createQueryBuilder('mq')
             ->where('IDENTITY(mq.lead) = :leadId')
@@ -33,7 +33,7 @@ class MessageQueueRepository extends CommonRepository
     /**
      * @return array<int, MessageQueue>
      */
-    public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null)
+    public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null): array
     {
         $q = $this->createQueryBuilder('mq');
 
@@ -101,10 +101,8 @@ class MessageQueueRepository extends CommonRepository
      *
      * @param int|null             $leadId
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getLeadTimelineEvents($leadId = null, array $options = [])
+    public function getLeadTimelineEvents($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')

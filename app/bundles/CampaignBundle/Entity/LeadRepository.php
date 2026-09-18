@@ -50,10 +50,8 @@ class LeadRepository extends CommonRepository
 
     /**
      * Get leads for a specific campaign.
-     *
-     * @return array
      */
-    public function getLeads($campaignId, $eventId = null)
+    public function getLeads($campaignId, $eventId = null): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Lead::class, 'lc')

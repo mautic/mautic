@@ -21,7 +21,7 @@ class EventRepository extends CommonRepository
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator<object>|object[]|mixed[]
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $select = 'e';
         $q      = $this
@@ -50,10 +50,8 @@ class EventRepository extends CommonRepository
     /**
      * @param int    $contactId
      * @param string $type
-     *
-     * @return array
      */
-    public function getContactPendingEvents($contactId, $type)
+    public function getContactPendingEvents($contactId, $type): array
     {
         // Limit to events that hasn't been executed or scheduled yet
         $eventQb = $this->getEntityManager()->createQueryBuilder();
@@ -116,10 +114,8 @@ class EventRepository extends CommonRepository
      * @param int         $parentId
      * @param string|null $decisionPath
      * @param string|null $eventType
-     *
-     * @return array
      */
-    public function getEventsByParent($parentId, $decisionPath = null, $eventType = null)
+    public function getEventsByParent($parentId, $decisionPath = null, $eventType = null): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
 
@@ -226,10 +222,8 @@ class EventRepository extends CommonRepository
      * Get array of events with stats.
      *
      * @param array<string, mixed> $args
-     *
-     * @return array
      */
-    public function getEvents(array $args = [])
+    public function getEvents(array $args = []): array
     {
         $q = $this->createQueryBuilder('e')
             ->select('e, ec, ep')

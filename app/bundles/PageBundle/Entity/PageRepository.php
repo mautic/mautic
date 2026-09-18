@@ -14,7 +14,7 @@ class PageRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $select = ['p'];
 
@@ -39,10 +39,8 @@ class PageRepository extends CommonRepository
 
     /**
      * @param string $alias
-     *
-     * @return mixed
      */
-    public function checkPageUniqueAlias($alias, $ignoreIds = [])
+    public function checkPageUniqueAlias($alias, $ignoreIds = []): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as alias_count')
@@ -68,10 +66,8 @@ class PageRepository extends CommonRepository
      * @param string|bool $topLevel
      * @param array       $ignoreIds
      * @param array       $extraColumns
-     *
-     * @return array
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [], bool $publishedOnly = false)
+    public function getPageList($search = '', $limit = 10, $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [], bool $publishedOnly = false): array
     {
         $q = $this->createQueryBuilder('p');
         $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));

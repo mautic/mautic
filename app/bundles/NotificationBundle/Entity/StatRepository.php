@@ -13,12 +13,10 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 final class StatRepository extends CommonRepository
 {
     /**
-     * @return mixed
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getNotificationStatus($trackingHash)
+    public function getNotificationStatus($trackingHash): ?Stat
     {
         $q = $this->createQueryBuilder('s');
         $q->select('s')
@@ -66,10 +64,8 @@ final class StatRepository extends CommonRepository
     /**
      * @param int|array $notificationIds
      * @param int       $listId
-     *
-     * @return int
      */
-    public function getSentCount($notificationIds = null, $listId = null)
+    public function getSentCount($notificationIds = null, $listId = null): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -101,10 +97,8 @@ final class StatRepository extends CommonRepository
     /**
      * @param array|int $notificationIds
      * @param int       $listId
-     *
-     * @return int
      */
-    public function getReadCount($notificationIds = null, $listId = null)
+    public function getReadCount($notificationIds = null, $listId = null): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

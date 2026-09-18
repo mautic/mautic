@@ -20,7 +20,7 @@ class CampaignRepository extends CommonRepository
     use ReplicaConnectionTrait;
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().', cat')
@@ -62,10 +62,8 @@ class CampaignRepository extends CommonRepository
      *
      * @param bool $forList   If true, returns ID and name only
      * @param bool $viewOther If true, returns all the campaigns
-     *
-     * @return array
      */
-    public function getPublishedCampaigns($specificId = null, ?int $leadId = null, bool $forList = false, bool $viewOther = false)
+    public function getPublishedCampaigns($specificId = null, ?int $leadId = null, bool $forList = false, bool $viewOther = false): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Campaign::class, 'c', 'c.id');
@@ -232,10 +230,7 @@ class CampaignRepository extends CommonRepository
         return $forms;
     }
 
-    /**
-     * @return array
-     */
-    public function findByFormId($formId)
+    public function findByFormId($formId): array
     {
         $q = $this->createQueryBuilder('c')
             ->join('c.forms', 'f');
@@ -505,9 +500,9 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @return mixed
+     * @return array<string, mixed>|false
      */
-    public function getContactSingleSegmentByCampaign($contactId, $campaignId)
+    public function getContactSingleSegmentByCampaign($contactId, $campaignId): array|false
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

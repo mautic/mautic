@@ -505,7 +505,6 @@ class LeadModel extends FormModel
             $currentLeadStageId   = $this->stagesChangeLogRepository->getCurrentLeadStage($lead->getId());
             $currentLeadStageName = null;
             if ($currentLeadStageId) {
-                /** @var Stage|null $currentStage */
                 $currentStage = $this->stageRepository->findByIdOrName($currentLeadStageId);
                 if ($currentStage) {
                     $currentLeadStageName = $currentStage->getName();
@@ -514,7 +513,6 @@ class LeadModel extends FormModel
 
             $newLeadStageIdOrName = is_object($data['stage']) ? $data['stage']->getId() : $data['stage'];
             if ((int) $newLeadStageIdOrName !== $currentLeadStageId && $newLeadStageIdOrName !== $currentLeadStageName) {
-                /** @var Stage|null $newStage */
                 $newStage = $this->stageRepository->findByIdOrName($newLeadStageIdOrName);
                 if ($newStage) {
                     $lead->stageChangeLogEntry(
@@ -649,10 +647,8 @@ class LeadModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0)
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0): array
     {
         $results    = [];
 
@@ -684,7 +680,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getOwnerList()
+    public function getOwnerList(): array
     {
         return $this->userRepository->getUserList('', 0);
     }
@@ -694,7 +690,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadsByIp(string $ip)
+    public function getLeadsByIp(string $ip): array
     {
         return $this->getRepository()->getLeadsByIp($ip);
     }
@@ -787,10 +783,8 @@ class LeadModel extends FormModel
 
     /**
      * Returns flat array for single lead.
-     *
-     * @return array
      */
-    public function getLead(int $leadId)
+    public function getLead(int $leadId): array
     {
         return $this->getRepository()->getLead($leadId);
     }
@@ -843,7 +837,7 @@ class LeadModel extends FormModel
         if (count($uniqueFieldData)) {
             $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData);
 
-            if (!empty($existingLeads)) {
+            if ($existingLeads !== []) {
                 $this->logger->debug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
                 $lead = $existingLeads[0];
             }
@@ -854,10 +848,8 @@ class LeadModel extends FormModel
 
     /**
      * Get a list of segments this lead belongs to.
-     *
-     * @return mixed
      */
-    public function getLists(Lead $lead, bool $forLists = false, bool $arrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false)
+    public function getLists(Lead $lead, bool $forLists = false, bool $arrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {
         return $this->leadListRepository->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
@@ -2250,7 +2242,7 @@ class LeadModel extends FormModel
 
         if (!$newPrimaryCompany) {
             $latestCompany = $this->companyLeadRepository->getLatestCompanyForLead($leadId);
-            if (!empty($latestCompany)) {
+            if ($latestCompany !== []) {
                 $lead->addUpdatedField('company', $latestCompany['companyname'])
                     ->setDateModified(new \DateTime());
             }

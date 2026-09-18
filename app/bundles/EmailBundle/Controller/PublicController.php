@@ -73,7 +73,7 @@ final class PublicController extends CommonFormController
     {
         $stat  = $this->emailModel->getEmailStatus($idHash);
 
-        if (!empty($stat)) {
+        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
             if ($this->security->isAnonymous()) {
                 $this->emailModel->hitEmail($stat, $request, true);
             }
@@ -162,7 +162,7 @@ final class PublicController extends CommonFormController
             return $this->oneClickUnsubscribe($model, $stat);
         }
 
-        if (!empty($stat) && $email = $stat->getEmail()) {
+        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat && $email = $stat->getEmail()) {
             $template = $email->getTemplate();
             if ('mautic_code_mode' === $template) {
                 $template = null; // Use system default
@@ -192,9 +192,9 @@ final class PublicController extends CommonFormController
         }
         $contentTemplate = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
         $isCorrectHash   = $secretHash && $urlEmail && $mailHash->getEmailHash($urlEmail) === $secretHash;
-        if (!empty($stat) || $isCorrectHash) {
+        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat || $isCorrectHash) {
             $successSessionName = 'mautic.email.prefscenter.success';
-            if (!empty($stat) && $lead = $stat->getLead()) {
+            if ($stat instanceof \Mautic\EmailBundle\Entity\Stat && $lead = $stat->getLead()) {
                 // Set the lead as current lead
                 $contactTracker->setTrackedContact($lead);
 
@@ -206,10 +206,10 @@ final class PublicController extends CommonFormController
                 // Add contact ID to the session name in case more contacts
                 // share the same session/device and the contact is known.
                 $successSessionName .= ".{$lead->getId()}";
-            } elseif (empty($stat)) {
+            } elseif (!$stat instanceof \Mautic\EmailBundle\Entity\Stat) {
                 $contacts = $this->leadRepository->getContactsByEmail($urlEmail);
                 $lead     = null;
-                if (is_array($contacts) && count($contacts) > 0) {
+                if (count($contacts) > 0) {
                     $lead  = array_pop($contacts);
                 } else {
                     $message = $this->translator->trans('mautic.email.stat_record.not_found');
@@ -217,7 +217,7 @@ final class PublicController extends CommonFormController
             }
 
             if (!$isHeadRequest && (!$showContactPreferences || $isUnsubscribeAll)) {
-                if (!empty($stat)) {
+                if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
                     $message = $this->getUnsubscribeMessage($idHash, $model, $stat);
                 } elseif ($lead && $lead instanceof Lead) {
                     $message = $this->getUnsubscribeMessageLead($idHash, $model, $lead, $urlEmail);
@@ -369,7 +369,7 @@ final class PublicController extends CommonFormController
     {
         $stat = $model->getEmailStatus($idHash);
 
-        if (!empty($stat)) {
+        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
             $email = $stat->getEmail();
             $lead  = $stat->getLead();
 

@@ -13,7 +13,7 @@ class TriggerRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()
             ->createQueryBuilder()
@@ -29,10 +29,8 @@ class TriggerRepository extends CommonRepository
 
     /**
      * Get a list of published triggers with color and points.
-     *
-     * @return array
      */
-    public function getTriggerColors()
+    public function getTriggerColors(): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('partial t.{id, color, points}')

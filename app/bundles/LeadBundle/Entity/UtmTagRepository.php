@@ -15,10 +15,8 @@ class UtmTagRepository extends CommonRepository
      * Get tag entities by lead.
      *
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getUtmTagsByLead(?Lead $lead = null, array $options = [])
+    public function getUtmTagsByLead(?Lead $lead = null, array $options = []): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('*')

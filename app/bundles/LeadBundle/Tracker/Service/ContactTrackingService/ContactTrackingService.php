@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Tracker\Service\ContactTrackingService;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
@@ -23,10 +22,7 @@ final readonly class ContactTrackingService implements ContactTrackingServiceInt
     ) {
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getTrackedLead()
+    public function getTrackedLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         $request = $this->requestStack->getCurrentRequest();
 

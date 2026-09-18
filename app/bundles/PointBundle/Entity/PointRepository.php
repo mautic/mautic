@@ -12,7 +12,7 @@ class PointRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()
             ->createQueryBuilder()
@@ -35,10 +35,8 @@ class PointRepository extends CommonRepository
      * Get array of published actions based on type.
      *
      * @param string $type
-     *
-     * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType($type): array
     {
         $q = $this->createQueryBuilder('p')
             ->select('partial p.{id, type, name, delta, repeatable, properties}')

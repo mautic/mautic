@@ -4,11 +4,8 @@ namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -386,8 +383,8 @@ final class SubmissionModel extends CommonFormModel
 
         // Find and add the lead to the associated campaigns
         $campaigns = $this->campaignModel->getCampaignsByForm($form);
-        /** @var Campaign $campaign */
-        foreach ($campaigns ?? [] as $campaign) {
+
+        foreach ($campaigns as $campaign) {
             if ($campaign->isPublished()) {
                 $this->membershipManager->addContact($lead, $campaign);
             }
@@ -450,9 +447,9 @@ final class SubmissionModel extends CommonFormModel
     /**
      * @param array<string,mixed> $args
      *
-     * @return Submission[]|array<int,Submission>|iterable<Submission>|\Doctrine\ORM\Internal\Hydration\IterableResult<Submission>|Paginator<Submission>|SimplePaginator<Submission>
+     * @return array<mixed>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): array
     {
         return $this->submissionRepository->getEntities($args);
     }

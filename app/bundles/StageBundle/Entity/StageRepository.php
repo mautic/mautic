@@ -12,7 +12,7 @@ class StageRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
@@ -44,10 +44,8 @@ class StageRepository extends CommonRepository
      * Get array of published actions based on type.
      *
      * @param string $type
-     *
-     * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType($type): array
     {
         $q = $this->createQueryBuilder('s')
             ->select('partial s.{id, name}')
@@ -185,10 +183,8 @@ class StageRepository extends CommonRepository
 
     /**
      * @param string|int $value
-     *
-     * @return Stage|null
      */
-    public function findByIdOrName($value)
+    public function findByIdOrName($value): ?Stage
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('s')

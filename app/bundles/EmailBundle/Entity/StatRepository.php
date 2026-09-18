@@ -18,12 +18,10 @@ class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @return mixed
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getEmailStatus($trackingHash)
+    public function getEmailStatus($trackingHash): ?Stat
     {
         $q = $this->createQueryBuilder('s');
         $q->select('s')
@@ -41,10 +39,8 @@ class StatRepository extends CommonRepository
     /**
      * @param int $contactId
      * @param int $emailId
-     *
-     * @return array
      */
-    public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId)
+    public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('distinct ph.url, ph.date_hit')
@@ -213,10 +209,8 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     *
-     * @return array|int
      */
-    public function getSentCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
+    public function getSentCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         return $this->getStatusCount('is_sent', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -224,10 +218,8 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null $emailIds
      * @param array<int,int|string>|int|null $listId
-     *
-     * @return array|int
      */
-    public function getReadCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
+    public function getReadCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -235,10 +227,8 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     *
-     * @return array|int
      */
-    public function getFailedCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
+    public function getFailedCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         return $this->getStatusCount('is_failed', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -247,10 +237,8 @@ class StatRepository extends CommonRepository
      * @param string                              $column
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     *
-     * @return array|int
      */
-    public function getStatusCount($column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
+    public function getStatusCount($column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -439,12 +427,10 @@ class StatRepository extends CommonRepository
      * @param int                  $leadId
      * @param array<string, mixed> $options
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($leadId, array $options = [])
+    public function getLeadStats($leadId, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
@@ -526,12 +512,10 @@ class StatRepository extends CommonRepository
      *
      * @param QueryBuilder $query
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getIgnoredReadFailed($query = null)
+    public function getIgnoredReadFailed($query = null): array
     {
         $query->select('count(es.id) as sent, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read", count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed');
 
@@ -644,10 +628,7 @@ class StatRepository extends CommonRepository
         return 's';
     }
 
-    /**
-     * @return array
-     */
-    public function findContactEmailStats($leadId, $emailId)
+    public function findContactEmailStats($leadId, $emailId): array
     {
         return $this->createQueryBuilder('s')
             ->where('IDENTITY(s.lead) = :leadId AND IDENTITY(s.email) =  :emailId')

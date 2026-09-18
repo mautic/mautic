@@ -222,10 +222,8 @@ class WebhookModel extends FormModel
      * Get a list of webhooks by matching events.
      *
      * @param string $type string of event type
-     *
-     * @return array
      */
-    public function getEventWebooksByType(string $type)
+    public function getEventWebooksByType(string $type): array
     {
         return $this->eventRepository->getEntitiesByEventType($type);
     }
@@ -516,7 +514,7 @@ class WebhookModel extends FormModel
      *
      * @return iterable<object>
      */
-    public function getWebhookQueues(Webhook $webhook)
+    public function getWebhookQueues(Webhook $webhook): iterable
     {
         $webhookRetryTime = new \DateTimeImmutable()
             ->modify(sprintf('-%d seconds', $this->webhookRetryDelay))

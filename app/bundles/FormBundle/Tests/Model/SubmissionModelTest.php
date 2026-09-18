@@ -273,7 +273,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepository
             ->method('getLeadsByUniqueFields')
-            ->willReturn(null);
+            ->willReturn([]);
 
         $this->file1Mock
             ->method('getClientOriginalName')
