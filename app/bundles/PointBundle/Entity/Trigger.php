@@ -151,7 +151,6 @@ class Trigger extends FormEntity implements UuidInterface
 
         $builder->addCategory();
 
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'point_trigger_projects_xref', 'point_trigger_id');
     }
 

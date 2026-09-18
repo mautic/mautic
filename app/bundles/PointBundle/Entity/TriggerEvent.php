@@ -130,7 +130,6 @@ class TriggerEvent implements UuidInterface
             ->isOwnershipParent()
             ->build();
 
-        static::addUuidField($builder);
     }
 
     /**
@@ -194,11 +193,7 @@ class TriggerEvent implements UuidInterface
     {
         return $this->order;
     }
-
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -229,11 +224,7 @@ class TriggerEvent implements UuidInterface
     {
         return $this->trigger;
     }
-
-    /**
-     * @param string $type
-     */
-    public function setType($type): static
+    public function setType(string $type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -272,11 +263,7 @@ class TriggerEvent implements UuidInterface
     {
         return $this->description;
     }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;

@@ -79,7 +79,6 @@ class Tag implements UuidInterface
         $builder->addId();
         $builder->addField('tag', Types::STRING);
         $builder->addNamedField('description', Types::TEXT, 'description', true);
-        static::addUuidField($builder);
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

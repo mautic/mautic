@@ -283,7 +283,6 @@ class Form extends FormEntity implements UuidInterface
 
         $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
 
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'form_projects_xref', 'form_id');
     }
 

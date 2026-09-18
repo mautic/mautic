@@ -336,7 +336,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['mautic.email.table.most.emails.failed']);
         $matcher = new AnyInvokedCount();
 
-        $eventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
+        $eventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher): bool {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame(['email.stats', 'emails'], $parameters[0]);
 
@@ -347,6 +347,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
                 return false;
             }
+
+            return false;
         });
 
         $eventMock->expects($this->once())

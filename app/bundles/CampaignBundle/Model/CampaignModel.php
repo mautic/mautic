@@ -741,10 +741,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @param Campaign $entity
      * @param string   $root
-     * @param int      $order
      * @param Event[]  $events
      */
-    protected function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', $order = 1): void
+    protected function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', int $order = 1): void
     {
         $count = count($hierarchy);
         if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {

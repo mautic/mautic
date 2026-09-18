@@ -98,7 +98,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
 
         $builder->addField('bitwise', 'integer');
 
-        static::addUuidField($builder);
     }
 
     /**

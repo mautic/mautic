@@ -111,7 +111,6 @@ class Channel extends CommonEntity implements UuidInterface
                 ->isOwnershipParent()
                 ->build();
 
-        static::addUuidField($builder);
     }
 
     /**

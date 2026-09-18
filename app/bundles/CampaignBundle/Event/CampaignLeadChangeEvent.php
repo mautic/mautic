@@ -10,10 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class CampaignLeadChangeEvent extends Event
 {
-    /**
-     * @var ?Lead
-     */
-    private $lead;
+    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 
     /**
      * @var Lead[]
@@ -25,7 +22,7 @@ final class CampaignLeadChangeEvent extends Event
      */
     public function __construct(
         private readonly Campaign $campaign,
-        $leads,
+        array|\Mautic\LeadBundle\Entity\Lead $leads,
         private readonly ?string $action,
     ) {
         if (is_array($leads)) {
@@ -45,10 +42,8 @@ final class CampaignLeadChangeEvent extends Event
 
     /**
      * Returns the Lead entity.
-     *
-     * @return Lead|null
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

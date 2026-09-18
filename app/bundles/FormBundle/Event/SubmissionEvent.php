@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ServerBag;
 
 class SubmissionEvent extends CommonEvent
@@ -54,10 +53,7 @@ class SubmissionEvent extends CommonEvent
 
     private ?string $context = null;
 
-    /**
-     * @var array|Response|null
-     */
-    private $postSubmitResponse;
+    private \Symfony\Component\HttpFoundation\Response|array|null $postSubmitResponse = null;
 
     /**
      * @var array<mixed>
@@ -218,7 +214,7 @@ class SubmissionEvent extends CommonEvent
     /**
      * @return mixed
      */
-    public function getPostSubmitCallback($key = null)
+    public function getPostSubmitCallback(?string $key = null)
     {
         return (null === $key) ? $this->callbacks : $this->callbacks[$key];
     }
@@ -236,10 +232,7 @@ class SubmissionEvent extends CommonEvent
         return (null === $key) ? $this->callbackResponses : $this->callbackResponses[$key];
     }
 
-    /**
-     * @param mixed $callbackResponse
-     */
-    public function setPostSubmitCallbackResponse($key, $callbackResponse): static
+    public function setPostSubmitCallbackResponse(string $key, \Symfony\Component\HttpFoundation\RedirectResponse $callbackResponse): static
     {
         $this->callbackResponses[$key] = $callbackResponse;
 
@@ -251,12 +244,12 @@ class SubmissionEvent extends CommonEvent
         return null !== $this->postSubmitResponse;
     }
 
-    public function getPostSubmitResponse()
+    public function getPostSubmitResponse(): \Symfony\Component\HttpFoundation\Response|array|null
     {
         return $this->postSubmitResponse;
     }
 
-    public function setPostSubmitResponse($response): void
+    public function setPostSubmitResponse(array|\Symfony\Component\HttpFoundation\Response $response): void
     {
         $this->postSubmitResponse = $response;
     }

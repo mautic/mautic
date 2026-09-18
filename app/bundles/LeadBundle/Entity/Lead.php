@@ -183,6 +183,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<string, IpAddress>
      */
+    #[ORM\ManyToMany(targetEntity: IpAddress::class, cascade: ['detach', 'merge', 'persist'], indexBy: 'ipAddress')]
+    #[ORM\JoinTable(name: 'lead_ips_xref')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'ip_id', onDelete: 'CASCADE')]
     private $ipAddresses;
 
     /**
@@ -257,6 +261,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<string, Tag>
      */
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\ManyToMany(targetEntity: Tag::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'tag')]
+    #[ORM\JoinTable(name: 'lead_tags_xref')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'tag_id', nullable: false)]
+    #[ORM\OrderBy(['tag' => 'ASC'])]
     private $tags;
 
     /**
@@ -327,16 +336,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder->createField('points', 'integer')
             ->build();
 
-        $builder->createManyToMany('ipAddresses', IpAddress::class)
-            ->setJoinTable('lead_ips_xref')
-            ->addInverseJoinColumn('ip_id', 'id', true, false, 'CASCADE')
-            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
-            ->setIndexBy('ipAddress')
-            ->cascadeDetach()
-            ->cascadeMerge()
-            ->cascadePersist()
-            ->build();
-
         $builder->createField('lastActive', 'datetime')
             ->columnName('last_active')
             ->nullable()
@@ -359,18 +358,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder->createField('preferredProfileImage', 'string')
             ->columnName('preferred_profile_image')
             ->nullable()
-            ->build();
-
-        $builder->createManyToMany('tags', Tag::class)
-            ->setJoinTable('lead_tags_xref')
-            ->addInverseJoinColumn('tag_id', 'id', false)
-            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
-            ->setOrderBy(['tag' => 'ASC'])
-            ->setIndexBy('tag')
-            ->fetchLazy()
-            ->cascadeMerge()
-            ->cascadePersist()
-            ->cascadeDetach()
             ->build();
 
         self::loadFixedFieldMetadata(

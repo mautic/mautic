@@ -121,7 +121,6 @@ class Action implements UuidInterface
             ->isOwnershipParent()
             ->build();
 
-        static::addUuidField($builder);
     }
 
     /**

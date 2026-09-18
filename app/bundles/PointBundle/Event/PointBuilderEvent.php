@@ -40,7 +40,7 @@ class PointBuilderEvent extends Event
      *
      * @throws InvalidArgumentException
      */
-    public function addAction($key, array $action): void
+    public function addAction(string $key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
             throw new InvalidArgumentException("The key, '{$key}' is already used by another action. Please use a different key.");

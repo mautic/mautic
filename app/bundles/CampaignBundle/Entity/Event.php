@@ -99,75 +99,88 @@ class Event implements ChannelInterface, UuidInterface
      * @var string
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var string
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'event_type', type: 'string', length: 50)]
     private $eventType;
 
     /**
      * @var int
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'event_order', type: 'integer')]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_date', type: 'datetime', nullable: true)]
     private $triggerDate;
 
     /**
      * @var int|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_interval', type: 'integer', nullable: true)]
     private $triggerInterval = 0;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_interval_unit', type: 'string', length: 1, nullable: true)]
     private $triggerIntervalUnit;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_hour', type: 'time', nullable: true)]
     private $triggerHour;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_restricted_start_hour', type: 'time', nullable: true)]
     private $triggerRestrictedStartHour;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_restricted_stop_hour', type: 'time', nullable: true)]
     private $triggerRestrictedStopHour;
 
     /**
      * @var array|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_restricted_dow', type: 'array', nullable: true)]
     private $triggerRestrictedDaysOfWeek = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_window', type: 'integer', nullable: true)]
     private ?int $triggerWindow = null;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'trigger_mode', type: 'string', length: 10, nullable: true)]
     private $triggerMode;
 
     /**
@@ -196,11 +209,13 @@ class Event implements ChannelInterface, UuidInterface
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'decision_path', type: 'string', length: 191, nullable: true)]
     private $decisionPath;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'temp_id', type: 'string', length: 191, nullable: true)]
     private $tempId;
 
     /**
@@ -221,12 +236,14 @@ class Event implements ChannelInterface, UuidInterface
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $channel;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'channel_id', type: Types::STRING, length: 64, nullable: true)]
     private $channelId;
 
     private array $changes = [];
@@ -234,6 +251,7 @@ class Event implements ChannelInterface, UuidInterface
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTimeInterface $deleted = null;
 
+    #[ORM\Column(name: 'failed_count', type: 'integer')]
     private int $failedCount = 0;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
@@ -242,6 +260,7 @@ class Event implements ChannelInterface, UuidInterface
     private ?Event $redirectEvent = null;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(name: 'date_linked', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateLinked = null;
 
     /**
@@ -282,69 +301,7 @@ class Event implements ChannelInterface, UuidInterface
 
         $builder->addIdColumns();
 
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('eventType', 'string')
-            ->columnName('event_type')
-            ->length(50)
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('event_order')
-            ->build();
-
-        $builder->addField('properties', 'array');
-
         $builder->addNullableField('deleted', 'datetime');
-
-        $builder->createField('triggerDate', 'datetime')
-            ->columnName('trigger_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerInterval', 'integer')
-            ->columnName('trigger_interval')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerIntervalUnit', 'string')
-            ->columnName('trigger_interval_unit')
-            ->length(1)
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerHour', 'time')
-            ->columnName('trigger_hour')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerRestrictedStartHour', 'time')
-            ->columnName('trigger_restricted_start_hour')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerRestrictedStopHour', 'time')
-            ->columnName('trigger_restricted_stop_hour')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerRestrictedDaysOfWeek', 'array')
-            ->columnName('trigger_restricted_dow')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerWindow', 'integer')
-            ->columnName('trigger_window')
-            ->nullable()
-            ->build();
-
-        $builder->createField('triggerMode', 'string')
-            ->columnName('trigger_mode')
-            ->length(10)
-            ->nullable()
-            ->build();
 
         $builder->createManyToOne('campaign', 'Campaign')
             ->inversedBy('events')
@@ -352,40 +309,10 @@ class Event implements ChannelInterface, UuidInterface
             ->isOwnershipParent()
             ->build();
 
-        $builder->createField('decisionPath', 'string')
-            ->columnName('decision_path')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tempId', 'string')
-            ->columnName('temp_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('channelId', Types::STRING)
-            ->columnName('channel_id')
-            ->length(64)
-            ->nullable()
-            ->build();
-
-        $builder->createField('failedCount', 'integer')
-            ->columnName('failed_count')
-            ->build();
-
-        static::addUuidField($builder);
 
         $builder->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added')
             ->option('default', '1970-01-01 00:00:00')
-            ->build();
-
-        $builder->createField('dateLinked', Types::DATETIME_MUTABLE)
-            ->columnName('date_linked')
-            ->nullable()
             ->build();
     }
 
@@ -531,11 +458,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         $this->id = null;
     }
-
-    /**
-     * @param int $order
-     */
-    public function setOrder($order): static
+    public function setOrder(int $order): static
     {
         $this->isChanged('order', $order);
 
@@ -551,11 +474,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->order;
     }
-
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array|null $properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -586,11 +505,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->campaign;
     }
-
-    /**
-     * @param string $type
-     */
-    public function setType($type): static
+    public function setType(string $type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -611,10 +526,7 @@ class Event implements ChannelInterface, UuidInterface
         return get_object_vars($this);
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription($description): static
+    public function setDescription(?string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -622,18 +534,11 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -751,11 +656,9 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @param string $type
-     *
      * @return ArrayCollection<int,Event>
      */
-    public function getChildrenByEventType($type)
+    public function getChildrenByEventType(string $type)
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
 
@@ -811,11 +714,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->triggerInterval;
     }
-
-    /**
-     * @param int $triggerInterval
-     */
-    public function setTriggerInterval($triggerInterval): void
+    public function setTriggerInterval(int $triggerInterval): void
     {
         $this->isChanged('triggerInterval', $triggerInterval);
         $this->triggerInterval = $triggerInterval;
@@ -830,9 +729,9 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @param \DateTime|string|array<string,string> $triggerHour
+     * @param array<string,string>|string|null $triggerHour
      */
-    public function setTriggerHour($triggerHour): static
+    public function setTriggerHour(array|string|null $triggerHour): static
     {
         $triggerHour = $this->convertToDateTime($triggerHour);
         $this->isChanged('triggerHour', $triggerHour ? $triggerHour->format('H:i') : $triggerHour);
@@ -849,10 +748,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->triggerIntervalUnit;
     }
 
-    /**
-     * @param mixed $triggerIntervalUnit
-     */
-    public function setTriggerIntervalUnit($triggerIntervalUnit): void
+    public function setTriggerIntervalUnit(string|null $triggerIntervalUnit): void
     {
         $this->isChanged('triggerIntervalUnit', $triggerIntervalUnit);
         $this->triggerIntervalUnit = $triggerIntervalUnit;
@@ -866,7 +762,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->eventType;
     }
 
-    public function setEventType($eventType): static
+    public function setEventType(string $eventType): static
     {
         $this->isChanged('eventType', $eventType);
         $this->eventType = $eventType;
@@ -886,61 +782,40 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTriggerMode()
+    public function getTriggerMode(): ?string
     {
         return $this->triggerMode;
     }
 
-    /**
-     * @param mixed $triggerMode
-     */
-    public function setTriggerMode($triggerMode): void
+    public function setTriggerMode(?string $triggerMode): void
     {
         $this->isChanged('triggerMode', $triggerMode);
         $this->triggerMode = $triggerMode;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDecisionPath()
+    public function getDecisionPath(): ?string
     {
         return $this->decisionPath;
     }
 
-    /**
-     * @param mixed $decisionPath
-     */
-    public function setDecisionPath($decisionPath): void
+    public function setDecisionPath(?string $decisionPath): void
     {
         $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTempId()
+    public function getTempId(): ?string
     {
         return $this->tempId;
     }
 
-    /**
-     * @param mixed $tempId
-     */
-    public function setTempId($tempId): void
+    public function setTempId(?string $tempId): void
     {
         $this->isChanged('tempId', $tempId);
         $this->tempId = $tempId;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getChannel()
+    public function getChannel(): ?string
     {
         return $this->channel;
     }
@@ -1024,10 +899,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Set the value of triggerRestrictedStartHour.
-     *
-     * @param \DateTime|string|array<string,string>|null $triggerRestrictedStartHour
      */
-    public function setTriggerRestrictedStartHour($triggerRestrictedStartHour): static
+    public function setTriggerRestrictedStartHour(string|\DateTimeInterface|null $triggerRestrictedStartHour): static
     {
         $triggerRestrictedStartHour = $this->convertToDateTime($triggerRestrictedStartHour);
 
@@ -1050,10 +923,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Set the value of triggerRestrictedStopHour.
-     *
-     * @param \DateTime|string|array<string,string>|null $triggerRestrictedStopHour
      */
-    public function setTriggerRestrictedStopHour($triggerRestrictedStopHour): static
+    public function setTriggerRestrictedStopHour(string|\DateTime|null $triggerRestrictedStopHour): static
     {
         $triggerRestrictedStopHour = $this->convertToDateTime($triggerRestrictedStopHour);
 

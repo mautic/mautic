@@ -212,7 +212,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 ->nullable()
                 ->build();
 
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'dynamic_content_projects_xref', 'dynamic_content_id');
     }
 

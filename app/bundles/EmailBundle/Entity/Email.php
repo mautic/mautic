@@ -242,12 +242,20 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var ArrayCollection<LeadList>
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\ManyToMany(targetEntity: LeadList::class, fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\JoinTable(name: 'email_list_xref')]
+    #[ORM\JoinColumn(name: 'email_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
     private $lists;
 
     /**
      * @var ArrayCollection<LeadList>
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\ManyToMany(targetEntity: LeadList::class, fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\JoinTable(name: 'email_list_excluded')]
+    #[ORM\JoinColumn(name: 'email_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
     private $excludedLists;
 
     /**
@@ -288,6 +296,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var ArrayCollection<Asset>
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\ManyToMany(targetEntity: Asset::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\JoinTable(name: 'email_assets_xref')]
+    #[ORM\JoinColumn(name: 'email_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'asset_id', nullable: false, onDelete: 'CASCADE')]
     private $assetAttachments;
 
     /**
@@ -418,32 +430,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addField('revision', Types::INTEGER);
         $builder->addCategory();
 
-        $builder->createManyToMany('lists', LeadList::class)
-            ->setJoinTable('email_list_xref')
-            ->setIndexBy('id')
-            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createManyToMany('excludedLists', LeadList::class)
-            ->setJoinTable('email_list_excluded')
-            ->setIndexBy('id')
-            ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
-
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
-        self::addDynamicContentMetadata($builder);
-
-        $builder->createManyToMany('assetAttachments', Asset::class)
-            ->setJoinTable('email_assets_xref')
-            ->addInverseJoinColumn('asset_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('email_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
 
         $builder->addField('headers', Types::JSON);
 
@@ -454,9 +442,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->nullable()
             ->build();
 
-        static::addUuidField($builder);
         self::addProjectsField($builder, 'email_projects_xref', 'email_id');
-        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

@@ -31,6 +31,10 @@ class Client extends BaseClient
     /**
      * @var ArrayCollection<int, User>
      */
+    #[ORM\ManyToMany(targetEntity: User::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\JoinTable(name: 'oauth2_user_client_xref')]
+    #[ORM\JoinColumn(name: 'client_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'user_id', nullable: false, onDelete: 'CASCADE')]
     protected $users;
 
     /**
@@ -38,19 +42,23 @@ class Client extends BaseClient
      */
     protected $authCodes;
 
+    #[ORM\Column(name: 'random_id', type: 'string', length: 191)]
     protected ?string $randomId = null;
 
+    #[ORM\Column(type: 'string', length: 191)]
     protected ?string $secret = null;
 
     /**
      * @var array<string>
      */
     #[Assert\NotBlank(message: 'mautic.api.client.redirecturis.notblank')]
+    #[ORM\Column(name: 'redirect_uris', type: 'array')]
     protected array $redirectUris = [];
 
     /**
      * @var array<string>
      */
+    #[ORM\Column(name: 'allowed_grant_types', type: 'array')]
     protected array $allowedGrantTypes;
 
     #[ORM\ManyToOne(targetEntity: Role::class, cascade: ['persist'])]
@@ -75,27 +83,6 @@ class Client extends BaseClient
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns('name', false);
-
-        $builder->createManyToMany('users', User::class)
-            ->setJoinTable('oauth2_user_client_xref')
-            ->addInverseJoinColumn('user_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createField('randomId', 'string')
-            ->columnName('random_id')
-            ->build();
-
-        $builder->addField('secret', 'string');
-
-        $builder->createField('redirectUris', 'array')
-            ->columnName('redirect_uris')
-            ->build();
-
-        $builder->createField('allowedGrantTypes', 'array')
-            ->columnName('allowed_grant_types')
-            ->build();
     }
 
     /**

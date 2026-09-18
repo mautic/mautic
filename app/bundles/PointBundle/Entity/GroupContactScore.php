@@ -18,6 +18,9 @@ class GroupContactScore extends CommonEntity
 {
     public const TABLE_NAME = 'point_group_contact_score';
 
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'groupScores')]
+    #[ORM\JoinColumn(name: 'contact_id', nullable: false, onDelete: 'CASCADE')]
     private Lead $contact;
 
     #[ORM\Id]
@@ -39,8 +42,6 @@ class GroupContactScore extends CommonEntity
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addContact(false, 'CASCADE', true, 'groupScores');
 
         $builder->createField('score', Types::INTEGER)
             ->build();

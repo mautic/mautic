@@ -6,7 +6,6 @@ namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\RefreshToken as BaseRefreshToken;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 
 #[ORM\Entity]
@@ -21,26 +20,14 @@ class RefreshToken extends BaseRefreshToken
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', nullable: false, onDelete: 'CASCADE')]
     protected ?\Symfony\Component\Security\Core\User\UserInterface $user = null;
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
-
-        $builder->createField('token', 'string')
-            ->unique()
-            ->build();
-
-        $builder->createField('expiresAt', 'bigint')
-            ->columnName('expires_at')
-            ->nullable()
-            ->build();
-
-        $builder->createField('scope', 'string')
-            ->nullable()
-            ->build();
-    }
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
+    protected $id;
+    #[ORM\Column(type: 'string', length: 191, unique: true)]
+    protected string $token;
+    #[ORM\Column(name: 'expires_at', type: 'bigint', nullable: true)]
+    protected ?int $expiresAt = null;
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
+    protected ?string $scope = null;
 }

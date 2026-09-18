@@ -138,10 +138,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set the widget template.
-     *
-     * @param string $template
      */
-    public function setTemplate($template): void
+    public function setTemplate(string $template): void
     {
         $this->template = $template;
         $this->widget->setTemplate($template);
