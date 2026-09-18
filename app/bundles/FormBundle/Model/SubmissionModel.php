@@ -826,7 +826,7 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of top submission referrers.
      */
-    public function getTopSubmissionReferrers(int $limit = 10, ?string $dateFrom = null, ?string $dateTo = null, array $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmissionReferrers(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -851,7 +851,7 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of the most submisions per lead.
      */
-    public function getTopSubmitters(int $limit = 10, ?string $dateFrom = null, ?string $dateTo = null, array $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmitters(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')

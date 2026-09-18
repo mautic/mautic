@@ -1997,7 +1997,7 @@ class LeadModel extends FormModel
     /**
      * Get a list of top (by leads owned) users.
      */
-    public function getTopOwners(int $limit = 10, ?string $dateFrom = null, ?string $dateTo = null, array $filters = []): array
+    public function getTopOwners(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
@@ -2018,7 +2018,7 @@ class LeadModel extends FormModel
     /**
      * Get a list of top (by leads owned) users.
      */
-    public function getTopCreators(int $limit = 10, ?string $dateFrom = null, ?string $dateTo = null, array $filters = []): array
+    public function getTopCreators(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
