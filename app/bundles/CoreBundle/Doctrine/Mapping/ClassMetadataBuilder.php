@@ -263,32 +263,6 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
         return $this;
     }
 
-    /**
-     * Add a lead column.
-     *
-     * @param string $onDelete
-     *
-     * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
-     */
-    public function addLead(bool $nullable = false, $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
-    {
-        $lead = $this->createManyToOne('lead', Lead::class);
-
-        if ($isPrimaryKey) {
-            $lead->makePrimaryKey();
-        }
-
-        if ($inversedBy) {
-            $lead->inversedBy($inversedBy);
-        }
-
-        $lead
-            ->addJoinColumn('lead_id', 'id', $nullable, false, $onDelete)
-            ->build();
-
-        return $this;
-    }
-
     public function addIpAddress(bool $nullable = false): static
     {
         $this->createManyToOne('ipAddress', IpAddress::class)

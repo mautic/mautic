@@ -26,6 +26,8 @@ class UtmTag
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'utmtags')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -80,7 +82,6 @@ class UtmTag
         $builder = new ClassMetadataBuilder($metadata);
         $builder->addId();
         $builder->addDateAdded();
-        $builder->addLead(false, 'CASCADE', false, 'utmtags');
         $builder->addNullableField('query', Types::ARRAY);
         $builder->addNullableField('referer', Types::TEXT);
         $builder->addNullableField('remoteHost', Types::STRING, 'remote_host');

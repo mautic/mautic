@@ -55,6 +55,8 @@ class MessageQueue
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -131,8 +133,6 @@ class MessageQueue
 
         $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');
-
-        $builder->addLead(false, 'CASCADE', false);
 
         $builder->createField('priority', 'smallint')
             ->columnName('priority')

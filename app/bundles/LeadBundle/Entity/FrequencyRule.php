@@ -30,6 +30,8 @@ class FrequencyRule extends CommonEntity
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'frequencyRules')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -69,8 +71,6 @@ class FrequencyRule extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->addLead(false, 'CASCADE', false, 'frequencyRules');
 
         $builder->addDateAdded();
 
