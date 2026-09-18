@@ -262,7 +262,7 @@ return [
                 'class'     => 'Mautic\UserBundle\Security\Authenticator\FormAuthenticator',
                 'arguments' => [
                     'mautic.helper.integration',
-                    'security.password_encoder',
+                    'security.user_password_hasher',
                     'event_dispatcher',
                     'request_stack',
                 ],
@@ -285,7 +285,7 @@ return [
                     'mautic.permission.repository',
                     'session',
                     'event_dispatcher',
-                    'security.password_encoder',
+                    'security.user_password_hasher',
                 ],
             ],
             'mautic.security.authentication_listener' => [
@@ -388,7 +388,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.security.saml.username_mapper',
                     'mautic.user.model.user',
-                    'security.password_encoder',
+                    'security.user_password_hasher',
                     '%mautic.saml_idp_default_role%',
                 ],
             ],
@@ -541,7 +541,7 @@ return [
             'mautic.user.fixture.user' => [
                 'class'     => Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class,
                 'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['security.password_encoder'],
+                'arguments' => ['security.user_password_hasher'],
             ],
         ],
     ],

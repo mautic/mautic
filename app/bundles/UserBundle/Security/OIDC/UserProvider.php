@@ -45,6 +45,11 @@ final class UserProvider implements CredentialsUserProviderInterface
         throw new UsernameNotFoundException();
     }
 
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+        return $this->loadUserByUsername($identifier);
+    }
+
     public function loadUserByCredentials(UserCredentials $credentials): UserInterface
     {
         $openIdConnectId    = $credentials->getId();

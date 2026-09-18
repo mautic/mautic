@@ -70,6 +70,7 @@ $firewalls = [
     ],
     'api' => [
         'pattern'            => '^/api/',
+        'provider'           => 'user_provider',
         'fos_oauth'          => true,
         'mautic_plugin_auth' => true,
         'stateless'          => true,
@@ -78,6 +79,7 @@ $firewalls = [
     ],
     'main' => [
         'pattern'       => '^/(s/|elfinder|efconnect)',
+        'provider'      => 'user_provider',
         'light_saml_sp' => [
             'provider'        => 'user_provider',
             'success_handler' => 'mautic.security.authentication_handler',
@@ -135,9 +137,6 @@ $container->loadFromExtension(
         'providers' => [
             'user_provider' => [
                 'id' => 'mautic.user.provider',
-            ],
-            'beefree_provider' => [
-                'id' => 'mautic.beefree.user_provider',
             ],
             'open_id_provider' => [
                 'id' => 'mautic.security.oidc.user_provider',
