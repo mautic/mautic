@@ -120,9 +120,13 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * Test filtering categories by bundle.
+     * The Category API resource declares no API Platform filters, so query parameters such as
+     * `bundle` are ignored rather than rejected, and the whole collection is returned.
+     *
+     * TODO: change this to assert ['contact'] once a bundle filter is added to the Category
+     * API resource.
      */
-    public function testGetCategoriesByBundle(): void
+    public function testGetCategoriesIgnoresUnsupportedBundleQueryParameter(): void
     {
         // Clear existing categories first
         $this->em->createQuery('DELETE FROM '.Category::class)->execute();
@@ -144,7 +148,7 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($pageCategory);
         $this->em->flush();
 
-        // Filter by contact bundle
+        // Ask for a single bundle; the parameter has no filter behind it.
         $this->client->request(
             Request::METHOD_GET,
             '/api/v2/categories?bundle=contact',
@@ -164,27 +168,16 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertIsArray($responseData);
         $this->assertArrayHasKey('member', $responseData);
 
-        // If filtering doesn't work, both categories will be returned
-        // For now, let's just verify we get categories back
-        $this->assertGreaterThanOrEqual(1, count($responseData['member']));
+        $bundles = array_column($responseData['member'], 'bundle');
+        sort($bundles);
 
-        // Check if bundle filtering is working
-        $hasContactCategory = false;
-        $hasPageCategory    = false;
-        foreach ($responseData['member'] as $item) {
-            if ('contact' === $item['bundle']) {
-                $hasContactCategory = true;
-            }
-            if ('page' === $item['bundle']) {
-                $hasPageCategory = true;
-            }
-        }
-
-        $this->assertTrue($hasContactCategory, 'Should have contact category');
-        // Note: If filtering is not implemented, this test documents current behavior
-        if ($hasPageCategory) {
-            $this->markTestIncomplete('Bundle filtering is not implemented in API Platform for Category entity');
-        }
+        $this->assertSame(
+            ['contact', 'page'],
+            $bundles,
+            'Unsupported query parameters are ignored, so filtering by bundle returns everything. '
+            .'If this fails, a bundle filter was added to the Category API resource: assert '
+            ."['contact'] instead of reverting the filter."
+        );
     }
 
     /**
