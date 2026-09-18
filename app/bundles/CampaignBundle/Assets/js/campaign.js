@@ -477,6 +477,8 @@ Mautic.handleCampaignEventAjaxClick = function (event) {
  * @param response
  */
 Mautic.campaignEventOnLoad = function (container, response) {
+    Mautic.messageSendOnLoad(container);
+
     if (mQuery('#campaignevent_triggerHour').length) {
         Mautic.campaignEventUpdateIntervalHours();
         mQuery('#campaignevent_triggerHour').on('change', Mautic.campaignEventUpdateIntervalHours);
