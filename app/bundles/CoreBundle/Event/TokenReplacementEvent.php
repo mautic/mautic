@@ -18,7 +18,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @var CommonEntity|string|null
      */
-    protected $content;
+    protected array|string $content;
 
     /**
      * @var array
