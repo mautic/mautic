@@ -62,8 +62,9 @@ final class ParseEmailEvent extends Event
 
     /**
      * Check if the set of messages is applicable and should be processed by the listener.
+     * @param string|string[] $folderKeys
      */
-    public function isApplicable($bundleKey, $folderKeys): bool
+    public function isApplicable(string $bundleKey, string|array $folderKeys): bool
     {
         if (!is_array($folderKeys)) {
             $folderKeys = [$folderKeys];
@@ -83,12 +84,11 @@ final class ParseEmailEvent extends Event
     /**
      * Set a criteria request for filtering fetched mail.
      *
-     * @param string $bundleKey
-     * @param string $folderKeys
+     * @param string|string[] $folderKeys
      * @param string $criteria   Should be a string using combinations of Mautic\EmailBundle\MonitoredEmail\Mailbox::CRITERIA_* constants
      * @param bool   $markAsSeen Mark the message as read after being processed
      */
-    public function setCriteriaRequest($bundleKey, $folderKeys, $criteria, bool $markAsSeen = true): void
+    public function setCriteriaRequest(string $bundleKey, string|array $folderKeys, $criteria, bool $markAsSeen = true): void
     {
         if (!is_array($folderKeys)) {
             $folderKeys = [$folderKeys];

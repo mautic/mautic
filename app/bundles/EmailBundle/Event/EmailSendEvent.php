@@ -240,7 +240,7 @@ class EmailSendEvent extends CommonEvent
         $this->tokens = array_merge($this->tokens, $tokens);
     }
 
-    public function addToken($key, $value): void
+    public function addToken(string $key, string $value): void
     {
         $this->tokens[$key] = $value;
     }
@@ -257,7 +257,7 @@ class EmailSendEvent extends CommonEvent
         return $this->tokens;
     }
 
-    public function addTextHeader($name, $value): void
+    public function addTextHeader(string $name, string $value): void
     {
         if (null !== $this->helper) {
             $this->helper->addCustomHeader($name, $value);

@@ -87,10 +87,9 @@ class AuthenticationEvent extends Event
     /**
      * Set the user to be used after authentication.
      *
-     * @param bool|true $saveUser
      * @param bool|true $createIfNotExists If true, the user will be created if it does not exist
      */
-    public function setUser(User $user, $saveUser = true, $createIfNotExists = true): void
+    public function setUser(User $user, bool $saveUser = true, bool $createIfNotExists = true): void
     {
         if ($saveUser) {
             $user = $this->userProvider->saveUser($user, $createIfNotExists);
@@ -130,9 +129,8 @@ class AuthenticationEvent extends Event
      * Set if this user is successfully authenticated.
      *
      * @param string    $service           Service that authenticated the user; if using a Integration, it should match that of AbstractIntegration::getName();
-     * @param bool|true $createIfNotExists
      */
-    public function setIsAuthenticated(?string $service, ?User $user = null, $createIfNotExists = true): void
+    public function setIsAuthenticated(?string $service, ?User $user = null, bool $createIfNotExists = true): void
     {
         $this->authenticatingService = $service;
 

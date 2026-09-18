@@ -19,7 +19,7 @@ final class MessageQueueBatchProcessEvent extends Event
     ) {
     }
 
-    public function checkContext($channel): bool
+    public function checkContext(string $channel): bool
     {
         return $channel === $this->channel;
     }

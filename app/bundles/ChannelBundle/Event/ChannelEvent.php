@@ -27,7 +27,7 @@ final class ChannelEvent extends CommonEvent
      *                          ]
      *                       ]
      */
-    public function addChannel($channel, array $config = []): static
+    public function addChannel(string $channel, array $config = []): static
     {
         $this->channels[$channel] = $config;
 
