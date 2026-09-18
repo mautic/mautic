@@ -4,7 +4,7 @@ namespace Mautic\ApiBundle\Helper;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class EntityResultHelper
+final class EntityResultHelper
 {
     /**
      * @param array<mixed>|Paginator<mixed> $results

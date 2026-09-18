@@ -62,6 +62,14 @@ parameters:
                 - app/bundles/CoreBundle/Tests/Traits/LoggerTrait.php
                 - app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
                 - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
+        # createStub() has unresolvable return type in tests
+        -
+            identifier: method.unresolvableReturnType
+            path: */Tests/*
+        # mocks of final classes have unresolvable native type in tests
+        -
+            identifier: property.unresolvableNativeType
+            path: */Tests/*
         - identifier: missingType.generics
         # controllers - group missing parameter types to fix later
         -
