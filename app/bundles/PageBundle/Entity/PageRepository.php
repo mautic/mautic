@@ -61,17 +61,10 @@ class PageRepository extends CommonRepository
         return $results['alias_count'];
     }
 
-    /**
-     * @param string      $search
-     * @param int         $limit
-     * @param string|bool $topLevel
-     * @param array       $ignoreIds
-     * @param array       $extraColumns
-     */
-    public function getPageList($search = '', $limit = 10, int $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [], bool $publishedOnly = false): array
+    public function getPageList(string $search = '', int $limit = 10, int $start = 0, bool $viewOther = false, string|bool $topLevel = false, array $ignoreIds = [], array $extraColumns = [], bool $publishedOnly = false): array
     {
         $q = $this->createQueryBuilder('p');
-        $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
+        $q->select(sprintf('partial p.{id, title, language, alias %s}', $extraColumns === [] ? '' : ','.implode(',', $extraColumns)));
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('p.title', ':search'))
@@ -90,7 +83,7 @@ class PageRepository extends CommonRepository
             $q->andWhere($q->expr()->isNull('p.variantParent'));
         }
 
-        if (!empty($ignoreIds)) {
+        if ($ignoreIds !== []) {
             $q->andWhere($q->expr()->notIn('p.id', ':pageIds'))
                 ->setParameter('pageIds', $ignoreIds);
         }

@@ -92,12 +92,8 @@ class UserModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of users for an autocomplete input.
-     *
-     * @param string $search
-     * @param int    $limit
-     * @param array  $permissionLimiter
      */
-    public function getUserList($search = '', $limit = 10, int $start = 0, $permissionLimiter = []): array
+    public function getUserList(string $search = '', int $limit = 10, int $start = 0, array $permissionLimiter = []): array
     {
         return $this->userRepository->getUserList($search, $limit, $start, $permissionLimiter);
     }
@@ -211,12 +207,11 @@ class UserModel extends FormModel implements GlobalSearchInterface
      * Get list of entities for autopopulate fields.
      *
      * @param string $type
-     * @param string $filter
      * @param int    $limit
      *
      * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults($type, ?string $filter = '', int|string|null $limit = 10)
     {
         $results = [];
 

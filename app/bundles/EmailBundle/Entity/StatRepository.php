@@ -549,12 +549,10 @@ class StatRepository extends CommonRepository
     /**
      * Get pie graph data for Sent, Read and Failed email count.
      *
-     * @param QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostEmails($query, int $limit = 10, int $offset = 0): array
+    public function getMostEmails(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query
             ->setMaxResults($limit)

@@ -383,12 +383,10 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get companies grouped by column.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getCompaniesByGroup($query, string $column): array
+    public function getCompaniesByGroup(\Doctrine\DBAL\Query\QueryBuilder $query, string $column): array
     {
         $query->select('count(comp.id) as companies, '.$column)
             ->addGroupBy($column)

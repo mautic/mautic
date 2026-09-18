@@ -412,10 +412,7 @@ class IntegrationEntityRepository extends CommonRepository
         return $this->getIntegrationEntityByLead($leadId, $integration, $integrationEntity, $internalEntity, false);
     }
 
-    /**
-     * @param int|bool $limit
-     */
-    public function getIntegrationEntityByLead($leadId, $integration = null, $integrationEntity = null, $internalEntity = null, $limit = 100): array|int
+    public function getIntegrationEntityByLead($leadId, $integration = null, $integrationEntity = null, $internalEntity = null, int|bool $limit = 100): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');

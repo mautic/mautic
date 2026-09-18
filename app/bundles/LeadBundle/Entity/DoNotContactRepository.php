@@ -16,11 +16,9 @@ class DoNotContactRepository extends CommonRepository
     /**
      * Get a list of DNC entries based on channel and lead_id.
      *
-     * @param string $channel
-     *
      * @return DoNotContact[]
      */
-    public function getEntriesByLeadAndChannel(Lead $lead, $channel): array
+    public function getEntriesByLeadAndChannel(Lead $lead, string $channel): array
     {
         return $this->findBy(['channel' => $channel, 'lead' => $lead]);
     }
@@ -138,7 +136,7 @@ class DoNotContactRepository extends CommonRepository
 
     /**
      * @param string|null    $channel
-     * @param string[]|int[] $contacts Array of contact IDs to filter by
+     * @param string[]|int[]|null $contacts Array of contact IDs to filter by
      *
      * @return mixed[]
      */

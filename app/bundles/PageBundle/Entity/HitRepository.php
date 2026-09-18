@@ -478,12 +478,10 @@ class HitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers($query, int $limit = 10, int $offset = 0): array
+    public function getReferers(\Doctrine\DBAL\Query\QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('ph.referer, count(ph.referer) as sessions')
             ->groupBy('ph.referer')
@@ -497,12 +495,10 @@ class HitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     * @param string                            $as
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostVisited($query, int $limit = 10, int $offset = 0, string $column = 'p.hits', $as = ''): array
+    public function getMostVisited(\Doctrine\DBAL\Query\QueryBuilder $query, int $limit = 10, int $offset = 0, string $column = 'p.hits', string $as = ''): array
     {
         if ($as) {
             $as = ' as "'.$as.'"';

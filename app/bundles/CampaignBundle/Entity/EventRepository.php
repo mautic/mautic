@@ -47,11 +47,7 @@ class EventRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @param int    $contactId
-     * @param string $type
-     */
-    public function getContactPendingEvents($contactId, $type): array
+    public function getContactPendingEvents(int $contactId, string $type): array
     {
         // Limit to events that hasn't been executed or scheduled yet
         $eventQb = $this->getEntityManager()->createQueryBuilder();
@@ -103,26 +99,22 @@ class EventRepository extends CommonRepository
                 )
             )
             ->setParameter('type', $type)
-            ->setParameter('contactId', (int) $contactId);
+            ->setParameter('contactId', $contactId);
 
         return $q->getQuery()->getResult();
     }
 
     /**
      * Get array of events by parent.
-     *
-     * @param int         $parentId
-     * @param string|null $decisionPath
-     * @param string|null $eventType
      */
-    public function getEventsByParent($parentId, $decisionPath = null, $eventType = null): array
+    public function getEventsByParent(int $parentId, ?string $decisionPath = null, ?string $eventType = null): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('e')
             ->from(Event::class, 'e', 'e.id')
             ->where(
-                $q->expr()->eq('IDENTITY(e.parent)', (int) $parentId)
+                $q->expr()->eq('IDENTITY(e.parent)', $parentId)
             );
 
         if (null !== $decisionPath) {

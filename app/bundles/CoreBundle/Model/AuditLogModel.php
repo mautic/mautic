@@ -70,13 +70,8 @@ class AuditLogModel extends AbstractCommonModel
 
     /**
      * Get the audit log for specific object.
-     *
-     * @param string|null             $object
-     * @param string|int              $id
-     * @param \DateTimeInterface|null $afterDate
-     * @param string|null             $bundle
      */
-    public function getLogForObject($object, $id, $afterDate = null, int $limit = 10, $bundle = null): array
+    public function getLogForObject(?string $object, string|int|null $id, ?\DateTimeInterface $afterDate = null, int $limit = 10, ?string $bundle = null): array
     {
         return $this->auditLogRepository->getLogForObject($object, $id, $limit, $afterDate, $bundle);
     }

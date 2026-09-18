@@ -41,10 +41,7 @@ final class VideoHitRepository extends CommonRepository
         return $this->getTimelineResults($query, $options, 'h.url', 'h.date_hit', [], ['date_hit'], null, 'h.id');
     }
 
-    /**
-     * @param string $guid
-     */
-    public function getHitForLeadByGuid(Lead $lead, $guid): \Mautic\PageBundle\Entity\VideoHit
+    public function getHitForLeadByGuid(Lead $lead, string $guid): \Mautic\PageBundle\Entity\VideoHit
     {
         $result = $this->findOneBy(['guid' => $guid, 'lead' => $lead]);
 
@@ -54,18 +51,17 @@ final class VideoHitRepository extends CommonRepository
     /**
      * Get a lead's page hits.
      *
-     * @param int                  $leadId
      * @param array<string, mixed> $options
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadHits($leadId, array $options = []): array
+    public function getLeadHits(int $leadId, array $options = []): array
     {
         $query = $this->createQueryBuilder('h');
         $query->select('h.userAgent, h.dateHit, h.dateLeft, h.referer, h.channel, h.channelId, h.url, h.duration, h.query, h.timeWatched')
             ->where('h.lead = :leadId')
-            ->setParameter('leadId', (int) $leadId);
+            ->setParameter('leadId', $leadId);
 
         if (isset($options['url']) && $options['url']) {
             $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
@@ -95,12 +91,10 @@ final class VideoHitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers($query, int $limit = 10, int $offset = 0): array
+    public function getReferers(\Doctrine\DBAL\Query\QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('h.referer, count(h.referer) as sessions')
             ->groupBy('h.referer')

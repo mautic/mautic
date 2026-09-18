@@ -67,11 +67,9 @@ class LogRepository extends CommonRepository
      * 1 = 100% responses are successful
      * null = no log rows yet
      *
-     * @param int $webhookId
-     *
      * @return float|null
      */
-    public function getSuccessVsErrorStatusCodeRatio($webhookId, ?int $limit): int|float|null
+    public function getSuccessVsErrorStatusCodeRatio(int $webhookId, ?int $limit): int|float|null
     {
         // Generate query to select last X = $limit rows
         $selectqb = $this->getEntityManager()->getConnection()->createQueryBuilder();

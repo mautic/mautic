@@ -308,12 +308,10 @@ class SubmissionRepository extends CommonRepository
     /**
      * Get list of forms ordered by it's count.
      *
-     * @param DbalQueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getTopReferrers($query, int $limit = 10, int $offset = 0): array
+    public function getTopReferrers(DbalQueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('fs.referer, count(fs.referer) as sessions')
             ->groupBy('fs.referer')
@@ -327,12 +325,10 @@ class SubmissionRepository extends CommonRepository
     /**
      * Get list of forms ordered by it's count.
      *
-     * @param DbalQueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostSubmitted($query, int $limit = 10, int $offset = 0, $column = 'fs.id', $as = 'submissions'): array
+    public function getMostSubmitted(DbalQueryBuilder $query, int $limit = 10, int $offset = 0, $column = 'fs.id', $as = 'submissions'): array
     {
         $asSelect = ($as) ? ' as '.$as : '';
 
@@ -502,10 +498,7 @@ class SubmissionRepository extends CommonRepository
         return !empty($result['id']);
     }
 
-    /**
-     * @param Form $form
-     */
-    public function getSubmissionCounts($form): array|false
+    public function getSubmissionCounts(Form $form): array|false
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->select('COUNT(fs.id) AS `total`, COUNT(DISTINCT (fs.lead_id)) AS `unique`')

@@ -49,10 +49,7 @@ final class VideoModel extends FormModel
         return 'getTitle';
     }
 
-    /**
-     * @param string $guid
-     */
-    public function getHitForLeadByGuid(Lead $lead, $guid): \Mautic\PageBundle\Entity\VideoHit
+    public function getHitForLeadByGuid(Lead $lead, string $guid): \Mautic\PageBundle\Entity\VideoHit
     {
         return $this->videoHitRepository->getHitForLeadByGuid($lead, $guid);
     }

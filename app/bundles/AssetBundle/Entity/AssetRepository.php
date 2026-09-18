@@ -200,12 +200,10 @@ class AssetRepository extends CommonRepository
     }
 
     /**
-     * @param int $categoryId
-     *
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getLatestAssetForCategory($categoryId): Asset
+    public function getLatestAssetForCategory(int $categoryId): Asset
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where($this->getTableAlias().'.category = :categoryId');

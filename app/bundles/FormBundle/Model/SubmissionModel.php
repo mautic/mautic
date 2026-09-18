@@ -798,14 +798,13 @@ final class SubmissionModel extends CommonFormModel
      *
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
-     * @param array       $filter
      */
     public function getSubmissionsLineChartData(
         ?string $unit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $dateFormat = null,
-        $filter = [],
+        array $filter = [],
         bool $canViewOthers = true,
     ): array {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -826,12 +825,8 @@ final class SubmissionModel extends CommonFormModel
 
     /**
      * Get a list of top submission referrers.
-     *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
      */
-    public function getTopSubmissionReferrers(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmissionReferrers(int $limit = 10, ?string $dateFrom = null, ?string $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -855,12 +850,8 @@ final class SubmissionModel extends CommonFormModel
 
     /**
      * Get a list of the most submisions per lead.
-     *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
      */
-    public function getTopSubmitters(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmitters(int $limit = 10, ?string $dateFrom = null, ?string $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')

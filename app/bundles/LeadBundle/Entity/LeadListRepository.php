@@ -83,11 +83,9 @@ class LeadListRepository extends CommonRepository
     /**
      * Get a list of lists.
      *
-     * @param string $alias
-     * @param string $id
      * @param bool   $justPublished if false, returns all published and unpublished segments
      */
-    public function getLists(?User $user = null, $alias = '', $id = '', bool $justPublished = true): array
+    public function getLists(?User $user = null, string $alias = '', string|int|null $id = '', bool $justPublished = true): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');

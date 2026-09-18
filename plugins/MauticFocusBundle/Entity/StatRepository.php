@@ -14,15 +14,13 @@ class StatRepository extends CommonRepository
 
     /**
      * Fetch the base stat data from the database.
-     *
-     * @param int $id
      */
-    public function getStats($id, $type, $fromDate = null): array
+    public function getStats(int $id, $type, $fromDate = null): array
     {
         $q = $this->createQueryBuilder('s');
 
         $expr = $q->expr()->andX(
-            $q->expr()->eq('IDENTITY(s.focus)', (int) $id),
+            $q->expr()->eq('IDENTITY(s.focus)', $id),
             $q->expr()->eq('s.type', ':type')
         );
 

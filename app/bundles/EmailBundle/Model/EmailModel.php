@@ -555,12 +555,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param int|null             $companyId
-     * @param int|null             $campaignId
-     * @param int|null             $segmentId
      * @param array<string, mixed> $options
      */
-    public function getSentEmailToContactData(?int $limit, \DateTime $dateFrom, \DateTime $dateTo, array $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
+    public function getSentEmailToContactData(?int $limit, \DateTime $dateFrom, \DateTime $dateTo, array $options = [], ?int $companyId = null, ?int $campaignId = null, ?int $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -615,12 +612,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param int|null             $companyId
-     * @param int|null             $campaignId
-     * @param int|null             $segmentId
      * @param array<string, mixed> $options
      */
-    public function getMostHitEmailRedirects(?int $limit, \DateTime $dateFrom, \DateTime $dateTo, array $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
+    public function getMostHitEmailRedirects(?int $limit, \DateTime $dateFrom, \DateTime $dateTo, array $options = [], ?int $companyId = null, ?int $campaignId = null, ?int $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -1806,11 +1800,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
-    /**
-     * @param string $column
-     */
     public function getBestHours(
-        $column,
+        string $column,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         array $filter = [],
@@ -1952,9 +1943,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @param string $dateFrom
      * @param string $dateTo
-     * @param array  $filters
      */
-    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -2019,10 +2009,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get a list of emails in a date range, grouped by a stat date count.
      *
-     * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getEmailStatList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getEmailStatList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], array $options = []): array
     {
         $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
         $q             = $this->em->getConnection()->createQueryBuilder();
@@ -2055,10 +2044,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get a list of emails in a date range.
      *
-     * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getEmailList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getEmailList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], array $options = []): array
     {
         $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
         $q             = $this->em->getConnection()->createQueryBuilder();

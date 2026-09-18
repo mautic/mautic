@@ -915,11 +915,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of top (by leads added) lists.
-     *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      */
-    public function getTopLists(int $limit = 10, $dateFrom = null, $dateTo = null, bool $canViewOthers = true): array
+    public function getTopLists(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')
@@ -945,17 +942,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of top (by leads added) lists.
      *
-     * @param int                 $limit
-     * @param ?\DateTimeInterface $dateFrom
-     * @param ?\DateTimeInterface $dateTo
-     * @param bool                $canViewOthers
      * @param int[]               $segments
      *
      * @return mixed[]
      */
-    public function getLifeCycleSegments($limit, $dateFrom, $dateTo, $canViewOthers, $segments): array
+    public function getLifeCycleSegments(int $limit, ?\DateTimeInterface $dateFrom, ?\DateTimeInterface $dateTo, bool $canViewOthers, array $segments): array
     {
-        if (!empty($segments)) {
+        if ($segments !== []) {
             $segmentlist = "'".implode("','", $segments)."'";
         }
         $q = $this->em->getConnection()->createQueryBuilder();
@@ -971,7 +964,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if ($limit) {
             $q->setMaxResults($limit);
         }
-        if (!empty($segments)) {
+        if ($segments !== []) {
             $q->andWhere('ll.id IN ('.$segmentlist.')');
         }
         if ($dateFrom instanceof \DateTimeInterface) {

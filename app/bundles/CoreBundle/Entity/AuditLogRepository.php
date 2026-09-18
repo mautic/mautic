@@ -44,10 +44,7 @@ class AuditLogRepository extends CommonRepository
         return (int) $query->executeQuery()->fetchOne();
     }
 
-    /**
-     * @param int $page
-     */
-    public function getAuditLogs(Lead $lead, ?array $filters = null, ?array $orderBy = null, $page = 1, int $limit = 25): array
+    public function getAuditLogs(Lead $lead, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25): array
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -146,11 +143,8 @@ class AuditLogRepository extends CommonRepository
 
     /**
      * Get array of objects which belongs to the object.
-     *
-     * @param string|null $object
-     * @param string|null $id
      */
-    public function getLogForObject($object = null, $id = null, int $limit = 10, $afterDate = null, $bundle = null): array
+    public function getLogForObject(?string $object = null, ?string $id = null, int $limit = 10, $afterDate = null, $bundle = null): array
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')

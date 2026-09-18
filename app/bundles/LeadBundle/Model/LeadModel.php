@@ -648,7 +648,7 @@ class LeadModel extends FormModel
     /**
      * Get list of entities for autopopulate fields.
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, int $start = 0): array
+    public function getLookupResults($type, string|array|null $filter = '', int|string|null $limit = 10, int $start = 0): array
     {
         $results    = [];
 
@@ -1698,7 +1698,7 @@ class LeadModel extends FormModel
      *
      * @param bool            $persist    True if tags modified
      * @param string[]|string $tags       can be CSV string
-     * @param string[]        $removeTags
+     * @param string[]|null        $removeTags
      */
     public function modifyTags(Lead $lead, $tags, ?array $removeTags = null, bool $persist = true): bool
     {
@@ -1836,12 +1836,10 @@ class LeadModel extends FormModel
      * Get bar chart data of contacts.
      *
      * @param string               $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime            $dateFrom
-     * @param \DateTime            $dateTo
      * @param string               $dateFormat
      * @param array<string, mixed> $filter
      */
-    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
+    public function getLeadsLineChartData($unit, ?\DateTime $dateFrom, ?\DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $flag        = null;
         $topLists    = null;
@@ -1919,9 +1917,8 @@ class LeadModel extends FormModel
      *
      * @param string $dateFrom
      * @param string $dateTo
-     * @param array  $filters
      */
-    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1946,7 +1943,7 @@ class LeadModel extends FormModel
      * @param \DateTime $dateTo
      * @param mixed[]   $filters
      */
-    public function getLeadMapData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getLeadMapData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         if (!$canViewOthers) {
             $filter['owner_id'] = $this->userHelper->getUser()->getId();
@@ -1999,12 +1996,8 @@ class LeadModel extends FormModel
 
     /**
      * Get a list of top (by leads owned) users.
-     *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
      */
-    public function getTopOwners(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
+    public function getTopOwners(int $limit = 10, ?string $dateFrom = null, ?string $dateTo = null, array $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
@@ -2024,12 +2017,8 @@ class LeadModel extends FormModel
 
     /**
      * Get a list of top (by leads owned) users.
-     *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
      */
-    public function getTopCreators(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
+    public function getTopCreators(int $limit = 10, ?string $dateFrom = null, ?string $dateTo = null, array $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
@@ -2050,10 +2039,9 @@ class LeadModel extends FormModel
     /**
      * Get a list of leads in a date range.
      *
-     * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getLeadList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getLeadList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], array $options = []): array
     {
         if (!empty($options['canViewOthers'])) {
             $filter['owner_id'] = $this->userHelper->getUser()->getId();

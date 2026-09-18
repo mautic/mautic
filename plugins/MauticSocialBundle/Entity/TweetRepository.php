@@ -10,10 +10,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 final class TweetRepository extends CommonRepository
 {
     /**
-     * @param string $search
-     * @param int    $limit
+     * @param string|array<int|string> $search
      */
-    public function getTweetList($search = '', $limit = 10, int $start = 0, bool $viewOther = false, array $ignoreIds = []): array
+    public function getTweetList(string|array $search = '', int $limit = 10, int $start = 0, bool $viewOther = false, array $ignoreIds = []): array
     {
         $qb = $this->createQueryBuilder('t');
         $qb->select('partial t.{id, text, name, language}');

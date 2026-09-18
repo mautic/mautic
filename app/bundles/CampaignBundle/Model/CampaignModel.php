@@ -625,11 +625,8 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
     /**
      * Get leads for a campaign.  If $event is passed in, only leads who have not triggered the event are returned.
-     *
-     * @param Campaign $campaign
-     * @param array    $event
      */
-    public function getCampaignLeads($campaign, $event = null): array
+    public function getCampaignLeads(Campaign $campaign, ?array $event = null): array
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
@@ -645,11 +642,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Get line chart data of leads added to campaigns.
      *
-     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
+     * @param string|null $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      */
-    public function getLeadsAddedLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], bool $canViewOthers = true): array
+    public function getLeadsAddedLineChartData(?string $unit, \DateTime $dateFrom, \DateTime $dateTo, ?string $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -719,7 +714,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                         $rawData = $q->executeQuery()->fetchAllAssociative();
                     }
 
-                    if (!empty($rawData)) {
+                    if ($rawData !== []) {
                         $triggers = $query->completeTimeData($rawData);
                         $chart->setDataset($this->translator->trans('mautic.campaign.'.$type), $triggers);
                     }

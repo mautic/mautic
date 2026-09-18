@@ -301,12 +301,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @param string $type
-     * @param string $filter
-     * @param int    $limit
      */
-    public function getLookupResults($type, $filter = '', $limit = 10): array
+    public function getLookupResults(string $type, string $filter = '', int $limit = 10): array
     {
         $results = [];
         if ('page' === $type) {
@@ -905,10 +901,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get pie chart data of dwell times.
-     *
-     * @param array $filters
      */
-    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $timesOnSite = $this->hitRepository->getDwellTimeLabels();
         $chart       = new PieChart();
@@ -967,10 +961,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of popular (by hits) pages.
-     *
-     * @param array $filters
      */
-    public function getPopularPages(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getPopularPages(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -994,10 +986,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of pages created in a date range.
-     *
-     * @param array $filters
      */
-    public function getPageList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getPageList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')

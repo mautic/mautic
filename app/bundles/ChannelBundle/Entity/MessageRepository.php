@@ -35,10 +35,9 @@ final class MessageRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
+     * @param string|array<int|string> $search
      */
-    public function getMessageList($search = '', $limit = 10, int $start = 0): array
+    public function getMessageList(string|array $search = '', int $limit = 10, int $start = 0): array
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($this->getTableAlias());

@@ -53,11 +53,7 @@ class FormRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @param string $search
-     * @param int    $limit
-     */
-    public function getFormList($search = '', $limit = 10, int $start = 0, bool $viewOther = false): array
+    public function getFormList(string $search = '', int $limit = 10, int $start = 0, bool $viewOther = false): array
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, alias}');

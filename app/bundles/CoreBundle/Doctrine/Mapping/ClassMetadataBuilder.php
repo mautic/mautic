@@ -189,10 +189,8 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Add a contact column.
-     *
-     * @param string|null $inversedBy
      */
-    public function addContact(bool $nullable = false, string $onDelete = 'CASCADE', bool $isPrimaryKey = false, $inversedBy = null): static
+    public function addContact(bool $nullable = false, string $onDelete = 'CASCADE', bool $isPrimaryKey = false, ?string $inversedBy = null): static
     {
         $lead = $this->createManyToOne('contact', Lead::class);
 
@@ -317,8 +315,8 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * @param mixed[] $flags
-     * @param mixed[] $options
+     * @param mixed[]|null $flags
+     * @param mixed[]|null $options
      */
     public function addIndex(array $columns, string $name, ?array $flags = null, ?array $options = null): static
     {
