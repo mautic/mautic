@@ -138,6 +138,57 @@ final class SecurityController extends CommonController implements EventSubscrib
     }
 
     /**
+     * OIDC login action.
+     */
+    public function oidcLoginAction(
+        \Mautic\UserBundle\Security\OIDC\DTO\Settings $oidcSettings,
+        \Mautic\UserBundle\Security\OIDC\Client\ClientInterface $oidcClient,
+        \Psr\Log\LoggerInterface $logger,
+    ): Response {
+        if (!$oidcSettings->isEnabled()) {
+            return $this->redirectToRoute('login');
+        }
+
+        try {
+            if ($authenticatedRedirect = $oidcClient->authenticate()) {
+                return $authenticatedRedirect;
+            }
+        } catch (\Mautic\UserBundle\Security\OIDC\Exception\AuthorizationRequestFailedException $e) {
+            $logger->error($e->getMessage(), ['exception' => $e]);
+        }
+
+        throw new Exception\AuthenticationException('OpenID Connect authentication failed.');
+    }
+
+    /**
+     * OIDC login check action (handled by authenticator).
+     */
+    public function oidcCheckAction(): void
+    {
+        // This method is intercepted by the security system
+    }
+
+    /**
+     * OIDC required action - prompts user to link their OIDC account.
+     */
+    public function oidcRequiredAction(
+        \Mautic\UserBundle\Security\OIDC\DTO\Settings $oidcSettings,
+        \Doctrine\ORM\EntityManagerInterface $entityManager,
+    ): Response {
+        if (!$oidcSettings->isEnabled() || !($user = $this->getUser())) {
+            return $this->redirectToRoute('login');
+        }
+
+        if ($entityManager->getRepository(\Mautic\UserBundle\Entity\OidcSubjectId::class)->findOneBy(['user' => $user])) {
+            return $this->redirectToRoute('mautic_oidc_login');
+        }
+
+        return $this->render('@MauticUser/Security/oidc_required.html.twig', [
+            'parameters' => $oidcSettings,
+        ]);
+    }
+
+    /**
      * @return array<string, string>
      */
     public static function getSubscribedEvents(): array
