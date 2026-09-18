@@ -91,7 +91,6 @@ New line',
     public function testParseResponseThrowsRuntimeExceptionForServerError(): void
     {
         $method = new \ReflectionMethod(FormSubscriber::class, 'parseResponse');
-        $method->setAccessible(true);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Remote system failed');
@@ -102,7 +101,6 @@ New line',
     public function testParseResponseThrowsValidationExceptionForViolations(): void
     {
         $method = new \ReflectionMethod(FormSubscriber::class, 'parseResponse');
-        $method->setAccessible(true);
 
         try {
             $method->invoke(
@@ -119,7 +117,6 @@ New line',
     public function testParseResponseThrowsRuntimeExceptionForEmptyBodyWithErrorStatus(): void
     {
         $method = new \ReflectionMethod(FormSubscriber::class, 'parseResponse');
-        $method->setAccessible(true);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Repost endpoint returned HTTP 502');
