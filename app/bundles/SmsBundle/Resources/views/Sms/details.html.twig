@@ -5,6 +5,9 @@
 {% block mauticContent %}sms{% endblock %}
 {% block headerTitle %}{{sms.getName()}}{% endblock %}
 
+{% set smsType = sms.getSmsType()|default('template') %}
+{% set scheduleSms = scheduleSms|default(sms) %}
+
 {% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
@@ -26,6 +29,34 @@
 
 {% block actions %}
     {% set customButtons = [] %}
+    {% if not isEmbedded
+        and scheduleSms.getSmsType() == 'list'
+        and securityHasEntityAccess(
+            permissions['sms:smses:publishown'],
+            permissions['sms:smses:publishother'],
+            scheduleSms.getCreatedBy()
+        )
+    %}
+        {% set scheduleLabel = scheduleSms.getPublishUp() is not null
+            ? 'mautic.sms.send.schedule.update'
+            : 'mautic.sms.send.schedule'
+        %}
+        {% set customButtons = customButtons|merge([{
+            'attr': {
+                'class': 'btn btn-tertiary btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_sms_action', {
+                    'objectAction': 'scheduleSend',
+                    'objectId': scheduleSms.getId()
+                }),
+                'data-header': scheduleLabel|trans,
+            },
+            'iconClass': 'ri-calendar-schedule-line',
+            'btnText': scheduleLabel,
+            'primary': true,
+        }]) %}
+    {% endif %}
     {{- include('@MauticCore/Helper/page_actions.html.twig',
         {
             'item'            : sms,
@@ -50,8 +81,9 @@
 
 {% block publishStatus %}
 {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
-    'entity': sms,
-    'status': sms.getPublishUp() is not null ? 'sending' : 'available'
+    'entity': scheduleSms,
+    'status': scheduleSms.getPublishUp() is not null ? 'sending' : 'available',
+    'sendingStatus': scheduleSms.getSendingStatus()
 }) -}}
 <div class="label__divider"></div>
 {% set tags = [
@@ -76,11 +108,6 @@
 
 {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
 {% endblock %}
-
-{% set smsType = sms.getSmsType() %}
-{% if smsType is empty %}
-    {% set smsType = 'template' %}
-{% endif %}
 
 {% set translationContent = include('@MauticCore/Translation/index.html.twig',
     {

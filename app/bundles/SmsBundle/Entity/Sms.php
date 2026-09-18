@@ -26,7 +26,9 @@ use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
+use Mautic\SmsBundle\ApiPlatform\SmsProcessor;
 use Mautic\SmsBundle\Form\Validator\Constraints\MediaMaxAllowedSize;
+use Mautic\SmsBundle\Validator\ScheduleDateRange;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Count;
@@ -37,10 +39,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('sms:smses:viewown')"),
-        new Post(security: "is_granted('sms:smses:create')"),
+        new Post(security: "is_granted('sms:smses:create')", processor: SmsProcessor::class),
         new Get(security: "is_granted('sms:smses:viewown', object)"),
-        new Put(security: "is_granted('sms:smses:editown', object)"),
-        new Patch(security: "is_granted('sms:smses:editother', object)"),
+        new Put(security: "is_granted('sms:smses:editown', object)", processor: SmsProcessor::class),
+        new Patch(security: "is_granted('sms:smses:editother', object)", processor: SmsProcessor::class),
         new Delete(security: "is_granted('sms:smses:deleteown', object)"),
     ],
     normalizationContext: [
@@ -91,16 +93,19 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     private $message;
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|null
      */
     #[Groups(['sms:read', 'sms:write'])]
     private $publishUp;
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|null
      */
     #[Groups(['sms:read', 'sms:write'])]
     private $publishDown;
+
+    #[Groups(['sms:read', 'sms:write'])]
+    private bool $continueSending = false;
 
     /**
      * @var int
@@ -145,9 +150,12 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
     public function __clone()
     {
-        $this->id        = null;
-        $this->stats     = new ArrayCollection();
-        $this->sentCount = 0;
+        $this->id              = null;
+        $this->stats           = new ArrayCollection();
+        $this->sentCount       = 0;
+        $this->publishUp       = null;
+        $this->publishDown     = null;
+        $this->continueSending = false;
 
         $this->clearTranslations();
 
@@ -185,6 +193,14 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
             ->build();
 
         $builder->addPublishDates();
+
+        $builder->addField('continueSending', Types::BOOLEAN, [
+            'columnName' => 'continue_sending',
+            'nullable'   => false,
+            'options'    => [
+                'default' => false,
+            ],
+        ]);
 
         $builder->createField('sentCount', 'integer')
             ->columnName('sent_count')
@@ -258,6 +274,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
         $metadata->addConstraint(new EntityEvent());
         $metadata->addConstraint(new MediaMaxAllowedSize());
+        $metadata->addConstraint(new ScheduleDateRange());
     }
 
     /**
@@ -279,6 +296,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
                 [
                     'publishUp',
                     'publishDown',
+                    'continueSending',
                     'sentCount',
                     'lists',
                 ]
@@ -386,6 +404,10 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      */
     public function getPublishDown()
     {
+        if ('list' === $this->smsType && !$this->continueSending) {
+            return null;
+        }
+
         return $this->publishDown;
     }
 
@@ -409,6 +431,28 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
+
+        return $this;
+    }
+
+    public function isContinueSending(): bool
+    {
+        return $this->continueSending;
+    }
+
+    public function getContinueSending(): bool
+    {
+        return $this->continueSending;
+    }
+
+    public function setContinueSending(bool $continueSending): static
+    {
+        $this->isChanged('continueSending', $continueSending);
+        $this->continueSending = $continueSending;
+
+        if (!$continueSending && 'list' === $this->smsType) {
+            $this->setPublishDown(null);
+        }
 
         return $this;
     }
@@ -468,6 +512,10 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     {
         $this->isChanged('smsType', $smsType);
         $this->smsType = $smsType;
+
+        if ('list' === $smsType && !$this->continueSending) {
+            $this->setPublishDown(null);
+        }
     }
 
     public function setPendingCount(int $pendingCount): static
@@ -480,6 +528,32 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     public function getPendingCount(): int
     {
         return $this->pendingCount;
+    }
+
+    public function isBackgroundSending(): bool
+    {
+        return $this->isPublished() && null !== $this->publishUp && $this->publishUp < new \DateTime();
+    }
+
+    public function getSendingStatus(): string
+    {
+        $publishStatus = $this->getPublishStatus();
+
+        if (in_array($publishStatus, ['published', 'unpublished'], true)
+            && 'list' === $this->smsType
+            && null !== $this->publishUp
+            && $this->getIsPublished()
+        ) {
+            if (!$this->continueSending && 0 === $this->pendingCount && $this->getSentCount(true)) {
+                return 'sent';
+            }
+
+            if ($this->pendingCount > 0) {
+                return 'sending';
+            }
+        }
+
+        return $publishStatus;
     }
 
     /**
