@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+{{ include('@MauticCore/Default/head.html.twig', {
+    headerTitle: 'mautic.email.preview'|trans
+}) }}
+<body>
+{{ outputScripts('bodyOpen') }}
+<section id="app-content" class="container content-only container-preview">
+    <div class="top-bar">
+        {{ form_start(previewOptionsForm) }}
+        {{ form_widget(previewOptionsForm.contact) }}
+        {{ form_widget(previewOptionsForm.company) }}
+        {{ customContent('email.preview.buttons', _context) }}
+        {{ form_end(previewOptionsForm) }}
+    </div>
+
+    <iframe src="{{ previewPageUrl }}" onload='javascript:(function(o){o.style.height=o.contentWindow.document.body.scrollHeight+"px";}(this));' style="height:200px;width:100%;border:none;overflow:hidden;"></iframe>
+</section>
+{{ outputScripts('bodyClose') }}
+<script>
+    Mautic.onPageLoad('body');
+</script>
+</body>
+</html>

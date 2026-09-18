@@ -311,4 +311,45 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertPageContent($url, $contentNoContactInfo);
         $this->assertPageContent($urlWithContact, $contentNoContactInfo);
     }
+
+    public function testPreviewDownloadPage(): void
+    {
+        $email = $this->createEmail(false);
+        $this->em->flush();
+
+        $url = sprintf('/email/download/preview/%s', $email->getId());
+
+        // Admin user
+        $this->assertPageContent($url, 'Download HTML');
+
+        $this->logoutUser();
+
+        // Anonymous visitor
+        $response = $this->getUrlResponse($url);
+        $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+    }
+
+    public function testPreviewDownloadForHtml(): void
+    {
+        $lead  = $this->createLead('John');
+        $email        = $this->createEmail();
+        $emailName    = $email->getName();
+        $fileName     = 'John-'.$emailName;
+        $this->em->flush();
+
+        // Test HTML file download without any contact.
+        $response = $this->getUrlResponse(sprintf('/email/download/preview/%s/real/html', $email->getId()));
+        $this->assertStringContainsString($emailName.'.html', (string) $response->headers->get('content-disposition'));
+
+        // Test HTML file download with contact.
+        $response = $this->getUrlResponse(sprintf('/email/download/preview/%s/real/html?contactId=%s', $email->getId(), $lead->getId()));
+        $this->assertStringContainsString($fileName.'.html', (string) $response->headers->get('content-disposition'));
+    }
+
+    private function getUrlResponse(string $url): Response
+    {
+        $this->client->request(Request::METHOD_GET, $url);
+
+        return $this->client->getResponse();
+    }
 }
