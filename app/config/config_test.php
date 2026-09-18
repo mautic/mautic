@@ -158,10 +158,10 @@ $container->register('test.service_container', Mautic\CoreBundle\Test\Container\
     ->setArgument('$privateServicesLocatorId', 'test.private_services_locator')
     ->setPublic(true);
 
-// stub openid client factory
-$container->register('mautic.open_id.client.factory', \Mautic\OpenIdBundle\Tests\Double\Factory\ClientFactory::class)
+// stub oidc client factory
+$container->register('mautic.security.oidc.client.factory', \Mautic\UserBundle\Tests\Security\OIDC\Double\Factory\ClientFactory::class)
     ->setPublic(true);
-$container->register('mautic.open_id.client', \Mautic\OpenIdBundle\Service\ClientInterface::class)
-    ->setFactory([new Reference('mautic.open_id.client.factory'), 'create'])
-    ->setArguments([new Reference('mautic.open_id.client_credentials')])
+$container->register('mautic.security.oidc.client', \Mautic\UserBundle\Security\OIDC\Client\ClientInterface::class)
+    ->setFactory([new Reference('mautic.security.oidc.client.factory'), 'create'])
+    ->setArguments([new Reference('mautic.security.oidc.client_credentials')])
     ->setPublic(true);
