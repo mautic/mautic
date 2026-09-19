@@ -1647,4 +1647,158 @@ final class MailHelperTest extends TestCase
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(fn (string $name, $default = null) => $values[$name] ?? $default);
     }
+
+    public function testQueuedSendAppliesTheAddressLengthLimit(): void
+    {
+        $limit = 30;
+
+        $this->coreParametersHelper->expects($this->atLeast(3))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['mailer_address_length_limit', null, $limit],
+        ]);
+
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->enableQueue();
+
+        $email = new Email();
+        $email->setSubject('Hello');
+        $email->setCustomHtml('<html>content</html>');
+        $mailer->setEmail($email);
+
+        $longName = 'This is a very long name that exceeds the length limit';
+
+        $mailer->addTo($this->contacts[0]['email'], $longName);
+        $mailer->setLead($this->contacts[0]);
+        $mailer->queue();
+        $mailer->flushQueue();
+
+        $sent = $transport->getMessage();
+        $this->assertInstanceOf(\Mautic\EmailBundle\Mailer\Message\MauticMessage::class, $sent);
+
+        $to = $sent->getTo();
+        $this->assertCount(1, $to);
+        $this->assertSame($this->contacts[0]['email'], $to[0]->getAddress());
+
+        // Measured the same way addTo() measures it.
+        $encodedLength = strlen((new MailboxListHeader('To', [$to[0]]))->getBodyAsString());
+        $this->assertLessThanOrEqual(
+            $limit,
+            $encodedLength,
+            'The queued path must respect mailer_address_length_limit, as addTo() already does.'
+        );
+
+        $this->assertSame('', $to[0]->getName(), 'The display name should have been dropped on the queued path as well.');
+
+        // The SES plugin builds its recipient from the metadata, not from the header.
+        $metadatas = $transport->getMetadatas();
+        $this->assertCount(1, $metadatas);
+        $this->assertNull(
+            $metadatas[0][$this->contacts[0]['email']]['name'],
+            'The metadata a batch transport builds its recipient from must not carry an over-long name.'
+        );
+    }
+
+    /**
+     * RFC 2047 encoding inflates a non-ASCII name, so the Thai names #14726 was reported
+     * with cross the default limit at far fewer characters than a Latin name would.
+     */
+    public function testQueuedSendAppliesTheLimitToAMultibyteName(): void
+    {
+        $limit = 320; // the shipped default, not a contrived one
+
+        $this->coreParametersHelper->expects($this->atLeast(3))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['mailer_address_length_limit', null, $limit],
+        ]);
+
+        $overLimit = mb_substr(str_repeat('สุธิดา', 40), 0, 33);
+        $this->assertSame(33, mb_strlen($overLimit), 'The fixture must match the reported character count.');
+
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->enableQueue();
+
+        $email = new Email();
+        $email->setSubject('Hello');
+        $email->setCustomHtml('<html>content</html>');
+        $mailer->setEmail($email);
+
+        $mailer->addTo($this->contacts[0]['email'], $overLimit);
+        $mailer->setLead($this->contacts[0]);
+        $mailer->queue();
+        $mailer->flushQueue();
+
+        $sent = $transport->getMessage();
+        $this->assertInstanceOf(\Mautic\EmailBundle\Mailer\Message\MauticMessage::class, $sent);
+        $this->assertSame('', $sent->getTo()[0]->getName(), 'An encoded name over the limit must be dropped from the header.');
+
+        $metadatas = $transport->getMetadatas();
+        $this->assertNull(
+            $metadatas[0][$this->contacts[0]['email']]['name'],
+            'An encoded name over the limit must be dropped from the metadata a batch transport reads.'
+        );
+
+        // A short multibyte name is left alone.
+        $withinLimit = mb_substr(str_repeat('สุธิดา', 40), 0, 6);
+
+        $secondTransport = new BatchTransport();
+        $secondMailer    = $this->createMailHelperWithTransport($secondTransport);
+        $secondMailer->enableQueue();
+        $secondMailer->setEmail($email);
+        $secondMailer->addTo($this->contacts[0]['email'], $withinLimit);
+        $secondMailer->setLead($this->contacts[0]);
+        $secondMailer->queue();
+        $secondMailer->flushQueue();
+
+        $this->assertSame(
+            $withinLimit,
+            $secondTransport->getMetadatas()[0][$this->contacts[0]['email']]['name'],
+            'A multibyte name inside the limit must reach the transport untouched.'
+        );
+    }
+
+    public function testQueuedSendKeepsADisplayNameThatFitsTheLimit(): void
+    {
+        $limit = 30;
+
+        $this->coreParametersHelper->expects($this->atLeast(3))->method('get')->willReturnMap([
+            ['mailer_from_email', null, 'nobody@nowhere.com'],
+            ['mailer_from_name', null, 'No Body'],
+            ['mailer_address_length_limit', null, $limit],
+        ]);
+
+        $transport = new BatchTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->enableQueue();
+
+        $email = new Email();
+        $email->setSubject('Hello');
+        $email->setCustomHtml('<html>content</html>');
+        $mailer->setEmail($email);
+
+        // Well inside the limit above.
+        $shortName = 'Al';
+
+        $mailer->addTo($this->contacts[0]['email'], $shortName);
+        $mailer->setLead($this->contacts[0]);
+        $mailer->queue();
+        $mailer->flushQueue();
+
+        $sent = $transport->getMessage();
+        $this->assertInstanceOf(\Mautic\EmailBundle\Mailer\Message\MauticMessage::class, $sent);
+
+        // Nothing is dropped when it fits.
+        $this->assertSame($shortName, $sent->getTo()[0]->getName());
+
+        $metadatas = $transport->getMetadatas();
+        $this->assertCount(1, $metadatas);
+        $this->assertSame(
+            $shortName,
+            $metadatas[0][$this->contacts[0]['email']]['name'],
+            'A name inside the limit must reach the transport untouched.'
+        );
+    }
 }
