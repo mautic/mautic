@@ -226,13 +226,12 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Added dateAdded column.
-     *
-     * @param bool|false $nullable
      */
-    public function addDateAdded($nullable = false): static
+    public function addDateAdded(bool $nullable = false, int $precision = 0): static
     {
         $dateAdded = $this->createField('dateAdded', Types::DATETIME_MUTABLE)
-            ->columnName('date_added');
+            ->columnName('date_added')
+            ->precision($precision);
 
         if ($nullable) {
             $dateAdded->nullable();
