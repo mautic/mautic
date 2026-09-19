@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -508,9 +509,9 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $this->mockLeadModel->expects($this->exactly(2))
+        $this->mockLeadModel->expects($this->once())
             ->method('setFieldValues')
-            ->with($lead, $properties, false, true, false);
+            ->with($lead, $properties, false);
 
         $this->mockLeadModel->expects($this->once())
             ->method('saveEntity')
@@ -521,5 +522,59 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(1, $pendingEvent->getSuccessful());
         $this->assertCount(0, $pendingEvent->getFailures());
+    }
+
+    public function testOnCampaignTriggerActionUpdateLeadContinuesAfterImportFailure(): void
+    {
+        $eventAccessor = $this->createStub(ActionAccessor::class);
+        $properties    = [
+            'points' => 10,
+        ];
+        $event         = (new Event())->setProperties($properties);
+        $event->setType('lead.updatelead');
+
+        $firstLead  = (new Lead())->setEmail('first@mautic.org');
+        $secondLead = (new Lead())->setEmail('second@mautic.org');
+
+        $firstLog = $this->createLeadEventLogMock(1, $firstLead);
+        $secondLog = $this->createLeadEventLogMock(2, $secondLead);
+
+        $call = 0;
+        $this->mockLeadModel->expects($this->exactly(2))
+            ->method('setFieldValues')
+            ->willReturnCallback(function () use (&$call): void {
+                ++$call;
+
+                if (1 === $call) {
+                    throw new ImportFailedException('Invalid contact data');
+                }
+            });
+
+        $this->mockLeadModel->expects($this->once())
+            ->method('saveEntity')
+            ->with($secondLead);
+
+        $pendingEvent = new PendingEvent($eventAccessor, $event, new ArrayCollection([$firstLog, $secondLog]));
+        $this->subscriber->onCampaignTriggerActionUpdateLead($pendingEvent);
+
+        $this->assertCount(1, $pendingEvent->getFailures());
+        $this->assertSame($firstLog, $pendingEvent->getFailures()->get(1));
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame($secondLog, $pendingEvent->getSuccessful()->get(2));
+    }
+
+    private function createLeadEventLogMock(int $id, Lead $lead): LeadEventLog&MockObject
+    {
+        $log = $this->createMock(LeadEventLog::class);
+        $log->method('getId')->willReturn($id);
+        $log->method('getLead')->willReturn($lead);
+        $log->method('getFailedLog')->willReturn(null);
+        $log->method('getMetadata')->willReturn([]);
+        $log->method('setMetadata')->willReturnSelf();
+        $log->method('setRescheduleInterval')->willReturnSelf();
+        $log->method('setIsScheduled')->willReturnSelf();
+        $log->method('setDateTriggered')->willReturnSelf();
+
+        return $log;
     }
 }
