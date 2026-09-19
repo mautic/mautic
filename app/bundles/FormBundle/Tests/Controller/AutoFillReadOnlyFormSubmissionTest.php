@@ -204,6 +204,30 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
         });
     }
 
+    public function testConditionalFieldIsAutoFilledAndReadOnlyForReturningContact(): void
+    {
+        $form   = $this->createFormWithConditionalAutoFillField();
+        $formId = $form->getId();
+
+        $crawler = $this->client->request('GET', '/form/'.$formId);
+        $this->assertResponseIsSuccessful();
+
+        $publicForm = $crawler->filter('form[id=mauticform_test]')->form([
+            'mauticform[email]'       => 'john@doe.com',
+            'mauticform[showdetails]' => 'yes',
+            'mauticform[firstname]'   => 'John',
+        ]);
+        $this->client->submit($publicForm);
+
+        $crawler = $this->client->request('GET', '/form/'.$formId);
+        $this->assertResponseIsSuccessful();
+
+        $firstNameInput = $crawler->filterXPath('//input[@name="mauticform[firstname]"]');
+        $this->assertCount(1, $firstNameInput);
+        $this->assertSame('John', $firstNameInput->attr('value'));
+        $this->assertNotNull($firstNameInput->attr('readonly'));
+    }
+
     private function assertInputCounts(Crawler $crawler, int $readonly): void
     {
         $this->assertCount(3, $crawler->filterXPath('//input[not(@type="hidden")]'));
@@ -223,6 +247,45 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
 
         $lastNameField = $this->createFormField($form, 'Last name', 'text', false, true, 'lastname', 'contact');
         $form->addField(3, $lastNameField);
+
+        $submitButton = $this->createFormField($form, 'Submit', 'button');
+        $form->addField(4, $submitButton);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        return $form;
+    }
+
+    private function createFormWithConditionalAutoFillField(): Form
+    {
+        $form = $this->createForm();
+
+        $emailField = $this->createFormField($form, 'Email', 'email', true, false, 'email', 'contact');
+        $form->addField(1, $emailField);
+
+        $parentField = $this->createFormField($form, 'Show details', 'select');
+        $parentField->setProperties([
+            'syncList' => 0,
+            'multiple' => 0,
+            'list'     => [
+                'list' => [
+                    ['label' => 'Yes', 'value' => 'yes'],
+                    ['label' => 'No', 'value' => 'no'],
+                ],
+            ],
+        ]);
+        $form->addField(2, $parentField);
+        $this->em->flush();
+
+        $firstNameField = $this->createFormField($form, 'First name', 'text', true, true, 'firstname', 'contact');
+        $firstNameField->setParent((string) $parentField->getId());
+        $firstNameField->setConditions([
+            'expr'   => 'in',
+            'any'    => 0,
+            'values' => ['yes'],
+        ]);
+        $form->addField(3, $firstNameField);
 
         $submitButton = $this->createFormField($form, 'Submit', 'button');
         $form->addField(4, $submitButton);
