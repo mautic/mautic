@@ -465,7 +465,7 @@ final class FieldType extends AbstractType
                     'data'  => $isReadOnlyValue,
                     'attr'  => [
                         'class'           => 'read-only-data',
-                        'tooltip'         => 'mautic.form.field.help.auto_fill',
+                        'tooltip'         => 'mautic.form.field.help.read_only',
                         'data-disable-on' => '{"formfield_isAutoFill_0": "checked"}',
                         'data-enable-on'  => '{"formfield_isAutoFill_1": "checked"}',
                     ],
