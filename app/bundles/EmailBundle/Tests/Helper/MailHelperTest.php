@@ -1681,8 +1681,7 @@ final class MailHelperTest extends TestCase
         $this->assertCount(1, $to);
         $this->assertSame($this->contacts[0]['email'], $to[0]->getAddress());
 
-        // The transport must not be handed an address longer than the configured limit.
-        // This is measured the same way addTo() measures it.
+        // Measured the same way addTo() measures it.
         $encodedLength = strlen((new MailboxListHeader('To', [$to[0]]))->getBodyAsString());
         $this->assertLessThanOrEqual(
             $limit,
@@ -1692,9 +1691,7 @@ final class MailHelperTest extends TestCase
 
         $this->assertSame('', $to[0]->getName(), 'The display name should have been dropped on the queued path as well.');
 
-        // The header is not the only place the name becomes a recipient. A batch transport
-        // builds its own To from this metadata rather than from the header, so the limit
-        // has to reach the metadata as well or the provider still sees the long name.
+        // The SES plugin builds its recipient from the metadata, not from the header.
         $metadatas = $transport->getMetadatas();
         $this->assertCount(1, $metadatas);
         $this->assertNull(
@@ -1704,11 +1701,8 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * #14726 was reported with Thai display names, and the reporter's repro step of "more
-     * than 33 characters" only makes sense once the encoding is accounted for. RFC 2047
-     * inflates them: the name below is 33 characters but 436 bytes once encoded, while 33
-     * Latin characters encode to 55. So a multibyte name crosses the default limit at 24
-     * characters where a Latin one has room for hundreds.
+     * RFC 2047 encoding inflates a non-ASCII name, so the Thai names #14726 was reported
+     * with cross the default limit at far fewer characters than a Latin name would.
      */
     public function testQueuedSendAppliesTheLimitToAMultibyteName(): void
     {
@@ -1747,8 +1741,7 @@ final class MailHelperTest extends TestCase
             'An encoded name over the limit must be dropped from the metadata a batch transport reads.'
         );
 
-        // And a short multibyte name is left alone, so the limit is not simply discarding
-        // every name that is not plain ASCII.
+        // A short multibyte name is left alone.
         $withinLimit = mb_substr(str_repeat('สุธิดา', 40), 0, 6);
 
         $secondTransport = new BatchTransport();
@@ -1786,7 +1779,7 @@ final class MailHelperTest extends TestCase
         $email->setCustomHtml('<html>content</html>');
         $mailer->setEmail($email);
 
-        // 'Al <contact1@somewhere.com>' encodes to 27 bytes, inside the limit above.
+        // Well inside the limit above.
         $shortName = 'Al';
 
         $mailer->addTo($this->contacts[0]['email'], $shortName);
@@ -1797,8 +1790,7 @@ final class MailHelperTest extends TestCase
         $sent = $transport->getMessage();
         $this->assertInstanceOf(\Mautic\EmailBundle\Mailer\Message\MauticMessage::class, $sent);
 
-        // Nothing is dropped when it fits, otherwise the limit could be satisfied by
-        // throwing every display name away.
+        // Nothing is dropped when it fits.
         $this->assertSame($shortName, $sent->getTo()[0]->getName());
 
         $metadatas = $transport->getMetadatas();

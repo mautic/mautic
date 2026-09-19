@@ -940,11 +940,9 @@ class MailHelper
     /**
      * Drops the display name when the encoded address exceeds the configured limit.
      *
-     * Some transports reject an over-long To header outright, so the address has to be
-     * measured everywhere it can become one. addTo() is not enough on its own. On a
-     * tokenized transport flushQueue() clears the recipients and rebuilds them from the
-     * message metadata, and a batch transport then builds its own recipient from that
-     * same metadata rather than from the header, so buildMetadata() measures it too.
+     * Applied to the metadata as well as the To header: on a tokenized transport
+     * flushQueue() rebuilds the recipients from the metadata, and a batch transport such
+     * as SES builds its own recipient from that metadata rather than from the header.
      */
     private function limitAddressLength(Address $address): Address
     {
@@ -1921,10 +1919,8 @@ class MailHelper
     }
 
     /**
-     * The display name is measured here as well as in the To header, because a batch
-     * transport builds its own recipient from this field rather than from the header the
-     * message carries. Leaving it unmeasured lets an over-long name reach the provider
-     * whatever the header says.
+     * The name is limited here because the SES transport plugin builds its recipient from
+     * this field, not from the To header.
      */
     private function buildMetadata(string $email, ?string $name, array $tokens): array
     {

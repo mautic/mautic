@@ -18,13 +18,10 @@ use Symfony\Component\Mime\Header\MailboxListHeader;
  * A tokenized transport that rejects a recipient whose encoded address is longer than the
  * given limit, the way Amazon SES does.
  *
- * The recipient it measures is built the way a real batch transport builds it, from the
- * message metadata rather than from the To header the message carries. That is what
- * etailors/mautic-amazon-ses does at Mailer/Transport/AmazonSesTransport.php:308 in tag
- * 1.0.37, where each tokenized recipient becomes
- * `$sentMessage->to(new Address($recipient, $mailData['name'] ?? ''))` before :320 turns
- * it into Destination.ToAddresses. Measuring the header instead would make this double
- * agree with whatever the code under test put there, which tests nothing.
+ * The recipient it measures is built from the message metadata rather than from the To
+ * header, which is what etailors/mautic-amazon-ses does at
+ * Mailer/Transport/AmazonSesTransport.php:308 (tag 1.0.37):
+ * `$sentMessage->to(new Address($recipient, $mailData['name'] ?? ''))`.
  */
 final class AddressLengthEnforcingTransport extends AbstractTransport implements TokenTransportInterface
 {
@@ -77,8 +74,7 @@ final class AddressLengthEnforcingTransport extends AbstractTransport implements
     }
 
     /**
-     * How many times the transport was actually asked to send, so a test can prove it
-     * exercised the path rather than passing because nothing happened.
+     * How many sends reached the transport, so a test can prove it exercised the path.
      */
     public function getSendCount(): int
     {
