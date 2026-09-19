@@ -42,7 +42,7 @@ final class ActionType extends AbstractType
             ]
         );
 
-        $properties      = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
+        $properties      = (empty($options['data']['properties'])) ? null : $options['data']['properties'];
         $formType        = $options['settings']['formType'];
         $formTypeOptions = [
             'label' => false,

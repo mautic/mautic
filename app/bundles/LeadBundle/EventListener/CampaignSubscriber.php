@@ -417,8 +417,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
         $config = $event->getConfig();
         $lead   = $event->getLead();
 
-        $addTags    = (!empty($config['add_tags'])) ? $config['add_tags'] : [];
-        $removeTags = (!empty($config['remove_tags'])) ? $config['remove_tags'] : [];
+        $addTags    = (empty($config['add_tags'])) ? [] : $config['add_tags'];
+        $removeTags = (empty($config['remove_tags'])) ? [] : $config['remove_tags'];
 
         $this->leadModel->modifyTags($lead, $addTags, $removeTags);
 

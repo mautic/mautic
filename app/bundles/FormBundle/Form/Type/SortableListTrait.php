@@ -43,7 +43,7 @@ trait SortableListTrait
                     'data-show-on' => '{"'.$formName.'_mappedField:data-list-type": "1"}',
                 ],
                 'label' => 'mautic.form.field.form.property_list_sync_choices',
-                'data'  => !isset($options['data']['syncList']) ? false : (bool) $options['data']['syncList'],
+                'data'  => isset($options['data']['syncList']) && (bool) $options['data']['syncList'],
             ]
         );
 

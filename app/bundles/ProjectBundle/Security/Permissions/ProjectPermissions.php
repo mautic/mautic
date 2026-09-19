@@ -61,7 +61,7 @@ final class ProjectPermissions extends AbstractPermissions
                 'label'   => 'mautic.project.permissions.project',
                 'bundle'  => $this->getName(),
                 'level'   => $this->getName(),
-                'data'    => (!empty($data[$this->getName()]) ? $data[$this->getName()] : []),
+                'data'    => (empty($data[$this->getName()]) ? [] : $data[$this->getName()]),
             ]
         );
     }

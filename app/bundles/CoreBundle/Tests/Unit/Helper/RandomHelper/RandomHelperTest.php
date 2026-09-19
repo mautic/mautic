@@ -18,7 +18,7 @@ final class RandomHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(5, strlen($randomHelper->generate(5)));
         $this->assertSame(200, strlen($randomHelper->generate(200)));
         $this->assertTrue((bool) preg_match('#^[0-9a-z]+$#', $randomHelper->generate()));
-        $this->assertTrue((bool) preg_match('#^[0-9]+$#', $randomHelper->generate(1000, '0-9')));
+        $this->assertTrue((bool) preg_match('#^\d+$#', $randomHelper->generate(1000, '0-9')));
         $this->assertTrue((bool) preg_match('#^[0a-z12]+$#', $randomHelper->generate(1000, '0a-z12')));
         $this->assertTrue((bool) preg_match('#^[-a]+$#', $randomHelper->generate(1000, '-a')));
 

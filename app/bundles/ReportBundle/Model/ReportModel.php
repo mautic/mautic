@@ -234,7 +234,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     {
         $data = $this->buildAvailableReports($context, $reportSource);
 
-        $data = (!isset($data['tables'])) ? [] : $data['tables'];
+        $data = $data['tables'] ?? [];
 
         if (array_key_exists('columns', $data)) {
             $data['columns'] = $this->preventSameAliases($data['columns']);
@@ -278,7 +278,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     {
         $data = $this->buildAvailableReports($context);
 
-        return (!isset($data['graphs'])) ? [] : $data['graphs'];
+        return $data['graphs'] ?? [];
     }
 
     /**
@@ -507,7 +507,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         }
 
         $dataOptions = [
-            'order'          => (!empty($orderBy)) ? [$orderBy, $orderByDir] : false,
+            'order'          => (empty($orderBy)) ? false : [$orderBy, $orderByDir],
             'columns'        => $tableDetails['columns'],
             'filters'        => $tableDetails['filters'] ?? $tableDetails['columns'],
             'dateFrom'       => $options['dateFrom'] ?? null,
@@ -537,7 +537,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             $options['chartQuery'] = $chartQuery;
 
             // Check to see if this is an update from AJAX
-            $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
+            $selectedGraphs = (empty($options['graphName'])) ? $entity->getGraphs() : [$options['graphName']];
             if (!empty($selectedGraphs)) {
                 $availableGraphs = $this->getGraphData($entity->getSource());
                 if (empty($query)) {

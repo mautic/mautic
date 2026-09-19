@@ -232,7 +232,7 @@ final class BatchIdToEntityHelperTest extends TestCase
         $helper          = new BatchIdToEntityHelper($parameters);
         $orderedEntities = $helper->orderByOriginalKey($entities);
         $this->assertSame([0, 1, 2, 3], array_keys($orderedEntities));
-        foreach ($parameters as $key => $contact) {
+        foreach (array_keys($parameters) as $key) {
             $this->assertEquals($orderedEntities[$key]->getId(), $entities[$key]->getId());
         }
 

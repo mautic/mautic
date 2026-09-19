@@ -48,7 +48,7 @@ trait CustomFieldRepositoryTrait
 
         if (!empty($args['withTotalCount']) || !isset($args['count'])) {
             // Distinct is required here to get the correct count when group by is used due to applied filters
-            $countSelect = !empty($groupBy) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
+            $countSelect = empty($groupBy) ? 'COUNT('.$this->getTableAlias().'.id)' : 'COUNT(DISTINCT('.$this->getTableAlias().'.id))';
             $dq->select($countSelect.' as count');
 
             // Advanced search filters may have set a group by and if so, let's remove it for the count.
@@ -174,11 +174,11 @@ trait CustomFieldRepositoryTrait
             }
         }
 
-        return (!empty($args['withTotalCount'])) ?
-            [
+        return (empty($args['withTotalCount'])) ?
+            $results : [
                 'count'   => $total,
                 'results' => $results,
-            ] : $results;
+            ];
     }
 
     /**

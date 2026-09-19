@@ -40,7 +40,7 @@ final class BuilderTokenHelper
         ?string $viewPermissionBase = null,
     ): void {
         $this->modelName          = $modelName;
-        $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "{$modelName}:{$modelName}s";
+        $this->viewPermissionBase = (empty($viewPermissionBase)) ? "{$modelName}:{$modelName}s" : $viewPermissionBase;
 
         $this->permissionSet = [
             $this->viewPermissionBase.':viewown',

@@ -81,7 +81,7 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
             throw new MethodNotAllowedHttpException(['Client']);
         }
 
-        $params = (!empty($action)) ? ['action' => $action] : [];
+        $params = (empty($action)) ? [] : ['action' => $action];
 
         return $formFactory->create(ClientType::class, $entity, $params);
     }

@@ -272,9 +272,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                                         )
                                         ) {
                                             $type      = 'string';
-                                            $fieldName = (!str_contains($fieldInfo['name'],
-                                                'webtolead_email')) ? $fieldInfo['name'] : str_replace('webtolead_',
-                                                    '', $fieldInfo['name']);
+                                            $fieldName = (str_contains($fieldInfo['name'],
+                                                'webtolead_email')) ? str_replace('webtolead_',
+                                                    '', $fieldInfo['name']) : $fieldInfo['name'];
                                             // make these congruent as some come in with colons and some do not
                                             $label = str_replace(':', '', $fieldInfo['label']);
                                             if ('company' !== $sObject) {
@@ -315,13 +315,13 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                                             // make these congruent as some come in with colons and some do not
                                             $label = str_replace(':', '', $label);
 
-                                            $fieldName = (!str_contains($fieldInfo['name'], 'webtolead_email'))
-                                                ? $fieldInfo['name']
-                                                : str_replace(
+                                            $fieldName = (str_contains($fieldInfo['name'], 'webtolead_email'))
+                                                ? str_replace(
                                                     'webtolead_',
                                                     '',
                                                     $fieldInfo['name']
-                                                );
+                                                )
+                                                : $fieldInfo['name'];
 
                                             $type = 'string';
                                             if ('company' !== $sObject) {
@@ -1451,7 +1451,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
             }
 
             if ([] !== $body) {
-                $id = $lead['internal_entity_id'].'-'.$object.(!empty($lead['id']) ? '-'.$lead['id'] : '');
+                $id = $lead['internal_entity_id'].'-'.$object.(empty($lead['id']) ? '' : '-'.$lead['id']);
 
                 $body[] = ['name' => 'reference_id', 'value' => $id];
 
@@ -1599,7 +1599,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
             $object = 'Lead';
         }
 
-        $objects = (!is_array($object)) ? [$object] : $object;
+        $objects = (is_array($object)) ? $object : [$object];
         if (is_string($object) && 'Accounts' === $object) {
             return $fields['companyFields'] ?? $fields;
         }

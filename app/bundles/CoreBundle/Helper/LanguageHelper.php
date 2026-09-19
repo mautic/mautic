@@ -166,12 +166,12 @@ class LanguageHelper
             // Log the error
             $this->logger->error('An error occurred while attempting to fetch the language list: '.$exception->getMessage());
 
-            return (!$returnError)
-                ? []
-                : [
+            return ($returnError)
+                ? [
                     'error'   => true,
                     'message' => 'mautic.core.language.helper.error.fetching.languages',
-                ];
+                ]
+                : [];
         }
 
         if (200 != $data->getStatusCode()) {
@@ -184,12 +184,12 @@ class LanguageHelper
                 )
             );
 
-            return (!$returnError)
-                ? []
-                : [
+            return ($returnError)
+                ? [
                     'error'   => true,
                     'message' => 'mautic.core.language.helper.error.fetching.languages',
-                ];
+                ]
+                : [];
         }
 
         // Store to cache
@@ -366,7 +366,7 @@ class LanguageHelper
             }
 
             $config                            = json_decode(file_get_contents($configFile), true);
-            $this->supportedLanguages[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
+            $this->supportedLanguages[$locale] = (empty($config['name'])) ? $locale : $config['name'];
         }
     }
 

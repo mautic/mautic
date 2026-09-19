@@ -112,7 +112,7 @@ final class TimelineController extends CommonController
                     'page'        => $page,
                     'events'      => $events,
                     'integration' => $integration,
-                    'tmpl'        => (!$request->isXmlHttpRequest()) ? 'index' : '',
+                    'tmpl'        => ($request->isXmlHttpRequest()) ? '' : 'index',
                     'newCount'    => (array_key_exists('count', $query) && $query['count']) ? $query['count'] : 0,
                 ],
                 'passthroughVars' => [

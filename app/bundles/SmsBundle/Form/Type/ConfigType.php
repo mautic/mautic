@@ -32,7 +32,7 @@ final class ConfigType extends AbstractType
     {
         $choices    = [];
         $transports = $this->transportChain->getEnabledTransports();
-        foreach ($transports as $transportServiceId=>$transport) {
+        foreach (array_keys($transports) as $transportServiceId) {
             $choices[$this->translator->trans($transportServiceId)] = $transportServiceId;
         }
 

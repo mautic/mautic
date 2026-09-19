@@ -321,7 +321,7 @@ final class PluginController extends FormController
         $themes = array_unique($themes);
 
         $formSettings = $integrationObject->getFormSettings();
-        $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
+        $callbackUrl  = empty($formSettings['requires_callback']) ? '' : $integrationObject->getAuthCallbackUrl();
 
         $formNotes    = [];
         $noteSections = ['authorization', 'features', 'feature_settings', 'custom'];

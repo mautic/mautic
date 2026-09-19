@@ -123,7 +123,7 @@ class CommonRepository extends ServiceEntityRepository
                         $o = strtolower($o);
                     }
 
-                    $o = (!empty($alias)) ? $alias.'.'.$o : $o;
+                    $o = (empty($alias)) ? $o : $alias.'.'.$o;
                 }
             }
         }
@@ -487,7 +487,7 @@ class CommonRepository extends ServiceEntityRepository
                 $parameter = [$unique => $filter['value']];
             }
         } else {
-            $func = (!empty($filter['operator'])) ? $filter['operator'] : $filter['expr'];
+            $func = (empty($filter['operator'])) ? $filter['expr'] : $filter['operator'];
 
             if (in_array($func, ['isNull', 'isNotNull'])) {
                 $expr = $q->expr()->{$func}($filter['column']);
@@ -1414,7 +1414,7 @@ class CommonRepository extends ServiceEntityRepository
     {
         foreach ($clauses as $clause) {
             $clause = $this->validateOrderByClause($clause);
-            $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+            $column = (str_contains($clause['col'], '.')) ? $clause['col'] : $this->getTableAlias().'.'.$clause['col'];
             $query->addOrderBy($column, $clause['dir']);
         }
     }
@@ -1532,7 +1532,7 @@ class CommonRepository extends ServiceEntityRepository
                     $this->buildWhereClauseFromArray($q, $filter['where']);
                 }
                 if (!empty($filter['criteria']) || !empty($filter['force'])) {
-                    $criteria = !empty($filter['criteria']) ? $filter['criteria'] : $filter['force'];
+                    $criteria = empty($filter['criteria']) ? $filter['force'] : $filter['criteria'];
                     if (is_array($criteria)) {
                         // defined columns with keys of column, expr, value
                         foreach ($criteria as $criterion) {
@@ -1636,7 +1636,7 @@ class CommonRepository extends ServiceEntityRepository
                 }
             } else {
                 $clause = $this->validateWhereClause($clause);
-                $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+                $column = (str_contains($clause['col'], '.')) ? $clause['col'] : $this->getTableAlias().'.'.$clause['col'];
 
                 $whereClause = null;
                 switch ($clause['expr']) {
@@ -1858,7 +1858,7 @@ class CommonRepository extends ServiceEntityRepository
                 $col = strtolower($col);
             }
 
-            $f[$key] = (!empty($alias)) ? $alias.'.'.$col : $col;
+            $f[$key] = (empty($alias)) ? $col : $alias.'.'.$col;
         }
     }
 

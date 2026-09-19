@@ -567,7 +567,7 @@ final class SugarcrmApi extends CrmApi
                 $mixedFields = array_filter($availableFields['leadFields']);
                 $fields      = [];
                 $object      = ('Contacts' == $object) ? 'Contacts' : 'Leads';
-                foreach ($mixedFields as $sugarField => $mField) {
+                foreach (array_keys($mixedFields) as $sugarField) {
                     if (str_contains($sugarField, '__'.$object)) {
                         $fields[] = str_replace('__'.$object, '', $sugarField);
                     }

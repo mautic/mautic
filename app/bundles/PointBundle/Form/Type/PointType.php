@@ -85,7 +85,7 @@ final class PointType extends AbstractType
             ]
         );
 
-        $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
+        $type = (empty($options['actionType'])) ? $options['data']->getType() : $options['actionType'];
 
         if ($type && !empty($options['pointActions']['actions'][$type]['formType'])) {
             $formType   = $options['pointActions']['actions'][$type]['formType'];

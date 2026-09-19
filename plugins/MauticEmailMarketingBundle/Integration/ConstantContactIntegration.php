@@ -149,7 +149,7 @@ final class ConstantContactIntegration extends EmailAbstractIntegration
                 }
 
                 $options              = [];
-                $options['action_by'] = (!empty($config['list_settings']['sendWelcome'])) ? 'ACTION_BY_VISITOR' : 'ACTION_BY_OWNER';
+                $options['action_by'] = (empty($config['list_settings']['sendWelcome'])) ? 'ACTION_BY_OWNER' : 'ACTION_BY_VISITOR';
                 $listId               = $config['list_settings']['list'];
 
                 $this->getApiHelper()->subscribeLead($email, $listId, $mappedData, $options);

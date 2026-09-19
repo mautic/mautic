@@ -11,8 +11,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class EmailAddressMatchesLinkValidator extends ConstraintValidator
 {
-    public function __construct(private readonly EmailAddressLinkMatcher $emailAddressLinkMatcher)
-    {
+    public function __construct(
+        private readonly EmailAddressLinkMatcher $emailAddressLinkMatcher,
+    ) {
     }
 
     public function validate(mixed $value, Constraint $constraint): void

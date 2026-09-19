@@ -216,7 +216,7 @@ final class ApiMetadataDriver implements DriverInterface
     public function addGroup($group, $property = null): static
     {
         if (true === $property) {
-            foreach ($this->properties as $prop => $metadata) {
+            foreach (array_keys($this->properties) as $prop) {
                 $this->addGroup($group, $prop);
             }
         } else {

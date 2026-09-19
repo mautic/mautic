@@ -126,7 +126,7 @@ final class LeadType extends AbstractType
                 'multiple'   => $allowMultipleCompanies,
                 'required'   => false,
                 'mapped'     => false,
-                'data'       => !$allowMultipleCompanies ? ($companyIds[0] ?? null) : array_combine($companyIds, $companyIds),
+                'data'       => $allowMultipleCompanies ? (array_combine($companyIds, $companyIds)) : $companyIds[0] ?? null,
             ]
         );
 

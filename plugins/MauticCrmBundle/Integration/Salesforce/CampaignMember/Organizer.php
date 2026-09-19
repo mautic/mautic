@@ -60,8 +60,8 @@ final class Organizer
     private function organize(): void
     {
         foreach ($this->records as $campaignMember) {
-            $object    = !empty($campaignMember['LeadId']) ? 'Lead' : 'Contact';
-            $objectId  = !empty($campaignMember['LeadId']) ? $campaignMember['LeadId'] : $campaignMember['ContactId'];
+            $object    = empty($campaignMember['LeadId']) ? 'Contact' : 'Lead';
+            $objectId  = empty($campaignMember['LeadId']) ? $campaignMember['ContactId'] : $campaignMember['LeadId'];
             $isDeleted = (bool) $campaignMember['IsDeleted'];
 
             switch ($object) {

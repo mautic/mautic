@@ -214,8 +214,8 @@ trait MatchFilterForLeadTrait
      */
     private function checkLeadValueIsInFilter($leadVal, $filterVal, bool $defaultFlag): bool
     {
-        $leadVal    = !is_array($leadVal) ? [$leadVal] : $leadVal;
-        $filterVal  = !is_array($filterVal) ? [$filterVal] : $filterVal;
+        $leadVal    = is_array($leadVal) ? $leadVal : [$leadVal];
+        $filterVal  = is_array($filterVal) ? $filterVal : [$filterVal];
         $retFlag    = $defaultFlag;
         foreach ($leadVal as $v) {
             if (in_array($v, $filterVal)) {
@@ -234,8 +234,8 @@ trait MatchFilterForLeadTrait
      */
     private function checkAllLeadValuesAreInFilter($leadVal, $filterVal, bool $defaultFlag): bool
     {
-        $leadVal       = !is_array($leadVal) ? [$leadVal] : $leadVal;
-        $filterVal     = !is_array($filterVal) ? [$filterVal] : $filterVal;
+        $leadVal       = is_array($leadVal) ? $leadVal : [$leadVal];
+        $filterVal     = is_array($filterVal) ? $filterVal : [$filterVal];
         $valuesMatched = 0;
 
         foreach ($leadVal as $value) {

@@ -33,7 +33,7 @@ final class PluginRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
         $q->select($this->getTableAlias())
-            ->from(Plugin::class, $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
+            ->from(Plugin::class, $this->getTableAlias(), (empty($args['index'])) ? $this->getTableAlias().'.id' : $this->getTableAlias().'.'.$args['index']);
 
         $args['qb']               = $q;
         $args['ignore_paginator'] = true;

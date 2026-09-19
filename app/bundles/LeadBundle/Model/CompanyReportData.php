@@ -35,7 +35,7 @@ class CompanyReportData
     public function eventHasCompanyColumns(ReportGeneratorEvent $event): bool
     {
         $companyColumns = $this->getCompanyData();
-        foreach ($companyColumns as $key => $column) {
+        foreach (array_keys($companyColumns) as $key) {
             if ($event->hasColumn($key)) {
                 return true;
             }

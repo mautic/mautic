@@ -134,7 +134,7 @@ final class InstagramIntegration extends SocialIntegration
                 }
             }
 
-            return (!empty($socialCache['id'])) ? $socialCache['id'] : false;
+            return (empty($socialCache['id'])) ? false : $socialCache['id'];
         }
 
         return false;
