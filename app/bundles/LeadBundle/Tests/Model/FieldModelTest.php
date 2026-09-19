@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -23,12 +22,20 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class FieldModelTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    /**
+     * Debug wires up DBAL's query logging, which the index assertions below read.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $clientOptions = ['debug' => true];
 
     /**
      * @param array<string, mixed[]> $filters
@@ -257,44 +264,11 @@ final class FieldModelTest extends MauticMysqlTestCase
 
     public function testUniqueIdentifierIndexToggleForContacts(): void
     {
-        // Log queries so we can detect if alter queries were executed
-        $stack = new class() implements SQLLogger {
-            /**
-             * @var array<mixed>
-             */
-            private array $indexQueries = [];
+        // DBAL 4 dropped the SQL logger, so the queries are read off doctrine-bundle's
+        // debug middleware instead
+        $debugDataHolder = $this->getContainer()->get('doctrine.debug_data_holder');
+        $this->assertInstanceOf(DebugDataHolder::class, $debugDataHolder);
 
-            public function startQuery($sql, ?array $params = null, ?array $types = null): void
-            {
-                if (false !== stripos($sql, 'create index')) {
-                    $this->indexQueries[] = $sql;
-                }
-
-                if (false !== stripos($sql, 'drop index')) {
-                    $this->indexQueries[] = $sql;
-                }
-            }
-
-            public function stopQuery(): void
-            {
-                // not used
-            }
-
-            /**
-             * @return array<mixed>
-             */
-            public function getIndexQueries(): array
-            {
-                return $this->indexQueries;
-            }
-
-            public function resetQueries(): void
-            {
-                $this->indexQueries = [];
-            }
-        };
-
-        $this->connection->getConfiguration()->setSQLLogger($stack); /** @phpstan-ignore-line SQLLogger is deprecated */
         /** @var FieldModel $fieldModel */
         $fieldModel = $this->getContainer()->get(FieldModel::class);
 
@@ -304,7 +278,7 @@ final class FieldModelTest extends MauticMysqlTestCase
         $columns = $this->getUniqueIdentifierIndexColumns('leads');
         $this->assertCount(1, $columns);
         $this->assertEquals('email', $columns[0]['COLUMN_NAME']);
-        $stack->resetQueries();
+        $debugDataHolder->reset();
 
         // Test updating the index
         $ui1Field = new LeadField();
@@ -318,12 +292,12 @@ final class FieldModelTest extends MauticMysqlTestCase
         $this->assertCount(2, $columns);
         $this->assertEquals('email', $columns[0]['COLUMN_NAME']);
         $this->assertEquals('ui1', $columns[1]['COLUMN_NAME']);
-        $alteredIndexes = $stack->getIndexQueries();
+        $alteredIndexes = $this->getIndexQueries($debugDataHolder);
         $this->assertCount(3, $alteredIndexes);
         $this->assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
         $this->assertEquals(sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
         $this->assertEquals(sprintf('CREATE INDEX %1$sui1_search ON %1$sleads (ui1)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
-        $stack->resetQueries();
+        $debugDataHolder->reset();
 
         // Test only the first 3 columns are used for the index
         $ui2Field = new LeadField();
@@ -344,20 +318,20 @@ final class FieldModelTest extends MauticMysqlTestCase
         $this->assertEquals('email', $columns[0]['COLUMN_NAME']);
         $this->assertEquals('ui1', $columns[1]['COLUMN_NAME']);
         $this->assertEquals('ui2', $columns[2]['COLUMN_NAME']);
-        $alteredIndexes = $stack->getIndexQueries();
+        $alteredIndexes = $this->getIndexQueries($debugDataHolder);
         $this->assertCount(4, $alteredIndexes);
         $this->assertEquals(sprintf('DROP INDEX %1$sunique_identifier_search ON %1$sleads', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
         $this->assertEquals(sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email, ui1, ui2)', MAUTIC_TABLE_PREFIX), $alteredIndexes[1]);
         $this->assertEquals(sprintf('CREATE INDEX %1$sui2_search ON %1$sleads (ui2)', MAUTIC_TABLE_PREFIX), $alteredIndexes[2]);
         $this->assertEquals(sprintf('CREATE INDEX %1$sui3_search ON %1$sleads (ui3)', MAUTIC_TABLE_PREFIX), $alteredIndexes[3]);
-        $stack->resetQueries();
+        $debugDataHolder->reset();
 
         // Test that the index was not touched if only the label was updated
         $ui1Field->setLabel('UI1 Patched Again');
         $fieldModel->saveEntity($ui1Field);
         $columns = $this->getUniqueIdentifierIndexColumns('leads');
         $this->assertCount(3, $columns);
-        $this->assertCount(0, $stack->getIndexQueries());
+        $this->assertCount(0, $this->getIndexQueries($debugDataHolder));
 
         // Cleanup
         $fieldModel->deleteEntities([$ui1Field->getId(), $ui2Field->getId(), $ui3Field->getId()]);
@@ -375,6 +349,24 @@ final class FieldModelTest extends MauticMysqlTestCase
         );
 
         return $stmt->fetchAllAssociative();
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getIndexQueries(DebugDataHolder $debugDataHolder): array
+    {
+        $indexQueries = [];
+
+        foreach ($debugDataHolder->getData() as $queries) {
+            foreach ($queries as $query) {
+                if (false !== stripos($query['sql'], 'create index') || false !== stripos($query['sql'], 'drop index')) {
+                    $indexQueries[] = $query['sql'];
+                }
+            }
+        }
+
+        return $indexQueries;
     }
 
     /**

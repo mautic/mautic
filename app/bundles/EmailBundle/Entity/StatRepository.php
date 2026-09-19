@@ -64,14 +64,13 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param int      $limit
      * @param int|null $createdByUserId
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
      */
     public function getSentEmailToContactData(
-        $limit,
+        ?int $limit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $createdByUserId = null,
@@ -150,7 +149,7 @@ class StatRepository extends CommonRepository
                     $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
-                        $sb->expr()->eq('lll.manually_removed', 0)
+                        $sb->expr()->eq('lll.manually_removed', '0')
                     )
                 );
 
@@ -474,11 +473,11 @@ class StatRepository extends CommonRepository
             if ('read' == $state) {
                 $timestampColumn = 's.date_read';
                 $query->andWhere(
-                    $query->expr()->eq('s.is_read', 1)
+                    $query->expr()->eq('s.is_read', '1')
                 );
             } elseif ('failed' == $state) {
                 $query->andWhere(
-                    $query->expr()->eq('s.is_failed', 1)
+                    $query->expr()->eq('s.is_failed', '1')
                 );
             }
         }
@@ -550,12 +549,10 @@ class StatRepository extends CommonRepository
     /**
      * Get pie graph data for Sent, Read and Failed email count.
      *
-     * @param QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostEmails($query, $limit = 10, $offset = 0): array
+    public function getMostEmails(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query
             ->setMaxResults($limit)
@@ -644,10 +641,7 @@ class StatRepository extends CommonRepository
         return 's';
     }
 
-    /**
-     * @return array
-     */
-    public function findContactEmailStats($leadId, $emailId)
+    public function findContactEmailStats($leadId, $emailId): array
     {
         return $this->createQueryBuilder('s')
             ->where('IDENTITY(s.lead) = :leadId AND IDENTITY(s.email) =  :emailId')

@@ -85,7 +85,9 @@ class AppKernel extends Kernel
         if (!defined('MAUTIC_INSTALLER')) {
             $db = $this->getContainer()->get('database_connection');
             try {
-                $db->connect();
+                // DBAL 4 made connect() protected; getNativeConnection() is the public way to
+                // force the connection to be established (and to fail if it cannot be).
+                $db->getNativeConnection();
             } catch (Exception $e) {
                 error_log($e);
                 throw new Mautic\CoreBundle\Exception\DatabaseConnectionException($this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', ['%code%' => $e->getCode()]), 0, $e);

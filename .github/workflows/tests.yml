@@ -313,16 +313,36 @@ jobs:
             echo \"OK: Webroot correctly auto-detected as {\$webrootDir}\n\";
           "
         elif [[ "${{ matrix.commands }}" == "Identifier order" ]]; then
-          # Compare every entity's identifier against the base revision. Swapping only
-          # the mapped sources keeps vendor/ in place, so the base does not need its own
-          # composer install.
+          # Compare every entity's table shape against the base revision.
           base=$(git merge-base origin/${{ github.base_ref || '8.x' }} HEAD)
           rm -rf var/cache/prod
           php .github/scripts/dump-identifiers.php > /tmp/identifiers-head.json
-          git checkout -q "$base" -- app plugins
+
+          # Swap the mapped sources to the base revision, along with the manifests that
+          # decide what they are loaded against. .github/ stays on HEAD, so these two
+          # scripts are still here even when the base predates them.
+          git checkout -q "$base" -- app plugins composer.json composer.lock
+
+          # Sharing this branch's vendor/ is what makes the base need no install of its
+          # own, and that holds only while both revisions agree on their dependencies.
+          # When they do not, the base's sources fail to load against the wrong major
+          # long before any mapping is read, so give it the install it asks for. The
+          # install action caches Composer's package cache rather than vendor/, so
+          # replacing vendor/ here cannot leave a wrong tree behind for another run.
+          if ! git diff --quiet HEAD "$base" -- composer.lock; then
+            echo "Base revision has its own composer.lock; installing it to read its mapping."
+            composer install --no-interaction --no-progress --no-scripts
+          fi
+
           rm -rf var/cache/prod
           php .github/scripts/dump-identifiers.php > /tmp/identifiers-base.json
-          git checkout -q HEAD -- app plugins
+
+          # Restore HEAD. Checking the paths back out rewrites the files both revisions
+          # share but leaves behind any the base added and HEAD does not have.
+          git checkout -q HEAD -- app plugins composer.json composer.lock
+          git diff --name-only --diff-filter=A HEAD "$base" -- app plugins | xargs -r rm -f
+          git reset -q HEAD -- app plugins composer.json composer.lock
+
           php .github/scripts/compare-identifiers.php /tmp/identifiers-base.json /tmp/identifiers-head.json
         elif [[ "${{ matrix.commands }}" == "Class Leak" ]]; then
           # skip-type entries are false positives: Symfony autodiscovered services and test helpers class-leak cannot see referenced

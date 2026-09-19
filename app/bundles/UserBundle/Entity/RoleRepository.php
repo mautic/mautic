@@ -54,13 +54,9 @@ class RoleRepository extends CommonRepository
     /**
      * Get a list of roles.
      *
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
+     * $search arrives as null from UserModel::getLookupResults().
      */
-    public function getRoleList($search = '', $limit = 10, $start = 0)
+    public function getRoleList(?string $search = '', int $limit = 10, int $start = 0): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
 

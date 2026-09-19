@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: LogRepository::class)]
 #[ORM\Table(name: 'webhook_logs')]
-#[ORM\Index(columns: ['webhook_id', 'date_added'], name: 'webhook_id_date_added')]
+#[ORM\Index(name: 'webhook_id_date_added', columns: ['webhook_id', 'date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Log
 {

@@ -45,7 +45,7 @@ class LeadDeviceRepository extends CommonRepository
             }
 
             $or = $selectQuery->expr()->or(
-                ...array_map(fn ($key, $deviceName) => $selectQuery->expr()->eq('es.device', ':device'.$key), array_keys($deviceNames), $deviceNames)
+                ...array_map(fn ($key, $deviceName): string => $selectQuery->expr()->eq('es.device', ':device'.$key), array_keys($deviceNames), $deviceNames)
             );
             $selectQuery->andWhere($or);
             foreach ($deviceNames as $key => $deviceName) {
@@ -59,7 +59,7 @@ class LeadDeviceRepository extends CommonRepository
             }
 
             $or = $selectQuery->expr()->or(
-                ...array_map(fn ($key, $deviceBrand) => $selectQuery->expr()->eq('es.device_brand', ':deviceBrand'.$key), array_keys($deviceBrands), $deviceBrands)
+                ...array_map(fn ($key, $deviceBrand): string => $selectQuery->expr()->eq('es.device_brand', ':deviceBrand'.$key), array_keys($deviceBrands), $deviceBrands)
             );
             $selectQuery->andWhere($or);
             foreach ($deviceBrands as $key => $deviceBrand) {
@@ -73,7 +73,7 @@ class LeadDeviceRepository extends CommonRepository
             }
 
             $or = $selectQuery->expr()->or(
-                ...array_map(fn ($key, $deviceModel) => $selectQuery->expr()->eq('es.device_model', ':deviceModel'.$key), array_keys($deviceModels), $deviceModels)
+                ...array_map(fn ($key, $deviceModel): string => $selectQuery->expr()->eq('es.device_model', ':deviceModel'.$key), array_keys($deviceModels), $deviceModels)
             );
             $selectQuery->andWhere($or);
             foreach ($deviceModels as $key => $deviceModel) {
@@ -87,7 +87,7 @@ class LeadDeviceRepository extends CommonRepository
             }
 
             $or = $selectQuery->expr()->or(
-                ...array_map(fn ($key, $deviceOs) => $selectQuery->expr()->eq('es.device_os_name', ':deviceOs'.$key), array_keys($deviceOss), $deviceOss)
+                ...array_map(fn ($key, $deviceOs): string => $selectQuery->expr()->eq('es.device_os_name', ':deviceOs'.$key), array_keys($deviceOss), $deviceOss)
             );
             $selectQuery->andWhere($or);
             foreach ($deviceOss as $key => $deviceOs) {

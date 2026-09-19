@@ -116,7 +116,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @var Collection<int, Event>|ArrayCollection<int, Event>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
-    #[ORM\OneToMany(mappedBy: 'campaign', targetEntity: Event::class, cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'campaign', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     #[ORM\OrderBy(['order' => 'ASC'])]
     private $events;
 
@@ -124,7 +124,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @var ArrayCollection<int, Lead>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
-    #[ORM\OneToMany(mappedBy: 'campaign', targetEntity: Lead::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: Lead::class, mappedBy: 'campaign', fetch: 'EXTRA_LAZY')]
     private Collection $leads;
 
     /**

@@ -11,12 +11,7 @@ final class UTCDateTimeType extends DateTimeType
 {
     private static ?\DateTimeZone $utc = null;
 
-    /**
-     * @param \DateTime $value
-     *
-     * @return string|null
-     */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
         if (null === $value) {
             return null;
@@ -39,13 +34,9 @@ final class UTCDateTimeType extends DateTimeType
     }
 
     /**
-     * @param mixed $value
-     *
-     * @return \DateTimeInterface|null
-     *
      * @throws ConversionException
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?\DateTime
     {
         if (null === $value) {
             return null;

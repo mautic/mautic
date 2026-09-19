@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
-use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Exception\DbalException as DBALException;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -58,7 +58,7 @@ final class EmailRepositoryUpCountSentTest extends \PHPUnit\Framework\TestCase
 
         // Assert that the generated SQL matches our expectations
         $expectedSql = 'UPDATE test_emails SET sent_count = sent_count + :increaseBy WHERE id = :id';
-        $this->assertEquals($expectedSql, $generatedSql);
+        $this->assertSame($expectedSql, $generatedSql);
 
         // Assert parameters are properly set up
         $this->assertEquals(11, $this->queryBuilder->getParameter('id'));
@@ -79,7 +79,7 @@ final class EmailRepositoryUpCountSentTest extends \PHPUnit\Framework\TestCase
 
         // Assert that the generated SQL matches our expectations
         $expectedSql = 'UPDATE test_emails SET sent_count = sent_count + :increaseBy, variant_sent_count = variant_sent_count + :increaseBy WHERE id = :id';
-        $this->assertEquals($expectedSql, $generatedSql);
+        $this->assertSame($expectedSql, $generatedSql);
     }
 
     public function testUpCountWithTwoErrors(): void

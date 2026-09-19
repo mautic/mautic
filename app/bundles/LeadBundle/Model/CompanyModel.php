@@ -266,7 +266,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array|Company $companies
      * @param array|Lead    $lead
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function addLeadToCompany($companies, $lead): bool
     {
@@ -387,7 +387,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function removeLeadFromCompany($companies, $lead): void
     {
@@ -537,9 +537,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $expr->or(
                     $expr->and(
                         $expr->isNull('comp.owner_id'),
-                        $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
+                        $expr->eq('comp.created_by', (string) ((int) $this->userHelper->getUser()->getId()))
                     ),
-                    $expr->eq('comp.owner_id', (int) $this->userHelper->getUser()->getId())
+                    $expr->eq('comp.owner_id', (string) ((int) $this->userHelper->getUser()->getId()))
                 )
             );
         }
@@ -582,9 +582,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $expr->or(
                             $expr->and(
                                 $expr->isNull('comp.owner_id'),
-                                $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
+                                $expr->eq('comp.created_by', (string) ((int) $this->userHelper->getUser()->getId()))
                             ),
-                            $expr->eq('comp.owner_id', (int) $this->userHelper->getUser()->getId())
+                            $expr->eq('comp.owner_id', (string) ((int) $this->userHelper->getUser()->getId()))
                         )
                     );
                 }

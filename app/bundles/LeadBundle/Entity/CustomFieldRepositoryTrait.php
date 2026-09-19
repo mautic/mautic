@@ -5,9 +5,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
@@ -53,7 +53,7 @@ trait CustomFieldRepositoryTrait
 
             // Advanced search filters may have set a group by and if so, let's remove it for the count.
             if ($groupBy) {
-                $dq->resetQueryPart('groupBy');
+                $dq->resetGroupBy();
             }
 
             // get a total count
@@ -64,7 +64,7 @@ trait CustomFieldRepositoryTrait
             }
 
             $result = $statement->fetchAllAssociative();
-            $total  = ($result) ? $result[0]['count'] : 0;
+            $total  = ($result !== []) ? $result[0]['count'] : 0;
         } else {
             $total = $args['count'];
         }
@@ -73,13 +73,13 @@ trait CustomFieldRepositoryTrait
             $results = [];
         } else {
             if (isset($groupBy) && $groupBy) {
-                $dq->groupBy($groupBy);
+                // the query part comes back as a list, and DBAL 4 takes the expressions one by one
+                $dq->groupBy(...$groupBy);
             }
             // now get the actual paginated results
 
             $this->buildOrderByClause($dq, $args);
             $this->buildLimiterClauses($dq, $args);
-
             $dq->resetQueryPart('select');
             $this->buildSelectClause($dq, $args);
 

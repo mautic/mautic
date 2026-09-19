@@ -7,6 +7,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
@@ -79,38 +80,33 @@ class ChartQuery extends AbstractChart
 
     /**
      * Apply where filters to the query.
-     *
-     * @param QueryBuilder $query
-     * @param array        $filters
      */
-    public function applyFilters(&$query, $filters): void
+    public function applyFilters(TrackingQueryBuilder $query, array $filters): void
     {
-        if ($filters && is_array($filters)) {
-            foreach ($filters as $column => $value) {
-                $valId = $column.'_val';
+        foreach ($filters as $column => $value) {
+            $valId = $column.'_val';
 
-                // Special case: Lead list filter
-                if ('leadlist_id' === $column) {
-                    $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
-                    $query->andWhere('lll.leadlist_id = :'.$valId);
+            // Special case: Lead list filter
+            if ('leadlist_id' === $column) {
+                $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
+                $query->andWhere('lll.leadlist_id = :'.$valId);
+                $query->setParameter($valId, $value['value']);
+            } elseif (isset($value['expression']) && method_exists($query->expr(), $value['expression'])) {
+                $query->andWhere($query->expr()->{$value['expression']}($column));
+                if (isset($value['value'])) {
                     $query->setParameter($valId, $value['value']);
-                } elseif (isset($value['expression']) && method_exists($query->expr(), $value['expression'])) {
-                    $query->andWhere($query->expr()->{$value['expression']}($column));
-                    if (isset($value['value'])) {
-                        $query->setParameter($valId, $value['value']);
-                    }
-                } elseif (isset($value['subquery'])) {
-                    $query->andWhere($value['subquery']);
+                }
+            } elseif (isset($value['subquery'])) {
+                $query->andWhere($value['subquery']);
+            } else {
+                $column = str_replace('t.', '', $column);
+                $valId  = str_replace('t.', '', $valId);
+                if (is_array($value)) {
+                    $query->andWhere($query->expr()->in('t.'.$column, ":{$valId}"));
+                    $query->setParameter($valId, array_map(strval(...), $value), ArrayParameterType::STRING);
                 } else {
-                    $column = str_replace('t.', '', $column);
-                    $valId  = str_replace('t.', '', $valId);
-                    if (is_array($value)) {
-                        $query->andWhere($query->expr()->in('t.'.$column, ":{$valId}"));
-                        $query->setParameter($valId, array_map(strval(...), $value), ArrayParameterType::STRING);
-                    } else {
-                        $query->andWhere('t.'.$column.' = :'.$valId);
-                        $query->setParameter($valId, $value);
-                    }
+                    $query->andWhere('t.'.$column.' = :'.$valId);
+                    $query->setParameter($valId, $value);
                 }
             }
         }
@@ -118,12 +114,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * Apply date filters to the query.
-     *
-     * @param QueryBuilder $query
-     * @param string       $dateColumn
-     * @param string       $tablePrefix
      */
-    public function applyDateFilters(&$query, $dateColumn, $tablePrefix = 't'): void
+    public function applyDateFilters(TrackingQueryBuilder $query, ?string $dateColumn, string $tablePrefix = 't'): void
     {
         // Check if the date filters have already been applied
         if ($parameters = $query->getParameters()) {
@@ -133,7 +125,7 @@ class ChartQuery extends AbstractChart
         }
 
         if ($dateColumn) {
-            $generatedColumn = $this->getGeneratedColumnForDateColumn($query, (string) $dateColumn, (string) $tablePrefix);
+            $generatedColumn = $this->getGeneratedColumnForDateColumn($query, $dateColumn, $tablePrefix);
 
             if ($generatedColumn) {
                 $dateColumn = $generatedColumn->getFilterDateColumn() ?: $dateColumn;
@@ -201,11 +193,9 @@ class ChartQuery extends AbstractChart
      *
      * @param string $table   without prefix
      * @param string $column  name. The column must be type of datetime
-     * @param array  $filters will be added to where claues
-     *
-     * @return QueryBuilder
+     * @param array $filters will be added to where claues
      */
-    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', bool|string $isEnumerable = true, bool|string $useSqlOrder = true)
+    public function prepareTimeDataQuery(string $table, string $column, array $filters = [], string $countColumn = '*', bool|string $isEnumerable = true, bool|string $useSqlOrder = true): TrackingQueryBuilder
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
@@ -222,11 +212,9 @@ class ChartQuery extends AbstractChart
      * Modify database query for fetching the line time chart data.
      *
      * @param string      $column       name
-     * @param string      $tablePrefix
-     * @param string      $countColumn
      * @param bool|string $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery(QueryBuilder $query, $column, $tablePrefix = 't', $countColumn = '*', bool|string $isEnumerable = true, bool $useSqlOrder = true): void
+    public function modifyTimeDataQuery(TrackingQueryBuilder $query, string $column, string $tablePrefix = 't', string $countColumn = '*', bool|string $isEnumerable = true, bool $useSqlOrder = true): void
     {
         // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
@@ -256,7 +244,7 @@ class ChartQuery extends AbstractChart
      * @param string $column  name. The column must be type of datetime
      * @param array  $filters will be added to where claues
      */
-    public function fetchTimeData($table, $column, $filters = []): array
+    public function fetchTimeData(string $table, string $column, array $filters = []): array
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters);
 
@@ -271,7 +259,7 @@ class ChartQuery extends AbstractChart
      * @param array  $filters   will be added to where claues
      * @param string $sumColumn name that will be summed
      */
-    public function fetchSumTimeData($table, $column, $filters, $sumColumn): array
+    public function fetchSumTimeData(string $table, string $column, array $filters, string $sumColumn): array
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters, $sumColumn, 'sum');
 
@@ -415,13 +403,11 @@ class ChartQuery extends AbstractChart
      *
      * @param string  $table        without prefix
      * @param string  $uniqueColumn name
-     * @param string  $dateColumn   name
+     * @param string|null  $dateColumn   name
      * @param mixed[] $filters      will be added to where claues
      * @param mixed[] $options      for special behavior
-     *
-     * @return QueryBuilder
      */
-    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], array $options = [], $tablePrefix = 't')
+    public function getCountQuery(string $table, string $uniqueColumn, ?string $dateColumn = null, array $filters = [], array $options = [], string $tablePrefix = 't'): TrackingQueryBuilder
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
@@ -437,9 +423,8 @@ class ChartQuery extends AbstractChart
      *
      * @param string               $uniqueColumn name
      * @param array<string, mixed> $options      for special behavior
-     * @param string               $tablePrefix
      */
-    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, array $options = [], $tablePrefix = 't')
+    public function modifyCountQuery(TrackingQueryBuilder &$query, string $uniqueColumn, array $options = [], string $tablePrefix = 't')
     {
         $query->select('COUNT('.$tablePrefix.'.'.$uniqueColumn.') AS count');
 
@@ -463,6 +448,8 @@ class ChartQuery extends AbstractChart
             $uniqueQuery->setParameters($query->getParameters());
 
             // Replace the new query with previous query
+            // Replacing the caller's builder is why this one still takes it by
+            // reference, where applyDateFilters() no longer needs to.
             $query = $uniqueQuery;
         }
 
@@ -474,11 +461,11 @@ class ChartQuery extends AbstractChart
      *
      * @param string $table        without prefix
      * @param string $uniqueColumn name
-     * @param string $dateColumn   name
+     * @param string|null $dateColumn   name
      * @param array  $filters      will be added to where claues
      * @param array  $options      for special behavior
      */
-    public function count($table, $uniqueColumn, $dateColumn = null, $filters = [], $options = []): int
+    public function count(string $table, string $uniqueColumn, ?string $dateColumn = null, array $filters = [], $options = []): int
     {
         $query = $this->getCountQuery($table, $uniqueColumn, $dateColumn, $filters);
 
@@ -499,16 +486,9 @@ class ChartQuery extends AbstractChart
      * Get the query to count how many rows is between a range of date diff in seconds.
      *
      * @param string $table       without prefix
-     * @param string $dateColumn1
-     * @param string $dateColumn2
-     * @param int    $startSecond
-     * @param int    $endSecond
      * @param array  $filters     will be added to where claues
-     * @param string $tablePrefix
-     *
-     * @return QueryBuilder
      */
-    public function getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = [], $tablePrefix = 't')
+    public function getCountDateDiffQuery(string $table, string $dateColumn1, string $dateColumn2, int|\DateTime $startSecond = 0, int|\DateTime $endSecond = 60, array $filters = [], string $tablePrefix = 't'): TrackingQueryBuilder
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
@@ -521,14 +501,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * Modify the query to count how many rows is between a range of date diff in seconds.
-     *
-     * @param string $dateColumn1
-     * @param string $dateColumn2
-     * @param int    $startSecond
-     * @param int    $endSecond
-     * @param string $tablePrefix
      */
-    public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
+    public function modifyCountDateDiffQuery(TrackingQueryBuilder $query, string $dateColumn1, string $dateColumn2, int|\DateTime $startSecond = 0, int|\DateTime $endSecond = 60, string $tablePrefix = 't'): void
     {
         $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
         $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');
@@ -566,13 +540,9 @@ class ChartQuery extends AbstractChart
         return MAUTIC_TABLE_PREFIX.$table;
     }
 
-    /**
-     * @param string $tablePrefix
-     * @param string $column
-     */
-    private function getDateConstruct(QueryBuilder $query, $tablePrefix, $column): string
+    private function getDateConstruct(QueryBuilder $query, string $tablePrefix, string $column): string
     {
-        $generatedColumn = $this->getGeneratedColumnForDateColumn($query, (string) $column, (string) $tablePrefix);
+        $generatedColumn = $this->getGeneratedColumnForDateColumn($query, $column, $tablePrefix);
 
         if ($generatedColumn) {
             return $tablePrefix.'.'.$generatedColumn->getColumnName();
@@ -592,6 +562,15 @@ class ChartQuery extends AbstractChart
             return null;
         }
 
+        if (!$query instanceof TrackingQueryBuilder) {
+            // Only Mautic's builder records its parts, and resolving an alias means
+            // reading the FROM clause back. Connections hand out that builder, so this
+            // is defensive - and it is checked here rather than on entry so that a
+            // plain DBAL builder still works for every query that needs no alias
+            // resolved, which is how this class has always behaved.
+            throw new \LogicException(sprintf('Cannot resolve the alias "%s": the query builder does not record its parts.', $tablePrefix));
+        }
+
         $tableName = $this->getTableNameByAlias($query, $tablePrefix);
 
         try {
@@ -602,7 +581,7 @@ class ChartQuery extends AbstractChart
         }
     }
 
-    private function getTableNameByAlias(QueryBuilder $query, string $alias): string
+    private function getTableNameByAlias(TrackingQueryBuilder $query, string $alias): string
     {
         foreach ($query->getQueryPart('from') as $from) {
             $fromAlias = $from['alias'] ?? null;

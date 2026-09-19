@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Test\EnvLoader;
@@ -27,6 +28,10 @@ final class InstallSchemaTest extends TestCase
     private array $dbParams;
 
     private string $indexTableName;
+
+    private string $parentTableName;
+
+    private string $childTableName;
 
     /**
      * @var AbstractSchemaManager<T>
@@ -65,6 +70,21 @@ final class InstallSchemaTest extends TestCase
         $t->addIndex(['a_column'], 'index_with_options', [], $indexOptions);
         $this->schemaManager = $this->connection->createSchemaManager();
         $this->schemaManager->createTable($t);
+
+        $this->parentTableName = 'table_with_fk_parent';
+        $this->childTableName  = 'table_with_fk_child';
+
+        $parent = new Table($this->parentTableName);
+        $parent->addColumn('id', 'integer', ['unsigned' => true]);
+        $parent->addPrimaryKeyConstraint(PrimaryKeyConstraint::editor()->setUnquotedColumnNames('id')->create());
+        $this->schemaManager->createTable($parent);
+
+        $child = new Table($this->childTableName);
+        $child->addColumn('parent_id', 'integer', ['unsigned' => true, 'notnull' => false]);
+        $child->addIndex(['parent_id'], 'parent_id_search');
+        // the referential action has to survive being copied onto the backup table
+        $child->addForeignKeyConstraint($this->parentTableName, ['parent_id'], ['id'], ['onDelete' => 'CASCADE'], 'fk_to_parent');
+        $this->schemaManager->createTable($child);
     }
 
     protected function tearDown(): void
@@ -76,6 +96,14 @@ final class InstallSchemaTest extends TestCase
         }
         if ($this->schemaManager->tablesExist([$this->dbParams['backup_prefix'].$this->indexTableName])) {
             $this->schemaManager->dropTable($this->dbParams['backup_prefix'].$this->indexTableName);
+        }
+
+        foreach ([$this->childTableName, $this->parentTableName] as $table) {
+            foreach (['', $this->dbParams['backup_prefix']] as $prefix) {
+                if ($this->schemaManager->tablesExist([$prefix.$table])) {
+                    $this->schemaManager->dropTable($prefix.$table);
+                }
+            }
         }
     }
 
@@ -105,6 +133,43 @@ final class InstallSchemaTest extends TestCase
                 } catch (\Exception $exception) {
                     $exceptions[] = $exception->getMessage();
                 }
+            }
+        }
+        $this->connection->close();
+
+        $this->assertSame([], $exceptions);
+    }
+
+    public function testBackupForeignKeysKeepTheirReferentialActions(): void
+    {
+        $schemaHelper = new SchemaHelper($this->dbParams, $this->createStub(EntityManagerInterface::class));
+
+        $controllerReflection = new \ReflectionClass(SchemaHelper::class);
+        $method               = $controllerReflection->getMethod('backupExistingSchema');
+
+        $property   = $controllerReflection->getProperty('platform');
+        $connection = DriverManager::getConnection($this->dbParams);
+        $property->setValue($schemaHelper, $connection->getDatabasePlatform());
+
+        $tables       = [$this->childTableName, $this->parentTableName];
+        $mauticTables = [
+            $this->childTableName  => $this->dbParams['backup_prefix'].$this->childTableName,
+            $this->parentTableName => $this->dbParams['backup_prefix'].$this->parentTableName,
+        ];
+
+        /** @var list<string> $sql */
+        $sql = $method->invokeArgs($schemaHelper, [$tables, $mauticTables, $this->dbParams['backup_prefix']]);
+
+        $addForeignKey = array_values(array_filter($sql, static fn (string $query): bool => str_contains($query, 'ADD CONSTRAINT')));
+        $this->assertCount(1, $addForeignKey, 'The backup table should get the foreign key back.');
+        $this->assertStringContainsString('ON DELETE CASCADE', $addForeignKey[0], 'The referential action has to be carried over.');
+
+        $exceptions = [];
+        foreach ($sql as $q) {
+            try {
+                $this->connection->executeStatement($q);
+            } catch (\Exception $exception) {
+                $exceptions[] = $exception->getMessage();
             }
         }
         $this->connection->close();

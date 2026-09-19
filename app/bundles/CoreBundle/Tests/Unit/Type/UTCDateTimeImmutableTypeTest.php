@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Type;
 
-use Doctrine\DBAL\Platforms\MySQL80Platform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeImmutableType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -16,13 +16,13 @@ final class UTCDateTimeImmutableTypeTest extends TestCase
 
     private UTCDateTimeImmutableType $type;
 
-    private MySQL80Platform $platform;
+    private MySQLPlatform $platform;
 
     protected function setUp(): void
     {
         $this->previousTimeZone = date_default_timezone_get();
         $this->type             = new UTCDateTimeImmutableType();
-        $this->platform         = new MySQL80Platform();
+        $this->platform         = new MySQLPlatform();
     }
 
     protected function tearDown(): void

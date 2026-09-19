@@ -2,7 +2,7 @@
 
 namespace Mautic\ReportBundle\Event;
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 
 class ReportGraphEvent extends AbstractReportEvent

@@ -3726,23 +3726,8 @@ parameters:
 			count: 1
 			path: app/bundles/FormBundle/Event/SubmissionEvent.php
 
-		-
-			message: '#^Parameter \#4 \$filters of method Mautic\\FormBundle\\Model\\SubmissionModel\:\:getTopSubmissionReferrers\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
 
-		-
-			message: '#^Parameter \#4 \$filters of method Mautic\\FormBundle\\Model\\SubmissionModel\:\:getTopSubmitters\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
 
-		-
-			message: '#^Parameter \#5 \$filter of method Mautic\\FormBundle\\Model\\SubmissionModel\:\:getSubmissionsLineChartData\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
 
 		-
 			message: '#^Parameter \#1 \$response of method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:parseResponse\(\) expects GuzzleHttp\\Psr7\\Response, Psr\\Http\\Message\\ResponseInterface given\.$#'
@@ -5220,17 +5205,7 @@ parameters:
 			count: 1
 			path: app/bundles/LeadBundle/Event/PointsChangeEvent.php
 
-		-
-			message: '#^Parameter \#3 \$filters of method Mautic\\LeadBundle\\Model\\LeadModel\:\:getAnonymousVsIdentifiedPieChartData\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
 
-		-
-			message: '#^Parameter \#4 \$filters of method Mautic\\LeadBundle\\Model\\LeadModel\:\:getLeadList\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\EventListener\\LeadSubscriber\:\:getChannelEntity\(\) has parameter \$channelId with no type specified\.$#'

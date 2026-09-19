@@ -42,12 +42,8 @@ class StageRepository extends CommonRepository
 
     /**
      * Get array of published actions based on type.
-     *
-     * @param string $type
-     *
-     * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType(string $type): array
     {
         $q = $this->createQueryBuilder('s')
             ->select('partial s.{id, name}')
@@ -75,7 +71,7 @@ class StageRepository extends CommonRepository
         // make sure the published up and down dates are good
         $q->where(
             $q->expr()->and(
-                $q->expr()->eq('x.lead_id', (int) $leadId)
+                $q->expr()->eq('x.lead_id', (string) ((int) $leadId))
             )
         );
 
@@ -183,12 +179,7 @@ class StageRepository extends CommonRepository
         return null;
     }
 
-    /**
-     * @param string|int $value
-     *
-     * @return Stage|null
-     */
-    public function findByIdOrName($value)
+    public function findByIdOrName(string|int $value): ?Stage
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('s')

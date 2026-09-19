@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 #[ORM\Table(name: 'oauth2_clients')]
-#[ORM\Index(columns: ['random_id'], name: 'client_id_search')]
+#[ORM\Index(name: 'client_id_search', columns: ['random_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Client extends BaseClient
 {

@@ -5,6 +5,7 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -62,10 +63,8 @@ class CampaignRepository extends CommonRepository
      *
      * @param bool $forList   If true, returns ID and name only
      * @param bool $viewOther If true, returns all the campaigns
-     *
-     * @return array
      */
-    public function getPublishedCampaigns($specificId = null, ?int $leadId = null, bool $forList = false, bool $viewOther = false)
+    public function getPublishedCampaigns(?int $specificId = null, ?int $leadId = null, bool $forList = false, bool $viewOther = false): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(Campaign::class, 'c', 'c.id');
@@ -158,10 +157,8 @@ class CampaignRepository extends CommonRepository
 
     /**
      * Get array of list IDs assigned to this campaign.
-     *
-     * @param int|null $id
      */
-    public function getCampaignListIds($id = null): array
+    public function getCampaignListIds(?int $id = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl');
@@ -169,7 +166,7 @@ class CampaignRepository extends CommonRepository
         if ($id) {
             $q->select('cl.leadlist_id')
                 ->where(
-                    $q->expr()->eq('cl.campaign_id', $id)
+                    $q->expr()->eq('cl.campaign_id', (string) $id)
                 );
         } else {
             // Retrieve a list of unique IDs that are assigned to a campaign
@@ -189,14 +186,14 @@ class CampaignRepository extends CommonRepository
     /**
      * Get array of list IDs => name assigned to this campaign.
      */
-    public function getCampaignListSources($id): array
+    public function getCampaignListSources(int $id): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cl.leadlist_id, l.name')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'l', 'l.id = cl.leadlist_id');
         $q->where(
-            $q->expr()->eq('cl.campaign_id', $id)
+            $q->expr()->eq('cl.campaign_id', (string) $id)
         );
 
         $lists   = [];
@@ -212,14 +209,14 @@ class CampaignRepository extends CommonRepository
     /**
      * Get array of form IDs => name assigned to this campaign.
      */
-    public function getCampaignFormSources($id): array
+    public function getCampaignFormSources(int $id): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cf.form_id, f.name')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_form_xref', 'cf')
             ->join('cf', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = cf.form_id');
         $q->where(
-            $q->expr()->eq('cf.campaign_id', $id)
+            $q->expr()->eq('cf.campaign_id', (string) $id)
         );
 
         $forms   = [];
@@ -232,10 +229,7 @@ class CampaignRepository extends CommonRepository
         return $forms;
     }
 
-    /**
-     * @return array
-     */
-    public function findByFormId($formId)
+    public function findByFormId($formId): array
     {
         $q = $this->createQueryBuilder('c')
             ->join('c.forms', 'f');
@@ -326,10 +320,8 @@ class CampaignRepository extends CommonRepository
 
     /**
      * Get a list of popular (by logs) campaigns.
-     *
-     * @param int $limit
      */
-    public function getPopularCampaigns($limit = 10): array
+    public function getPopularCampaigns(int $limit = 10): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -354,7 +346,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
@@ -397,7 +389,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
@@ -413,7 +405,7 @@ class CampaignRepository extends CommonRepository
             ->where(
                 $sq->expr()->and(
                     $sq->expr()->eq('e.lead_id', 'cl.lead_id'),
-                    $sq->expr()->eq('e.campaign_id', (int) $campaignId),
+                    $sq->expr()->eq('e.campaign_id', (string) ((int) $campaignId)),
                     $sq->expr()->eq('e.rotation', 'cl.rotation')
                 )
             );
@@ -476,20 +468,18 @@ class CampaignRepository extends CommonRepository
     /**
      * Get lead data of a campaign.
      *
-     * @param int   $start
-     * @param array $select
-     *
+     * @param string[] $select
      * @return mixed[]
      */
-    public function getCampaignLeads($campaignId, $start = 0, bool $limit = false, $select = ['cl.lead_id']): array
+    public function getCampaignLeads($campaignId, int $start = 0, bool $limit = false, array $select = ['cl.lead_id']): array
     {
         $q = $this->getReplicaConnection()->createQueryBuilder();
 
-        $q->select($select)
+        $q->select(...$select)
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $q->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
@@ -504,10 +494,7 @@ class CampaignRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getContactSingleSegmentByCampaign($contactId, $campaignId)
+    public function getContactSingleSegmentByCampaign($contactId, $campaignId): array|false
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -630,12 +617,12 @@ class CampaignRepository extends CommonRepository
                         // version = 1 means the job was killed after the DB INSERT but before evaluation —
                         // children must NOT be picked up; the condition/decision itself must be re-executed.
                         $query->expr()->in('parent.event_type', ["'condition'", "'decision'"]),
-                        $query->expr()->gt('log.version', 1),
+                        $query->expr()->gt('log.version', '1'),
                         $query->expr()->or(
                             // "No" path taken
                             $query->expr()->and(
                                 $query->expr()->eq('ce.decision_path', $query->expr()->literal('no')),
-                                $query->expr()->eq('log.non_action_path_taken', 1)
+                                $query->expr()->eq('log.non_action_path_taken', '1')
                             ),
                             // "Yes" path or default path taken
                             $query->expr()->and(
@@ -644,7 +631,7 @@ class CampaignRepository extends CommonRepository
                                     $query->expr()->isNull('ce.decision_path')
                                 ),
                                 $query->expr()->or(
-                                    $query->expr()->eq('log.non_action_path_taken', 0),
+                                    $query->expr()->eq('log.non_action_path_taken', '0'),
                                     $query->expr()->isNull('log.non_action_path_taken')
                                 )
                             )
@@ -691,7 +678,7 @@ class CampaignRepository extends CommonRepository
             ->executeQuery(
                 'SELECT is_published, version FROM '.MAUTIC_TABLE_PREFIX.'campaigns WHERE id = ? FOR UPDATE',
                 [$campaignId],
-                [\PDO::PARAM_INT]
+                [ParameterType::INTEGER]
             )->fetchAssociative();
 
         return $result ?: [];

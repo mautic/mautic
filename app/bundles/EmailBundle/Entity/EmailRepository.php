@@ -11,6 +11,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
@@ -218,8 +219,8 @@ class EmailRepository extends CommonRepository
             $mqQb->andWhere($mqQb->expr()->in('mq.channel_id', ':variantIds'))
                 ->setParameter('variantIds', $variantIds, ArrayParameterType::INTEGER);
         } else {
-            $statQb->andWhere($statQb->expr()->eq('stat.email_id', (int) $emailId));
-            $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int) $emailId));
+            $statQb->andWhere($statQb->expr()->eq('stat.email_id', (string) ((int) $emailId)));
+            $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (string) ((int) $emailId)));
         }
 
         // Only include those who belong to the associated lead lists
@@ -387,14 +388,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * @param string|array<int|string> $search
-     * @param int                      $limit
-     * @param int                      $start
-     * @param string|null              $emailType
-     * @param int|null                 $variantParentId
-     *
-     * @return array
      */
-    public function getEmailList($search = '', $limit = 10, $start = 0, bool $viewOther = false, bool|string|array $topLevel = false, $emailType = null, array $ignoreIds = [], $variantParentId = null)
+    public function getEmailList(string|array $search = '', int $limit = 10, int $start = 0, bool $viewOther = false, bool|string|array $topLevel = false, ?string $emailType = null, array $ignoreIds = [], ?int $variantParentId = null): array
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, subject, name, language}');
@@ -470,9 +465,9 @@ class EmailRepository extends CommonRepository
     /**
      * @return array<string, int>
      */
-    public function getSentReadNotReadCount(QueryBuilder $queryBuilder): array
+    public function getSentReadNotReadCount(TrackingQueryBuilder $queryBuilder): array
     {
-        $queryBuilder->resetQueryPart('groupBy');
+        $queryBuilder->resetGroupBy();
         $queryBuilder->resetQueryParts(['join']);
 
         $queryBuilder->select('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count');
@@ -490,7 +485,7 @@ class EmailRepository extends CommonRepository
         return $results;
     }
 
-    public function getUnsubscribedCount(QueryBuilder $queryBuilder): int
+    public function getUnsubscribedCount(TrackingQueryBuilder $queryBuilder): int
     {
         $queryBuilder->resetQueryParts(['join']);
         $this->addDNCTableForEmails($queryBuilder);
@@ -500,7 +495,7 @@ class EmailRepository extends CommonRepository
         return $queryBuilder->executeQuery()->rowCount();
     }
 
-    public function getUniqueClicks(QueryBuilder $queryBuilder): int
+    public function getUniqueClicks(TrackingQueryBuilder $queryBuilder): int
     {
         $this->addTrackableTablesForEmailStats($queryBuilder);
         $queryBuilder->select('SUM( tr.unique_hits) as `unique_clicks`');
@@ -508,7 +503,7 @@ class EmailRepository extends CommonRepository
         return (int) $queryBuilder->executeQuery()->fetchOne();
     }
 
-    private function addTrackableTablesForEmailStats(QueryBuilder $qb): void
+    private function addTrackableTablesForEmailStats(TrackingQueryBuilder $qb): void
     {
         $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
         $prTable = MAUTIC_TABLE_PREFIX.'page_redirects';
@@ -534,7 +529,7 @@ class EmailRepository extends CommonRepository
     /**
      * Add the Do Not Contact table to the query builder.
      */
-    private function addDNCTableForEmails(QueryBuilder $qb): void
+    private function addDNCTableForEmails(TrackingQueryBuilder $qb): void
     {
         $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
 
@@ -548,7 +543,7 @@ class EmailRepository extends CommonRepository
         }
     }
 
-    private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
+    private function isJoined(TrackingQueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
         $joins = $query->getQueryParts()['join'][$fromAlias] ?? null;
 
@@ -791,7 +786,7 @@ class EmailRepository extends CommonRepository
             ->where('es.id = :statId')
             ->andWhere('es.is_read = 1');
 
-        $q->update(MAUTIC_TABLE_PREFIX.'emails', 'e')
+        $q->update(MAUTIC_TABLE_PREFIX.'emails e')
             ->set('read_count', 'read_count + 1')
             ->where(
                 $q->expr()->and(
@@ -878,7 +873,7 @@ class EmailRepository extends CommonRepository
         return $qb->select('lc.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc')
             ->innerJoin('lc', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.category_id = lc.category_id')
-            ->where($qb->expr()->eq('e.id', $emailId))
+            ->where($qb->expr()->eq('e.id', (string) $emailId))
             ->andWhere('lc.manually_removed = 1');
     }
 
@@ -922,7 +917,7 @@ class EmailRepository extends CommonRepository
             ->executeQuery()
             ->fetchFirstColumn();
 
-        if (!$excludedListIds) {
+        if ($excludedListIds === []) {
             return null;
         }
 
