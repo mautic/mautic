@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\DependencyInjection\Compiler;
 
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\InstallBundle\Command\InstallCommand;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -30,7 +32,7 @@ final class InstallCommandPass implements CompilerPassInterface
 
         $container->setParameter('mautic.db_table_prefix', $tablePrefix);
         $container->getDefinition('mautic.tblprefix_subscriber')->setArgument('$tablePrefix', $tablePrefix);
-        $container->getDefinition('mautic.schema.helper.column')->setArgument('$prefix', $tablePrefix);
-        $container->getDefinition('mautic.schema.helper.index')->setArgument('$prefix', $tablePrefix);
+        $container->getDefinition(ColumnSchemaHelper::class)->setArgument('$prefix', $tablePrefix);
+        $container->getDefinition(IndexSchemaHelper::class)->setArgument('$prefix', $tablePrefix);
     }
 }

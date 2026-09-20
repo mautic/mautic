@@ -90,12 +90,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CoreBundle\Factory\IpLookupFactory::class)
         ->arg('$lookupServices', param('mautic.ip_lookup_services'))
         ->arg('$cacheDir', param('kernel.cache_dir'));
-    $services->set('mautic.schema.helper.column', Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class)
+    $services->set(Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class)
         ->arg('$prefix', param('mautic.db_table_prefix'));
-    $services->alias(Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper::class, 'mautic.schema.helper.column');
-    $services->set('mautic.schema.helper.index', Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class)
+    $services->set(Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class)
         ->arg('$prefix', param('mautic.db_table_prefix'));
-    $services->alias(Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper::class, 'mautic.schema.helper.index');
     $services->set(Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper::class)
         ->arg('$prefix', param('mautic.db_table_prefix'));
 
@@ -115,6 +113,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set('mautic.configurator', Mautic\CoreBundle\Configurator\Configurator::class);
     $services->alias(Mautic\CoreBundle\Configurator\Configurator::class, 'mautic.configurator');
+    $services->alias('mautic.helper.bundle', Mautic\CoreBundle\Helper\BundleHelper::class);
     $services->set(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);
 
     $services->set(Mautic\CoreBundle\Security\Permissions\CorePermissions::class)

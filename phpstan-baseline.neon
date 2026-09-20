@@ -9821,3 +9821,22 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: plugins/MauticSocialBundle/Security/Permissions/MauticSocialPermissions.php
+
+		-
+			message: '#^Fetch the definition by its class, getDefinition\(Psr\\Http\\Client\\ClientInterface\:\:class\), rather than by the string id "mautic\.http\.client" the service is registered with\.$#'
+			identifier: mautic.preferClassInDefinitionFetch
+			count: 1
+			path: app/bundles/CoreBundle/DependencyInjection/Compiler/TestPass.php
+
+		-
+			message: '#^Fetch the definition by its class, getDefinition\(Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\HttpFactory\:\:class\), rather than by the string id "mautic\.integrations\.auth_provider\.oauth2threelegged" the service is registered with\.$#'
+			identifier: mautic.preferClassInDefinitionFetch
+			count: 1
+			path: app/bundles/IntegrationsBundle/DependencyInjection/Compiler/TestPass.php
+
+		-
+			message: '#^Fetch the definition by its class, getDefinition\(Mautic\\UserBundle\\Security\\TimingSafeFormLoginAuthenticator\:\:class\), rather than by the string id "mautic\.security\.authenticator\.form_login\.decorator" the service is registered with\.$#'
+			identifier: mautic.preferClassInDefinitionFetch
+			count: 1
+			path: app/bundles/UserBundle/DependencyInjection/Compiler/FormLoginAuthenticatorOptionsPass.php
+
