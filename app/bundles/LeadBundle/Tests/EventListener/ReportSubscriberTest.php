@@ -830,7 +830,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEventMock->expects($matcher)
             ->method('checkContext')
             ->willReturnCallback(
-                function (array $context) use ($matcher): true {
+                function (array|string $context) use ($matcher): true {
                     if (1 === $matcher->numberOfInvocations()) {
                         $this->assertSame([
                             'leads',
