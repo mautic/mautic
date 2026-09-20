@@ -80,33 +80,37 @@ class ChartQuery extends AbstractChart
 
     /**
      * Apply where filters to the query.
+     *
+     * @param array $filters
      */
-    public function applyFilters(TrackingQueryBuilder $query, array $filters): void
+    public function applyFilters(TrackingQueryBuilder $query, $filters): void
     {
-        foreach ($filters as $column => $value) {
-            $valId = $column.'_val';
+        if ($filters && is_array($filters)) {
+            foreach ($filters as $column => $value) {
+                $valId = $column.'_val';
 
-            // Special case: Lead list filter
-            if ('leadlist_id' === $column) {
-                $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
-                $query->andWhere('lll.leadlist_id = :'.$valId);
-                $query->setParameter($valId, $value['value']);
-            } elseif (isset($value['expression']) && method_exists($query->expr(), $value['expression'])) {
-                $query->andWhere($query->expr()->{$value['expression']}($column));
-                if (isset($value['value'])) {
+                // Special case: Lead list filter
+                if ('leadlist_id' === $column) {
+                    $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
+                    $query->andWhere('lll.leadlist_id = :'.$valId);
                     $query->setParameter($valId, $value['value']);
-                }
-            } elseif (isset($value['subquery'])) {
-                $query->andWhere($value['subquery']);
-            } else {
-                $column = str_replace('t.', '', $column);
-                $valId  = str_replace('t.', '', $valId);
-                if (is_array($value)) {
-                    $query->andWhere($query->expr()->in('t.'.$column, ":{$valId}"));
-                    $query->setParameter($valId, array_map(strval(...), $value), ArrayParameterType::STRING);
+                } elseif (isset($value['expression']) && method_exists($query->expr(), $value['expression'])) {
+                    $query->andWhere($query->expr()->{$value['expression']}($column));
+                    if (isset($value['value'])) {
+                        $query->setParameter($valId, $value['value']);
+                    }
+                } elseif (isset($value['subquery'])) {
+                    $query->andWhere($value['subquery']);
                 } else {
-                    $query->andWhere('t.'.$column.' = :'.$valId);
-                    $query->setParameter($valId, $value);
+                    $column = str_replace('t.', '', $column);
+                    $valId  = str_replace('t.', '', $valId);
+                    if (is_array($value)) {
+                        $query->andWhere($query->expr()->in('t.'.$column, ":{$valId}"));
+                        $query->setParameter($valId, array_map(strval(...), $value), ArrayParameterType::STRING);
+                    } else {
+                        $query->andWhere('t.'.$column.' = :'.$valId);
+                        $query->setParameter($valId, $value);
+                    }
                 }
             }
         }
@@ -195,7 +199,7 @@ class ChartQuery extends AbstractChart
      * @param string $column  name. The column must be type of datetime
      * @param array $filters will be added to where claues
      */
-    public function prepareTimeDataQuery(string $table, string $column, array $filters = [], string $countColumn = '*', bool|string $isEnumerable = true, bool|string $useSqlOrder = true): TrackingQueryBuilder
+    public function prepareTimeDataQuery(string $table, string $column, $filters = [], string $countColumn = '*', bool|string $isEnumerable = true, bool|string $useSqlOrder = true): TrackingQueryBuilder
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
@@ -407,7 +411,7 @@ class ChartQuery extends AbstractChart
      * @param mixed[] $filters      will be added to where claues
      * @param mixed[] $options      for special behavior
      */
-    public function getCountQuery(string $table, string $uniqueColumn, ?string $dateColumn = null, array $filters = [], array $options = [], string $tablePrefix = 't'): TrackingQueryBuilder
+    public function getCountQuery(string $table, string $uniqueColumn, ?string $dateColumn = null, $filters = [], array $options = [], string $tablePrefix = 't'): TrackingQueryBuilder
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
@@ -465,7 +469,7 @@ class ChartQuery extends AbstractChart
      * @param array  $filters      will be added to where claues
      * @param array  $options      for special behavior
      */
-    public function count(string $table, string $uniqueColumn, ?string $dateColumn = null, array $filters = [], $options = []): int
+    public function count(string $table, string $uniqueColumn, ?string $dateColumn = null, $filters = [], $options = []): int
     {
         $query = $this->getCountQuery($table, $uniqueColumn, $dateColumn, $filters);
 
