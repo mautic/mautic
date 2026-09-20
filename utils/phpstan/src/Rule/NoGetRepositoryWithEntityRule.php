@@ -98,14 +98,18 @@ final class NoGetRepositoryWithEntityRule implements Rule
             return [];
         }
 
-        $ruleError = RuleErrorBuilder::message(sprintf(
+        $ruleErrorBuilder = RuleErrorBuilder::message(sprintf(
             'Do not fetch the "%s" repository by entity constant. Inject the repository as a typed dependency instead, to make the dependency and its type explicit.',
             $entityClass
         ))
-            ->identifier('mautic.noGetRepository')
-            ->build();
+            ->identifier('mautic.noGetRepository');
 
-        return [$ruleError];
+        // a repository must not reach for another one, no exception allowed
+        if (str_ends_with($scope->getFile(), self::REPOSITORY_SUFFIX)) {
+            $ruleErrorBuilder->nonIgnorable();
+        }
+
+        return [$ruleErrorBuilder->build()];
     }
 
     private function shouldReport(MethodCall $methodCall, Scope $scope, string $entityClass): bool
