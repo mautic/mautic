@@ -327,7 +327,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testNotRelevantContextGenerate(): void
     {
         $matcher = $this->exactly(2);
-        $this->reportGeneratorEventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher): false {
+        $this->reportGeneratorEventMock->expects($matcher)->method('checkContext')
+            ->willReturnCallback(function (array $context) use ($matcher): false {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame([
                     'leads',
@@ -336,10 +337,10 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                     'contact.attribution.first',
                     'contact.attribution.last',
                     'contact.frequencyrules',
-                ], $parameters[0]);
+                ], $context);
             }
             if (2 === $matcher->numberOfInvocations()) {
-                $this->assertSame(['companies'], $parameters[0]);
+                $this->assertSame(['companies'], $context);
             }
 
             return false;
@@ -826,9 +827,10 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testReportGenerate(string $context): void
     {
         $matcher = new AnyInvokedCount();
-        $this->reportGeneratorEventMock->expects($matcher)->method('checkContext')
+        $this->reportGeneratorEventMock->expects($matcher)
+            ->method('checkContext')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher): true {
+                function (array $context) use ($matcher): true {
                     if (1 === $matcher->numberOfInvocations()) {
                         $this->assertSame([
                             'leads',
@@ -837,7 +839,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'contact.attribution.first',
                             'contact.attribution.last',
                             'contact.frequencyrules',
-                        ], $parameters[0]);
+                        ], $context);
                     }
 
                     return true;
@@ -981,6 +983,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'channel_action' => 'click',
                 'activity_count' => 10,
             ]]);
+
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEventMock);
         $this->reportSubscriber->onReportDisplay($this->reportDataEventMock);
     }
