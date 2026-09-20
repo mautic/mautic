@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Functional;
 
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -22,9 +23,10 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
 
     public function testTranslationChildrenAreNotBroadcastIndependently(): void
     {
-        $segment = $this->createSegment();
-        $parent  = $this->createEmail('Email EN', 'en', $segment);
-        $this->createEmail('Email PT', 'pt_PT', $segment, $parent);
+        $segment  = $this->createSegment();
+        $category = $this->createCategory('Newsletter');
+        $parent   = $this->createEmail('Email EN', 'en', $segment, null, $category);
+        $this->createEmail('Email PT', 'pt_PT', $segment, $parent, $category);
         $this->em->clear();
 
         $repository = $this->em->getRepository(Email::class);
@@ -52,8 +54,9 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
         $segment = $this->createSegment();
         $this->addContactsToSegment($contacts, $segment);
 
-        $parent = $this->createEmail('Email EN', 'en', $segment);
-        $child  = $this->createEmail('Email PT', 'pt_PT', $segment, $parent);
+        $category = $this->createCategory('Newsletter');
+        $parent   = $this->createEmail('Email EN', 'en', $segment, null, $category);
+        $child    = $this->createEmail('Email PT', 'pt_PT', $segment, $parent, $category);
         $this->em->clear();
 
         // A limit lower than the segment size ensures a single broadcast cannot
@@ -90,6 +93,61 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
             $sentEmailIdByAddress,
             'Contacts must receive the translation matching their preferred locale and the parent otherwise.'
         );
+    }
+
+    /**
+     * A translated broadcast leaves its translation children in the entity manager
+     * (they are hydrated by Email::getRelatedEntityIds()) while the parent itself is
+     * detached at the end of its iteration in BroadcastSubscriber::onBroadcast().
+     *
+     * Any later flush in the same run - such as the auto-unpublish of the next
+     * broadcast - then walks those still-managed children and finds a detached
+     * translation parent behind an association that does not cascade persist,
+     * which aborts the whole cron run with an ORMInvalidArgumentException.
+     */
+    public function testAutoUnpublishOfALaterBroadcastDoesNotBreakOnADetachedTranslationParent(): void
+    {
+        $contacts = [
+            $this->createContact('en-locale@example.com', 'en'),
+            $this->createContact('pt-locale@example.com', 'pt_PT'),
+        ];
+        $segment = $this->createSegment();
+        $this->addContactsToSegment($contacts, $segment);
+
+        $category = $this->createCategory('Newsletter');
+        // Processed first: a translated email whose children stay managed after it is detached.
+        $translatedParent = $this->createEmail('Email EN', 'en', $segment, null, $category);
+        $this->createEmail('Email PT', 'pt_PT', $segment, $translatedParent, $category);
+        // Processed afterwards: its auto-unpublish triggers the flush that walks the leftovers.
+        $secondEmail = $this->createEmail('Email Second', 'en', $segment, null, $category);
+        $this->em->clear();
+
+        // First run drains both broadcasts, so neither is unpublished yet.
+        $commandTester = $this->testSymfonyCommand('mautic:broadcasts:send');
+        Assert::assertSame(0, $commandTester->getStatusCode());
+
+        $this->setUpSymfony($this->configParams);
+
+        // Second run has nothing pending for either broadcast, so both auto-unpublish.
+        $commandTester = $this->testSymfonyCommand('mautic:broadcasts:send');
+        Assert::assertSame(
+            0,
+            $commandTester->getStatusCode(),
+            'The broadcast run must not abort: '.$commandTester->getDisplay()
+        );
+
+        $this->em->clear();
+        $repository = $this->em->getRepository(Email::class);
+        \assert($repository instanceof EmailRepository);
+
+        foreach ([$translatedParent->getId(), $secondEmail->getId()] as $emailId) {
+            $email = $repository->find($emailId);
+            \assert($email instanceof Email);
+            Assert::assertFalse(
+                $email->isPublished(),
+                sprintf('Email "%s" must be unpublished once it has no pending contacts left.', $email->getName())
+            );
+        }
     }
 
     private function createSegment(): LeadList
@@ -139,7 +197,19 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
         $this->em->flush();
     }
 
-    private function createEmail(string $name, string $language, LeadList $segment, ?Email $translationParent = null): Email
+    private function createCategory(string $title): Category
+    {
+        $category = new Category();
+        $category->setTitle($title);
+        $category->setAlias(strtolower($title));
+        $category->setBundle('email');
+        $this->em->persist($category);
+        $this->em->flush();
+
+        return $category;
+    }
+
+    private function createEmail(string $name, string $language, LeadList $segment, ?Email $translationParent = null, ?Category $category = null): Email
     {
         $email = new Email();
         $email->setName($name);
@@ -150,6 +220,10 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
         $email->setPublishUp(new \DateTime('-1 day'));
         $email->setIsPublished(true);
         $email->addList($segment);
+
+        if (null !== $category) {
+            $email->setCategory($category);
+        }
 
         if (null !== $translationParent) {
             $email->setTranslationParent($translationParent);
