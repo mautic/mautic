@@ -24,7 +24,7 @@ trait TranslationEntityTrait
      * @var Collection<int, T>
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
-    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'translationParent', indexBy: 'id')]
+    #[ORM\OneToMany(mappedBy: 'translationParent', targetEntity: self::class, indexBy: 'id')]
     #[ORM\OrderBy(['isPublished' => 'DESC'])]
     private $translationChildren;
 
