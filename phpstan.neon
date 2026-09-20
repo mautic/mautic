@@ -41,10 +41,6 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     ignoreErrors:
-        # CompanyLeadRepository is only needed by the static IdentifyCompanyHelper, exposed via getter to avoid threading it through 9 call sites
-        -
-            identifier: mautic.noServiceGetter
-            path: app/bundles/LeadBundle/Model/CompanyModel.php
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: mautic.noNullableServiceInConstructor
@@ -111,6 +107,8 @@ parameters:
         # on purposelater
         #- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
 
+        # can't figure out what the right type should be for FormBuilderInterface
+        - '#buildForm\(\) expects Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null>, Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null> given#'
         # on purpose type check
         -
             message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
@@ -125,9 +123,6 @@ parameters:
         -
             identifier: return.deprecatedClass
             path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
-        -
-            identifier: argument.type
-            path: app/bundles/CacheBundle/Tests/EventListener/CacheClearSubscriberTest.php
 
         -
             identifier: class.extendsDeprecatedClass
@@ -207,9 +202,6 @@ parameters:
             paths:
                 - app/bundles/CoreBundle/EventListener/CommonStatsSubscriber.php
                 - app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
-        -
-            message: '#Method PHPUnit\\Framework\\MockObject\\Builder\\InvocationMocker::willReturnOnConsecutiveCalls\(\) invoked with unpacked array with possibly string key#'
-            path: app/bundles/IntegrationsBundle/Tests/Unit/Sync/SyncDataExchange/Internal/Executioner/ReferenceResolverTest.php
         -
             message: '#Method MauticPlugin\\GrapesJsBuilderBundle\\Entity\\GrapesJsBuilderRepository@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php:\d+::findOneBy\(\) is marked as impure but does not have any side effects#'
             path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php

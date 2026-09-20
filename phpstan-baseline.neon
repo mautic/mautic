@@ -246,12 +246,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Entity/Event.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\Event\:\:setEventType\(\) has parameter \$eventType with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/Event.php
-
-		-
 			message: '#^Property Mautic\\CampaignBundle\\Entity\\Event\:\:\$campaign \(Mautic\\CampaignBundle\\Entity\\Campaign\) does not accept null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -612,12 +606,6 @@ parameters:
 			path: app/bundles/ChannelBundle/Entity/MessageRepository.php
 
 		-
-			message: '#^Method Mautic\\ChannelBundle\\Event\\ChannelBroadcastEvent\:\:checkContext\(\) has parameter \$channel with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Event/ChannelBroadcastEvent.php
-
-		-
 			message: '#^Method Mautic\\ChannelBundle\\Event\\MessageQueueBatchProcessEvent\:\:__construct\(\) has parameter \$channel with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -625,12 +613,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\ChannelBundle\\Event\\MessageQueueBatchProcessEvent\:\:__construct\(\) has parameter \$channelId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Event/MessageQueueBatchProcessEvent.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Event\\MessageQueueBatchProcessEvent\:\:checkContext\(\) has parameter \$channel with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/ChannelBundle/Event/MessageQueueBatchProcessEvent.php
@@ -787,12 +769,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\ConfigBundle\\Event\\ConfigBuilderEvent\:\:addFileFields\(\) has parameter \$fields with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ConfigBundle/Event/ConfigBuilderEvent.php
-
-		-
-			message: '#^Method Mautic\\ConfigBundle\\Event\\ConfigBuilderEvent\:\:getParametersFromConfig\(\) has parameter \$bundle with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/ConfigBundle/Event/ConfigBuilderEvent.php
@@ -997,12 +973,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:\:addBigIntIdField\(\) has parameter \$fieldName with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Doctrine/Mapping/ClassMetadataBuilder.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:\:addLead\(\) has parameter \$inversedBy with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Doctrine/Mapping/ClassMetadataBuilder.php
@@ -2661,61 +2631,7 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/StatRepository.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\EmailSendEvent\:\:addTextHeader\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/EmailSendEvent.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\EmailSendEvent\:\:addTextHeader\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/EmailSendEvent.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\EmailSendEvent\:\:addToken\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/EmailSendEvent.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\EmailSendEvent\:\:addToken\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/EmailSendEvent.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\EmailValidationEvent\:\:setInvalid\(\) has parameter \$reason with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/EmailValidationEvent.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\MonitoredEmailEvent\:\:addFolder\(\) has parameter \$bundleKey with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/MonitoredEmailEvent.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\MonitoredEmailEvent\:\:addFolder\(\) has parameter \$folderKey with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/MonitoredEmailEvent.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\MonitoredEmailEvent\:\:addFolder\(\) has parameter \$label with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/MonitoredEmailEvent.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Event\\MonitoredEmailEvent\:\:getData\(\) has parameter \$bundleKey with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/MonitoredEmailEvent.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\MonitoredEmailEvent\:\:getData\(\) has parameter \$default with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Event/MonitoredEmailEvent.php
@@ -2725,18 +2641,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Event/MonitoredEmailEvent.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\ParseEmailEvent\:\:isApplicable\(\) has parameter \$bundleKey with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/ParseEmailEvent.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Event\\ParseEmailEvent\:\:isApplicable\(\) has parameter \$folderKeys with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Event/ParseEmailEvent.php
 
 		-
 			message: '#^Call to an undefined method Mautic\\EmailBundle\\Entity\\Email\:\:getEmail\(\)\.$#'
@@ -3648,19 +3552,7 @@ parameters:
 			path: app/bundles/FormBundle/Entity/SubmissionRepository.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\Event\\FormBuilderEvent\:\:addValidator\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Event/FormBuilderEvent.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Event\\SubmissionEvent\:\:getActionFeedback\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Event/SubmissionEvent.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Event\\SubmissionEvent\:\:getPostSubmitCallback\(\) has parameter \$key with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/FormBundle/Event/SubmissionEvent.php
@@ -3672,12 +3564,6 @@ parameters:
 			path: app/bundles/FormBundle/Event/SubmissionEvent.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\Event\\SubmissionEvent\:\:getPostSubmitResponse\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/FormBundle/Event/SubmissionEvent.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Event\\SubmissionEvent\:\:setActionFeedback\(\) has parameter \$feedback with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -3685,18 +3571,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\FormBundle\\Event\\SubmissionEvent\:\:setActionFeedback\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Event/SubmissionEvent.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Event\\SubmissionEvent\:\:setPostSubmitCallbackResponse\(\) has parameter \$key with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Event/SubmissionEvent.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Event\\SubmissionEvent\:\:setPostSubmitResponse\(\) has parameter \$response with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/FormBundle/Event/SubmissionEvent.php
