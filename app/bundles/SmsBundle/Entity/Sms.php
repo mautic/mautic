@@ -211,8 +211,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
             ->option('default', 0)
             ->build();
 
-        self::addTranslationMetadata($builder, self::class);
-
         self::addProjectsField($builder, 'sms_projects_xref', 'sms_id');
     }
 

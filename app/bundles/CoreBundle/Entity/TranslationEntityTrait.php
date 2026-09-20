@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
@@ -40,10 +39,6 @@ trait TranslationEntityTrait
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     #[ORM\Column(name: 'lang', type: 'string', length: 191)]
     private string $language = 'en';
-
-    protected static function addTranslationMetadata(ClassMetadataBuilder $builder, string $entityClass, string $languageColumnName = 'lang'): void
-    {
-    }
 
     public function addTranslationChild(TranslationEntityInterface $child): static
     {

@@ -431,7 +431,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addField('revision', Types::INTEGER);
         $builder->addCategory();
 
-        self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
 
         $builder->addField('headers', Types::JSON);

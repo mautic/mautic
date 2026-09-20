@@ -308,7 +308,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
         $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
 
-        self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
         self::addProjectsField($builder, 'page_projects_xref', 'page_id');
     }
