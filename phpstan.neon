@@ -300,8 +300,6 @@ rules:
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
     - Utils\PHPStan\Rule\PreferCustomRepositoryOverGetRepositoryRule
     - Utils\PHPStan\Rule\RequireArrayShapeReturnRule
-    # enable later, might not be needed
-    - Utils\PHPStan\Rule\NoDuplicateNonRepeatableAttributeRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
