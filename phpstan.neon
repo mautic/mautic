@@ -6,11 +6,10 @@ parameters:
     tmpDir: ./var/phpstan-cache
     level: 6
 
-    reportUnmatchedIgnoredErrors: false
+    # reportUnmatchedIgnoredErrors: false
 
     treatPhpDocTypesAsCertain: false
-    parallel:
-        processTimeout: 1000.0
+
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
         return: 88.9
@@ -59,8 +58,11 @@ parameters:
                 - app/bundles/CoreBundle/Tests/Functional/RouteMapTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php
+<<<<<<< HEAD
                 - app/bundles/CoreBundle/Tests/Traits/LoggerTrait.php
                 - app/bundles/LeadBundle/Tests/Model/FieldModelTest.php
+=======
+>>>>>>> 4ce39f18b3 (Clean up phpstan.neon: enable unmatched-ignore reporting and drop stale ignores)
                 - app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
                 - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
         - identifier: missingType.generics
@@ -71,8 +73,6 @@ parameters:
         # not all IDEs are as smart as PHPSTAN and need the type hint
         - identifier: function.alreadyNarrowedType
         - identifier: instanceof.alwaysTrue
-        # Symfony 7.4 deprecation - Request->get() to be fixed before Symfony 8.0
-        - '#Call to deprecated method get\(\) of class Symfony\\Component\\HttpFoundation\\Request#'
         - '/Variable \$\w+ might not be defined\./'
         # test on purpose
         - '#Call to method PHPUnit\\Framework\\Assert::assertIsClosedResource\(\) with resource will always evaluate to true#'
@@ -111,8 +111,6 @@ parameters:
         # on purposelater
         #- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
 
-        # can't figure out what the right type should be for FormBuilderInterface
-        - '#buildForm\(\) expects Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null>, Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null> given#'
         # on purpose type check
         -
             message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
@@ -124,9 +122,6 @@ parameters:
             path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/HttpFactory.php
 
         # deprecation
-        -
-            identifier: return.deprecatedClass
-            message: '#Return type of method (Mautic|MauticPlugin)\\(.*?)\\EventListener\\CampaignSubscriber::(.*?) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent#'
         -
             identifier: return.deprecatedClass
             path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
@@ -164,9 +159,6 @@ parameters:
 
         # mautic deprecations
         -
-            identifier: staticMethod.deprecated
-            message: '#class\s+Mautic#'
-        -
             identifier: parameter.deprecatedClass
             message: '#class\s+Mautic#'
         -
@@ -186,12 +178,6 @@ parameters:
             message: '#class\s+Mautic#'
         -
             identifier: classConstant.deprecatedClass
-            message: '#class\s+Mautic#'
-        -
-            identifier: new.deprecatedClass
-            message: '#class\s+Mautic#'
-        -
-            identifier: classConstant.deprecated
             message: '#class\s+Mautic#'
 
         # handle later
@@ -243,11 +229,6 @@ parameters:
             identifier: parameterByRef.type
             path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
 
-        # not relevant
-        -
-            path: utils/rector/src/LoadMetadataToDoctrineAttributeRector.php
-            identifier: return.type
-
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
         - vendor/lightsaml2/sp-bundle/src
@@ -262,7 +243,6 @@ parameters:
     symfony:
         containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
         consoleApplicationLoader: app/console-application.php
-
 
 rules:
     - Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
