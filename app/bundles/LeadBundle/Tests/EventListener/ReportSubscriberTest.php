@@ -302,7 +302,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = new AnyInvokedCount();
         $this->reportBuilderEventMock->expects($matcher)->method('checkContext')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher): false {
+                function (array $context) use ($matcher): false {
                     if (1 === $matcher->numberOfInvocations()) {
                         $this->assertSame([
                             'leads',
@@ -311,7 +311,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'contact.attribution.first',
                             'contact.attribution.last',
                             'contact.frequencyrules',
-                        ], $parameters[0]);
+                        ], $context);
                     }
 
                     return false;
