@@ -61,6 +61,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use VariantEntityTrait<Page>
  */
 #[EntityEvent]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinTable: new ORM\JoinTable(name: 'page_projects_xref'),
+    joinColumns: [new ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+)])]
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface, OptimisticLockInterface
 {
     use TranslationEntityTrait;
@@ -310,7 +316,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
-        self::addProjectsField($builder, 'page_projects_xref', 'page_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

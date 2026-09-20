@@ -52,6 +52,12 @@ use Symfony\Component\Validator\Constraints\Sequentially;
     ]
 )]
 #[Upload]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinTable: new ORM\JoinTable(name: 'asset_projects_xref'),
+    joinColumns: [new ORM\JoinColumn(name: 'asset_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+)])]
 class Asset extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -224,7 +230,6 @@ class Asset extends FormEntity implements UuidInterface
             ->nullable()
             ->build();
 
-        self::addProjectsField($builder, 'asset_projects_xref', 'asset_id');
     }
 
     /**

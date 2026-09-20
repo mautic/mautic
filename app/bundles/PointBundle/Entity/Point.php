@@ -47,6 +47,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinTable: new ORM\JoinTable(name: 'point_projects_xref'),
+    joinColumns: [new ORM\JoinColumn(name: 'point_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+)])]
 class Point extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -163,7 +169,6 @@ class Point extends FormEntity implements UuidInterface
 
         $builder->addCategory();
 
-        self::addProjectsField($builder, 'point_projects_xref', 'point_id');
     }
 
     /**

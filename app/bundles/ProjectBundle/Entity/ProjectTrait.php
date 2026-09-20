@@ -6,33 +6,22 @@ namespace Mautic\ProjectBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
+use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 
 trait ProjectTrait
 {
+    // Join table and columns differ per entity, so each entity overrides them with #[ORM\AssociationOverrides].
     /**
      * @var Collection<int, Project>
      */
+    #[ORM\ManyToMany(targetEntity: Project::class, fetch: 'LAZY', indexBy: 'name', cascade: ['persist', 'merge', 'detach'])]
+    #[ORM\OrderBy(['name' => 'ASC'])]
     private Collection $projects;
 
     private function initializeProjects(): void
     {
         $this->projects = new ArrayCollection();
-    }
-
-    private static function addProjectsField(ClassMetadataBuilder $builder, string $tableName, string $columnName): void
-    {
-        $builder->createManyToMany('projects', Project::class)
-            ->setJoinTable($tableName)
-            ->addInverseJoinColumn('project_id', 'id', false, false, 'CASCADE')
-            ->addJoinColumn($columnName, 'id', false, false, 'CASCADE')
-            ->setOrderBy(['name' => 'ASC'])
-            ->setIndexBy('name')
-            ->fetchLazy()
-            ->cascadePersist()
-            ->cascadeDetach()
-            ->build();
     }
 
     private static function addProjectsInLoadApiMetadata(ApiMetadataDriver $metadata, string $groupPrefix): void

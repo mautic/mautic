@@ -64,6 +64,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use TranslationEntityTrait<DynamicContent>
  * @use VariantEntityTrait<DynamicContent>
  */
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinTable: new ORM\JoinTable(name: 'dynamic_content_projects_xref'),
+    joinColumns: [new ORM\JoinColumn(name: 'dynamic_content_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+)])]
 class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
     use TranslationEntityTrait;
@@ -212,7 +218,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 ->nullable()
                 ->build();
 
-        self::addProjectsField($builder, 'dynamic_content_projects_xref', 'dynamic_content_id');
     }
 
     /**

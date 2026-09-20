@@ -55,6 +55,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 #[NoOrphanEvents]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinTable: new ORM\JoinTable(name: 'campaign_projects_xref'),
+    joinColumns: [new ORM\JoinColumn(name: 'campaign_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+)])]
 class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
 {
     use UuidTrait;
@@ -190,7 +196,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
         $builder->addNullableField('deleted', 'datetime');
 
-        self::addProjectsField($builder, 'campaign_projects_xref', 'campaign_id');
     }
 
     /**

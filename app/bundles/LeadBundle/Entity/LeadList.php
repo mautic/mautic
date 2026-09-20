@@ -53,6 +53,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueUserAlias(field: 'alias', message: 'mautic.lead.list.alias.unique')]
 #[SegmentUsedInCampaigns]
 #[SegmentInUse]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinTable: new ORM\JoinTable(name: 'lead_list_projects_xref'),
+    joinColumns: [new ORM\JoinColumn(name: 'leadlist_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+)])]
 class LeadList extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -173,7 +179,6 @@ class LeadList extends FormEntity implements UuidInterface
             ->nullable()
             ->build();
 
-        self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
         $builder->addNullableField('deleted', 'datetime');
 
     }

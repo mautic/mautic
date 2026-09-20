@@ -47,6 +47,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinTable: new ORM\JoinTable(name: 'focus_projects_xref'),
+    joinColumns: [new ORM\JoinColumn(name: 'focus_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+)])]
 class Focus extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -194,7 +200,6 @@ class Focus extends FormEntity implements UuidInterface
 
         $builder->addNullableField('html', 'text');
 
-        self::addProjectsField($builder, 'focus_projects_xref', 'focus_id');
     }
 
     /**

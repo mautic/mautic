@@ -48,6 +48,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinTable: new ORM\JoinTable(name: 'message_projects_xref'),
+    joinColumns: [new ORM\JoinColumn(name: 'message_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+)])]
 class Message extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -111,7 +117,6 @@ class Message extends FormEntity implements UuidInterface
             ->addPublishDates()
             ->addCategory();
 
-        self::addProjectsField($builder, 'message_projects_xref', 'message_id');
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

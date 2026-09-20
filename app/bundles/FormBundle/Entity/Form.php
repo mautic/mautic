@@ -47,6 +47,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinTable: new ORM\JoinTable(name: 'form_projects_xref'),
+    joinColumns: [new ORM\JoinColumn(name: 'form_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+)])]
 class Form extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -283,7 +289,6 @@ class Form extends FormEntity implements UuidInterface
 
         $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
 
-        self::addProjectsField($builder, 'form_projects_xref', 'form_id');
     }
 
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array

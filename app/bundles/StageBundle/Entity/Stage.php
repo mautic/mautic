@@ -45,6 +45,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 #[UniqueEntity(fields: ['weight'], message: 'mautic.stage.weight.unique')]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinTable: new ORM\JoinTable(name: 'stage_projects_xref'),
+    joinColumns: [new ORM\JoinColumn(name: 'stage_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+)])]
 class Stage extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -125,7 +131,6 @@ class Stage extends FormEntity implements UuidInterface
 
         $builder->addCategory();
 
-        self::addProjectsField($builder, 'stage_projects_xref', 'stage_id');
     }
 
     /**
