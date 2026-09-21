@@ -15,6 +15,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\ProjectBundle\Entity\Project;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -161,7 +162,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $filesystem->mirror($translationsPath, $languagePath);
 
         /** @var LanguageHelper $languageHelper */
-        $languageHelper = $this->getContainer()->get('mautic.helper.language');
+        $languageHelper = $this->getContainer()->get(LanguageHelper::class);
 
         $formPayload = [
             'name'       => 'Test Form',
@@ -401,7 +402,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
      *      message_arg: array<string, mixed>
      *  }> $expectedMessages The expected messages with translation arguments
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataTestLabelsForFormActions')]
+    #[DataProvider('dataTestLabelsForFormActions')]
     public function testLabelsForFormAction(array $inputValues, array $expectedMessages): void
     {
         $form = $this->createForm('test', 'test');
@@ -424,7 +425,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
-        $translator = $this->getContainer()->get('translator');
+        $translator = $this->getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         foreach ($expectedMessages as $expectedMessage) {

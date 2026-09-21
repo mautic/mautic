@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\PointBundle\Form\Type\GroupListType;
@@ -11,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
 /**
  * @extends AbstractType<mixed>
  */
-class PointActionType extends AbstractType
+final class PointActionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -25,12 +27,7 @@ class PointActionType extends AbstractType
                 'scale'       => 0,
                 'data'        => $options['data']['points'] ?? 0,
                 'constraints' => [
-                    new NotEqualTo(
-                        [
-                            'value'   => '0',
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
+                    new NotEqualTo(value: '0', message: 'mautic.core.value.required'),
                 ],
             ]
         );

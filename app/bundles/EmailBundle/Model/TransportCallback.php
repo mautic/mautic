@@ -8,12 +8,12 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
 
-class TransportCallback
+final readonly class TransportCallback
 {
     public function __construct(
-        private readonly DoNotContact $dncModel,
-        private readonly ContactFinder $finder,
-        private readonly EmailStatModel $emailStatModel,
+        private DoNotContact $dncModel,
+        private ContactFinder $finder,
+        private EmailStatModel $emailStatModel,
     ) {
     }
 

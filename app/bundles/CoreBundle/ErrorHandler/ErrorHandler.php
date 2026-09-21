@@ -11,7 +11,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Symfony\Component\ErrorHandler\Error\OutOfMemoryError;
     use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
-    class ErrorHandler
+    final class ErrorHandler
     {
         public static $handler;
 
@@ -373,7 +373,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         /**
          * @param mixed[] $context
          */
-        protected function log($logLevel, $message, array $context = [], $debugTrace = null)
+        private function log(string $logLevel, string $message, array $context = [], $debugTrace = null): void
         {
             $message = strip_tags($message);
             if ($this->logger) {
@@ -473,7 +473,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 }
             }
 
-            defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
+            defined('MAUTIC_OFFLINE') || define('MAUTIC_OFFLINE', 1);
 
             try {
                 // Get the URLs base path
@@ -548,7 +548,7 @@ namespace {
                 if (1 === count($context) && true === $context[0]) {
                     ErrorHandler::logDebugEntry($log, $context, true);
                 } else {
-                    ErrorHandler::logDebugEntry($log, (empty($context)) ? [] : $context);
+                    ErrorHandler::logDebugEntry($log, $context);
                 }
             }
         }

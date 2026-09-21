@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class TimelineController extends CommonController
+final class TimelineController extends CommonController
 {
     use LeadAccessTrait;
     use LeadDetailsTrait;
@@ -187,7 +187,7 @@ class TimelineController extends CommonController
         );
     }
 
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): array|Response
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

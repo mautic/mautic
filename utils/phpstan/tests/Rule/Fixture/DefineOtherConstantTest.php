@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Tests\Rule\Fixture;
 
-class DefineOtherConstantTest
+final class DefineOtherConstantTest
 {
     public function setUp(): void
     {

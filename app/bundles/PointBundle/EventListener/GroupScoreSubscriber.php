@@ -9,10 +9,10 @@ use Mautic\PointBundle\Model\TriggerModel;
 use Mautic\PointBundle\PointGroupEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GroupScoreSubscriber implements EventSubscriberInterface
+final readonly class GroupScoreSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly TriggerModel $triggerModel,
+        private TriggerModel $triggerModel,
     ) {
     }
 

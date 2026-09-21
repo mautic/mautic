@@ -10,6 +10,7 @@ use Mautic\ApiBundle\Serializer\Exclusion\FieldInclusionStrategy;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -20,6 +21,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -28,21 +30,15 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @extends FetchCommonApiController<LeadEventLog>
  */
-class EventLogApiController extends FetchCommonApiController
+final class EventLogApiController extends FetchCommonApiController
 {
     use LeadAccessTrait;
 
     private const LOG_SERIALIZATION = 30;
 
-    /**
-     * @var Campaign
-     */
-    protected $campaign;
+    private ?Campaign $campaign = null;
 
-    /**
-     * @var Lead
-     */
-    protected $contact;
+    private ?Lead $contact = null;
 
     /**
      * @var EventLogModel|null
@@ -59,9 +55,11 @@ class EventLogApiController extends FetchCommonApiController
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        EventLogModel $campaignEventLogModel,
+        private LeadModel $leadModel,
+        private CampaignModel $campaignModel,
+        private EventModel $eventModel,
     ) {
-        $campaignEventLogModel = $modelFactory->getModel('campaign.event_log');
-        \assert($campaignEventLogModel instanceof EventLogModel);
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
         $this->entityNameOne            = 'event';
@@ -90,10 +88,8 @@ class EventLogApiController extends FetchCommonApiController
 
     /**
      * Get a list of events.
-     *
-     * @return Response
      */
-    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null)
+    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null): Response
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -103,7 +99,7 @@ class EventLogApiController extends FetchCommonApiController
 
         // Ensure campaign exists and user has access
         if (!empty($campaignId)) {
-            $campaign = $this->getModel('campaign')->getEntity($campaignId);
+            $campaign = $this->campaignModel->getEntity($campaignId);
             if (null == $campaign || !$campaign->getId()) {
                 return $this->notFound();
             }
@@ -140,10 +136,7 @@ class EventLogApiController extends FetchCommonApiController
         return $this->getEntitiesAction($request, $userHelper);
     }
 
-    /**
-     * @return Response
-     */
-    public function editContactEventAction(Request $request, $eventId, $contactId)
+    public function editContactEventAction(Request $request, $eventId, $contactId): Response
     {
         $parameters = $request->request->all();
 
@@ -152,11 +145,8 @@ class EventLogApiController extends FetchCommonApiController
         if ($contact instanceof Response) {
             return $contact;
         }
-
-        /** @var EventModel $eventModel */
-        $eventModel = $this->getModel('campaign.event');
         /** @var Event $event */
-        $event = $eventModel->getEntity($eventId);
+        $event = $this->eventModel->getEntity($eventId);
         if (null === $event || !$event->getId()) {
             return $this->notFound();
         }
@@ -199,8 +189,8 @@ class EventLogApiController extends FetchCommonApiController
 
         $errors= [];
 
-        $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->getModel('campaign.event'), false);
-        $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->getModel('lead'), false);
+        $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->eventModel, false);
+        $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->leadModel, false);
 
         $this->inBatchMode = true;
         $errors            = [];
@@ -245,7 +235,7 @@ class EventLogApiController extends FetchCommonApiController
             $this->entityNameMulti => $events,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 

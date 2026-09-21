@@ -19,13 +19,23 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class ConfigController extends FormController
+final class ConfigController extends FormController
 {
+    private TokenStorageInterface $tokenStorage;
+
+    #[Required]
+    public function autowireConfigController(
+        TokenStorageInterface $tokenStorage,
+    ): void {
+        $this->tokenStorage = $tokenStorage;
+    }
+
     /**
      * Controller action for editing the application configuration.
      */
-    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
@@ -33,8 +43,7 @@ class ConfigController extends FormController
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
         $fileFields = $event->getFileFields();
         $formThemes = $event->getFormThemes();
 
@@ -74,7 +83,7 @@ class ConfigController extends FormController
                     $configEvent
                         ->setOriginalNormData($originalNormData)
                         ->setNormData($form->getNormData());
-                    $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
+                    $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
                     $formValues = $configEvent->getConfig();
 
                     $errors      = $configEvent->getErrors();
@@ -120,7 +129,7 @@ class ConfigController extends FormController
                             }
 
                             $configurator->write();
-                            $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
+                            $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
 
                             $this->addFlashMessage('mautic.config.config.notice.updated');
 
@@ -133,7 +142,7 @@ class ConfigController extends FormController
                             $this->addFlashMessage('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
 
-                        $this->setLocale($request, $tokenStorage, $params);
+                        $this->setLocale($request, $params);
                     }
                 } elseif (!$isWritable) {
                     $form->addError(
@@ -189,8 +198,7 @@ class ConfigController extends FormController
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
@@ -226,8 +234,7 @@ class ConfigController extends FormController
 
         $success    = 0;
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $dispatcher = $this->dispatcher;
-        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
@@ -278,9 +285,9 @@ class ConfigController extends FormController
     /**
      * @param array<string, string> $params
      */
-    private function setLocale(Request $request, TokenStorageInterface $tokenStorage, array $params): void
+    private function setLocale(Request $request, array $params): void
     {
-        $me = $tokenStorage->getToken()->getUser();
+        $me = $this->tokenStorage->getToken()->getUser();
         assert($me instanceof User);
         $locale = $me->getLocale();
 

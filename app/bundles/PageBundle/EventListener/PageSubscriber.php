@@ -16,15 +16,15 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly AssetsHelper $assetsHelper,
-        private readonly IpLookupHelper $ipLookupHelper,
-        private readonly AuditLogModel $auditLogModel,
-        private readonly LanguageHelper $languageHelper,
-        private readonly PageModel $pageModel,
-        private readonly PageDraftModel $pageDraftModel,
+        private AssetsHelper $assetsHelper,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private LanguageHelper $languageHelper,
+        private PageModel $pageModel,
+        private PageDraftModel $pageDraftModel,
     ) {
     }
 

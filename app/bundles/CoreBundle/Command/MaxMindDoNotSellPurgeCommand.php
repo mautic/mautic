@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -19,12 +19,23 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 #[AsCommand(
     name: 'mautic:max-mind:purge',
-    description: 'Purge data connected to MaxMind Do Not Sell list.'
+    description: 'Purge data connected to MaxMind Do Not Sell list.',
+    help: <<<'TXT'
+The <info>%command.name%</info> command will purge all data from Mautic which is related to any IP found on the MaxMind Do Not Sell List.
+
+<info>php %command.full_name% --dry-run</info>
+
+Performs a dry-run which will not actually purge any data, but will produce a list of what would be purged.
+
+<info>php %command.full_name% --batch-size</info>
+
+Set the number of records to return in a batch when processing the Do Not Sell List. This option is ignored if IPs are passed as an argument.
+TXT
 )]
-class MaxMindDoNotSellPurgeCommand extends Command
+final class MaxMindDoNotSellPurgeCommand extends Command
 {
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
         private readonly LeadRepository $leadRepository,
         private readonly MaxMindDoNotSellList $doNotSellList,
     ) {
@@ -39,18 +50,6 @@ class MaxMindDoNotSellPurgeCommand extends Command
                 'd',
                 InputOption::VALUE_NONE,
                 'Get a list of data that will be purged.'
-            )
-            ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command will purge all data from Mautic which is related to any IP found on the MaxMind Do Not Sell List.
-
-<info>php %command.full_name% --dry-run</info>
-
-Performs a dry-run which will not actually purge any data, but will produce a list of what would be purged.
-
-<info>php %command.full_name% --batch-size</info>
-
-Set the number of records to return in a batch when processing the Do Not Sell List. This option is ignored if IPs are passed as an argument.
-EOT
             );
     }
 

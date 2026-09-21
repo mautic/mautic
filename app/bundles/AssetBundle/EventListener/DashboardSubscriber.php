@@ -7,7 +7,7 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Symfony\Component\Routing\RouterInterface;
 
-class DashboardSubscriber extends MainDashboardSubscriber
+final class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
      * Define the name of the bundle/category of the widget(s).
@@ -39,8 +39,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected AssetModel $assetModel,
-        protected RouterInterface $router,
+        private readonly AssetModel $assetModel,
+        private readonly RouterInterface $router,
     ) {
     }
 

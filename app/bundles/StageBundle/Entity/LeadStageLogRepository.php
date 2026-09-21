@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * @extends CommonRepository<LeadStageLog>
  */
-class LeadStageLogRepository extends CommonRepository
+final class LeadStageLogRepository extends CommonRepository
 {
     private const UPDATE_STAGE_BATCH_SIZE = 500;
 

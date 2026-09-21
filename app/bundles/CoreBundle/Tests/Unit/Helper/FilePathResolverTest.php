@@ -7,6 +7,8 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\InputHelper;
+use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -35,7 +37,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $this->filePathResolver = new FilePathResolver($this->filesystemMock, $inputHelper);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Get correct name if few previous names are taken')]
+    #[TestDox('Get correct name if few previous names are taken')]
     public function testGetUniqueName(): void
     {
         $uploadDir     = 'my/upload/dir';
@@ -61,7 +63,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
                     return false;
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->fileMock->expects($this->once())
@@ -79,7 +81,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('filename_x-2.jpg', $name);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Throws an Exception if name cannot be generated')]
+    #[TestDox('Throws an Exception if name cannot be generated')]
     public function testCouldNotGetUniqueName(): void
     {
         $uploadDir     = 'my/upload/dir';
@@ -106,7 +108,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $this->filePathResolver->getUniqueFileName($uploadDir, $this->fileMock);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('No action is taken when directory already exists')]
+    #[TestDox('No action is taken when directory already exists')]
     public function testNoActionIfDirectoryExists(): void
     {
         $directory = 'my/directory';
@@ -119,7 +121,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $this->filePathResolver->createDirectory($directory);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Create new directory')]
+    #[TestDox('Create new directory')]
     public function testCreateNewDirectory(): void
     {
         $directory = 'my/directory';
@@ -136,7 +138,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $this->filePathResolver->createDirectory($directory);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Directory could not be created')]
+    #[TestDox('Directory could not be created')]
     public function testDirectoryCouldNotBeCreated(): void
     {
         $directory = 'my/directory';
@@ -157,7 +159,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $this->filePathResolver->createDirectory($directory);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Successfuly detete file')]
+    #[TestDox('Successfuly detete file')]
     public function testDeleteFile(): void
     {
         $file = 'my/file';
@@ -174,7 +176,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $this->filePathResolver->delete($file);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('File could not be deleted')]
+    #[TestDox('File could not be deleted')]
     public function testCouldNotDeleteFile(): void
     {
         $file = 'my/file';
@@ -192,7 +194,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $this->filePathResolver->delete($file);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('File could not be deleted')]
+    #[TestDox('File could not be deleted')]
     public function testDeleteFileWhichNotExists(): void
     {
         $file = 'my/file';

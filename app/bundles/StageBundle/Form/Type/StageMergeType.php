@@ -32,12 +32,9 @@ final class StageMergeType extends AbstractType
                 'placeholder' => 'mautic.core.form.chooseone',
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.core.value.required']
+                        message: 'mautic.core.value.required'
                     ),
-                    new Choice([
-                        'choices' => array_values($stageChoices),
-                        'message' => 'mautic.core.value.invalid',
-                    ]),
+                    new Choice(choices: array_values($stageChoices), message: 'mautic.core.value.invalid'),
                 ],
             ]
         );

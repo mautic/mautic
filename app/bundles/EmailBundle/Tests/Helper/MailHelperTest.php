@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
@@ -29,6 +30,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -101,7 +103,7 @@ final class MailHelperTest extends TestCase
     /**
      * @var array<array<string,string|int>>
      */
-    protected array $contacts = [
+    private array $contacts = [
         [
             'id'        => 1,
             'email'     => 'contact1@somewhere.com',
@@ -134,13 +136,13 @@ final class MailHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
 
         // Some local environments do not have ext-imap loaded, but Mailbox uses these
         // constants in method signatures and class loading fails without them.
-        defined('SORTARRIVAL') or define('SORTARRIVAL', 0);
-        defined('SE_UID') or define('SE_UID', 1);
-        defined('FT_PEEK') or define('FT_PEEK', 2);
+        defined('SORTARRIVAL') || define('SORTARRIVAL', 0);
+        defined('SE_UID') || define('SE_UID', 1);
+        defined('FT_PEEK') || define('FT_PEEK', 2);
 
         $this->contactRepository    = $this->createMock(LeadRepository::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -455,7 +457,8 @@ final class MailHelperTest extends TestCase
             $this->createStub(TrackableModel::class),
             $this->createStub(RedirectModel::class),
             $this->sMimeHelper,
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
 
         $email = new Email();
@@ -685,7 +688,7 @@ final class MailHelperTest extends TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmails')]
+    #[DataProvider('provideEmails')]
     public function testValidateEmails(string $email, bool $isValid): void
     {
         $helper = $this->mockEmptyMailHelper();
@@ -1036,9 +1039,7 @@ final class MailHelperTest extends TestCase
             $parameterMap
         );
 
-        $coreParametersHelper = $this->coreParametersHelper;
-
-        $coreParametersHelper->method('get')->willReturnMap($parameterMap);
+        $this->coreParametersHelper->method('get')->willReturnMap($parameterMap);
 
         $mockMailboxHelper = $this->createMock(Mailbox::class);
         $mockMailboxHelper->method('isConfigured')
@@ -1049,8 +1050,7 @@ final class MailHelperTest extends TestCase
 
     public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair(): void
     {
-        $coreParametersHelper = $this->coreParametersHelper;
-        $coreParametersHelper->expects($this->atLeast(2))->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(2))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_return_path', false, null],
@@ -1075,7 +1075,7 @@ final class MailHelperTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('minifyHtmlDataProvider')]
+    #[DataProvider('minifyHtmlDataProvider')]
     public function testMinifyHtml(bool $minifyHtml, string $html, string $expectedHtml): void
     {
         $params = [
@@ -1416,6 +1416,7 @@ final class MailHelperTest extends TestCase
             $this->createStub(RedirectModel::class),
             $this->sMimeHelper,
             $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
     }
 
@@ -1459,7 +1460,8 @@ final class MailHelperTest extends TestCase
             $this->trackableModel,
             $this->redirectModel,
             $this->sMimeHelper,
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
         $mailer->addTo($this->contacts[0]['email']);
         $mailer->setIdHash();
@@ -1538,7 +1540,8 @@ final class MailHelperTest extends TestCase
             $this->trackableModel,
             $this->redirectModel,
             $this->sMimeHelper,
-            $this->emailStatModel
+            $this->emailStatModel,
+            $this->createStub(CopyRepository::class),
         );
         $mailer->addTo($this->contacts[0]['email']);
 
@@ -1563,5 +1566,85 @@ final class MailHelperTest extends TestCase
         $mailer->send(true);
         $this->assertSame(1, $onSendDispatchCount);
         $this->assertStringContainsString('Demo Signature', (string) $mailer->message->getHtmlBody());
+    }
+
+    public function testBounceMailboxReturnPathIsNotShadowedBySenderHeader(): void
+    {
+        $this->stubCoreParameters(['mailer_from_email' => 'from@example.com', 'mailer_from_name' => 'From']);
+
+        $this->mailbox->method('isConfigured')->willReturn(true);
+        $this->mailbox->method('getMailboxSettings')->willReturn(['address' => 'bounces@example.com']);
+
+        $transport = new SmtpTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->setIdHash('abc123');
+        $mailer->setTo('recipient@example.com');
+        $mailer->setSubject('Subject');
+        $mailer->setBody('<p>Body</p>');
+
+        $this->assertTrue($mailer->send());
+
+        $returnPath = $transport->sentMessage->getReturnPath();
+        $this->assertInstanceOf(\Symfony\Component\Mime\Address::class, $returnPath, 'Return-Path should be set to the VERP bounce address.');
+        $this->assertSame('bounces+bounce_abc123@example.com', $returnPath->getAddress());
+
+        $this->assertNotInstanceOf(
+            \Symfony\Component\Mime\Address::class,
+            $transport->sentMessage->getSender(),
+            'Sender header must be removed when a VERP Return-Path is configured; otherwise Symfony Mailer routes the SMTP envelope to From instead of Return-Path.'
+        );
+    }
+
+    public function testCustomReturnPathIsNotShadowedBySenderHeader(): void
+    {
+        $this->stubCoreParameters([
+            'mailer_from_email'  => 'from@example.com',
+            'mailer_from_name'   => 'From',
+            'mailer_return_path' => 'bounce@example.org',
+        ]);
+
+        $this->mailbox->method('isConfigured')->willReturn(false);
+
+        $transport = new SmtpTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->setTo('recipient@example.com');
+        $mailer->setSubject('Subject');
+        $mailer->setBody('<p>Body</p>');
+
+        $this->assertTrue($mailer->send());
+
+        $returnPath = $transport->sentMessage->getReturnPath();
+        $this->assertInstanceOf(\Symfony\Component\Mime\Address::class, $returnPath);
+        $this->assertSame('bounce@example.org', $returnPath->getAddress());
+        $this->assertNotInstanceOf(\Symfony\Component\Mime\Address::class, $transport->sentMessage->getSender());
+    }
+
+    public function testSenderHeaderAlignsWithFromWhenNoReturnPathIsConfigured(): void
+    {
+        $this->stubCoreParameters(['mailer_from_email' => 'from@example.com', 'mailer_from_name' => 'From']);
+
+        $this->mailbox->method('isConfigured')->willReturn(false);
+
+        $transport = new SmtpTransport();
+        $mailer    = $this->createMailHelperWithTransport($transport);
+        $mailer->setTo('recipient@example.com');
+        $mailer->setSubject('Subject');
+        $mailer->setBody('<p>Body</p>');
+
+        $this->assertTrue($mailer->send());
+
+        $this->assertNotInstanceOf(\Symfony\Component\Mime\Address::class, $transport->sentMessage->getReturnPath());
+        $sender = $transport->sentMessage->getSender();
+        $this->assertInstanceOf(\Symfony\Component\Mime\Address::class, $sender, 'Sender must align with From when no Return-Path is set so strict SMTP servers do not reject the envelope (see #14047).');
+        $this->assertSame('from@example.com', $sender->getAddress());
+    }
+
+    /**
+     * @param array<string, mixed> $values
+     */
+    private function stubCoreParameters(array $values): void
+    {
+        $this->coreParametersHelper->method('get')
+            ->willReturnCallback(fn (string $name, $default = null) => $values[$name] ?? $default);
     }
 }

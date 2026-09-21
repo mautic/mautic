@@ -7,13 +7,24 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<LeadCategory>
  */
 class LeadCategoryRepository extends CommonRepository
 {
+    private CategoryRepository $categoryRepository;
+
+    #[Required]
+    public function autowireLeadCategoryRepository(
+        CategoryRepository $categoryRepository,
+    ): void {
+        $this->categoryRepository = $categoryRepository;
+    }
+
     /**
      * @return array<mixed, array<string, mixed>>
      */
@@ -91,7 +102,7 @@ class LeadCategoryRepository extends CommonRepository
      */
     private function getLeadCategoriesMapping(Lead $lead, array $types, ?Criteria $criteria = null): array
     {
-        $parentQ = $this->getEntityManager()->getRepository(Category::class)->createQueryBuilder('c');
+        $parentQ = $this->categoryRepository->createQueryBuilder('c');
         $parentQ->select('c.id');
         $parentQ->where('c.isPublished = :isPublished');
         $parentQ->setParameter('isPublished', 1);
@@ -99,7 +110,7 @@ class LeadCategoryRepository extends CommonRepository
         $parentQ->setParameter('bundles', $types, ArrayParameterType::STRING);
 
         // Get the category ids for particular lead
-        $subQ = $this->getEntityManager()->getRepository(LeadCategory::class)->createQueryBuilder('lc');
+        $subQ = $this->createQueryBuilder('lc');
         $subQ->select('IDENTITY(lc.category)');
         $subQ->where($subQ->expr()->eq('lc.lead', ':leadId'));
         $subQ->setParameter('leadId', $lead->getId());

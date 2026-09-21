@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -13,10 +14,20 @@ use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AssetController extends FormController
+final class AssetController extends FormController
 {
-    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
+    private AuditLogModel $auditLogModel;
+
+    #[Required]
+    public function autowireAssetController(
+        AuditLogModel $auditLogModel,
+    ): void {
+        $this->auditLogModel = $auditLogModel;
+    }
+
+    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, AssetSearchScopeProvider $assetSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -103,8 +114,9 @@ class AssetController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue' => $search,
-                'items'       => $assets,
+                'searchValue'     => $search,
+                'searchScopes'    => $assetSearchScopeProvider->getScopes(),
+                'items'           => $assets,
                 'categories'  => $categories,
                 'limit'       => $limit,
                 'permissions' => $permissions,
@@ -165,11 +177,7 @@ class AssetController extends FormController
         if (!$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
             $this->throwAccessDenied();
         }
-
-        // Audit Log
-        $auditLogModel = $this->getModel('core.auditlog');
-        \assert($auditLogModel instanceof AuditLogModel);
-        $logs          = $auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
+        $logs          = $this->auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         return $this->delegateView([
             'returnUrl'      => $action,
@@ -393,10 +401,8 @@ class AssetController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -586,10 +592,8 @@ class AssetController extends FormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, AssetModel $model, $objectId)
+    public function deleteAction(Request $request, AssetModel $model, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.asset.page', 1);
         $returnUrl = $this->generateUrl('mautic_asset_index', ['page' => $page]);
@@ -691,7 +695,7 @@ class AssetController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $model->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -713,8 +717,6 @@ class AssetController extends FormController
 
     /**
      * Renders the container for the remote file browser.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response
     {

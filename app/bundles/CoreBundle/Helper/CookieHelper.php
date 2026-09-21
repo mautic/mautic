@@ -29,12 +29,7 @@ class CookieHelper implements EventSubscriberInterface
     ) {
     }
 
-    /**
-     * @param mixed $default
-     *
-     * @return mixed
-     */
-    public function getCookie(string $key, $default = null)
+    public function getCookie(string $key, mixed $default = null): mixed
     {
         if (null === $this->getRequest()) {
             return $default;

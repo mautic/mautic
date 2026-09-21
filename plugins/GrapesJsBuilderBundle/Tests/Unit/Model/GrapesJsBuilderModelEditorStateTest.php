@@ -28,14 +28,13 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 {
     public function testAddOrEditEntityStoresDecodedEditorStateAndCustomHtmlFallback(): void
     {
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request([], [
+        $requestStack = new RequestStack([new Request([], [
             'grapesjsbuilder' => [
                 'customMjml'  => '<mjml/>',
                 'editorState' => '{"pages":[{"id":"main"}]}',
             ],
             'customHtml' => '<html/>',
-        ]));
+        ])]);
 
         /** @var MockObject&EmailRepository $emailRepository */
         $emailRepository = $this->createMock(EmailRepository::class);
@@ -46,7 +45,6 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         /** @var MockObject&EmailModel $emailModel */
         $emailModel = $this->createMock(EmailModel::class);
         $emailModel->method('isUpdatingTranslationChildren')->willReturn(false);
-        $emailModel->method('getRepository')->willReturn($emailRepository);
 
         /** @var MockObject&GrapesJsBuilderRepository $grapesRepository */
         $grapesRepository = $this->createMock(GrapesJsBuilderRepository::class);
@@ -56,10 +54,9 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
             ->with(self::callback(static fn ($entity): bool => $entity instanceof GrapesJsBuilder && '<mjml/>' === $entity->getCustomMjml()));
 
         /** @var MockObject&EntityManager $entityManager */
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->method('getRepository')->with(GrapesJsBuilder::class)->willReturn($grapesRepository);
+        $entityManager = $this->createStub(EntityManager::class);
 
-        $model = $this->getModel($requestStack, $emailModel, $entityManager);
+        $model = $this->getModel($requestStack, $emailModel, $entityManager, $grapesRepository, $emailRepository);
 
         $email = new Email();
         $email->setContent(['existing' => true]);
@@ -77,13 +74,12 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
     public function testAddOrEditEntitySkipsWhenTranslationChildrenAreUpdating(): void
     {
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request([], [
+        $requestStack = new RequestStack([new Request([], [
             'grapesjsbuilder' => [
                 'customMjml'  => '<mjml/>',
                 'editorState' => '{"pages":[]}',
             ],
-        ]));
+        ])]);
 
         /** @var MockObject&EmailRepository $emailRepository */
         $emailRepository = $this->createMock(EmailRepository::class);
@@ -92,25 +88,23 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         /** @var MockObject&EmailModel $emailModel */
         $emailModel = $this->createMock(EmailModel::class);
         $emailModel->method('isUpdatingTranslationChildren')->willReturn(true);
-        $emailModel->method('getRepository')->willReturn($emailRepository);
 
         /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->never())->method('getRepository');
 
-        $model = $this->getModel($requestStack, $emailModel, $entityManager);
+        $model = $this->getModel($requestStack, $emailModel, $entityManager, null, $emailRepository);
 
         $model->addOrEditEntity(new Email());
     }
 
     public function testAddOrEditPageEntityPersistsOnlyWhenEditorStateProvided(): void
     {
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request([], [
+        $requestStack = new RequestStack([new Request([], [
             'grapesjsbuilder' => [
                 'editorState' => ['pages' => [['id' => 'landing']]],
             ],
-        ]));
+        ])]);
 
         /** @var MockObject&EmailModel $emailModel */
         $emailModel = $this->createStub(EmailModel::class);
@@ -133,12 +127,11 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         $this->assertIsArray($content['grapesjsbuilder']);
         $this->assertSame(['pages' => [['id' => 'landing']]], $content['grapesjsbuilder']['editorState']);
 
-        $requestStackNoEditor = new RequestStack();
-        $requestStackNoEditor->push(new Request([], [
+        $requestStackNoEditor = new RequestStack([new Request([], [
             'grapesjsbuilder' => [
                 'customMjml' => '<mjml/>',
             ],
-        ]));
+        ])]);
 
         /** @var MockObject&EntityManager $entityManagerNoEditor */
         $entityManagerNoEditor = $this->createMock(EntityManager::class);
@@ -153,10 +146,10 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         RequestStack $requestStack,
         EmailModel $emailModel,
         EntityManager $entityManager,
+        ?GrapesJsBuilderRepository $grapesJsBuilderRepository = null,
+        ?EmailRepository $emailRepository = null,
     ): GrapesJsBuilderModel {
-        return new GrapesJsBuilderModel(
-            $requestStack,
-            $emailModel,
+        $grapesJsBuilderModel = new GrapesJsBuilderModel(
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -164,7 +157,15 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
         );
+        $grapesJsBuilderModel->autowireGrapesJsBuilderModel(
+            $requestStack,
+            $emailModel,
+            $grapesJsBuilderRepository ?? $this->createStub(GrapesJsBuilderRepository::class),
+            $emailRepository ?? $this->createStub(EmailRepository::class),
+        );
+
+        return $grapesJsBuilderModel;
     }
 }

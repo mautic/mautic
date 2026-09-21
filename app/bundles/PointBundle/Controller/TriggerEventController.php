@@ -9,9 +9,19 @@ use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class TriggerEventController extends CommonFormController
+final class TriggerEventController extends CommonFormController
 {
+    private TriggerModel $triggerModel;
+
+    #[Required]
+    public function autowireTriggerEventController(
+        TriggerModel $triggerModel,
+    ): void {
+        $this->triggerModel = $triggerModel;
+    }
+
     /**
      * Generates new form and processes post data.
      */
@@ -46,12 +56,7 @@ class TriggerEventController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
-        // fire the builder event
-        /** @var TriggerModel $pointTriggerModel */
-        $pointTriggerModel = $this->getModel('point.trigger');
-        \assert($pointTriggerModel instanceof TriggerModel);
-        $events = $pointTriggerModel->getEvents();
+        $events = $this->triggerModel->getEvents();
         $form   = $this->formFactory->create(TriggerEventType::class, $triggerEvent, [
             'action'   => $this->generateUrl('mautic_pointtriggerevent_action', ['objectAction' => 'new']),
             'settings' => $events[$eventType],
@@ -148,13 +153,11 @@ class TriggerEventController extends CommonFormController
         $events       = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified', []);
         $success      = 0;
         $valid        = $cancelled = false;
-        $triggerEvent = array_key_exists($objectId, $events) ? $events[$objectId] : null;
+        $triggerEvent = $events[$objectId] ?? null;
 
         if (null !== $triggerEvent) {
             $eventType         = $triggerEvent['type'];
-            $pointTriggerModel = $this->getModel('point.trigger');
-            \assert($pointTriggerModel instanceof TriggerModel);
-            $events                   = $pointTriggerModel->getEvents();
+            $events                   = $this->triggerModel->getEvents();
             $triggerEvent['settings'] = $events[$eventType];
 
             // ajax only for form fields
@@ -277,7 +280,7 @@ class TriggerEventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
+        $triggerEvent = $events[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $triggerEvent) {
             // add the field to the delete list
@@ -336,7 +339,7 @@ class TriggerEventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
+        $triggerEvent = $events[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $triggerEvent) {
             // add the field to the delete list

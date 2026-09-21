@@ -10,12 +10,12 @@ use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MaintenanceSubscriber implements EventSubscriberInterface
+final readonly class MaintenanceSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly Connection $db,
-        private readonly UserTokenRepositoryInterface $userTokenRepository,
-        private readonly TranslatorInterface $translator,
+        private Connection $db,
+        private UserTokenRepositoryInterface $userTokenRepository,
+        private TranslatorInterface $translator,
     ) {
     }
 

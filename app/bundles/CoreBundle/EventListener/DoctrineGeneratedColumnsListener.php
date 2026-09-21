@@ -9,11 +9,11 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Type\GeneratedType;
 use Psr\Log\LoggerInterface;
 
-class DoctrineGeneratedColumnsListener
+final readonly class DoctrineGeneratedColumnsListener
 {
     public function __construct(
-        protected GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        protected LoggerInterface $logger,
+        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private LoggerInterface $logger,
     ) {
     }
 

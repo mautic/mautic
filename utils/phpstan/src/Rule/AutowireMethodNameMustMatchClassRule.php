@@ -19,6 +19,10 @@ use PHPStan\Rules\RuleErrorBuilder;
  *
  * Controllers extend each other deeply, which is where the collisions happen, so only they are checked.
  *
+ * Every bundle declares its own AjaxController extending a shared parent, so the short name alone repeats across
+ * bundles. Those get the bundle name in the middle instead: Mautic\CoreBundle\Controller\AjaxController must name
+ * its method "autowireCoreAjaxController".
+ *
  * @implements Rule<ClassMethod>
  */
 final class AutowireMethodNameMustMatchClassRule implements Rule
@@ -37,6 +41,16 @@ final class AutowireMethodNameMustMatchClassRule implements Rule
      * @var string
      */
     private const CONTROLLER_SUFFIX = 'Controller.php';
+
+    /**
+     * @var string
+     */
+    private const AJAX_CONTROLLER_SHORT_CLASS_NAME = 'AjaxController';
+
+    /**
+     * @var string
+     */
+    private const BUNDLE_SUFFIX = 'Bundle';
 
     public function getNodeType(): string
     {
@@ -62,7 +76,7 @@ final class AutowireMethodNameMustMatchClassRule implements Rule
         }
 
         $currentMethodName  = $node->name->toString();
-        $expectedMethodName = self::AUTOWIRE_PREFIX.$shortClassName;
+        $expectedMethodName = self::AUTOWIRE_PREFIX.$this->prependBundleName($shortClassName, $scope);
 
         if ($currentMethodName === $expectedMethodName) {
             return [];
@@ -131,5 +145,41 @@ final class AutowireMethodNameMustMatchClassRule implements Rule
         }
 
         return $classReflection->getNativeReflection()->getShortName();
+    }
+
+    /**
+     * Every bundle declares an AjaxController of the very same short name, so the bundle name has to keep it apart.
+     */
+    private function prependBundleName(string $shortClassName, Scope $scope): string
+    {
+        if (self::AJAX_CONTROLLER_SHORT_CLASS_NAME !== $shortClassName) {
+            return $shortClassName;
+        }
+
+        $classReflection = $scope->getClassReflection();
+        if (!$classReflection instanceof \PHPStan\Reflection\ClassReflection) {
+            return $shortClassName;
+        }
+
+        $bundleName = $this->resolveBundleName($classReflection->getName());
+        if (null === $bundleName) {
+            return $shortClassName;
+        }
+
+        return $bundleName.$shortClassName;
+    }
+
+    /**
+     * "Mautic\CoreBundle\Controller\AjaxController" resolves to "Core".
+     */
+    private function resolveBundleName(string $className): ?string
+    {
+        foreach (explode('\\', $className) as $namePart) {
+            if (str_ends_with($namePart, self::BUNDLE_SUFFIX)) {
+                return substr($namePart, 0, -strlen(self::BUNDLE_SUFFIX));
+            }
+        }
+
+        return null;
     }
 }

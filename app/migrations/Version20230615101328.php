@@ -16,13 +16,8 @@ final class Version20230615101328 extends PreUpAssertionMigration
         $configurator = $this->getConfigurator();
 
         $this->skipAssertion(
-            fn () => !$configurator->isFileWritable(),
-            'The local.php file is not writable. Skipping the email configuration migration.'
-        );
-
-        $this->skipAssertion(
-            fn () => array_key_exists('mailer_dsn', $configurator->getParameters()),
-            'The mailer_dsn parameter is already set. Skipping the email configuration migration.'
+            fn () => !$configurator->isFileWritable() || array_key_exists('mailer_dsn', $configurator->getParameters()),
+            'The local.php file is not writable or the mailer_dsn parameter is already set. Skipping the email configuration migration.'
         );
     }
 

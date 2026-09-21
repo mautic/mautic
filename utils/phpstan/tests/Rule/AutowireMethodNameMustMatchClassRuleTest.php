@@ -33,7 +33,7 @@ final class AutowireMethodNameMustMatchClassRuleTest extends RuleTestCase
         $this->analyse([__DIR__.'/Fixture/SetterAutowireController.php'], [
             [
                 'Method "setSomeModel()" has the #[Required] attribute, so it must be named "autowireSetterAutowireController()". Rename it to keep the autowired method unique in the class hierarchy.',
-                9,
+                11,
             ],
         ]);
     }
@@ -41,6 +41,21 @@ final class AutowireMethodNameMustMatchClassRuleTest extends RuleTestCase
     public function testSkipCorrectlyNamedMethod(): void
     {
         $this->analyse([__DIR__.'/Fixture/NamedAutowireController.php'], []);
+    }
+
+    public function testAjaxControllerWithoutBundleName(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/SomeBundle/AjaxController.php'], [
+            [
+                'Method "autowireAjaxController()" has the #[Required] attribute, so it must be named "autowireSomeAjaxController()". Rename it to keep the autowired method unique in the class hierarchy.',
+                12,
+            ],
+        ]);
+    }
+
+    public function testSkipAjaxControllerWithBundleName(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/OtherBundle/AjaxController.php'], []);
     }
 
     public function testSkipMethodWithoutRequiredAttribute(): void

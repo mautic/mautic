@@ -9,6 +9,7 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Form\Type\DetailsType;
 use Mautic\PluginBundle\Form\Type\KeysType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -84,7 +85,7 @@ final class DetailsTypeTest extends TestCase
         $this->assertSame(1, $calls);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('authorizedDataProvider')]
+    #[DataProvider('authorizedDataProvider')]
     public function testBuildFormRequiresAuthorization(bool $isAuthorized, string $label): void
     {
         /** @var MockObject&FormBuilderInterface $builder */
@@ -166,7 +167,7 @@ final class DetailsTypeTest extends TestCase
     /**
      * @param array<string> $expectedFeatures
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('withFeaturesProvider')]
+    #[DataProvider('withFeaturesProvider')]
     public function testBuildFormWithFeatures(?int $integrationId, array $expectedFeatures): void
     {
         /** @var MockObject&FormBuilderInterface $builder */

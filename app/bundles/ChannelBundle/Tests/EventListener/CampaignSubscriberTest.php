@@ -26,8 +26,10 @@ use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\SmsEvents;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -62,7 +64,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                             'form.submit',
                         ],
                         'lookupFormType'             => 'sms_list',
-                        'repository'                 => \Mautic\SmsBundle\Entity\Sms::class,
+                        'repository'                 => Sms::class,
                     ],
                 ]
             );
@@ -87,7 +89,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $scheduler = $this->createMock(EventScheduler::class);
 
-        /** @phpstan-ignore new.deprecated */
         $legacyDispatcher = new LegacyEventDispatcher(
             $this->dispatcher,
             $scheduler,
@@ -239,10 +240,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return Event&\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getEvent(): \PHPUnit\Framework\MockObject\MockObject
+    private function getEvent(): MockObject&Event
     {
         $event = $this->getMockBuilder(Event::class)
             ->onlyMethods(['getId'])

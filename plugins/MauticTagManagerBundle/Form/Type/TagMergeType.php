@@ -37,7 +37,7 @@ final class TagMergeType extends AbstractType
                     return $qb;
                 },
                 'constraints'     => [
-                    new NotBlank(['message' => 'mautic.tagmanager.tag.choose.notblank']),
+                    new NotBlank(message: 'mautic.tagmanager.tag.choose.notblank'),
                 ],
             ]
         );

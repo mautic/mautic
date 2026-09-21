@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CategoryBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -17,7 +19,6 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -51,6 +52,7 @@ class Category extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
+    #[NotBlank(message: 'mautic.core.title.required')]
     private $title;
 
     /**
@@ -75,6 +77,7 @@ class Category extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
+    #[NotBlank(message: 'mautic.core.value.required')]
     private $bundle;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -99,27 +102,6 @@ class Category extends FormEntity implements UuidInterface
             ->build();
 
         static::addUuidField($builder);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'title',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.title.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'bundle',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.value.required',
-                ]
-            )
-        );
     }
 
     /**

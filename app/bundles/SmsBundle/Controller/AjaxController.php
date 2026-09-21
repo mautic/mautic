@@ -16,15 +16,20 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
+
+    private EmailModel $emailModel;
 
     private SmsModel $smsModel;
 
     #[Required]
-    public function autowireAjaxController(SmsModel $smsModel): void
-    {
+    public function autowireSmsAjaxController(
+        EmailModel $emailModel,
+        SmsModel $smsModel,
+    ): void {
+        $this->emailModel = $emailModel;
         $this->smsModel = $smsModel;
     }
 
@@ -90,11 +95,9 @@ class AjaxController extends CommonAjaxController
      *
      * @return array<string, string>
      */
-    protected function getBuilderTokens(string $query): array
+    private function getBuilderTokens(string $query): array
     {
-        /** @var EmailModel $model */
-        $model        = $this->getModel('email');
-        $components   = $model->getBuilderComponents(null, ['tokens'], $query);
+        $components   = $this->emailModel->getBuilderComponents(null, ['tokens'], $query);
         $findTokens   = ['{contactfield=', '{assetlink', '{pagelink'];
         $returnTokens = [];
         $tokens       = $components['tokens'];

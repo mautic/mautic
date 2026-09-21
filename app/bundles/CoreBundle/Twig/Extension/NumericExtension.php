@@ -8,7 +8,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigTest;
 
-class NumericExtension extends AbstractExtension
+final class NumericExtension extends AbstractExtension
 {
     public function getTests(): array
     {

@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
-use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -78,8 +77,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listModel       = $this->createMock(ListModel::class);
         $this->campaignModel   = $this->createMock(CampaignModel::class);
         $this->emailModel      = $this->createMock(EmailModel::class);
-        $stageModel            = $this->createMock(StageModel::class);
-        $stageRepository = new class() extends StageRepository {
+        $stageRepository       = new class() extends StageRepository {
             public function __construct()
             {
             }
@@ -103,13 +101,12 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->listModel,
             $this->campaignModel,
             $this->emailModel,
-            $stageModel,
             $this->categoryModel,
             $this->assetModel,
-            $translator
+            $translator,
+            $stageRepository
         );
 
-        $stageModel->method('getRepository')->willReturn($stageRepository);
         $translator->method('trans')->willReturnArgument(0);
     }
 
@@ -126,7 +123,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnTypeOperatorsCollect(): void
     {
-        $event = new TypeOperatorsEvent();
+        $event = new TypeOperatorsEvent('segment');
 
         $this->subscriber->onTypeOperatorsCollect($event);
 
@@ -241,7 +238,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     'multiple'                  => true,
                     'choice_translation_domain' => false,
                     'disabled'                  => false,
-                    'constraints'               => [new NotBlank(['message' => 'mautic.core.value.required'])],
+                    'constraints'               => [new NotBlank(message: 'mautic.core.value.required')],
                     'attr'                      => [
                         'class'                => 'form-control',
                         'data-placeholder'     => 'mautic.lead.tags.select_or_create',
@@ -492,7 +489,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                     'multiple'                  => true,
                     'choice_translation_domain' => false,
                     'disabled'                  => false,
-                    'constraints'               => [new NotBlank(['message' => 'mautic.core.value.required'])],
+                    'constraints'               => [new NotBlank(message: 'mautic.core.value.required')],
                 ]
             );
 

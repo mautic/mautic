@@ -77,7 +77,6 @@ final class PluginAuthenticator extends AbstractAuthenticator
                 $integrations
             );
             $authEvent = $this->dispatcher->dispatch($authEvent, UserEvents::USER_PRE_AUTHENTICATION);
-            \assert($authEvent instanceof AuthenticationEvent);
 
             if ($authenticated = $authEvent->isAuthenticated()) {
                 $eventToken            = $authEvent->getToken();

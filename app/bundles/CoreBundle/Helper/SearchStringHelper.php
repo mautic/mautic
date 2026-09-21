@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-class SearchStringHelper
+final class SearchStringHelper
 {
     public const COMMAND_NEGATE  = 0;
 
@@ -10,27 +10,18 @@ class SearchStringHelper
 
     public const COMMAND_NEUTRAL = 2;
 
-    /**
-     * @var array
-     */
-    protected $needsParsing = [
+    private array $needsParsing = [
         ' ',
         '(',
         ')',
     ];
 
-    /**
-     * @var array
-     */
-    protected $needsClosing = [
+    private array $needsClosing = [
         'quote'       => '"',
         'parenthesis' => '(',
     ];
 
-    /**
-     * @var array
-     */
-    protected $closingChars = [
+    private array $closingChars = [
         'quote'       => '"',
         'parenthesis' => ')',
     ];
@@ -86,7 +77,7 @@ class SearchStringHelper
         }
     }
 
-    protected function addFilterCommand(&$filters, $mergeFilter)
+    private function addFilterCommand(&$filters, $mergeFilter): void
     {
         $command = $mergeFilter->command;
         if ('is' === $command) {
@@ -107,7 +98,7 @@ class SearchStringHelper
     /**
      * @param string $input
      */
-    protected function splitUpSearchString($input, string $baseName = 'root', string $overrideCommand = ''): \stdClass
+    private function splitUpSearchString($input, string $baseName = 'root', string $overrideCommand = ''): \stdClass
     {
         $keyCount                                 = 0;
         $command                                  = $overrideCommand;
@@ -142,9 +133,11 @@ class SearchStringHelper
                     $command                              = substr($command, 1);
                 }
 
-                if (empty($chars)) {
+                if ([] === $chars) {
                     // Command hasn't been defined so don't allow empty or could end up searching entire table
-                    unset($filters->{$baseName}[$keyCount]);
+                    $filters->{$baseName}[$keyCount]->command      = $command;
+                    $filters->{$baseName}[$keyCount]->missingValue = true;
+                    $this->addFilterCommand($filters, $filters->{$baseName}[$keyCount]);
                 } else {
                     $filters->{$baseName}[$keyCount]->command = $command;
                     $string                                   = '';
@@ -154,7 +147,7 @@ class SearchStringHelper
                 if (' ' !== $string) {
                     $string = trim($string);
                     $type   = ('OR' === $string || 'AND' === $string) ? $string : '';
-                    $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, !empty($chars));
+                    $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, [] !== $chars);
                 }
                 continue;
             } elseif (in_array($char, $this->needsClosing)) {
@@ -212,7 +205,7 @@ class SearchStringHelper
                         ++$closingCount;
                     }
                 }
-            } elseif (empty($chars)) {
+            } elseif ([] === $chars) {
                 $filters->{$baseName}[$keyCount]->command = $command;
                 $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, null, false);
             }// else keep concocting chars

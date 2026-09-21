@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -130,9 +132,6 @@ class Stat
         ++$this->sentCount;
     }
 
-    /**
-     * Up the sent count.
-     */
     public function upSentCount(): static
     {
         $count           = (int) $this->sentCount + 1;

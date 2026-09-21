@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PublicControllerFunctionalTest extends MauticMysqlTestCase
@@ -20,7 +21,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(200);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('xssPayloadsProvider')]
+    #[DataProvider('xssPayloadsProvider')]
     public function testContactTrackingTagsXss(string $payload, ?string $expectedSanitized): void
     {
         $this->logoutUser();

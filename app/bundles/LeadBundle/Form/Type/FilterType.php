@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,12 +19,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FilterType extends AbstractType
+final class FilterType extends AbstractType
 {
     public function __construct(
         private readonly FormAdjustmentsProviderInterface $formAdjustmentsProvider,
         private readonly ListModel $listModel,
+        TypeOperatorProviderInterface $typeOperatorProvider,
     ) {
+        $typeOperatorProvider->setContext('segment');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

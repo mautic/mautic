@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20190326190241 extends AbstractMauticMigration
+final class Version20190326190241 extends AbstractMauticMigration
 {
     /**
      * @throws SkipMigration

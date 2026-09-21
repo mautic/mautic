@@ -19,36 +19,9 @@ use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Expression;
 use Rector\PHPStan\ScopeFetcher;
 use Rector\Rector\AbstractRector;
-use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
-use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
 final class AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector extends AbstractRector
 {
-    public function getRuleDefinition(): RuleDefinition
-    {
-        return new RuleDefinition(
-            'Replace BrowserKit success assertions with assertResponseIsSuccessful()',
-            [
-                new CodeSample(
-                    'Assert::assertTrue($this->client->getResponse()->isOk());',
-                    'self::assertResponseIsSuccessful();'
-                ),
-                new CodeSample(
-                    '$this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());',
-                    '$this->assertResponseIsSuccessful($this->client->getResponse()->getContent());'
-                ),
-                new CodeSample(
-                    '$clientResponse = $this->client->getResponse();'."\n".'$this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());',
-                    '$clientResponse = $this->client->getResponse();'."\n".'$this->assertResponseIsSuccessful($clientResponse->getContent());'
-                ),
-                new CodeSample(
-                    '$clientResponse = $this->client->getResponse();'."\n".'$this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());',
-                    '$clientResponse = $this->client->getResponse();'."\n".'$this->assertResponseIsSuccessful();'
-                ),
-            ]
-        );
-    }
-
     /**
      * @return array<class-string<Node>>
      */

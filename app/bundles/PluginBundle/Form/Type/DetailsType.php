@@ -19,13 +19,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Integration>
  */
-class DetailsType extends AbstractType
+final class DetailsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('isPublished', YesNoButtonGroupType::class, [
             'constraints' => [
-                new CanPublish($options['integration'] ?? ''),
+                new CanPublish(integrationName: $options['integration'] ?? ''),
             ],
         ]);
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests;
 
-class Fixtures
+final class Fixtures
 {
     /**
      * @return mixed[]

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\RawMessage;
 
@@ -46,7 +48,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         yield 'encrypted certificate' => ['encrypted' => true];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('certificateTypeProvider')]
+    #[DataProvider('certificateTypeProvider')]
     public function testSendingSegmentEmailWithSMime(bool $encrypted): void
     {
         if ($encrypted) {
@@ -119,7 +121,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         $privateKeyContent = file_get_contents($privateKeyPath);
 
         // Encrypt it using the EncryptionHelper
-        $encryptionHelper = $this->getContainer()->get(\Mautic\CoreBundle\Helper\EncryptionHelper::class);
+        $encryptionHelper = $this->getContainer()->get(EncryptionHelper::class);
         $encryptedContent = $encryptionHelper->encrypt($privateKeyContent);
 
         // Write the encrypted content to .pem.enc file
