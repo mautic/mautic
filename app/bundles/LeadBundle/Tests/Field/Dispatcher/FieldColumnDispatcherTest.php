@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Field\Dispatcher;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
-use Mautic\LeadBundle\Field\Event\AddColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Event\AddColumnEvent;
 use Mautic\LeadBundle\Field\Event\DeleteColumnEvent;
 use Mautic\LeadBundle\Field\Event\UpdateColumnEvent;
@@ -72,9 +71,8 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $backgroundSettings = $this->createMock(BackgroundSettings::class);
 
         $dispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(true);
+            ->expects($this->never())
+            ->method('hasListeners');
 
         $backgroundSettings
             ->expects($this->once())
@@ -85,10 +83,7 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function ($event) {
-                    /* @var AddColumnBackgroundEvent $event */
-                    return $event instanceof UpdateColumnEvent;
-                }),
+                $this->callback(fn ($event) => $event instanceof UpdateColumnEvent),
                 'mautic.lead_field_pre_update_column'
             );
 
@@ -106,9 +101,8 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $backgroundSettings = $this->createMock(BackgroundSettings::class);
 
-        $dispatcher->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(true);
+        $dispatcher->expects($this->never())
+            ->method('hasListeners');
 
         $backgroundSettings->expects($this->once())
             ->method('shouldProcessColumnChangeInBackground')

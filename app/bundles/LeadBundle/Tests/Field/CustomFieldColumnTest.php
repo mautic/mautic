@@ -487,7 +487,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $customFieldColumn->deleteLeadColumn($leadField);
     }
 
-    public function testUpdateLeadColumnInBackground(): void
+    public function testUpdateLeadColumnInBackgroundIfColumnDoesNotExistYet(): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);
@@ -511,6 +511,63 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 
         $columnSchemaHelper->expects($this->never())
             ->method('updateColumnLength');
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('checkColumnExists')
+            ->with($leadField->getAlias(), false)
+            ->willReturn(false);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('setName')
+            ->with('leads')
+            ->willReturnSelf();
+
+        $leadFieldSaver->expects($this->once())
+            ->method('saveLeadFieldEntityWithoutColumnCreated')
+            ->with($leadField);
+
+        $this->expectException(AbortColumnUpdateException::class);
+
+        $customFieldColumn->updateLeadColumn($leadField);
+    }
+
+    public function testUpdateLeadColumnInBackgroundIfColumnExists(): void
+    {
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $schemaDefinition      = $this->createStub(SchemaDefinition::class);
+        $logger                = $this->createStub(Logger::class);
+        $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
+        $customFieldIndex      = $this->createStub(CustomFieldIndex::class);
+        $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createStub(TranslatorInterface::class);
+
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
+
+        $leadField = new LeadField();
+        $leadField->setId(42);
+        $leadField->setObject('lead');
+        $leadField->setAlias('IamAlias');
+
+        $fieldColumnDispatcher->expects($this->once())
+            ->method('dispatchPreUpdateColumnEvent')
+            ->with($leadField)
+            ->willThrowException(new AbortColumnUpdateException());
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('updateColumnLength');
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('checkColumnExists')
+            ->with($leadField->getAlias(), false)
+            ->willReturn(true);
+
+        $columnSchemaHelper->expects($this->exactly(2))
+            ->method('setName')
+            ->with('leads')
+            ->willReturnSelf();
+
+        $leadFieldSaver->expects($this->never())
+            ->method('saveLeadFieldEntityWithoutColumnCreated');
 
         $customFieldColumn->updateLeadColumn($leadField);
     }
@@ -542,6 +599,9 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->method('setName')
             ->with('leads')
             ->willReturn($columnSchemaHelper);
+
+        $columnSchemaHelper->expects($this->never())
+            ->method('checkColumnExists');
 
         $columnSchemaHelper->expects($this->once())
             ->method('updateColumnLength')
