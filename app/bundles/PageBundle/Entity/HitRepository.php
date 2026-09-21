@@ -92,33 +92,6 @@ class HitRepository extends CommonRepository
         return $this->getTimelineResults($query, $options, 'p.title', 'h.date_hit', ['query'], ['dateHit', 'dateLeft'], null, 'h.id');
     }
 
-    public function getHitCountForSource(bool|string|int|float $source, $sourceId = null, $fromDate = null, $code = 200): array
-    {
-        $query = $this->createQueryBuilder('h');
-        $query->select('count(distinct(h.trackingId)) as hitCount');
-        $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($source)));
-
-        if (null != $sourceId) {
-            if (is_array($sourceId)) {
-                $query->andWhere($query->expr()->in('h.sourceId', ':sourceIds'))
-                    ->setParameter('sourceIds', $sourceId);
-            } else {
-                $query->andWhere('h.sourceId = :sourceId')
-                ->setParameter('sourceId', $sourceId);
-            }
-        }
-
-        if (null != $fromDate) {
-            $query->andwhere($query->expr()->gte('h.dateHit', ':date'))
-                ->setParameter('date', $fromDate);
-        }
-
-        $query->andWhere('h.code = :code')
-        ->setParameter('code', $code);
-
-        return $query->getQuery()->getArrayResult();
-    }
-
     /**
      * Get an array of hits via an email clickthrough.
      *
