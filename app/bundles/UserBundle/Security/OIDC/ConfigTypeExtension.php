@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Security\OIDC;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\ConfigType;
 use Mautic\UserBundle\Form\Type\RoleListType;
-use Mautic\UserBundle\Security\OIDC\DTO\ClientCredentials;
-use Mautic\UserBundle\Security\OIDC\DTO\Settings;
-use Mautic\UserBundle\Security\OIDC\Repository\SubjectIdRepository;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\Event\PreSubmitEvent;
@@ -26,9 +24,9 @@ final class ConfigTypeExtension extends AbstractTypeExtension
     private const SHOW_IF_ENABLED = '{"config_userconfig_open_id_is_enabled_1":"checked"}';
     private Settings $config;
     private ClientCredentials $clientCredentials;
-    private SubjectIdRepository $subjectIdRepository;
+    private OidcSubjectIdRepository $subjectIdRepository;
 
-    public function __construct(Settings $config, ClientCredentials $clientCredentials, SubjectIdRepository $subjectIdRepository)
+    public function __construct(Settings $config, ClientCredentials $clientCredentials, OidcSubjectIdRepository $subjectIdRepository)
     {
         $this->config              = $config;
         $this->clientCredentials   = $clientCredentials;

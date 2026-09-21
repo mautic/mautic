@@ -8,12 +8,12 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use Mautic\UserBundle\Security\OIDC\DTO\Settings;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
 use Mautic\UserBundle\Security\OIDC\Exception\EmailRequiredException;
 use Mautic\UserBundle\Security\OIDC\Exception\EmailTakenException;
 use Mautic\UserBundle\Security\OIDC\Exception\RegistrationNotAllowedException;
 use Mautic\UserBundle\Security\OIDC\Exception\RoleNotFoundException;
+use Mautic\UserBundle\Security\OIDC\Settings;
 use Psr\Log\LoggerInterface;
 
 final class UserFactory implements UserFactoryInterface

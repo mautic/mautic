@@ -7,35 +7,27 @@ namespace Mautic\UserBundle\Security\OIDC;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
 use Mautic\UserBundle\Security\OIDC\Factory\UserFactoryInterface;
-use Mautic\UserBundle\Security\OIDC\Service\LinkerInterface;
+use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 use Mautic\UserBundle\Security\Provider\UserProvider as MauticUserProvider;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 // this wraps the Mautic UserProvider to provide a UserInterface for the OpenIdBundle without having to duplicate the code
 final class UserProvider implements CredentialsUserProviderInterface
 {
-    private LinkerInterface $linker;
-    private UserFactoryInterface $userFactory;
-    private MauticUserProvider $userProvider;
-    private Security $security;
-
     public function __construct(
-        LinkerInterface $linker,
-        UserFactoryInterface $userFactory,
-        MauticUserProvider $userProvider,
-        Security $security,
+        private readonly LinkerInterface $linker,
+        private readonly UserFactoryInterface $userFactory,
+        private readonly MauticUserProvider $userProvider,
+        private readonly TokenStorageInterface $tokenStorage,
     ) {
-        $this->linker       = $linker;
-        $this->userFactory  = $userFactory;
-        $this->userProvider = $userProvider;
-        $this->security     = $security;
     }
 
     public function loadUserByUsername($username): UserInterface
     {
-        $campaignStudioUser = $this->security->getUser();
+        $token = $this->tokenStorage->getToken();
+        $campaignStudioUser = $token?->getUser();
         \assert(null === $campaignStudioUser || $campaignStudioUser instanceof User);
 
         if ($user = $this->linker->findLinkedUser($username, $campaignStudioUser)) {
@@ -53,7 +45,8 @@ final class UserProvider implements CredentialsUserProviderInterface
     public function loadUserByCredentials(UserCredentials $credentials): UserInterface
     {
         $openIdConnectId    = $credentials->getId();
-        $campaignStudioUser = $this->security->getUser();
+        $token = $this->tokenStorage->getToken();
+        $campaignStudioUser = $token?->getUser();
         \assert(null === $campaignStudioUser || $campaignStudioUser instanceof User);
 
         if ($user = $this->linker->findLinkedUser($openIdConnectId, $campaignStudioUser)) {

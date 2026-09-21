@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Security\OIDC\Factory;
 
 use Mautic\UserBundle\Entity\RoleRepository;
-use Mautic\UserBundle\Security\OIDC\DTO\Settings;
+use Mautic\UserBundle\Security\OIDC\Settings;
 
 final class SettingsFactory
 {

@@ -6,29 +6,16 @@ namespace Mautic\UserBundle\Security\OIDC\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
-use Mautic\CoreBundle\Templating\Helper\SlotsHelper;
-use Mautic\UserBundle\Security\OIDC\DTO\Settings;
+use Mautic\UserBundle\Security\OIDC\Settings;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Templating\PhpEngine;
 use Twig\Environment;
 
 final class InjectCustomTemplateSubscriber implements EventSubscriberInterface
 {
-    private Settings $settings;
-    private SlotsHelper $slotsHelper;
-    private Environment $twig;
-    private PhpEngine $phpEngine;
-
     public function __construct(
-        Settings $settings,
-        SlotsHelper $slotsHelper,
-        Environment $twig,
-        PhpEngine $phpEngine,
+        private readonly Settings $settings,
+        private readonly Environment $twig,
     ) {
-        $this->settings    = $settings;
-        $this->slotsHelper = $slotsHelper;
-        $this->twig        = $twig;
-        $this->phpEngine   = $phpEngine;
     }
 
     public static function getSubscribedEvents(): array
@@ -54,8 +41,8 @@ final class InjectCustomTemplateSubscriber implements EventSubscriberInterface
 
     private function addConfig(CustomTemplateEvent $event): void
     {
-        if ('MauticUserBundle:FormTheme\Config:_config_userconfig_widget.html.php' === $event->getTemplate()) {
-            $this->slotsHelper->set('appended_user_config_fields', $this->phpEngine->render('OpenIdBundle:Form:config.html.php', [
+        if ('@MauticUser/FormTheme/Config/_config_userconfig_widget.html.twig' === $event->getTemplate()) {
+            $event->appendContent($this->twig->render('@MauticUser/Security/OIDC/oidc_config.html.twig', [
                 'form' => $event->getVars()['form'],
             ]));
         }
@@ -63,11 +50,11 @@ final class InjectCustomTemplateSubscriber implements EventSubscriberInterface
 
     private function addLoginButton(CustomTemplateEvent $event): void
     {
-        if ('MauticUserBundle:Security:login.html.php' === $event->getTemplate()) {
-            $this->slotsHelper->set('above_login_form', $this->twig->render('OpenIdBundle:security:login_top.html.twig', [
+        if ('@MauticUser/Security/login.html.twig' === $event->getTemplate()) {
+            $event->prependContent($this->twig->render('@MauticUser/Security/OIDC/oidc_login_top.html.twig', [
                 'parameters' => $this->settings,
             ]));
-            $this->slotsHelper->set('below_login_form', $this->twig->render('OpenIdBundle:security:login_bottom.html.twig', [
+            $event->appendContent($this->twig->render('@MauticUser/Security/OIDC/oidc_login_bottom.html.twig', [
                 'parameters' => $this->settings,
             ]));
         }
@@ -75,8 +62,8 @@ final class InjectCustomTemplateSubscriber implements EventSubscriberInterface
 
     private function addUserFields(CustomTemplateEvent $event): void
     {
-        if ('MauticUserBundle:User:form.html.php' === $event->getTemplate()) {
-            $this->slotsHelper->set('appended_user_fields', $this->phpEngine->render('OpenIdBundle:Form:user.html.php', [
+        if ('@MauticUser/User/form.html.twig' === $event->getTemplate()) {
+            $event->appendContent($this->twig->render('@MauticUser/Security/OIDC/oidc_user_form.html.twig', [
                 'form' => $event->getVars()['form'],
             ]));
         }

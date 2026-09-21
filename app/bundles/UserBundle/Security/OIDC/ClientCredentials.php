@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\UserBundle\Security\OIDC\DTO;
+namespace Mautic\UserBundle\Security\OIDC;
 
 final class ClientCredentials
 {

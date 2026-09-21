@@ -30,6 +30,15 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\UserBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
+    // Load OIDC services separately (they would be excluded by default)
+    // Note: UserCredentials is excluded as it's created dynamically from OIDC response
+    $services->load('Mautic\\UserBundle\\Security\\OIDC\\', '../Security/OIDC')
+        ->exclude('../Security/OIDC/{Exception,Tests,DTO/UserCredentials.php}');
+
+    // Load Factory and User classes (DEFAULT_EXCLUDES may exclude interfaces, so load explicitly)
+    $services->load('Mautic\\UserBundle\\Security\\OIDC\\Factory\\', '../Security/OIDC/Factory/*.php');
+    $services->load('Mautic\\UserBundle\\Security\\OIDC\\User\\', '../Security/OIDC/User/*.php');
+
     $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
@@ -61,6 +70,40 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(UserProvider::class);
     $services->alias('mautic.user.provider', UserProvider::class);
+
+    // OIDC Services
+    $services->set(Mautic\UserBundle\Security\OIDC\UserProvider::class);
+    $services->alias('mautic.security.oidc.user_provider', Mautic\UserBundle\Security\OIDC\UserProvider::class);
+
+    $services->set(Mautic\UserBundle\Security\OIDC\OidcAuthenticator::class);
+    $services->alias('mautic.security.oidc.authenticator', Mautic\UserBundle\Security\OIDC\OidcAuthenticator::class);
+
+    // OIDC Factory and User services (explicit registration and aliases for interfaces)
+    $services->set(Mautic\UserBundle\Security\OIDC\Factory\UserFactory::class);
+    $services->alias(Mautic\UserBundle\Security\OIDC\Factory\UserFactoryInterface::class, Mautic\UserBundle\Security\OIDC\Factory\UserFactory::class);
+
+    $services->set(Mautic\UserBundle\Security\OIDC\User\Linker::class);
+    $services->alias(Mautic\UserBundle\Security\OIDC\User\LinkerInterface::class, Mautic\UserBundle\Security\OIDC\User\Linker::class);
+
+    $services->set(Mautic\UserBundle\Security\OIDC\Factory\ClientFactory::class);
+    $services->alias(Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface::class, Mautic\UserBundle\Security\OIDC\Factory\ClientFactory::class);
+
+    $services->set(Mautic\UserBundle\Security\OIDC\Client\Client::class)
+        ->arg('$mappingField', param('mautic.open_id_mapping_field'));
+    $services->alias(Mautic\UserBundle\Security\OIDC\Client\ClientInterface::class, Mautic\UserBundle\Security\OIDC\Client\Client::class);
+
+    // OIDC Configuration Objects (Settings & ClientCredentials are singletons injected as services)
+    $services->set(Mautic\UserBundle\Security\OIDC\Settings::class)
+        ->arg('$isEnabled', param('mautic.open_id_is_enabled'))
+        ->arg('$isRequired', param('mautic.open_id_is_required'))
+        ->arg('$isUserRegistrationAllowed', param('mautic.open_id_is_user_registration_allowed'))
+        ->arg('$registeredUserRole', param('mautic.open_id_registered_user_role'));
+
+    $services->set(Mautic\UserBundle\Security\OIDC\ClientCredentials::class)
+        ->arg('$clientUrl', param('mautic.open_id_client_url'))
+        ->arg('$clientId', param('mautic.open_id_client_id'))
+        ->arg('$clientSecret', param('mautic.open_id_client_secret'))
+        ->arg('$mappingField', param('mautic.open_id_mapping_field'));
 
     $services->load('Mautic\\UserBundle\\Security\\EntryPoint\\', '../Security/EntryPoint/*.php');
     $services->load('Mautic\\UserBundle\\Security\\Authentication\\Token\\Permissions\\', '../Security/Authentication/Token/Permissions/*.php');

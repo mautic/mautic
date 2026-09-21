@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC;
 
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\UserType;
-use Mautic\UserBundle\Security\OIDC\DTO\Settings;
 use Mautic\UserBundle\Security\OIDC\Form\Transformer\SubjectToUserTransformer;
 use Mautic\UserBundle\Security\OIDC\Form\Type\SubjectIdType;
-use Mautic\UserBundle\Security\OIDC\Repository\SubjectIdRepository;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 
 final class UserTypeExtension extends AbstractTypeExtension
 {
     private Settings $parameters;
-    private SubjectIdRepository $subjectIdRepository;
+    private OidcSubjectIdRepository $subjectIdRepository;
 
-    public function __construct(Settings $parameters, SubjectIdRepository $subjectIdRepository)
+    public function __construct(Settings $parameters, OidcSubjectIdRepository $subjectIdRepository)
     {
         $this->parameters          = $parameters;
         $this->subjectIdRepository = $subjectIdRepository;

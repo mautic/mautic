@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Security\OIDC\Factory;
 
 use Mautic\UserBundle\Security\OIDC\Client\ClientInterface;
-use Mautic\UserBundle\Security\OIDC\DTO\ClientCredentials;
+use Mautic\UserBundle\Security\OIDC\ClientCredentials;
 
 interface ClientFactoryInterface
 {

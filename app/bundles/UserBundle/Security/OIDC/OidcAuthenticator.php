@@ -7,7 +7,6 @@ namespace Mautic\UserBundle\Security\OIDC;
 use Jumbojett\OpenIDConnectClientException;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
-use Mautic\UserBundle\Security\OIDC\DTO\Settings;
 use Mautic\UserBundle\Security\OIDC\Exception\TranslatableException;
 use Mautic\UserBundle\Security\OIDC\Factory\UserCredentialsFactoryInterface;
 use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;

@@ -6,7 +6,7 @@ namespace Mautic\UserBundle\Security\OIDC\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\UserBundle\Security\OIDC\DTO\ClientCredentials;
+use Mautic\UserBundle\Security\OIDC\ClientCredentials;
 use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

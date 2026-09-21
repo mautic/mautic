@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC;
 
+use Mautic\UserBundle\Entity\OidcSubjectId;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Security\OIDC\Entity\SubjectId;
-use Mautic\UserBundle\Security\OIDC\Repository\SubjectIdRepository;
 use Symfony\Component\Form\DataTransformerInterface;
 
 final class SubjectToUserTransformer implements DataTransformerInterface
 {
-    private SubjectIdRepository $subjectIdRepository;
+    private OidcSubjectIdRepository $subjectIdRepository;
 
-    public function __construct(SubjectIdRepository $subjectIdRepository)
+    public function __construct(OidcSubjectIdRepository $subjectIdRepository)
     {
         $this->subjectIdRepository = $subjectIdRepository;
     }
 
-    public function transform($value): ?SubjectId
+    public function transform($value): ?OidcSubjectId
     {
         if ($value instanceof User) {
-            return $this->subjectIdRepository->findOneBy(['user' => $value]) ?: (new SubjectId())->setUser($value);
+            return $this->subjectIdRepository->findOneBy(['user' => $value]) ?: (new OidcSubjectId())->setUser($value);
         }
 
         throw new \InvalidArgumentException(\sprintf('Expected instance of %s. Given %s', User::class, \is_object($value) ? \get_class($value) : \gettype($value)));
@@ -29,7 +29,7 @@ final class SubjectToUserTransformer implements DataTransformerInterface
 
     public function reverseTransform($value): ?User
     {
-        if ($value instanceof SubjectId) {
+        if ($value instanceof OidcSubjectId) {
             return $value->getUser();
         }
 

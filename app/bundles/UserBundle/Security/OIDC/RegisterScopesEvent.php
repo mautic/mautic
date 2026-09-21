@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC;
 
-use Symfony\Component\EventDispatcher\Event;
-
-final class RegisterScopesEvent extends Event
+final class RegisterScopesEvent
 {
     /**
      * @var string[]

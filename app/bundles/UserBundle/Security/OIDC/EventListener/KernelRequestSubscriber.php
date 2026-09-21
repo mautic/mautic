@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Security\OIDC\EventListener;
 
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
-use Mautic\UserBundle\Security\OIDC\DTO\Settings;
+use Mautic\UserBundle\Security\OIDC\Settings;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;

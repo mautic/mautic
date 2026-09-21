@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC;
 
-use Mautic\UserBundle\Security\OIDC\Entity\SubjectId;
+use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Security\OIDC\Exception\OpenIdConnectIdTakenException;
-use Mautic\UserBundle\Security\OIDC\Service\LinkerInterface;
+use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class SubjectIdType extends AbstractType
+final class OidcSubjectIdType extends AbstractType
 {
     private LinkerInterface $linker;
     private TranslatorInterface $translator;
@@ -50,7 +50,7 @@ final class SubjectIdType extends AbstractType
             }
 
             $subjectId = $event->getData();
-            \assert($subjectId instanceof SubjectId);
+            \assert($subjectId instanceof OidcSubjectId);
             try {
                 $this->linker->editLinkToUser($subjectId, $subjectId->getUser());
             } catch (OpenIdConnectIdTakenException $e) {
@@ -64,8 +64,8 @@ final class SubjectIdType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'        => SubjectId::class,
-                'validation_groups' => [SubjectId::class, 'subjectID'],
+                'data_class'        => OidcSubjectId::class,
+                'validation_groups' => [OidcSubjectId::class, 'subjectID'],
             ]
         );
     }
