@@ -287,9 +287,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('', $this->helper->getDynamicContentSlotForLead($slotName, $contact));
     }
 
-    /**
-     * @dataProvider replaceDWCTokenToHtmlTagDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('replaceDWCTokenToHtmlTagDataProvider')]
     public function testReplaceDWCTokenToHtmlTag(string $input, string $expected): void
     {
         $this->assertSame($expected, $this->helper->replaceDWCTokenToHtmlTag($input));
