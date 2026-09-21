@@ -5,10 +5,14 @@
         "This file is @generated automatically"
     ],
 <<<<<<< HEAD
+<<<<<<< HEAD
     "content-hash": "b244e9390f9351c66c6f2c8b719875f6",
 =======
     "content-hash": "52bbd1989710ce31bcdb231bd00c1cb7",
 >>>>>>> 3bf88af3e0 (Reuse symplify/phpstan-rules 14.14.1, drop local duplicate rules; make PreferClassInDefinitionFetchRule collector-free)
+=======
+    "content-hash": "ee576981462fcc51e2eb583673f77772",
+>>>>>>> 884099ba6f (Bump symplify/phpstan-rules to ^14.15)
     "packages": [
         {
             "name": "api-platform/core",
@@ -18242,16 +18246,16 @@
         },
         {
             "name": "symplify/phpstan-rules",
-            "version": "14.14.1",
+            "version": "14.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symplify/phpstan-rules.git",
-                "reference": "bdc672f6c3fa63d199f97536d17468126e519ad1"
+                "reference": "010d2ba98638618d985644c57a590814f5b18d1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/bdc672f6c3fa63d199f97536d17468126e519ad1",
-                "reference": "bdc672f6c3fa63d199f97536d17468126e519ad1",
+                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/010d2ba98638618d985644c57a590814f5b18d1e",
+                "reference": "010d2ba98638618d985644c57a590814f5b18d1e",
                 "shasum": ""
             },
             "require": {
@@ -18302,7 +18306,7 @@
             "description": "Set of Symplify rules, type extensions and error formatter for PHPStan",
             "support": {
                 "issues": "https://github.com/symplify/phpstan-rules/issues",
-                "source": "https://github.com/symplify/phpstan-rules/tree/14.14.1"
+                "source": "https://github.com/symplify/phpstan-rules/tree/14.15.0"
             },
             "funding": [
                 {
@@ -18314,7 +18318,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-21T08:59:01+00:00"
+            "time": "2026-09-21T11:23:08+00:00"
         },
         {
             "name": "theseer/tokenizer",
