@@ -225,7 +225,7 @@ parameters:
 rules:
     - Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
     - Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
-    - Utils\PHPStan\Rule\NoStringTargetEntityRule
+    - Symplify\PHPStanRules\Rules\Doctrine\NoStringTargetEntityRule
     - Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
     - Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
     - Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
@@ -248,12 +248,12 @@ rules:
     - Utils\PHPStan\Rule\NoUnusedServiceNameRule
     - Utils\PHPStan\Rule\NoClassNameServiceAliasRule
     - Utils\PHPStan\Rule\NoAlreadyLoadedServiceSetRule
-    - Utils\PHPStan\Rule\NoAutoconfiguredServiceTagRule
+    - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoAutoconfiguredServiceTagRule
     - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\PreferClassServiceReferenceRule
     - Utils\PHPStan\Rule\NoRedundantAutowiredServiceArgumentRule
-    - Utils\PHPStan\Rule\NoServiceSetterCallRule
+    - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoServiceSetterCallRule
     - Utils\PHPStan\Rule\NoServiceGetterRule
-    - Utils\PHPStan\Rule\NoReadonlyEntityClassRule
+    - Symplify\PHPStanRules\Rules\Doctrine\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
     - Symplify\PHPStanRules\Rules\RequireArrayShapeReturnRule
