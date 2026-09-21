@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC\Factory;
 
-use Mautic\OpenIdBundle\Exception\AuthorizationRequestFailedException;
-use Mautic\OpenIdBundle\Exception\InvalidMappedIdentifierException;
-use Mautic\OpenIdBundle\Exception\UserInfoException;
 use Mautic\UserBundle\Security\OIDC\Client\ClientInterface;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
+use Mautic\UserBundle\Exception\OidcAuthorizationException;
+use Mautic\UserBundle\Exception\OidcException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 
+#[AsAlias(UserCredentialsFactoryInterface::class)]
 final class UserCredentialsFactory implements UserCredentialsFactoryInterface
 {
     private LoggerInterface $logger;
@@ -29,9 +30,9 @@ final class UserCredentialsFactory implements UserCredentialsFactoryInterface
         try {
             $userInfo = $this->client->requestUserInfo($claims);
             $tokens   = $this->client->getVerifiedClaims($claims);
-        } catch (AuthorizationRequestFailedException $e) {
+        } catch (OidcAuthorizationException $e) {
             $this->logger->error($e->getMessage(), ['exception' => $e]);
-            throw new UserInfoException('mautic.open_id.login.exception.user_info');
+            throw new OidcException('mautic.open_id.login.exception.user_info');
         }
 
         $this->logger->debug('OpenID Connect: User info', $userInfo);
@@ -48,7 +49,7 @@ final class UserCredentialsFactory implements UserCredentialsFactoryInterface
 
         if (!$id) {
             $this->logger->error('Unable to locate identifier field in response', ['mapping_field' => $this->client->getMappingField(), 'data' => $data]);
-            throw new InvalidMappedIdentifierException('mautic.open_id.login.exception.invalid_mapping_field');
+            throw new OidcException('mautic.open_id.login.exception.invalid_mapping_field');
         }
 
         return new UserCredentials($id, $email, $preferredUsername, $givenName, $familyName);

@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Factory;
 use Mautic\UserBundle\Security\OIDC\DTO\ClientCredentials;
 use Mautic\UserBundle\Security\OIDC\Event\RegisterScopesEvent;
 use Mautic\UserBundle\Security\OIDC\Factory\ClientFactory;
-use Mautic\UserBundle\Security\OIDC\Service\ClientInterface;
+use Mautic\UserBundle\Security\OIDC\Client\ClientInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;

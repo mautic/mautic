@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC\Client;
 
-use Mautic\UserBundle\Security\OIDC\Exception\AuthorizationRequestFailedException;
+use Mautic\UserBundle\Exception\OidcAuthorizationException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 interface ClientBridgeInterface
@@ -16,7 +16,7 @@ interface ClientBridgeInterface
     /**
      * @return bool
      *
-     * @throws AuthorizationRequestFailedException
+     * @throws OidcAuthorizationException
      */
     public function authenticate();
 
@@ -30,7 +30,7 @@ interface ClientBridgeInterface
      *
      * @return mixed
      *
-     * @throws AuthorizationRequestFailedException
+     * @throws OidcAuthorizationException
      */
     public function requestUserInfo($claim = null);
 }

@@ -25,9 +25,9 @@ $firewalls = [
         'provider'              => 'open_id_provider',
         'context'               => 'mautic',
         'custom_authenticators' => [
-            'mautic.security.oidc.authenticator',
+            Mautic\UserBundle\Security\OIDC\OidcAuthenticator::class,
         ],
-        'entry_point'           => 'mautic.security.oidc.authenticator',
+        'entry_point'           => Mautic\UserBundle\Security\OIDC\OidcAuthenticator::class,
     ],
     'sso_login' => [
         'pattern'            => '^/s/sso_login',
@@ -139,7 +139,7 @@ $container->loadFromExtension(
                 'id' => 'mautic.user.provider',
             ],
             'open_id_provider' => [
-                'id' => 'mautic.security.oidc.user_provider',
+                'id' => Mautic\UserBundle\Security\OIDC\UserProvider::class,
             ],
         ],
         'password_hashers' => [

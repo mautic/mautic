@@ -6,8 +6,10 @@ namespace Mautic\UserBundle\Security\OIDC\Client;
 
 use GuzzleHttp\Exception\ClientException;
 use Mautic\UserBundle\Security\OIDC\Exception\AuthorizationRequestFailedException;
+use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+#[Exclude]
 final class Client implements ClientInterface
 {
     private ClientBridgeInterface $client;

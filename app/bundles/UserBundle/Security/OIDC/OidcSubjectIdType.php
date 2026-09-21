@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Security\OIDC;
 
 use Mautic\UserBundle\Entity\OidcSubjectId;
-use Mautic\UserBundle\Security\OIDC\Exception\OpenIdConnectIdTakenException;
+use Mautic\UserBundle\Exception\OidcIdTakenException;
 use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -53,7 +53,7 @@ final class OidcSubjectIdType extends AbstractType
             \assert($subjectId instanceof OidcSubjectId);
             try {
                 $this->linker->editLinkToUser($subjectId, $subjectId->getUser());
-            } catch (OpenIdConnectIdTakenException $e) {
+            } catch (OidcIdTakenException $e) {
                 $error = new FormError($this->translator->trans($e->getMessage()));
                 $event->getForm()->get('subjectID')->addError($error);
             }

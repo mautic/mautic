@@ -6,7 +6,7 @@ namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\EventListener;
 
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\OIDC\EventListener\KernelRequestSubscriber;
-use Mautic\UserBundle\Security\OIDC\Tests\Builder\DTO\ParametersBuilder;
+use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;

@@ -6,9 +6,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\OpenIdBundle\Entity\SubjectId;
 use Mautic\OpenIdBundle\Repository\SubjectIdRepository;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Security\OIDC\Exception\OpenIdConnectIdTakenException;
-use Mautic\UserBundle\Security\OIDC\Exception\UserTakenException;
+use Mautic\UserBundle\Exception\OidcException;
+use Mautic\UserBundle\Exception\OidcIdTakenException;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 
+#[AsAlias(LinkerInterface::class)]
 final class Linker implements LinkerInterface
 {
     private EntityManagerInterface $entityManager;
@@ -31,7 +33,7 @@ final class Linker implements LinkerInterface
         }
 
         if ($user && $subjectId->getUser()->getId() !== $user->getId()) {
-            throw new OpenIdConnectIdTakenException('mautic.open_id.login.exception.open_id_taken');
+            throw new OidcIdTakenException('mautic.open_id.login.exception.open_id_taken');
         }
 
         return $subjectId->getUser();
@@ -40,11 +42,11 @@ final class Linker implements LinkerInterface
     public function linkToUser(string $identifier, User $user, bool $flush = true): User
     {
         if ($this->subjectIdRepository->count(['subjectID' => $identifier])) {
-            throw new OpenIdConnectIdTakenException('mautic.open_id.link.exception.open_id_taken');
+            throw new OidcIdTakenException('mautic.open_id.link.exception.open_id_taken');
         }
 
         if ($this->subjectIdRepository->count(['user' => $user->getId()])) {
-            throw new UserTakenException('mautic.open_id.link.exception.user_taken');
+            throw new OidcException('mautic.open_id.link.exception.user_taken');
         }
 
         $subjectIdEntity = new SubjectId();

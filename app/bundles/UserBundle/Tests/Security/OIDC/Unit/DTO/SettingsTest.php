@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\DTO;
 
 use Mautic\UserBundle\Entity\Role;
-use Mautic\UserBundle\Security\OIDC\DTO\Settings;
+use Mautic\UserBundle\Security\OIDC\Settings;
 use PHPUnit\Framework\TestCase;
 
 final class SettingsTest extends TestCase

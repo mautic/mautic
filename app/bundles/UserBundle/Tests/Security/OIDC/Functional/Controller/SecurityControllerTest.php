@@ -8,11 +8,11 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Security\OIDC\DTO\Settings;
-use Mautic\UserBundle\Security\OIDC\Service\ClientInterface;
-use Mautic\UserBundle\Security\OIDC\Tests\Builder\DTO\ParametersBuilder;
-use Mautic\UserBundle\Security\OIDC\Tests\Functional\LoadFixturesTrait;
-use Mautic\UserBundle\Security\OIDC\Tests\Functional\WebLoginTrait;
+use Mautic\UserBundle\Security\OIDC\Settings;
+use Mautic\UserBundle\Security\OIDC\Client\ClientInterface;
+use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
+use Mautic\UserBundle\Tests\Security\OIDC\Functional\LoadFixturesTrait;
+use Mautic\UserBundle\Tests\Security\OIDC\Functional\WebLoginTrait;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\UserBundle\Security\OIDC\EventListener;
+namespace Mautic\UserBundle\EventListener;
 
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\OIDC\Settings;
@@ -17,24 +17,18 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
-final class KernelRequestSubscriber implements EventSubscriberInterface
+final class OidcRequestSubscriber implements EventSubscriberInterface
 {
-    private Settings $parameters;
-    private TokenStorageInterface $tokenStorage;
-    private LoggerInterface $logger;
     private string $requiredUrl;
     private string $loginUrl;
     private string $dashboardUrl;
 
     public function __construct(
-        Settings $parameters,
-        TokenStorageInterface $tokenStorage,
+        private readonly Settings $parameters,
+        private readonly TokenStorageInterface $tokenStorage,
         UrlGeneratorInterface $urlGenerator,
-        LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
     ) {
-        $this->parameters   = $parameters;
-        $this->tokenStorage = $tokenStorage;
-        $this->logger       = $logger;
         $this->requiredUrl  = $urlGenerator->generate('open_id_login_required', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $this->loginUrl     = $urlGenerator->generate('login', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $this->dashboardUrl = $urlGenerator->generate('mautic_dashboard_index', [], UrlGeneratorInterface::ABSOLUTE_URL);

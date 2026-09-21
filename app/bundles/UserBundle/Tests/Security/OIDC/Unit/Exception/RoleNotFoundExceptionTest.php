@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Exception;
 
-use Mautic\UserBundle\Security\OIDC\Exception\RoleNotFoundException;
+use Mautic\UserBundle\Exception\OidcException;
 use PHPUnit\Framework\TestCase;
 
 final class RoleNotFoundExceptionTest extends TestCase

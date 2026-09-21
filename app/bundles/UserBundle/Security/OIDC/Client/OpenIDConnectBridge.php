@@ -6,10 +6,12 @@ namespace Mautic\UserBundle\Security\OIDC\Client;
 
 use Jumbojett\OpenIDConnectClient;
 use Jumbojett\OpenIDConnectClientException;
-use Mautic\UserBundle\Security\OIDC\Exception\AuthorizationRequestFailedException;
+use Mautic\UserBundle\Exception\OidcAuthorizationException;
+use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\SessionUnavailableException;
 
+#[Exclude]
 final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBridgeInterface
 {
     private ?SessionInterface $session = null;
@@ -46,28 +48,28 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
     }
 
     /**
-     * @throws AuthorizationRequestFailedException
+     * @throws OidcAuthorizationException
      */
     public function authenticate(): bool
     {
         try {
             return parent::authenticate();
         } catch (OpenIDConnectClientException $e) {
-            throw new AuthorizationRequestFailedException($e->getMessage());
+            throw new OidcAuthorizationException($e->getMessage());
         }
     }
 
     /**
      * @return mixed
      *
-     * @throws AuthorizationRequestFailedException
+     * @throws OidcAuthorizationException
      */
     public function requestUserInfo($claim = null)
     {
         try {
             return parent::requestUserInfo($claim);
         } catch (OpenIDConnectClientException $e) {
-            throw new AuthorizationRequestFailedException($e->getMessage());
+            throw new OidcAuthorizationException($e->getMessage());
         }
     }
 

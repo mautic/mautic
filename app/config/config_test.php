@@ -159,9 +159,9 @@ $container->register('test.service_container', Mautic\CoreBundle\Test\Container\
     ->setPublic(true);
 
 // stub oidc client factory
-$container->register('mautic.security.oidc.client.factory', \Mautic\UserBundle\Tests\Security\OIDC\Double\Factory\ClientFactory::class)
+$container->register(\Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface::class, \Mautic\UserBundle\Tests\Security\OIDC\Double\Factory\ClientFactory::class)
     ->setPublic(true);
-$container->register('mautic.security.oidc.client', \Mautic\UserBundle\Security\OIDC\Client\ClientInterface::class)
-    ->setFactory([new Reference('mautic.security.oidc.client.factory'), 'create'])
-    ->setArguments([new Reference('mautic.security.oidc.client_credentials')])
+$container->register(\Mautic\UserBundle\Security\OIDC\Client\ClientInterface::class)
+    ->setFactory([new Reference(\Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface::class), 'create'])
+    ->setArguments([new Reference(\Mautic\UserBundle\Security\OIDC\ClientCredentials::class)])
     ->setPublic(true);

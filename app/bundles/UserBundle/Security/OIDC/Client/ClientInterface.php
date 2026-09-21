@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC\Client;
 
-use Mautic\UserBundle\Security\OIDC\Exception\AuthorizationRequestFailedException;
+use Mautic\UserBundle\Exception\OidcAuthorizationException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 interface ClientInterface
 {
     /**
-     * @throws AuthorizationRequestFailedException
+     * @throws OidcAuthorizationException
      */
     public function isAuthenticated(): bool;
 
     /**
-     * @throws AuthorizationRequestFailedException
+     * @throws OidcAuthorizationException
      */
     public function authenticate(): ?RedirectResponse;
 
@@ -28,7 +28,7 @@ interface ClientInterface
      *
      * @return array<string, mixed>
      *
-     * @throws AuthorizationRequestFailedException
+     * @throws OidcAuthorizationException
      */
     public function getVerifiedClaims(array $claims): array;
 
@@ -39,7 +39,7 @@ interface ClientInterface
      *
      * @return array<string, mixed>
      *
-     * @throws AuthorizationRequestFailedException
+     * @throws OidcAuthorizationException
      */
     public function requestUserInfo(array $claims): array;
 

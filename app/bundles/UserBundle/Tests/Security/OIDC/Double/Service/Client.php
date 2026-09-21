@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Double\Service;
 
-use Mautic\UserBundle\Security\OIDC\Service\ClientInterface;
+use Mautic\UserBundle\Security\OIDC\Client\ClientInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 final class Client implements ClientInterface

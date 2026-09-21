@@ -10,7 +10,7 @@ use Mautic\UserBundle\Form\Type\ConfigType;
 use Mautic\UserBundle\Security\OIDC\DTO\ClientCredentials;
 use Mautic\UserBundle\Security\OIDC\Form\Extension\ConfigTypeExtension;
 use Mautic\UserBundle\Security\OIDC\Repository\SubjectIdRepository;
-use Mautic\UserBundle\Security\OIDC\Tests\Builder\DTO\ParametersBuilder;
+use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Event\PostSubmitEvent;

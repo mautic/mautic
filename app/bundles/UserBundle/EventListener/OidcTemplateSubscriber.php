@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\UserBundle\Security\OIDC\EventListener;
+namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
@@ -10,7 +10,7 @@ use Mautic\UserBundle\Security\OIDC\Settings;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Twig\Environment;
 
-final class InjectCustomTemplateSubscriber implements EventSubscriberInterface
+final class OidcTemplateSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly Settings $settings,
@@ -27,8 +27,6 @@ final class InjectCustomTemplateSubscriber implements EventSubscriberInterface
 
     public function onTemplateRender(CustomTemplateEvent $event): void
     {
-        // we always want to inject the configuration to the template
-        // so the user can enable/disable the feature in the UI
         $this->addConfig($event);
 
         if (!$this->settings->isEnabled()) {

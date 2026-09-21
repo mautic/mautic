@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\Security\OIDC;
 use Jumbojett\OpenIDConnectClientException;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
-use Mautic\UserBundle\Security\OIDC\Exception\TranslatableException;
+use Mautic\UserBundle\Exception\OidcException;
 use Mautic\UserBundle\Security\OIDC\Factory\UserCredentialsFactoryInterface;
 use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -58,7 +58,7 @@ final class OidcAuthenticator extends AbstractAuthenticator
             );
         } catch (OpenIDConnectClientException $e) {
             throw new AuthenticationException($e->getMessage(), 0, $e);
-        } catch (TranslatableException $e) {
+        } catch (OidcException $e) {
             throw new AuthenticationException($this->translator->trans($e->getMessage()), 0, $e);
         }
     }

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mautic\UserBundle\Security\OIDC\EventListener;
+namespace Mautic\UserBundle\EventListener;
 
-use Mautic\UserBundle\Security\OIDC\Event\RegisterScopesEvent;
+use Mautic\UserBundle\Security\OIDC\RegisterScopesEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class RegisterScopesSubscriber implements EventSubscriberInterface
+final class OidcScopesSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

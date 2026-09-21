@@ -6,7 +6,7 @@ namespace Mautic\UserBundle\Security\OIDC;
 
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
-use Mautic\UserBundle\Security\OIDC\Factory\UserFactoryInterface;
+use Mautic\UserBundle\Security\OIDC\User\UserFactoryInterface;
 use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 use Mautic\UserBundle\Security\Provider\UserProvider as MauticUserProvider;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;

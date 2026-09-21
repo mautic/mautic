@@ -9,12 +9,12 @@ use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
-use Mautic\UserBundle\Security\OIDC\Exception\EmailRequiredException;
-use Mautic\UserBundle\Security\OIDC\Exception\EmailTakenException;
-use Mautic\UserBundle\Security\OIDC\Exception\RegistrationNotAllowedException;
-use Mautic\UserBundle\Security\OIDC\Exception\RoleNotFoundException;
+use Mautic\UserBundle\Exception\OidcException;
+use Mautic\UserBundle\Exception\OidcException;
+use Mautic\UserBundle\Exception\OidcException;
+use Mautic\UserBundle\Exception\OidcException;
 use Mautic\UserBundle\Security\OIDC\Factory\UserFactory;
-use Mautic\UserBundle\Security\OIDC\Tests\Builder\DTO\ParametersBuilder;
+use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 

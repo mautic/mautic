@@ -8,7 +8,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Templating\Helper\SlotsHelper;
 use Mautic\UserBundle\Security\OIDC\EventListener\InjectCustomTemplateSubscriber;
-use Mautic\UserBundle\Security\OIDC\Tests\Builder\DTO\ParametersBuilder;
+use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPStan\Testing\TestCase;
 use Symfony\Component\Templating\PhpEngine;
 use Twig\Environment;

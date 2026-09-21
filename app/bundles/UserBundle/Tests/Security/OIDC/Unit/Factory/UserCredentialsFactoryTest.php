@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Factory;
 
-use Mautic\UserBundle\Security\OIDC\Exception\AuthorizationRequestFailedException;
-use Mautic\UserBundle\Security\OIDC\Exception\InvalidMappedIdentifierException;
-use Mautic\UserBundle\Security\OIDC\Exception\UserInfoException;
+use Mautic\UserBundle\Exception\OidcAuthorizationException;
+use Mautic\UserBundle\Exception\OidcException;
+use Mautic\UserBundle\Exception\OidcException;
 use Mautic\UserBundle\Security\OIDC\Factory\UserCredentialsFactory;
-use Mautic\UserBundle\Security\OIDC\Service\ClientInterface;
+use Mautic\UserBundle\Security\OIDC\Client\ClientInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 

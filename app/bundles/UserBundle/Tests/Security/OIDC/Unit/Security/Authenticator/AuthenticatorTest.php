@@ -11,7 +11,7 @@ use Mautic\UserBundle\Security\OIDC\Factory\UserCredentialsFactoryInterface;
 use Mautic\UserBundle\Security\OIDC\Repository\SubjectIdRepository;
 use Mautic\UserBundle\Security\OIDC\Security\Authenticator\Authenticator;
 use Mautic\UserBundle\Security\OIDC\Security\Provider\CredentialsUserProviderInterface;
-use Mautic\UserBundle\Security\OIDC\Tests\Builder\DTO\ParametersBuilder;
+use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;

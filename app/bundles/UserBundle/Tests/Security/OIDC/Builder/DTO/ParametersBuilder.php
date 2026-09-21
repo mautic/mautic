@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO;
 
 use Mautic\UserBundle\Entity\Role;
-use Mautic\UserBundle\Security\OIDC\DTO\Settings;
+use Mautic\UserBundle\Security\OIDC\Settings;
 
 final class ParametersBuilder
 {

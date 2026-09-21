@@ -9,13 +9,12 @@ use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
-use Mautic\UserBundle\Security\OIDC\Exception\EmailRequiredException;
-use Mautic\UserBundle\Security\OIDC\Exception\EmailTakenException;
-use Mautic\UserBundle\Security\OIDC\Exception\RegistrationNotAllowedException;
-use Mautic\UserBundle\Security\OIDC\Exception\RoleNotFoundException;
+use Mautic\UserBundle\Exception\OidcException;
 use Mautic\UserBundle\Security\OIDC\Settings;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 
+#[AsAlias(UserFactoryInterface::class)]
 final class UserFactory implements UserFactoryInterface
 {
     private UserRepository $userRepository;
@@ -39,23 +38,23 @@ final class UserFactory implements UserFactoryInterface
     {
         if (!$this->parameters->isUserRegistrationAllowed()) {
             $this->logger->debug('User registration is not allowed');
-            throw new RegistrationNotAllowedException('mautic.open_id.registration.exception.registration_disabled');
+            throw new OidcException('mautic.open_id.registration.exception.registration_disabled');
         }
 
         $role = $this->getUserRole();
         if (!$role) {
             $this->logger->error('Could not register user through OpenID Connect. Registered user role not found.', ['role' => $this->parameters->getRegisteredUserRole()]);
-            throw new RoleNotFoundException('mautic.open_id.registration.exception.invalid_role');
+            throw new OidcException('mautic.open_id.registration.exception.invalid_role');
         }
 
         if (!$credentials->getEmail()) {
             $this->logger->error('Could not locate email to register user through Open ID Connect.', ['credentials' => $credentials]);
-            throw new EmailRequiredException('mautic.open_id.registration.exception.email_required');
+            throw new OidcException('mautic.open_id.registration.exception.email_required');
         }
 
         if ($this->userRepository->findOneBy(['email' => $credentials->getEmail()])) {
             $this->logger->debug('Could not register user through Open ID Connect. Email is already taken.', ['credentials' => $credentials]);
-            throw new EmailTakenException('mautic.open_id.registration.exception.email_taken');
+            throw new OidcException('mautic.open_id.registration.exception.email_taken');
         }
 
         $username    = $this->getUniqueUsername($credentials);

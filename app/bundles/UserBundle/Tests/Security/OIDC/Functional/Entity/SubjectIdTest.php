@@ -8,7 +8,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\OIDC\Entity\SubjectId;
-use Mautic\UserBundle\Security\OIDC\Tests\Functional\LoadFixturesTrait;
+use Mautic\UserBundle\Tests\Security\OIDC\Functional\LoadFixturesTrait;
 
 final class SubjectIdTest extends MauticMysqlTestCase
 {
