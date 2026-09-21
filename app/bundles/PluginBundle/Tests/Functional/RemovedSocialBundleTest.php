@@ -33,26 +33,26 @@ final class RemovedSocialBundleTest extends MauticMysqlTestCase
             $this->em->refresh($plugin);
             $this->em->refresh($integration);
 
-            self::assertTrue($plugin->getIsMissing());
-            self::assertTrue($integration->getIsPublished());
-            self::assertSame(['existing_setting' => 'preserved'], $integration->getFeatureSettings());
+            $this->assertTrue($plugin->getIsMissing());
+            $this->assertTrue($integration->getIsPublished());
+            $this->assertSame(['existing_setting' => 'preserved'], $integration->getFeatureSettings());
         }
 
         $integrations = self::getContainer()->get(IntegrationHelper::class)->getIntegrationObjects();
-        self::assertArrayNotHasKey('Twitter', $integrations);
-        self::assertArrayHasKey('Salesforce', $integrations);
+        $this->assertArrayNotHasKey('Twitter', $integrations);
+        $this->assertArrayHasKey('Salesforce', $integrations);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/plugins');
         self::assertResponseIsSuccessful();
-        self::assertStringNotContainsString('Social Media', $crawler->filter('#app-content')->text());
+        $this->assertStringNotContainsString('Social Media', $crawler->filter('#app-content')->text());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
         self::assertResponseIsSuccessful();
-        self::assertStringNotContainsString('Social Settings', $crawler->filter('.list-group-tabs')->text());
-        self::assertStringNotContainsString('Social Monitoring', $crawler->filter('.sidebar-left .sidebar-content')->text());
+        $this->assertStringNotContainsString('Social Settings', $crawler->filter('.list-group-tabs')->text());
+        $this->assertStringNotContainsString('Social Monitoring', $crawler->filter('.sidebar-left .sidebar-content')->text());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/forms/new');
         self::assertResponseIsSuccessful();
-        self::assertStringNotContainsString('Social Login', $crawler->filter('#fields-container select.form-builder-new-component')->text());
+        $this->assertStringNotContainsString('Social Login', $crawler->filter('#fields-container select.form-builder-new-component')->text());
     }
 }

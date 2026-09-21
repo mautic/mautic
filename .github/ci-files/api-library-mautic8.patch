@@ -1,0 +1,65 @@
+diff --git a/tests/Api/StatsTest.php b/tests/Api/StatsTest.php
+index c5c5f7c..1032262 100644
+--- a/tests/Api/StatsTest.php
++++ b/tests/Api/StatsTest.php
+@@ -93,7 +93,6 @@ class StatsTest extends MauticApiTestCase
+             'push_notification_stats',
+             'sms_message_stats',
+             'stage_lead_action_log',
+-            'tweet_stats',
+             'video_hits',
+             'webhook_logs',
+         ];
+diff --git a/tests/Api/TweetsTest.php b/tests/Api/TweetsTest.php
+index 03a76d6..b8a6e1b 100644
+--- a/tests/Api/TweetsTest.php
++++ b/tests/Api/TweetsTest.php
+@@ -25,17 +25,18 @@ class TweetsTest extends MauticApiTestCase
+
+     public function testGetList()
+     {
+-        $this->standardTestGetList();
++        $this->assertRemoved($this->api->getList());
+     }
+
+     public function testGetListOfSpecificIds()
+     {
+-        $this->standardTestGetListOfSpecificIds();
++        $this->assertRemoved($this->api->get(1));
+     }
+
+     public function testCreateGetAndDelete()
+     {
+-        $this->standardTestCreateGetAndDelete();
++        $this->assertRemoved($this->api->create($this->testPayload));
++        $this->assertRemoved($this->api->delete(1));
+     }
+
+     public function testEditPatch()
+@@ -43,16 +44,23 @@ class TweetsTest extends MauticApiTestCase
+         $editTo = [
+             'name' => 'API test name updated',
+         ];
+-        $this->standardTestEditPatch($editTo);
++        $this->assertRemoved($this->api->edit(1, $editTo));
+     }
+
+     public function testEditPut()
+     {
+-        $this->standardTestEditPut();
++        $this->assertRemoved($this->api->edit(1, $this->testPayload, true));
+     }
+
+     public function testBatchEndpoints()
+     {
+-        $this->standardTestBatchEndpoints();
++        $this->assertRemoved($this->api->createBatch([$this->testPayload]));
++        $this->assertRemoved($this->api->editBatch([['id' => 1] + $this->testPayload]));
++        $this->assertRemoved($this->api->deleteBatch([1]));
++    }
++
++    private function assertRemoved(array $response): void
++    {
++        $this->assertSame(404, $response['errors'][0]['code'] ?? null, 'The Tweets API was removed in Mautic 8.');
+     }
+ }
