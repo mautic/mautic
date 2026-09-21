@@ -180,11 +180,6 @@ parameters:
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/Campaign.php
 
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:findByFormId\(\) has parameter \$formId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:getCampaignFormSources\(\) has parameter \$id with no type specified\.$#'
@@ -192,11 +187,6 @@ parameters:
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:getCampaignLeads\(\) has parameter \$campaignId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:getCampaignListSources\(\) has parameter \$id with no type specified\.$#'
@@ -204,11 +194,6 @@ parameters:
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:getContactSingleSegmentByCampaign\(\) has parameter \$campaignId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:getContactSingleSegmentByCampaign\(\) has parameter \$contactId with no type specified\.$#'
@@ -216,17 +201,7 @@ parameters:
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:getCountsForPendingContacts\(\) has parameter \$campaignId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:getPendingContactIds\(\) has parameter \$campaignId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:getPublishedCampaigns\(\) has parameter \$specificId with no type specified\.$#'

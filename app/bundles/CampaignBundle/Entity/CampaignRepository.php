@@ -229,7 +229,7 @@ class CampaignRepository extends CommonRepository
         return $forms;
     }
 
-    public function findByFormId($formId): array
+    public function findByFormId(int $formId): array
     {
         $q = $this->createQueryBuilder('c')
             ->join('c.forms', 'f');
@@ -338,7 +338,7 @@ class CampaignRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    public function getCountsForPendingContacts($campaignId, array $pendingEvents, ContactLimiter $limiter): CountResult
+    public function getCountsForPendingContacts(int $campaignId, array $pendingEvents, ContactLimiter $limiter): CountResult
     {
         $q = $this->getReplicaConnection($limiter)->createQueryBuilder();
 
@@ -346,7 +346,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
+                    $q->expr()->eq('cl.campaign_id', (string) $campaignId),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
@@ -377,7 +377,7 @@ class CampaignRepository extends CommonRepository
     /**
      * Get pending contact IDs for a campaign.
      */
-    public function getPendingContactIds($campaignId, ContactLimiter $limiter): array
+    public function getPendingContactIds(int $campaignId, ContactLimiter $limiter): array
     {
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             return [];
@@ -389,7 +389,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
+                    $q->expr()->eq('cl.campaign_id', (string) $campaignId),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
@@ -405,7 +405,7 @@ class CampaignRepository extends CommonRepository
             ->where(
                 $sq->expr()->and(
                     $sq->expr()->eq('e.lead_id', 'cl.lead_id'),
-                    $sq->expr()->eq('e.campaign_id', (string) ((int) $campaignId)),
+                    $sq->expr()->eq('e.campaign_id', (string) $campaignId),
                     $sq->expr()->eq('e.rotation', 'cl.rotation')
                 )
             );
@@ -471,7 +471,7 @@ class CampaignRepository extends CommonRepository
      * @param string[] $select
      * @return mixed[]
      */
-    public function getCampaignLeads($campaignId, int $start = 0, bool $limit = false, array $select = ['cl.lead_id']): array
+    public function getCampaignLeads(int $campaignId, int $start = 0, bool $limit = false, array $select = ['cl.lead_id']): array
     {
         $q = $this->getReplicaConnection()->createQueryBuilder();
 
@@ -479,7 +479,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (string) ((int) $campaignId)),
+                    $q->expr()->eq('cl.campaign_id', (string) $campaignId),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
@@ -494,7 +494,7 @@ class CampaignRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    public function getContactSingleSegmentByCampaign($contactId, $campaignId): array|false
+    public function getContactSingleSegmentByCampaign($contactId, int $campaignId): array|false
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -503,7 +503,7 @@ class CampaignRepository extends CommonRepository
             ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = ll.id and lll.lead_id = :contactId and lll.manually_removed = 0')
             ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx', 'clx.leadlist_id = ll.id and clx.campaign_id = :campaignId')
             ->setParameter('contactId', (int) $contactId)
-            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('campaignId', $campaignId)
             ->setMaxResults(1)
             ->executeQuery()
             ->fetchAssociative();
