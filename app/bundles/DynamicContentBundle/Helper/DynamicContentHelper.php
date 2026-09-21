@@ -352,6 +352,20 @@ class DynamicContentHelper
 
     public function replaceDWCTokenToHtmlTag(string $content): string
     {
+        // First, replace tokens with default content and closing tag: {dwc=slotname}default{/dwc}
+        // Preserve default content inside the div for fallback
+        $content = preg_replace_callback(
+            self::DWC_WITH_OPTIONAL_DEFAULT_CONTENT,
+            function (array $matches): string {
+                $slotName       = htmlspecialchars($matches[1], ENT_QUOTES);
+                $defaultContent = $matches[2];
+
+                return '<div data-slot="dwc" data-param-slot-name="'.$slotName.'">'.$defaultContent.'</div>';
+            },
+            $content
+        );
+
+        // Then, replace simple tokens without closing tag: {dwc=slotname}
         return preg_replace_callback(
             self::DYNAMIC_WEB_CONTENT_REGEX,
             function (array $matches): string {

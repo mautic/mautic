@@ -286,4 +286,53 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame('', $this->helper->getDynamicContentSlotForLead($slotName, $contact));
     }
+
+    /**
+     * @dataProvider replaceDWCTokenToHtmlTagDataProvider
+     */
+    public function testReplaceDWCTokenToHtmlTag(string $input, string $expected): void
+    {
+        $this->assertSame($expected, $this->helper->replaceDWCTokenToHtmlTag($input));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function replaceDWCTokenToHtmlTagDataProvider(): iterable
+    {
+        yield 'simple token without closing tag' => [
+            '{dwc=my-slot}',
+            '<div data-slot="dwc" data-param-slot-name="my-slot"></div>',
+        ];
+
+        yield 'token with default content and closing tag preserves default content' => [
+            '{dwc=my-slot}Default content goes here{/dwc}',
+            '<div data-slot="dwc" data-param-slot-name="my-slot">Default content goes here</div>',
+        ];
+
+        yield 'token with empty default content and closing tag' => [
+            '{dwc=my-slot}{/dwc}',
+            '<div data-slot="dwc" data-param-slot-name="my-slot"></div>',
+        ];
+
+        yield 'multiple tokens with closing tags preserve default content' => [
+            '<p>{dwc=slot1}Default 1{/dwc}</p><p>{dwc=slot2}Default 2{/dwc}</p>',
+            '<p><div data-slot="dwc" data-param-slot-name="slot1">Default 1</div></p><p><div data-slot="dwc" data-param-slot-name="slot2">Default 2</div></p>',
+        ];
+
+        yield 'mixed tokens - with and without closing tags' => [
+            '<p>{dwc=slot1}Default{/dwc}</p><p>{dwc=slot2}</p>',
+            '<p><div data-slot="dwc" data-param-slot-name="slot1">Default</div></p><p><div data-slot="dwc" data-param-slot-name="slot2"></div></p>',
+        ];
+
+        yield 'token with HTML in default content preserves HTML' => [
+            '{dwc=my-slot}<strong>Bold default</strong>{/dwc}',
+            '<div data-slot="dwc" data-param-slot-name="my-slot"><strong>Bold default</strong></div>',
+        ];
+
+        yield 'token with multiline default content' => [
+            "{dwc=my-slot}Line 1\nLine 2{/dwc}",
+            "<div data-slot=\"dwc\" data-param-slot-name=\"my-slot\">Line 1\nLine 2</div>",
+        ];
+    }
 }
