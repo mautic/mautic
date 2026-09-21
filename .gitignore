@@ -111,7 +111,6 @@ phpstan.neon.dist
 !/plugins/MauticFullContactBundle
 !/plugins/MauticGmailBundle
 !/plugins/MauticOutlookBundle
-!/plugins/MauticSocialBundle
 !/plugins/MauticZapierBundle
 !/plugins/MauticTagManagerBundle
 !/plugins/index.html

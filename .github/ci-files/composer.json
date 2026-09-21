@@ -40,7 +40,6 @@
     "mautic/plugin-fullcontact": "*",
     "mautic/plugin-gmail": "*",
     "mautic/plugin-outlook": "*",
-    "mautic/plugin-social": "*",
     "mautic/plugin-tagmanager": "*",
     "mautic/plugin-zapier": "*",
     "mautic/theme-aurora": "*",

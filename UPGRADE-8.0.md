@@ -6,6 +6,21 @@
 
 ## Removed code
 
+### Social media integrations
+
+`MauticSocialBundle` and the bundled `mautic/plugin-social` package have been removed. This removes the Facebook, Twitter/X, Instagram and Foursquare integrations, Social Monitoring, tweets, the `twitter.tweet` campaign action and the `plugin.loginSocial` form field. CRM integrations in `MauticCrmBundle` are unaffected, as are contact social-profile fields and social links in emails.
+
+Before upgrading:
+
+- Remove Twitter actions from campaigns and review/reconnect the subsequent campaign steps. A retained `twitter.tweet` action is no longer registered and can interrupt execution of the rest of that campaign.
+- Remove Social Login fields from forms, then save the forms to regenerate their HTML. Update any externally embedded static form HTML. A retained `plugin.loginSocial` field cannot be rendered after the bundle is removed.
+- Remove scheduled `mautic:social:monitoring`, `social:monitor:twitter:hashtags` and `social:monitor:twitter:mentions` commands. Remove custom code that depends on this bundle's classes, services, routes or Twig templates.
+- For Composer-managed installations, remove any explicit `mautic/plugin-social` requirement from the project's `composer.json` as part of the upgrade.
+
+After upgrading, clear the application cache and run `bin/console mautic:plugins:reload` to mark the removed plugin as missing. Existing integration settings and social tables are retained; this removal does not delete historical data or automatically rewrite campaigns and forms.
+
+### Other removed code
+
 - Deprecated method `addLead()` removed from `Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder`. The 28 entities that used it now map their `lead` association with native `#[ORM\ManyToOne]` / `#[ORM\JoinColumn]` attributes (column `lead_id`, unchanged). Any custom entity calling `$builder->addLead(...)` in `loadMetadata()` must declare the mapping with Doctrine attributes instead.
 - Deprecated entity `Mautic\CoreBundle\Entity\Cache` removed with no replacement. It mapped the `cache_items` table but was never read or written anywhere in the codebase.
 - Deprecated methods `getResult()` and `setResult()` removed from `Mautic\CampaignBundle\Event\ConditionEvent` and `Mautic\CampaignBundle\Event\DecisionEvent`. Campaign condition/decision listeners must type their event argument as `ConditionEvent` / `DecisionEvent` (not the deprecated parent `CampaignExecutionEvent`) and use the real API: conditions call `pass()` / `fail()` (read back with `wasConditionSatisfied()`), decisions call `setAsApplicable()` (read back with `wasDecisionApplicable()`). The broken `setChannel()` overrides on both events were also removed; they now inherit the working `CampaignExecutionEvent::setChannel()`. The executioners already read the applicability via `wasConditionSatisfied()` / `wasDecisionApplicable()`, so behaviour is unchanged.
@@ -15,7 +30,6 @@
 - Deprecated constant `Mautic\PageBundle\PageEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.page.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.page.on_campaign_batch_action`). The `tracking.pixel.send` action now runs on `PendingEvent`. Switch to `'batchEventName' => PageEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener.
 - Deprecated constant `Mautic\PluginBundle\PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.plugin.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.plugin.on_campaign_batch_action`). The `plugin.leadpush` action now runs on `PendingEvent`. Switch to `'batchEventName' => PluginEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener.
 - Deprecated constant `MauticPlugin\MauticFocusBundle\FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.focus.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.focus.on_campaign_batch_action`). The `focus.show` action now runs on `PendingEvent`. Switch to `'batchEventName' => FocusEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener.
-- Deprecated constant `MauticPlugin\MauticSocialBundle\SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.social.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.social.on_campaign_batch_action`). The `twitter.tweet` action now runs on `PendingEvent`. Switch to `'batchEventName' => SocialEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener. `MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper::sendTweetAction()` now takes the `Mautic\CampaignBundle\Entity\Event` entity instead of the legacy event array.
 - Deprecated form type removed from `Mautic\FormBundle\Entity\Form`. Form types were no longer used, so the `$formType` property, the `getFormType()` method, the `form_type` ORM mapping and the `formType` API field are gone. The `form_type` database column is dropped by a migration. The `formType`/`form_type` key is no longer read from or written to the API, and is dropped from form export payloads.
 - Deprecated Mautic v1 theme fallback removed from `Mautic\PageBundle\Controller\PublicController::indexAction()`. Public pages are now rendered solely from `Page::getCustomHtml()`; the legacy path that rendered `Page::getContent()` through a `@themes/<template>/html/page.html.twig` theme template (used when `customHtml` was empty) is gone. The unused `ThemeHelper` argument was dropped from `indexAction()`.
 - Deprecated method `Mautic\LeadBundle\Model\LeadModel::isContactable()` removed. Use `Mautic\LeadBundle\Model\DoNotContact::isContactable()` instead.
@@ -660,7 +674,6 @@
     | `SmsBundle\Model\SmsModel` | `getSmsClickStats()` | `int` |
     | `WebhookBundle\Model\WebhookModel` | `getEventWebooksByType()`, `queueWebhooksByType()` (first parameter) | `string` |
     | `WebhookBundle\Model\WebhookModel` | `processWebhooks()` | `array\|Paginator` |
-    | `MauticPlugin\MauticSocialBundle\Model\MonitoringModel` | `getFormByType()` | `string` |
 - The `Mautic\CoreBundle\DependencyInjection\Compiler\ServicePass` compiler pass was removed. It used to read the `services > menus` array from a bundle's `Config/config.php` and wire the menu item (`knp_menu.menu`) and its renderer (`knp_menu.renderer`) automatically. A bundle that registered its own menu must now declare both services explicitly in its `Config/services.php`.
 
     Before — `Config/config.php`:

@@ -52,7 +52,7 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
 {
     /**
-     * There are 300 local event subscribers in the container, keep a small reserve for removed ones.
+     * There are 299 local event subscribers in the container, keep a small reserve for removed ones.
      */
     private const int MINIMAL_EVENT_SUBSCRIBER_COUNT = 297;
 
@@ -105,7 +105,6 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
         ],
         CampaignBuilderEvent::class => [
             \MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber::class,
-            \MauticPlugin\MauticSocialBundle\EventListener\CampaignSubscriber::class,
             \Mautic\AssetBundle\EventListener\CampaignSubscriber::class,
             CampaignActionChangeMembershipSubscriber::class,
             CampaignActionJumpToEventSubscriber::class,
@@ -146,7 +145,6 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\PointBundle\EventListener\ReportSubscriber::class,
         ],
         'mautic.config_on_generate' => [
-            \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
@@ -164,7 +162,6 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\WebhookBundle\EventListener\ConfigSubscriber::class,
         ],
         'mautic.config_pre_save' => [
-            \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
@@ -187,7 +184,6 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\PageBundle\EventListener\BuilderSubscriber::class,
         ],
         FormBuilderEvent::class => [
-            \MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber::class,
             \Mautic\AssetBundle\EventListener\FormSubscriber::class,
             \Mautic\EmailBundle\EventListener\FormSubscriber::class,
             \Mautic\FormBundle\EventListener\FormSubscriber::class,
