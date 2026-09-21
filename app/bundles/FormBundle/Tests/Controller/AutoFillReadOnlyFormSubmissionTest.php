@@ -118,29 +118,7 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
     public function testConditionalFieldConfigurationShowsAutoFillBehavior(): void
     {
         $form = $this->createForm();
-
-        $parentField = $this->createFormField($form, 'Show details', 'select');
-        $parentField->setProperties([
-            'syncList' => 0,
-            'multiple' => 0,
-            'list'     => [
-                'list' => [
-                    ['label' => 'Yes', 'value' => 'yes'],
-                    ['label' => 'No', 'value' => 'no'],
-                ],
-            ],
-        ]);
-        $form->addField(1, $parentField);
-        $this->em->flush();
-
-        $firstNameField = $this->createFormField($form, 'First name', 'text', true, true, 'firstname', 'contact');
-        $firstNameField->setParent((string) $parentField->getId());
-        $firstNameField->setConditions([
-            'expr'   => 'in',
-            'any'    => 0,
-            'values' => ['yes'],
-        ]);
-        $form->addField(2, $firstNameField);
+        $firstNameField = $this->addConditionalAutoFillField($form, 1);
 
         $this->em->flush();
         $this->em->clear();
@@ -264,6 +242,19 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
         $emailField = $this->createFormField($form, 'Email', 'email', true, false, 'email', 'contact');
         $form->addField(1, $emailField);
 
+        $this->addConditionalAutoFillField($form, 2);
+
+        $submitButton = $this->createFormField($form, 'Submit', 'button');
+        $form->addField(4, $submitButton);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        return $form;
+    }
+
+    private function addConditionalAutoFillField(Form $form, int $position): Field
+    {
         $parentField = $this->createFormField($form, 'Show details', 'select');
         $parentField->setProperties([
             'syncList' => 0,
@@ -275,7 +266,7 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
                 ],
             ],
         ]);
-        $form->addField(2, $parentField);
+        $form->addField($position, $parentField);
         $this->em->flush();
 
         $firstNameField = $this->createFormField($form, 'First name', 'text', true, true, 'firstname', 'contact');
@@ -285,15 +276,9 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
             'any'    => 0,
             'values' => ['yes'],
         ]);
-        $form->addField(3, $firstNameField);
+        $form->addField($position + 1, $firstNameField);
 
-        $submitButton = $this->createFormField($form, 'Submit', 'button');
-        $form->addField(4, $submitButton);
-
-        $this->em->flush();
-        $this->em->clear();
-
-        return $form;
+        return $firstNameField;
     }
 
     private function createForm(): Form
