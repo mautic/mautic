@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -40,10 +39,7 @@ class TrackingHelper
         return $result;
     }
 
-    /**
-     * @return string|null
-     */
-    private function getCacheKey()
+    private function getCacheKey(): ?string
     {
         $lead = $this->contactTracker->getContact();
 
@@ -77,7 +73,6 @@ class TrackingHelper
         $cacheKey   = $this->getCacheKey();
         $cacheValue = [];
 
-        /* @var CacheItemInterface $item */
         if (null !== $cacheKey) {
             $item = $this->cache->getItem($cacheKey);
             if ($item->isHit()) {

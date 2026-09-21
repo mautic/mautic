@@ -8,10 +8,11 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\GetStatDataEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class SegmentStatsSubscriber implements EventSubscriberInterface
+final readonly class SegmentStatsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadListRepository $leadListRepository)
-    {
+    public function __construct(
+        private LeadListRepository $leadListRepository,
+    ) {
     }
 
     /**

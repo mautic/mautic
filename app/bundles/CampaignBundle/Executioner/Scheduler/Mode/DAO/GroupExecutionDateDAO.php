@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode\DAO;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 
-class GroupExecutionDateDAO
+final readonly class GroupExecutionDateDAO
 {
     private ArrayCollection $contacts;
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Command;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\FormBundle\Entity\FormRepository;
 use Psr\Log\LoggerInterface;
@@ -19,17 +19,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: DeleteOrphanFormResultsTableCommand::COMMAND_NAME,
     description: 'Deletes form results table for already deleted forms'
 )]
-class DeleteOrphanFormResultsTableCommand extends Command
+final class DeleteOrphanFormResultsTableCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:forms:delete-results-table';
 
-    private Connection $conn;
+    private readonly Connection $conn;
 
     public function __construct(
-        private EntityManager $entityManager,
-        private LoggerInterface $logger,
-        private TranslatorInterface $translator,
-        private FormRepository $formRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly FormRepository $formRepository,
     ) {
         parent::__construct();
 

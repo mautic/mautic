@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EntityLookupType extends AbstractType
+final class EntityLookupType extends AbstractType
 {
     /**
      * @var EntityLookupChoiceLoader[]
@@ -31,10 +31,10 @@ class EntityLookupType extends AbstractType
      * @param ModelFactory<object> $modelFactory
      */
     public function __construct(
-        private ModelFactory $modelFactory,
-        private TranslatorInterface $translator,
-        private Connection $connection,
-        private RouterInterface $router,
+        private readonly ModelFactory $modelFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly Connection $connection,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -93,7 +93,7 @@ class EntityLookupType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

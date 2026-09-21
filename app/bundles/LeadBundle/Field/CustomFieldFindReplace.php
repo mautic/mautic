@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
-final class CustomFieldFindReplace
+final readonly class CustomFieldFindReplace
 {
     public function __construct(
         private FieldList $fieldList,

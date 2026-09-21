@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ChannelSubscriptionChange extends Event
+final class ChannelSubscriptionChange extends Event
 {
     /**
      * @param string $channel
      */
     public function __construct(
-        private Lead $lead,
+        private readonly Lead $lead,
         private $channel,
-        private int $oldStatus,
-        private int $newStatus,
+        private readonly int $oldStatus,
+        private readonly int $newStatus,
     ) {
     }
 

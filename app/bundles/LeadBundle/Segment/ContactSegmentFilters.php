@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment;
 
 /**
  * Array object containing filters.
  */
-class ContactSegmentFilters implements \Iterator, \Countable
+final class ContactSegmentFilters implements \Iterator, \Countable
 {
     private int $position = 0;
 
@@ -14,10 +16,7 @@ class ContactSegmentFilters implements \Iterator, \Countable
      */
     private array $contactSegmentFilters = [];
 
-    /**
-     * @return $this
-     */
-    public function addContactSegmentFilter(ContactSegmentFilter $contactSegmentFilter)
+    public function addContactSegmentFilter(ContactSegmentFilter $contactSegmentFilter): static
     {
         $this->contactSegmentFilters[] = $contactSegmentFilter;
 

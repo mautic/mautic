@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 
-class FieldMergerHelper
+final class FieldMergerHelper
 {
     /**
      * @var MappedFieldInfoInterface[]
@@ -17,7 +17,7 @@ class FieldMergerHelper
     private ?array $allFields = null;
 
     public function __construct(
-        private ConfigFormSyncInterface $integrationObject,
+        private readonly ConfigFormSyncInterface $integrationObject,
         private array $currentFieldMappings,
     ) {
     }
@@ -131,7 +131,7 @@ class FieldMergerHelper
             $supportedDirections[] = ObjectMappingDAO::SYNC_TO_MAUTIC;
         }
 
-        if (empty($supportedDirections)) {
+        if ([] === $supportedDirections) {
             throw new InvalidFormOptionException('field "'.$field->getName().'" must allow at least 1 direction for sync');
         }
 

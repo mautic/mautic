@@ -2,10 +2,14 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use MauticPlugin\MauticCrmBundle\Api\VtigerApi;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
+/**
+ * @extends CrmAbstractIntegration<VtigerApi>
+ */
 class VtigerIntegration extends CrmAbstractIntegration
 {
     private string $authorzationError = '';

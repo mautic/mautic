@@ -20,18 +20,18 @@ use Mautic\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\ConfigTokenSigner
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 use PHPUnit\Framework\TestCase;
 
-class HttpFactoryTest extends TestCase
+final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertEquals('oauth2_three_legged', (new HttpFactory())->getAuthType());
+        $this->assertSame('oauth2_three_legged', (new HttpFactory())->getAuthType());
     }
 
     public function testMissingAuthorizationUrlThrowsException(): void
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class implements CredentialsInterface {
+        $credentials = new class() implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return '';
@@ -60,7 +60,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class implements CredentialsInterface {
+        $credentials = new class() implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -87,7 +87,7 @@ class HttpFactoryTest extends TestCase
 
     public function testBaseURISetOnBaseUriAwareCredentials(): void
     {
-        $credentials = new class implements CredentialsInterface {
+        $credentials = new class() implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -135,14 +135,14 @@ class HttpFactoryTest extends TestCase
          * https://github.com/guzzle/guzzle/issues/3114#issuecomment-1627228395.
          */
         /** @phpstan-ignore-next-line */
-        $this->assertEquals('https://mautic.com', (string) $client->getConfig('base_uri'));
+        $this->assertSame('https://mautic.com', (string) $client->getConfig('base_uri'));
     }
 
     public function testMissingClientIdThrowsException(): void
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class implements CredentialsInterface {
+        $credentials = new class() implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -171,7 +171,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class implements CredentialsInterface {
+        $credentials = new class() implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -198,7 +198,7 @@ class HttpFactoryTest extends TestCase
 
     public function testInstantiatedClientIsReturned(): void
     {
-        $credentials = new class implements CredentialsInterface {
+        $credentials = new class() implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -224,9 +224,9 @@ class HttpFactoryTest extends TestCase
 
         $client1 = $factory->getClient($credentials);
         $client2 = $factory->getClient($credentials);
-        $this->assertTrue($client1 === $client2);
+        $this->assertSame($client2, $client1);
 
-        $credentials2 = new class implements CredentialsInterface {
+        $credentials2 = new class() implements CredentialsInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';
@@ -249,7 +249,7 @@ class HttpFactoryTest extends TestCase
         };
 
         $client3 = $factory->getClient($credentials2);
-        $this->assertFalse($client1 === $client3);
+        $this->assertNotSame($client3, $client1);
     }
 
     public function testReAuthClientConfiguration(): void
@@ -280,9 +280,9 @@ class HttpFactoryTest extends TestCase
     public function testClientConfiguration(): void
     {
         $credentials               = $this->getCredentials();
-        $signerInterface           = $this->createMock(SignerInterface::class);
-        $kamermansTokenPersistence = $this->createMock(KamermansTokenPersistenceInterface::class);
-        $accessTokenSigner         = $this->createMock(AccessTokenSigner::class);
+        $signerInterface           = $this->createStub(SignerInterface::class);
+        $kamermansTokenPersistence = $this->createStub(KamermansTokenPersistenceInterface::class);
+        $accessTokenSigner         = $this->createStub(AccessTokenSigner::class);
 
         $clientCredentialSigner = $this->createMock(ConfigCredentialsSignerInterface::class);
         $clientCredentialSigner->expects($this->once())
@@ -292,7 +292,7 @@ class HttpFactoryTest extends TestCase
         $client              = (new HttpFactory())->getClient($credentials, $clientCredentialSigner);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
-        $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'clientCredentialsSigner') === $signerInterface);
+        $this->assertSame($signerInterface, $this->getProperty($reflectedMiddleware, $middleware, 'clientCredentialsSigner'));
 
         $tokenPersistence = $this->createMock(ConfigTokenPersistenceInterface::class);
         $tokenPersistence->expects($this->once())
@@ -302,7 +302,7 @@ class HttpFactoryTest extends TestCase
         $client              = (new HttpFactory())->getClient($credentials, $tokenPersistence);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
-        $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'tokenPersistence') === $kamermansTokenPersistence);
+        $this->assertSame($kamermansTokenPersistence, $this->getProperty($reflectedMiddleware, $middleware, 'tokenPersistence'));
 
         $tokenPersistence = $this->createMock(ConfigTokenSignerInterface::class);
         $tokenPersistence->expects($this->once())
@@ -312,7 +312,7 @@ class HttpFactoryTest extends TestCase
         $client              = (new HttpFactory())->getClient($credentials, $tokenPersistence);
         $middleware          = $this->extractMiddleware($client);
         $reflectedMiddleware = new \ReflectionClass($middleware);
-        $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'accessTokenSigner') === $accessTokenSigner);
+        $this->assertSame($accessTokenSigner, $this->getProperty($reflectedMiddleware, $middleware, 'accessTokenSigner'));
     }
 
     /**
@@ -343,7 +343,7 @@ class HttpFactoryTest extends TestCase
 
     private function getCredentials(): CredentialsInterface&CodeInterface&RedirectUriInterface&ScopeInterface
     {
-        return new class implements CredentialsInterface, CodeInterface, RedirectUriInterface, ScopeInterface {
+        return new class() implements CredentialsInterface, CodeInterface, RedirectUriInterface, ScopeInterface {
             public function getAuthorizationUrl(): string
             {
                 return 'http://auth.url';

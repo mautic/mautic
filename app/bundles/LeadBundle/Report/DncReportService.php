@@ -17,8 +17,8 @@ class DncReportService
     ];
 
     public function __construct(
-        private DoNotContact $doNotContactModel,
-        private DncFormatterHelper $dncFormatterHelper,
+        private readonly DoNotContact $doNotContactModel,
+        private readonly DncFormatterHelper $dncFormatterHelper,
     ) {
     }
 
@@ -83,7 +83,7 @@ class DncReportService
      */
     public function processDncStatusDisplay(array $data): array
     {
-        if (empty($data) || !array_key_exists('dnc_preferences', $data[0])) {
+        if ([] === $data || !array_key_exists('dnc_preferences', $data[0])) {
             return $data;
         }
 

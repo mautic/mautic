@@ -10,10 +10,10 @@ use Twig\TwigFunction;
 
 final class BarChartExtension extends AbstractExtension
 {
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('barChartInitialize', [$this, 'createNewChart']),
+            new TwigFunction('barChartInitialize', $this->createNewChart(...)),
         ];
     }
 

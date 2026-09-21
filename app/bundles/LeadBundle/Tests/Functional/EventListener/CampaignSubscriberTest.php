@@ -13,10 +13,9 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\FieldModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class CampaignSubscriberTest extends MauticMysqlTestCase
+final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -83,10 +82,10 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
             'eventSettings'   => [],
         ];
 
-        $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false); // @phpstan-ignore new.deprecated
-        $result                 = $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        Assert::assertInstanceOf(CampaignExecutionEvent::class, $result); // @phpstan-ignore classConstant.deprecatedClass
-        Assert::assertTrue($result->getResult());
+        $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false);
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
+        $this->assertTrue($campaignExecutionEvent->getResult());
     }
 
     /**
@@ -146,10 +145,10 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
             'eventSettings'   => [],
         ];
 
-        $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false); // @phpstan-ignore new.deprecated
-        $result                 = $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        $this->assertInstanceOf(CampaignExecutionEvent::class, $result); // @phpstan-ignore classConstant.deprecatedClass
-        $this->assertSame($expected, $result->getResult());
+        $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false);
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
+        $this->assertSame($expected, $campaignExecutionEvent->getResult());
     }
 
     public function testOnCampaignTriggerConditionReturnsCorrectResultsForContactAddedContext(): void
@@ -185,9 +184,10 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         ];
 
         $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false); // @phpstan-ignore-line classConstant.deprecatedClass
-        $result                 = $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        $this->assertInstanceOf(CampaignExecutionEvent::class, $result); // @phpstan-ignore-line classConstant.deprecatedClass
-        $this->assertFalse($result->getResult());
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
+        $this->assertInstanceOf(CampaignExecutionEvent::class, $campaignExecutionEvent); // @phpstan-ignore-line classConstant.deprecatedClass
+        $this->assertFalse($campaignExecutionEvent->getResult());
     }
 
     /**
@@ -204,7 +204,7 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         $field->setAlias($fieldDetails['alias']);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 

@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class KickoffExecutioner implements ExecutionerInterface
+final class KickoffExecutioner implements ExecutionerInterface
 {
     private ?ContactLimiter $limiter = null;
 
@@ -38,16 +38,16 @@ class KickoffExecutioner implements ExecutionerInterface
     private ?Counter $counter = null;
 
     public function __construct(
-        private LoggerInterface $logger,
-        private KickoffContactFinder $kickoffContactFinder,
-        private TranslatorInterface $translator,
-        private EventExecutioner $executioner,
-        private EventScheduler $scheduler,
-        private ProcessSignalService $processSignalService,
-        private CoreParametersHelper $coreParametersHelper,
-        private EventDispatcherInterface $eventDispatcher,
-        private EventRedirectionHelper $redirectionHelper,
-        private EntityManagerInterface $entityManager,
+        private readonly LoggerInterface $logger,
+        private readonly KickoffContactFinder $kickoffContactFinder,
+        private readonly TranslatorInterface $translator,
+        private readonly EventExecutioner $executioner,
+        private readonly EventScheduler $scheduler,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly EventRedirectionHelper $redirectionHelper,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 

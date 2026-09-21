@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
@@ -13,11 +15,11 @@ class Remover
 {
     public const NAME = 'removed';
 
-    private string $unscheduledMessage;
+    private readonly string $unscheduledMessage;
 
     public function __construct(
-        private LeadRepository $leadRepository,
-        private LeadEventLogRepository $leadEventLogRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
         TranslatorInterface $translator,
         DateHelper $dateHelper,
     ) {

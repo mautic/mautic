@@ -14,7 +14,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(TimelineTrait::class)]
-class TimelineTraitTest extends TestCase
+final class TimelineTraitTest extends TestCase
 {
     private UtmTagRepository&MockObject $repository;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -237,10 +239,8 @@ class LeadDevice
 
     /**
      * @param string $deviceOsName
-     *
-     * @return $this
      */
-    public function setDeviceOsName($deviceOsName)
+    public function setDeviceOsName($deviceOsName): static
     {
         $this->deviceOsName = $deviceOsName;
 
@@ -257,10 +257,8 @@ class LeadDevice
 
     /**
      * @param string $deviceOsShortName
-     *
-     * @return $this
      */
-    public function setDeviceOsShortName($deviceOsShortName)
+    public function setDeviceOsShortName($deviceOsShortName): static
     {
         $this->deviceOsShortName = $deviceOsShortName;
 
@@ -277,10 +275,8 @@ class LeadDevice
 
     /**
      * @param string $deviceOsVersion
-     *
-     * @return $this
      */
-    public function setDeviceOsVersion($deviceOsVersion)
+    public function setDeviceOsVersion($deviceOsVersion): static
     {
         $this->deviceOsVersion = $deviceOsVersion;
 
@@ -297,10 +293,8 @@ class LeadDevice
 
     /**
      * @param string $deviceOsPlatform
-     *
-     * @return $this
      */
-    public function setDeviceOsPlatform($deviceOsPlatform)
+    public function setDeviceOsPlatform($deviceOsPlatform): static
     {
         $this->deviceOsPlatform = $deviceOsPlatform;
 
@@ -316,9 +310,9 @@ class LeadDevice
     }
 
     /**
-     * @param array $deviceOs
+     * @param array<string, mixed>|null $deviceOs
      */
-    public function setDeviceOs($deviceOs): void
+    public function setDeviceOs(?array $deviceOs): void
     {
         if (isset($deviceOs['name'])) {
             $this->deviceOsName = $deviceOs['name'];
@@ -344,10 +338,8 @@ class LeadDevice
 
     /**
      * @param string $trackingId
-     *
-     * @return self
      */
-    public function setTrackingId($trackingId)
+    public function setTrackingId($trackingId): static
     {
         $this->trackingId = $trackingId;
 
@@ -362,10 +354,7 @@ class LeadDevice
         return $this->lead;
     }
 
-    /**
-     * @return $this
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 

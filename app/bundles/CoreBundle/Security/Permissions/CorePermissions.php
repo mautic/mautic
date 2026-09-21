@@ -28,10 +28,10 @@ class CorePermissions implements ResetInterface
 
     public function __construct(
         protected UserHelper $userHelper,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
-        private array $bundles,
-        private array $pluginBundles,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly array $bundles,
+        private readonly array $pluginBundles,
     ) {
         $this->registerPermissionClasses();
     }
@@ -74,11 +74,9 @@ class CorePermissions implements ResetInterface
      * @param string $bundle         can be either short bundle name or full path to the permissions class
      * @param bool   $throwException
      *
-     * @return AbstractPermissions
-     *
      * @throws \InvalidArgumentException
      */
-    public function getPermissionObject($bundle, $throwException = true)
+    public function getPermissionObject($bundle, $throwException = true): false|AbstractPermissions
     {
         if (empty($bundle)) {
             throw new \InvalidArgumentException("Bundle and permission type must be specified. {$bundle} given.");
@@ -160,7 +158,7 @@ class CorePermissions implements ResetInterface
                 foreach ($perms as $perm) {
                     // get the bit for the perm
                     if (!$object->isSupported($name, $perm)) {
-                        throw new \InvalidArgumentException("$perm does not exist for $bundle:$name");
+                        throw new \InvalidArgumentException("{$perm} does not exist for {$bundle}:{$name}");
                     }
 
                     $bit += $object->getValue($name, $perm);
@@ -190,11 +188,11 @@ class CorePermissions implements ResetInterface
      * @param bool            $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
      *                                             exception will be thrown
      *
-     * @return mixed
+     * @return ($mode is 'RETURN_ARRAY' ? array<mixed> : bool)
      *
      * @throws \InvalidArgumentException
      */
-    public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
+    public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false): bool|array
     {
         // Initialize all permission classes if
         $this->getPermissionObjects();
@@ -216,7 +214,7 @@ class CorePermissions implements ResetInterface
 
             $parts = explode(':', $permission);
             if (false === in_array(count($parts), [3, 4])) {
-                throw new PermissionBadFormatException($this->getTranslator()->trans('mautic.core.permissions.badformat', ['%permission%' => $permission]));
+                throw new PermissionBadFormatException($this->translator->trans('mautic.core.permissions.badformat', ['%permission%' => $permission]));
             }
 
             if ($userEntity->isAdmin()) {
@@ -233,7 +231,7 @@ class CorePermissions implements ResetInterface
                     if ($allowUnknown) {
                         $permissions[$permission] = false;
                     } else {
-                        throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.notfound', ['%permission%' => $permission]));
+                        throw new PermissionNotFoundException($this->translator->trans('mautic.core.permissions.notfound', ['%permission%' => $permission]));
                     }
                 } elseif ('anon.' == $userEntity) {
                     // anon user or session timeout
@@ -254,13 +252,15 @@ class CorePermissions implements ResetInterface
         if ('MATCH_ALL' == $mode) {
             // deny if any of the permissions are denied
             return !in_array(0, $permissions);
-        } elseif ('MATCH_ONE' == $mode) {
+        }
+        if ('MATCH_ONE' == $mode) {
             // grant if any of the permissions were granted
             return in_array(1, $permissions);
-        } elseif ('RETURN_ARRAY' == $mode) {
+        }
+        if ('RETURN_ARRAY' == $mode) {
             return $permissions;
         }
-        throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
+        throw new PermissionNotFoundException($this->translator->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
     }
 
     /**
@@ -285,7 +285,7 @@ class CorePermissions implements ResetInterface
             }
 
             $parts = explode(':', $p);
-            if (3 != count($parts)) {
+            if (3 !== count($parts)) {
                 $result[$p] = false;
             } else {
                 // check against bundle permissions class
@@ -370,13 +370,12 @@ class CorePermissions implements ResetInterface
 
         if (0 === $ownerId) {
             return (bool) $other;
-        } elseif ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
-            return true;
-        } elseif ($other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId) {
+        }
+        if ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
             return true;
         }
 
-        return false;
+        return $other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId;
     }
 
     /**
@@ -436,7 +435,7 @@ class CorePermissions implements ResetInterface
 
     protected function getPermissionClasses(): array
     {
-        if (empty($this->permissionClasses)) {
+        if ([] === $this->permissionClasses) {
             $this->registerPermissionClasses();
         }
 
@@ -480,18 +479,15 @@ class CorePermissions implements ResetInterface
         throw new \UnexpectedValueException("There is no permission object for {$bundle}");
     }
 
-    /**
-     * Register permission classes.
-     */
     private function registerPermissionClasses(): void
     {
-        foreach ($this->getBundles() as $bundle) {
+        foreach ($this->bundles as $bundle) {
             if (!empty($bundle['permissionClasses'])) {
                 $this->permissionClasses = array_merge($this->permissionClasses, $bundle['permissionClasses']);
             }
         }
 
-        foreach ($this->getPluginBundles() as $bundle) {
+        foreach ($this->pluginBundles as $bundle) {
             if (!empty($bundle['permissionClasses'])) {
                 $this->permissionClasses = array_merge($this->permissionClasses, $bundle['permissionClasses']);
             }

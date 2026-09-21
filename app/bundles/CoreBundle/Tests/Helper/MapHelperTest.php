@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Controller\CampaignMapStatsController;
 use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class MapHelperTest extends MauticMysqlTestCase
+final class MapHelperTest extends MauticMysqlTestCase
 {
     /**
      * @return array<string, array<int, array<string, int|string>>>
@@ -68,7 +68,7 @@ class MapHelperTest extends MauticMysqlTestCase
             '%withCountry' => '2',
         ];
 
-        $this->assertEquals(
+        $this->assertSame(
             'Total: 4 (2 with country)',
             MapHelper::getOptionLegendText(CampaignMapStatsController::LEGEND_TEXT, $legendValues)
         );

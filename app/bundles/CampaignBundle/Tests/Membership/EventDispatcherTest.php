@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Membership;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -11,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EventDispatcherTest extends \PHPUnit\Framework\TestCase
+final class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&EventDispatcherInterface $eventDispatcher;
 

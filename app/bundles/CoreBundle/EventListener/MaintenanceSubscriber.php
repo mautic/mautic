@@ -10,7 +10,7 @@ use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MaintenanceSubscriber implements EventSubscriberInterface
+final readonly class MaintenanceSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private Connection $db,
@@ -62,7 +62,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
             while (true) {
                 $ids = array_column($qb->executeQuery()->fetchAllAssociative(), 'id');
 
-                if (0 === sizeof($ids)) {
+                if (0 === count($ids)) {
                     break;
                 }
 
@@ -72,7 +72,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                           'id', ':ids'
                       )
                   )
-                  ->setParameter('ids', array_map('intval', $ids), ArrayParameterType::INTEGER)
+                  ->setParameter('ids', array_map(intval(...), $ids), ArrayParameterType::INTEGER)
                   ->executeStatement();
             }
         }

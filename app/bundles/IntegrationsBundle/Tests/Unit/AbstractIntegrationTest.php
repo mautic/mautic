@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\IntegrationsBundle\Tests\Unit;
 
 use Doctrine\ORM\EntityManager;
@@ -21,7 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AbstractIntegrationTest extends TestCase
+final class AbstractIntegrationTest extends TestCase
 {
     public function testParseCallbackResponseWithUTF8StringThatContainsControlChars(): void
     {
@@ -38,16 +40,14 @@ class AbstractIntegrationTest extends TestCase
 JSON;
 
         $json = $integrationDouble->parseCallbackResponse($jsonString);
-        self::assertArrayHasKey('webinars', $json);
+        $this->assertArrayHasKey('webinars', $json);
     }
 
-    /** @phpstan-ignore return.deprecatedClass */
     private function buildAbstractIntegrationDouble(): AbstractIntegration
     {
         // creating a double since we can't instantiate
         // we also need to expose some things for better unit test coverage
-        // @phpstan-ignore new.deprecated, class.extendsDeprecatedClass, classConstant.deprecatedClass
-        return new class($this->createMock(EventDispatcherInterface::class), $this->createMock(CacheStorageHelper::class), $this->createMock(EntityManager::class), $this->createMock(RequestStack::class), $this->createMock(Router::class), $this->createMock(TranslatorInterface::class), $this->createMock(Logger::class), $this->createMock(EncryptionHelper::class), $this->createMock(LeadModel::class), $this->createMock(CompanyModel::class), $this->createMock(PathsHelper::class), $this->createMock(NotificationModel::class), $this->createMock(FieldModel::class), $this->createMock(IntegrationEntityModel::class), $this->createMock(DoNotContactModel::class), $this->createMock(FieldsWithUniqueIdentifier::class)) extends AbstractIntegration {
+        return new class($this->createStub(EventDispatcherInterface::class), $this->createStub(CacheStorageHelper::class), $this->createStub(EntityManager::class), $this->createStub(RequestStack::class), $this->createStub(Router::class), $this->createStub(TranslatorInterface::class), $this->createStub(Logger::class), $this->createStub(EncryptionHelper::class), $this->createStub(LeadModel::class), $this->createStub(CompanyModel::class), $this->createStub(PathsHelper::class), $this->createStub(NotificationModel::class), $this->createStub(FieldModel::class), $this->createStub(IntegrationEntityModel::class), $this->createStub(DoNotContactModel::class), $this->createStub(FieldsWithUniqueIdentifier::class)) extends AbstractIntegration {
             public function getName(): string
             {
                 return 'double';

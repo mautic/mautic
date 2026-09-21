@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\Language\Installer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
@@ -13,22 +14,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class LanguageHelper
 {
-    private string $cacheFile;
+    private readonly string $cacheFile;
 
-    private Installer $installer;
+    private readonly Installer $installer;
 
     private array $supportedLanguages = [];
 
-    private string $installedTranslationsDirectory;
+    private readonly string $installedTranslationsDirectory;
 
-    private string $defaultTranslationsDirectory;
+    private readonly string $defaultTranslationsDirectory;
 
     public function __construct(
-        private PathsHelper $pathsHelper,
-        private LoggerInterface $logger,
-        private CoreParametersHelper $coreParametersHelper,
-        private Client $client,
-        private TranslatorInterface $translator,
+        private readonly PathsHelper $pathsHelper,
+        private readonly LoggerInterface $logger,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Client $client,
+        private readonly TranslatorInterface $translator,
     ) {
         $this->defaultTranslationsDirectory   = __DIR__.'/../Translations';
         $this->installedTranslationsDirectory = $this->pathsHelper->getSystemPath('translations_root').'/translations';
@@ -43,7 +44,7 @@ class LanguageHelper
      */
     public function getSupportedLanguages(): array
     {
-        if (!empty($this->supportedLanguages)) {
+        if ([] !== $this->supportedLanguages) {
             return $this->supportedLanguages;
         }
 
@@ -128,7 +129,8 @@ class LanguageHelper
             $overrideData = json_decode(file_get_contents($overrideFile), true);
             if (isset($overrideData['languages'])) {
                 return $overrideData['languages'];
-            } elseif (isset($overrideData['name'])) {
+            }
+            if (isset($overrideData['name'])) {
                 return $overrideData;
             }
 
@@ -149,7 +151,7 @@ class LanguageHelper
         try {
             $data = $this->client->get(
                 $this->coreParametersHelper->get('translations_list_url'),
-                [\GuzzleHttp\RequestOptions::TIMEOUT => 10]
+                [RequestOptions::TIMEOUT => 10]
             );
             $manifest  = json_decode($data->getBody(), true);
             $languages = [];
@@ -203,10 +205,8 @@ class LanguageHelper
 
     /**
      * Fetches a language package from the remote server.
-     *
-     * @param string $languageCode
      */
-    public function fetchPackage($languageCode): array
+    public function fetchPackage(?string $languageCode): array
     {
         // Check if we have a cache file, generate it if not
         if (!is_readable($this->cacheFile)) {
@@ -220,10 +220,12 @@ class LanguageHelper
             ];
         }
 
-        $cacheData = json_decode(file_get_contents($this->cacheFile), true);
+        $cacheData     = json_decode(file_get_contents($this->cacheFile), true);
+        $languageCode  = (string) $languageCode;
+        $cacheLanguages = is_array($cacheData['languages'] ?? null) ? $cacheData['languages'] : [];
 
-        // Make sure the language actually exists
-        if (!isset($cacheData['languages'][$languageCode])) {
+        // Make sure the language code is valid and the language actually exists.
+        if ('' === $languageCode || !isset($cacheLanguages[$languageCode])) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.invalid.language',
@@ -258,7 +260,8 @@ class LanguageHelper
                     '%url%' => $langUrl,
                 ],
             ];
-        } elseif (200 != $data->getStatusCode()) {
+        }
+        if (200 != $data->getStatusCode()) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.error.on.language.server.side',
@@ -295,7 +298,7 @@ class LanguageHelper
 
         foreach (array_merge($mauticBundles, $pluginBundles) as $bundle) {
             // Apply the bundle filter.
-            if (!empty($forBundles) && !in_array($bundle['bundle'], $forBundles)) {
+            if ([] !== $forBundles && !in_array($bundle['bundle'], $forBundles)) {
                 continue;
             }
 

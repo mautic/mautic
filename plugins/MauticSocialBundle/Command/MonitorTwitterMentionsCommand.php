@@ -9,7 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
     name: 'social:monitor:twitter:mentions',
     description: 'Searches for mentioned tweets'
 )]
-class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
+final class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
 {
     /**
      * Search for tweets by mention.

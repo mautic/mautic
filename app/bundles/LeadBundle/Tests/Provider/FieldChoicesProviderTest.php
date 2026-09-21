@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
@@ -75,7 +75,7 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
 
     private function setSomeChoicesLikeASubscriber(): callable
     {
-        return function (ListFieldChoicesEvent $event) {
+        return function (ListFieldChoicesEvent $event): true {
             $event->setChoicesForFieldAlias(
                 'select_a',
                 ['Choice A' => 'choice_a']

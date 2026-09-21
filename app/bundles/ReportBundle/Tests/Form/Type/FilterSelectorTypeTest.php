@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormInterface;
 final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|FormBuilderInterface
+     * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilder;
 
@@ -47,10 +47,10 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
         $this->formBuilder->expects($matcher1)
             ->method('addEventListener')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher1) {
+                function (...$parameters) use ($matcher1): MockObject {
                     if (1 === $matcher1->numberOfInvocations()) {
                         $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
-                        $callback = function (callable $formModifier) {
+                        $callback = function (callable $formModifier): void {
                             /** @var FormInterface<FormBuilderInterface>&MockObject $form */
                             $form = $this->createMock(FormInterface::class);
                             $data = [

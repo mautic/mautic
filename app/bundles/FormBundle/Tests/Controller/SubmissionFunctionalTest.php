@@ -12,6 +12,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Tests\FormTestHelperTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\PageBundle\Entity\Page;
@@ -19,9 +20,10 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
@@ -29,6 +31,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     use FormTestHelperTrait;
 
     protected $useCleanupRollback   = false;
+
     protected bool $authenticateApi = true;
 
     public function testRedirectPostAction(): void
@@ -93,11 +96,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $urlParts   = parse_url($currentUrl);
         parse_str($urlParts['query'], $queryParams);
 
-        $this->assertEquals('/test-form-redirect-target-page', $urlParts['path']);
+        $this->assertSame('/test-form-redirect-target-page', $urlParts['path']);
         // Test that the redirect didn't remove any additional URL parts
-        $this->assertEquals('john@doe.com', $queryParams['email']);
+        $this->assertSame('john@doe.com', $queryParams['email']);
         $this->assertGreaterThan(0, (int) $queryParams['lead']);
-        $this->assertEquals('bar', $queryParams['foo']);
+        $this->assertSame('bar', $queryParams['foo']);
     }
 
     public function testRequiredConditionalFieldIfNotEmpty(): void
@@ -178,20 +181,21 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
-        Assert::assertSame([
+        $this->assertSame([
             'country' => 'Australia',
             'state'   => 'Victoria',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
-        Assert::assertSame('Australia', $contact->getCountry());
-        Assert::assertSame('Victoria', $contact->getState());
+        $this->assertSame('Australia', $contact->getCountry());
+        $this->assertSame('Victoria', $contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -270,19 +274,20 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
-        Assert::assertSame([
+        $this->assertSame([
             'country' => '',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
-        Assert::assertNull($contact->getCountry());
-        Assert::assertNull($contact->getState());
+        $this->assertNull($contact->getCountry());
+        $this->assertNull($contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -362,7 +367,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $submissions = $this->em->getRepository(Submission::class)->findAll();
 
         // It should not create a submission now as the required field is now visible and empty.
-        Assert::assertCount(0, $submissions);
+        $this->assertCount(0, $submissions);
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -427,7 +432,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $formCrawler->filter('.mauticform-text'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('formTypeDataProvider')]
+    #[DataProvider('formTypeDataProvider')]
     public function testAddContactToCampaignByForm(?string $formType): void
     {
         // Create the test form via API.
@@ -464,7 +469,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $campaignSources = ['forms' => [$formId => $formId]];
 
         /** @var CampaignModel $campaignModel */
-        $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
+        $campaignModel = self::getContainer()->get(CampaignModel::class);
 
         $campaign = new Campaign();
         $campaign->setName('Test Campaign');
@@ -485,19 +490,17 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['campaign' => $campaign->getId()]);
-        Assert::assertCount(1, $campaignLeads);
+        $this->assertCount(1, $campaignLeads);
     }
 
     /**
-     * @return array<string, array{formType: string|null}>
+     * @return \Iterator<string, array{formType: (string|null)}>
      */
-    public static function formTypeDataProvider(): array
+    public static function formTypeDataProvider(): \Iterator
     {
-        return [
-            'campaign form type'   => ['formType' => 'campaign'],
-            'standalone form type' => ['formType' => 'standalone'],
-            'no form type'         => ['formType' => null],
-        ];
+        yield 'campaign form type' => ['formType' => 'campaign'];
+        yield 'standalone form type' => ['formType' => 'standalone'];
+        yield 'no form type' => ['formType' => null];
     }
 
     public function testFetchFormSubmissionsApiIfPermissionNotGrantedForUser(): void
@@ -543,7 +546,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
 
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         // Enable reboots so all the services and in-memory data are refreshed.
         $this->client->enableReboot();
@@ -556,8 +559,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $submission     = $response['submissions'][0];
 
         $this->assertResponseIsSuccessful();
-        Assert::assertSame($formId, $submission['form']['id']);
-        Assert::assertGreaterThanOrEqual(1, $response['total']);
+        $this->assertSame($formId, $submission['form']['id']);
+        $this->assertGreaterThanOrEqual(1, $response['total']);
 
         // Create non admin user
         $user = $this->createUser();
@@ -591,8 +594,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('test');
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
         /** @var UserRepository $userRepo */
@@ -650,20 +653,21 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
-        Assert::assertSame([
+        $this->assertSame([
             'company' => 'Acquia',
             'email'   => 'leeloo@fifth.element',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
-        Assert::assertSame('Acquia', $contact->getCompany());
-        Assert::assertSame($company->getId(), $contact->getCompanyChangeLog()->get(0)->getCompany());
+        $this->assertSame('Acquia', $contact->getCompany());
+        $this->assertSame($company->getId(), $contact->getCompanyChangeLog()->get(0)->getCompany());
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -715,18 +719,19 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
         $submission = $submissions[0];
-        Assert::assertSame([
+        $this->assertSame([
             'f_all' => 'test',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
-        Assert::assertSame('test', $contact->getFirstname());
+        $this->assertSame('test', $contact->getFirstname());
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -734,7 +739,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Results for Submission test form', $clientResponse->getContent());
+        $this->assertStringContainsString('Results for Submission test form', (string) $clientResponse->getContent());
 
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
@@ -750,7 +755,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
      * @param array<string, string> $submissionData
      * @param array<string, string> $expectedData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('formFieldValuesMappingDataProvider')]
+    #[DataProvider('formFieldValuesMappingDataProvider')]
     public function testFormFieldValuesMapping(array $submissionData, array $expectedData): void
     {
         $formPayload = [
@@ -866,7 +871,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('results', $latestSubmission);
         foreach ($expectedData as $key => $value) {
             $this->assertArrayHasKey($key, $latestSubmission['results']);
-            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '{$value}' for field '{$key}'");
         }
 
         // Check contact details
@@ -890,7 +895,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $contactCompanies = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('total', $contactCompanies);
         $this->assertArrayHasKey('companies', $contactCompanies);
-        $this->assertEquals(1, count($contactCompanies['companies']));
+        $this->assertCount(1, $contactCompanies['companies']);
 
         // Check company details
         $this->assertEquals($expectedData['company_name'], $contactCompanies['companies'][0]['companyname']);
@@ -903,120 +908,118 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
+     * @return \Iterator<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
      */
-    public static function formFieldValuesMappingDataProvider(): array
+    public static function formFieldValuesMappingDataProvider(): \Iterator
     {
-        return [
-            'normal_submission' => [
-                'submissionData' => [
-                    'email'           => 'john@example.com',
-                    'firstname'       => 'John',
-                    'lastname'        => 'Doe',
-                    'country'         => 'United States',
-                    'company_name'    => 'Acme Inc',
-                    'company_country' => 'United States',
-                    'company_city'    => 'New York',
-                    'message'         => 'Hello, this is a normal submission.',
-                ],
-                'expectedData' => [
-                    'email'           => 'john@example.com',
-                    'firstname'       => 'John',
-                    'lastname'        => 'Doe',
-                    'country'         => 'United States',
-                    'company_name'    => 'Acme Inc',
-                    'company_country' => 'United States',
-                    'company_city'    => 'New York',
-                    'message'         => 'Hello, this is a normal submission.',
-                ],
+        yield 'normal_submission' => [
+            'submissionData' => [
+                'email'           => 'john@example.com',
+                'firstname'       => 'John',
+                'lastname'        => 'Doe',
+                'country'         => 'United States',
+                'company_name'    => 'Acme Inc',
+                'company_country' => 'United States',
+                'company_city'    => 'New York',
+                'message'         => 'Hello, this is a normal submission.',
             ],
-            'special_characters' => [
-                'submissionData' => [
-                    'email'           => 'jane@example.com',
-                    'firstname'       => 'Jane',
-                    'lastname'        => 'O\'Brien-Smith',
-                    'country'         => 'Ireland',
-                    'company_name'    => '"Super" R&D Company, Ltd.',
-                    'company_country' => 'Ireland',
-                    'company_city'    => 'Dublin',
-                    'message'         => 'Super & Special',
-                ],
-                'expectedData' => [
-                    'email'           => 'jane@example.com',
-                    'firstname'       => 'Jane',
-                    'lastname'        => 'O\'Brien-Smith',
-                    'country'         => 'Ireland',
-                    'company_name'    => '"Super" R&D Company, Ltd.',
-                    'company_country' => 'Ireland',
-                    'company_city'    => 'Dublin',
-                    'message'         => 'Super & Special',
-                ],
+            'expectedData' => [
+                'email'           => 'john@example.com',
+                'firstname'       => 'John',
+                'lastname'        => 'Doe',
+                'country'         => 'United States',
+                'company_name'    => 'Acme Inc',
+                'company_country' => 'United States',
+                'company_city'    => 'New York',
+                'message'         => 'Hello, this is a normal submission.',
             ],
-            'xss_attempt' => [
-                'submissionData' => [
-                    'email'           => 'hacker@evil.com',
-                    'firstname'       => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                    'lastname'        => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                    'country'         => 'Poland',
-                    'company_name'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                    'company_country' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                    'company_city'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                    'message'         => '<script>alert("XSS")</script>',
-                ],
-                'expectedData' => [
-                    'email'           => 'hacker@evil.com',
-                    'firstname'       => 'alert("XSS")',
-                    'lastname'        => 'alert("XSS")',
-                    'country'         => 'Poland',
-                    'company_name'    => 'alert("XSS")',
-                    'company_country' => 'alert("XSS")',
-                    'company_city'    => 'alert("XSS")',
-                    'message'         => 'alert("XSS")',
-                ],
+        ];
+        yield 'special_characters' => [
+            'submissionData' => [
+                'email'           => 'jane@example.com',
+                'firstname'       => 'Jane',
+                'lastname'        => 'O\'Brien-Smith',
+                'country'         => 'Ireland',
+                'company_name'    => '"Super" R&D Company, Ltd.',
+                'company_country' => 'Ireland',
+                'company_city'    => 'Dublin',
+                'message'         => 'Super & Special',
             ],
-            'sql_injection_attempt' => [
-                'submissionData' => [
-                    'email'           => 'sqlhacker@evil.com',
-                    'firstname'       => "Robert'; DROP TABLE users; --",
-                    'lastname'        => 'Tables',
-                    'country'         => 'United States',
-                    'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
-                    'company_country' => 'United States',
-                    'company_city'    => 'SQL City',
-                    'message'         => "Robert'; DROP TABLE messages; --",
-                ],
-                'expectedData' => [
-                    'email'           => 'sqlhacker@evil.com',
-                    'firstname'       => "Robert'; DROP TABLE users; --",
-                    'lastname'        => 'Tables',
-                    'country'         => 'United States',
-                    'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
-                    'company_country' => 'United States',
-                    'company_city'    => 'SQL City',
-                    'message'         => "Robert'; DROP TABLE messages; --",
-                ],
+            'expectedData' => [
+                'email'           => 'jane@example.com',
+                'firstname'       => 'Jane',
+                'lastname'        => 'O\'Brien-Smith',
+                'country'         => 'Ireland',
+                'company_name'    => '"Super" R&D Company, Ltd.',
+                'company_country' => 'Ireland',
+                'company_city'    => 'Dublin',
+                'message'         => 'Super & Special',
             ],
-            'unicode_characters' => [
-                'submissionData' => [
-                    'email'           => 'unicode@example.com',
-                    'firstname'       => 'José',
-                    'lastname'        => 'Martínez',
-                    'country'         => 'Spain',
-                    'company_name'    => '株式会社スマイル',
-                    'company_country' => 'Japan',
-                    'company_city'    => '東京',
-                    'message'         => 'こんにちは、世界！',
-                ],
-                'expectedData' => [
-                    'email'           => 'unicode@example.com',
-                    'firstname'       => 'José',
-                    'lastname'        => 'Martínez',
-                    'country'         => 'Spain',
-                    'company_name'    => '株式会社スマイル',
-                    'company_country' => 'Japan',
-                    'company_city'    => '東京',
-                    'message'         => 'こんにちは、世界！',
-                ],
+        ];
+        yield 'xss_attempt' => [
+            'submissionData' => [
+                'email'           => 'hacker@evil.com',
+                'firstname'       => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                'lastname'        => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                'country'         => 'Poland',
+                'company_name'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                'company_country' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                'company_city'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                'message'         => '<script>alert("XSS")</script>',
+            ],
+            'expectedData' => [
+                'email'           => 'hacker@evil.com',
+                'firstname'       => 'alert("XSS")',
+                'lastname'        => 'alert("XSS")',
+                'country'         => 'Poland',
+                'company_name'    => 'alert("XSS")',
+                'company_country' => 'alert("XSS")',
+                'company_city'    => 'alert("XSS")',
+                'message'         => 'alert("XSS")',
+            ],
+        ];
+        yield 'sql_injection_attempt' => [
+            'submissionData' => [
+                'email'           => 'sqlhacker@evil.com',
+                'firstname'       => "Robert'; DROP TABLE users; --",
+                'lastname'        => 'Tables',
+                'country'         => 'United States',
+                'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
+                'company_country' => 'United States',
+                'company_city'    => 'SQL City',
+                'message'         => "Robert'; DROP TABLE messages; --",
+            ],
+            'expectedData' => [
+                'email'           => 'sqlhacker@evil.com',
+                'firstname'       => "Robert'; DROP TABLE users; --",
+                'lastname'        => 'Tables',
+                'country'         => 'United States',
+                'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
+                'company_country' => 'United States',
+                'company_city'    => 'SQL City',
+                'message'         => "Robert'; DROP TABLE messages; --",
+            ],
+        ];
+        yield 'unicode_characters' => [
+            'submissionData' => [
+                'email'           => 'unicode@example.com',
+                'firstname'       => 'José',
+                'lastname'        => 'Martínez',
+                'country'         => 'Spain',
+                'company_name'    => '株式会社スマイル',
+                'company_country' => 'Japan',
+                'company_city'    => '東京',
+                'message'         => 'こんにちは、世界！',
+            ],
+            'expectedData' => [
+                'email'           => 'unicode@example.com',
+                'firstname'       => 'José',
+                'lastname'        => 'Martínez',
+                'country'         => 'Spain',
+                'company_name'    => '株式会社スマイル',
+                'company_country' => 'Japan',
+                'company_city'    => '東京',
+                'message'         => 'こんにちは、世界！',
             ],
         ];
     }
@@ -1025,7 +1028,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
      * @param array<string, string> $submissionData
      * @param array<string, string> $expectedData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('formCustomFieldsMappingDataProvider')]
+    #[DataProvider('formCustomFieldsMappingDataProvider')]
     public function testFormCustomFieldsMapping(array $submissionData, array $expectedData): void
     {
         // Create new contact custom field
@@ -1099,7 +1102,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('results', $latestSubmission);
         foreach ($expectedData as $key => $value) {
             $this->assertArrayHasKey($key, $latestSubmission['results']);
-            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '{$value}' for field '{$key}'");
         }
 
         // Check contact details
@@ -1127,95 +1130,93 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
+     * @return \Iterator<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
      */
-    public static function formCustomFieldsMappingDataProvider(): array
+    public static function formCustomFieldsMappingDataProvider(): \Iterator
     {
-        return [
-            'simple_value' => [
-                'submissionData' => [
-                    'animal' => 'Dog',
-                ],
-                'expectedData' => [
-                    'animal' => 'Dog',
-                ],
+        yield 'simple_value' => [
+            'submissionData' => [
+                'animal' => 'Dog',
             ],
-            'special_characters' => [
-                'submissionData' => [
-                    'animal' => 'Guinea-Pig & Hamster\'s "friend"',
-                ],
-                'expectedData' => [
-                    'animal' => 'Guinea-Pig & Hamster\'s "friend"',
-                ],
+            'expectedData' => [
+                'animal' => 'Dog',
             ],
-            'xss_attempt' => [
-                'submissionData' => [
-                    'animal' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                ],
-                'expectedData' => [
-                    'animal' => 'alert("XSS")',
-                ],
+        ];
+        yield 'special_characters' => [
+            'submissionData' => [
+                'animal' => 'Guinea-Pig & Hamster\'s "friend"',
             ],
-            'sql_injection' => [
-                'submissionData' => [
-                    'animal' => "Cat'; DROP TABLE animals; --",
-                ],
-                'expectedData' => [
-                    'animal' => "Cat'; DROP TABLE animals; --",
-                ],
+            'expectedData' => [
+                'animal' => 'Guinea-Pig & Hamster\'s "friend"',
             ],
-            'unicode_and_emoji' => [
-                'submissionData' => [
-                    'animal' => '🐕 犬 🐈 猫',  // Dog and Cat in Japanese with emojis
-                ],
-                'expectedData' => [
-                    'animal' => '🐕 犬 🐈 猫',
-                ],
+        ];
+        yield 'xss_attempt' => [
+            'submissionData' => [
+                'animal' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
             ],
-            'nested_tags' => [
-                'submissionData' => [
-                    'animal' => '<div><span>Text</span></div>',
-                ],
-                'expectedData' => [
-                    'animal' => 'Text',
-                ],
+            'expectedData' => [
+                'animal' => 'alert("XSS")',
             ],
-            'incomplete_tags' => [
-                'submissionData' => [
-                    'animal' => '<div><span>Text',
-                ],
-                'expectedData' => [
-                    'animal' => 'Text',
-                ],
+        ];
+        yield 'sql_injection' => [
+            'submissionData' => [
+                'animal' => "Cat'; DROP TABLE animals; --",
             ],
-            'null_byte' => [
-                'submissionData' => [
-                    'animal' => "Dog\x00Cat",
-                ],
-                'expectedData' => [
-                    'animal' => 'DogCat',
-                ],
+            'expectedData' => [
+                'animal' => "Cat'; DROP TABLE animals; --",
             ],
-            'javascript_protocol' => [
-                'submissionData' => [
-                    'animal' => '<a href="javascript:alert(\'XSS\')">Click me</a>',
-                ],
-                'expectedData' => [
-                    'animal' => 'Click me',
-                ],
+        ];
+        yield 'unicode_and_emoji' => [
+            'submissionData' => [
+                'animal' => '🐕 犬 🐈 猫',  // Dog and Cat in Japanese with emojis
             ],
-            'css_expression' => [
-                'submissionData' => [
-                    'animal' => '<div style="width: expression(alert(\'XSS\'));">Test</div>',
-                ],
-                'expectedData' => [
-                    'animal' => 'Test',
-                ],
+            'expectedData' => [
+                'animal' => '🐕 犬 🐈 猫',
+            ],
+        ];
+        yield 'nested_tags' => [
+            'submissionData' => [
+                'animal' => '<div><span>Text</span></div>',
+            ],
+            'expectedData' => [
+                'animal' => 'Text',
+            ],
+        ];
+        yield 'incomplete_tags' => [
+            'submissionData' => [
+                'animal' => '<div><span>Text',
+            ],
+            'expectedData' => [
+                'animal' => 'Text',
+            ],
+        ];
+        yield 'null_byte' => [
+            'submissionData' => [
+                'animal' => "Dog\x00Cat",
+            ],
+            'expectedData' => [
+                'animal' => 'DogCat',
+            ],
+        ];
+        yield 'javascript_protocol' => [
+            'submissionData' => [
+                'animal' => '<a href="javascript:alert(\'XSS\')">Click me</a>',
+            ],
+            'expectedData' => [
+                'animal' => 'Click me',
+            ],
+        ];
+        yield 'css_expression' => [
+            'submissionData' => [
+                'animal' => '<div style="width: expression(alert(\'XSS\'));">Test</div>',
+            ],
+            'expectedData' => [
+                'animal' => 'Test',
             ],
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('htmlFieldSubmissionDataProvider')]
+    #[DataProvider('htmlFieldSubmissionDataProvider')]
     public function testHtmlReadOnlyFieldSubmission(string $submittedHtml, string $submittedEmail): void
     {
         // Create form with freehtml and email fields
@@ -1348,7 +1349,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $submissionsData['submissions']);
 
         // The denormalised counter must match the single submission that was just created.
-        $prefix   = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix   = self::getContainer()->getParameter('mautic.db_table_prefix');
         $countSql = "SELECT submission_count FROM {$prefix}forms WHERE id = ?";
         $this->assertSame(1, (int) $this->connection->fetchOne($countSql, [$formId]));
 
@@ -1388,7 +1389,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Deleting the submission decrements the counter symmetrically (via the postRemove listener).
         $submissionId    = $finalSubmissionsData['submissions'][0]['id'];
-        $submissionModel = static::getContainer()->get('mautic.form.model.submission');
+        /** @var SubmissionModel $submissionModel */
+        $submissionModel = self::getContainer()->get(SubmissionModel::class);
         $submission      = $submissionModel->getEntity($submissionId);
         $submissionModel->deleteEntity($submission);
 
@@ -1396,19 +1398,17 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{0: string, 1: string}>
+     * @return \Iterator<string, array{string, string}>
      */
-    public static function htmlFieldSubmissionDataProvider(): array
+    public static function htmlFieldSubmissionDataProvider(): \Iterator
     {
-        return [
-            'any_text' => [
-                '<div></div>',
-                'test1@test.com',
-            ],
-            'with_content' => [
-                '<div>Some content</div>',
-                'test2@test.com',
-            ],
+        yield 'any_text' => [
+            '<div></div>',
+            'test1@test.com',
+        ];
+        yield 'with_content' => [
+            '<div>Some content</div>',
+            'test2@test.com',
         ];
     }
 
@@ -1457,7 +1457,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         // The previous request changes user to anonymous. We have to configure API again.
         $this->setUpSymfony($this->configParams);
@@ -1466,14 +1466,14 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         // we are expecting form results table to be deleted in background, so the table should exists
         $this->assertTrue($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_{$formId}_{$formAlias}"));
 
         $submissions = $submissionRepository->findBy(['form' => $formId]);
 
-        Assert::assertCount(0, $submissions);
+        $this->assertCount(0, $submissions);
     }
 
     public function testResultRecordsAreRemovedIfSubmissionRecordsAreRemovedForForm(): void
@@ -1490,7 +1490,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);
 
-        Assert::assertCount(1, $submissions);
+        $this->assertCount(1, $submissions);
 
         $submissionId = $submissions[0]->getId();
 
@@ -1504,7 +1504,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $stmt        = $conn->prepare($sql);
         $results     = $stmt->executeQuery()->fetchAllAssociative();
 
-        Assert::assertCount(0, $results);
+        $this->assertCount(0, $results);
     }
 
     public function testResultRecordsAreRemovedIfSubmissionRecordsAreRemovedInBatchForForm(): void
@@ -1525,7 +1525,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);
 
-        Assert::assertCount($totalSubmissions, $submissions);
+        $this->assertCount($totalSubmissions, $submissions);
 
         $submissionIds = [];
 
@@ -1551,7 +1551,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $resultCount = (int) $qb->executeQuery()->fetchOne();
 
-        Assert::assertSame(0, $resultCount);
+        $this->assertSame(0, $resultCount);
     }
 
     protected function beforeTearDown(): void

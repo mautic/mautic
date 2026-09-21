@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
-class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
+final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
 {
-    /** @var array<string, array<string, mixed>> */
+    /**
+     * @var array<string, array<string, mixed>>
+     */
     private array $fields = [
         'firstname' => [
             'id'       => 2,
@@ -38,7 +43,9 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
         ],
     ];
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     private array $fieldValues = [
         'preferred_profile_image' => 'gravatar',
         'firstname'               => 'John',
@@ -46,21 +53,27 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
         'twitter'                 => 'johndoe',
     ];
 
-    /** @var array<string, string> */
-    protected array $fixedFields = [
+    /**
+     * @var array<string, string>
+     */
+    private array $fixedFields = [
         'firstname' => 'firstname',
         'lastname'  => 'lastname',
     ];
 
-    /** @var array<int, string> */
-    protected array $baseColumns = [
+    /**
+     * @var array<int, string>
+     */
+    private array $baseColumns = [
         'preferred_profile_image',
         'firstname',
         'lastname',
     ];
 
-    /** @var array<int, string> */
-    protected array $fieldGroups = [
+    /**
+     * @var array<int, string>
+     */
+    private array $fieldGroups = [
         'core',
         'social',
         'personal',
@@ -81,7 +94,7 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
             ->willReturn($this->baseColumns);
 
         $mockWithTrait->method('getClassName')
-            ->willReturn(\Mautic\LeadBundle\Entity\Lead::class);
+            ->willReturn(Lead::class);
 
         $mockWithTrait->method('getFieldGroups')
             ->willReturn($this->fieldGroups);
@@ -147,7 +160,7 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
             ->willReturn($this->baseColumns);
 
         $mockWithTrait->method('getClassName')
-            ->willReturn(\Mautic\LeadBundle\Entity\Lead::class);
+            ->willReturn(Lead::class);
 
         $mockWithTrait->method('getFieldGroups')
             ->willReturn($this->fieldGroups);

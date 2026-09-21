@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class PointInsightType extends AbstractType
 {
     public function __construct(
-        private FieldList $fieldList,
+        private readonly FieldList $fieldList,
     ) {
     }
 

@@ -6,13 +6,15 @@ use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 
 trait DefaultValueTrait
 {
-    /** @var array<string, array<string, array<string, mixed>>> */
+    /**
+     * @var array<string, array<string, array<string, mixed>>>
+     */
     private array $cachedDefaultFields = [];
 
     /**
      * @param string $object
      */
-    protected function setEntityDefaultValues(CustomFieldEntityInterface $entity, $object = 'lead')
+    protected function setEntityDefaultValues(CustomFieldEntityInterface $entity, $object = 'lead'): void
     {
         if ($entity->getId()) {
             return;

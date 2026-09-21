@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class InstallCommandPass implements CompilerPassInterface
+final class InstallCommandPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

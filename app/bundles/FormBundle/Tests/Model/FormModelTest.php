@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -35,63 +36,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-class FormModelTest extends \PHPUnit\Framework\TestCase
+final class FormModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&RequestStack
-     */
-    private MockObject $requestStack;
-
-    /**
-     * @var MockObject&Environment
-     */
-    private MockObject $twigMock;
-
-    /**
-     * @var MockObject&ThemeHelper
-     */
-    private MockObject $themeHelper;
-
-    /**
-     * @var MockObject&ActionModel
-     */
-    private MockObject $formActionModel;
-
-    /**
-     * @var MockObject&FieldModel
-     */
-    private MockObject $formFieldModel;
-
-    /**
-     * @var MockObject&EventDispatcher
-     */
-    private MockObject $dispatcher;
-
-    /**
-     * @var MockObject&Translator
-     */
-    private MockObject $translator;
-
-    /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $entityManager;
-
-    /**
-     * @var MockObject&FormUploader
-     */
-    private MockObject $formUploaderMock;
-
-    /**
-     * @var MockObject&ColumnSchemaHelper
-     */
-    private MockObject $columnSchemaHelper;
-
-    /**
-     * @var MockObject&TableSchemaHelper
-     */
-    private MockObject $tableSchemaHelper;
-
     /**
      * @var MockObject&FormRepository
      */
@@ -117,11 +63,6 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $primaryCompanyHelper;
 
-    /**
-     * @var MockObject&MappedObjectCollectorInterface
-     */
-    private MockObject $mappedObjectCollector;
-
     private FormModel $formModel;
 
     protected function setUp(): void
@@ -129,56 +70,40 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         if (!isset($_ENV['MAUTIC_UPLOAD_DIR'])) {
             $_ENV['MAUTIC_UPLOAD_DIR'] = sys_get_temp_dir();
         }
-
-        $this->requestStack          = $this->createMock(RequestStack::class);
-        $this->twigMock              = $this->createMock(Environment::class);
-        $this->themeHelper           = $this->createMock(ThemeHelper::class);
-        $this->formActionModel       = $this->createMock(ActionModel::class);
-        $this->formFieldModel        = $this->createMock(FieldModel::class);
         $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->fieldHelper           = $this->createMock(FormFieldHelper::class);
         $this->primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
-        $this->dispatcher            = $this->createMock(EventDispatcher::class);
-        $this->translator            = $this->createMock(Translator::class);
-        $this->entityManager         = $this->createMock(EntityManager::class);
-        $this->formUploaderMock      = $this->createMock(FormUploader::class);
         $this->leadFieldModel        = $this->createMock(LeadFieldModel::class);
         $this->formRepository        = $this->createMock(FormRepository::class);
-        $this->columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
-        $this->tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
-        $this->mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
-
-        $this->entityManager->expects($this
-            ->any())
-            ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [Form::class, $this->formRepository],
-                ]
-            );
+        $coreParametersHelper  = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->willReturnMap([
+                ['form_field_autofill', false, true],
+            ]);
 
         $this->formModel = new FormModel(
-            $this->requestStack,
-            $this->twigMock,
-            $this->themeHelper,
-            $this->formActionModel,
-            $this->formFieldModel,
+            $this->createStub(RequestStack::class),
+            $this->createStub(Environment::class),
+            $this->createStub(ThemeHelper::class),
+            $this->createStub(ActionModel::class),
+            $this->createStub(FieldModel::class),
             $this->fieldHelper,
             $this->primaryCompanyHelper,
             $this->leadFieldModel,
-            $this->formUploaderMock,
+            $this->createStub(FormUploader::class),
             $this->contactTracker,
-            $this->columnSchemaHelper,
-            $this->tableSchemaHelper,
-            $this->mappedObjectCollector,
-            $this->entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->translator,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(ColumnSchemaHelper::class),
+            $this->createStub(TableSchemaHelper::class),
+            $this->createStub(MappedObjectCollectorInterface::class),
+            $this->createStub(EntityManager::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcher::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $coreParametersHelper,
+            $this->formRepository,
         );
     }
 
@@ -449,18 +374,16 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<string[]>
+     * @return \Iterator<(int|string), array<string>>
      */
-    public static function fieldTypeProvider(): array
+    public static function fieldTypeProvider(): \Iterator
     {
-        return [
-            ['select'],
-            ['multiselect'],
-            ['lookup'],
-        ];
+        yield ['select'];
+        yield ['multiselect'];
+        yield ['lookup'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldTypeProvider')]
+    #[DataProvider('fieldTypeProvider')]
     public function testSyncListField(string $type): void
     {
         $formEntity = $this->createMock(Form::class);
@@ -591,6 +514,53 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             ->method('getContact');
 
         $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithLeadWhenAutofillFeatureDisabled(): void
+    {
+        $formHtml   = '<html>';
+        $form       = new Form();
+        $emailField = new Field();
+        $emailField->setMappedField('email');
+        $emailField->setMappedObject('contact');
+        $emailField->setIsAutoFill(true);
+        $form->addField(123, $emailField);
+
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->with('form_field_autofill', false)
+            ->willReturn(false);
+
+        $formModel = new FormModel(
+            $this->createStub(RequestStack::class),
+            $this->createStub(Environment::class),
+            $this->createStub(ThemeHelper::class),
+            $this->createStub(ActionModel::class),
+            $this->createStub(FieldModel::class),
+            $this->fieldHelper,
+            $this->primaryCompanyHelper,
+            $this->leadFieldModel,
+            $this->createStub(FormUploader::class),
+            $this->contactTracker,
+            $this->createStub(ColumnSchemaHelper::class),
+            $this->createStub(TableSchemaHelper::class),
+            $this->createStub(MappedObjectCollectorInterface::class),
+            $this->createStub(EntityManager::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcher::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $coreParametersHelper,
+            $this->formRepository,
+        );
+
+        $this->contactTracker->expects($this->never())
+            ->method('getContact');
+
+        $formModel->populateValuesWithLead($form, $formHtml);
     }
 
     public function testPopulateValuesWithLeadWithoutLeadObject(): void

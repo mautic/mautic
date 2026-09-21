@@ -117,7 +117,7 @@ class GrapesJsController extends CommonController
         $aclToCheck = $this->getAclPrefix($objectType);
 
         // permission check
-        if (str_contains((string) $objectId, 'new')) {
+        if (str_contains($objectId, 'new')) {
             $isNew = true;
 
             if (!$this->security->isGranted($aclToCheck.'create')) {
@@ -163,7 +163,7 @@ class GrapesJsController extends CommonController
         }
 
         // Replace short codes to emoji
-        $content = array_map(fn ($text): string => EmojiHelper::toEmoji($text, 'short'), $content);
+        $content = array_map(fn (string $text): string => EmojiHelper::toEmoji($text, 'short'), $content);
 
         $renderedTemplate =  $themeHelper->renderThemeTemplate(
             $logicalName,
@@ -231,9 +231,7 @@ class GrapesJsController extends CommonController
      */
     private function checkForMjmlTemplate(string $template): ?string
     {
-        $twig = $this->container->get('twig');
-
-        if ($twig->getLoader()->exists($template)) {
+        if ($this->twig->getLoader()->exists($template)) {
             return $template;
         }
 

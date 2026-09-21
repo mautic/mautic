@@ -10,7 +10,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Client extends BaseClient
 {
@@ -22,6 +21,7 @@ class Client extends BaseClient
     /**
      * @var string
      */
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     protected $name;
 
     /**
@@ -41,6 +41,7 @@ class Client extends BaseClient
     /**
      * @var array<string>
      */
+    #[Assert\NotBlank(message: 'mautic.api.client.redirecturis.notblank')]
     protected array $redirectUris = [];
 
     /**
@@ -100,26 +101,15 @@ class Client extends BaseClient
             ->build();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            ['message' => 'mautic.core.name.required']
-        ));
-
-        $metadata->addPropertyConstraint('redirectUris', new Assert\NotBlank(
-            ['message' => 'mautic.api.client.redirecturis.notblank']
-        ));
-    }
-
     /**
      * @var array
      */
     protected $changes;
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ($current != $val) {
             $this->changes[$prop] = [$current, $val];
         }
@@ -143,10 +133,8 @@ class Client extends BaseClient
 
     /**
      * @param string $name
-     *
-     * @return Client
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
 
@@ -170,10 +158,7 @@ class Client extends BaseClient
         $this->redirectUris = $redirectUris;
     }
 
-    /**
-     * @return Client
-     */
-    public function addAuthCode(AuthCode $authCodes)
+    public function addAuthCode(AuthCode $authCodes): static
     {
         $this->authCodes[] = $authCodes;
 
@@ -200,15 +185,12 @@ class Client extends BaseClient
      */
     public function isAuthorizedClient(User $user)
     {
-        $users = $this->getUsers();
+        $users = $this->users;
 
         return $users->contains($user);
     }
 
-    /**
-     * @return Client
-     */
-    public function addUser(User $users)
+    public function addUser(User $users): static
     {
         $this->users[] = $users;
 
@@ -231,7 +213,7 @@ class Client extends BaseClient
     /**
      * Add Authorization Grant Type.
      */
-    public function addGrantType(string $grantType): Client
+    public function addGrantType(string $grantType): self
     {
         $this->allowedGrantTypes[] = $grantType;
 

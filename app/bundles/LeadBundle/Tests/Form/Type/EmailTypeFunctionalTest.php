@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -46,6 +48,7 @@ final class EmailTypeFunctionalTest extends MauticMysqlTestCase
 
         // Check the email has correct text
         $copy = $this->em->getRepository(Copy::class)->findOneBy(['subject' => 'Test Jap Mautic']);
-        $this->assertStringContainsString('<p style="font-family: メイリオ">Test</p>', $copy->getBody());
+        $this->assertInstanceOf(Copy::class, $copy);
+        $this->assertStringContainsString('<p style="font-family: メイリオ">Test</p>', (string) $copy->getBody());
     }
 }

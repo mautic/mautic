@@ -5,7 +5,7 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-class ConditionEvent extends CampaignExecutionEvent
+final class ConditionEvent extends CampaignExecutionEvent
 {
     use ContextTrait;
 
@@ -80,10 +80,8 @@ class ConditionEvent extends CampaignExecutionEvent
 
     /**
      * @deprecated 2.13.0 to be removed in 3.0; BC support
-     *
-     * @return $this
      */
-    public function setResult($result)
+    public function setResult($result): static
     {
         $this->passed = (bool) $result;
 

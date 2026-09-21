@@ -30,16 +30,16 @@ class EventScheduler
 {
     public function __construct(
         #[Autowire(service: 'monolog.logger.mautic')]
-        private LoggerInterface $logger,
-        private EventLogger $eventLogger,
-        private IntervalScheduler $intervalScheduler,
-        private DateTimeScheduler $dateTimeScheduler,
-        private OptimizedScheduler $optimizedScheduler,
-        private EventCollector $collector,
-        private EventDispatcherInterface $dispatcher,
-        private CoreParametersHelper $coreParametersHelper,
-        private OptimisticLockServiceInterface $optimisticLockService,
-        private PublishStateService $publishStateService,
+        private readonly LoggerInterface $logger,
+        private readonly EventLogger $eventLogger,
+        private readonly IntervalScheduler $intervalScheduler,
+        private readonly DateTimeScheduler $dateTimeScheduler,
+        private readonly OptimizedScheduler $optimizedScheduler,
+        private readonly EventCollector $collector,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly OptimisticLockServiceInterface $optimisticLockService,
+        private readonly PublishStateService $publishStateService,
     ) {
     }
 

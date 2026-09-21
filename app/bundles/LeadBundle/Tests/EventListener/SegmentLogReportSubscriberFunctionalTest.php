@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber;
 use Mautic\ReportBundle\Entity\Report;
 
-class SegmentLogReportSubscriberFunctionalTest extends MauticMysqlTestCase
+final class SegmentLogReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

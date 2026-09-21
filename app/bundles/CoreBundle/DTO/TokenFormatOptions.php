@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\DTO;
 
-final class TokenFormatOptions
+final readonly class TokenFormatOptions
 {
     public function __construct(
-        public readonly string $translationKey,
-        public readonly TokenLabelFormat $format = TokenLabelFormat::SIMPLE_PREFIX,
-        public readonly ?string $tokenIdPattern = null,
+        public string $translationKey,
+        public TokenLabelFormat $format = TokenLabelFormat::SIMPLE_PREFIX,
+        public ?string $tokenIdPattern = null,
     ) {
     }
 

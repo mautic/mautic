@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Tests\Entity;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\ChannelBundle\Entity\Message;
 use PHPUnit\Framework\TestCase;
 
-class MessageTest extends TestCase
+final class MessageTest extends TestCase
 {
     public function testMessageUpdatesReflectsInChanges(): void
     {

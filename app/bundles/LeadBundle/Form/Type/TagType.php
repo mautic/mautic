@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\Common\Collections\Order;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer;
@@ -15,10 +15,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Tag>
  */
-class TagType extends AbstractType
+final class TagType extends AbstractType
 {
     public function __construct(
-        private EntityManager $em,
+        private readonly EntityManagerInterface $em,
     ) {
     }
 
@@ -56,7 +56,7 @@ class TagType extends AbstractType
         return 'lead_tag';
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return EntityType::class;
     }

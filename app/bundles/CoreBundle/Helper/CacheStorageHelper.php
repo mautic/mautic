@@ -157,7 +157,7 @@ class CacheStorageHelper
     /**
      * Creates adapter.
      */
-    protected function setCacheAdaptor()
+    protected function setCacheAdaptor(): void
     {
         switch ($this->adaptor) {
             case self::ADAPTOR_DATABASE:

@@ -219,9 +219,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
 
         $metadata->addPropertyConstraint('toAddress', new EmailAssert\MultipleEmailsValid());
 
@@ -277,10 +275,8 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     /**
      * @param string $name
-     *
-     * @return Report
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -289,8 +285,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()
@@ -300,10 +294,8 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     /**
      * @param string $system
-     *
-     * @return Report
      */
-    public function setSystem($system)
+    public function setSystem($system): static
     {
         $this->isChanged('system', $system);
         $this->system = $system;
@@ -320,13 +312,9 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * Set source.
-     *
      * @param string $source
-     *
-     * @return Report
      */
-    public function setSource($source)
+    public function setSource($source): static
     {
         $this->isChanged('source', $source);
         $this->source = $source;
@@ -344,10 +332,8 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     /**
      * @param mixed[] $columns
-     *
-     * @return Report
      */
-    public function setColumns($columns)
+    public function setColumns($columns): static
     {
         $this->isChanged('columns', $columns);
         $this->columns = $columns;
@@ -365,10 +351,8 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     /**
      * @param mixed[] $filters
-     *
-     * @return Report
      */
-    public function setFilters($filters)
+    public function setFilters($filters): static
     {
         $this->isChanged('filters', $filters);
         $this->filters = $filters;
@@ -395,7 +379,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      */
     public function getFilterValue($column)
     {
-        foreach ($this->getFilters() as $field) {
+        foreach ($this->filters as $field) {
             if ($column === $field['column']) {
                 return $field['value'];
             }
@@ -414,13 +398,13 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     public function getFilterValues($column): array
     {
         $values = [];
-        foreach ($this->getFilters() as $field) {
+        foreach ($this->filters as $field) {
             if ($column === $field['column']) {
                 $values[] = $field['value'];
             }
         }
 
-        if (empty($values)) {
+        if ([] === $values) {
             throw new \UnexpectedValueException("Column {$column} doesn't have any filter.");
         }
 
@@ -498,22 +482,22 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     public function getAggregatorColumns(): array
     {
-        return array_map(fn (array $aggregator): mixed => $aggregator['column'], $this->getAggregators());
+        return array_map(fn (array $aggregator): mixed => $aggregator['column'], $this->aggregators);
     }
 
     public function getOrderColumns(): array
     {
-        return array_map(fn (array $order): mixed => $order['column'], $this->getTableOrder());
+        return array_map(fn (array $order): mixed => $order['column'], $this->tableOrder);
     }
 
     public function getSelectAndAggregatorAndOrderAndGroupByColumns(): array
     {
-        return array_merge($this->getSelectAndAggregatorColumns(), $this->getOrderColumns(), $this->getGroupBy());
+        return array_merge($this->getSelectAndAggregatorColumns(), $this->getOrderColumns(), $this->groupBy);
     }
 
     public function getSelectAndAggregatorColumns(): array
     {
-        return array_merge($this->getColumns(), $this->getAggregatorColumns());
+        return array_merge($this->columns, $this->getAggregatorColumns());
     }
 
     public function setAggregators(array $aggregators): void
@@ -656,8 +640,8 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     public function ensureIsMonthlyScheduled(): void
     {
         if (
-            !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect())
-            || !in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
+            !in_array($this->scheduleMonthFrequency, SchedulerEnum::getMonthFrequencyForSelect())
+            || !in_array($this->scheduleDay, SchedulerEnum::getDayEnumForSelect())
         ) {
             throw new ScheduleNotValidException();
         }
@@ -670,7 +654,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      */
     public function ensureIsWeeklyScheduled(): void
     {
-        if (!in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())) {
+        if (!in_array($this->scheduleDay, SchedulerEnum::getDayEnumForSelect())) {
             throw new ScheduleNotValidException();
         }
         $this->setIsScheduled(true);
@@ -680,27 +664,27 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     public function isScheduledNow(): bool
     {
-        return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
+        return SchedulerEnum::UNIT_NOW === $this->scheduleUnit;
     }
 
     public function isScheduledDaily(): bool
     {
-        return SchedulerEnum::UNIT_DAILY === $this->getScheduleUnit();
+        return SchedulerEnum::UNIT_DAILY === $this->scheduleUnit;
     }
 
     public function isScheduledWeekly(): bool
     {
-        return SchedulerEnum::UNIT_WEEKLY === $this->getScheduleUnit();
+        return SchedulerEnum::UNIT_WEEKLY === $this->scheduleUnit;
     }
 
     public function isScheduledMonthly(): bool
     {
-        return SchedulerEnum::UNIT_MONTHLY === $this->getScheduleUnit();
+        return SchedulerEnum::UNIT_MONTHLY === $this->scheduleUnit;
     }
 
     public function isScheduledWeekDays(): bool
     {
-        return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
+        return SchedulerEnum::DAY_WEEK_DAYS === $this->scheduleDay;
     }
 
     public function getHasScheduleChanged(): bool
@@ -718,11 +702,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      */
     public function getSchedule(): array
     {
-        $schedule                             = [];
-        $schedule['schedule_unit']            = $this->getScheduleUnit();
-        $schedule['schedule_day']             = $this->getScheduleDay();
-        $schedule['schedule_month_frequency'] = $this->getScheduleMonthFrequency();
-
-        return $schedule;
+        return ['schedule_unit' => $this->scheduleUnit, 'schedule_day' => $this->scheduleDay, 'schedule_month_frequency' => $this->scheduleMonthFrequency];
     }
 }

@@ -130,10 +130,7 @@ final class AssetDownloadFunctionalTest extends MauticMysqlTestCase
         return $page;
     }
 
-    /**
-     * @param Page|Email $entity
-     */
-    private function createAssetDownload($entity, string $type, Asset $asset, Lead $contact, IpAddress $ipAddress): void
+    private function createAssetDownload(Page|Email $entity, string $type, Asset $asset, Lead $contact, IpAddress $ipAddress): void
     {
         $assetDownload = new Download();
         $assetDownload->setAsset($asset);
@@ -142,7 +139,7 @@ final class AssetDownloadFunctionalTest extends MauticMysqlTestCase
         $assetDownload->setSourceId($entity->getId());
         $assetDownload->setDateDownload(new \DateTime());
         $assetDownload->setCode(200);
-        $assetDownload->setTrackingId(13);
+        $assetDownload->setTrackingId('13');
         $assetDownload->setIpAddress($ipAddress);
 
         if ('email' === $type) {

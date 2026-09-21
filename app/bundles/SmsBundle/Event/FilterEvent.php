@@ -17,8 +17,9 @@ final class FilterEvent extends Event
     /**
      * @param array<int, Lead> $contacts
      */
-    public function __construct(private array $contacts)
-    {
+    public function __construct(
+        private array $contacts,
+    ) {
     }
 
     /**
@@ -39,7 +40,7 @@ final class FilterEvent extends Event
 
     public function removeContact(int $id): void
     {
-        array_push($this->removed, $id);
+        $this->removed[] = $id;
         unset($this->contacts[$id]);
     }
 

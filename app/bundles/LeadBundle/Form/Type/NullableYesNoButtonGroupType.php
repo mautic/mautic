@@ -24,7 +24,7 @@ final class NullableYesNoButtonGroupType extends AbstractType
                     $options['no_label']  => $options['no_value'],
                     $options['yes_label'] => $options['yes_value'],
                 ],
-                'choice_value'      => function ($choiceKey) {
+                'choice_value'      => function ($choiceKey): string|int|null {
                     if (null === $choiceKey || '' === $choiceKey) {
                         return null;
                     }

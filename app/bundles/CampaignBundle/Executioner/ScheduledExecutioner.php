@@ -53,16 +53,16 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     protected ?\DateTime $now = null;
 
     public function __construct(
-        private LeadEventLogRepository $repo,
-        private LoggerInterface $logger,
-        private TranslatorInterface $translator,
-        private EventExecutioner $executioner,
-        private EventScheduler $scheduler,
-        private ScheduledContactFinder $scheduledContactFinder,
-        private ProcessSignalService $processSignalService,
-        private EntityManagerInterface $entityManager,
-        private EventRedirectionHelper $eventRedirectionHelper,
-        private LeadRepository $leadRepository,
+        private readonly LeadEventLogRepository $repo,
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly EventExecutioner $executioner,
+        private readonly EventScheduler $scheduler,
+        private readonly ScheduledContactFinder $scheduledContactFinder,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EventRedirectionHelper $eventRedirectionHelper,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 
@@ -109,7 +109,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 
-        if (!$logIds) {
+        if ([] === $logIds) {
             return $this->counter;
         }
 
@@ -183,7 +183,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
-        $totalScheduledCount   = $scheduledEvents ? array_sum($scheduledEvents) : 0;
+        $totalScheduledCount   = [] !== $scheduledEvents ? array_sum($scheduledEvents) : 0;
         $this->scheduledEvents = array_keys($scheduledEvents);
         $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
 

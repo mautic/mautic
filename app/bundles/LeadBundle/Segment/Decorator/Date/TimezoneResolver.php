@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -8,7 +10,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class TimezoneResolver
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

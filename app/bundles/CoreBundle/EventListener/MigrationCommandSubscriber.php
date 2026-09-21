@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class MigrationCommandSubscriber implements EventSubscriberInterface
+final readonly class MigrationCommandSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private VersionProviderInterface $versionProvider,

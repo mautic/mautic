@@ -17,7 +17,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormFieldRatingTypeTest extends TypeTestCase
 {
-    private TranslatorInterface $translator;
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {

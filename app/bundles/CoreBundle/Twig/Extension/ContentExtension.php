@@ -8,19 +8,19 @@ use Mautic\CoreBundle\Twig\Helper\ContentHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ContentExtension extends AbstractExtension
+final class ContentExtension extends AbstractExtension
 {
     public function __construct(
-        protected ContentHelper $contentHelper,
+        private readonly ContentHelper $contentHelper,
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('customContent', [$this, 'getCustomContent'], ['is_safe' => ['all']]),
-            new TwigFunction('showScriptTags', [$this, 'showScriptTags'], ['is_safe' => ['all']]),
-            new TwigFunction('getSortedEditorFonts', [$this, 'sortEditorFonts']),
+            new TwigFunction('customContent', $this->getCustomContent(...), ['is_safe' => ['all']]),
+            new TwigFunction('showScriptTags', $this->showScriptTags(...), ['is_safe' => ['all']]),
+            new TwigFunction('getSortedEditorFonts', $this->sortEditorFonts(...)),
         ];
     }
 

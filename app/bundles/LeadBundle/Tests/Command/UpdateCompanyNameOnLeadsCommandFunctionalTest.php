@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
-use PHPUnit\Framework\Assert;
 
 final class UpdateCompanyNameOnLeadsCommandFunctionalTest extends MauticMysqlTestCase
 {
@@ -21,14 +20,10 @@ final class UpdateCompanyNameOnLeadsCommandFunctionalTest extends MauticMysqlTes
 
     public function testUpdateCompanies(): void
     {
-        /**
-         * @var CompanyRepository
-         */
+        /** @var CompanyRepository $companyRepository */
         $companyRepository = $this->em->getRepository(Company::class);
 
-        /**
-         * @var LeadRepository
-         */
+        /** @var LeadRepository $contactRepository */
         $contactRepository = $this->em->getRepository(Lead::class);
 
         $contact1 = $this->createContact();
@@ -57,17 +52,17 @@ final class UpdateCompanyNameOnLeadsCommandFunctionalTest extends MauticMysqlTes
 
         $this->em->clear();
 
-        Assert::assertSame($companyRepository->getEntity($company1->getId())->getName(), $contactRepository->getEntity($contact1->getId())->getCompany(), 'Company name is updated on leads.');
-        Assert::assertSame($companyRepository->getEntity($company1->getId())->getName(), $contactRepository->getEntity($contact2->getId())->getCompany(), 'Company name is updated on leads.');
-        Assert::assertSame($companyRepository->getEntity($company2->getId())->getName(), $contactRepository->getEntity($contact3->getId())->getCompany(), 'Company name is not updated and remains same as it\'s primary company');
+        $this->assertSame($companyRepository->getEntity($company1->getId())->getName(), $contactRepository->getEntity($contact1->getId())->getCompany(), 'Company name is updated on leads.');
+        $this->assertSame($companyRepository->getEntity($company1->getId())->getName(), $contactRepository->getEntity($contact2->getId())->getCompany(), 'Company name is updated on leads.');
+        $this->assertSame($companyRepository->getEntity($company2->getId())->getName(), $contactRepository->getEntity($contact3->getId())->getCompany(), 'Company name is not updated and remains same as it\'s primary company');
 
         $this->updateCompanyName($companyRepository->getEntity($company2->getId()));
 
         $this->testSymfonyCommand(UpdateCompanyNameOnLeadsCommand::COMMAND_NAME);
         $this->em->clear();
 
-        Assert::assertSame($companyRepository->getEntity($company2->getId())->getName(), $contactRepository->getEntity($contact3->getId())->getCompany(), 'Company name is updated on leads.');
-        Assert::assertSame($companyRepository->getEntity($company2->getId())->getName(), $contactRepository->getEntity($contact4->getId())->getCompany(), 'Company name is updated on leads.');
-        Assert::assertSame($companyRepository->getEntity($company1->getId())->getName(), $contactRepository->getEntity($contact1->getId())->getCompany(), 'Company name is not updated and remains same as it\'s primary company');
+        $this->assertSame($companyRepository->getEntity($company2->getId())->getName(), $contactRepository->getEntity($contact3->getId())->getCompany(), 'Company name is updated on leads.');
+        $this->assertSame($companyRepository->getEntity($company2->getId())->getName(), $contactRepository->getEntity($contact4->getId())->getCompany(), 'Company name is updated on leads.');
+        $this->assertSame($companyRepository->getEntity($company1->getId())->getName(), $contactRepository->getEntity($contact1->getId())->getCompany(), 'Company name is not updated and remains same as it\'s primary company');
     }
 }

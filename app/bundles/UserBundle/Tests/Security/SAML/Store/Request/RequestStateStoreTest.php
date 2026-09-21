@@ -11,17 +11,19 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 
-class RequestStateStoreTest extends TestCase
+final class RequestStateStoreTest extends TestCase
 {
     /**
-     * @var CacheProviderInterface&MockObject
+     * @var MockObject&CacheProviderInterface
      */
     private MockObject $cacheProvider;
 
     private CacheItem $cacheItem;
 
     private RequestStateStore $requestStateStore;
+
     private string $cachePrefix = 'prefix_suffix';
+
     private string $stateId     = 'state_id';
 
     protected function setUp(): void
@@ -41,11 +43,11 @@ class RequestStateStoreTest extends TestCase
     public function testSet(): void
     {
         $state = $this->createMock(RequestState::class);
-        $state->expects(self::once())
+        $state->expects($this->once())
             ->method('getId')
             ->willReturn($this->stateId);
 
-        $this->cacheProvider->expects(self::once())
+        $this->cacheProvider->expects($this->once())
             ->method('save')
             ->with($this->cacheItem);
 
@@ -68,7 +70,7 @@ class RequestStateStoreTest extends TestCase
 
     public function testGetNotHit(): void
     {
-        self::assertNull($this->requestStateStore->get($this->stateId));
+        $this->assertNotInstanceOf(RequestState::class, $this->requestStateStore->get($this->stateId));
     }
 
     public function testGetIsHitButNotRequestState(): void
@@ -83,12 +85,12 @@ class RequestStateStoreTest extends TestCase
         );
         ($setUp)($this->cacheItem);
 
-        self::assertNull($this->requestStateStore->get($this->stateId));
+        $this->assertNotInstanceOf(RequestState::class, $this->requestStateStore->get($this->stateId));
     }
 
     public function testGetIsHitRequestState(): void
     {
-        $state = $this->createMock(RequestState::class);
+        $state = $this->createStub(RequestState::class);
 
         $setUp = \Closure::bind(
             static function (CacheItem $item, RequestState $state): void {
@@ -100,23 +102,23 @@ class RequestStateStoreTest extends TestCase
         );
         ($setUp)($this->cacheItem, $state);
 
-        self::assertSame($state, $this->requestStateStore->get($this->stateId));
+        $this->assertSame($state, $this->requestStateStore->get($this->stateId));
     }
 
     public function testRemove(): void
     {
         $id = 'whatever';
-        $this->cacheProvider->expects(self::once())
+        $this->cacheProvider->expects($this->once())
             ->method('deleteItem')
             ->with($this->cachePrefix.$id)
             ->willReturn(true);
 
-        self::assertTrue($this->requestStateStore->remove($id));
+        $this->assertTrue($this->requestStateStore->remove($id));
     }
 
     public function testClear(): void
     {
-        $this->cacheProvider->expects(self::once())
+        $this->cacheProvider->expects($this->once())
             ->method('clear')
             ->with($this->cachePrefix);
 

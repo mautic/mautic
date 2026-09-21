@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,9 +22,9 @@ class ListChangeEvent extends Event
      */
     public function __construct(
         Lead|array $leads,
-        private LeadList $list,
-        private bool $added = true,
-        private ?\DateTime $date = null,
+        private readonly LeadList $list,
+        private readonly bool $added = true,
+        private readonly ?\DateTime $date = null,
     ) {
         if (is_array($leads)) {
             $this->leads = $leads;

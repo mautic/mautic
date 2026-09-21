@@ -4,7 +4,7 @@ namespace Mautic\StatsBundle\Aggregate\Helper;
 
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatDAO;
 
-class CalculatorHelper
+final class CalculatorHelper
 {
     /**
      * @throws \Exception
@@ -16,7 +16,7 @@ class CalculatorHelper
 
     public static function getYearDateString($year): string
     {
-        return "$year-01-01 00:00:00";
+        return "{$year}-01-01 00:00:00";
     }
 
     /**
@@ -55,7 +55,7 @@ class CalculatorHelper
 
     public static function getMonthDateString($month): string
     {
-        return "$month-01 00:00:00";
+        return "{$month}-01 00:00:00";
     }
 
     /**
@@ -94,7 +94,7 @@ class CalculatorHelper
 
     public static function getDayDateString($day): string
     {
-        return "$day 00:00:00";
+        return "{$day} 00:00:00";
     }
 
     /**
@@ -183,7 +183,7 @@ class CalculatorHelper
 
     public static function getHourDateString($hour): string
     {
-        return "$hour:00:00";
+        return "{$hour}:00:00";
     }
 
     /**

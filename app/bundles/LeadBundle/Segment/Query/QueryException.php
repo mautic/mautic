@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Segment\Query;
 /**
  * @since 2.1.4
  */
-class QueryException extends \Doctrine\DBAL\Exception
+final class QueryException extends \Doctrine\DBAL\Exception
 {
     public static function unknownAlias($alias, $registeredAliases): self
     {

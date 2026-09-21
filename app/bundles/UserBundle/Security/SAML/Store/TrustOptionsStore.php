@@ -6,13 +6,13 @@ use LightSaml\Meta\TrustOptions\TrustOptions;
 use LightSaml\Store\TrustOptions\TrustOptionsStoreInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class TrustOptionsStore implements TrustOptionsStoreInterface
+final class TrustOptionsStore implements TrustOptionsStoreInterface
 {
     private ?TrustOptions $trustOptions = null;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private string $entityId,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly string $entityId,
     ) {
     }
 

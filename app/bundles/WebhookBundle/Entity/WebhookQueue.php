@@ -19,7 +19,7 @@ class WebhookQueue
 
     private ?\DateTime $dateAdded = null;
 
-    private ?\DateTimeImmutable $dateModified = null; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
+    private ?\DateTimeImmutable $dateModified = null;
 
     /**
      * @var string|resource|null
@@ -33,7 +33,7 @@ class WebhookQueue
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable(WebhookQueue::TABLE_NAME)
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(WebhookQueueRepository::class);
         $builder->addBigIntIdField();
         $builder->createManyToOne('webhook', 'Webhook')
@@ -67,10 +67,7 @@ class WebhookQueue
         return $this->webhook;
     }
 
-    /**
-     * @return WebhookQueue
-     */
-    public function setWebhook(?Webhook $webhook)
+    public function setWebhook(?Webhook $webhook): static
     {
         $this->webhook = $webhook;
 
@@ -82,10 +79,7 @@ class WebhookQueue
         return $this->dateAdded;
     }
 
-    /**
-     * @return WebhookQueue
-     */
-    public function setDateAdded(?\DateTime $dateAdded)
+    public function setDateAdded(?\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -95,7 +89,7 @@ class WebhookQueue
     /**
      * @return string|null
      */
-    public function getPayload()
+    public function getPayload(): string|false|null
     {
         if (null === $this->payloadCompressed) {
             // no payload is set
@@ -114,10 +108,8 @@ class WebhookQueue
 
     /**
      * @param string $payload
-     *
-     * @return WebhookQueue
      */
-    public function setPayload($payload)
+    public function setPayload($payload): static
     {
         $this->payloadCompressed = gzcompress($payload, 9);
 
@@ -129,10 +121,7 @@ class WebhookQueue
         return $this->event;
     }
 
-    /**
-     * @return WebhookQueue
-     */
-    public function setEvent(?Event $event)
+    public function setEvent(?Event $event): static
     {
         $this->event = $event;
 
@@ -144,7 +133,7 @@ class WebhookQueue
         return $this->retries;
     }
 
-    public function setRetries(int $retries): WebhookQueue
+    public function setRetries(int $retries): self
     {
         $this->retries = $retries;
 
@@ -156,7 +145,7 @@ class WebhookQueue
         return $this->dateModified;
     }
 
-    public function setDateModified(?\DateTimeImmutable $dateModified): WebhookQueue
+    public function setDateModified(?\DateTimeImmutable $dateModified): self
     {
         $this->dateModified = $dateModified;
 

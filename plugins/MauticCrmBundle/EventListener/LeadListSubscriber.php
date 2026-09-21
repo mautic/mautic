@@ -12,7 +12,7 @@ use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListSubscriber implements EventSubscriberInterface
+final readonly class LeadListSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private IntegrationHelper $helper,
@@ -63,7 +63,7 @@ class LeadListSubscriber implements EventSubscriberInterface
             }
         }
 
-        if (!empty($choices)) {
+        if ([] !== $choices) {
             $config = [
                 'label'      => $this->translator->trans('mautic.plugin.integration.campaign_members'),
                 'properties' => ['type' => 'select', 'list' => $choices],
@@ -83,7 +83,7 @@ class LeadListSubscriber implements EventSubscriberInterface
     /**
      * Add/remove contacts to a segment based on contacts found in Integration Campaigns.
      */
-    public function onLeadListProcessList(ListPreProcessListEvent $event)
+    public function onLeadListProcessList(ListPreProcessListEvent $event): void
     {
         // get Integration Campaign members
         $list    = $event->getList();
@@ -115,6 +115,6 @@ class LeadListSubscriber implements EventSubscriberInterface
             }
         }
 
-        return $event->setResult($success);
+        $event->setResult($success);
     }
 }

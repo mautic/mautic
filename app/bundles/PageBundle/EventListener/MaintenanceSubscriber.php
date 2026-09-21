@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MaintenanceSubscriber implements EventSubscriberInterface
+final readonly class MaintenanceSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private Connection $db,
@@ -76,7 +76,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
                 $leadsIds = array_column($subQb->executeQuery()->fetchAllAssociative(), 'id');
 
-                if (0 === sizeof($leadsIds)) {
+                if (0 === count($leadsIds)) {
                     break;
                 }
 
@@ -85,7 +85,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                       $qb->expr()->in(
                           'lead_id', ':leadsIds')
                   )
-                  ->setParameter('leadsIds', array_map('intval', $leadsIds), ArrayParameterType::INTEGER)
+                  ->setParameter('leadsIds', array_map(intval(...), $leadsIds), ArrayParameterType::INTEGER)
                     ->executeStatement();
                 ++$loop;
             }

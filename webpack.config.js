@@ -10,7 +10,6 @@ const path = require( 'path' );
 const glob = require("glob")
 const fs = require( 'fs' );
 const { loaders } = require( '@ckeditor/ckeditor5-dev-utils' );
-const { CKEditorTranslationsPlugin } = require( '@ckeditor/ckeditor5-dev-translations' );
 
 // Find the webroot path if it is not the same folder as the current dir.
 // This is the case for Composer based installations following the best practices.
@@ -39,13 +38,6 @@ module.exports = {
 		libraryTarget: 'umd',
 		libraryExport: 'default'
 	},
-
-	plugins: [
-		new CKEditorTranslationsPlugin( {
-			language: 'en',
-			additionalLanguages: 'all'
-		} )
-	],
 
 	module: {
 		rules: [

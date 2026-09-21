@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class TokenSorter
+final readonly class TokenSorter
 {
     private const CATEGORY_CONTACT   = 10;
 

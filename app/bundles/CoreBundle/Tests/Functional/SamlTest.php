@@ -8,23 +8,23 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar as GuzzleCookieJar;
 use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
-class SamlTest extends MauticMysqlTestCase
+final class SamlTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
     public function testDiscoveryTemplateIsOverridden(): void
     {
-        $twig    = static::getContainer()->get('twig');
+        $twig    = self::getContainer()->get(Environment::class);
         $content = $twig->render('@LightSamlSp/discovery.html.twig', ['parties' => []]);
 
-        Assert::assertStringContainsString('SAML not configured or configured incorrectly.', $content);
+        $this->assertStringContainsString('SAML not configured or configured incorrectly.', (string) $content);
     }
 
     /**
@@ -44,11 +44,11 @@ class SamlTest extends MauticMysqlTestCase
         $host          = $_ENV['SAML_HOST'];
         $port          = $_ENV['SAML_PORT'];
         $temporaryFile = tempnam(sys_get_temp_dir(), 'samlTest');
-        Assert::assertNotFalse($temporaryFile);
+        $this->assertNotFalse($temporaryFile);
 
         // Go to http://localhost:8080/simplesaml/saml2/idp/metadata.php?output=xhtml and copy the metadata in xml format to a temp file (e.g. mautic_saml_test_metatada.xml).
         $metadataUrl = 'http://'.$host.':'.$port.'/simplesaml/saml2/idp/metadata.php';
-        Assert::assertTrue(copy($metadataUrl, $temporaryFile), 'Error copying '.$metadataUrl.' to '.$temporaryFile);
+        $this->assertTrue(copy($metadataUrl, $temporaryFile), 'Error copying '.$metadataUrl.' to '.$temporaryFile);
 
         $configUrl        = '/s/config/edit?tab=userconfig';
         $crawler          = $this->client->request(Request::METHOD_GET, $configUrl);
@@ -57,20 +57,20 @@ class SamlTest extends MauticMysqlTestCase
 
         // Select your entity ID
         $samlIdField = $configForm['config[userconfig][saml_idp_entity_id]'];
-        \assert($samlIdField instanceof ChoiceFormField);
+        $this->assertInstanceOf(ChoiceFormField::class, $samlIdField);
         $availableSamlIdOptions = $samlIdField->availableOptionValues();
-        Assert::assertCount(2, $availableSamlIdOptions, print_r($availableSamlIdOptions, true));
+        $this->assertCount(2, $availableSamlIdOptions, print_r($availableSamlIdOptions, true));
         $samlIdField->setValue($availableSamlIdOptions[1]);
 
         $samlDefaultRoleField = $configForm['config[userconfig][saml_idp_default_role]'];
-        \assert($samlDefaultRoleField instanceof ChoiceFormField);
+        $this->assertInstanceOf(ChoiceFormField::class, $samlDefaultRoleField);
         $availableDefaultRoleOptions = $samlDefaultRoleField->availableOptionValues();
-        Assert::assertCount(3, $availableDefaultRoleOptions, print_r($availableDefaultRoleOptions, true));
+        $this->assertCount(3, $availableDefaultRoleOptions, print_r($availableDefaultRoleOptions, true));
         $samlDefaultRoleField->setValue($availableDefaultRoleOptions[1]);
 
         // Upload the metadata.xml file
         $samlProviderMetadata = $configForm['config[userconfig][saml_idp_metadata]'];
-        \assert($samlProviderMetadata instanceof FileFormField);
+        $this->assertInstanceOf(FileFormField::class, $samlProviderMetadata);
         $samlProviderMetadata->upload($temporaryFile);
 
         // Fill in email in the fields Email, First Name and Last name (we are testing, so no problem that the actual values are not correct)
@@ -83,10 +83,10 @@ class SamlTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($configForm);
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $content = $clientResponse->getContent();
-        Assert::assertNotFalse($content);
-        Assert::assertStringContainsString('Configuration successfully updated', $content);
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString('Configuration successfully updated', $content);
 
         // Go in an anonymous tab to <LOCAL_MAUTIC_URL> and you should be redirected to the simplesaml page
         $this->client->enableReboot();
@@ -112,7 +112,7 @@ class SamlTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $clientResponse->getContent());
-        Assert::assertStringContainsString('http://'.$host.':'.$port.'/simplesaml/saml2/idp/SSOService.php?SAMLRequest=', $clientResponse->headers->get('Location'));
+        $this->assertStringContainsString('http://'.$host.':'.$port.'/simplesaml/saml2/idp/SSOService.php?SAMLRequest=', (string) $clientResponse->headers->get('Location'));
 
         // Here need to replicate the browser. The default client will not work, because the test must request an external service.
         $url          = $clientResponse->headers->get('Location');
@@ -122,20 +122,20 @@ class SamlTest extends MauticMysqlTestCase
             RequestOptions::ALLOW_REDIRECTS => false,
         ]);
         $response = $guzzleClient->request(Request::METHOD_GET, $url);
-        \assert($response instanceof \GuzzleHttp\Psr7\Response);
-        Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        $this->assertInstanceOf(\GuzzleHttp\Psr7\Response::class, $response);
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         $url = $response->getHeaderLine('Location');
-        Assert::assertStringContainsString('http://'.$host.':'.$port.'/simplesaml/module.php/core/loginuserpass.php?AuthState=', $url);
+        $this->assertStringContainsString('http://'.$host.':'.$port.'/simplesaml/module.php/core/loginuserpass.php?AuthState=', $url);
 
         // Get the form for authentication.
         $response = $guzzleClient->request(Request::METHOD_GET, $url);
-        \assert($response instanceof \GuzzleHttp\Psr7\Response);
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertInstanceOf(\GuzzleHttp\Psr7\Response::class, $response);
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
 
         $body    = (string) $response->getBody();
         $crawler = new Crawler($body, $url);
         $form    = $crawler->filter('form');
-        Assert::assertCount(1, $form);
+        $this->assertCount(1, $form);
 
         $form = $form->form([
             'username' => 'user1',
@@ -148,16 +148,16 @@ class SamlTest extends MauticMysqlTestCase
                 'form_params' => $form->getPhpValues(),
             ]
         );
-        \assert($response instanceof \GuzzleHttp\Psr7\Response);
+        $this->assertInstanceOf(\GuzzleHttp\Psr7\Response::class, $response);
         // Because guzzle does not support javascript the answer is a form.
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
 
         $body        = (string) $response->getBody();
         $crawler     = new Crawler($body, $url);
         $formElement = $crawler->filter('form');
-        Assert::assertCount(1, $formElement);
+        $this->assertCount(1, $formElement);
         $form = $formElement->form();
-        Assert::assertSame('https://localhost/s/saml/login_check', $form->getUri());
+        $this->assertSame('https://localhost/s/saml/login_check', $form->getUri());
         $this->client->request(
             $form->getMethod(),
             $form->getUri(),
@@ -174,9 +174,9 @@ class SamlTest extends MauticMysqlTestCase
 
         $this->client->followRedirect();
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $content = $clientResponse->getContent();
-        Assert::assertNotFalse($content);
-        Assert::assertStringContainsString('user1@example.com user1@example.com', $content);
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString('user1@example.com user1@example.com', $content);
     }
 }

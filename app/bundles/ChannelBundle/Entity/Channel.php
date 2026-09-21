@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -152,10 +154,8 @@ class Channel extends CommonEntity implements UuidInterface
 
     /**
      * @param string $channel
-     *
-     * @return Channel
      */
-    public function setChannel($channel)
+    public function setChannel($channel): static
     {
         $this->channel = $channel;
 
@@ -172,10 +172,8 @@ class Channel extends CommonEntity implements UuidInterface
 
     /**
      * @param int $channelId
-     *
-     * @return Channel
      */
-    public function setChannelId($channelId)
+    public function setChannelId($channelId): static
     {
         if (empty($channelId)) {
             $channelId = null;
@@ -196,10 +194,8 @@ class Channel extends CommonEntity implements UuidInterface
 
     /**
      * @param string $channelName
-     *
-     * @return Channel
      */
-    public function setChannelName($channelName)
+    public function setChannelName($channelName): static
     {
         $this->channelName = $channelName;
 
@@ -214,10 +210,7 @@ class Channel extends CommonEntity implements UuidInterface
         return $this->message;
     }
 
-    /**
-     * @return Channel
-     */
-    public function setMessage(Message $message)
+    public function setMessage(Message $message): static
     {
         $this->message = $message;
 
@@ -232,10 +225,7 @@ class Channel extends CommonEntity implements UuidInterface
         return $this->properties;
     }
 
-    /**
-     * @return Channel
-     */
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): static
     {
         $this->properties = $properties;
 
@@ -252,10 +242,8 @@ class Channel extends CommonEntity implements UuidInterface
 
     /**
      * @param bool $isEnabled
-     *
-     * @return Channel
      */
-    public function setIsEnabled($isEnabled)
+    public function setIsEnabled($isEnabled): static
     {
         $this->isEnabled = $isEnabled;
 
@@ -264,6 +252,6 @@ class Channel extends CommonEntity implements UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getMessage()->getCreatedBy();
+        return $this->message->getCreatedBy();
     }
 }

@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Exception;
 
-class ApiException extends \Exception
+final class ApiException extends \Exception
 {
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -14,7 +16,7 @@ class ListLead
 
     /**
      * @var LeadList
-     **/
+     */
     private $list;
 
     /**

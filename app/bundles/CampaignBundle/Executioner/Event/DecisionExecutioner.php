@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\LeadBundle\Entity\Lead;
 
 class DecisionExecutioner implements EventInterface
@@ -19,8 +20,9 @@ class DecisionExecutioner implements EventInterface
     public const TYPE = 'decision';
 
     public function __construct(
-        private EventLogger $eventLogger,
-        private DecisionDispatcher $dispatcher,
+        private readonly EventLogger $eventLogger,
+        private readonly DecisionDispatcher $dispatcher,
+        private readonly OptimisticLockServiceInterface $optimisticLockService,
     ) {
     }
 
@@ -47,8 +49,8 @@ class DecisionExecutioner implements EventInterface
         if (!$decisionEvent->wasDecisionApplicable()) {
             throw new DecisionNotApplicableException('evaluation failed');
         }
-
         $this->eventLogger->persistLog($log);
+        $this->optimisticLockService->acquireLock($log);
     }
 
     /**
@@ -67,7 +69,7 @@ class DecisionExecutioner implements EventInterface
             }
 
             try {
-                /* @var DecisionAccessor $config */
+                /** @var DecisionAccessor $config */
                 $this->dispatchEvent($config, $log);
                 $evaluatedContacts->pass($log->getLead());
 

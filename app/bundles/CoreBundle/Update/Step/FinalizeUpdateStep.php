@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FinalizeUpdateStep implements StepInterface
+final readonly class FinalizeUpdateStep implements StepInterface
 {
     public function __construct(
         private TranslatorInterface $translator,
@@ -51,7 +51,7 @@ final class FinalizeUpdateStep implements StepInterface
             if ($postMessage = $this->requestStack->getSession()->get('post_upgrade_message')) {
                 $postMessage = strip_tags($postMessage);
                 $this->requestStack->getSession()->remove('post_upgrade_message');
-                $output->writeln("\n\n<info>$postMessage</info>");
+                $output->writeln("\n\n<info>{$postMessage}</info>");
             }
         }
     }

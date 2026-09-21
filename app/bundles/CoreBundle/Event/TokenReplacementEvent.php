@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
@@ -35,7 +37,7 @@ class TokenReplacementEvent extends CommonEvent
         protected $lead = null,
         protected array $clickthrough = [],
         protected $passthrough = null,
-        private bool $internalSend = false,
+        private readonly bool $internalSend = false,
     ) {
         if ($content instanceof CommonEntity) {
             $this->entity = $content;

@@ -14,18 +14,14 @@ import grapesjsckeditor from './plugins/grapesjs-ckeditor';
 import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs-mjmlThemeTokens';
 import grapesjsImageLink from './plugins/grapesjs-image-link';
 import { extractMjHeadContent, createHeadInjectingMjmlParser } from './plugins/grapesjs-mjmlThemeTokens/utils';
-import contentService from 'grapesjs-preset-mautic/dist/content.service';
-import grapesjsmautic from 'grapesjs-preset-mautic';
-import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
+import contentService from './preset-mautic/content.service';
+import grapesjsmautic from './preset-mautic';
+import editorFontsService from './preset-mautic/editorFonts/editorFonts.service';
 import StorageService from './storage.service';
-
-// for local dev
-// import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
-// import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 
 import CodeModeButton from './codeMode/codeMode.button';
 import CompCopyPaste from './commands/compCopyPaste';
-import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
+import MjmlService from './preset-mautic/mjml/mjml.service';
 import MjmlStylesService from './mjmlStyles.service';
 import EditorStateService from './editorState.service';
 
@@ -84,6 +80,45 @@ export default class BuilderService {
     };
 
     MjmlService.__gjsBuilderListStylesPatched = true;
+  }
+
+  patchMjmlCommentViews(editor) {
+    const dc = editor?.DomComponents;
+    if (!dc || dc.__mauticMjmlCommentViewPatched) {
+      return;
+    }
+
+    const commentType = dc.getType('comment');
+    const BaseCommentModel = commentType?.model;
+    const BaseCommentView = commentType?.view;
+
+    if (!BaseCommentModel || !BaseCommentView) {
+      return;
+    }
+
+    dc.addType('comment', {
+      model: BaseCommentModel,
+      view: BaseCommentView.extend({
+        _createElement() {
+          const parent = typeof this.model?.parent === 'function' ? this.model.parent() : null;
+          const parentTagName = `${parent?.get?.('tagName') || ''}`.toLowerCase();
+
+          if (parentTagName !== 'mj-body') {
+            return document.createComment(this.model.content || '');
+          }
+
+          const marker = document.createElement('div');
+          marker.setAttribute('aria-hidden', 'true');
+          marker.setAttribute('data-gjs-comment-marker', 'true');
+          marker.style.cssText =
+            'display:block;width:100%;height:1px;min-height:1px;margin:0;padding:0;border:0;opacity:0;overflow:hidden;pointer-events:none;';
+
+          return marker;
+        },
+      }),
+    });
+
+    dc.__mauticMjmlCommentViewPatched = true;
   }
 
   /**
@@ -685,11 +720,15 @@ export default class BuilderService {
     this.editor.on('run:mautic-editor-email-mjml-close', triggerBuilderHide);
     this.editor.on('run:preset-mautic:apply-form', () => this.persistEditorState());
 
-    this.editor.on('load', () => this.normalizeTextComponentContainers());
-    this.editor.on('component:add', (component) =>
-      this.normalizeTextComponentContainers(component)
-    );
+    this.editor.on('load', () => {
+      if (this.isPageContext()) {
+        this.addMobileCssFix();
+      }
+      this.normalizeTextComponentContainers();
+    });
+    this.editor.on('component:add', (component) => this.normalizeTextComponentContainers(component));
     this.editor.on('rte:disable', (component) => this.normalizeTextComponentContainers(component));
+    this.editor.on('mautic:code-editor-update', () => this.normalizeTextComponentContainers());
 
     // add offset to flashes container for better UI visibility when builder is on
     this.editor.on('show', () => mQuery('#flashes').addClass('alert-offset'));
@@ -1198,6 +1237,18 @@ export default class BuilderService {
     const inlineElements = BuilderService.getInlineElements();
     const emailCkEditorOptions = BuilderService.getCkeConf('email:getBuilderTokens');
     const emailInlineOptions = BuilderService.buildInlineCkeConf(emailCkEditorOptions);
+    const allowedTextInnerChildTags = [
+      'a',
+      'b',
+      'em',
+      'i',
+      'small',
+      'span',
+      'strong',
+      'sub',
+      'sup',
+      'u',
+    ];
 
     this.editor = grapesjs.init({
       selectorManager: {
@@ -1212,8 +1263,18 @@ export default class BuilderService {
         styles,
       },
       domComponents: {
-        // disable all except link components
-        disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
+        // Keep inline phrasing content inside paragraph text components. If
+        // spans are disallowed here, GrapesJS reparses them as siblings of the
+        // paragraph and MJML renders extra line breaks.
+        disableTextInnerChilds: (child) => {
+          if (child.is('link')) {
+            return false;
+          }
+
+          const tagName = `${child.get('tagName') || ''}`.toLowerCase();
+
+          return !allowedTextInnerChildTags.includes(tagName);
+        },
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
@@ -1235,6 +1296,7 @@ export default class BuilderService {
 
         [grapesjsMjmlThemeTokens]: {
           headContent: mjHeadContent,
+          mjmlParser: headInjectingParser,
         },
 
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
@@ -1255,6 +1317,7 @@ export default class BuilderService {
       },
     });
 
+    this.patchMjmlCommentViews(this.editor);
     this.unsetComponentVoidTypes(this.editor);
     this.editor.setComponents(components);
 
@@ -1278,8 +1341,16 @@ export default class BuilderService {
       const textType = dc.getType('text');
       const originalIsComponent = textType?.model?.isComponent;
 
+      const isHeadingWrapper = (el) =>
+        el.tagName === 'DIV' &&
+        typeof el.classList !== 'undefined' &&
+        el.classList.contains('gjs-heading-wrapper');
+
       dc.addType('text', {
         isComponent(el) {
+          if (isHeadingWrapper(el)) {
+            return { type: 'text' };
+          }
           if (el.tagName === 'DIV' && el.getAttribute && el.getAttribute('data-slot') === 'text') {
             return { type: 'text' };
           }
@@ -1535,6 +1606,21 @@ export default class BuilderService {
           order: -1,
         });
       }
+    });
+  }
+
+  addMobileCssFix() {
+    const cssc = this.editor.CssComposer;
+    if (!cssc || typeof cssc.setRule !== 'function') {
+      return;
+    }
+
+    cssc.setRule('.gjs-cell, .gjs-cell30, .gjs-cell70', {
+      height: 'auto',
+    }, {
+      atRuleType: 'media',
+      atRuleParams: '(max-width: 768px)',
+      addStyles: true,
     });
   }
 

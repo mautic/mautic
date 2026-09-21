@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Helper;
 
 use Mautic\ReportBundle\Event\ColumnCollectEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class ReportHelper
+final readonly class ReportHelper
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,

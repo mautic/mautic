@@ -25,10 +25,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class MappingHelper
 {
     public function __construct(
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        private ObjectMappingRepository $objectMappingRepository,
-        private ObjectProvider $objectProvider,
-        private EventDispatcherInterface $dispatcher,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly ObjectMappingRepository $objectMappingRepository,
+        private readonly ObjectProvider $objectProvider,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -64,14 +64,13 @@ class MappingHelper
         foreach ($uniqueIdentifierFields as $field => $fieldLabel) {
             try {
                 $integrationField = $mappingManualDAO->getIntegrationMappedField($integrationObjectDAO->getObject(), $internalObjectName, $field);
-                if ($integrationValue = $integrationObjectDAO->getField($integrationField)) {
-                    $identifiers[$field] = $integrationValue->getValue()->getNormalizedValue();
-                }
+                $integrationValue = $integrationObjectDAO->getField($integrationField);
+                $identifiers[$field] = $integrationValue->getValue()->getNormalizedValue();
             } catch (FieldNotFoundException) {
             }
         }
 
-        if (empty($identifiers)) {
+        if ([] === $identifiers) {
             // No fields found to search for contact so return null
             return new ObjectDAO($internalObjectName, null);
         }
@@ -94,7 +93,7 @@ class MappingHelper
 
         $foundObjects = $event->getFoundObjects();
 
-        if (!$foundObjects) {
+        if ([] === $foundObjects) {
             // No contacts were found
             return new ObjectDAO($internalObjectName, null);
         }

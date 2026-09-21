@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
-class TagRepository extends BaseTagRepository
+final class TagRepository extends BaseTagRepository
 {
     /**
      * @return string[][]
@@ -24,6 +25,9 @@ class TagRepository extends BaseTagRepository
         return 'lt';
     }
 
+    /**
+     * @param string $tag
+     */
     public function countOccurrences($tag): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -36,10 +40,22 @@ class TagRepository extends BaseTagRepository
         return $q->executeQuery()->rowCount();
     }
 
+    public function getTagByName(string $tag): ?Tag
+    {
+        $qb = $this->createQueryBuilder($this->getTableAlias());
+        $qb->where($qb->expr()->eq($this->getTableAlias().'.tag', ':tag'))
+            ->setParameter('tag', $tag)
+            ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
     /**
      * Get a count of leads that belong to the tag.
      *
-     * @return array
+     * @param int|int[] $tagIds
+     *
+     * @return int|array<int, int>
      */
     public function countByLeads($tagIds)
     {

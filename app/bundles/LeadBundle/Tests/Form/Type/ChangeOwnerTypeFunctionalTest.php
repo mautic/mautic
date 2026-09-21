@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
@@ -36,8 +35,8 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $responseData      = json_decode($this->client->getResponse()->getContent(), true);
         $modifyTagsEventId = $responseData['eventId'] ?? null;
-        Assert::assertNotNull($modifyTagsEventId, 'Modify tags event should be created');
-        Assert::assertSame(1, $responseData['success']);
+        $this->assertNotNull($modifyTagsEventId, 'Modify tags event should be created');
+        $this->assertSame(1, $responseData['success']);
 
         // Add "Update contact owner" action below "Modify contact's tags"
         $uri = '/s/campaigns/events/new?type=lead.changeowner&eventType=action&campaignId='.self::TEMP_CAMPAIGN_ID.'&anchor=yes&anchorEventType=action';
@@ -50,11 +49,11 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
 
         // Verify that the form does not contain a buttons field (the fix)
         $buttonsField = $crawler->filter('[id$="_properties_buttons"]');
-        Assert::assertCount(0, $buttonsField, 'The buttons field should not exist in the ChangeOwnerType form');
+        $this->assertCount(0, $buttonsField, 'The buttons field should not exist in the ChangeOwnerType form');
 
         // Verify owner field exists
         $ownerField = $crawler->filter('#campaignevent_properties_owner');
-        Assert::assertCount(1, $ownerField, 'The owner field should exist in the form');
+        $this->assertCount(1, $ownerField, 'The owner field should exist in the form');
 
         $form->setValues([
             'campaignevent[name]'            => 'Update contact owner',
@@ -70,8 +69,8 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $responseData       = json_decode($this->client->getResponse()->getContent(), true);
         $changeOwnerEventId = $responseData['eventId'] ?? null;
-        Assert::assertNotNull($changeOwnerEventId, 'Change owner event should be created');
-        Assert::assertSame(1, $responseData['success']);
+        $this->assertNotNull($changeOwnerEventId, 'Change owner event should be created');
+        $this->assertSame(1, $responseData['success']);
 
         // Verify that the first event (Modify contact tags) can still be edited after adding change owner
         $modifiedEvents = [
@@ -92,7 +91,7 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
-        Assert::assertSame($modifyTagsEventId, $responseData['eventId'], 'Should be able to edit the first event');
-        Assert::assertArrayHasKey('newContent', $responseData, 'Edit form content should be returned');
+        $this->assertSame($modifyTagsEventId, $responseData['eventId'], 'Should be able to edit the first event');
+        $this->assertArrayHasKey('newContent', $responseData, 'Edit form content should be returned');
     }
 }

@@ -11,10 +11,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ThemeListType extends AbstractType
+final class ThemeListType extends AbstractType
 {
     public function __construct(
-        private ThemeHelperInterface $themeHelper,
+        private readonly ThemeHelperInterface $themeHelper,
     ) {
     }
 
@@ -43,7 +43,7 @@ class ThemeListType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

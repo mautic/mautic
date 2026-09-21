@@ -19,12 +19,12 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailType extends AbstractType
+final class EmailType extends AbstractType
 {
     public const REPLY_TO_ADDRESS = 'replyToAddress';
 
     public function __construct(
-        private UserHelper $userHelper,
+        private readonly UserHelper $userHelper,
     ) {
     }
 

@@ -11,7 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
+final class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&FormBuilderInterface $formBuilder;
 
@@ -32,7 +32,7 @@ class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->formBuilder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): MockObject&\Symfony\Component\Form\FormBuilderInterface {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('useremail', $parameters[0]);
                     $this->assertSame(EmailSendType::class, $parameters[1]);
@@ -57,9 +57,7 @@ class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
                         ],
                         'required'    => true,
                         'constraints' => new NotBlank(
-                            [
-                                'message' => 'mautic.core.value.required',
-                            ]
+                            message: 'mautic.core.value.required'
                         ),
                     ], $parameters[2]);
                 }

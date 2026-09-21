@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
+use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncService;
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
@@ -14,9 +15,9 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\PluginBundle\Entity\Integration;
 
-class SyncServiceTest extends MauticMysqlTestCase
+final class SyncServiceTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,13 +41,14 @@ class SyncServiceTest extends MauticMysqlTestCase
         $settings->setIsPublished(true);
         $exampleIntegration->setIntegrationConfiguration($settings);
 
+        /** @var SyncIntegrationsHelper $syncIntegrationsHelper */
         $syncIntegrationsHelper = $this->getContainer()->get('mautic.integrations.helper.sync_integrations');
         $syncIntegrationsHelper->addIntegration($exampleIntegration);
 
         /** @var SyncService $syncService */
-        $syncService = $this->getContainer()->get('mautic.integrations.sync.service');
+        $syncService = $this->getContainer()->get(SyncService::class);
 
-        $syncService->processIntegrationSync(ExampleIntegration::NAME, true);
+        $syncService->processIntegrationSync(ExampleIntegration::NAME);
         $payload = $dataExchange->getOrderPayload();
 
         // Created the 48 known contacts already in Mautic

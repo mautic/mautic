@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
@@ -12,14 +14,14 @@ use JMS\Serializer\Metadata\PropertyMetadata;
  */
 class FieldExclusionStrategy implements ExclusionStrategyInterface
 {
-    private int $level;
+    private readonly int $level;
 
     /**
      * @param int         $level
      * @param string|null $path
      */
     public function __construct(
-        private array $fields,
+        private readonly array $fields,
         $level = 3,
         private $path = null,
     ) {

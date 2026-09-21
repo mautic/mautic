@@ -11,7 +11,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class ProcessMarketingMessagesQueueCommandFunctionalTest extends MauticMysqlTestCase
 {
@@ -20,7 +19,7 @@ final class ProcessMarketingMessagesQueueCommandFunctionalTest extends MauticMys
     public function testIdleCommand(): void
     {
         $commandTester = $this->testSymfonyCommand('mautic:messages:send');
-        Assert::assertSame(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
     }
 
     public function testCommandWithEmailQueue(): void
@@ -51,8 +50,8 @@ final class ProcessMarketingMessagesQueueCommandFunctionalTest extends MauticMys
         $this->em->flush();
 
         $commandTester = $this->testSymfonyCommand('mautic:messages:send');
-        Assert::assertSame(0, $commandTester->getStatusCode());
-        Assert::assertStringContainsString('Messages sent: 60', $commandTester->getDisplay());
+        $this->assertSame(0, $commandTester->getStatusCode());
+        $this->assertStringContainsString('Messages sent: 60', $commandTester->getDisplay());
 
         // Verify that stats were created for a sample of leads
         $this->assertEmailStatCreated($email, $leads[0]);
@@ -83,8 +82,8 @@ final class ProcessMarketingMessagesQueueCommandFunctionalTest extends MauticMys
         $this->em->flush();
 
         $commandTester = $this->testSymfonyCommand('mautic:messages:send', ['--limit' => 2]);
-        Assert::assertSame(0, $commandTester->getStatusCode());
-        Assert::assertStringContainsString('Messages sent: 2', $commandTester->getDisplay());
+        $this->assertSame(0, $commandTester->getStatusCode());
+        $this->assertStringContainsString('Messages sent: 2', $commandTester->getDisplay());
     }
 
     private function createMessageQueue(Email $email, Lead $lead, \DateTime $scheduledDate, \DateTime $datePublished): MessageQueue
@@ -114,6 +113,6 @@ final class ProcessMarketingMessagesQueueCommandFunctionalTest extends MauticMys
             'lead'  => $lead->getId(),
         ]);
 
-        Assert::assertNotNull($emailStat, "Email stat not created for email ID {$email->getId()} and lead ID {$lead->getId()}");
+        $this->assertInstanceOf(Stat::class, $emailStat, "Email stat not created for email ID {$email->getId()} and lead ID {$lead->getId()}");
     }
 }

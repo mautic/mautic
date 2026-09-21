@@ -15,17 +15,17 @@ use Symfony\Component\Form\FormBuilderInterface;
 final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|FieldModel
+     * @var MockObject&FieldModel
      */
     private MockObject $fieldModel;
 
     /**
-     * @var MockObject|PropertiesAccessor
+     * @var MockObject&PropertiesAccessor
      */
     private MockObject $propertiesAccessor;
 
     /**
-     * @var MockObject&FormBuilderInterface<string|FormBuilderInterface>
+     * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilder;
 
@@ -54,7 +54,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(3);
 
         $this->formBuilder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('values', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
@@ -128,7 +128,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->formBuilder->expects($matcher)->method('add')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher) {
+                function (...$parameters) use ($matcher): MockObject {
                     if (1 === $matcher->numberOfInvocations()) {
                         $this->assertSame('values', $parameters[0]);
                         $this->assertSame(ChoiceType::class, $parameters[1]);

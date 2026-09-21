@@ -18,16 +18,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
         'mautic:integration:synccontacts',
     ]
 )]
-class FetchLeadsCommand extends Command
+final class FetchLeadsCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private IntegrationHelper $integrationHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -115,7 +115,7 @@ class FetchLeadsCommand extends Command
         $config            = $integrationObject->mergeConfigToFeatureSettings();
         $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 
-        defined('MAUTIC_CONSOLE_VERBOSITY') or define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
+        defined('MAUTIC_CONSOLE_VERBOSITY') || define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
 
         if (!isset($config['objects'])) {
             $config['objects'] = [];
@@ -143,7 +143,7 @@ class FetchLeadsCommand extends Command
                     $leadObjectName = 'Leads';
                 }
                 $contactObjectName = 'Contact';
-                if (in_array(strtolower('Contacts'), array_map(fn ($i): string => strtolower($i), $config['objects']), true)) {
+                if (in_array(strtolower('Contacts'), array_map(strtolower(...), $config['objects']), true)) {
                     $contactObjectName = 'Contacts';
                 }
 
@@ -159,7 +159,7 @@ class FetchLeadsCommand extends Command
                         $processed += (int) $results;
                     }
                 }
-                if (in_array(strtolower($contactObjectName), array_map(fn ($i): string => strtolower($i), $config['objects']), true)) {
+                if (in_array(strtolower($contactObjectName), array_map(strtolower(...), $config['objects']), true)) {
                     $output->writeln('');
                     $output->writeln('<comment>'.$this->translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                     $contactList = [];

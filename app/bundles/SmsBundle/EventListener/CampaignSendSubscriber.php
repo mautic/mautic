@@ -13,7 +13,7 @@ use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSendSubscriber implements EventSubscriberInterface
+final readonly class CampaignSendSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private SmsModel $smsModel,

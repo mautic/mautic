@@ -10,8 +10,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class TagMergeEvent extends Event
 {
     public function __construct(
-        private Tag $primaryTag,
-        private Tag $secondaryTag,
+        private readonly Tag $primaryTag,
+        private readonly Tag $secondaryTag,
     ) {
     }
 

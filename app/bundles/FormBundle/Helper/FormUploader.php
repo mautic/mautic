@@ -13,8 +13,8 @@ use Mautic\FormBundle\Entity\Submission;
 class FormUploader
 {
     public function __construct(
-        private FileUploader $fileUploader,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly FileUploader $fileUploader,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

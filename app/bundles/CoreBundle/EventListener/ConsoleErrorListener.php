@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\EventListener;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 
-class ConsoleErrorListener
+final readonly class ConsoleErrorListener
 {
     public function __construct(
         private LoggerInterface $logger,

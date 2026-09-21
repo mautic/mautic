@@ -276,8 +276,7 @@ export const editorLifecycleMixin = {
 
     this.inlineStyles = createHtmlElem('style', head, {
       innerHTML:
-        `.ck-editor__editable>p {display: inline-block; margin-top: 0px !important; margin-bottom: 0px !important;}` +
-        `.ck-editor__editable {display: inline-block;}`,
+        `.ck-editor__editable>p {display: inline-block; margin-top: 0px !important; margin-bottom: 0px !important;}`,
     });
   },
 
@@ -313,44 +312,6 @@ export const editorLifecycleMixin = {
     }
 
     return null;
-  },
-
-  detachEditableClassObserver() {
-    const observer = this._Ck5ForGrapesJsData?.editableClassObserver;
-    if (!observer || typeof observer.disconnect !== 'function') {
-      this._Ck5ForGrapesJsData.editableClassObserver = null;
-      return;
-    }
-
-    observer.disconnect();
-    this._Ck5ForGrapesJsData.editableClassObserver = null;
-  },
-
-  stripEditableClasses(editableEl) {
-    if (!editableEl || typeof editableEl.removeAttribute !== 'function') {
-      return;
-    }
-
-    const removeClasses = () => {
-      if (editableEl.getAttribute('class')) {
-        editableEl.removeAttribute('class');
-      }
-    };
-
-    removeClasses();
-    this.detachEditableClassObserver();
-
-    if (typeof MutationObserver !== 'function') {
-      return;
-    }
-
-    const observer = new MutationObserver(() => removeClasses());
-    observer.observe(editableEl, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    this._Ck5ForGrapesJsData.editableClassObserver = observer;
   },
 
   ensureBodyWrapperHandlers() {
@@ -399,7 +360,6 @@ export const editorLifecycleMixin = {
 
     const editableEl = this.getEditorEditableElement(ckeditor);
     if (editableEl) {
-      this.stripEditableClasses(editableEl);
       el.appendChild(editableEl);
     }
 
@@ -1165,8 +1125,6 @@ export const editorLifecycleMixin = {
   },
 
   finalizeDisableCleanup(content, reuseEditor, toolbarContainer) {
-    this.detachEditableClassObserver();
-
     if (this.inFrameData) {
       if (!reuseEditor) {
         this.inFrameData.editor = null;
@@ -1219,6 +1177,44 @@ export const editorLifecycleMixin = {
     finalizeCleanup();
   },
 
+  sanitizeCkeditorIframeStyles(frameDocument) {
+    const ckeditorEditingRules = [
+      /\.ck\.ck-editor__editable_inline\s*{[^}]*overflow\s*:[^;]+;[^}]*}\s*/g,
+      // CKEditor adds editing-only boundary margins that make content jump when
+      // opening and closing the editor.
+      /\.ck\.ck-editor__editable_inline\s*>\s*:first-child\s*{[^}]*}\s*/g,
+      /\.ck\.ck-editor__editable_inline\s*>\s*:last-child\s*{[^}]*}\s*/g,
+    ];
+
+    [...frameDocument.querySelectorAll('style[data-cke="true"]')].forEach((item) => {
+      let content = item.textContent;
+
+      if (!content || !content.includes('.ck.ck-editor__editable_inline')) {
+        return;
+      }
+
+      ckeditorEditingRules.forEach((rule) => {
+        content = content.replace(rule, '');
+      });
+
+      item.textContent = content;
+    });
+  },
+
+  injectCkeditorIframeOverrides(frameDocument) {
+    if (frameDocument.getElementById('grapesjs-ckeditor-iframe-overrides')) {
+      return;
+    }
+
+    createHtmlElem('style', frameDocument.querySelector('head'), {
+      id: 'grapesjs-ckeditor-iframe-overrides',
+      innerHTML:
+        `.ck-toolbar {border-bottom-width: 1px !important;}` +
+        `.ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {border: none !important;box-shadow: none !important;}` +
+        `.ck.ck-dropdown .ck-dropdown__panel.ck-dropdown__panel-visible { max-height: 200px; overflow-y: auto; }`,
+    });
+  },
+
   /**
    * Injects the CKEditor script and data storage into the iframe.
    *
@@ -1244,6 +1240,10 @@ export const editorLifecycleMixin = {
     const hasInjectedModule = !!(
       moduleSource && injectedModuleScript?.getAttribute('src') === moduleSource
     );
+    const cleanEditorStyles = () => {
+      this.sanitizeCkeditorIframeStyles(frameDocument);
+      this.injectCkeditorIframeOverrides(frameDocument);
+    };
 
     if (!hasInjectedModule && moduleSource) {
       createHtmlElem('script', body, {
@@ -1251,27 +1251,10 @@ export const editorLifecycleMixin = {
         src: moduleSource,
       }).onload = () =>
         setTimeout(() => {
-          const styles = [...frameDocument.querySelectorAll('style')];
-          for (let index = 0; index < styles.length; index += 1) {
-            const item = styles[index];
-            let innerHTML = item.innerHTML;
-            let match = innerHTML.match(
-              /.ck.ck-editor__editable_inline ?{[^}]*(overflow:[^;]*;)[^}]*}/
-            );
-            if (!match) {
-              continue;
-            }
-
-            item.innerHTML = innerHTML.replace(match[0], '');
-            createHtmlElem('style', item.parentNode, {
-              innerHTML:
-                `.ck-toolbar {border-bottom-width: 1px !important;}` +
-                `.ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {border: none !important;box-shadow: none !important;} 
-                         .ck.ck-dropdown .ck-dropdown__panel.ck-dropdown__panel-visible { max-height: 200px; overflow-y: auto; } `,
-            });
-            break;
-          }
+          cleanEditorStyles();
         });
+    } else {
+      cleanEditorStyles();
     }
 
     if (!frameDocument.getElementById('grapesjs-ckeditor-runtime')) {

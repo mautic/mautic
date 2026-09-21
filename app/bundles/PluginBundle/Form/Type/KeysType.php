@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class KeysType extends AbstractType
+final class KeysType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

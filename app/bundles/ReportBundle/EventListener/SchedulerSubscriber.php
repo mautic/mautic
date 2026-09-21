@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\EventListener;
 
 use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
@@ -7,7 +9,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SchedulerSubscriber implements EventSubscriberInterface
+final readonly class SchedulerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private SendSchedule $sendSchedule,

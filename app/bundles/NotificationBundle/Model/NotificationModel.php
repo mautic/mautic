@@ -3,70 +3,62 @@
 namespace Mautic\NotificationBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\Entity\Stat;
+use Mautic\NotificationBundle\Entity\StatRepository;
 use Mautic\NotificationBundle\Event\NotificationEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Notification>
  *
  * @implements AjaxLookupModelInterface<Notification>
  */
-class NotificationModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class NotificationModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use TranslationModelTrait;
 
-    public function __construct(
-        protected TrackableModel $pageTrackableModel,
-        EntityManager $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    private TrackableModel $pageTrackableModel;
+
+    private NotificationRepository $notificationRepository;
+
+    private StatRepository $statRepository;
+
+    #[Required]
+    public function autowireNotificationModel(
+        TrackableModel $pageTrackableModel,
+        NotificationRepository $notificationRepository,
+        StatRepository $statRepository,
+    ): void {
+        $this->pageTrackableModel     = $pageTrackableModel;
+        $this->notificationRepository = $notificationRepository;
+        $this->statRepository         = $statRepository;
     }
 
-    /**
-     * @return \Mautic\NotificationBundle\Entity\NotificationRepository
-     */
-    public function getRepository()
+    public function getRepository(): NotificationRepository
     {
-        return $this->em->getRepository(Notification::class);
+        return $this->notificationRepository;
     }
 
-    /**
-     * @return \Mautic\NotificationBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     public function getPermissionBase(): string
@@ -89,7 +81,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
                 $event = $this->dispatchEvent('pre_save', $entity, $isNew);
             }
 
-            $this->getRepository()->saveEntity($entity, false);
+            $this->notificationRepository->saveEntity($entity, false);
 
             if ($dispatchEvent) {
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
@@ -158,7 +150,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
         $stat->setSource($source);
         $stat->setSourceId($sourceId);
 
-        $this->getStatRepository()->saveEntity($stat);
+        $this->statRepository->saveEntity($stat);
     }
 
     /**
@@ -216,10 +208,9 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
      *
      * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param array   $filter
      * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -250,7 +241,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
      */
     public function getNotificationStatus($idHash)
     {
-        return $this->getStatRepository()->getNotificationStatus($idHash);
+        return $this->statRepository->getNotificationStatus($idHash);
     }
 
     /**
@@ -260,7 +251,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
      */
     public function getNotificationStatByLeadId($notificationId, $leadId)
     {
-        return $this->getStatRepository()->findBy(
+        return $this->statRepository->findBy(
             [
                 'notification' => (int) $notificationId,
                 'lead'         => (int) $leadId,
@@ -278,17 +269,15 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
     }
 
     /**
-     * @param string $filter
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $options
+     * @param string|array<int, string> $filter
+     * @param array<string, mixed>      $options
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
         switch ($type) {
             case 'notification':
-                $entities = $this->getRepository()->getNotificationList(
+                $entities = $this->notificationRepository->getNotificationList(
                     $filter,
                     $limit,
                     $start,
@@ -305,7 +294,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
 
                 break;
             case 'mobile_notification':
-                $entities = $this->getRepository()->getMobileNotificationList(
+                $entities = $this->notificationRepository->getMobileNotificationList(
                     $filter,
                     $limit,
                     $start,

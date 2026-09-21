@@ -8,10 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class VisitPageWitIpAnonymizationOffFunctionalTest extends MauticMysqlTestCase
+final class VisitPageWitIpAnonymizationOffFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -38,14 +37,14 @@ class VisitPageWitIpAnonymizationOffFunctionalTest extends MauticMysqlTestCase
         $pageContent = $this->client->request(Request::METHOD_GET, '/page-page-anonymizaiton-off');
 
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Test Html', $pageContent->text());
+        $this->assertStringContainsString('Test Html', $pageContent->text());
 
         /** @var HitRepository $hitRepository */
         $hitRepository = $this->em->getRepository(Hit::class);
 
         /** @var Hit[] $hits */
         $hits = $hitRepository->findBy(['page' => $pageObject->getId()]);
-        Assert::assertCount(1, $hits);
-        Assert::assertSame('127.0.0.1', $hits[0]->getIpAddress()->getIpAddress());
+        $this->assertCount(1, $hits);
+        $this->assertSame('127.0.0.1', $hits[0]->getIpAddress()->getIpAddress());
     }
 }

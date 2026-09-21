@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\ProgressiveProfiling;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
-class DisplayManager
+final readonly class DisplayManager
 {
     private DisplayCounter $displayCounter;
 

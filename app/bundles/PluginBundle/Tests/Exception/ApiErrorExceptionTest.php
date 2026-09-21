@@ -6,7 +6,7 @@ namespace Mautic\PluginBundle\Tests\Exception;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class ApiErrorExceptionTest extends \PHPUnit\Framework\TestCase
+final class ApiErrorExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testShortMessage(): void
     {
