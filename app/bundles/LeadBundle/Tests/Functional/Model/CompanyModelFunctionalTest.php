@@ -29,7 +29,7 @@ final class CompanyModelFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(0, $companyLeadRepo->count([]));
 
         /** @var CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $companyModel->addLeadToCompany($company, $lead->convertToArray());
 
         $this->assertEquals(1, $companyLeadRepo->count([]));

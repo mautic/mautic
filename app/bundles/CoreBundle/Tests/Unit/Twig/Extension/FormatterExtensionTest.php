@@ -24,10 +24,10 @@ final class FormatterExtensionTest extends TestCase
                     'D, M d',
                     'F j, Y',
                     'g:i a',
-                    $this->createMock(TranslatorInterface::class),
-                    $this->createMock(CoreParametersHelper::class)
+                    $this->createStub(TranslatorInterface::class),
+                    $this->createStub(CoreParametersHelper::class)
                 ),
-                $this->createMock(TranslatorInterface::class)
+                $this->createStub(TranslatorInterface::class)
             )
         );
     }

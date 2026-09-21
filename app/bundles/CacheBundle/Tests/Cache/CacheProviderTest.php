@@ -11,29 +11,23 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class CacheProviderTest extends TestCase
+final class CacheProviderTest extends TestCase
 {
     private CacheProvider $cacheProvider;
 
     /**
-     * @var MockObject|FilesystemTagAwareAdapter
-     */
-    private MockObject $adapter;
-
-    /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var MockObject|ContainerInterface
+     * @var MockObject&ContainerInterface
      */
     private MockObject $container;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->adapter              = $this->createMock(FilesystemTagAwareAdapter::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->container            = $this->createMock(ContainerInterface::class);
         $this->cacheProvider        = new CacheProvider($this->coreParametersHelper, $this->container);
@@ -49,9 +43,9 @@ class CacheProviderTest extends TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with('foo.bar')
-            ->willReturn($this->adapter);
+            ->willReturn($this->createStub(FilesystemTagAwareAdapter::class));
 
-        $this->assertEquals($this->cacheProvider->getCacheAdapter(), $this->adapter);
+        $this->assertEquals($this->cacheProvider->getCacheAdapter(), $this->createStub(FilesystemTagAwareAdapter::class));
     }
 
     public function testSimplePsrCacheIsReturned(): void
@@ -64,7 +58,7 @@ class CacheProviderTest extends TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with('foo.bar')
-            ->willReturn($this->adapter);
+            ->willReturn($this->createStub(FilesystemTagAwareAdapter::class));
 
         $this->cacheProvider->getSimpleCache();
     }

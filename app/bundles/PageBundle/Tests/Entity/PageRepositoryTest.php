@@ -8,30 +8,31 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PageRepositoryTest extends TestCase
+final class PageRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
     private function getRepository(): PageRepository
     {
         $repository = $this->configureRepository(Page::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.page.searchcommand.isexpired' => 'is:expired',
             'mautic.page.searchcommand.ispending' => 'is:pending',
             default                               => $id,
         });
-        $repository->setTranslator($translator);
+        $repository->autowireCommonRepository($translator);
 
         return $repository;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataExpirationFilters')]
+    #[DataProvider('dataExpirationFilters')]
     public function testAddSearchCommandWhereClauseHandlesExpirationFilters(string $command, string $expected): void
     {
         $repository = $this->getRepository();
@@ -42,8 +43,8 @@ class PageRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($repository, $qb, $filter);
 
-        self::assertSame($expected, (string) $expr);
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame($expected, (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     /**
@@ -59,7 +60,7 @@ class PageRepositoryTest extends TestCase
     {
         $repository = $this->getRepository();
         $commands   = $repository->getSearchCommands();
-        self::assertContains('mautic.page.searchcommand.isexpired', $commands);
-        self::assertContains('mautic.page.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.page.searchcommand.isexpired', $commands);
+        $this->assertContains('mautic.page.searchcommand.ispending', $commands);
     }
 }

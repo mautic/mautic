@@ -1,0 +1,21 @@
+{% block _campaignevent_lead_contact_added_widget%}
+<div class="row condition-row">
+    <div class="col-xs-4">
+        {{ form_row(form.timestamp) }}
+    </div>
+    <div class="col-xs-4">
+        {{ form_row(form.operator) }}
+    </div>
+    <div class="col-xs-4">
+        <div class="row">
+            <div class="col-sm-4">
+                {{ form_row(form.triggerInterval) }}
+            </div>
+            <div class="col-sm-8">
+                {{ form_row(form.triggerIntervalUnit) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

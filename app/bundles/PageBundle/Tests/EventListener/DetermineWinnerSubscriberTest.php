@@ -13,15 +13,15 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends TestCase
+final class DetermineWinnerSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|HitRepository
+     * @var MockObject&HitRepository
      */
     private MockObject $hitRepository;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
@@ -98,7 +98,7 @@ class DetermineWinnerSubscriberTest extends TestCase
             ->method('getTranslationChildren')
             ->willReturn($transChildren);
 
-        $parentMock->expects(self::once())
+        $parentMock->expects($this->once())
             ->method('getRelatedEntityIds')
             ->willReturn($ids);
 
@@ -110,11 +110,11 @@ class DetermineWinnerSubscriberTest extends TestCase
             ->method('getId')
             ->willReturn(3);
 
-        $parentMock->expects(self::once())
+        $parentMock->expects($this->once())
             ->method('getVariantStartDate')
             ->willReturn($startDate);
 
-        $this->hitRepository->expects(self::once())
+        $this->hitRepository->expects($this->once())
             ->method('getBounces')
             ->with($ids, $startDate)
             ->willReturn($bounces);
@@ -126,8 +126,8 @@ class DetermineWinnerSubscriberTest extends TestCase
         $abTestResults = $event->getAbTestResults();
 
         // Check for lowest bounce rates
-        self::assertEquals([1], $abTestResults['winners']);
-        self::assertEquals($expectedData, $abTestResults['support']['data'][$translation]);
+        $this->assertSame([1], $abTestResults['winners']);
+        $this->assertEquals($expectedData, $abTestResults['support']['data'][$translation]);
     }
 
     public function testOnDetermineDwellTimeWinner(): void
@@ -158,7 +158,7 @@ class DetermineWinnerSubscriberTest extends TestCase
             ],
         ];
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn($translation);
 
@@ -166,7 +166,7 @@ class DetermineWinnerSubscriberTest extends TestCase
             ->method('getRelatedEntityIds')
             ->willReturn($ids);
 
-        $parentMock->expects($this->any())
+        $parentMock
             ->method('getId')
             ->willReturn(1);
 

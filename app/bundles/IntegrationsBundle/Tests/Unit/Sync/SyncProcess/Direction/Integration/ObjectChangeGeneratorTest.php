@@ -14,13 +14,12 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class ObjectChangeGeneratorTest extends TestCase
+final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ValueHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
 
@@ -33,7 +32,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -67,7 +66,7 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // Email should be a required field
         $requiredFields = $objectChangeDAO->getRequiredFields();
-        $this->assertTrue(isset($requiredFields['email']));
+        $this->assertArrayHasKey('email', $requiredFields);
 
         // Both fields should be included
         $fields = $objectChangeDAO->getFields();
@@ -75,14 +74,14 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // First name is presumed to be changed
         $changedFields = $objectChangeDAO->getChangedFields();
-        $this->assertTrue(isset($changedFields['first_name']));
+        $this->assertArrayHasKey('first_name', $changedFields);
     }
 
     public function testFieldIsNotAddedToObjectChangeIfNotFound(): void
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -116,17 +115,17 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // Email should be a required field
         $requiredFields = $objectChangeDAO->getRequiredFields();
-        $this->assertTrue(isset($requiredFields['email']));
+        $this->assertArrayHasKey('email', $requiredFields);
 
         // First name should not be included because it wasn't found in the internal object
         $fields = $objectChangeDAO->getFields();
-        $this->assertFalse(isset($fields['first_name']));
+        $this->assertArrayNotHasKey('first_name', $fields);
     }
 
     public function testFieldsWithDirectionToIntegrationAreSkipped(): void
     {
         $objectChangeGenerator = new ObjectChangeGenerator(
-            new class extends ValueHelper {
+            new class() extends ValueHelper {
             }
         );
 
@@ -150,20 +149,17 @@ class ObjectChangeGeneratorTest extends TestCase
         $objectChange = $objectChangeGenerator->getSyncObjectChange($reportDAO, $mappingManualDAO, $objectMappingDAO, $internalObject, $integrationObject);
 
         // The points/Score field should not be recorded as a change because it has direction to Mautic.
-        Assert::assertCount(2, $objectChange->getFields());
-        Assert::assertSame('john@doe.email', $objectChange->getField('Email')->getValue()->getNormalizedValue());
-        Assert::assertSame('John', $objectChange->getField('FirstName')->getValue()->getNormalizedValue());
-        Assert::assertSame(Contact::NAME, $objectChange->getMappedObject());
-        Assert::assertSame(123, $objectChange->getMappedObjectId());
-        Assert::assertSame('integration-id-1', $objectChange->getObjectId());
-        Assert::assertSame('Lead', $objectChange->getObject());
-        Assert::assertSame($integrationName, $objectChange->getIntegration());
+        $this->assertCount(2, $objectChange->getFields());
+        $this->assertSame('john@doe.email', $objectChange->getField('Email')->getValue()->getNormalizedValue());
+        $this->assertSame('John', $objectChange->getField('FirstName')->getValue()->getNormalizedValue());
+        $this->assertSame(Contact::NAME, $objectChange->getMappedObject());
+        $this->assertSame(123, $objectChange->getMappedObjectId());
+        $this->assertSame('integration-id-1', $objectChange->getObjectId());
+        $this->assertSame('Lead', $objectChange->getObject());
+        $this->assertSame($integrationName, $objectChange->getIntegration());
     }
 
-    /**
-     * @return MappingManualDAO
-     */
-    private function getMappingManual(string $integration, string $objectName)
+    private function getMappingManual(string $integration, string $objectName): MappingManualDAO
     {
         $mappingManual = new MappingManualDAO($integration);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
@@ -174,12 +170,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return $mappingManual;
     }
 
-    /**
-     * @param bool $includeFirstNameField
-     *
-     * @return ReportDAO
-     */
-    private function getInternalSyncReport($includeFirstNameField = true)
+    private function getInternalSyncReport(bool $includeFirstNameField = true): ReportDAO
     {
         $syncReport           = new ReportDAO(MauticSyncDataExchange::NAME);
         $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);
@@ -196,10 +187,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return $syncReport;
     }
 
-    /**
-     * @return ObjectChangeGenerator
-     */
-    private function getObjectChangeGenerator()
+    private function getObjectChangeGenerator(): ObjectChangeGenerator
     {
         return new ObjectChangeGenerator($this->valueHelper);
     }

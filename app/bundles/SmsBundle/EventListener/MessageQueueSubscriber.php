@@ -8,7 +8,7 @@ use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\SmsBundle\Model\SmsModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class MessageQueueSubscriber implements EventSubscriberInterface
+final readonly class MessageQueueSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private SmsModel $model,

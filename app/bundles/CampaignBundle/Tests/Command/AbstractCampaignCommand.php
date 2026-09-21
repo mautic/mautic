@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Doctrine\DBAL\Connection;
@@ -7,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
@@ -14,7 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 
-class AbstractCampaignCommand extends MauticMysqlTestCase
+abstract class AbstractCampaignCommand extends MauticMysqlTestCase
 {
     public const SEND_EMAIL_SECONDS = 3;
 
@@ -45,6 +48,8 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
      */
     protected function setUp(): void
     {
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+
         // Everything needs to happen anonymously
         $this->defaultClientServer = $this->clientServer;
         $this->clientServer        = [];
@@ -92,10 +97,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         ]);
     }
 
-    /**
-     * @return array
-     */
-    protected function getCampaignEventLogs(array $ids)
+    protected function getCampaignEventLogs(array $ids): array
     {
         $logs = $this->db->createQueryBuilder()
             ->select('l.email, l.country, event.name, event.event_type, event.type, log.*')
@@ -138,13 +140,14 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         return $campaign;
     }
 
-    protected function createCampaignLead(Campaign $campaign, Lead $lead, bool $manuallyRemoved = false): CampaignLead
+    protected function createCampaignLead(Campaign $campaign, Lead $lead, bool $manuallyRemoved = false, int $rotation = 1): CampaignLead
     {
         $campaignLead = new CampaignLead();
         $campaignLead->setCampaign($campaign);
         $campaignLead->setLead($lead);
         $campaignLead->setDateAdded(new \DateTime());
         $campaignLead->setManuallyRemoved($manuallyRemoved);
+        $campaignLead->setRotation($rotation);
         $this->em->persist($campaignLead);
 
         return $campaignLead;
@@ -163,7 +166,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
 
     protected function createEvent(string $name, Campaign $campaign, string $type, string $eventType, ?array $property = null): Event
     {
-        $event = new Event();
+        $event = new Event(new \DateTime());
         $event->setName($name);
         $event->setCampaign($campaign);
         $event->setType($type);
@@ -176,15 +179,29 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         return $event;
     }
 
-    protected function createEventLog(Lead $lead, Event $event, Campaign $campaign): LeadEventLog
+    protected function createEventLog(Lead $lead, Event $event, Campaign $campaign, int $rotation): LeadEventLog
     {
         $leadEventLog = new LeadEventLog();
         $leadEventLog->setLead($lead);
         $leadEventLog->setEvent($event);
         $leadEventLog->setCampaign($campaign);
-        $leadEventLog->setRotation(0);
+        $leadEventLog->setRotation($rotation);
+        $leadEventLog->setDateTriggered(new \DateTime());
         $this->em->persist($leadEventLog);
 
         return $leadEventLog;
+    }
+
+    /**
+     * Simulate a fully completed condition/decision event log by incrementing the version to 2.
+     * A version=1 log means the event was inserted but execution never completed (stuck mid-execution).
+     * A version=2 log means the event was fully executed and its children may now be considered.
+     */
+    protected function markEventLogAsCompleted(LeadEventLog $log): void
+    {
+        /** @var OptimisticLockServiceInterface $lockService */
+        $lockService = self::getContainer()->get(OptimisticLockServiceInterface::class);
+        $this->em->flush();
+        $lockService->incrementVersion($log);
     }
 }

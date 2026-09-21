@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 
-class IpAddressTest extends \PHPUnit\Framework\TestCase
+final class IpAddressTest extends \PHPUnit\Framework\TestCase
 {
     public function testExactIp(): void
     {

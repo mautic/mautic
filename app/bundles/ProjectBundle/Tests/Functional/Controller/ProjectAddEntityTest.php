@@ -9,10 +9,14 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 final class ProjectAddEntityTest extends MauticMysqlTestCase
 {
     private Project $testProject;
+
     private Email $testEmail;
 
     protected function setUp(): void
@@ -49,16 +53,14 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $this->assertStringContainsString('entityType=email', $content);
+        $this->assertStringContainsString('entityType=email', (string) $content);
     }
 
     public function testSelectEntityTypeActionNotFound(): void
     {
         $this->client->followRedirects(false);
         $this->client->request('GET', '/s/projects/selectEntityType/99999');
-        $response = $this->client->getResponse();
-
-        $this->assertSame(404, $response->getStatusCode());
+        $this->assertResponseStatusCodeSame(404);
     }
 
     public function testAddEntityActionGetRequest(): void
@@ -72,10 +74,10 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Should contain the form with proper structure
-        $this->assertStringContainsString('name="project_add_entity"', $content);
-        $this->assertStringContainsString('project_add_entity[entityType]', $content);
-        $this->assertStringContainsString('project_add_entity[projectId]', $content);
-        $this->assertStringContainsString('project_add_entity[entityIds][]', $content);
+        $this->assertStringContainsString('name="project_add_entity"', (string) $content);
+        $this->assertStringContainsString('project_add_entity[entityType]', (string) $content);
+        $this->assertStringContainsString('project_add_entity[projectId]', (string) $content);
+        $this->assertStringContainsString('project_add_entity[entityIds][]', (string) $content);
     }
 
     public function testAddEntityActionPostWithValidData(): void
@@ -93,8 +95,8 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $content  = $response->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($this->testProject->getName(), $content);
-        $this->assertStringContainsString($this->testEmail->getName(), $content);
+        $this->assertStringContainsString($this->testProject->getName(), (string) $content);
+        $this->assertStringContainsString($this->testEmail->getName(), (string) $content);
     }
 
     public function testAddEntityActionPostWithEmptyData(): void
@@ -140,21 +142,19 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
 
         // Check for error message in flashes
         $content = $response->getContent();
-        $this->assertStringContainsString('Invalid entity type', $content);
+        $this->assertStringContainsString('Invalid entity type', (string) $content);
     }
 
     public function testAddEntityActionNotFound(): void
     {
         $this->client->followRedirects(false);
         $this->client->request('GET', '/s/projects/addEntity/99999?entityType=email');
-        $response = $this->client->getResponse();
-
-        $this->assertSame(404, $response->getStatusCode());
+        $this->assertResponseStatusCodeSame(404);
     }
 
     public function testAddEntityActionWithoutPermission(): void
     {
-        $user = $this->createAndLoginUser();
+        $this->createAndLoginUser();
 
         $url = '/s/projects/addEntity/'.$this->testProject->getId().'?entityType=email';
         $this->client->request('GET', $url);
@@ -162,21 +162,21 @@ final class ProjectAddEntityTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(403);
     }
 
-    private function createAndLoginUser(): \Mautic\UserBundle\Entity\User
+    private function createAndLoginUser(): User
     {
         // Create non-admin role
-        $role = new \Mautic\UserBundle\Entity\Role();
+        $role = new Role();
         $role->setName('Test Role');
         $role->setIsAdmin(false);
         $this->em->persist($role);
 
         // Create non-admin user
-        $user = new \Mautic\UserBundle\Entity\User();
+        $user = new User();
         $user->setFirstName('Test');
         $user->setLastName('User');
         $user->setUsername('testuser');
         $user->setEmail('test@example.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $user->setPassword($hasher->hash('password'));
         $user->setRole($role);
         $this->em->persist($user);

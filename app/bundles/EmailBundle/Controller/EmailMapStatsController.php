@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class EmailMapStatsController extends AbstractController
+final class EmailMapStatsController extends AbstractController
 {
     public const MAP_OPTIONS = [
         'read_count' => [
@@ -28,8 +28,9 @@ class EmailMapStatsController extends AbstractController
 
     public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
 
-    public function __construct(protected EmailModel $model)
-    {
+    public function __construct(
+        private readonly EmailModel $model,
+    ) {
     }
 
     /**
@@ -45,7 +46,7 @@ class EmailMapStatsController extends AbstractController
         // get translation parent
         $translationParent = $entity->getTranslationParent();
 
-        $includeVariants = (($entity->isVariant() && empty($parent)) || ($entity->isTranslation() && empty($translationParent)));
+        $includeVariants = (($entity->isVariant() && !$parent instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface) || ($entity->isTranslation() && !$translationParent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface));
 
         return $this->model->getCountryStats(
             $entity,
@@ -88,7 +89,7 @@ class EmailMapStatsController extends AbstractController
     ): Response {
         $entity = $this->model->getEntity($objectId);
 
-        if (empty($entity) || !$this->hasAccess($security, $entity)) {
+        if (!$entity instanceof Email || !$this->hasAccess($security, $entity)) {
             throw new AccessDeniedHttpException();
         }
 

@@ -11,13 +11,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\CoreExtension;
+use Twig\Markup;
 use Twig\TwigFunction;
 
 final class OverrideIncludeExtension extends AbstractExtension
 {
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher,
-        private RequestStack $requestStack,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -25,7 +26,7 @@ final class OverrideIncludeExtension extends AbstractExtension
     {
         return [
             // Override the built-in include function with higher priority
-            new TwigFunction('include', [$this, 'includeWithEvent'], [
+            new TwigFunction('include', $this->includeWithEvent(...), [
                 'needs_environment' => true,
                 'needs_context'     => true,
                 'is_safe'           => ['html'],
@@ -40,7 +41,7 @@ final class OverrideIncludeExtension extends AbstractExtension
      * @param string|string[] $template
      * @param mixed[]         $variables
      */
-    public function includeWithEvent(Environment $env, array $context, $template, array $variables = [], bool $withContext = true, bool $ignoreMissing = false, bool $sandboxed = false): string
+    public function includeWithEvent(Environment $env, array $context, $template, array $variables = [], bool $withContext = true, bool $ignoreMissing = false, bool $sandboxed = false): string|Markup
     {
         if ($withContext) {
             $variables = array_merge($context, $variables);
@@ -54,14 +55,17 @@ final class OverrideIncludeExtension extends AbstractExtension
                 $templates[] = $event->getTemplate();
             }
 
-            // Use Twig's original include for array handling
+            // Use Twig's original include for array handling. Return Twig's value as-is:
+            // a string on Twig < 3.28, a Twig\Markup on >= 3.28. Escaping is unaffected
+            // as the function is registered with 'is_safe' => ['html'].
             return CoreExtension::include($env, $context, $templates, $event->getVars(), $withContext, $ignoreMissing, $sandboxed);
         }
 
         // Handle single template
         $event = $this->dispatchCustomTemplateEvent((string) $template, $variables);
 
-        // Use Twig's original include functionality
+        // Use Twig's original include functionality. Return Twig's value as-is: a string
+        // on Twig < 3.28, a Twig\Markup on >= 3.28 (escaping handled via 'is_safe' above).
         return CoreExtension::include($env, $context, $event->getTemplate(), $event->getVars(), $withContext, $ignoreMissing, $sandboxed);
     }
 

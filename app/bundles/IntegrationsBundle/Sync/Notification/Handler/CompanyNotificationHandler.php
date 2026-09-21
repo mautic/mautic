@@ -10,7 +10,7 @@ use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
-class CompanyNotificationHandler implements HandlerInterface
+final readonly class CompanyNotificationHandler implements HandlerInterface
 {
     public function __construct(
         private Writer $writer,

@@ -4,54 +4,46 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Model;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Entity\Page;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends AbstractCommonModel<GrapesJsBuilder>
  */
 class GrapesJsBuilderModel extends AbstractCommonModel
 {
-    public function __construct(
-        private RequestStack $requestStack,
-        private EmailModel $emailModel,
-        EntityManager $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    private RequestStack $requestStack;
+
+    private EmailModel $emailModel;
+
+    private GrapesJsBuilderRepository $grapesJsBuilderRepository;
+
+    private EmailRepository $emailRepository;
+
+    #[Required]
+    public function autowireGrapesJsBuilderModel(
+        RequestStack $requestStack,
+        EmailModel $emailModel,
+        GrapesJsBuilderRepository $grapesJsBuilderRepository,
+        EmailRepository $emailRepository,
+    ): void {
+        $this->requestStack              = $requestStack;
+        $this->emailModel                = $emailModel;
+        $this->grapesJsBuilderRepository = $grapesJsBuilderRepository;
+        $this->emailRepository           = $emailRepository;
     }
 
-    /**
-     * @return GrapesJsBuilderRepository
-     */
-    public function getRepository()
+    public function getRepository(): GrapesJsBuilderRepository
     {
-        /** @var GrapesJsBuilderRepository $repository */
-        $repository = $this->em->getRepository(GrapesJsBuilder::class);
-
-        $repository->setTranslator($this->translator);
-
-        return $repository;
+        return $this->grapesJsBuilderRepository;
     }
 
     /**
@@ -109,7 +101,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         }
 
         $entity->setCustomHtml($customHtml);
-        $this->emailModel->getRepository()->saveEntity($entity);
+        $this->emailRepository->saveEntity($entity);
     }
 
     /**

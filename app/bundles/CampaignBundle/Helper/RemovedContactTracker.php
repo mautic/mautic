@@ -45,10 +45,7 @@ class RemovedContactTracker
         return !empty($this->removedContacts[$campaignId][$contactId]);
     }
 
-    /**
-     * @return array
-     */
-    public function getRemovedContacts()
+    public function getRemovedContacts(): array
     {
         return $this->removedContacts;
     }

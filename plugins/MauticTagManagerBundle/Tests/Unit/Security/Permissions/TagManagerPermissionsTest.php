@@ -1,22 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Unit\Security\Permissions;
 
 use MauticPlugin\MauticTagManagerBundle\Security\Permissions\TagManagerPermissions;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class TagManagerPermissionsTest extends TestCase
+final class TagManagerPermissionsTest extends TestCase
 {
     /**
      * @var TagManagerPermissions
      */
     private \PHPUnit\Framework\MockObject\MockObject $tagManagerPermissions;
-
-    /**
-     * @var FormBuilderInterface
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 
     protected function setUp(): void
     {
@@ -28,18 +25,19 @@ class TagManagerPermissionsTest extends TestCase
                 'addStandardFormFields',
             ])
             ->getMock();
-
-        $this->formBuilder = $this->createMock(FormBuilderInterface::class);
     }
 
     public function testBuildFormMethodAddsStandardFormFields(): void
     {
         $options = ['someOption'];
         $data    = ['someData'];
+        // buildForm() takes the builder by reference, so a variable is required — passing
+        // the stub call result directly raises "Only variables should be passed by reference".
+        $builder = $this->createStub(FormBuilderInterface::class);
         $this->tagManagerPermissions->expects($this->once())
             ->method('addStandardFormFields')
-            ->with('tagManager', 'tagManager', $this->formBuilder, $data);
+            ->with('tagManager', 'tagManager', $this->createStub(FormBuilderInterface::class), $data);
 
-        $this->tagManagerPermissions->buildForm($this->formBuilder, $options, $data);
+        $this->tagManagerPermissions->buildForm($builder, $options, $data);
     }
 }

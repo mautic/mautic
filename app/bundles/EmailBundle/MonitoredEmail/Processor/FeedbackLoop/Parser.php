@@ -6,7 +6,7 @@ use Mautic\EmailBundle\MonitoredEmail\Exception\FeedbackLoopNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 
-class Parser
+final readonly class Parser
 {
     public function __construct(
         private Message $message,
@@ -14,11 +14,9 @@ class Parser
     }
 
     /**
-     * @return string|null
-     *
      * @throws FeedbackLoopNotFound
      */
-    public function parse()
+    public function parse(): string
     {
         if (null === $this->message->fblReport) {
             throw new FeedbackLoopNotFound();
@@ -35,7 +33,7 @@ class Parser
         throw new FeedbackLoopNotFound();
     }
 
-    protected function searchMessage(string $pattern, string $content): ?string
+    private function searchMessage(string $pattern, string $content): ?string
     {
         if (preg_match('/'.$pattern.'/i', $content, $match)) {
             if ($parsedAddressList = Address::parseList($match[1])) {

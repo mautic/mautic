@@ -11,29 +11,14 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
-use Mautic\StageBundle\Model\StageModel;
-use PHPUnit\Framework\Assert;
+use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
+use Mautic\StageBundle\Entity\StageRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailTypeTest extends \PHPUnit\Framework\TestCase
+final class EmailTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
-
-    /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $entityManager;
-
-    /**
-     * @var MockObject&StageModel
-     */
-    private MockObject $stageModel;
-
     /**
      * @var MockObject&FormBuilderInterface
      */
@@ -42,22 +27,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     private EmailType $form;
 
     /**
-     * @var CoreParametersHelper&MockObject
-     */
-    private MockObject $coreParametersHelper;
-
-    /**
-     * @var CorePermissions&MockObject
-     */
-    private MockObject $corePermissions;
-
-    /**
-     * @var EmailConfigInterface&MockObject
-     */
-    private MockObject $emailConfig;
-
-    /**
-     * @var ThemeHelperInterface&MockObject
+     * @var MockObject&ThemeHelperInterface
      */
     private MockObject $themeHelper;
 
@@ -65,41 +35,40 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->entityManager        = $this->createMock(EntityManager::class);
-        $this->stageModel           = $this->createMock(StageModel::class);
+        $translator                 = $this->createMock(TranslatorInterface::class);
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->corePermissions      = $this->createMock(CorePermissions::class);
+        $corePermissions            = $this->createMock(CorePermissions::class);
         $this->themeHelper          = $this->createMock(ThemeHelperInterface::class);
-        $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
+        $emailConfig                = $this->createMock(EmailConfigInterface::class);
         $this->form                 = new EmailType(
-            $this->translator,
-            $this->entityManager,
-            $this->stageModel,
-            $this->coreParametersHelper,
+            $translator,
+            $this->createStub(EntityManager::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->themeHelper,
-            $this->corePermissions,
-            $this->emailConfig
+            $corePermissions,
+            $emailConfig,
+            $this->createStub(EmailDefaultsHelper::class),
+            $this->createStub(StageRepository::class),
         );
 
         $this->formBuilder->method('create')->willReturnSelf();
+        $this->formBuilder->method('add')->willReturnSelf();
+        $this->formBuilder->method('addModelTransformer')->willReturnSelf();
+        $corePermissions->method('hasPublishAccessForEntity')->willReturn(true);
+        $translator->method('trans')->willReturn('translated');
+        $emailConfig->method('isDraftEnabled')->willReturn(false);
     }
 
     public function testBuildForm(): void
     {
         $options = ['data' => new Email()];
         $names   = [];
-        $this->themeHelper
-            ->expects($this->once())
-            ->method('getCurrentTheme')
-            ->with('blank', 'email')
-            ->willReturn('blank');
+        $this->expectThemeHelper();
 
         $this->formBuilder->method('add')
             ->with(
                 $this->callback(
-                    function ($name) use (&$names) {
+                    function (string|FormBuilderInterface $name) use (&$names): true {
                         $names[] = $name;
 
                         return true;
@@ -109,6 +78,15 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->form->buildForm($this->formBuilder, $options);
 
-        Assert::assertContains('buttons', $names);
+        $this->assertContains('buttons', $names);
+    }
+
+    private function expectThemeHelper(): void
+    {
+        $this->themeHelper
+            ->expects($this->once())
+            ->method('getCurrentTheme')
+            ->with('blank', 'email')
+            ->willReturn('blank');
     }
 }

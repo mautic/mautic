@@ -12,8 +12,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class EntityEventValidator extends ConstraintValidator
 {
-    public function __construct(private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private readonly EventDispatcherInterface $dispatcher,
+    ) {
     }
 
     public function validate(mixed $value, Constraint $constraint): void

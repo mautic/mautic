@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -40,10 +39,7 @@ class TrackingHelper
         return $result;
     }
 
-    /**
-     * @return string|null
-     */
-    private function getCacheKey()
+    private function getCacheKey(): ?string
     {
         $lead = $this->contactTracker->getContact();
 
@@ -77,7 +73,6 @@ class TrackingHelper
         $cacheKey   = $this->getCacheKey();
         $cacheValue = [];
 
-        /* @var CacheItemInterface $item */
         if (null !== $cacheKey) {
             $item = $this->cache->getItem($cacheKey);
             if ($item->isHit()) {
@@ -108,10 +103,7 @@ class TrackingHelper
         return false;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->contactTracker->getContact();
     }
@@ -124,10 +116,7 @@ class TrackingHelper
     protected function isLandingPage(): bool
     {
         $server = $this->requestStack->getCurrentRequest()->server;
-        if (!str_contains((string) $server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
-            return false;
-        }
 
-        return true;
+        return str_contains((string) $server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'));
     }
 }

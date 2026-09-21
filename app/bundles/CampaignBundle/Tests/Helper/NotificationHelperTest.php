@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -13,30 +15,25 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Routing\Router;
 
-class NotificationHelperTest extends \PHPUnit\Framework\TestCase
+final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|UserModel
+     * @var \PHPUnit\Framework\MockObject\MockObject&UserModel
      */
     private \PHPUnit\Framework\MockObject\MockObject $userModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|NotificationModel
+     * @var \PHPUnit\Framework\MockObject\MockObject&NotificationModel
      */
     private \PHPUnit\Framework\MockObject\MockObject $notificationModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Router
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $router;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Translator
+     * @var \PHPUnit\Framework\MockObject\MockObject&Translator
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
@@ -45,8 +42,6 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->userModel = $this->createMock(UserModel::class);
 
         $this->notificationModel = $this->createMock(NotificationModel::class);
-
-        $this->router = $this->createMock(Router::class);
 
         $this->translator = $this->createMock(Translator::class);
 
@@ -213,8 +208,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToEmailAddress(): void
     {
         $event = new Event();
-        $user  = $this->createMock(User::class);
-        $this->prepareCommonMocks($event, $user);
+        $this->prepareCommonMocks($event, $this->createMock(User::class));
 
         $emails = 'a@test.co, b@test.co';
         $this->coreParametersHelper->expects($this->exactly(2))
@@ -226,7 +220,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->userModel->expects($this->once())
             ->method('sendMailToEmailAddresses')
-            ->with(array_map('trim', explode(',', $emails)), 'test', 'test');
+            ->with(array_map(trim(...), explode(',', $emails)), 'test', 'test');
 
         $this->userModel->expects($this->never())
             ->method('emailUser');
@@ -234,16 +228,17 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->getNotificationHelper()->notifyOfUnpublish($event);
     }
 
-    private function prepareCommonMocks(Event $event, User $user): void
+    /**
+     * @param \PHPUnit\Framework\MockObject\MockObject&User $user
+     */
+    private function prepareCommonMocks(Event $event, \PHPUnit\Framework\MockObject\MockObject $user): void
     {
         $campaign = new Campaign();
         $event->setCampaign($campaign);
         $campaign->setCreatedBy(2);
 
-        $user = $this->createMock(User::class);
-
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->any())
+        $lead
             ->method('getOwner')
             ->willReturn(null);
 
@@ -256,21 +251,17 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($user);
 
         $this->translator
-            ->expects($this->any())
             ->method('trans')
             ->willReturn('test');
     }
 
-    /**
-     * @return NotificationHelper
-     */
-    private function getNotificationHelper()
+    private function getNotificationHelper(): NotificationHelper
     {
         return new NotificationHelper(
             $this->userModel,
             $this->notificationModel,
             $this->translator,
-            $this->router,
+            $this->createStub(Router::class),
             $this->coreParametersHelper
         );
     }

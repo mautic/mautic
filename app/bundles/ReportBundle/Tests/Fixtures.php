@@ -6,7 +6,7 @@ namespace Mautic\ReportBundle\Tests;
 
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 
-class Fixtures
+final class Fixtures
 {
     /**
      * @return mixed[]
@@ -14,8 +14,8 @@ class Fixtures
     public static function getValidReportResult(): array
     {
         return [
-            'dateFrom'     => Fixtures::getDateFrom(),
-            'dateTo'       => Fixtures::getDateTo(),
+            'dateFrom'     => self::getDateFrom(),
+            'dateTo'       => self::getDateTo(),
             'totalResults' => '11',
             'data'         => self::getValidReportData(),
             'dataColumns'  => [
@@ -258,8 +258,8 @@ class Fixtures
     public static function getValidReportResultWithAggregatedColumns(): array
     {
         return [
-            'dateFrom'     => Fixtures::getDateFrom(),
-            'dateTo'       => Fixtures::getDateTo(),
+            'dateFrom'     => self::getDateFrom(),
+            'dateTo'       => self::getDateTo(),
             'totalResults' => '2',
             'data'         => self::getValidReportDataAggregatedColumns(),
             'dataColumns'  => [
@@ -375,7 +375,7 @@ class Fixtures
      */
     public static function getValidReportResultWithNoGraphs(): array
     {
-        $validReportResult           = Fixtures::getValidReportResult();
+        $validReportResult           = self::getValidReportResult();
         $validReportResult['graphs'] = [];
 
         return $validReportResult;
@@ -387,8 +387,8 @@ class Fixtures
     public static function getValidReportResultWithGraphs(): array
     {
         return [
-            'dateFrom'     => Fixtures::getDateFrom(),
-            'dateTo'       => Fixtures::getDateTo(),
+            'dateFrom'     => self::getDateFrom(),
+            'dateTo'       => self::getDateTo(),
             'totalResults' => '2',
             'data'         => [
                 [

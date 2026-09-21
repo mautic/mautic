@@ -8,7 +8,7 @@ use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class SystemThemeTemplatePathPass implements CompilerPassInterface
+final class SystemThemeTemplatePathPass implements CompilerPassInterface
 {
     /**
      * Processes the container to update Twig template paths.

@@ -11,13 +11,18 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\ImportModel;
+use Mautic\LeadBundle\Model\TagModel;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Security\UserTokenSetter;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImportControllerFunctionalTest extends MauticMysqlTestCase
+final class ImportControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -34,6 +39,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->generateSmallCSV();
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $tagName = 'tag1';
         $tag     = $this->createTag($tagName);
@@ -51,10 +57,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $html = $this->client->submit($form);
 
-        Assert::assertStringContainsString(
-            'Match the columns from the imported file to Mautic\'s contact fields.',
-            $html->text(null, false)
-        );
+        $this->assertStringContainsString('Match the columns from the imported file to Mautic\'s contact fields.', $html->text(null, false));
 
         $importButton = $html->selectButton('Import');
         $importForm   = $importButton->form();
@@ -64,9 +67,9 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($importForm);
 
         $importData = $this->em->getRepository(Import::class)->findOneBy(['object' => 'lead']);
-        Assert::assertInstanceOf(Import::class, $importData);
+        $this->assertInstanceOf(Import::class, $importData);
         $importProperty = $importData->getProperties();
-        Assert::assertSame([$tagName], $importProperty['defaults']['tags']);
+        $this->assertSame([$tagName], $importProperty['defaults']['tags']);
     }
 
     /**
@@ -78,7 +81,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         yield [true,  '4 lines were processed, 2 items created, 1 items updated, 1 items ignored'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataImportCSV')]
+    #[DataProvider('dataImportCSV')]
     public function testImportCSV(bool $createLead, string $expectedOutput): void
     {
         $this->generateSmallCSV();
@@ -102,22 +105,19 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
 
         // Execute import
         $output = $this->createAndExecuteImport($import);
-        Assert::assertStringContainsString($expectedOutput, $output->getDisplay());
+        $this->assertStringContainsString($expectedOutput, $output->getDisplay());
 
         /** @var LeadRepository $leadRepository */
         $leadRepository = $this->em->getRepository(Lead::class);
         $leadCount      = $leadRepository->count(['firstname' => 'John']);
-        Assert::assertSame(3, $leadCount);
+        $this->assertSame(3, $leadCount);
 
         if ($createLead) {
             $lead       = $leadRepository->findOneBy(['email' => 'john1@doe.email']);
             $fieldValue = $lead ? $lead->getFieldValue('state_from') : null;
 
             // Assert that existing leads are not updated by import
-            Assert::assertNull(
-                $fieldValue,
-                'Existing lead should not be updated with state_from value.'
-            );
+            $this->assertNull($fieldValue, 'Existing lead should not be updated with state_from value.');
         }
     }
 
@@ -157,24 +157,21 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
             '--limit' => 10000,
         ]);
 
-        Assert::assertStringContainsString(
-            '4 lines were processed, 3 items created, 0 items updated, 1 items ignored',
-            $output->getDisplay()
-        );
+        $this->assertStringContainsString('4 lines were processed, 3 items created, 0 items updated, 1 items ignored', $output->getDisplay());
 
         $leadRepository = $this->em->getRepository(Lead::class);
         $leads          = $leadRepository->findBy(['firstname' => 'John']);
-        Assert::assertCount(3, $leads);
+        $this->assertCount(3, $leads);
 
         foreach ($leads as $lead) {
             $leadTags = $lead->getTags();
-            Assert::assertCount(1, $leadTags);
-            Assert::assertSame($tagName, $leadTags->first()->getTag());
+            $this->assertCount(1, $leadTags);
+            $this->assertSame($tagName, $leadTags->first()->getTag());
         }
 
         $tagCountAfter = $tagRepository->count([]);
-        Assert::assertSame($tagCountBefore + 1, $tagCountAfter);
-        Assert::assertNotNull($tagRepository->findOneBy(['tag' => $tagName]));
+        $this->assertSame($tagCountBefore + 1, $tagCountAfter);
+        $this->assertInstanceOf(Tag::class, $tagRepository->findOneBy(['tag' => $tagName]));
     }
 
     /**
@@ -186,7 +183,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         yield [true,  '7 lines were processed, 1 items created, 1 items updated, 5 items ignored'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataImportWithInvalidDates')]
+    #[DataProvider('dataImportWithInvalidDates')]
     public function testImportWithInvalidDates(bool $createLead, string $expectedOutput): void
     {
         $this->generateSmallCSV([
@@ -217,16 +214,16 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $import = $this->createCsvContactImport();
         $output = $this->createAndExecuteImport($import);
 
-        Assert::assertStringContainsString($expectedOutput, $output->getDisplay());
+        $this->assertStringContainsString($expectedOutput, $output->getDisplay());
 
         /** @var LeadRepository $leadRepository */
         $leadRepository = $this->em->getRepository(Lead::class);
         $leadCount      = $leadRepository->count(['firstname' => 'John']);
-        Assert::assertSame(2, $leadCount);
+        $this->assertSame(2, $leadCount);
 
         // Recheck import entity for ignored count
         $importEntity = $this->em->getRepository(Import::class)->find($import->getId());
-        Assert::assertSame(5, $importEntity->getIgnoredCount());
+        $this->assertSame(5, $importEntity->getIgnoredCount());
     }
 
     public function testImportWithOwnerUsername(): void
@@ -269,8 +266,8 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertSelectorExists('.alert.alert-danger a.text-danger');
-        $translator = self::getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->assertSelectorTextContains(
             '.alert.alert-danger a.text-danger',
@@ -347,7 +344,8 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $field->setName($alias);
         $field->setProperties($properties);
 
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        /** @var FieldModel $fieldModel */
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -401,8 +399,9 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->getContainer()->get('mautic.security.user_token_setter')->setUser($import->getCreatedBy());
-        $importModel = static::getContainer()->get('mautic.lead.model.import');
+        $this->getContainer()->get(UserTokenSetter::class)->setUser($import->getCreatedBy());
+        /** @var ImportModel $importModel */
+        $importModel = self::getContainer()->get(ImportModel::class);
         $importModel->saveEntity($import);
 
         return $import;
@@ -443,10 +442,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $html = $this->client->submit($form);
 
-        Assert::assertStringContainsString(
-            'Match the columns from the imported file to Mautic\'s contact fields.',
-            $html->text()
-        );
+        $this->assertStringContainsString('Match the columns from the imported file to Mautic\'s contact fields.', $html->text());
 
         return $this->testSymfonyCommand('mautic:import', [
             '-e'      => 'dev',
@@ -460,7 +456,8 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $tag = new Tag();
         $tag->setTag($tagName);
 
-        $tagModel = static::getContainer()->get('mautic.lead.model.tag');
+        /** @var TagModel $tagModel */
+        $tagModel = self::getContainer()->get(TagModel::class);
         $tagModel->saveEntity($tag);
 
         return $tag;

@@ -14,10 +14,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class VariantType extends AbstractType
+final class VariantType extends AbstractType
 {
     public function __construct(
-        private PageModel $pageModel,
+        private readonly PageModel $pageModel,
     ) {
     }
 
@@ -34,7 +34,7 @@ class VariantType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.page.variant.weight.notblank']
+                        message: 'mautic.page.variant.weight.notblank'
                     ),
                 ],
             ]
@@ -61,7 +61,7 @@ class VariantType extends AbstractType
                     'placeholder' => 'mautic.core.form.chooseone',
                     'constraints' => [
                         new NotBlank(
-                            ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                            message: 'mautic.core.ab_test.winner_criteria.not_blank'
                         ),
                     ],
                 ]

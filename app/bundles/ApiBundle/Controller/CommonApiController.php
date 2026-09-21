@@ -111,13 +111,14 @@ class CommonApiController extends FetchCommonApiController
                 $msg = $this->translator->trans('mautic.api.dependent.entity.delete.error',
                     ['%id%'   => $entity->getId()], 'validators');
                 $this->setBatchError($key, $msg, $e->getCode(), $errors, $entities, $entity);
+                $errors[$key]['details'] = $e->getErrors();
                 continue;
             }
 
             $this->doctrine->getManager()->detach($entity);
         }
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $content           = json_decode($response->getContent(), true);
             $content['errors'] = $errors;
             $response->setContent(json_encode($content));
@@ -151,7 +152,7 @@ class CommonApiController extends FetchCommonApiController
             $msg = $this->translator->trans('mautic.api.dependent.entity.delete.error',
                 ['%id%'   => $entity->getId()], 'validators');
 
-            return $this->returnError($msg, $e->getCode());
+            return $this->returnError($msg, $e->getCode(), $e->getErrors());
         }
         $this->preSerializeEntity($entity);
         $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK);
@@ -222,7 +223,7 @@ class CommonApiController extends FetchCommonApiController
             'statusCodes'          => $statusCodes,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 
@@ -319,7 +320,7 @@ class CommonApiController extends FetchCommonApiController
             'statusCodes'          => $statusCodes,
         ];
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $payload['errors'] = $errors;
         }
 
@@ -379,6 +380,11 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Give the controller an opportunity to process the entity before persisting.
      *
+     * @param E                    $entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
+     *
      * @return mixed
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
@@ -399,6 +405,10 @@ class CommonApiController extends FetchCommonApiController
         return $parameters;
     }
 
+    /**
+     * @param mixed[] $errors
+     * @param mixed[] $entities
+     */
     protected function processBatchForm(Request $request, $key, $entity, $params, $method, &$errors, &$entities)
     {
         $this->inBatchMode = true;
@@ -628,7 +638,7 @@ class CommonApiController extends FetchCommonApiController
             $category = $this->doctrine->getManager()->find(Category::class, $categoryId);
 
             if (null === $category) {
-                throw new \UnexpectedValueException("Category $categoryId does not exist");
+                throw new \UnexpectedValueException("Category {$categoryId} does not exist");
             }
 
             $entity->setCategory($category);

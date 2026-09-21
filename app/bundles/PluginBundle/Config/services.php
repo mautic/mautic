@@ -19,13 +19,21 @@ return function (ContainerConfigurator $configurator): void {
     $excludes = [
         'Helper/oAuthHelper.php',
         'Integration/IntegrationObject.php',
+        'Form/Constraint/CanPublish.php',
     ];
 
     $services->load('Mautic\\PluginBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\PluginBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->set('mautic.helper.integration', Mautic\PluginBundle\Helper\IntegrationHelper::class);
+    $services->alias(Mautic\PluginBundle\Helper\IntegrationHelper::class, 'mautic.helper.integration');
+    $services->set('mautic.plugin.helper.reload', Mautic\PluginBundle\Helper\ReloadHelper::class);
+    $services->alias(Mautic\PluginBundle\Helper\ReloadHelper::class, 'mautic.plugin.helper.reload');
+    $services->set('mautic.plugin.facade.reload', Mautic\PluginBundle\Facade\ReloadFacade::class);
+    $services->alias(Mautic\PluginBundle\Facade\ReloadFacade::class, 'mautic.plugin.facade.reload');
 
+    $services->alias('mautic.plugin.repository.integration', Mautic\PluginBundle\Entity\IntegrationRepository::class);
     $services->alias('mautic.plugin.model.plugin', Mautic\PluginBundle\Model\PluginModel::class);
     $services->alias('mautic.plugin.model.integration_entity', Mautic\PluginBundle\Model\IntegrationEntityModel::class);
 

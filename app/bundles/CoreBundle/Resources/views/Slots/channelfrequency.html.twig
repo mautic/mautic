@@ -79,7 +79,7 @@
             <div class="text-left">
                 <input type="checkbox" checked="">
                 <label class="control-label">
-                    {{ 'mautic.lead.contact.me.label'|trans }}</label>
+                    {{ channelfrequency['label-text']|default('mautic.lead.contact.me.label'|trans) }}</label>
             </div>
         </td>
     </tr>
@@ -87,17 +87,17 @@
         <td>
             <div id="frequency_email" class="text-left row">
                 <div class="col-xs-6">
-                    <label class="text-secondary label1">{{ 'mautic.lead.list.frequency.number'|trans }}</label>
+                    <label class="text-secondary label1">{{ channelfrequency['label-text1']|default('mautic.lead.list.frequency.number'|trans) }}</label>
                     <input type="text" class="frequency form-control">
-                    <label class="text-secondary fw-n frequency-label label2">{{ 'mautic.lead.list.frequency.times'|trans }}</label>
+                    <label class="text-secondary fw-n frequency-label label2">{{ channelfrequency['label-text2']|default('mautic.lead.list.frequency.times'|trans) }}</label>
                     <select class="form-control">
                         <option value="" selected="selected"></option>
                     </select>
                 </div>
                 <div class="col-xs-6">
-                    <label class="text-secondary label3">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                    <label class="text-secondary label3">{{ channelfrequency['label-text3']|default('mautic.lead.frequency.dates.label'|trans) }}</label>
                     <input type="date" class="form-control">
-                    <label class="frequency-label text-secondary fw-n label4">{{ 'mautic.lead.frequency.contact.end.date'|trans }}</label>
+                    <label class="frequency-label text-secondary fw-n label4">{{ channelfrequency['label-text4']|default('mautic.lead.frequency.contact.end.date'|trans) }}</label>
                     <input type="date" class="form-control">
                 </div>
             </div>

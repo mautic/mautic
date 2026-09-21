@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
@@ -10,7 +11,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
+final readonly class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
 
@@ -28,6 +29,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     public function __construct(
         private Unsubscribe $unsubscriber,
         private FeedbackLoop $looper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -54,11 +56,14 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
      */
     public function onEmailSend(EmailSendEvent $event): void
     {
+        if ($this->coreParametersHelper->get('disable_unsubscribe_link_header')) {
+            return;
+        }
         $helper = $event->getHelper();
         if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
             $headers          = $event->getTextHeaders();
             $existing         = $headers['List-Unsubscribe'] ?? '';
-            $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
+            $unsubscribeEmail = "<mailto:{$unsubscribeEmail}>";
             if ($existing) {
                 if (!str_contains($existing, $unsubscribeEmail)) {
                     $updatedHeader = $existing.', '.$unsubscribeEmail;
@@ -70,6 +75,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
             }
 
             $event->addTextHeader('List-Unsubscribe', $updatedHeader);
+            $event->addTextHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
         }
     }
 }

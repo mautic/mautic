@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Form\Type\ProjectAddEntityType;
 use Mautic\ProjectBundle\Form\Type\ProjectEntityType;
+use Mautic\ProjectBundle\Helper\ProjectSearchScopeProvider;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\ProjectBundle\Security\Permissions\ProjectPermissions;
 use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
@@ -18,17 +19,20 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class ProjectController extends AbstractFormController
 {
     public const ROUTE_INDEX     = 'mautic_project_index';
+
     private const ROUTE_ACTION   = 'mautic_project_action';
+
     private const LINK_ID_INDEX  = '#'.self::ROUTE_INDEX;
+
     private const TEMPLATE_INDEX = 'Mautic\ProjectBundle\Controller\ProjectController::indexAction';
+
     private const TEMPLATE_FORM  = '@MauticProject/Project/form.html.twig';
 
-    public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader, int $page = 1): Response
+    public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader, ProjectSearchScopeProvider $projectSearchScopeProvider, int $page = 1): Response
     {
         $session = $request->getSession();
 
@@ -40,7 +44,7 @@ final class ProjectController extends AbstractFormController
         ], 'RETURN_ARRAY');
 
         if (!$permissions[ProjectPermissions::CAN_VIEW]) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -114,14 +118,15 @@ final class ProjectController extends AbstractFormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'         => $items,
-                'page'          => $page,
-                'limit'         => $limit,
-                'permissions'   => $permissions,
-                'security'      => $corePermissions,
-                'tmpl'          => $tmpl,
-                'currentUser'   => $this->user,
-                'searchValue'   => $search,
+                'items'           => $items,
+                'page'            => $page,
+                'limit'           => $limit,
+                'permissions'     => $permissions,
+                'security'        => $corePermissions,
+                'tmpl'            => $tmpl,
+                'currentUser'     => $this->user,
+                'searchValue'     => $search,
+                'searchScopes'    => $projectSearchScopeProvider->getScopes(),
             ],
             'contentTemplate' => '@MauticProject/Project/list.html.twig',
             'passthroughVars' => [
@@ -135,7 +140,7 @@ final class ProjectController extends AbstractFormController
     public function newAction(Request $request, ProjectModel $projectModel, FormFactoryInterface $formFactory, CorePermissions $corePermissions): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $project   = new Project();
@@ -194,7 +199,7 @@ final class ProjectController extends AbstractFormController
     public function editAction(string|int $objectId, Request $request, ProjectModel $projectModel, FormFactoryInterface $formFactory, CorePermissions $corePermissions, bool $ignorePost = false): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $postActionVars = $this->getPostActionVars($request, $objectId);
@@ -274,8 +279,6 @@ final class ProjectController extends AbstractFormController
                     'mauticContent' => 'project',
                 ],
             ]);
-        } catch (AccessDeniedException) {
-            return $this->accessDenied();
         } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -346,10 +349,11 @@ final class ProjectController extends AbstractFormController
         }
 
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_VIEW)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $entityTypes     = $entityLoader->getEntityTypesWithViewPermissions();
+        $editableTypes   = $entityLoader->getEntityTypesWithEditPermissions();
         $projectEntities = $entityLoader->getProjectEntities($project, $entityTypes);
 
         return $this->delegateView([
@@ -358,6 +362,7 @@ final class ProjectController extends AbstractFormController
                 'project'         => $project,
                 'projectEntities' => $projectEntities,
                 'entityTypes'     => $entityTypes,
+                'editableTypes'   => $editableTypes,
             ],
             'contentTemplate' => '@MauticProject/Project/details.html.twig',
             'passthroughVars' => [
@@ -394,7 +399,7 @@ final class ProjectController extends AbstractFormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$corePermissions->isGranted(ProjectPermissions::CAN_DELETE)) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $projectModel->deleteEntity($project);
@@ -443,14 +448,14 @@ final class ProjectController extends AbstractFormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$corePermissions->isGranted(ProjectPermissions::CAN_DELETE)) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } else {
                     $deleteIds[] = $objectId;
                 }
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 try {
                     $entities = $projectModel->deleteEntities($deleteIds);
                 } catch (ForeignKeyConstraintViolationException) {
@@ -480,7 +485,7 @@ final class ProjectController extends AbstractFormController
     public function selectEntityTypeAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $projectId = $request->get('objectId');
@@ -506,7 +511,7 @@ final class ProjectController extends AbstractFormController
     public function addEntityAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, FormFactoryInterface $formFactory, ProjectEntityLoaderService $entityLoader): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $projectId  = $request->get('objectId');
@@ -652,7 +657,7 @@ final class ProjectController extends AbstractFormController
     public function removeAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $projectId  = $request->get('objectId');

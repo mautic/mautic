@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\Update\Exception\CouldNotFetchLatestVersionException;
 use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Exception\UpdateCacheDataNeedsToBeRefreshedException;
@@ -19,7 +20,7 @@ use Monolog\Logger;
  */
 class UpdateHelper
 {
-    private string $phpVersion;
+    private readonly string $phpVersion;
 
     /**
      * @var string
@@ -27,12 +28,12 @@ class UpdateHelper
     private $mauticVersion;
 
     public function __construct(
-        private PathsHelper $pathsHelper,
-        private Logger $logger,
-        private CoreParametersHelper $coreParametersHelper,
-        private Client $client,
-        private ReleaseParser $releaseParser,
-        private PreUpdateCheckHelper $preUpdateCheckHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly Logger $logger,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Client $client,
+        private readonly ReleaseParser $releaseParser,
+        private readonly PreUpdateCheckHelper $preUpdateCheckHelper,
     ) {
         $this->mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : 'unknown';
         $this->phpVersion    = defined('PHP_VERSION') ? PHP_VERSION : 'unknown';
@@ -109,7 +110,7 @@ class UpdateHelper
                 'message' => 'mautic.core.updater.error.fetching.updates',
             ];
         } catch (RequestException $exception) {
-            if (!empty($exception->getResponse())) {
+            if ($exception->getResponse() instanceof \Psr\Http\Message\ResponseInterface) {
                 $this->logger->error(
                     sprintf(
                         'UPDATE CHECK: Could not fetch a release list: %s (%s)',
@@ -177,7 +178,7 @@ class UpdateHelper
             $checkResults[] = new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('mautic.core.update.check.error.release_data')]);
         }
 
-        if (!empty($checkResults)) {
+        if ([] !== $checkResults) {
             return $checkResults;
         }
 
@@ -212,7 +213,7 @@ class UpdateHelper
             $instanceId = hash('sha1', $key.$installSource.$dbDriver);
 
             $data = array_map(
-                'trim',
+                trim(...),
                 [
                     'application'   => 'Mautic',
                     'version'       => $this->mauticVersion,
@@ -225,16 +226,16 @@ class UpdateHelper
             );
 
             $options = [
-                \GuzzleHttp\RequestOptions::FORM_PARAMS     => $data,
-                \GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => 10,
-                \GuzzleHttp\RequestOptions::HEADERS         => [
+                RequestOptions::FORM_PARAMS     => $data,
+                RequestOptions::CONNECT_TIMEOUT => 10,
+                RequestOptions::HEADERS         => [
                     'Accept' => '*/*',
                 ],
             ];
 
             $this->client->request('POST', $statUrl, $options);
         } catch (RequestException $exception) {
-            if (!empty($exception->getResponse())) {
+            if ($exception->getResponse() instanceof \Psr\Http\Message\ResponseInterface) {
                 $this->logger->error(
                     sprintf(
                         'STAT UPDATE: Error communicating with the stat server: %s (%s)',
@@ -316,14 +317,13 @@ class UpdateHelper
 
     /**
      * Tries to get server OS.
-     *
-     * @return string
      */
-    private function getServerOs()
+    private function getServerOs(): string
     {
         if (function_exists('php_uname')) {
             return php_uname('s').' '.php_uname('r');
-        } elseif (defined('PHP_OS')) {
+        }
+        if (defined('PHP_OS')) {
             return PHP_OS;
         }
 

@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Service;
 
 use Symfony\Component\Process\Process;
 
-final class ProcessQueue
+final readonly class ProcessQueue
 {
     /**
      * @var \SplQueue<Process>

@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Entity\ReportRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportEvent;
@@ -31,6 +32,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -65,8 +67,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         protected ChannelListHelper $channelListHelper,
         protected FieldModel $fieldModel,
         protected ReportHelper $reportHelper,
-        private CsvExporter $csvExporter,
-        private ExcelExporter $excelExporter,
+        private readonly CsvExporter $csvExporter,
+        private readonly ExcelExporter $excelExporter,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -74,19 +76,17 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
+        private readonly ReportRepository $reportRepository,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\ReportBundle\Entity\ReportRepository
-     */
-    public function getRepository()
+    public function getRepository(): ReportRepository
     {
-        return $this->em->getRepository(Report::class);
+        return $this->reportRepository;
     }
 
     public function getPermissionBase(): string
@@ -106,7 +106,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -166,7 +166,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new ReportEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -300,7 +300,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
                 continue;
             }
             if (isset($data['label'])) {
-                $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
+                $return->choiceHtml .= "<option value=\"{$column}\">{$data['label']}</option>\n";
                 $return->choices[$column]     = $data['label'];
                 $return->definitions[$column] = $data;
             }
@@ -330,13 +330,13 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             if (isset($data['label'])) {
                 $return->definitions[$filter] = $data;
                 $return->choices[$filter]     = $data['label'];
-                $return->choiceHtml .= "<option value=\"$filter\">{$data['label']}</option>\n";
+                $return->choiceHtml .= "<option value=\"{$filter}\">{$data['label']}</option>\n";
 
                 $return->operatorChoices[$filter] = $this->getOperatorOptions($data);
                 $return->operatorHtml[$filter]    = '';
 
                 foreach ($return->operatorChoices[$filter] as $value => $label) {
-                    $return->operatorHtml[$filter] .= "<option value=\"$value\">$label</option>\n";
+                    $return->operatorHtml[$filter] .= "<option value=\"{$value}\">{$label}</option>\n";
                 }
             }
         }
@@ -386,7 +386,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
         switch ($format) {
             case 'csv':
-                if (!is_null($handle)) {
+                if (null !== $handle) {
                     $this->csvExporter->export($reportDataResult, $handle, $page);
 
                     return;
@@ -451,7 +451,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         $debugData     = [];
 
         // UI doesn't set time so reset it to midnight. API can set time so do not reset it. Using DateTimeImmutable to distinguish.
-        $resetTime = !(isset($options['dateFrom']) && $options['dateFrom'] instanceof \DateTimeImmutable);
+        $resetTime = !isset($options['dateFrom']) || !$options['dateFrom'] instanceof \DateTimeImmutable;
 
         if ($resetTime && isset($options['dateFrom'])) {
             $now = new \DateTime();
@@ -637,7 +637,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
                 if (is_array($param)) {
                     $param = implode("','", $param);
                 }
-                $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
+                $debugData['query'] = str_replace(":{$name}", "'{$param}'", $debugData['query']);
             }
 
             $debugData['query_time'] = $queryTime ?? 'N/A';
@@ -674,12 +674,18 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      */
     private function getOrderBySanitized(iterable $orderBys, \stdClass $allowedColumns): iterable
     {
-        $hasOrderBy = false;
+        $hasOrderBy  = false;
+        $definitions = $allowedColumns->definitions ?? [];
+
         foreach ($orderBys as $key => $orderBy) {
-            if ($this->orderByIsValid($orderBy, $allowedColumns->choices)) {
-                $hasOrderBy = true;
+            $order = $this->parseOrderBy((string) $orderBy);
+
+            if (null !== $order && $this->orderByIsValid($order['column'], $order['direction'], $allowedColumns->choices)) {
+                $orderBys[$key] = $this->getOrderByExpression($order['column'], $order['direction'], $definitions);
+                $hasOrderBy     = true;
                 continue;
             }
+
             $orderBys[$key] = '';
         }
 
@@ -690,30 +696,55 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @return array{column: string, direction: string}|null
+     */
+    private function parseOrderBy(string $order): ?array
+    {
+        $order = trim($order);
+
+        if (empty($order)) {
+            return null;
+        }
+
+        $direction = '';
+
+        if (preg_match('/\s+(ASC|DESC)$/i', $order, $matches)) {
+            $direction = strtoupper($matches[1]);
+            $order     = trim(substr($order, 0, -strlen($matches[0])));
+        }
+
+        return [
+            'column'    => trim($order, '`'),
+            'direction' => $direction,
+        ];
+    }
+
+    /**
      * Check if order by is valid.
      *
      * @param array<string, string> $allowedColumns
      */
-    private function orderByIsValid(string $order, array $allowedColumns): bool
+    private function orderByIsValid(string $orderBy, string $orderByDirection, array $allowedColumns): bool
     {
-        if (empty($order)) {
-            return false;
+        return array_key_exists($orderBy, $allowedColumns) && in_array($orderByDirection, ['ASC', 'DESC', ''], true);
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $definitions
+     */
+    private function getOrderByExpression(string $orderBy, string $orderByDirection, array $definitions): string
+    {
+        $expression = $orderBy;
+
+        if (!empty($definitions[$orderBy]['formula'])) {
+            $expression = $definitions[$orderBy]['formula'];
+
+            if (!empty($definitions[$orderBy]['prefix']) || !empty($definitions[$orderBy]['suffix'])) {
+                $expression = sprintf('(%s) + 0', $expression);
+            }
         }
 
-        $orderBy         = $order;
-        $oderByDirection = '';
-
-        if (str_contains($order, ' ')) {
-            $orderTemp       = explode(' ', $order);
-            $orderBy         = $orderTemp[0];
-            $oderByDirection = $orderTemp[1];
-        }
-
-        if (!array_key_exists($orderBy, $allowedColumns) || !in_array($oderByDirection, ['ASC', 'DESC', ''])) {
-            return false;
-        }
-
-        return true;
+        return trim($expression.' '.$orderByDirection);
     }
 
     /**
@@ -723,7 +754,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     {
         $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
 
-        return $this->getRepository()->findReportsWithGraphs($ownedBy);
+        return $this->reportRepository->findReportsWithGraphs($ownedBy);
     }
 
     /**

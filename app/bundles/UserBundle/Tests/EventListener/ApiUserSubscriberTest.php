@@ -20,11 +20,11 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-class ApiUserSubscriberTest extends TestCase
+final class ApiUserSubscriberTest extends TestCase
 {
     public function testSubscribedEvents(): void
     {
-        self::assertSame([
+        $this->assertSame([
             CheckPassportEvent::class              => ['onCheckPassport', 2048],
             AuthenticationTokenCreatedEvent::class => 'onTokenCreated',
         ], ApiUserSubscriber::getSubscribedEvents());
@@ -33,23 +33,23 @@ class ApiUserSubscriberTest extends TestCase
     public function testIfAuthenticationHasNoUserInvolved(): void
     {
         $passport = $this->createMock(Passport::class);
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('hasBadge')
             ->with(UserBadge::class)
             ->willReturn(false);
-        $passport->expects(self::never())
+        $passport->expects($this->never())
             ->method('getBadge');
 
         $event = $this->createMock(CheckPassportEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
 
         $userProvider = $this->createMock(UserProvider::class);
-        $userProvider->expects(self::never())
+        $userProvider->expects($this->never())
             ->method('loadUserByIdentifier');
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::never())
+        $tokenPermissions->expects($this->never())
             ->method('setActivePermissionsOnAuthToken');
 
         $subscriber = new ApiUserSubscriber($userProvider, $tokenPermissions);
@@ -59,34 +59,34 @@ class ApiUserSubscriberTest extends TestCase
     public function testIfAuthenticationAlreadySetUserLoader(): void
     {
         $userBadge = $this->createMock(UserBadge::class);
-        $userBadge->expects(self::once())
+        $userBadge->expects($this->once())
             ->method('getUserLoader')
-            ->willReturn(function () {});
-        $userBadge->expects(self::never())
+            ->willReturn(function (): void {});
+        $userBadge->expects($this->never())
             ->method('setUserLoader');
 
         $passport = $this->createMock(Passport::class);
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('hasBadge')
             ->with(UserBadge::class)
             ->willReturn(true);
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('getBadge')
             ->with(UserBadge::class)
             ->willReturn($userBadge);
-        $passport->expects(self::never())
+        $passport->expects($this->never())
             ->method('addBadge');
 
         $event = $this->createMock(CheckPassportEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
 
         $userProvider = $this->createMock(UserProvider::class);
-        $userProvider->expects(self::never())
+        $userProvider->expects($this->never())
             ->method('loadUserByIdentifier');
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::never())
+        $tokenPermissions->expects($this->never())
             ->method('setActivePermissionsOnAuthToken');
 
         $subscriber = new ApiUserSubscriber($userProvider, $tokenPermissions);
@@ -96,14 +96,14 @@ class ApiUserSubscriberTest extends TestCase
     public function testIfAuthenticationIsNotOauthAuthentication(): void
     {
         $userBadge = $this->createMock(UserBadge::class);
-        $userBadge->expects(self::once())
+        $userBadge->expects($this->once())
             ->method('getUserLoader')
             ->willReturn(null);
-        $userBadge->expects(self::never())
+        $userBadge->expects($this->never())
             ->method('setUserLoader');
 
         $passport = $this->createMock(Passport::class);
-        $passport->expects(self::exactly(2))
+        $passport->expects($this->exactly(2))
             ->method('hasBadge')
             ->willReturnCallback(static function (string $className): bool {
                 if (UserBadge::class === $className) {
@@ -116,23 +116,23 @@ class ApiUserSubscriberTest extends TestCase
 
                 self::fail('Unknown badge class '.$className);
             });
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('getBadge')
             ->with(UserBadge::class)
             ->willReturn($userBadge);
-        $passport->expects(self::never())
+        $passport->expects($this->never())
             ->method('addBadge');
 
         $event = $this->createMock(CheckPassportEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
 
         $userProvider = $this->createMock(UserProvider::class);
-        $userProvider->expects(self::never())
+        $userProvider->expects($this->never())
             ->method('loadUserByIdentifier');
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::never())
+        $tokenPermissions->expects($this->never())
             ->method('setActivePermissionsOnAuthToken');
 
         $subscriber = new ApiUserSubscriber($userProvider, $tokenPermissions);
@@ -143,16 +143,16 @@ class ApiUserSubscriberTest extends TestCase
     {
         $userIdentifier = 'The user';
         $userBadge      = $this->createMock(UserBadge::class);
-        $userBadge->expects(self::once())
+        $userBadge->expects($this->once())
             ->method('getUserLoader')
             ->willReturn(null);
 
-        $accessToken      = $this->createMock(AccessToken::class);
+        $accessToken      = $this->createStub(AccessToken::class);
         $accessTokenBadge = $this->createMock(AccessTokenBadge::class);
         $accessTokenBadge->method('getAccessToken')->willReturn($accessToken);
 
         $passport = $this->createMock(Passport::class);
-        $passport->expects(self::exactly(2))
+        $passport->expects($this->exactly(2))
             ->method('hasBadge')
             ->willReturnCallback(static function (string $className): bool {
                 if (UserBadge::class === $className) {
@@ -165,7 +165,7 @@ class ApiUserSubscriberTest extends TestCase
 
                 self::fail('Unknown badge class '.$className);
             });
-        $passport->expects(self::exactly(2))
+        $passport->expects($this->exactly(2))
             ->method('getBadge')
             ->willReturnCallback(function (string $className) use ($accessTokenBadge, $userBadge): BadgeInterface {
                 if (UserBadge::class === $className) {
@@ -179,33 +179,31 @@ class ApiUserSubscriberTest extends TestCase
                 self::fail('Unknown badge requested '.$className);
             });
         // Not changing any badges.
-        $passport->expects(self::never())
+        $passport->expects($this->never())
             ->method('addBadge');
 
         $event = $this->createMock(CheckPassportEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
 
         $userProvider = $this->createMock(UserProvider::class);
-        $userProvider->expects(self::once())
+        $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($userIdentifier)
             ->willThrowException(new UserNotFoundException());
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::once())
+        $tokenPermissions->expects($this->once())
             ->method('setActivePermissionsOnAuthToken')
             ->with($accessToken)
             ->willReturn(null);
 
-        $userBadge->expects(self::once())
+        $userBadge->expects($this->once())
             ->method('setUserLoader')
             // After update to PHP 8.2 change return type to `null`.
-            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): ?UserInterface {
+            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): void {
                 $loaderResult = $userLoader($userIdentifier);
-                self::assertNull($loaderResult);
-
-                return $loaderResult;
+                $this->assertNull($loaderResult);
             });
 
         $subscriber = new ApiUserSubscriber($userProvider, $tokenPermissions);
@@ -217,16 +215,16 @@ class ApiUserSubscriberTest extends TestCase
         $userIdentifier = 'The user';
         $userRoles      = ['role' => 'test'];
         $userBadge      = $this->createMock(UserBadge::class);
-        $userBadge->expects(self::once())
+        $userBadge->expects($this->once())
             ->method('getUserLoader')
             ->willReturn(null);
 
-        $accessToken      = $this->createMock(AccessToken::class);
+        $accessToken      = $this->createStub(AccessToken::class);
         $accessTokenBadge = $this->createMock(AccessTokenBadge::class);
         $accessTokenBadge->method('getAccessToken')->willReturn($accessToken);
 
         $passport = $this->createMock(Passport::class);
-        $passport->expects(self::exactly(2))
+        $passport->expects($this->exactly(2))
             ->method('hasBadge')
             ->willReturnCallback(static function (string $className): bool {
                 if (UserBadge::class === $className) {
@@ -239,7 +237,7 @@ class ApiUserSubscriberTest extends TestCase
 
                 self::fail('Unknown badge class '.$className);
             });
-        $passport->expects(self::exactly(2))
+        $passport->expects($this->exactly(2))
             ->method('getBadge')
             ->willReturnCallback(function (string $className) use ($accessTokenBadge, $userBadge): BadgeInterface {
                 if (UserBadge::class === $className) {
@@ -252,12 +250,12 @@ class ApiUserSubscriberTest extends TestCase
 
                 self::fail('Unknown badge requested '.$className);
             });
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('addBadge')
             ->with(new AccessTokenBadge($accessToken, $userRoles));
 
         $event = $this->createMock(CheckPassportEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
 
@@ -265,21 +263,19 @@ class ApiUserSubscriberTest extends TestCase
         $user->method('getRoles')->willReturn($userRoles);
 
         $userProvider = $this->createMock(UserProvider::class);
-        $userProvider->expects(self::once())
+        $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($userIdentifier)
             ->willReturn($user);
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::never())
+        $tokenPermissions->expects($this->never())
             ->method('setActivePermissionsOnAuthToken');
 
-        $userBadge->expects(self::once())
+        $userBadge->expects($this->once())
             ->method('setUserLoader')
-            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): User {
+            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): void {
                 $loaderResult = $userLoader($userIdentifier);
-                self::assertNotNull($loaderResult);
-
-                return $loaderResult;
+                $this->assertNotNull($loaderResult);
             });
 
         $subscriber = new ApiUserSubscriber($userProvider, $tokenPermissions);
@@ -291,16 +287,16 @@ class ApiUserSubscriberTest extends TestCase
         $userIdentifier = 'The user';
         $userRoles      = ['role' => 'test'];
         $userBadge      = $this->createMock(UserBadge::class);
-        $userBadge->expects(self::once())
+        $userBadge->expects($this->once())
             ->method('getUserLoader')
             ->willReturn(null);
 
-        $accessToken      = $this->createMock(AccessToken::class);
+        $accessToken      = $this->createStub(AccessToken::class);
         $accessTokenBadge = $this->createMock(AccessTokenBadge::class);
         $accessTokenBadge->method('getAccessToken')->willReturn($accessToken);
 
         $passport = $this->createMock(Passport::class);
-        $passport->expects(self::exactly(2))
+        $passport->expects($this->exactly(2))
             ->method('hasBadge')
             ->willReturnCallback(static function (string $className): bool {
                 if (UserBadge::class === $className) {
@@ -313,7 +309,7 @@ class ApiUserSubscriberTest extends TestCase
 
                 self::fail('Unknown badge class '.$className);
             });
-        $passport->expects(self::exactly(2))
+        $passport->expects($this->exactly(2))
             ->method('getBadge')
             ->willReturnCallback(function (string $className) use ($accessTokenBadge, $userBadge): BadgeInterface {
                 if (UserBadge::class === $className) {
@@ -326,12 +322,12 @@ class ApiUserSubscriberTest extends TestCase
 
                 self::fail('Unknown badge requested '.$className);
             });
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('addBadge')
             ->with(new AccessTokenBadge($accessToken, $userRoles));
 
         $event = $this->createMock(CheckPassportEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
 
@@ -339,23 +335,21 @@ class ApiUserSubscriberTest extends TestCase
         $user->method('getRoles')->willReturn($userRoles);
 
         $userProvider = $this->createMock(UserProvider::class);
-        $userProvider->expects(self::once())
+        $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($userIdentifier)
             ->willThrowException(new UserNotFoundException());
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::once())
+        $tokenPermissions->expects($this->once())
             ->method('setActivePermissionsOnAuthToken')
             ->with($accessToken)
             ->willReturn($user);
 
-        $userBadge->expects(self::once())
+        $userBadge->expects($this->once())
             ->method('setUserLoader')
-            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): User {
+            ->willReturnCallback(function (callable $userLoader) use ($userIdentifier): void {
                 $loaderResult = $userLoader($userIdentifier);
-                self::assertNotNull($loaderResult);
-
-                return $loaderResult;
+                $this->assertNotNull($loaderResult);
             });
 
         $subscriber = new ApiUserSubscriber($userProvider, $tokenPermissions);
@@ -365,24 +359,24 @@ class ApiUserSubscriberTest extends TestCase
     public function testTokenCreatedNotOauthToken(): void
     {
         $userProvider = $this->createMock(UserProvider::class);
-        $userProvider->expects(self::never())
+        $userProvider->expects($this->never())
             ->method('loadUserByIdentifier');
 
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::never())
+        $tokenPermissions->expects($this->never())
             ->method('setActivePermissionsOnAuthToken');
 
         $passport = $this->createMock(Passport::class);
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('hasBadge')
             ->with(AccessTokenBadge::class)
             ->willReturn(false);
 
         $event = $this->createMock(AuthenticationTokenCreatedEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
-        $event->expects(self::never())
+        $event->expects($this->never())
             ->method('getAuthenticatedToken');
 
         $subscriber = new ApiUserSubscriber($userProvider, $tokenPermissions);
@@ -392,33 +386,33 @@ class ApiUserSubscriberTest extends TestCase
     public function testTokenCreateOauthAlreadyHasAuthenticatedUser(): void
     {
         $userProvider = $this->createMock(UserProvider::class);
-        $userProvider->expects(self::never())
+        $userProvider->expects($this->never())
             ->method('loadUserByIdentifier');
 
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::never())
+        $tokenPermissions->expects($this->never())
             ->method('setActivePermissionsOnAuthToken');
 
-        $accessTokenBadge = $this->createMock(AccessTokenBadge::class);
+        $accessTokenBadge = $this->createStub(AccessTokenBadge::class);
 
         $authenticatedToken = $this->createMock(OAuthToken::class);
-        $authenticatedToken->method('getUser')->willReturn($this->createMock(UserInterface::class));
+        $authenticatedToken->method('getUser')->willReturn($this->createStub(UserInterface::class));
         // No user was replaced.
-        $authenticatedToken->expects(self::never())
+        $authenticatedToken->expects($this->never())
             ->method('setUser');
 
         $passport = $this->createMock(Passport::class);
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('hasBadge')
             ->with(AccessTokenBadge::class)
             ->willReturn(true);
         $passport->method('getBadge')->with(AccessTokenBadge::class)->willReturn($accessTokenBadge);
 
         $event = $this->createMock(AuthenticationTokenCreatedEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getAuthenticatedToken')
             ->willReturn($authenticatedToken);
 
@@ -429,14 +423,14 @@ class ApiUserSubscriberTest extends TestCase
     public function testTokenCreateOauthSetsAuthenticatedUser(): void
     {
         $userProvider = $this->createMock(UserProvider::class);
-        $userProvider->expects(self::never())
+        $userProvider->expects($this->never())
             ->method('loadUserByIdentifier');
 
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::never())
+        $tokenPermissions->expects($this->never())
             ->method('setActivePermissionsOnAuthToken');
 
-        $user = $this->createMock(UserInterface::class);
+        $user = $this->createStub(UserInterface::class);
 
         $accessToken = $this->createMock(AccessToken::class);
         $accessToken->method('getUser')->willReturn($user);
@@ -447,22 +441,22 @@ class ApiUserSubscriberTest extends TestCase
         $authenticatedToken = $this->createMock(OAuthToken::class);
         $authenticatedToken->method('getUser')->willReturn(null);
         // Replace the user from oAuth token.
-        $authenticatedToken->expects(self::once())
+        $authenticatedToken->expects($this->once())
             ->method('setUser')
             ->with($user);
 
         $passport = $this->createMock(Passport::class);
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('hasBadge')
             ->with(AccessTokenBadge::class)
             ->willReturn(true);
         $passport->method('getBadge')->with(AccessTokenBadge::class)->willReturn($accessTokenBadge);
 
         $event = $this->createMock(AuthenticationTokenCreatedEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getAuthenticatedToken')
             ->willReturn($authenticatedToken);
 

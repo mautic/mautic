@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Scheduler\Model;
 
 use Mautic\ReportBundle\Entity\Report;
@@ -9,8 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MessageSchedule
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private UrlGeneratorInterface $router,
+        private readonly TranslatorInterface $translator,
+        private readonly UrlGeneratorInterface $router,
     ) {
     }
 

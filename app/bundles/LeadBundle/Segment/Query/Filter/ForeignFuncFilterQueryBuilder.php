@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 
-class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
+final class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     public static function getServiceId(): string
     {
@@ -84,31 +84,23 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             default:
                 if ($filterAggr) {
-                    if (!is_null($filter)) {
-                        if ('sum' === $filterAggr) {
-                            $expressionArg = $queryBuilder->expr()->func('COALESCE',
-                                $queryBuilder->expr()->func('SUM', $tableAlias.'.'.$filter->getField()),
-                                0
-                            );
-                            $expression = $queryBuilder->expr()->$filterOperator($expressionArg,
-                                $filterParametersHolder);
-                        } else {
-                            $expressionArg = sprintf('%s(DISTINCT %s)', $filterAggr, $tableAlias.'.'
-                                .$filter->getField());
-                            $expression = $queryBuilder->expr()->$filterOperator(
-                                $expressionArg,
-                                $filterParametersHolder
-                            );
-                        }
+                    if ('sum' === $filterAggr) {
+                        $expressionArg = $queryBuilder->expr()->func('COALESCE',
+                            $queryBuilder->expr()->func('SUM', $tableAlias.'.'.$filter->getField()),
+                            0
+                        );
+                        $expression = $queryBuilder->expr()->{$filterOperator}($expressionArg,
+                            $filterParametersHolder);
                     } else {
-                        $expressionArg = $queryBuilder->expr()->func($filterAggr, $tableAlias.'.'.$filter->getField());
-                        $expression    = $queryBuilder->expr()->$filterOperator(
+                        $expressionArg = sprintf('%s(DISTINCT %s)', $filterAggr, $tableAlias.'.'
+                            .$filter->getField());
+                        $expression = $queryBuilder->expr()->{$filterOperator}(
                             $expressionArg,
                             $filterParametersHolder
                         );
                     }
                 } else { // This should never happen
-                    $expression = $queryBuilder->expr()->$filterOperator(
+                    $expression = $queryBuilder->expr()->{$filterOperator}(
                         $tableAlias.'.'.$filter->getField(),
                         $filterParametersHolder
                     );

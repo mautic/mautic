@@ -25,25 +25,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: PushTransifexCommand::NAME,
-    description: 'Pushes Mautic translation resources to Transifex'
-)]
-class PushTransifexCommand extends Command
-{
-    public const NAME = 'mautic:transifex:push';
-
-    public function __construct(
-        private TransifexFactory $transifexFactory,
-        private TranslatorInterface $translator,
-        private LanguageHelper $languageHelper,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
-            ->setHelp(<<<'EOT'
+    description: 'Pushes Mautic translation resources to Transifex',
+    help: <<<'TXT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex
 
 <info>php %command.full_name%</info>
@@ -51,8 +34,24 @@ The <info>%command.name%</info> command is used to push translation resources to
 You can optionally choose to update resources for one bundle only with the --bundle option:
 
 <info>php %command.full_name% --bundle AssetBundle</info>
-EOT
-            );
+TXT
+)]
+final class PushTransifexCommand extends Command
+{
+    public const NAME = 'mautic:transifex:push';
+
+    public function __construct(
+        private readonly TransifexFactory $transifexFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly LanguageHelper $languageHelper,
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -71,7 +70,6 @@ EOT
         }
 
         $resources = $transifex->getConnector(Resources::class);
-        \assert($resources instanceof Resources);
 
         $existingResources = json_decode((string) $resources->getAll()->getBody(), true);
         $promises          = new \SplQueue();

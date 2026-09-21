@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use PHPUnit\Framework\TestCase;
 
-class CustomFieldHelperTest extends TestCase
+final class CustomFieldHelperTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testFixValueTypeForBooleans(): void
     {
         $this->assertNull(CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_BOOLEAN, null));
@@ -228,10 +225,5 @@ class CustomFieldHelperTest extends TestCase
             $property->setValue(null, $originalDefaultLocalTimezone);
             date_default_timezone_set($originalTimezone);
         }
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
     }
 }

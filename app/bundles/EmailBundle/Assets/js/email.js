@@ -81,6 +81,10 @@ Mautic.emailOnLoad = function (container, response) {
         });
     }
 
+    if (mQuery('#content_preview_frame').length && Mautic.contentPreviewUrlGenerator) {
+        Mautic.contentPreviewUrlGenerator.init();
+    }
+
     var $loadDeliveredElements = mQuery('[data-email-stat-delivered-for]');
     if ($loadDeliveredElements.length) {
         $loadDeliveredElements.each(function(i, el) {
@@ -157,6 +161,12 @@ Mautic.submitSendForm = function () {
     Mautic.dismissConfirmation();
     mQuery('.btn-send').prop('disabled', true);
     mQuery('form[name=\'batch_send\']').submit();
+};
+
+Mautic.submitAbSendForm = function () {
+    Mautic.dismissConfirmation();
+    mQuery('.btn-send').prop('disabled', true);
+    mQuery('form[name=\'ab_test_send\']').submit();
 };
 
 Mautic.emailSendOnLoad = function (container, response) {
@@ -241,7 +251,7 @@ Mautic.selectEmailType = function(emailType) {
     } else {
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
-        mQuery('#leadList').addClass('hide');
+        mQuery('#leadList,#ab-test').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
     }
 
@@ -291,13 +301,41 @@ Mautic.disabledEmailAction = function(opener, origin) {
         opener = window;
     }
     var email = opener.mQuery(origin);
-    if (email.length == 0) return;
+    if (email.length == 0){
+        mQuery('#email_send_to_dnc_status').addClass('hide');
+        return;
+    }
     var emailId = email.val();
     var disabled = emailId === '' || emailId === null;
 
     opener.mQuery('[id$=_editEmailButton]').prop('disabled', disabled);
     opener.mQuery('[id$=_previewEmailButton]').prop('disabled', disabled);
+    if (disabled) {
+        mQuery('#email_send_to_dnc_status, .queue_hide').addClass('hide');
+    } else {
+        Mautic.setEmailSendToDncStatus(emailId);
+    }
 };
+
+Mautic.setEmailSendToDncStatus = function (emailId) {
+    const dnc_status = mQuery('#email_send_to_dnc_status');
+    if (emailId && dnc_status.length > 0) {
+        Mautic.ajaxActionRequest('email:getEmailSendToDncStatus', {id: emailId}, function(response) {
+            if (typeof response.sendToDncStatus != "undefined") {
+                dnc_status.removeClass('hide')
+                dnc_status.find('span.dnc-status-text')
+                    .removeClass('label-danger label-primary')
+                    .addClass(response.sendToDncStatus ? 'label-danger' : 'label-primary')
+                    .text(response.sendToDncText);
+
+                mQuery('.queue_hide').toggleClass('hide', response.sendToDncStatus);
+            } else {
+                dnc_status.addClass('hide');
+                mQuery('.queue_hide').addClass('hide');
+            }
+        }, false, false, "GET");
+    }
+}
 
 Mautic.initEmailDynamicContent = function() {
     if (mQuery('#dynamic-content-container').length) {
@@ -520,10 +558,27 @@ Mautic.toggleMailerIsOwnerWarningMessage = function(radioSelector) {
     }
 }
 
+Mautic.destroyCkEditorsInContainer = function (container) {
+    if (typeof ckEditors === 'undefined' || ckEditors.size === 0) {
+        return;
+    }
+
+    container.find('textarea.editor').each(function () {
+        var editor = ckEditors.get(this);
+
+        if (editor && typeof editor.destroy === 'function') {
+            editor.destroy();
+            ckEditors.delete(this);
+        }
+    });
+};
+
 Mautic.initRemoveEvents = function (elements, jQueryVariant) {
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (elements.hasClass('remove-selected')) {
-        elements.on('click', function() {
+        elements.off('click').on('click', function() {
+            Mautic.destroyCkEditorsInContainer(mQuery(this).closest('.panel'));
+
             mQuery(this).closest('.panel').animate(
                 {'opacity': 0},
                 'fast',
@@ -533,7 +588,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             );
         });
     } else {
-        elements.on('click', function (e) {
+        elements.off('click').on('click', function (e) {
             e.preventDefault();
             var $this         = mQuery(this);
             var parentElement = $this.parents('.tab-pane.dynamic-content');
@@ -541,6 +596,8 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             if ($this.hasClass('remove-filter')) {
                 parentElement = $this.parents('.tab-pane.dynamic-content-filter');
             }
+
+            Mautic.destroyCkEditorsInContainer(parentElement);
 
             var tabLink      = mQuery('a[href="#' + parentElement.attr('id') + '"]').parent();
             var tabContainer = tabLink.parent();
@@ -746,4 +803,28 @@ Mautic.loadEmailUsages = function($el) {
         var usagesHtml = response.usagesHtml;
         $el.html(usagesHtml);
     }, false, true, "GET");
+};
+
+Mautic.setSendToDncOnModelLoad = function(el) {
+    mQuery(el).trigger('change');
+};
+
+Mautic.showSendToDncConfirmation = function (el) {
+    const element = mQuery(el);
+
+    if (element.val() === '1' && element.prop('checked')) {
+        Mautic.showConfirmation(element);
+    }
+};
+
+Mautic.setSendToDncToNo = function(el) {
+    Mautic.dismissConfirmation();
+    const noButton   = mQuery(el).parent('.btn-yes').siblings('.btn-no').children('input');
+    const noButtonId = mQuery(noButton).attr('id');
+
+    if (noButtonId !== undefined) {
+        mQuery('#' + noButtonId).trigger('click');
+        mQuery(el).parent('.btn-yes').removeClass('active');
+        mQuery(el).parent('.btn-yes').siblings('.btn-no').addClass('active');
+    }
 };

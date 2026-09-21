@@ -8,15 +8,26 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends AbstractFormController
+final class PublicController extends AbstractFormController
 {
+    private AssetRepository $assetRepository;
+
+    #[Required]
+    public function autowirePublicController(
+        AssetRepository $assetRepository,
+    ): void {
+        $this->assetRepository = $assetRepository;
+    }
+
     /**
      * Handles public download of assets by slug.
      *
@@ -32,7 +43,7 @@ class PublicController extends AbstractFormController
         string $slug,
     ): Response {
         try {
-            $entity = $model->getRepository()->findOneByUuid($slug);
+            $entity = $this->assetRepository->findOneByUuid($slug);
         } catch (NonUniqueResultException|EntityNotFoundException) {
             /**
              * Legacy slug lookup fallback.
@@ -67,7 +78,7 @@ class PublicController extends AbstractFormController
         if (!$this->isAccessAllowed($entity)) {
             $model->trackDownload($entity, $request, 401);
 
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if ($entity->isRemote()) {
@@ -94,7 +105,7 @@ class PublicController extends AbstractFormController
      *
      * @throws ORMException
      */
-    private function remoteRedirectResponse(AssetModel $model, Asset $entity, Request $request): Response
+    private function remoteRedirectResponse(AssetModel $model, Asset $entity, Request $request): RedirectResponse
     {
         $model->trackDownload($entity, $request);
 

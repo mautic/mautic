@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
@@ -23,7 +24,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $projectModel = self::getContainer()->get(ProjectModel::class);
 
         $projects = array_map(
-            static function (string $projectName) use ($projectModel) {
+            static function (string $projectName) use ($projectModel): Project {
                 $project = new Project();
                 $project->setName($projectName);
                 $projectModel->saveEntity($project);
@@ -45,10 +46,10 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $payload = json_decode($this->client->getResponse()->getContent(), true);
 
-        Assert::assertArrayHasKey('projects', $payload);
+        $this->assertArrayHasKey('projects', $payload);
 
         // The options are orderec alphabetically by name.
-        Assert::assertSame(
+        $this->assertSame(
             // The Blue Project is selected as it was sent as part of the existingProjectIds.
             '<option selected="selected" value="'.$projects[1]->getId().'">'.$projects[1]->getName().'</option>'.
             // The Green Project is selected as it was sent as part of the newProjectNames and should have next ID as it was created as 4th.
@@ -63,8 +64,9 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     public function testCreatingDuplicateProject(): void
     {
-        $projectModel = self::getContainer()->get('mautic.project.model.project');
-        \assert($projectModel instanceof ProjectModel);
+        /** @var ProjectModel $projectModel */
+        $projectModel = self::getContainer()->get(ProjectModel::class);
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         $this->assertCount(
             0,
@@ -111,5 +113,180 @@ final class AjaxControllerTest extends MauticMysqlTestCase
             $this->em->getRepository(Project::class)->findAll(),
             'There should be 2 projects after an attempt to create a unique project.'
         );
+    }
+
+    /**
+     * Project names with HTML/JS payloads should be properly escaped when rendered
+     * in <option> elements to prevent stored XSS attacks.
+     *
+     * @param string $xssPayload         Malicious XSS payload to test
+     * @param string $dangerousSubstring Substring that should NOT appear in escaped output
+     */
+    #[DataProvider('xssPayloadsProvider')]
+    public function testProjectNamesAreEscapedInAjaxResponse(string $xssPayload, string $dangerousSubstring): void
+    {
+        /** @var ProjectModel $projectModel */
+        $projectModel = self::getContainer()->get(ProjectModel::class);
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
+
+        // Create a project with an XSS payload in the name
+        $project = new Project();
+        $project->setName($xssPayload);
+        $projectModel->saveEntity($project);
+
+        // Create another project to verify selection works
+        $normalProject = new Project();
+        $normalProject->setName('Normal Project');
+        $projectModel->saveEntity($normalProject);
+
+        // Request the project options via AJAX without selecting the malicious project
+        $this->client->request(
+            'POST',
+            '/s/ajax?action=project:addProjects',
+            [
+                'newProjectNames'    => json_encode([]),
+                'existingProjectIds' => json_encode([]),
+            ]
+        );
+
+        $this->assertResponseIsSuccessful();
+
+        $payload = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('projects', $payload);
+
+        $projectOptions = $payload['projects'];
+
+        // The XSS payload should be escaped in both the label and value
+        $escapedPayload = htmlspecialchars($xssPayload, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        // Assert the malicious payload is properly escaped
+        $this->assertStringContainsString($escapedPayload, (string) $projectOptions, 'Project name should be HTML-escaped in the response');
+
+        // Assert the dangerous substring is NOT present in the response
+        $this->assertStringNotContainsString($dangerousSubstring, (string) $projectOptions, 'Raw XSS payload should not be present in the response');
+
+        // Assert proper option structure with escaped content
+        $this->assertStringContainsString('<option value="'.$project->getId().'">'.$escapedPayload.'</option>', (string) $projectOptions, 'Option should contain properly escaped label');
+
+        // Verify the malicious project can still be selected and associated normally
+        $this->client->request(
+            'POST',
+            '/s/ajax?action=project:addProjects',
+            [
+                'newProjectNames'    => json_encode([]),
+                'existingProjectIds' => json_encode([$project->getId()]),
+            ]
+        );
+
+        $this->assertResponseIsSuccessful();
+
+        $payload2        = json_decode($this->client->getResponse()->getContent(), true);
+        $projectOptions2 = $payload2['projects'];
+
+        // Verify the malicious project can be selected
+        $this->assertStringContainsString('<option selected="selected" value="'.$project->getId().'">'.$escapedPayload.'</option>', (string) $projectOptions2, 'Malicious project should be selectable with escaped content');
+
+        // Verify dangerous content is still not present when selected
+        $this->assertStringNotContainsString($dangerousSubstring, (string) $projectOptions2, 'Raw XSS payload should not be present even when selected');
+    }
+
+    /**
+     * @return \Iterator<string, array<string>>
+     */
+    public static function xssPayloadsProvider(): \Iterator
+    {
+        yield 'option break with img onerror' => [
+            '</option><img src=x onerror="alert(1)">',
+            '<img src=x onerror="alert(1)">',
+        ];
+        yield 'script tag' => [
+            '<script>alert(1)</script>',
+            '<script>alert(1)</script>',
+        ];
+        yield 'quote escape with img onerror' => [
+            '"><img src=x onerror=alert(1)>',
+            '<img src=x onerror=alert(1)>',
+        ];
+    }
+
+    /**
+     * Test that project names with special characters are properly escaped
+     * and remain functional in the project selector.
+     *
+     * @param string $projectName Project name with special characters
+     */
+    #[DataProvider('specialCharacterProjectNamesProvider')]
+    public function testProjectNamesWithSpecialCharactersAreEscapedAndFunctional(string $projectName): void
+    {
+        /** @var ProjectModel $projectModel */
+        $projectModel = self::getContainer()->get(ProjectModel::class);
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
+
+        // Create a project with special characters
+        $project = new Project();
+        $project->setName($projectName);
+        $projectModel->saveEntity($project);
+
+        // Create another unselected project for comparison
+        $unselectedProject = new Project();
+        $unselectedProject->setName('Unselected Project');
+        $projectModel->saveEntity($unselectedProject);
+
+        // Request project options with the special char project selected
+        $this->client->request(
+            'POST',
+            '/s/ajax?action=project:addProjects',
+            [
+                'newProjectNames'    => json_encode([]),
+                'existingProjectIds' => json_encode([$project->getId()]),
+            ]
+        );
+
+        $this->assertResponseIsSuccessful();
+
+        $payload = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('projects', $payload);
+
+        $projectOptions = $payload['projects'];
+        $escapedName    = htmlspecialchars($projectName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        // Verify the project appears correctly with escaped name
+        $this->assertStringContainsString($escapedName, (string) $projectOptions, 'Project name with special characters should be HTML-escaped');
+
+        // Verify the selected project has the selected attribute
+        $this->assertStringContainsString('<option selected="selected" value="'.$project->getId().'">'.$escapedName.'</option>', (string) $projectOptions, 'Selected project should have selected attribute and escaped name');
+
+        // Verify the unselected project appears without selected attribute
+        $this->assertStringContainsString('<option value="'.$unselectedProject->getId().'">Unselected Project</option>', (string) $projectOptions, 'Unselected project should not have selected attribute');
+
+        // Test that we can change selection (deselect the special char project, select the other)
+        $this->client->request(
+            'POST',
+            '/s/ajax?action=project:addProjects',
+            [
+                'newProjectNames'    => json_encode([]),
+                'existingProjectIds' => json_encode([$unselectedProject->getId()]),
+            ]
+        );
+
+        $this->assertResponseIsSuccessful();
+
+        $payload2        = json_decode($this->client->getResponse()->getContent(), true);
+        $projectOptions2 = $payload2['projects'];
+
+        // Verify selections are preserved correctly
+        $this->assertStringContainsString('<option selected="selected" value="'.$unselectedProject->getId().'">Unselected Project</option>', (string) $projectOptions2, 'Selection changes should be preserved');
+
+        $this->assertStringContainsString('<option value="'.$project->getId().'">'.$escapedName.'</option>', (string) $projectOptions2, 'Previously selected project should now be unselected');
+    }
+
+    /**
+     * @return \Iterator<string, array<string>>
+     */
+    public static function specialCharacterProjectNamesProvider(): \Iterator
+    {
+        yield 'ampersand' => ['Project & Company'];
+        yield 'double quotes' => ['Client "ABC" Ltd'];
+        yield 'single quotes' => ["Q1 '26 Results"];
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
 use Mautic\SmsBundle\Helper\ContactHelper;
@@ -9,21 +11,15 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
+final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ContactHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $contactHelper;
-
-    /**
-     * @var Configuration|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Configuration
      */
     private \PHPUnit\Framework\MockObject\MockObject $configuration;
 
     protected function setUp(): void
     {
-        $this->contactHelper = $this->createMock(ContactHelper::class);
         $this->configuration = $this->createMock(Configuration::class);
         $this->configuration->method('getAccountSid')
             ->willReturn('123');
@@ -33,7 +29,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createMock(Request::class);
+        $request          = $this->createStub(Request::class);
         $inputBag         = new InputBag([
             'AccountSid' => '123',
             'From'       => '',
@@ -48,7 +44,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createMock(Request::class);
+        $request          = $this->createStub(Request::class);
         $inputBag         = new InputBag([
             'AccountSid' => '123',
             'From'       => '321',
@@ -64,7 +60,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createMock(Request::class);
+        $request          = $this->createStub(Request::class);
         $inputBag         = new InputBag([
             'AccountSid' => '321',
         ]);
@@ -88,14 +84,11 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 
         $request->request = $inputBag;
 
-        $this->assertEquals('Hello', $this->getCallback()->getMessage($request));
+        $this->assertSame('Hello', $this->getCallback()->getMessage($request));
     }
 
-    /**
-     * @return TwilioCallback
-     */
-    private function getCallback()
+    private function getCallback(): TwilioCallback
     {
-        return new TwilioCallback($this->contactHelper, $this->configuration);
+        return new TwilioCallback($this->createStub(ContactHelper::class), $this->configuration);
     }
 }

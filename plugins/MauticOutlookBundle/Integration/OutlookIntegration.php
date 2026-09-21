@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticOutlookBundle\Integration;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
-class OutlookIntegration extends AbstractIntegration
+final class OutlookIntegration extends AbstractIntegration
 {
     public function getName(): string
     {

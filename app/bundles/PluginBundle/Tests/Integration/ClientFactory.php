@@ -6,13 +6,11 @@ namespace Mautic\PluginBundle\Tests\Integration;
 
 use GuzzleHttp\Client;
 
-class ClientFactory
+final readonly class ClientFactory
 {
-    private Client $httpClient;
-
-    public function __construct(Client $httpClient)
-    {
-        $this->httpClient = $httpClient;
+    public function __construct(
+        private Client $httpClient,
+    ) {
     }
 
     public function __invoke(): Client

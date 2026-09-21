@@ -20,13 +20,13 @@ final class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCa
 
         // Run segments update command.
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentAId]);
-        self::assertCount(5, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentAId]));
+        $this->assertCount(5, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentAId]));
 
         $segmentB   = $this->saveSegmentB($segmentAId);
         $segmentBId = $segmentB->getId();
         // Run segments update command.
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentBId]);
-        self::assertCount(3, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentBId]));
+        $this->assertCount(3, $this->em->getRepository(ListLead::class)->findBy(['list' => $segmentBId]));
     }
 
     /**

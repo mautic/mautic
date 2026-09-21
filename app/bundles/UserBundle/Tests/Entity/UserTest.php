@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\Entity;
 
 use Mautic\UserBundle\Entity\User;
 
-class UserTest extends \PHPUnit\Framework\TestCase
+final class UserTest extends \PHPUnit\Framework\TestCase
 {
     public function testEraseCredentials(): void
     {
@@ -14,7 +16,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $user->setCurrentPassword('currentPass');
 
         $user = unserialize(serialize($user));
-        \assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->assertSame('testUser', $user->getUsername());
         $this->assertNull($user->getPlainPassword());

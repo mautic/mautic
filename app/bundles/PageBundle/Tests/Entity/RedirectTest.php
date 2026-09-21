@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Entity;
 
 use Mautic\PageBundle\Entity\Redirect;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class RedirectTest extends TestCase
+final class RedirectTest extends TestCase
 {
     public function testGetUrlRemovesWhitespace(): void
     {
@@ -18,7 +17,7 @@ class RedirectTest extends TestCase
 
         $property->setValue($redirect, 'https://example.com '); // trailing whitespace
 
-        Assert::assertSame('https://example.com', $redirect->getUrl());
+        $this->assertSame('https://example.com', $redirect->getUrl());
     }
 
     public function testSetUrlRemovesWhitespace(): void
@@ -29,6 +28,6 @@ class RedirectTest extends TestCase
 
         $redirect->setUrl('https://example.com '); // trailing whitespace
 
-        Assert::assertSame('https://example.com', $property->getValue($redirect));
+        $this->assertSame('https://example.com', $property->getValue($redirect));
     }
 }

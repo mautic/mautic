@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Adapter;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -9,7 +11,7 @@ use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-class ReportDataAdapterTest extends \PHPUnit\Framework\TestCase
+final class ReportDataAdapterTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoEmailsProvided(): void
     {

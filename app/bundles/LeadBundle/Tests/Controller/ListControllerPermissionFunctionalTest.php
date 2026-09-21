@@ -4,37 +4,30 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var User
-     */
-    private $nonAdminUser;
+    private const SEGMENTS_ROUTE = '/s/segments';
 
-    /**
-     * @var User
-     */
-    private $userOne;
+    private User $nonAdminUser;
 
-    /**
-     * @var User
-     */
-    private $userTwo;
+    private User $userOne;
 
-    /**
-     * @var LeadList
-     */
-    private $segmentA;
+    private User $userTwo;
+
+    private LeadList $segmentA;
 
     protected function setUp(): void
     {
@@ -85,7 +78,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->loginOtherUser($this->userOne->getUserIdentifier());
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $crawler = $this->client->request(Request::METHOD_GET, self::SEGMENTS_ROUTE);
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         $this->assertCount(1, $crawler->filterXPath('//a[contains(@href,"/s/segments/new")]'), 'Listing page has the New button');
@@ -95,7 +88,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->loginOtherUser($this->nonAdminUser->getUserIdentifier());
 
-        $this->client->request(Request::METHOD_GET, '/s/segments');
+        $this->client->request(Request::METHOD_GET, self::SEGMENTS_ROUTE);
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
@@ -103,6 +96,48 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/segments/2');
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testIndexActionFiltersSegmentsByCategoryAliasQuickFilter(): void
+    {
+        $matchingCategory    = $this->createCategory('Operating Systems', 'os');
+        $nonMatchingCategory = $this->createCategory('Hardware', 'hardware');
+
+        $matchingSegment = $this->createSegment('Segment OS', $this->userOne);
+        $matchingSegment->setCategory($matchingCategory);
+        $this->em->persist($matchingSegment);
+
+        $nonMatchingSegment = $this->createSegment('Segment Hardware', $this->userOne);
+        $nonMatchingSegment->setCategory($nonMatchingCategory);
+        $this->em->persist($nonMatchingSegment);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $matchingSegment    = $this->em->getRepository(LeadList::class)->find($matchingSegment->getId());
+        $nonMatchingSegment = $this->em->getRepository(LeadList::class)->find($nonMatchingSegment->getId());
+
+        $this->assertSame('os', $matchingSegment?->getCategory()?->getAlias());
+        $this->assertSame('hardware', $nonMatchingSegment?->getCategory()?->getAlias());
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            self::SEGMENTS_ROUTE,
+            [
+                'search'  => 'category:os',
+                'filters' => json_encode(['category:os']),
+                'tmpl'    => 'list',
+            ]
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertStringContainsString($matchingSegment->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString($nonMatchingSegment->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString('No Results Found', (string) $responseData['newContent']);
     }
 
     public function testCreateSegmentForUserWithoutPermission(): void
@@ -138,7 +173,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Edit Segment - Segment Test', $crawler->html());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSegmentCloneUserPermissions')]
+    #[DataProvider('dataSegmentCloneUserPermissions')]
     public function testSegmentCloningOwnedSegmentWithDifferentPermissions(string $name, int $perm, int $expected): void
     {
         $user = $this->createUser(
@@ -278,17 +313,16 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
     public function testEditSegmentWhileLock(): void
     {
-        $segmentA = $this->segmentA;
-        $segmentA->setCheckedOut(new \DateTime());
-        $segmentA->setCheckedOutBy($this->userOne);
-        $this->em->persist($segmentA);
+        $this->segmentA->setCheckedOut(new \DateTime());
+        $this->segmentA->setCheckedOutBy($this->userOne);
+        $this->em->persist($this->segmentA);
         $this->em->flush();
 
-        $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segmentA->getId());
+        $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$this->segmentA->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
-        // As $segmentA is locked, so it will redirect user to its view page.
-        $this->assertStringContainsString('/s/segments/view/'.$segmentA->getId(), $this->client->getRequest()->getRequestUri());
+        // As $this->segmentA is locked, so it will redirect user to its view page.
+        $this->assertStringContainsString('/s/segments/view/'.$this->segmentA->getId(), $this->client->getRequest()->getRequestUri());
     }
 
     public function testDeleteSegmentWithoutPermission(): void
@@ -331,22 +365,22 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             'display'   => '',
             'filter'    => [$listId],
         ]];
-        $segmentA  = $this->createSegment('Segment List A', $this->userTwo, $filter);
+        $segmentB  = $this->createSegment('Segment List B', $this->userTwo, $filter);
 
-        $this->assertSame($filter, $segmentA->getFilters(), 'Filters');
+        $this->assertSame($filter, $segmentB->getFilters(), 'Filters');
         $crawler    = $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$listId);
-        $this->assertStringContainsString("Segment cannot be deleted, it is required by {$segmentA->getName()}.", $crawler->text());
+        $this->assertStringContainsString("The segment {$this->segmentA->getName()} is used in {$segmentB->getName()}, please go back and check segments before deleting", $crawler->text());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
-        $segmentA->setCheckedOut(new \DateTime());
-        $segmentA->setCheckedOutBy($this->userOne);
-        $this->em->persist($segmentA);
+        $segmentB->setCheckedOut(new \DateTime());
+        $segmentB->setCheckedOutBy($this->userOne);
+        $this->em->persist($segmentB);
         $this->em->flush();
 
-        $crawler = $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$segmentA->getId());
+        $crawler = $this->client->request(Request::METHOD_POST, '/s/segments/delete/'.$segmentB->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
-        $this->assertStringContainsString("{$segmentA->getName()} is currently checked out by", $crawler->html());
+        $this->assertStringContainsString("{$segmentB->getName()} is currently checked out by", $crawler->html());
 
         // As $segmentA is locked, so it will redirect user to its view page.
         $this->assertStringContainsString('/s/segments/1', $this->client->getRequest()->getRequestUri());
@@ -519,7 +553,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         // The segment $segmentA is used as filter in $segmentB.
-        $this->assertStringContainsString("{$segmentA->getName()} cannot be deleted, it is required by other segments.", $crawler->text());
+        $this->assertStringContainsString("Segment(s) \"{$segmentA->getName()}\" cannot be deleted because they are in use by other entities. For more details, please attempt to delete each segment individually.", $crawler->text());
     }
 
     public function testViewSegment(): void
@@ -629,7 +663,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         $this->em->refresh($segment);
         $this->assertFalse($segment->isPublished());
@@ -674,6 +708,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => $name]);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $name);
@@ -700,8 +735,8 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $user->setLastName($userDetails['last-name']);
         $user->setRole($role);
 
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
 
         $this->em->persist($user);
@@ -721,6 +756,18 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($permission);
     }
 
+    private function createCategory(string $title, string $alias): Category
+    {
+        $category = new Category();
+        $category->setTitle($title);
+        $category->setAlias($alias);
+        $category->setBundle('lead.list');
+
+        $this->em->persist($category);
+
+        return $category;
+    }
+
     /**
      * @param mixed[] $filters
      */
@@ -732,7 +779,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $segment->setAlias(str_shuffle('abcdefghijklmnopqrstuvwxyz'));
         $segment->setCreatedBy($user);
 
-        if ($filters) {
+        if ([] !== $filters) {
             $segment->setFilters($filters);
         }
 

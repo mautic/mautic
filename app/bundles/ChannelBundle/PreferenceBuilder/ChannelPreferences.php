@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 
-class ChannelPreferences
+final class ChannelPreferences
 {
     /**
      * @var ArrayCollection[]
@@ -14,16 +16,14 @@ class ChannelPreferences
     private array $organizedByPriority = [];
 
     public function __construct(
-        private Event $event,
+        private readonly Event $event,
     ) {
     }
 
     /**
      * @param int $priority
-     *
-     * @return $this
      */
-    public function addPriority($priority)
+    public function addPriority($priority): static
     {
         $priority = (int) $priority;
 
@@ -36,10 +36,8 @@ class ChannelPreferences
 
     /**
      * @param int $priority
-     *
-     * @return $this
      */
-    public function addLog(LeadEventLog $log, $priority)
+    public function addLog(LeadEventLog $log, $priority): static
     {
         $priority = (int) $priority;
 
@@ -58,10 +56,8 @@ class ChannelPreferences
 
     /**
      * Removes a log from all prioritized groups.
-     *
-     * @return $this
      */
-    public function removeLog(LeadEventLog $log)
+    public function removeLog(LeadEventLog $log): static
     {
         foreach ($this->organizedByPriority as $logs) {
             /** @var ArrayCollection<int, LeadEventLog> $logs */
@@ -74,7 +70,7 @@ class ChannelPreferences
     /**
      * @param int $priority
      *
-     * @return ArrayCollection|LeadEventLog[]
+     * @return ArrayCollection<int, LeadEventLog>
      */
     public function getLogsByPriority($priority)
     {

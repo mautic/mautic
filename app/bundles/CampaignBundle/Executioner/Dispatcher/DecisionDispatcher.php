@@ -11,7 +11,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DecisionDispatcher
+final readonly class DecisionDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,

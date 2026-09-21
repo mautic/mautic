@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 /**
  * Helper functions for simpler operations with arrays.
  */
-class ArrayHelper
+final class ArrayHelper
 {
     /**
      * If the $key exists in the $origin array then it will return its value.
@@ -78,7 +78,7 @@ class ArrayHelper
     {
         return array_filter(
             $array,
-            fn ($value): bool => !is_null($value) && '' !== $value
+            fn ($value): bool => null !== $value && '' !== $value
         );
     }
 
@@ -96,7 +96,7 @@ class ArrayHelper
         }
 
         return array_map(
-            fn (array $subArray) => array_flip($subArray),
+            array_flip(...),
             $masterArrays
         );
     }
@@ -122,12 +122,10 @@ class ArrayHelper
 
     /**
      *  SUM/SUBSTRACT between two arrays.
-     *
-     * @param bool $subtracted
      */
-    private static function sumOrSub(array $a1, array $b2, $subtracted = false): array
+    private static function sumOrSub(array $a1, array $b2, bool $subtracted = false): array
     {
-        return array_map(function ($x, $y) use ($subtracted) {
+        return array_map(function (int|string|float|array $x, int|string|array|float $y) use ($subtracted): int|float|array {
             if ($subtracted) {
                 return $x - $y;
             }

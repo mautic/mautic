@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Request;
 
-class ObjectDAO
+final class ObjectDAO
 {
     /**
      * @var string[]
@@ -17,16 +17,16 @@ class ObjectDAO
     private array $requiredFields = [];
 
     public function __construct(
-        private string $object,
+        private readonly string $object,
         /**
          * Date/time based on last synced date for the object or the start date/time fed through the command's arguments.
          * This value does not change between iterations.
          */
-        private ?\DateTimeInterface $fromDateTime = null,
+        private readonly ?\DateTimeInterface $fromDateTime = null,
         /**
          * Date/Time the sync started.
          */
-        private ?\DateTimeInterface $toDateTime = null,
+        private readonly ?\DateTimeInterface $toDateTime = null,
     ) {
     }
 
@@ -35,10 +35,7 @@ class ObjectDAO
         return $this->object;
     }
 
-    /**
-     * @return self
-     */
-    public function addField(string $field)
+    public function addField(string $field): static
     {
         $this->fields[] = $field;
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\LeadList;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class LeadListTest extends \PHPUnit\Framework\TestCase
 {
@@ -153,16 +153,22 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('setIsGlobalDataProvider')]
-    public function testSetIsGlobal($value, $expected, array $changes): void
+    /**
+     * @param array<string, array<int, mixed>> $changes
+     */
+    #[DataProvider('setIsGlobalDataProvider')]
+    public function testSetIsGlobal(mixed $value, mixed $expected, array $changes): void
     {
         $segment = new LeadList();
         $segment->setIsGlobal($value);
 
-        Assert::assertSame($expected, $segment->getIsGlobal());
-        Assert::assertSame($changes, $segment->getChanges());
+        $this->assertSame($expected, $segment->getIsGlobal());
+        $this->assertSame($changes, $segment->getChanges());
     }
 
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setIsGlobalDataProvider(): iterable
     {
         yield [null, false, ['isGlobal' => [true, false]]];
@@ -173,16 +179,22 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         yield ['string', true, []];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('setIsPreferenceCenterDataProvider')]
-    public function testSetIsPreferenceCenter($value, $expected, array $changes): void
+    /**
+     * @param array<string, array<int, mixed>> $changes
+     */
+    #[DataProvider('setIsPreferenceCenterDataProvider')]
+    public function testSetIsPreferenceCenter(mixed $value, mixed $expected, array $changes): void
     {
         $segment = new LeadList();
         $segment->setIsPreferenceCenter($value);
 
-        Assert::assertSame($expected, $segment->getIsPreferenceCenter());
-        Assert::assertSame($changes, $segment->getChanges());
+        $this->assertSame($expected, $segment->getIsPreferenceCenter());
+        $this->assertSame($changes, $segment->getChanges());
     }
 
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setIsPreferenceCenterDataProvider(): iterable
     {
         yield [null, false, []];

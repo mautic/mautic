@@ -5,12 +5,13 @@ namespace Mautic\NotificationBundle\EventListener;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
+use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Form\Type\NotificationListType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ChannelSubscriber implements EventSubscriberInterface
+final readonly class ChannelSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private IntegrationHelper $integrationHelper,
@@ -40,7 +41,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                             'form.submit',
                         ],
                         'lookupFormType' => NotificationListType::class,
-                        'repository'     => \Mautic\NotificationBundle\Entity\Notification::class,
+                        'repository'     => Notification::class,
                         'lookupOptions'  => [
                             'mobile'  => false,
                             'desktop' => true,
@@ -66,7 +67,7 @@ class ChannelSubscriber implements EventSubscriberInterface
                                 'form.submit',
                             ],
                             'lookupFormType'             => NotificationListType::class,
-                            'repository'                 => \Mautic\NotificationBundle\Entity\Notification::class,
+                            'repository'                 => Notification::class,
                             'lookupOptions'              => [
                                 'mobile'  => true,
                                 'desktop' => false,

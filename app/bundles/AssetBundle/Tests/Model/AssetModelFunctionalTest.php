@@ -6,10 +6,11 @@ namespace Mautic\AssetBundle\Tests\Model;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class AssetModelFunctionalTest extends MauticMysqlTestCase
+final class AssetModelFunctionalTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {
@@ -46,8 +47,9 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
 
         $expectedUrl = 'https://localhost/asset/'.$slug.$expectedQuery;
 
-        $assetModel = static::getContainer()->get('mautic.asset.model.asset');
-        assert($assetModel instanceof AssetModel);
+        /** @var AssetModel $assetModel */
+        $assetModel = self::getContainer()->get(AssetModel::class);
+        $this->assertInstanceOf(AssetModel::class, $assetModel);
         $generatedUrl = $assetModel->generateUrl($asset, $absolute, $clickthrough, $stream);
 
         $this->assertSame($expectedUrl, $generatedUrl);
@@ -116,9 +118,60 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
         $this->assertNull($asset->getUuid());
         $this->assertSame('1:the-alias', $asset->getSlug());
 
-        $assetModel = static::getContainer()->get('mautic.asset.model.asset');
-        assert($assetModel instanceof AssetModel);
-        $generatedUrl = $assetModel->generateUrl($asset, true, [], null);
+        /** @var AssetModel $assetModel */
+        $assetModel = self::getContainer()->get(AssetModel::class);
+        $this->assertInstanceOf(AssetModel::class, $assetModel);
+        $generatedUrl = $assetModel->generateUrl($asset, true, []);
         $this->assertSame('https://localhost/asset/1:the-alias', $generatedUrl);
+    }
+
+    public function testGetAssetListRespectsCanViewOthersOption(): void
+    {
+        $currentUserId = self::getContainer()->get(UserHelper::class)->getUser()->getId();
+        $dateFrom      = new \DateTime('-1 day', new \DateTimeZone('UTC'));
+        $dateTo        = new \DateTime('+1 day', new \DateTimeZone('UTC'));
+
+        $ownAsset = new Asset();
+        $ownAsset->setTitle('Own Asset');
+        $ownAsset->setAlias('own-asset');
+        $ownAsset->setDateAdded(new \DateTime('now', new \DateTimeZone('UTC')));
+        $ownAsset->setDateModified(new \DateTime('now', new \DateTimeZone('UTC')));
+        $ownAsset->setCreatedBy($currentUserId);
+        $ownAsset->setCreatedByUser('Current User');
+        $ownAsset->setStorageLocation('remote');
+        $ownAsset->setRemotePath('https://example.com/remote/own-asset');
+        $ownAsset->setSize(0);
+        $ownAsset->setIsPublished(true);
+
+        $foreignAsset = new Asset();
+        $foreignAsset->setTitle('Foreign Asset');
+        $foreignAsset->setAlias('foreign-asset');
+        $foreignAsset->setDateAdded(new \DateTime('now', new \DateTimeZone('UTC')));
+        $foreignAsset->setDateModified(new \DateTime('now', new \DateTimeZone('UTC')));
+        $foreignAsset->setCreatedBy($currentUserId + 9999);
+        $foreignAsset->setCreatedByUser('Foreign User');
+        $foreignAsset->setStorageLocation('remote');
+        $foreignAsset->setRemotePath('https://example.com/remote/foreign-asset');
+        $foreignAsset->setSize(0);
+        $foreignAsset->setIsPublished(true);
+
+        $this->em->persist($ownAsset);
+        $this->em->persist($foreignAsset);
+        $this->em->flush();
+
+        /** @var AssetModel $assetModel */
+        $assetModel = self::getContainer()->get(AssetModel::class);
+        $this->assertInstanceOf(AssetModel::class, $assetModel);
+
+        $ownOnlyList = $assetModel->getAssetList(10, $dateFrom, $dateTo, [], ['canViewOthers' => false]);
+        $allList     = $assetModel->getAssetList(10, $dateFrom, $dateTo, [], ['canViewOthers' => true]);
+
+        $ownOnlyNames = array_column($ownOnlyList, 'name');
+        $allNames     = array_column($allList, 'name');
+
+        $this->assertContains('Own Asset', $ownOnlyNames);
+        $this->assertNotContains('Foreign Asset', $ownOnlyNames);
+        $this->assertContains('Own Asset', $allNames);
+        $this->assertContains('Foreign Asset', $allNames);
     }
 }

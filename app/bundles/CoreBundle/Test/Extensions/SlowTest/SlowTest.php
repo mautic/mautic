@@ -19,9 +19,10 @@ use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 
-class SlowTest implements Extension
+final class SlowTest implements Extension
 {
     private bool $prepared          = false;
+
     private bool $preparationFailed = false;
 
     /**
@@ -29,9 +30,9 @@ class SlowTest implements Extension
      */
     private array $classes = [];
 
-    private bool $enabled;
+    private readonly bool $enabled;
 
-    private float $threshold;
+    private readonly float $threshold;
 
     private ?HRTime $time = null;
 
@@ -85,8 +86,6 @@ class SlowTest implements Extension
         if (!$test->isTestMethod()) {
             return;
         }
-
-        assert($test instanceof TestMethod);
 
         $this->handleFinish($event->telemetryInfo(), $test);
 

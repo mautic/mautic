@@ -8,30 +8,31 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AssetRepositoryTest extends TestCase
+final class AssetRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
     private function getRepository(): AssetRepository
     {
         $repository = $this->configureRepository(Asset::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.asset.asset.searchcommand.isexpired' => 'is:expired',
             'mautic.asset.asset.searchcommand.ispending' => 'is:pending',
             default                                      => $id,
         });
-        $repository->setTranslator($translator);
+        $repository->autowireCommonRepository($translator);
 
         return $repository;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataExpirationFilters')]
+    #[DataProvider('dataExpirationFilters')]
     public function testAddSearchCommandWhereClauseHandlesExpirationFilters(string $command, string $expected): void
     {
         $repository = $this->getRepository();
@@ -42,8 +43,8 @@ class AssetRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($repository, $qb, $filter);
 
-        self::assertSame($expected, (string) $expr);
-        self::assertSame(['par1' => true], $params);
+        $this->assertSame($expected, (string) $expr);
+        $this->assertSame(['par1' => true], $params);
     }
 
     /**
@@ -59,7 +60,7 @@ class AssetRepositoryTest extends TestCase
     {
         $repository = $this->getRepository();
         $commands   = $repository->getSearchCommands();
-        self::assertContains('mautic.asset.asset.searchcommand.isexpired', $commands);
-        self::assertContains('mautic.asset.asset.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.asset.asset.searchcommand.isexpired', $commands);
+        $this->assertContains('mautic.asset.asset.searchcommand.ispending', $commands);
     }
 }

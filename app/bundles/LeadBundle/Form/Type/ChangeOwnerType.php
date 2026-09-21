@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -11,10 +12,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ChangeOwnerType extends AbstractType
+final class ChangeOwnerType extends AbstractType
 {
     public function __construct(
-        private UserModel $userModel,
+        private readonly UserModel $userModel,
     ) {
     }
 
@@ -31,11 +32,6 @@ class ChangeOwnerType extends AbstractType
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
-        );
-
-        $builder->add(
-            'buttons',
-            FormButtonsType::class
         );
     }
 }

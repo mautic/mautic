@@ -1,18 +1,32 @@
 {% set showConversionRate = showConversionRate is defined ? showConversionRate : false %}
+{% set clickCountsSortable = clickCountsSortable is defined ? clickCountsSortable : false %}
+{% set clickCountsSorting = clickCountsSorting|default({}) %}
 {% if trackables is not empty %}
     <div class="table-responsive">
         <table class="table table-hover click-list"
                 {% if showConversionRate %} data-conversion-rate-table data-entity-id="{{ entity.id }}"{% endif %}>
             <thead>
             <tr>
-                <td>{{ 'mautic.trackable.click_url'|trans }}</td>
-                <td>{{ 'mautic.trackable.click_count'|trans }}</td>
-                <td>{{ 'mautic.trackable.click_unique_count'|trans }}</td>
+                <th scope="col">{{ 'mautic.trackable.click_url'|trans }}</th>
+                {% if clickCountsSortable %}
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar' : clickCountsSorting.sessionVar|default(''),
+                        'orderBy'    : clickCountsSorting.orderBy|default(''),
+                        'text'       : 'mautic.trackable.click_count',
+                        'class'      : 'text-center',
+                        'target'     : clickCountsSorting.target|default('#clicks-container'),
+                        'tmpl'       : clickCountsSorting.tmpl|default('click_counts'),
+                        'baseUrl'    : clickCountsSorting.baseUrl|default(''),
+                    }) }}
+                {% else %}
+                    <th scope="col" class="text-center">{{ 'mautic.trackable.click_count'|trans }}</th>
+                {% endif %}
+                <th scope="col" class="text-center">{{ 'mautic.trackable.click_unique_count'|trans }}</th>
                 {{ customContent('click_counts_headers', _context) }}
                 {% if showConversionRate %}
-                    <td>{{ 'mautic.trackable.click_conversion_rate'|trans }}</td>
+                    <th scope="col">{{ 'mautic.trackable.click_conversion_rate'|trans }}</th>
                 {% endif %}
-                <td>{{ 'mautic.trackable.click_track_id'|trans }}</td>
+                <th scope="col">{{ 'mautic.trackable.click_track_id'|trans }}</th>
             </tr>
             </thead>
             <tbody>

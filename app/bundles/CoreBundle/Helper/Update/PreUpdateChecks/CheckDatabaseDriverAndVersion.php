@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Update\PreUpdateChecks;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 
-class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
+final class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
 {
     public function __construct(
-        private EntityManager $em,
+        private readonly EntityManagerInterface $em,
     ) {
     }
 

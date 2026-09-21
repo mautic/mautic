@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Deduplicate\Helper;
 
 use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
 
-class MergeValueHelper
+final class MergeValueHelper
 {
     /**
      * @param mixed $newerValue
@@ -29,7 +31,7 @@ class MergeValueHelper
 
         $isDefaultValue = null !== $defaultValue && $newerValue === $defaultValue;
 
-        if (self::isNotEmpty($newerValue) && !($newIsAnonymous && $isDefaultValue)) {
+        if (self::isNotEmpty($newerValue) && (!$newIsAnonymous || !$isDefaultValue)) {
             return $newerValue;
         }
 

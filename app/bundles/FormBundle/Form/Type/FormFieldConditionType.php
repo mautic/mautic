@@ -16,11 +16,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldConditionType extends AbstractType
+final class FormFieldConditionType extends AbstractType
 {
     public function __construct(
-        private FieldModel $fieldModel,
-        private PropertiesAccessor $propertiesAccessor,
+        private readonly FieldModel $fieldModel,
+        private readonly PropertiesAccessor $propertiesAccessor,
     ) {
     }
 

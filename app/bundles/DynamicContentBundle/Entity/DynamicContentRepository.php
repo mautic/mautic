@@ -10,7 +10,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<DynamicContent>
  */
-class DynamicContentRepository extends CommonRepository
+final class DynamicContentRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
@@ -52,7 +52,6 @@ class DynamicContentRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -63,8 +62,8 @@ class DynamicContentRepository extends CommonRepository
                     $unique     => $filter->string,
                 ];
                 $expr = $q->expr()->or(
-                    $q->expr()->eq('e.language', ":$unique"),
-                    $q->expr()->like('e.language', ":$langUnique")
+                    $q->expr()->eq('e.language', ":{$unique}"),
+                    $q->expr()->like('e.language', ":{$langUnique}")
                 );
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -85,9 +84,6 @@ class DynamicContentRepository extends CommonRepository
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif ($returnParameter) {
-            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
         }
 
         return [$expr, $parameters];
@@ -160,7 +156,7 @@ class DynamicContentRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                   ->setParameter('search', $search);
             } else {
@@ -200,10 +196,7 @@ class DynamicContentRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return bool|object|null
-     */
-    public function getDynamicContentForSlotFromCampaign($slot)
+    public function getDynamicContentForSlotFromCampaign($slot): DynamicContent|false
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 

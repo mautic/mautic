@@ -10,6 +10,8 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
+use Mautic\CampaignBundle\Executioner\Result\Counter;
+use Mautic\CampaignBundle\Executioner\TestInactiveExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -26,8 +28,8 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->inactiveExecutioner = self::getContainer()->get('mautic.campaign.executioner.inactive');
-        \assert($this->inactiveExecutioner instanceof InactiveExecutioner);
+        $this->inactiveExecutioner = self::getContainer()->get(TestInactiveExecutioner::class);
+        $this->assertInstanceOf(InactiveExecutioner::class, $this->inactiveExecutioner);
     }
 
     public function testDecisionRedirectionToAlreadyExecutedAction(): void
@@ -211,8 +213,9 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
 
         // Assertions - verify basic redirection to condition works
         $this->assertGreaterThan(0, count($redirectConditionLogs), 'Expected redirect condition to be executed');
-        $this->assertEquals(0, count($originalNegativeActionLogs),
+        $this->assertCount(0, $originalNegativeActionLogs,
             'Original decision negative action should NOT be executed');
+        $this->assertInstanceOf(Counter::class, $counter);
 
         // Verify execution counters
         $this->assertGreaterThan(0, $counter->getTotalEvaluated(), 'Expected contacts to be evaluated');
@@ -313,6 +316,90 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertCount(0, $firstNegativeLogs, 'Expected no logs for first negative action (should be bypassed)');
         $this->assertCount(0, $secondNegativeLogs, 'Expected no logs for second negative action (should be bypassed)');
+    }
+
+    /**
+     * Reproduces https://github.com/mautic/mautic/issues/16262.
+     *
+     * Deleted decisions with redirect_event_id must not re-trigger the redirect target on every
+     * inactive execution once contacts have been processed.
+     */
+    public function testDeletedDecisionRedirectDoesNotLoopOnRepeatedInactiveExecution(): void
+    {
+        $campaign     = $this->createCampaign();
+        $contact      = $this->createContact();
+        $campaignLead = $this->createCampaignLead($campaign, $contact);
+
+        $parentEvent = $this->createActionEvent($campaign, 'Parent Event');
+
+        $deletedDecision = $this->createDecisionEvent($campaign, 'Deleted Decision');
+        $deletedDecision->setParent($parentEvent);
+
+        $negativeAction = $this->createActionEvent($campaign, 'Negative Action', $deletedDecision, 'no');
+        $deletedDecision->addChild($negativeAction);
+
+        $redirectEmailAction = $this->createActionEvent($campaign, 'Redirect Thank You Email');
+        $deletedDecision->setDeleted(new \DateTime());
+        $deletedDecision->setRedirectEvent($redirectEmailAction);
+
+        $parentEventLog = $this->createEventLog($campaign, $parentEvent, $contact);
+
+        $this->em->persist($campaign);
+        $this->em->persist($contact);
+        $this->em->persist($campaignLead);
+        $this->em->persist($parentEvent);
+        $this->em->persist($deletedDecision);
+        $this->em->persist($negativeAction);
+        $this->em->persist($redirectEmailAction);
+        $this->em->persist($parentEventLog);
+        $this->em->flush();
+
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+
+        $limiter = new ContactLimiter(100, 0, 0, 0, [$contact->getId()]);
+
+        $this->inactiveExecutioner->validate($deletedDecision->getId(), $limiter, new BufferedOutput());
+        $this->em->clear();
+
+        $logsAfterFirstRun = $this->em->getRepository(LeadEventLog::class)->findBy([
+            'event' => $redirectEmailAction,
+            'lead'  => $contact,
+        ], ['rotation' => 'ASC']);
+
+        $this->assertCount(1, $logsAfterFirstRun, 'Redirect target should execute once on first inactive run');
+
+        $decisionLogsAfterFirstRun = $this->em->getRepository(LeadEventLog::class)->findBy([
+            'event' => $deletedDecision,
+            'lead'  => $contact,
+        ]);
+        $this->assertCount(1, $decisionLogsAfterFirstRun, 'Deleted decision should be recorded as executed');
+
+        $this->inactiveExecutioner->validate($deletedDecision->getId(), new ContactLimiter(100, 0, 0, 0, [$contact->getId()]), new BufferedOutput());
+        $this->em->clear();
+
+        $logsAfterSecondRun = $this->em->getRepository(LeadEventLog::class)->findBy([
+            'event' => $redirectEmailAction,
+            'lead'  => $contact,
+        ], ['rotation' => 'ASC']);
+
+        $this->assertCount(
+            count($logsAfterFirstRun),
+            $logsAfterSecondRun,
+            'Redirect target must not be re-executed on subsequent inactive runs'
+        );
+
+        $decisionLogsAfterSecondRun = $this->em->getRepository(LeadEventLog::class)->findBy([
+            'event' => $deletedDecision,
+            'lead'  => $contact,
+        ]);
+        $this->assertCount(1, $decisionLogsAfterSecondRun, 'Deleted decision should be recorded as executed once');
+
+        $campaignLeadAfter = $this->em->getRepository(CampaignLead::class)->findOneBy([
+            'campaign' => $campaign,
+            'lead'     => $contact,
+        ]);
+        $this->assertInstanceOf(CampaignLead::class, $campaignLeadAfter);
+        $this->assertSame(2, $campaignLeadAfter->getRotation(), 'campaign_leads.rotation increments once per redirect');
     }
 
     private function createCampaign(): Campaign
