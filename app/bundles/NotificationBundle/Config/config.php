@@ -1,55 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-    'services' => [
-        'events' => [
-            'mautic.notification.campaignbundle.subscriber' => [
-                'class'     => Mautic\NotificationBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'mautic.notification.model.notification',
-                    'mautic.notification.api',
-                    'event_dispatcher',
-                    'mautic.lead.model.dnc',
-                    'translator',
-                ],
-            ],
-        ],
-        'other' => [
-            'mautic.notification.api' => [
-                'class'     => Mautic\NotificationBundle\Api\OneSignalApi::class,
-                'arguments' => [
-                    'mautic.http.client',
-                    'mautic.page.model.trackable',
-                    'mautic.helper.integration',
-                ],
-                'alias' => 'notification_api',
-            ],
-        ],
-        'integrations' => [
-            'mautic.integration.onesignal' => [
-                'class'     => Mautic\NotificationBundle\Integration\OneSignalIntegration::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.cache_storage',
-                    'doctrine.orm.entity_manager',
-                    'request_stack',
-                    'router',
-                    'translator',
-                    'monolog.logger.mautic',
-                    'mautic.helper.encryption',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.paths',
-                    'mautic.core.model.notification',
-                    'mautic.lead.model.field',
-                    'mautic.plugin.model.integration_entity',
-                    'mautic.lead.model.dnc',
-                    'mautic.lead.field.fields_with_unique_identifier',
-                ],
-            ],
-        ],
-    ],
     'routes' => [
         'main' => [
             'mautic_notification_index' => [

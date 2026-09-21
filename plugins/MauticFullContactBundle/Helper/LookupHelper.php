@@ -5,7 +5,9 @@ namespace MauticPlugin\MauticFullContactBundle\Helper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -16,20 +18,22 @@ use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class LookupHelper
+final class LookupHelper
 {
     /**
      * @var bool|FullContactIntegration
      */
-    protected $integration;
+    private $integration;
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        protected UserHelper $userHelper,
-        protected Logger $logger,
-        protected Router $router,
-        protected LeadModel $leadModel,
-        protected CompanyModel $companyModel,
+        private readonly UserHelper $userHelper,
+        private readonly Logger $logger,
+        private readonly Router $router,
+        private readonly LeadModel $leadModel,
+        private readonly CompanyModel $companyModel,
+        private readonly LeadRepository $leadRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
     }
@@ -68,7 +72,7 @@ class LookupHelper
                         $lead->setSocialCache($cache);
 
                         if ($checkAuto) {
-                            $this->leadModel->getRepository()->saveEntity($lead);
+                            $this->leadRepository->saveEntity($lead);
                         } else {
                             $this->leadModel->saveEntity($lead);
                         }
@@ -114,7 +118,7 @@ class LookupHelper
                         ];
                         $company->setSocialCache($cache);
                         if ($checkAuto) {
-                            $this->companyModel->getRepository()->saveEntity($company);
+                            $this->companyRepository->saveEntity($company);
                         } else {
                             $this->companyModel->saveEntity($company);
                         }
@@ -165,7 +169,7 @@ class LookupHelper
         return false;
     }
 
-    protected function getFullContact(bool $person = true): false|FullContact_Person|FullContact_Company
+    private function getFullContact(bool $person = true): false|FullContact_Person|FullContact_Company
     {
         if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
             return false;
@@ -177,7 +181,7 @@ class LookupHelper
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }
 
-    protected function getCache($entity, $notify): array
+    private function getCache(Lead|Company $entity, $notify): array
     {
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);

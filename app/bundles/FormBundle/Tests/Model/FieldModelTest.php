@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Model\FieldModel;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -48,7 +49,6 @@ final class FieldModelTest extends TestCase
         $entityManager  = $this->createMock(EntityManager::class);
         $schemaHelper   = $this->createStub(ColumnSchemaHelper::class);
         $fieldModel     = new FieldModel(
-            $leadFieldModel,
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -57,8 +57,12 @@ final class FieldModelTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
+        );
+        $fieldModel->autowireFieldModel(
+            $leadFieldModel,
             $this->createStub(RequestStack::class),
-            $schemaHelper
+            $schemaHelper,
+            $this->createStub(FieldRepository::class)
         );
 
         $entityManager

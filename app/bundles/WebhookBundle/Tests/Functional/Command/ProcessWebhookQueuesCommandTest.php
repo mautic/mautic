@@ -38,7 +38,7 @@ final class ProcessWebhookQueuesCommandTest extends MauticMysqlTestCase
         // Generate 10 queue records.
         for ($i = 1; $i <= 10; ++$i) {
             $addedLog = $this->createWebhookQueue($webhook, $event, "Some payload {$i}");
-            array_push($queueIds, $addedLog->getId());
+            $queueIds[] = $addedLog->getId();
 
             $handlerStack->append(
                 function (RequestInterface $request): Response {

@@ -9,8 +9,10 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -124,7 +126,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('passwordProvider')]
+    #[DataProvider('passwordProvider')]
     public function testUserPasswordPolicy(int $responseCode, string $password): void
     {
         $userPayload = [
@@ -179,7 +181,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
@@ -193,7 +195,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
      *
      * @param array<string, mixed> $userData
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('userCreateDataProvider')]
+    #[DataProvider('userCreateDataProvider')]
     public function testCreateUserViaApiPlatform(array $userData, int $expectedStatusCode): void
     {
         // Create a role first
@@ -239,7 +241,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertSame($userData['email'], $user->getEmail());
 
             // Verify the password was hashed correctly by checking if we can verify it
-            $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+            $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
             $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
             $this->assertTrue(
                 $hasher->verify($user->getPassword(), $userData['plainPassword']),

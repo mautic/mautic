@@ -61,7 +61,9 @@
                 'tooltip': 'mautic.core.searchcommand.ismine.description',
                 'icon': 'ri-user-line'
             }
-        ]
+        ],
+        'searchScopes': searchScopes|default([]),
+        'searchScopeHint': searchScopeHint|default(''),
     }) }}
         <div class="page-list">
           {{ include('@MauticDynamicContent/DynamicContent/_list.html.twig') }}

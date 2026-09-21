@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: DeleteOrphanSubmissionRecordsFromFormResultsTableCommand::COMMAND_NAME,
     description: 'Deletes records from form results table for whom associated form submission records is deleted'
 )]
-class DeleteOrphanSubmissionRecordsFromFormResultsTableCommand extends Command
+final class DeleteOrphanSubmissionRecordsFromFormResultsTableCommand extends Command
 {
     private const SUBMISSION_RESULTS_LIMIT = 5000;
 

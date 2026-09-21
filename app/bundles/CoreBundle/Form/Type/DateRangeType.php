@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * @extends AbstractType<mixed>
  */
-class DateRangeType extends AbstractType
+final class DateRangeType extends AbstractType
 {
     public function __construct(
         private readonly RequestStack $requestStack,

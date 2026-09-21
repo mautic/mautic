@@ -441,8 +441,6 @@ class Mailbox
     }
 
     /**
-     * Gets listing the folders.
-     *
      * This function returns an object containing listing the folders.
      * The object has the following properties: messages, recent, unseen, uidnext, and uidvalidity.
      *
@@ -854,7 +852,7 @@ class Mailbox
      * @param bool|false $isDsn
      * @param bool|false $isFbl
      */
-    protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, $isDsn = false, $isFbl = false)
+    protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, $isDsn = false, $isFbl = false): void
     {
         $options = FT_UID;
         if (!$markAsSeen) {
@@ -1011,7 +1009,8 @@ class Mailbox
     {
         $newString = '';
         $elements  = imap_mime_header_decode($string);
-        for ($i = 0; $i < count($elements); ++$i) {
+        $counter = count($elements);
+        for ($i = 0; $i < $counter; ++$i) {
             if ('default' == $elements[$i]->charset) {
                 $elements[$i]->charset = 'iso-8859-1';
             }
@@ -1072,7 +1071,7 @@ class Mailbox
     /**
      * Close IMAP connection.
      */
-    protected function disconnect()
+    protected function disconnect(): void
     {
         if ($this->isConnected()) {
             // Prevent these from throwing notices such as "SECURITY PROBLEM: insecure server advertised"

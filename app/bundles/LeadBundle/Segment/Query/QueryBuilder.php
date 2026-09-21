@@ -372,7 +372,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $stack;
     }
 
-    private function addLogicStack($expression): static
+    private function addLogicStack(string|CompositeExpression $expression): static
     {
         $this->logicStack[] = $expression;
 

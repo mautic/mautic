@@ -12,11 +12,23 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigFormType extends AbstractType
+final class ConfigFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $arrayLinebreakTransformer = new ArrayLinebreakTransformer();
+
+        $builder->add(
+            'form_field_autofill',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.config.form.form_field_autofill',
+                'attr'  => [
+                    'tooltip' => 'mautic.form.config.form.form_field_autofill.tooltip',
+                ],
+            ]
+        );
+
         $builder->add(
             $builder->create(
                 'do_not_submit_emails',

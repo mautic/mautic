@@ -9,6 +9,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class FieldTest extends \PHPUnit\Framework\TestCase
 {
@@ -305,7 +306,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array<string, int> $properties
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
+    #[DataProvider('dataProvider')]
     public function testHasChoices(string $type, array $properties, bool $result): void
     {
         $field = new Field();

@@ -40,7 +40,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Focus>
  */
-class FocusType extends AbstractType
+final class FocusType extends AbstractType
 {
     /**
      * @var mixed[]

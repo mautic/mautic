@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\Dsn\Dsn;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class DsnTest extends TestCase
@@ -59,7 +60,7 @@ final class DsnTest extends TestCase
         $this->assertSame('10', $newDsn->getOption('timeout'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataInvalidFromString')]
+    #[DataProvider('dataInvalidFromString')]
     public function testInvalidFromString(string $dsn, string $exceptionMessage): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -95,7 +96,7 @@ final class DsnTest extends TestCase
         $this->assertSame('scheme://user:password@localhost:3300/path?ttl=300&timeout=10', (string) Dsn::fromString('scheme://user:password@localhost:3300/path?ttl=300&timeout=10'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataToString')]
+    #[DataProvider('dataToString')]
     public function testToString(Dsn $dsn, string $dsnString): void
     {
         $this->assertSame($dsnString, (string) $dsn);

@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PointActionUrlHitType extends AbstractType
+final class PointActionUrlHitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

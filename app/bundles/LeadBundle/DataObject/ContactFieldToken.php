@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Exception\InvalidContactFieldTokenException;
 /**
  * A value object representation of a contact field token.
  */
-class ContactFieldToken
+final class ContactFieldToken
 {
     private string $fieldAlias;
 

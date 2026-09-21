@@ -13,23 +13,19 @@ use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent;
 use Mautic\IntegrationsBundle\Helper\TokenParser;
 use Mautic\IntegrationsBundle\IntegrationEvents;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This class subscribes to events related to building and providing
  * tokens for emails, particularly the IntegrationObjectToken.
  */
-class EmailSubscriber implements EventSubscriberInterface
+final readonly class EmailSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        protected TranslatorInterface $translator,
-        protected EventDispatcherInterface $eventDispatcher,
-        protected TokenParser $tokenParser,
-        protected ObjectMappingRepository $objectMappingRepository,
-        protected IntegrationHelper $integrationHelper,
+        private EventDispatcherInterface $eventDispatcher,
+        private TokenParser $tokenParser,
+        private ObjectMappingRepository $objectMappingRepository,
     ) {
     }
 

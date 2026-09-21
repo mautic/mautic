@@ -6,15 +6,15 @@ namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
-use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterFactory::class)]
+#[CoversClass(ContactSegmentFilterFactory::class)]
 final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testLeadFilter(): void
@@ -102,7 +102,6 @@ final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $contactSegmentFilters = $contactSegmentFilterFactory->getSegmentFilters($leadList);
 
-        $this->assertInstanceOf(ContactSegmentFilters::class, $contactSegmentFilters);
         $this->assertCount(6, $contactSegmentFilters);
     }
 }

@@ -2,39 +2,33 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Crate\FieldCrate;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
-    public function __construct(
-        private readonly FieldCollectorInterface $fieldCollector,
-        private readonly AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private FieldCollectorInterface $fieldCollector;
+
+    private AlreadyMappedFieldCollectorInterface $mappedFieldCollector;
+
+    private FormModel $formModel;
+
+    #[Required]
+    public function autowireFormAjaxController(
+        FieldCollectorInterface $fieldCollector,
+        AlreadyMappedFieldCollectorInterface $mappedFieldCollector,
+        FormModel $formModel,
+    ): void {
+        $this->fieldCollector       = $fieldCollector;
+        $this->mappedFieldCollector = $mappedFieldCollector;
+        $this->formModel            = $formModel;
     }
 
     public function reorderFieldsAction(Request $request, string $name = 'fields'): JsonResponse
@@ -91,9 +85,8 @@ class AjaxController extends CommonAjaxController
     {
         $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
-        $model      = $this->getModel('form');
-        $entity     = $model->getEntity($formId);
-        $formFields = empty($entity) ? [] : $entity->getFields();
+        $entity     = $this->formModel->getEntity($formId);
+        $formFields = $entity instanceof \Mautic\FormBundle\Entity\Form ? $entity->getFields() : [];
         $fields     = [];
 
         foreach ($formFields as $field) {

@@ -10,7 +10,7 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotSetException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
 
-class TokenPersistence implements TokenPersistenceInterface
+final class TokenPersistence implements TokenPersistenceInterface
 {
     private ?Integration $integration = null;
 

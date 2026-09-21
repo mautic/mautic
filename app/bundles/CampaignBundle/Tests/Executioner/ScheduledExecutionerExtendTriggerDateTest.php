@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\Tests\CampaignAuditLogTrait;
 use Mautic\CampaignBundle\Tests\Command\AbstractCampaignCommand;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ScheduledExecutionerExtendTriggerDateTest extends AbstractCampaignCommand
 {
@@ -21,7 +22,7 @@ final class ScheduledExecutionerExtendTriggerDateTest extends AbstractCampaignCo
     /**
      * @param array<array{dateAdded: string, details: array<string, array<int, mixed>>}> $auditLogs
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('republishBehaviorProvider')]
+    #[DataProvider('republishBehaviorProvider')]
     public function testExecuteEventCommandWithRepublishBehavior(
         string $republishBehavior,
         string $triggerMode,

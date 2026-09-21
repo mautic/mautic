@@ -14,10 +14,13 @@ use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Model\BatchCompanyContactAssignmentModel;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -25,7 +28,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Company>
  */
-class CompanyApiController extends CommonApiController
+final class CompanyApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
     use LeadAccessTrait;
@@ -35,11 +38,22 @@ class CompanyApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $companyModel = $modelFactory->getModel('lead.company');
-        \assert($companyModel instanceof CompanyModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        private CompanyModel $companyModel,
+        private LeadModel $leadModel,
+        private BatchCompanyContactAssignmentModel $batchCompanyContactAssignmentModel,
+    ) {
         $this->model              = $companyModel;
         $this->entityClass        = Company::class;
         $this->entityNameOne      = 'company';
@@ -51,9 +65,7 @@ class CompanyApiController extends CommonApiController
 
     public function getNewEntity(array $params)
     {
-        $leadCompanyModel = $this->getModel('lead.company');
-        \assert($leadCompanyModel instanceof CompanyModel);
-        [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $leadCompanyModel);
+        [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $this->companyModel);
         if (count($companyEntities)) {
             return $this->model->getEntity($company['id']);
         }
@@ -67,7 +79,7 @@ class CompanyApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
         $this->setCustomFieldValues($entity, $form, $parameters);
     }
@@ -78,11 +90,9 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId Company ID
      * @param int $contactId Contact ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addContactAction($companyId, $contactId)
+    public function addContactAction($companyId, $contactId): Response
     {
         $company = $this->model->getEntity($companyId);
         $view    = $this->view(['success' => 1], Response::HTTP_OK);
@@ -96,9 +106,102 @@ class CompanyApiController extends CommonApiController
             return $contact;
         }
 
-        $this->model->addLeadToCompany($company, $contact);
+        $addedCompanyIds = $this->model->addLeadToCompanyReturningAddedIds($company, $contact);
+        $this->batchCompanyContactAssignmentModel->logContactCompanyAssignmentsSafely(
+            $contact,
+            $addedCompanyIds,
+            [$company->getId() => $company],
+        );
 
         return $this->handleView($view);
+    }
+
+    /**
+     * Assigns multiple contacts to multiple companies in one request.
+     */
+    public function batchAddContactsAction(Request $request): Response
+    {
+        if (!$this->security->isGranted('lead:leads:editown') && !$this->security->isGranted('lead:leads:editother')) {
+            return $this->accessDenied();
+        }
+
+        $parameters   = $this->getBatchAddContactsParameters($request);
+        $assignments = $parameters['assignments'] ?? null;
+
+        if (!is_array($assignments) || [] === $assignments) {
+            return $this->returnError('"assignments" parameter is required and must be a non-empty array', Response::HTTP_BAD_REQUEST);
+        }
+
+        foreach ($assignments as $entry) {
+            if (!is_array($entry)) {
+                return $this->returnError('Assignments entries must be a non-empty array', Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $invalidIds = $this->validateAssignmentIds($assignments);
+        if ($invalidIds instanceof Response) {
+            return $invalidIds;
+        }
+
+        $valid = $this->validateBatchPayload($assignments);
+        if ($valid instanceof Response) {
+            return $valid;
+        }
+
+        $payload = $this->batchCompanyContactAssignmentModel->process($assignments);
+
+        return $this->handleView($this->view($payload, Response::HTTP_OK));
+    }
+
+    /**
+     * Prefer the raw JSON body so Content-Type: application/json works without relying on
+     * request bag population; fall back to the request parameter bag for form posts.
+     *
+     * @return array<string, mixed>
+     */
+    private function getBatchAddContactsParameters(Request $request): array
+    {
+        $content = $request->getContent();
+        if ('' !== $content) {
+            $decoded = json_decode($content, true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return $request->request->all();
+    }
+
+    /**
+     * @param non-empty-array<int, array<string, mixed>> $assignments
+     */
+    private function validateAssignmentIds(array $assignments): Response|true
+    {
+        foreach ($assignments as $entry) {
+            foreach (['contactId', 'companyId'] as $field) {
+                if (!array_key_exists($field, $entry) || !$this->isValidPositiveIntegerId($entry[$field])) {
+                    return $this->returnError(
+                        'Assignment entries must include valid positive integer "contactId" and "companyId" values',
+                        Response::HTTP_BAD_REQUEST
+                    );
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private function isValidPositiveIntegerId(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return $value > 0;
+        }
+
+        if (!is_string($value) || !ctype_digit($value)) {
+            return false;
+        }
+
+        return (int) $value > 0;
     }
 
     /**
@@ -107,11 +210,9 @@ class CompanyApiController extends CommonApiController
      * @param int $companyId List ID
      * @param int $contactId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function removeContactAction($companyId, $contactId)
+    public function removeContactAction($companyId, $contactId): Response
     {
         $company = $this->model->getEntity($companyId);
         $view    = $this->view(['success' => 1], Response::HTTP_OK);
@@ -120,8 +221,7 @@ class CompanyApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $contactModel = $this->getModel('lead');
-        $contact      = $contactModel->getEntity($contactId);
+        $contact      = $this->leadModel->getEntity($contactId);
 
         // Does the contact exist and the user has permission to edit
         if (null === $contact) {

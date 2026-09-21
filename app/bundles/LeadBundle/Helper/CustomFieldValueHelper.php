@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 /**
  * Helper class custom field operations.
  */
-class CustomFieldValueHelper
+final class CustomFieldValueHelper
 {
     public const TYPE_BOOLEAN     = 'boolean';
 

@@ -4,7 +4,7 @@ namespace Mautic\PluginBundle\Exception;
 
 use Mautic\LeadBundle\Entity\Lead;
 
-class ApiErrorException extends \Exception
+final class ApiErrorException extends \Exception
 {
     private $contactId;
 

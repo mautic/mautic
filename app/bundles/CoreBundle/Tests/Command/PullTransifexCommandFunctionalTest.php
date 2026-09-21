@@ -25,7 +25,7 @@ final class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->filesystem = static::getContainer()->get('mautic.filesystem');
+        $this->filesystem = self::getContainer()->get(Filesystem::class);
         $this->filesystem->mkdir(self::FAKE_TRANSLATION_DIR);
     }
 

@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -16,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class BotRatioHelperMatomoTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('knownBotUserAgentsProvider')]
+    #[DataProvider('knownBotUserAgentsProvider')]
     public function testMatomoDetectorIdentifiesKnownBots(string $userAgent, string $expectedBotName): void
     {
         $deviceDetectorMock = $this->createMock(DeviceDetector::class);

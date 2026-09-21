@@ -6,9 +6,11 @@ namespace Mautic\ApiBundle\Tests\Functional;
 
 use Mautic\ApiBundle\Entity\oAuth2\AccessToken;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
-use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,12 +18,10 @@ use Symfony\Component\HttpFoundation\Response;
  * This test must run in a separate process because it sets the global constant
  * MAUTIC_INSTALLER which breaks other tests.
  */
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
 final class Oauth2Test extends MauticMysqlTestCase
 {
-    use IsolatedTestTrait;
-
     protected function setUp(): void
     {
         $this->useCleanupRollback = false;
@@ -29,7 +29,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideMethods')]
+    #[DataProvider('provideMethods')]
     public function testAuthorize(string $method): void
     {
         // Disable the default logging in via username and password.

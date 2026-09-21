@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Exception;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
@@ -68,7 +69,7 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
                     return 'no';
                 }
 
-                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $result = $this->formatterHelper->_(1, 'bool');

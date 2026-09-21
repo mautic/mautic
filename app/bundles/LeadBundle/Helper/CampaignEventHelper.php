@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 
-class CampaignEventHelper
+final class CampaignEventHelper
 {
     public static function validatePointChange(array $event, Lead $lead): bool
     {

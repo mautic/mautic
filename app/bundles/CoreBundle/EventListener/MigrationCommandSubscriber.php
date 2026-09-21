@@ -15,12 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class MigrationCommandSubscriber implements EventSubscriberInterface
+final readonly class MigrationCommandSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly VersionProviderInterface $versionProvider,
-        private readonly GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        private readonly Connection $connection,
+        private VersionProviderInterface $versionProvider,
+        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private Connection $connection,
     ) {
     }
 

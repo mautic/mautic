@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Controller;
 
 /**
@@ -44,7 +46,7 @@ class FormController extends AbstractStandardFormController
         string $templateBase,
         string $activeLink,
         string $mauticContent,
-    ) {
+    ): void {
         $this->deprecatedModelName      = $modelName;
         $this->deprecatedPermissionBase = $permissionBase;
         if (!str_starts_with($sessionBase, 'mautic.')) {

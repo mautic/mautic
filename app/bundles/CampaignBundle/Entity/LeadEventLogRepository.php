@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
  * @extends CommonRepository<LeadEventLog>
@@ -84,6 +85,7 @@ class LeadEventLogRepository extends CommonRepository
                     ll.channel,
                     ll.channel_id as channel_id,
                     ll.lead_id,
+                    ll.non_action_path_taken as nonActionPathTaken,
                     fl.reason as fail_reason,
                     e.deleted AS event_deleted_timestamp,
                     e.redirect_event_id,
@@ -145,7 +147,7 @@ class LeadEventLogRepository extends CommonRepository
     {
         $leadIps = [];
 
-        $query = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($this->_em->getConnection());
+        $query = new QueryBuilder($this->_em->getConnection());
 
         $joinCondition = 'e.id = ll.event_id';
         if (isset($options['type'])) {
@@ -352,7 +354,7 @@ class LeadEventLogRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($exists)) {
+        if ([] !== $exists) {
             $q->andWhere(
                 $q->expr()->notIn('event_id', ':ids')
             )

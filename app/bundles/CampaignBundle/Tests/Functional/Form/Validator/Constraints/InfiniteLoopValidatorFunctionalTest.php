@@ -6,11 +6,12 @@ namespace Mautic\CampaignBundle\Tests\Functional\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('delayDataProvider')]
+    #[DataProvider('delayDataProvider')]
     public function testSubmitCampaignActionVariousDelayOptions(string $triggerMode, int $triggerInterval, string $triggerIntervalUnit, int $success, string $expectedString): void
     {
         $uri = '/s/campaigns/events/new?type=campaign.addremovelead&eventType=action&campaignId=mautic_89f7f52426c1dff3daa3beaea708a6b39fe7a775&anchor=leadsource&anchorEventType=source';
@@ -76,7 +77,7 @@ final class InfiniteLoopValidatorFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('delayDataProvider')]
+    #[DataProvider('delayDataProvider')]
     public function testValidationViaCampaignApi(string $triggerMode, int $triggerInterval, string $triggerIntervalUnit, int $success, string $expectedString): void
     {
         $segment = new LeadList();
