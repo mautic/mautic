@@ -12,10 +12,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
 final class OidcRequestSubscriber implements EventSubscriberInterface
 {
@@ -106,12 +104,27 @@ final class OidcRequestSubscriber implements EventSubscriberInterface
 
     private function isAnonymousToken(?TokenInterface $token): bool
     {
-        return null === $token || $token instanceof AnonymousToken;
+        // In Symfony 7, null token represents anonymous (AnonymousToken was removed)
+        return null === $token || null === $token->getUser();
     }
 
     private function isOpenIdToken(?TokenInterface $token): bool
     {
-        return $token instanceof PostAuthenticationGuardToken && 'open_id' === $token->getProviderKey();
+        if (null === $token) {
+            return false;
+        }
+
+        // Check if token has firewall attribute (set by Symfony's authenticator)
+        if (method_exists($token, 'hasAttribute') && $token->hasAttribute('_firewall_name')) {
+            return 'open_id' === $token->getAttribute('_firewall_name');
+        }
+
+        // Fallback: check PluginToken's providerKey
+        if ($token instanceof PluginToken) {
+            return 'open_id' === $token->getProviderKey();
+        }
+
+        return false;
     }
 
     private function isSupportUserToken(?TokenInterface $token): bool
