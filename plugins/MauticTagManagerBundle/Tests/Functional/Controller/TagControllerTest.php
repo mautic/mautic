@@ -33,7 +33,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     {
         parent::setUp();
         /** @var TagModel $tagModel */
-        $tagModel            = static::getContainer()->get('mautic.lead.model.tag');
+        $tagModel            = self::getContainer()->get(TagModel::class);
         $this->tagRepository = $tagModel->getRepository();
 
         $tags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'];
@@ -228,7 +228,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $form['tag_entity[tag]']->setValue($TagName);
         $crawler = $this->client->submit($form);
 
-        $this->assertStringContainsString($TagName.' has been updated!', strip_tags($crawler->text(null, false)), 'Must contain already exist.');
+        $this->assertStringContainsString($TagName.' already exists!', $crawler->text(), 'Must contain already exist.');
     }
 
     public function testBatchDeleteAction(): void
@@ -356,7 +356,7 @@ final class TagControllerTest extends MauticMysqlTestCase
 
         // Test the actual merge functionality by calling the model directly
         /** @var TagModel $tagModel */
-        $tagModel = static::getContainer()->get('mautic.lead.model.tag');
+        $tagModel = self::getContainer()->get(TagModel::class);
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
         $this->em->clear();
@@ -396,7 +396,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $reportId              = (int) $report->getId();
 
         /** @var TagModel $tagModel */
-        $tagModel = static::getContainer()->get('mautic.lead.model.tag');
+        $tagModel = self::getContainer()->get(TagModel::class);
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
         $this->em->clear();

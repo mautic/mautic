@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\ReportWidgetType;
 use Mautic\ReportBundle\Model\ReportModel;
 
-class DashboardSubscriber extends MainDashboardSubscriber
+final class DashboardSubscriber extends MainDashboardSubscriber
 {
     private const TABLE_ROW_LIMIT = 10;
 
@@ -43,8 +43,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected ReportModel $reportModel,
-        protected CorePermissions $security,
+        private readonly ReportModel $reportModel,
+        private readonly CorePermissions $security,
     ) {
     }
 

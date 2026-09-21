@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\PrivateAddressChecker;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class PrivateAddressCheckerTest extends TestCase
@@ -30,25 +31,25 @@ final class PrivateAddressCheckerTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('privateIpProvider')]
+    #[DataProvider('privateIpProvider')]
     public function testIsPrivateIpReturnsTrue(string $ip): void
     {
         $this->assertTrue($this->checker->isPrivateIp($ip));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('publicIpProvider')]
+    #[DataProvider('publicIpProvider')]
     public function testIsPrivateIpReturnsFalse(string $ip): void
     {
         $this->assertFalse($this->checker->isPrivateIp($ip));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('privateUrlProvider')]
+    #[DataProvider('privateUrlProvider')]
     public function testIsPrivateUrlReturnsTrue(string $url): void
     {
         $this->assertTrue($this->checkerWithMockedDns->isPrivateUrl($url));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('publicUrlProvider')]
+    #[DataProvider('publicUrlProvider')]
     public function testIsPrivateUrlReturnsFalse(string $url): void
     {
         $this->assertFalse($this->checkerWithMockedDns->isPrivateUrl($url));
@@ -115,7 +116,7 @@ final class PrivateAddressCheckerTest extends TestCase
         yield 'Invalid Characters' => ['http://example.com\\invalid'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidUrlProvider')]
+    #[DataProvider('invalidUrlProvider')]
     public function testIsPrivateUrlThrowsExceptionForInvalidUrls(string $url): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -134,7 +135,7 @@ final class PrivateAddressCheckerTest extends TestCase
         $this->assertFalse($this->checker->isPrivateIp('invalid-ip'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('edgeCaseUrlProvider')]
+    #[DataProvider('edgeCaseUrlProvider')]
     public function testEdgeCaseUrls(string $url, bool $expectedResult): void
     {
         $this->assertSame($expectedResult, $this->checkerWithMockedDns->isPrivateUrl($url));
@@ -150,14 +151,14 @@ final class PrivateAddressCheckerTest extends TestCase
         yield 'IPv6 Full Format' => ['http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]', false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('allowedUrlProvider')]
+    #[DataProvider('allowedUrlProvider')]
     public function testIsAllowedUrlReturnsTrue(string $url): void
     {
         $this->checkerWithMockedDns->setAllowedPrivateAddresses(['192.168.1.1', 'localhost', '::1']);
         $this->assertTrue($this->checkerWithMockedDns->isAllowedUrl($url));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('disallowedUrlProvider')]
+    #[DataProvider('disallowedUrlProvider')]
     public function testIsAllowedUrlReturnsFalse(string $url): void
     {
         $this->checkerWithMockedDns->setAllowedPrivateAddresses(['192.168.1.2', '10.0.0.1']);
@@ -194,7 +195,7 @@ final class PrivateAddressCheckerTest extends TestCase
         yield 'Localhost when not allowed' => ['http://localhost'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidUrlProvider')]
+    #[DataProvider('invalidUrlProvider')]
     public function testIsAllowedUrlThrowsExceptionForInvalidUrls(string $url): void
     {
         $this->expectException(\InvalidArgumentException::class);

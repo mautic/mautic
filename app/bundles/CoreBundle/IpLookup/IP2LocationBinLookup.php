@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use IP2Location\Database;
 
-class IP2LocationBinLookup extends AbstractLocalDataLookup
+final class IP2LocationBinLookup extends AbstractLocalDataLookup
 {
     public function getAttribution(): string
     {
@@ -39,7 +39,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
     /**
      * Extract the IP from the local database.
      */
-    protected function lookup()
+    protected function lookup(): void
     {
         try {
             $reader = new Database($this->getLocalDataStoreFilepath(), Database::FILE_IO);

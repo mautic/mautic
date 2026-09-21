@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Controller;
 
+use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -27,6 +30,17 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['subdomain_url'] = self::SUBDOMAIN_URL;
 
         parent::setUp();
+
+        if ('testRestrictedAssetFieldIsNotRenderedInConfigForm' === $this->name()) {
+            $translator        = self::getContainer()->get(TranslatorInterface::class);
+            $restrictionHelper = new RestrictionHelper(
+                $translator,
+                ['upload_dir'],
+                RestrictionHelper::MODE_REMOVE
+            );
+            self::getContainer()->set(RestrictionHelper::class, $restrictionHelper);
+            self::getContainer()->set('mautic.config.form.restriction_helper', $restrictionHelper);
+        }
 
         $this->prefix = MAUTIC_TABLE_PREFIX;
     }
@@ -87,7 +101,10 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return static::getContainer()->get('kernel')->getLocalConfigFile();
+        /** @var \AppKernel $kernel */
+        $kernel = self::getContainer()->get(KernelInterface::class);
+
+        return $kernel->getLocalConfigFile();
     }
 
     /**
@@ -235,6 +252,52 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($campaign_notification_email_addresses, $form['config[notification_config][campaign_notification_email_addresses]']->getValue());
         $this->assertSame($send_notification_to_author, $form['config[notification_config][webhook_send_notification_to_author]']->getValue());
         $this->assertSame($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
+    }
+
+    public function testContactExportAdminNotificationsConfigDefaultsToEnabledAndCanBeDisabled(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+
+        $this->assertSame('1', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
+
+        $form->setValues(
+            [
+                'config[coreconfig][site_url]'                     => 'https://mautic-community.local',
+                'config[leadconfig][contact_columns]'              => ['name', 'email', 'id'],
+                'config[companyconfig][company_columns]'           => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+                'config[leadconfig][contact_export_notify_admins]' => '0',
+            ]
+        );
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('contact_export_notify_admins', $configParameters);
+        $this->assertFalse((bool) $configParameters['contact_export_notify_admins']);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+
+        $this->assertSame('0', $form['config[leadconfig][contact_export_notify_admins]']->getValue());
+    }
+
+    public function testRestrictedAssetFieldIsNotRenderedInConfigForm(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        // Restricted explicitly in test setUp().
+        $this->assertCount(0, $crawler->filter('#config_assetconfig_upload_dir'));
+        $this->assertCount(1, $crawler->filter('#config_assetconfig_max_size'));
+        $this->assertCount(1, $crawler->filter('#config_assetconfig_allowed_extensions'));
     }
 
     public function testUserAndSystemLocale(): void

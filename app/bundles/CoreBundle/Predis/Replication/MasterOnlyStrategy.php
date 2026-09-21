@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Predis\Replication;
 
 use Predis\Replication\ReplicationStrategy;
 
-class MasterOnlyStrategy extends ReplicationStrategy
+final class MasterOnlyStrategy extends ReplicationStrategy
 {
     public function __construct(
         private readonly StrategyConfig $config,

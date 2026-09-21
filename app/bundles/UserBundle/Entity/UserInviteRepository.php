@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<UserInvite>
  */
-final class UserInviteRepository extends CommonRepository implements UserInviteRepositoryInterface
+class UserInviteRepository extends CommonRepository implements UserInviteRepositoryInterface
 {
     public function findOneByTokenSelector(string $selector): ?UserInvite
     {

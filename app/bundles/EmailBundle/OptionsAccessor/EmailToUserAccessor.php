@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\OptionsAccessor;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\UserBundle\Entity\User;
 
-class EmailToUserAccessor
+final class EmailToUserAccessor
 {
     private readonly ArrayStringTransformer $transformer;
 

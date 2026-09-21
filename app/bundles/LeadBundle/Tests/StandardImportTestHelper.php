@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
@@ -101,7 +102,7 @@ abstract class StandardImportTestHelper extends CommonMocks
 
     public function setUp(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
 
         $this->eventEntities = [];
     }
@@ -156,7 +157,7 @@ abstract class StandardImportTestHelper extends CommonMocks
             ->method('getRepository')
             ->willReturnMap(
                 [
-                    [\Mautic\LeadBundle\Entity\LeadEventLog::class, $logRepository],
+                    [LeadEventLog::class, $logRepository],
                     [Import::class, $importRepository],
                 ]
             );
@@ -202,7 +203,9 @@ abstract class StandardImportTestHelper extends CommonMocks
             $translator,
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            new ProcessSignalService()
+            new ProcessSignalService(),
+            $importRepository,
+            $logRepository,
         );
     }
 }

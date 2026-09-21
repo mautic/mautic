@@ -28,7 +28,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<User>
  */
-class UserType extends AbstractType
+final class UserType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,

@@ -7,7 +7,9 @@ namespace Mautic\FormBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -90,7 +92,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
      * @param array<string, mixed> $payload
      * @param array<string, mixed> $expectedResponse
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('formDataProvider')]
+    #[DataProvider('formDataProvider')]
     public function testAddAndEditForms(array $payload, array $expectedResponse): void
     {
         $this->client->request('POST', '/api/forms/new', $payload);
@@ -110,7 +112,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertIsArray($response['form']['fields']);
         $this->assertCount(count($payload['fields']), $response['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);
@@ -131,7 +134,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $responsePatch['form']['description']);
         $this->assertIsArray($responsePatch['form']['fields']);
         $this->assertCount(count($payload['fields']), $responsePatch['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $responsePatch['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $responsePatch['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $responsePatch['form']['fields'][$i]['type']);
@@ -415,7 +419,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertSame('john@doe.test', $contact->getEmail());
         $this->assertSame('Czech Republic', $contact->getCountry());
@@ -520,7 +524,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertIsArray($response['form']['fields']);
         $this->assertCount(count($payload['fields']), $response['form']['fields']);
-        for ($i = 0; $i < count($payload['fields']); ++$i) {
+        $counter = count($payload['fields']);
+        for ($i = 0; $i < $counter; ++$i) {
             $this->assertEquals($payload['fields'][$i]['label'], $response['form']['fields'][$i]['label']);
             $this->assertEquals($payload['fields'][$i]['alias'], $response['form']['fields'][$i]['alias']);
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);

@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class BatchType extends AbstractType
+final class BatchType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

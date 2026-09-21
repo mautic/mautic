@@ -5,17 +5,21 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Controller\Api\FieldApiController;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Controller\Api\FieldApiController::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class)]
+#[CoversClass(FieldApiController::class)]
+#[CoversClass(CreateCustomFieldCommand::class)]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
@@ -112,7 +116,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, array<string, string>> $properties
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForCreatingNewBooleanFieldApiEndpoint')]
+    #[DataProvider('dataForCreatingNewBooleanFieldApiEndpoint')]
     public function testCreatingNewBooleanFieldApiEndpoint(array $properties, string $expectedMessage): void
     {
         $payload = [
@@ -165,7 +169,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmptyMultiSelectValue')]
+    #[DataProvider('provideEmptyMultiSelectValue')]
     public function testMultiselectSetDefaultValue(mixed $defaultFieldValue): void
     {
         $fieldAlias = 'test_multi';
@@ -277,7 +281,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         yield 'empty array with null value' => [[null]];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideEmptySelectValue')]
+    #[DataProvider('provideEmptySelectValue')]
     public function testSelectSetDefaultValue(mixed $defaultFieldValue): void
     {
         $fieldAlias = 'test_single';

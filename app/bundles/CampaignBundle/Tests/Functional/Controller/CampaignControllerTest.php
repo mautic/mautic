@@ -8,7 +8,6 @@ use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
-use GuzzleHttp\Utils;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
@@ -17,10 +16,10 @@ use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -205,6 +204,73 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertSame($expectedEventsStatistics, $eventsStatistics, 'Events statistics doesn\'t match the actual events in the database.');
     }
 
+    public function testIndexActionFiltersCampaignsBySegmentAliasQuickFilter(): void
+    {
+        $segmentPeople = $this->createSegment('people', []);
+        $segmentOther  = $this->createSegment('other', []);
+
+        $matchingCampaign = $this->createCampaign('Campaign For People');
+        $matchingCampaign->addList($segmentPeople);
+
+        $nonMatchingCampaign = $this->createCampaign('Campaign For Other');
+        $nonMatchingCampaign->addList($segmentOther);
+
+        $this->em->flush();
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/campaigns',
+            [
+                'search'  => 'list:people',
+                'filters' => json_encode(['list:people']),
+                'tmpl'    => 'list',
+            ]
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertStringContainsString($matchingCampaign->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString($nonMatchingCampaign->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString('No Results Found', (string) $responseData['newContent']);
+    }
+
+    public function testIndexActionFiltersCampaignsByFormQuickFilter(): void
+    {
+        $matchingForm    = $this->createFormEntity('matching-form');
+        $nonMatchingForm = $this->createFormEntity('other-form');
+        $this->em->flush();
+
+        $matchingCampaign = $this->createCampaign('Campaign For Matching Form');
+        $matchingCampaign->addForm($matchingForm);
+
+        $nonMatchingCampaign = $this->createCampaign('Campaign For Other Form');
+        $nonMatchingCampaign->addForm($nonMatchingForm);
+
+        $this->em->flush();
+
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/campaigns',
+            [
+                'search'  => sprintf('form:%d', $matchingForm->getId()),
+                'filters' => json_encode([sprintf('form:%d', $matchingForm->getId())]),
+                'tmpl'    => 'list',
+            ]
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertStringContainsString($matchingCampaign->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString($nonMatchingCampaign->getName(), (string) $responseData['newContent']);
+        $this->assertStringNotContainsString('No Results Found', (string) $responseData['newContent']);
+    }
+
     private function getCrawler(Campaign $campaign): Crawler
     {
         $now    = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
@@ -213,7 +279,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $url    = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $before->format('Y-m-d'), $after->format('Y-m-d'));
         $this->client->request('GET', $url);
         $response = $this->client->getResponse();
-        $body     = Utils::jsonDecode($response->getContent(), true);
+        $body     = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->client->restart();
 
         return new Crawler($body['actions']);
@@ -239,6 +305,16 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         }
 
         return $events;
+    }
+
+    private function createFormEntity(string $alias): Form
+    {
+        $form = new Form();
+        $form->setName($alias);
+        $form->setAlias($alias);
+        $this->em->persist($form);
+
+        return $form;
     }
 
     public function testExportAction(): void
@@ -312,7 +388,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $exportHelperMock->method('writeToZipFile')->willReturn('');
 
         // Inject the mock into the container
-        static::getContainer()->set(ExportHelper::class, $exportHelperMock);
+        self::getContainer()->set(ExportHelper::class, $exportHelperMock);
 
         $this->loginOtherUser($nonAdminUser);
 
@@ -370,7 +446,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $exportHelperMock->method('writeToZipFile')->willReturn('/invalid/path/to/file.zip');
 
         // Use the test container to replace the service with the mock
-        static::getContainer()->set(ExportHelper::class, $exportHelperMock);
+        self::getContainer()->set(ExportHelper::class, $exportHelperMock);
 
         $this->loginOtherUser($nonAdminUser);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -10,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class RedirectListType extends AbstractType
+final class RedirectListType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -37,7 +39,7 @@ class RedirectListType extends AbstractType
         $resolver->setDefined(['feature']);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

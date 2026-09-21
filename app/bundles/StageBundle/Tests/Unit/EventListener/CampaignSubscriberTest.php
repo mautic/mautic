@@ -154,8 +154,9 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function saveEntity($entity, $unlock = true): void
+            public function changeStage(Lead $lead, Stage $stage, string $origin): void
             {
+                $lead->setStage($stage);
             }
         };
 
@@ -227,6 +228,11 @@ final class CampaignSubscriberTest extends TestCase
         $contactModel = new class() extends LeadModel {
             public function __construct()
             {
+            }
+
+            public function changeStage(Lead $lead, Stage $stage, string $origin): void
+            {
+                throw new \UnexpectedValueException('[trans]mautic.stage.campaign.event.already_in_stage[/trans]');
             }
         };
 
@@ -305,6 +311,11 @@ final class CampaignSubscriberTest extends TestCase
         $contactModel = new class() extends LeadModel {
             public function __construct()
             {
+            }
+
+            public function changeStage(Lead $lead, Stage $stage, string $origin): void
+            {
+                throw new \UnexpectedValueException('[trans]mautic.stage.campaign.event.stage_invalid[/trans]');
             }
         };
 
@@ -386,8 +397,9 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function saveEntity($entity, $unlock = true): void
+            public function changeStage(Lead $lead, Stage $stage, string $origin): void
             {
+                $lead->setStage($stage);
             }
         };
 
@@ -432,7 +444,7 @@ final class CampaignSubscriberTest extends TestCase
             /**
              * @param array<string, mixed> $parameters
              */
-            public function trans($id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+            public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
             }

@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class VariantType extends AbstractType
+final class VariantType extends AbstractType
 {
     public const DEFAULT_WINNER_DELAY = 24;
 
@@ -68,10 +68,7 @@ class VariantType extends AbstractType
             'label'       => 'mautic.core.ab_test.form.traffic_total_weight',
             'label_attr'  => ['class' => 'control-label'],
             'attr'        => $attr + ['postaddon_text'  => '%'],
-            'constraints' => new Assert\Range([
-                'min' => 0,
-                'max' => 100,
-            ]),
+            'constraints' => new Assert\Range(min: 0, max: 100),
         ]);
 
         $attr = [
@@ -87,10 +84,7 @@ class VariantType extends AbstractType
             'label'       => 'mautic.core.ab_test.form.send_winner_delay',
             'label_attr'  => ['class' => 'control-label'],
             'attr'        => $attr + ['postaddon_text'  => $this->translator->trans('mautic.core.time.hours')],
-            'constraints' => new Assert\Range([
-                'min' => 1,
-                'max' => 480,
-            ]),
+            'constraints' => new Assert\Range(min: 1, max: 480),
             'data' => $options['data']['sendWinnerDelay'] ?? self::DEFAULT_WINNER_DELAY,
         ]);
 
@@ -103,7 +97,7 @@ class VariantType extends AbstractType
 
             if ($options['is_parent']) {
                 $constraints[] = new NotBlank(
-                    ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                    message: 'mautic.core.ab_test.winner_criteria.not_blank'
                 );
             }
 

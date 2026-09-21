@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -78,7 +80,6 @@ return [
             'mautic_email_unsubscribe' => [
                 'path'       => '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAction',
-                'defaults'   => ['urlEmail' => null, 'secretHash' => null],
             ],
             'mautic_email_unsubscribe_all' => [
                 'path'       => '/email/dnc/{idHash}/{urlEmail}/{secretHash}',
@@ -86,8 +87,14 @@ return [
                 'defaults'   => ['urlEmail' => null, 'secretHash' => null],
             ],
             'mautic_email_resubscribe' => [
-                'path'       => '/email/resubscribe/{idHash}',
+                'path'       => '/email/resubscribe/{idHash}/{urlEmail}/{secretHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::resubscribeAction',
+                'defaults'   => ['urlEmail' => null, 'secretHash' => null], // @todo make the secretHash required after a few years.
+            ],
+            'mautic_email_validate_email_form' => [
+                'path'       => '/email/validate/{action}/{secretHash}/{idHash}',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::validateEmailAction',
+                'defaults'   => ['idHash' => null],
             ],
             'mautic_mailer_transport_callback' => [
                 'path'       => '/mailer/callback',
@@ -117,149 +124,6 @@ return [
     'categories' => [
         'email' => [
             'class' => Mautic\EmailBundle\Entity\Email::class,
-        ],
-    ],
-    'services' => [
-        'other' => [
-            'mautic.di.env_processor.mailerdsn' => [
-                'class' => Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor::class,
-                'tag'   => 'container.env_var_processor',
-            ],
-            'mautic.message.search.contact' => [
-                'class'     => Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class,
-                'arguments' => [
-                    'mautic.email.repository.stat',
-                    'mautic.lead.repository.lead',
-                    'monolog.logger.mautic',
-                ],
-            ],
-            'mautic.message.processor.unsubscribe' => [
-                'class'     => Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
-                'arguments' => [
-                    'mailer.default_transport',
-                    'mautic.message.search.contact',
-                    'translator',
-                    'monolog.logger.mautic',
-                    'mautic.lead.model.dnc',
-                ],
-            ],
-            'mautic.message.processor.feedbackloop' => [
-                'class'     => Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class,
-                'arguments' => [
-                    'mautic.message.search.contact',
-                    'translator',
-                    'monolog.logger.mautic',
-                    'mautic.lead.model.dnc',
-                ],
-            ],
-            'mautic.validator.email' => [
-                'class'     => Mautic\EmailBundle\Helper\EmailValidator::class,
-                'arguments' => [
-                    'translator',
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.email.fetcher' => [
-                'class'     => Mautic\EmailBundle\MonitoredEmail\Fetcher::class,
-                'arguments' => [
-                    'mautic.helper.mailbox',
-                    'event_dispatcher',
-                    'translator',
-                ],
-            ],
-            'mautic.email.helper.stats_collection' => [
-                'class'     => Mautic\EmailBundle\Helper\StatsCollectionHelper::class,
-                'arguments' => [
-                    'mautic.email.stats.helper_container',
-                ],
-            ],
-            'mautic.email.stats.helper_container' => [
-                'class' => Mautic\EmailBundle\Stats\StatHelperContainer::class,
-            ],
-            'mautic.email.stats.helper_bounced' => [
-                'class'     => Mautic\EmailBundle\Stats\Helper\BouncedHelper::class,
-                'arguments' => [
-                    'mautic.stats.aggregate.collector',
-                    'doctrine.dbal.default_connection',
-                    'mautic.generated.columns.provider',
-                    'mautic.helper.user',
-                ],
-                'tag' => 'mautic.email_stat_helper',
-            ],
-            'mautic.email.stats.helper_clicked' => [
-                'class'     => Mautic\EmailBundle\Stats\Helper\ClickedHelper::class,
-                'arguments' => [
-                    'mautic.stats.aggregate.collector',
-                    'doctrine.dbal.default_connection',
-                    'mautic.generated.columns.provider',
-                    'mautic.helper.user',
-                ],
-                'tag' => 'mautic.email_stat_helper',
-            ],
-            'mautic.email.stats.helper_failed' => [
-                'class'     => Mautic\EmailBundle\Stats\Helper\FailedHelper::class,
-                'arguments' => [
-                    'mautic.stats.aggregate.collector',
-                    'doctrine.dbal.default_connection',
-                    'mautic.generated.columns.provider',
-                    'mautic.helper.user',
-                ],
-                'tag' => 'mautic.email_stat_helper',
-            ],
-            'mautic.email.stats.helper_opened' => [
-                'class'     => Mautic\EmailBundle\Stats\Helper\OpenedHelper::class,
-                'arguments' => [
-                    'mautic.stats.aggregate.collector',
-                    'doctrine.dbal.default_connection',
-                    'mautic.generated.columns.provider',
-                    'mautic.helper.user',
-                ],
-                'tag' => 'mautic.email_stat_helper',
-            ],
-            'mautic.email.stats.helper_sent' => [
-                'class'     => Mautic\EmailBundle\Stats\Helper\SentHelper::class,
-                'arguments' => [
-                    'mautic.stats.aggregate.collector',
-                    'doctrine.dbal.default_connection',
-                    'mautic.generated.columns.provider',
-                    'mautic.helper.user',
-                ],
-                'tag' => 'mautic.email_stat_helper',
-            ],
-            'mautic.email.stats.helper_unsubscribed' => [
-                'class'     => Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper::class,
-                'arguments' => [
-                    'mautic.stats.aggregate.collector',
-                    'doctrine.dbal.default_connection',
-                    'mautic.generated.columns.provider',
-                    'mautic.helper.user',
-                ],
-                'tag' => 'mautic.email_stat_helper',
-            ],
-        ],
-        'validator' => [
-            'mautic.email.validator.multiple_emails_valid_validator' => [
-                'class'     => Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class,
-                'arguments' => [
-                    'mautic.validator.email',
-                ],
-                'tag' => 'validator.constraint_validator',
-            ],
-            'mautic.email.validator.email_or_token_list_validator' => [
-                'class'     => Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class,
-                'arguments' => [
-                    'mautic.validator.email',
-                    'mautic.lead.validator.custom_field',
-                ],
-                'tag' => 'validator.constraint_validator',
-            ],
-        ],
-        'fixtures' => [
-            'mautic.email.fixture.email' => [
-                'class'     => Mautic\EmailBundle\DataFixtures\ORM\LoadEmailData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.email.model.email'],
-            ],
         ],
     ],
     'parameters' => [
@@ -333,6 +197,7 @@ return [
         'show_contact_preferred_channels'                                   => false,
         'show_contact_categories'                                           => false,
         'show_contact_segments'                                             => false,
+        'validate_unsubscribe_emails'                                       => true,
         'disable_trackable_urls'                                            => false,
         'email_draft_enabled'                                               => false,
         'theme_email_default'                                               => 'blank',

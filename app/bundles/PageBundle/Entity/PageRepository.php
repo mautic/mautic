@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\FormBundle\Entity\Submission;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
@@ -21,7 +22,7 @@ class PageRepository extends CommonRepository
             // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
             $sq = $this->_em->createQueryBuilder()
                 ->select('count(fs.id)')
-                ->from(\Mautic\FormBundle\Entity\Submission::class, 'fs')
+                ->from(Submission::class, 'fs')
                 ->where('fs.page = p');
 
             $select[] = '('.$sq->getDql().') as submission_count';
@@ -250,8 +251,6 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * Up the hit count.
-     *
      * @param int        $increaseBy
      * @param bool|false $unique
      * @param bool|false $variant

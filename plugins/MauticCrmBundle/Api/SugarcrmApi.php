@@ -8,9 +8,9 @@ use MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration;
 /**
  * @property SugarcrmIntegration $integration
  */
-class SugarcrmApi extends CrmApi
+final class SugarcrmApi extends CrmApi
 {
-    protected $object = 'Leads';
+    private string $object = 'Leads';
 
     /**
      * @param string $method
@@ -296,10 +296,8 @@ class SugarcrmApi extends CrmApi
 
     /**
      *                TODO 7.x.
-     *
-     * @return array|mixed|string
      */
-    public function createLeadActivity(array $activity, $object)
+    public function createLeadActivity(array $activity, $object): ?array
     {
         $tokenData = $this->integration->getKeys();
 
@@ -316,7 +314,7 @@ class SugarcrmApi extends CrmApi
         $s7_records = [];
         // Send activities and get back sugar activities id
 
-        if (!empty($activity)) {
+        if ([] !== $activity) {
             foreach ($activity as $sugarId => $records) {
                 foreach ($records['records'] as $record) {
                     $rec   = [];
@@ -420,6 +418,8 @@ class SugarcrmApi extends CrmApi
 
             return [];
         }
+
+        return null;
     }
 
     /**
@@ -580,7 +580,7 @@ class SugarcrmApi extends CrmApi
         if ('6' == $tokenData['version']) {
             $result = [];
 
-            if (!empty($fields)) {
+            if ([] !== $fields) {
                 $q   = '';
                 $qry = [];
                 if (isset($query['start'])) {
@@ -637,7 +637,7 @@ class SugarcrmApi extends CrmApi
                 return $this->request('get_entry_list', $parameters, 'GET', $object);
             }
         } else {
-            if (!empty($fields)) {
+            if ([] !== $fields) {
                 $q      = '';
                 $qry    = [];
                 $filter = [];

@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class PublishUpDateType extends AbstractType
+final class PublishUpDateType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -26,9 +26,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.asset.config.form.upload.dir.tooltip',
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );
@@ -44,9 +42,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.asset.config.form.max.size.tooltip',
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );

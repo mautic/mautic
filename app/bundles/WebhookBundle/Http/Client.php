@@ -2,7 +2,6 @@
 
 namespace Mautic\WebhookBundle\Http;
 
-use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\Request;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PrivateAddressChecker;
@@ -13,7 +12,7 @@ class Client
 {
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly GuzzleClient $httpClient,
+        private readonly \GuzzleHttp\Client $httpClient,
         private readonly PrivateAddressChecker $privateAddressChecker,
     ) {
     }

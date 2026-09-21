@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -25,22 +26,35 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<LeadField>
  */
-class FieldApiController extends CommonApiController
+final class FieldApiController extends CommonApiController
 {
     /**
      * Can have value of 'contact' or 'company'.
      *
      * @var string
      */
-    protected $fieldObject;
+    private $fieldObject;
 
     /**
      * @var FieldModel|null
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, FieldModel $fieldModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        FieldModel $fieldModel,
+        private readonly LeadFieldRepository $leadFieldRepository,
+    ) {
         $request = $requestStack->getCurrentRequest();
         \assert(null !== $request);
 
@@ -55,8 +69,7 @@ class FieldApiController extends CommonApiController
             $this->fieldObject = 'lead';
         }
 
-        $repo                = $this->model->getRepository();
-        $tableAlias          = $repo->getTableAlias();
+        $tableAlias          = $this->leadFieldRepository->getTableAlias();
         $this->listFilters[] = [
             'column' => $tableAlias.'.object',
             'expr'   => 'eq',

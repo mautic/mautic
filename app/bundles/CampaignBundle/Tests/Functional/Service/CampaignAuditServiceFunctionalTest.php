@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Functional\Service;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -31,7 +32,7 @@ final class CampaignAuditServiceFunctionalTest extends MauticMysqlTestCase
         $this->campaignAuditService = new CampaignAuditService(
             $this->flashBagMock,
             $this->urlGeneratorMock,
-            static::getContainer()->get('mautic.campaign.repository.event')
+            self::getContainer()->get(EventRepository::class)
         );
     }
 

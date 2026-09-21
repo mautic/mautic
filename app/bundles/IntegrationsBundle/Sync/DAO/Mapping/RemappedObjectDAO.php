@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
-class RemappedObjectDAO
+final class RemappedObjectDAO
 {
     /**
      * @param mixed $oldObjectId

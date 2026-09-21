@@ -17,12 +17,11 @@ final class Version20230311195347 extends AbstractMauticMigration
         $columnName = 'integration';
         $value      = 'Pipedrive';
 
-        $connection = $this->connection;
-        $rowCount   = self::BATCH_SIZE;
+        $rowCount = self::BATCH_SIZE;
 
         while ($rowCount) {
             $sql      = "DELETE FROM {$tableName} WHERE {$columnName} = :value LIMIT ".self::BATCH_SIZE;
-            $rowCount = $connection->executeStatement($sql, ['value' => $value]);
+            $rowCount = $this->connection->executeStatement($sql, ['value' => $value]);
         }
     }
 }

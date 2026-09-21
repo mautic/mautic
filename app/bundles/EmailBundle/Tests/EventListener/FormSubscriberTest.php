@@ -20,17 +20,14 @@ final class FormSubscriberTest extends TestCase
     /**
      * @var MockObject&EmailModel
      */
-    protected MockObject $emailModel;
+    private MockObject $emailModel;
 
     /**
      * @var MockObject&ContactTracker
      */
-    protected MockObject $contactTracker;
+    private MockObject $contactTracker;
 
-    /**
-     * @var FormSubscriber
-     */
-    protected $formSubscriber;
+    private FormSubscriber $formSubscriber;
 
     protected function setUp(): void
     {

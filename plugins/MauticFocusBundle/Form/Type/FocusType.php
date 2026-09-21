@@ -26,7 +26,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Focus>
  */
-class FocusType extends AbstractType
+final class FocusType extends AbstractType
 {
     public function __construct(
         private readonly CorePermissions $security,
