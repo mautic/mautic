@@ -13,18 +13,18 @@ use Mautic\IntegrationsBundle\Exception\InvalidCredentialsException;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 use PHPUnit\Framework\TestCase;
 
-class HttpFactoryTest extends TestCase
+final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertEquals('api_key', (new HttpFactory())->getAuthType());
+        $this->assertSame('api_key', (new HttpFactory())->getAuthType());
     }
 
     public function testInvalidCredentialsThrowsException(): void
     {
         $this->expectException(InvalidCredentialsException::class);
 
-        $credentials = new class implements AuthCredentialsInterface {
+        $credentials = new class() implements AuthCredentialsInterface {
         };
 
         (new HttpFactory())->getClient($credentials);
@@ -34,7 +34,7 @@ class HttpFactoryTest extends TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class implements HeaderCredentialsInterface {
+        $credentials = new class() implements HeaderCredentialsInterface {
             public function getApiKey(): string
             {
                 return '';
@@ -51,7 +51,7 @@ class HttpFactoryTest extends TestCase
 
     public function testInstantiatedClientIsReturned(): void
     {
-        $credentials = new class implements HeaderCredentialsInterface {
+        $credentials = new class() implements HeaderCredentialsInterface {
             public function getApiKey(): string
             {
                 return 'abc';
@@ -67,9 +67,9 @@ class HttpFactoryTest extends TestCase
 
         $client1 = $factory->getClient($credentials);
         $client2 = $factory->getClient($credentials);
-        $this->assertTrue($client1 === $client2);
+        $this->assertSame($client2, $client1);
 
-        $credential2 = new class implements HeaderCredentialsInterface {
+        $credential2 = new class() implements HeaderCredentialsInterface {
             public function getApiKey(): string
             {
                 return '123';
@@ -82,12 +82,12 @@ class HttpFactoryTest extends TestCase
         };
 
         $client3 = $factory->getClient($credential2);
-        $this->assertFalse($client1 === $client3);
+        $this->assertNotSame($client3, $client1);
     }
 
     public function testHeaderCredentialsSetsHeader(): void
     {
-        $credentials = new class implements HeaderCredentialsInterface {
+        $credentials = new class() implements HeaderCredentialsInterface {
             public function getApiKey(): string
             {
                 return '123';
@@ -109,7 +109,7 @@ class HttpFactoryTest extends TestCase
 
     public function testParameterCredentialsAppendsToken(): void
     {
-        $credentials = new class implements ParameterCredentialsInterface {
+        $credentials = new class() implements ParameterCredentialsInterface {
             public function getApiKey(): string
             {
                 return '123';
@@ -126,7 +126,7 @@ class HttpFactoryTest extends TestCase
 
         try {
             // Triggering an exception so we can extract the request
-            $client->request('get', 'foobar');
+            $client->request('get', 'http://foobar.invalid/test');
         } catch (ConnectException $exception) {
             $query = $exception->getRequest()->getUri()->getQuery();
             $this->assertEquals('abc=123', $query);

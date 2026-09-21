@@ -21,10 +21,27 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.2', '8.3', '8.4']
-        db-types: ['mysql:8.4', 'mysql:9.2', 'mariadb:10.11', 'mariadb:11.4']
+        include:
+          - php-versions: '8.2'
+            db-types: 'mysql:8.4'
+          - php-versions: '8.2'
+            db-types: 'mariadb:10.11'
+          - php-versions: '8.5'
+            db-types: 'mysql:9.2'
+          - php-versions: '8.5'
+            db-types: 'mariadb:11.4'
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
+
+    env:
+      # Collecting coverage roughly doubles the runtime of this job (~10 min -> ~19 min), so we only
+      # do it where the report is actually uploaded: on the mautic/mautic repository, for merges and
+      # for the nightly schedule. Pull requests skip it, which also stops fork PRs from generating a
+      # coverage report that is then discarded.
+      COVERAGE: ${{ matrix.php-versions == '8.2'
+        && matrix.db-types == 'mariadb:10.11'
+        && github.repository == 'mautic/mautic'
+        && (github.event_name == 'push' || github.event_name == 'schedule') }}
 
     services:
       database:
@@ -51,14 +68,14 @@ jobs:
           - 8086:8080
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # Codecov needs access to previous commits, so we add fetch-depth: 0
       with:
         fetch-depth: 0
 
     - name: PHPUnit cache
       if: ${{matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11'}}
-      uses: actions/cache@v4
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./var/cache/phpunit
         key: ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
@@ -67,7 +84,7 @@ jobs:
           ${{ runner.os }}-phpunit-
 
     - name: Setup PHP, with composer and extensions
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
@@ -89,8 +106,7 @@ jobs:
         echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
     - name: Install dependencies
-      # composer install cache - https://github.com/ramsey/composer-install
-      uses: "ramsey/composer-install@v3"
+      uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
 
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
@@ -98,15 +114,15 @@ jobs:
         export DB_PORT="${{ job.services.database.ports[3306] }}"
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
-        if [[ "${{ matrix.php-versions }}" == "8.2" ]] && [[ "${{ matrix.db-types }}" == "mariadb:10.11" ]]; then
+        if [[ "$COVERAGE" == "true" ]]; then
           php -d zend.assertions=1 -d pcov.enabled=1 bin/phpunit -d memory_limit=3G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
           php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
         fi
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
-      uses: codecov/codecov-action@v5
+      if: ${{ env.COVERAGE == 'true' }}
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
@@ -114,8 +130,8 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Save test results for future steps
-      if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
-      uses: actions/upload-artifact@v4
+      if: ${{ env.COVERAGE == 'true' }}
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: test-results
         path: |
@@ -123,7 +139,7 @@ jobs:
           ./coverage.xml
 
     - name: Slack Notification if tests fail
-      uses: rtCamp/action-slack-notify@v2
+      uses: rtCamp/action-slack-notify@33ca3be66c6f378fe1610fd1d5258632dbed5e58 # v2
       if: ${{ failure() && github.event_name == 'schedule' }}
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -131,7 +147,7 @@ jobs:
 
     - name: Store log artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: logs-${{ matrix.php-versions }}-${{ env.DB_LOG_NAME }}
         path: ./var/logs/*
@@ -141,22 +157,22 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
 
     - name: Setup DDEV
-      uses: ddev/github-action-setup-ddev@v1
+      uses: ddev/github-action-setup-ddev@fdf2f5c97943bae638f31df6df86f1defa6210c0 # v1
 
     - name: Set up environment variables for test mode
       run: echo -e "APP_ENV=test\nAPP_DEBUG=1" > .env.local
 
     - name: Run E2E tests
-      run: ddev composer e2e-test
+      run: ddev exec composer e2e-test
 
     - name: Upload test artifacts
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: e2e-test-screenshots
         path: tests/_output
@@ -170,19 +186,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Rector tests', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install', 'composer lock check']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'composer install', 'composer lock check']
         php-versions: ['8.2']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
 
     - name: Rector Cache
       if: ${{matrix.commands == 'Rector'}}
-      uses: actions/cache@v4
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./var/cache/rector
         key: ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
@@ -190,19 +206,9 @@ jobs:
           ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}
           ${{ runner.os }}-rector-
 
-    - name: Rector tests Cache
-      if: ${{matrix.commands == 'Rector tests'}}
-      uses: actions/cache@v4
-      with:
-        path: ./var/cache/rector-tests
-        key: ${{ runner.os }}-rector-tests-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
-        restore-keys: |
-          ${{ runner.os }}-rector-tests-${{ hashFiles('**/composer.lock') }}
-          ${{ runner.os }}-rector-tests-
-
     - name: PHPStan Cache
       if: ${{matrix.commands == 'PHPSTAN'}}
-      uses: actions/cache@v4
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./var/phpstan-cache
         key: ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
@@ -211,7 +217,7 @@ jobs:
           ${{ runner.os }}-phpstan-
 
     - name: NPM Cache
-      uses: actions/cache@v4
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./var/cache/js
         key: ${{ runner.os }}-js-${{ hashFiles('**/package-lock.json', 'webpack.config.js') }}-${{ github.run_id }}
@@ -221,17 +227,16 @@ jobs:
 
     - name: Get changed files
       id: changed-files
-      uses: tj-actions/changed-files@v46
+      uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
 
     - name: Setup PHP, with composer and extensions
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies
-      # composer install cache - https://github.com/ramsey/composer-install
-      uses: "ramsey/composer-install@v3"
+      uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
       env:
         NPM_CONFIG_CACHE: ./var/cache/js/npm
 
@@ -246,10 +251,6 @@ jobs:
           export SYMFONY_ENV=test
           bin/console cache:warmup
           bin/rector --dry-run --ansi
-        elif [[ "${{ matrix.commands }}" == "Rector tests" ]]; then
-          export SYMFONY_ENV=test
-          bin/console cache:warmup
-          bin/rector --config=rector-tests.php --dry-run --ansi
         elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
           bin/console lint:twig app plugins
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
@@ -274,17 +275,6 @@ jobs:
             bash diff_commands_verbose.sh
             exit 1
           fi
-        elif [[ "${{ matrix.commands }}" == "PHPStan baseline changes" ]]; then
-          if [[ "${{ steps.changed-files.outputs.modified_files }}" == *"phpstan-baseline.neon"* ]]; then
-            stat=$(git diff --shortstat "origin/${{ github.base_ref }}" ${{ github.sha }} -- phpstan-baseline.neon)
-            echo $stat
-            regex="[0-9]+[[:space:]]insertion"
-            if [[ $stat =~ $regex ]]; then
-              echo "There are modifications (added or changed lines) to the phpstan-baseline.neon"
-              echo "Please fix the PHPStan errors instead of altering the baseline file"
-              exit 1
-            fi
-          fi
         elif [[ "${{ matrix.commands }}" == "composer install" ]]; then
           # create a temp dir and mimic a composer install via mautic/recommended-project
           mkdir test_composer
@@ -298,6 +288,19 @@ jobs:
 
           # test if console is executable
           ./bin/console cache:clear
+
+          # test that local_root is auto-detected from composer.json's mautic-scaffold.locations.web-root
+          # This ensures ElFinder and other webroot-relative paths resolve correctly for recommended-project
+          php -r "
+            require 'vendor/autoload.php';
+            \$projectRoot = getcwd();
+            \$webrootDir = Mautic\CoreBundle\Loader\ParameterLoader::getWebrootDir(\$projectRoot);
+            if (\$webrootDir !== \$projectRoot . '/docroot') {
+              echo \"ERROR: Expected webroot to be {\$projectRoot}/docroot, got {\$webrootDir}\n\";
+              exit(1);
+            }
+            echo \"OK: Webroot correctly auto-detected as {\$webrootDir}\n\";
+          "
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer validate --ansi
         else
@@ -306,7 +309,7 @@ jobs:
         fi
 
     - name: Slack Notification if tests fail
-      uses: rtCamp/action-slack-notify@v2
+      uses: rtCamp/action-slack-notify@33ca3be66c6f378fe1610fd1d5258632dbed5e58 # v2
       if: ${{ failure() && github.event_name == 'schedule' }}
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

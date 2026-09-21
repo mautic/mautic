@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 /**
  * Helper class custom field operations.
  */
-class CustomFieldHelper
+final class CustomFieldHelper
 {
     public const TYPE_BOOLEAN = 'boolean';
 

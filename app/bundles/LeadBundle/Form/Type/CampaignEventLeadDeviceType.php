@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadDeviceType extends AbstractType
+final class CampaignEventLeadDeviceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

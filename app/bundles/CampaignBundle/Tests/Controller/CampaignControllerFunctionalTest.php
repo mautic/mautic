@@ -11,26 +11,19 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
+final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
     private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
 
     private const CAMPAIGN_RANGE_PARAM   = 'campaign_by_range';
 
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
+    private CampaignModel $campaignModel;
 
-    /**
-     * @var string
-     */
-    private $campaignLeadsLabel;
+    private string $campaignLeadsLabel;
 
     protected function setUp(): void
     {
@@ -47,10 +40,10 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->name(), $functionForUseRange);
         parent::setUp();
 
-        $model = static::getContainer()->get(CampaignModel::class);
+        $model = self::getContainer()->get(CampaignModel::class);
 
         $this->campaignModel                                           = $model;
-        $this->campaignLeadsLabel                                      = static::getContainer()->get('translator')->trans('mautic.campaign.campaign.leads');
+        $this->campaignLeadsLabel                                      = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.campaign.campaign.leads');
         $this->configParams['delete_campaign_event_log_in_background'] = false;
     }
 
@@ -262,7 +255,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $campaignId = $campaign->getId();
 
         $totalContacts = $this->getStatTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
+        $this->assertSame(2, $totalContacts);
     }
 
     private function campaignContactCountOnCanvas(): void
@@ -270,7 +263,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $campaign      = $this->saveSomeCampaignLeadEventLogs();
         $campaignId    = $campaign->getId();
         $totalContacts = $this->getCanvasTotalContacts($campaignId);
-        Assert::assertSame(2, $totalContacts);
+        $this->assertSame(2, $totalContacts);
     }
 
     /**
@@ -294,9 +287,9 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         }
 
         $actionCounts = $this->getActionCounts($campaignId);
-        Assert::assertSame($expectedSuccessPercent, $actionCounts['successPercent']);
-        Assert::assertSame($expectedCompleted, $actionCounts['completed']);
-        Assert::assertSame($expectedPending, $actionCounts['pending']);
+        $this->assertSame($expectedSuccessPercent, $actionCounts['successPercent']);
+        $this->assertSame($expectedCompleted, $actionCounts['completed']);
+        $this->assertSame($expectedPending, $actionCounts['pending']);
     }
 
     public function testDeleteCampaign(): void
@@ -309,10 +302,10 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $this->client->request(Request::METHOD_POST, '/s/campaigns/delete/'.$campaign->getId());
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
 
         $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(0, $eventLogs);
+        $this->assertCount(0, $eventLogs);
     }
 
     private function createLead(): Lead
@@ -365,12 +358,12 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $campaign = $this->saveSomeCampaignLeadEventLogs();
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns/view/%d', $campaign->getId()));
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
-        self::assertStringContainsString('Campaign ABC', $response->getContent());
-        self::assertSame('', trim($crawler->filter('#decisions-container')->text()));
-        self::assertSame('', trim($crawler->filter('#actions-container')->text()));
-        self::assertSame('', trim($crawler->filter('#conditions-container')->text()));
-        self::assertSame('', trim($crawler->filter('#campaign-graph-div')->text()));
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString('Campaign ABC', (string) $response->getContent());
+        $this->assertSame('', trim($crawler->filter('#decisions-container')->text()));
+        $this->assertSame('', trim($crawler->filter('#actions-container')->text()));
+        $this->assertSame('', trim($crawler->filter('#conditions-container')->text()));
+        $this->assertSame('', trim($crawler->filter('#campaign-graph-div')->text()));
     }
 
     public function testCampaignViewEvents(): void
@@ -380,10 +373,10 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $campaign = $this->saveSomeCampaignLeadEventLogs();
         $this->client->request('GET', sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
         $body     = json_decode($response->getContent(), true);
-        self::assertCount(2, $body);
+        $this->assertCount(2, $body);
         self::arrayHasKey('actions');
-        self::assertStringContainsString('100% 2 0 Event A mautic.campaign.type.a 100% 2 0 Event B mautic.campaign.type.b', preg_replace('/\s+/', ' ', strip_tags($body['actions'])));
+        $this->assertStringContainsString('100% 2 0 Event A mautic.campaign.type.a 100% 2 0 Event B mautic.campaign.type.b', (string) preg_replace('/\s+/', ' ', strip_tags($body['actions'])));
     }
 }

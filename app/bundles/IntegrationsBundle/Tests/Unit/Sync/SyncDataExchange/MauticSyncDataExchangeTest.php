@@ -19,48 +19,37 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullO
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class MauticSyncDataExchangeTest extends TestCase
+final class MauticSyncDataExchangeTest extends TestCase
 {
     /**
-     * @var MockObject|FieldChangeRepository
+     * @var MockObject&FieldChangeRepository
      */
     private MockObject $fieldChangeRepository;
 
     /**
-     * @var MockObject|FieldHelper
+     * @var MockObject&FieldHelper
      */
     private MockObject $fieldHelper;
 
     /**
-     * @var MockObject|MappingHelper
+     * @var MockObject&MappingHelper
      */
     private MockObject $mappingHelper;
 
     /**
-     * @var MockObject|FullObjectReportBuilder
+     * @var MockObject&FullObjectReportBuilder
      */
     private MockObject $fullObjectReportBuilder;
 
     /**
-     * @var MockObject|PartialObjectReportBuilder
+     * @var MockObject&PartialObjectReportBuilder
      */
     private MockObject $partialObjectReportBuilder;
 
-    /**
-     * @var MockObject|OrderExecutioner
-     */
-    private MockObject $orderExecutioner;
-
     private MauticSyncDataExchange $mauticSyncDataExchange;
-
-    /**
-     * @var SyncDateHelper&MockObject
-     */
-    private MockObject $syncDateHelper;
 
     protected function setUp(): void
     {
@@ -69,8 +58,6 @@ class MauticSyncDataExchangeTest extends TestCase
         $this->mappingHelper              = $this->createMock(MappingHelper::class);
         $this->fullObjectReportBuilder    = $this->createMock(FullObjectReportBuilder::class);
         $this->partialObjectReportBuilder = $this->createMock(PartialObjectReportBuilder::class);
-        $this->orderExecutioner           = $this->createMock(OrderExecutioner::class);
-        $this->syncDateHelper             = $this->createMock(SyncDateHelper::class);
 
         $this->mauticSyncDataExchange = new MauticSyncDataExchange(
             $this->fieldChangeRepository,
@@ -78,8 +65,8 @@ class MauticSyncDataExchangeTest extends TestCase
             $this->mappingHelper,
             $this->fullObjectReportBuilder,
             $this->partialObjectReportBuilder,
-            $this->orderExecutioner,
-            $this->syncDateHelper
+            $this->createStub(OrderExecutioner::class),
+            $this->createStub(SyncDateHelper::class)
         );
     }
 
@@ -164,8 +151,8 @@ class MauticSyncDataExchangeTest extends TestCase
 
         $internalObjectDao = $this->mauticSyncDataExchange->getConflictedInternalObject($mappingManualDao, 'lead', $integrationObjectDao);
 
-        Assert::assertSame('lead', $internalObjectDao->getObject());
-        Assert::assertNull($internalObjectDao->getObjectId());
+        $this->assertSame('lead', $internalObjectDao->getObject());
+        $this->assertNull($internalObjectDao->getObjectId());
     }
 
     public function testGetConflictedInternalObjectWithObjectId(): void
@@ -199,8 +186,8 @@ class MauticSyncDataExchangeTest extends TestCase
 
         $internalObjectDao = $this->mauticSyncDataExchange->getConflictedInternalObject($mappingManualDao, 'lead', $integrationObjectDao);
 
-        Assert::assertSame('lead', $internalObjectDao->getObject());
-        Assert::assertSame(123, $internalObjectDao->getObjectId());
-        Assert::assertCount(1, $internalObjectDao->getFields());
+        $this->assertSame('lead', $internalObjectDao->getObject());
+        $this->assertSame(123, $internalObjectDao->getObjectId());
+        $this->assertCount(1, $internalObjectDao->getFields());
     }
 }

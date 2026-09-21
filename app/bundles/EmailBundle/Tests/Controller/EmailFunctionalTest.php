@@ -15,7 +15,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailFunctionalTest extends MauticMysqlTestCase
+final class EmailFunctionalTest extends MauticMysqlTestCase
 {
     public const SAVE_AND_CLOSE = 'Save & Close';
 
@@ -35,15 +35,15 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
-        $this->assertResponseOk();
+        self::assertResponseIsSuccessful();
         $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
         // change lists/excludedLists and submit the form
         $form['emailform[excludedLists]']->setValue([$listOne->getId(), $listThree->getId()]); // @phpstan-ignore-line
         $crawler = $this->client->submit($form);
 
-        $this->assertResponseOk();
-        Assert::assertStringContainsString('The same segment cannot be excluded and included in the same time.', $crawler->html());
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString('The same segment cannot be excluded and included in the same time.', $crawler->html());
     }
 
     public function testExcludedSegmentsFieldIsUpdated(): void
@@ -63,7 +63,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
-        $this->assertResponseOk();
+        self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
@@ -86,9 +86,10 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         $excludedListsField->setValue([$listTwo->getId(), $listThree->getId()]);
         $this->client->submit($form);
 
-        $this->assertResponseOk();
+        self::assertResponseIsSuccessful();
 
         $email = $this->em->find(Email::class, $email->getId());
+        $this->assertInstanceOf(Email::class, $email);
 
         // assert lists/excludedLists changed accordingly
         $this->assertEmailLists([
@@ -105,19 +106,19 @@ class EmailFunctionalTest extends MauticMysqlTestCase
             'bundle' => 'email',
             'object' => 'email',
         ]);
-        Assert::assertCount(1, $auditLogs);
+        $this->assertCount(1, $auditLogs);
         /** @var AuditLog $auditLog */
         $auditLog = reset($auditLogs);
-        Assert::assertInstanceOf(AuditLog::class, $auditLog);
+        $this->assertInstanceOf(AuditLog::class, $auditLog);
         $details = $auditLog->getDetails();
-        Assert::assertIsArray($details);
-        Assert::assertArrayHasKey('lists', $details);
-        Assert::assertSame([
+        $this->assertIsArray($details);
+        $this->assertArrayHasKey('lists', $details);
+        $this->assertSame([
             [$listOne->getId()],
             [$listOne->getId(), $listFour->getId()],
         ], $details['lists']);
-        Assert::assertArrayHasKey('excludedLists', $details);
-        Assert::assertSame([
+        $this->assertArrayHasKey('excludedLists', $details);
+        $this->assertSame([
             [$listTwo->getId()],
             [$listTwo->getId(), $listThree->getId()],
         ], $details['excludedLists']);
@@ -139,36 +140,37 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
-        $this->assertResponseOk();
+        self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
         $preferenceCenterField = $form['emailform[preferenceCenter]'];
-        Assert::assertSame((string) $preferenceCenterOne->getId(), $preferenceCenterField->getValue());
+        $this->assertSame((string) $preferenceCenterOne->getId(), $preferenceCenterField->getValue());
 
         $preferenceCenterField->setValue((string) $preferenceCenterTwo->getId());
         $this->client->submit($form);
 
-        $this->assertResponseOk();
+        self::assertResponseIsSuccessful();
 
         $email = $this->em->find(Email::class, $email->getId());
+        $this->assertInstanceOf(Email::class, $email);
 
-        Assert::assertSame($preferenceCenterTwo->getId(), $email->getPreferenceCenter()->getId());
+        $this->assertSame($preferenceCenterTwo->getId(), $email->getPreferenceCenter()->getId());
 
         $auditLogs = $this->em->getRepository(AuditLog::class)->findBy([
             'bundle' => 'email',
             'object' => 'email',
         ]);
-        Assert::assertCount(1, $auditLogs);
+        $this->assertCount(1, $auditLogs);
 
         /** @var AuditLog $auditLog */
         $auditLog = reset($auditLogs);
-        Assert::assertInstanceOf(AuditLog::class, $auditLog);
+        $this->assertInstanceOf(AuditLog::class, $auditLog);
 
         $details = $auditLog->getDetails();
-        Assert::assertIsArray($details);
-        Assert::assertArrayHasKey('preferenceCenter', $details);
-        Assert::assertSame([
+        $this->assertIsArray($details);
+        $this->assertArrayHasKey('preferenceCenter', $details);
+        $this->assertSame([
             $preferenceCenterOne->getId(),
             $preferenceCenterTwo->getId(),
         ], $details['preferenceCenter']);
@@ -197,7 +199,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         sort($expected);
         sort($actual);
 
-        Assert::assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -215,9 +217,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
      */
     private function assertEmailLists(array $expectedListIds, Collection $collection): void
     {
-        $this->assertArrayValuesEquals($expectedListIds, $collection->map(function (LeadList $leadList) {
-            return $leadList->getId();
-        })->toArray());
+        $this->assertArrayValuesEquals($expectedListIds, $collection->map(fn (LeadList $leadList) => $leadList->getId())->toArray());
     }
 
     private function createEmail(): Email
@@ -247,10 +247,5 @@ class EmailFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($page);
 
         return $page;
-    }
-
-    private function assertResponseOk(): void
-    {
-        Assert::assertTrue($this->client->getResponse()->isOk());
     }
 }

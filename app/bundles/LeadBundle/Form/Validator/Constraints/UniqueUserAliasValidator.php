@@ -8,22 +8,12 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
-class UniqueUserAliasValidator extends ConstraintValidator
+final class UniqueUserAliasValidator extends ConstraintValidator
 {
-    /**
-     * @var LeadListRepository
-     */
-    public $segmentRepository;
-
-    /**
-     * @var UserHelper
-     */
-    public $userHelper;
-
-    public function __construct(LeadListRepository $segmentRepository, UserHelper $userHelper)
-    {
-        $this->segmentRepository = $segmentRepository;
-        $this->userHelper        = $userHelper;
+    public function __construct(
+        public LeadListRepository $segmentRepository,
+        public UserHelper $userHelper,
+    ) {
     }
 
     public function validate(mixed $list, Constraint $constraint): void

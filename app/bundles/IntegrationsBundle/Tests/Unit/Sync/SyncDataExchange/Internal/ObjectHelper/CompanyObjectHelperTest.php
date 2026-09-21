@@ -15,29 +15,23 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class CompanyObjectHelperTest extends TestCase
+final class CompanyObjectHelperTest extends TestCase
 {
     /**
-     * @var CompanyModel&MockObject
+     * @var MockObject&CompanyModel
      */
     private MockObject $model;
 
     /**
-     * @var CompanyRepository&MockObject
+     * @var MockObject&CompanyRepository
      */
     private MockObject $repository;
 
     /**
-     * @var Connection&MockObject
-     */
-    private MockObject $connection;
-
-    /**
-     * @var FieldsWithUniqueIdentifier&MockObject
+     * @var MockObject&FieldsWithUniqueIdentifier
      */
     private MockObject $fieldsWithUniqueIdentifier;
 
@@ -45,7 +39,6 @@ class CompanyObjectHelperTest extends TestCase
     {
         $this->model                      = $this->createMock(CompanyModel::class);
         $this->repository                 = $this->createMock(CompanyRepository::class);
-        $this->connection                 = $this->createMock(Connection::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
 
         $this->fieldsWithUniqueIdentifier->method('getFieldsWithUniqueIdentifier')
@@ -66,17 +59,12 @@ class CompanyObjectHelperTest extends TestCase
 
         $this->model->expects($this->exactly(3))
             ->method('saveEntity')
-            ->with(
-                $this->callback(function (Company $company) use ($idMap): bool {
-                    // Set ID
-                    $reflection = new \ReflectionClass($company);
-                    $property   = $reflection->getProperty('id');
-                    $property->setAccessible(true);
-                    $property->setValue($company, $idMap[$company->getEmail()]);
-
-                    return true;
-                })
-            );
+            ->willReturnCallback(function (Company $company) use ($idMap): void {
+                // Set ID
+                $reflection = new \ReflectionClass($company);
+                $property   = $reflection->getProperty('id');
+                $property->setValue($company, $idMap[$company->getEmail()]);
+            });
 
         $this->repository->expects($this->exactly(2))
             ->method('detachEntity');
@@ -100,10 +88,10 @@ class CompanyObjectHelperTest extends TestCase
             switch ($objects[$key]->getMappedObjectId()) {
                 case 1:
                 case 3:
-                    Assert::assertSame(127, $objectMapping->getInternalObjectId());
+                    $this->assertSame(127, $objectMapping->getInternalObjectId());
                     break;
                 case 2:
-                    Assert::assertSame(128, $objectMapping->getInternalObjectId());
+                    $this->assertSame(128, $objectMapping->getInternalObjectId());
                     break;
             }
         }
@@ -119,17 +107,12 @@ class CompanyObjectHelperTest extends TestCase
 
         $this->model->expects($this->exactly(4))
             ->method('saveEntity')
-            ->with(
-                $this->callback(function (Company $company) use ($idMap): bool {
-                    // Set ID
-                    $reflection = new \ReflectionClass($company);
-                    $property   = $reflection->getProperty('id');
-                    $property->setAccessible(true);
-                    $property->setValue($company, $idMap[$company->getEmail()]);
-
-                    return true;
-                })
-            );
+            ->willReturnCallback(function (Company $company) use ($idMap): void {
+                // Set ID
+                $reflection = new \ReflectionClass($company);
+                $property   = $reflection->getProperty('id');
+                $property->setValue($company, $idMap[$company->getEmail() ?? '']);
+            });
 
         $this->repository->expects($this->exactly(3))
             ->method('detachEntity');
@@ -154,13 +137,13 @@ class CompanyObjectHelperTest extends TestCase
             switch ($objects[$key]->getMappedObjectId()) {
                 case 1:
                 case 3:
-                    Assert::assertSame(127, $objectMapping->getInternalObjectId());
+                    $this->assertSame(127, $objectMapping->getInternalObjectId());
                     break;
                 case 2:
-                    Assert::assertSame(128, $objectMapping->getInternalObjectId());
+                    $this->assertSame(128, $objectMapping->getInternalObjectId());
                     break;
                 case 4:
-                    Assert::assertSame(129, $objectMapping->getInternalObjectId());
+                    $this->assertSame(129, $objectMapping->getInternalObjectId());
                     break;
             }
         }
@@ -197,7 +180,7 @@ class CompanyObjectHelperTest extends TestCase
         foreach ($objectMappings as $objectMapping) {
             $this->assertEquals('Test', $objectMapping->getIntegration());
             $this->assertEquals('MappedObject', $objectMapping->getIntegrationObjectName());
-            $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
+            $this->assertArrayHasKey($objectMapping->getIntegrationObjectId(), $objects);
             $this->assertEquals($objects[$objectMapping->getIntegrationObjectId()]->getMappedObjectId(), $objectMapping->getIntegrationObjectId());
         }
     }
@@ -205,27 +188,27 @@ class CompanyObjectHelperTest extends TestCase
     public function testFindObjectById(): void
     {
         $company = new Company();
-        $this->repository->expects(self::once())
+        $this->repository->expects($this->once())
             ->method('getEntity')
             ->with(1)
             ->willReturn($company);
 
-        self::assertSame($company, $this->getObjectHelper()->findObjectById(1));
+        $this->assertSame($company, $this->getObjectHelper()->findObjectById(1));
     }
 
     public function testFindObjectByIdReturnsNull(): void
     {
-        $this->repository->expects(self::once())
+        $this->repository->expects($this->once())
             ->method('getEntity')
             ->with(1);
 
-        self::assertNull($this->getObjectHelper()->findObjectById(1));
+        $this->assertNotInstanceOf(Company::class, $this->getObjectHelper()->findObjectById(1));
     }
 
     public function testSetFieldValues(): void
     {
         $company = new Company();
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('setFieldValues')
             ->with($company, []);
         $this->getObjectHelper()->setFieldValues($company);
@@ -238,12 +221,12 @@ class CompanyObjectHelperTest extends TestCase
 
         $objectMappings = $this->getObjectHelper()->update([], []);
 
-        Assert::assertSame([], $objectMappings);
+        $this->assertSame([], $objectMappings);
     }
 
     private function getObjectHelper(): CompanyObjectHelper
     {
-        return new CompanyObjectHelper($this->model, $this->repository, $this->connection, $this->fieldsWithUniqueIdentifier);
+        return new CompanyObjectHelper($this->model, $this->repository, $this->createStub(Connection::class), $this->fieldsWithUniqueIdentifier);
     }
 
     /**

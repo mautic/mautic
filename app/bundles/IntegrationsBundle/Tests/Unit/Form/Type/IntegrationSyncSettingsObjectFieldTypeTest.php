@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|FormBuilderInterface
+     * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilder;
 
@@ -58,7 +58,7 @@ final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framewor
         $matcher = $this->exactly(2);
 
         $this->formBuilder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $options) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $options): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mappedField', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);

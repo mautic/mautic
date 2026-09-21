@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Update\Step\FinalizeUpdateStep;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FinalizeUpdateStepTest extends AbstractStepTestCase
+final class FinalizeUpdateStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject&TranslatorInterface
@@ -29,16 +32,6 @@ class FinalizeUpdateStepTest extends AbstractStepTestCase
     private MockObject $session;
 
     /**
-     * @var MockObject&Request
-     */
-    private MockObject $request;
-
-    /**
-     * @var MockObject&RequestStack
-     */
-    private MockObject $requestStack;
-
-    /**
      * @var MockObject&AppVersion
      */
     private MockObject $appVersion;
@@ -52,16 +45,16 @@ class FinalizeUpdateStepTest extends AbstractStepTestCase
         $this->translator   = $this->createMock(TranslatorInterface::class);
         $this->pathsHelper  = $this->createMock(PathsHelper::class);
         $this->session      = $this->createMock(Session::class);
-        $this->requestStack = $this->createMock(RequestStack::class);
+        $requestStack       = $this->createMock(RequestStack::class);
         $this->appVersion   = $this->createMock(AppVersion::class);
-        $this->request      = $this->createMock(Request::class);
+        $request            = $this->createMock(Request::class);
 
-        $this->request->method('hasSession')->willReturn(true);
-        $this->request->method('getSession')->willReturn($this->session);
-        $this->requestStack->method('getSession')->willReturn($this->session);
-        $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
+        $request->method('hasSession')->willReturn(true);
+        $request->method('getSession')->willReturn($this->session);
+        $requestStack->method('getSession')->willReturn($this->session);
+        $requestStack->method('getCurrentRequest')->willReturn($request);
 
-        $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $this->requestStack, $this->appVersion);
+        $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $requestStack, $this->appVersion);
     }
 
     public function testFinalizationCleansUpFiles(): void
@@ -74,7 +67,7 @@ class FinalizeUpdateStepTest extends AbstractStepTestCase
         $matcher             = $this->exactly(2);
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $wrappingUpKey, $updateSuccessfulKey) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $wrappingUpKey, $updateSuccessfulKey): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($wrappingUpKey, $parameters[0]);
 
@@ -86,6 +79,8 @@ class FinalizeUpdateStepTest extends AbstractStepTestCase
 
                     return $updateSuccessfulKey;
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->pathsHelper->expects($this->once())
@@ -105,7 +100,7 @@ class FinalizeUpdateStepTest extends AbstractStepTestCase
         $this->assertFileDoesNotExist(__DIR__.'/resources/upgrade.php');
         $this->assertFileDoesNotExist(__DIR__.'/resources/lastUpdateCheck.txt');
 
-        $this->assertEquals($updateSuccessfulKey, trim($this->progressBar->getMessage()));
+        $this->assertSame($updateSuccessfulKey, trim($this->progressBar->getMessage()));
     }
 
     public function testFinalizationWithPostUpgradeMessage(): void
@@ -133,7 +128,7 @@ class FinalizeUpdateStepTest extends AbstractStepTestCase
             ->method('writeln')
             ->with("\n\n<info>This is an example message</info>");
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 

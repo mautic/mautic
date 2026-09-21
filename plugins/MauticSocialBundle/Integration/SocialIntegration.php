@@ -2,25 +2,12 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Mautic\PluginBundle\Model\IntegrationEntityModel;
-use Monolog\Logger;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Router;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class SocialIntegration extends AbstractIntegration
@@ -32,49 +19,19 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     protected TranslatorInterface $translator;
 
-    public function __construct(
-        EventDispatcherInterface $eventDispatcher,
-        CacheStorageHelper $cacheStorageHelper,
-        EntityManager $entityManager,
-        RequestStack $requestStack,
-        Router $router,
-        Translator $translator,
-        Logger $logger,
-        EncryptionHelper $encryptionHelper,
-        LeadModel $leadModel,
-        CompanyModel $companyModel,
-        PathsHelper $pathsHelper,
-        NotificationModel $notificationModel,
-        FieldModel $fieldModel,
-        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        IntegrationEntityModel $integrationEntityModel,
-        DoNotContact $doNotContact,
-        protected IntegrationHelper $integrationHelper,
-    ) {
-        parent::__construct(
-            $eventDispatcher,
-            $cacheStorageHelper,
-            $entityManager,
-            $requestStack,
-            $router,
-            $translator,
-            $logger,
-            $encryptionHelper,
-            $leadModel,
-            $companyModel,
-            $pathsHelper,
-            $notificationModel,
-            $fieldModel,
-            $integrationEntityModel,
-            $doNotContact,
-            $fieldsWithUniqueIdentifier
-        );
+    protected IntegrationHelper $integrationHelper;
+
+    #[Required]
+    public function autowireSocialIntegration(
+        IntegrationHelper $integrationHelper,
+    ): void {
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param Form|FormBuilder $builder
+     * @param array            $data
+     * @param string           $formArea
      */
     public function appendToForm(&$builder, $data, $formArea): void
     {
@@ -92,18 +49,18 @@ abstract class SocialIntegration extends AbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param array<string, mixed> $settings
      *
      * @return array
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         static $fields = [];
 
         if (empty($fields)) {
             $s         = $this->getName();
             $available = $this->getAvailableLeadFields($settings);
-            if (empty($available)) {
+            if ([] === $available) {
                 return [];
             }
             // create social profile fields
@@ -161,7 +118,7 @@ abstract class SocialIntegration extends AbstractIntegration
                 }
             }
             if ($this->sortFieldsAlphabetically()) {
-                uasort($fields, 'strnatcmp');
+                uasort($fields, strnatcmp(...));
             }
         }
 
@@ -218,9 +175,9 @@ abstract class SocialIntegration extends AbstractIntegration
     {
         if ($postAuthorization) {
             return json_decode($data, true);
-        } else {
-            return json_decode($data);
         }
+
+        return json_decode($data);
     }
 
     /**
@@ -248,7 +205,7 @@ abstract class SocialIntegration extends AbstractIntegration
      *
      * @return array|mixed|null
      */
-    protected function getContactAccessToken(&$socialCache)
+    protected function getContactAccessToken(array &$socialCache)
     {
         if (!$this->requestStack->getCurrentRequest()->hasSession()) {
             return null;

@@ -11,10 +11,17 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class EmailDraft
 {
+    /**
+     * @api cannot be readonly as modified by external source
+     */
     private int $id;
 
-    public function __construct(private Email $email, private ?string $html, private ?string $template, private ?bool $publicPreview = true)
-    {
+    public function __construct(
+        private Email $email,
+        private ?string $html,
+        private ?string $template,
+        private ?bool $publicPreview = true,
+    ) {
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

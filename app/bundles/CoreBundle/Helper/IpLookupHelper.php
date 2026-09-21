@@ -2,10 +2,10 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
+use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -36,7 +36,7 @@ class IpLookupHelper
      */
     private $realIp;
 
-    private CoreParametersHelper $coreParametersHelper;
+    private readonly CoreParametersHelper $coreParametersHelper;
 
     /**
      * @var array<string, IpAddress>
@@ -45,8 +45,9 @@ class IpLookupHelper
 
     public function __construct(
         protected RequestStack $requestStack,
-        protected EntityManager $em,
+        protected IpAddressRepository $ipAddressRepository,
         CoreParametersHelper $coreParametersHelper,
+        private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
         protected ?AbstractLookup $ipLookup = null,
     ) {
         $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');
@@ -123,9 +124,7 @@ class IpLookupHelper
         }
 
         if (!isset(self::$ipAddresses[$ip])) {
-            /** @var IpAddressRepository $repo */
-            $repo      = $this->em->getRepository(IpAddress::class);
-            $ipAddress = $repo->findOneByIpAddress($ip);
+            $ipAddress = $this->ipAddressRepository->findOneByIpAddress($ip);
             $saveIp    = (null === $ipAddress);
 
             if (null === $ipAddress) {
@@ -156,8 +155,16 @@ class IpLookupHelper
                     if (str_contains($userAgent, $bot)) {
                         $doNotTrack[] = $ip;
                         $ipAddress->setDoNotTrackList($doNotTrack);
-                        continue;
+                        break;
                     }
+                }
+
+                // second check for bots  https://github.com/matomo-org/device-detector
+                $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
+                $deviceDetector->parse();
+                if ($deviceDetector->isBot()) {
+                    $doNotTrack[] = $ip;
+                    $ipAddress->setDoNotTrackList($doNotTrack);
                 }
             }
 
@@ -177,7 +184,7 @@ class IpLookupHelper
             }
 
             if ($saveIp) {
-                $repo->saveEntity($ipAddress);
+                $this->ipAddressRepository->saveEntity($ipAddress);
             }
 
             self::$ipAddresses[$ip] = $ipAddress;

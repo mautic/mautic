@@ -30,13 +30,13 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        protected LeadModel $leadModel,
-        protected ContactTracker $contactTracker,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadFieldRepository $leadFieldRepository,
+        private LeadModel $leadModel,
+        private ContactTracker $contactTracker,
+        private IpLookupHelper $ipLookupHelper,
+        private LeadFieldRepository $leadFieldRepository,
         private PointGroupModel $groupModel,
         private DoNotContact $doNotContact,
         private FieldModel $leadFieldModel,
@@ -189,7 +189,7 @@ class FormSubscriber implements EventSubscriberInterface
         $pointGroup   = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
         $points       = $properties['points'];
 
-        if (!empty($pointGroup)) {
+        if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
             $this->groupModel->adjustPoints($contact, $pointGroup, $points, $operator);
         } else {
             $contact->adjustPoints($points, $operator);
@@ -346,7 +346,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         $mergedValues = array_merge($actionValues, array_filter(
             $contactFieldMatches,
-            static fn ($value) => '' !== $value && null !== $value
+            static fn ($value): bool => '' !== $value && null !== $value
         ));
 
         $processedValues = [];

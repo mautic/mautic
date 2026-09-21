@@ -226,11 +226,9 @@ class EventRepository extends CommonRepository
     /**
      * Get array of events with stats.
      *
-     * @param array $args
-     *
      * @return array
      */
-    public function getEvents($args = [])
+    public function getEvents(array $args = [])
     {
         $q = $this->createQueryBuilder('e')
             ->select('e, ec, ep')
@@ -285,8 +283,9 @@ class EventRepository extends CommonRepository
             ->set('parent_id', ':null')
             ->setParameter('null', null)
             ->where(
-                $qb->expr()->in('parent_id', $events)
+                $qb->expr()->in('parent_id', ':events')
             )
+            ->setParameter('events', $events, ArrayParameterType::INTEGER)
             ->executeStatement();
     }
 
@@ -311,7 +310,7 @@ class EventRepository extends CommonRepository
      */
     public function setEventsAsDeletedWithRedirect(array $eventData): void
     {
-        if (empty($eventData)) {
+        if ([] === $eventData) {
             return;
         }
 
@@ -355,7 +354,7 @@ class EventRepository extends CommonRepository
                ->executeStatement();
         }
 
-        if (!empty($eventData)) {
+        if ([] !== $eventData) {
             $this->updateRedirectionChains($eventData);
         }
     }
@@ -424,7 +423,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * For the API
      */
@@ -440,7 +439,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * For the API
      */

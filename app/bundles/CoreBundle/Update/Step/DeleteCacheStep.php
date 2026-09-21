@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Update\Step;
 
 use Mautic\CoreBundle\Helper\CacheHelper;
@@ -8,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class DeleteCacheStep implements StepInterface
+final readonly class DeleteCacheStep implements StepInterface
 {
     public function __construct(
         private CacheHelper $cacheHelper,

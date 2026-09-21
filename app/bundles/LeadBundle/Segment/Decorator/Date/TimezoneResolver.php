@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -8,7 +10,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class TimezoneResolver
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -22,7 +24,7 @@ class TimezoneResolver
          * All datetime fields are stored in UTC
          * Date field, however, is always stored in a local time (there is no time information, so it cannot be converted to UTC).
          *
-         * We will generate default date according to this. We need midnight as a default date (for relative intervals like "today" or "-1 day"
+         * We will generate default date according to this. We need now as a default date (for relative intervals like "today" or "-1 day"
          *  1) in UTC for datetime fields
          *  2) in the local timezone for date fields
          *
@@ -30,7 +32,7 @@ class TimezoneResolver
          */
         $timezone = $hasTimePart ? 'UTC' : $this->coreParametersHelper->getDefaultTimezone();
 
-        $date = new \DateTime('midnight today', new \DateTimeZone($timezone));
+        $date = new \DateTime('now', new \DateTimeZone($timezone));
 
         return new DateTimeHelper($date, null, $timezone);
     }

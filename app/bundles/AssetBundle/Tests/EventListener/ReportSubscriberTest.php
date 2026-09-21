@@ -15,77 +15,58 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private ChannelListHelper $channelListHelper;
 
     /**
-     * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
-
-    /**
-     * @var DownloadRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $downloadRepository;
-
-    /**
-     * @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&QueryBuilder
      */
     private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
-    /**
-     * @var DncReportService|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $dncReportService;
-
     private ReportHelper $reportHelper;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->queryBuilder        = $this->createMock(QueryBuilder::class);
-        $this->channelListHelper   = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->reportHelper        = new ReportHelper($this->createMock(EventDispatcherInterface::class));
-        $this->companyReportData   = $this->createMock(CompanyReportData::class);
-        $this->downloadRepository  = $this->createMock(DownloadRepository::class);
-        $this->dncReportService    = $this->createMock(DncReportService::class);
+        $this->channelListHelper   = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
+        $this->reportHelper        = new ReportHelper($this->createStub(EventDispatcherInterface::class));
     }
 
     public function testOnReportBuilderWithUnknownContext(): void
     {
-        $companyReportData = new class extends CompanyReportData {
+        $companyReportData = new class() extends CompanyReportData {
             public function __construct()
             {
             }
         };
 
-        $downloadRepository = new class extends DownloadRepository {
+        $downloadRepository = new class() extends DownloadRepository {
             public function __construct()
             {
             }
         };
 
-        $event = new class extends ReportBuilderEvent {
+        $event = new class() extends ReportBuilderEvent {
             public function __construct()
             {
                 $this->context = 'unicorn';
             }
         };
 
-        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository, $this->dncReportService);
+        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository, $this->createStub(DncReportService::class));
 
         $reportSubscriber->onReportBuilder($event);
 
-        Assert::assertSame([], $event->getTables());
+        $this->assertSame([], $event->getTables());
     }
 
     public function testOnReportBuilderWithAssetDownloadContext(): void
     {
-        $companyReportData = new class extends CompanyReportData {
+        $companyReportData = new class() extends CompanyReportData {
             public function __construct()
             {
             }
@@ -99,7 +80,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $downloadRepository = new class extends DownloadRepository {
+        $downloadRepository = new class() extends DownloadRepository {
             public function __construct()
             {
             }
@@ -107,52 +88,40 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event = new ReportBuilderEvent($this->createTranslatorMock(), $this->channelListHelper, ReportSubscriber::CONTEXT_ASSET_DOWNLOAD, [], $this->reportHelper);
 
-        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository, $this->dncReportService);
+        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository, $this->createStub(DncReportService::class));
 
         $reportSubscriber->onReportBuilder($event);
 
-        Assert::assertSame(
-            [
-                'alias' => 'download_count',
-                'label' => '[trans]mautic.asset.report.download_count[/trans]',
-                'type'  => 'int',
-            ],
-            $event->getTables()['assets']['columns']['a.download_count']
-        );
+        $this->assertSame([
+            'alias' => 'download_count',
+            'label' => '[trans]mautic.asset.report.download_count[/trans]',
+            'type'  => 'int',
+        ], $event->getTables()['assets']['columns']['a.download_count']);
 
-        Assert::assertSame(
-            [
-                'alias' => 'unique_download_count',
-                'label' => '[trans]mautic.asset.report.unique_download_count[/trans]',
-                'type'  => 'int',
-            ],
-            $event->getTables()['assets']['columns']['a.unique_download_count']
-        );
+        $this->assertSame([
+            'alias' => 'unique_download_count',
+            'label' => '[trans]mautic.asset.report.unique_download_count[/trans]',
+            'type'  => 'int',
+        ], $event->getTables()['assets']['columns']['a.unique_download_count']);
 
-        Assert::assertSame(
-            [
-                'alias'   => 'download_count',
-                'label'   => '[trans]mautic.asset.report.download_count[/trans]',
-                'type'    => 'int',
-                'formula' => 'COUNT(ad.id)',
-            ],
-            $event->getTables()['asset.downloads']['columns']['a.download_count']
-        );
+        $this->assertSame([
+            'alias'   => 'download_count',
+            'label'   => '[trans]mautic.asset.report.download_count[/trans]',
+            'type'    => 'int',
+            'formula' => 'COUNT(ad.id)',
+        ], $event->getTables()['asset.downloads']['columns']['a.download_count']);
 
-        Assert::assertSame(
-            [
-                'alias'   => 'unique_download_count',
-                'label'   => '[trans]mautic.asset.report.unique_download_count[/trans]',
-                'type'    => 'int',
-                'formula' => 'COUNT(DISTINCT ad.lead_id)',
-            ],
-            $event->getTables()['asset.downloads']['columns']['a.unique_download_count']
-        );
+        $this->assertSame([
+            'alias'   => 'unique_download_count',
+            'label'   => '[trans]mautic.asset.report.unique_download_count[/trans]',
+            'type'    => 'int',
+            'formula' => 'COUNT(DISTINCT ad.lead_id)',
+        ], $event->getTables()['asset.downloads']['columns']['a.unique_download_count']);
     }
 
     private function createTranslatorMock(): TranslatorInterface
     {
-        return new class implements TranslatorInterface {
+        return new class() implements TranslatorInterface {
             /**
              * @param array<int|string> $parameters
              */
@@ -173,7 +142,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $report             = new Report();
         $report->setSource(ReportSubscriber::CONTEXT_ASSET_DOWNLOAD);
         $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
-        $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository, $this->dncReportService);
+        $subscriber         = new ReportSubscriber($this->createStub(CompanyReportData::class), $this->createStub(DownloadRepository::class), $this->createStub(DncReportService::class));
         $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->once())
@@ -192,7 +161,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
         $report->setGroupBy(['a.id' => 'desc']);
         $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
-        $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository, $this->dncReportService);
+        $subscriber         = new ReportSubscriber($this->createStub(CompanyReportData::class), $this->createStub(DownloadRepository::class), $this->createStub(DncReportService::class));
         $subscriber->onReportGenerate($event);
         $this->assertTrue($event->hasGroupBy());
     }

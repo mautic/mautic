@@ -507,6 +507,18 @@
             "monthly": 430,
             "daily": 6
         },
-        "favers": 24
+        "favers": 24,
+        "reviews": {
+            "john_doe": {
+                "name": "john_doe",
+                "rating": 5,
+                "review": "Excellent reCAPTCHA integration!"
+            },
+            "jane_smith": {
+                "name": "jane_smith",
+                "rating": 4,
+                "review": "Works great with Mautic forms"
+            }
+        }
     }
 }

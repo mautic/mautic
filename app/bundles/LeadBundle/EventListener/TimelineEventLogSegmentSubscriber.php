@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
+final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
 {
     use TimelineEventLogTrait;
 
@@ -77,7 +77,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function writeEntries(array $contacts, LeadList $segment, $action, ?\DateTime $date = null): void
+    private function writeEntries(array $contacts, LeadList $segment, string $action, ?\DateTime $date = null): void
     {
         $user                    = $this->userHelper->getUser();
         $logs                    = [];

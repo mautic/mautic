@@ -9,12 +9,9 @@ use Symfony\Component\Validator\ConstraintValidator;
  * Throws an exception if the field alias is equal some segment filter keyword.
  * It would cause odd behavior with segment filters otherwise.
  */
-class FileEncodingValidator extends ConstraintValidator
+final class FileEncodingValidator extends ConstraintValidator
 {
-    /**
-     * @param LeadField $field
-     */
-    public function validate($field, Constraint $constraint): void
+    public function validate(mixed $field, Constraint $constraint): void
     {
         /*
             If the file uploaded exceeds the max size, it will not be considered,

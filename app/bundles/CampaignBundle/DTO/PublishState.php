@@ -9,8 +9,11 @@ use Mautic\CoreBundle\Entity\AuditLog;
 final class PublishState
 {
     private \DateTimeInterface $dateAdded;
+
     private ?bool $published                 = null;
+
     private ?\DateTimeInterface $publishUp   = null;
+
     private ?\DateTimeInterface $publishDown = null;
 
     public function setFromAuditLog(AuditLog $auditLog, bool $defaultPublishState): void
@@ -25,9 +28,8 @@ final class PublishState
         } elseif (null === $this->published) {
             // The current entity state is the best assumption we can make at this point.
             $this->published = $defaultPublishState;
-        } else {
-            // keep previous state
         }
+        // keep previous state
 
         if (isset($auditLog->getDetails()['publishUp'][1])) {
             $this->publishUp = (new \DateTimeImmutable($auditLog->getDetails()['publishUp'][1]))->setTimezone(new \DateTimeZone('UTC'));

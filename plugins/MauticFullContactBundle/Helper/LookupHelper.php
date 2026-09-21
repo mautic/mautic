@@ -5,7 +5,9 @@ namespace MauticPlugin\MauticFullContactBundle\Helper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -16,20 +18,22 @@ use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class LookupHelper
+final class LookupHelper
 {
     /**
      * @var bool|FullContactIntegration
      */
-    protected $integration;
+    private $integration;
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        protected UserHelper $userHelper,
-        protected Logger $logger,
-        protected Router $router,
-        protected LeadModel $leadModel,
-        protected CompanyModel $companyModel,
+        private readonly UserHelper $userHelper,
+        private readonly Logger $logger,
+        private readonly Router $router,
+        private readonly LeadModel $leadModel,
+        private readonly CompanyModel $companyModel,
+        private readonly LeadRepository $leadRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
     }
@@ -44,9 +48,9 @@ class LookupHelper
             return;
         }
 
-        /** @var FullContact_Person $fullcontact */
-        if ($fullcontact = $this->getFullContact()) {
-            if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
+        $fullcontact = $this->getFullContact();
+        if ($fullcontact instanceof FullContact_Person) {
+            if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
 
@@ -68,7 +72,7 @@ class LookupHelper
                         $lead->setSocialCache($cache);
 
                         if ($checkAuto) {
-                            $this->leadModel->getRepository()->saveEntity($lead);
+                            $this->leadRepository->saveEntity($lead);
                         } else {
                             $this->leadModel->saveEntity($lead);
                         }
@@ -90,9 +94,9 @@ class LookupHelper
             return;
         }
 
-        /** @var FullContact_Company $fullcontact */
-        if ($fullcontact = $this->getFullContact(false)) {
-            if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
+        $fullcontact = $this->getFullContact(false);
+        if ($fullcontact instanceof FullContact_Company) {
+            if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     $parse                             = parse_url($website);
                     [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
@@ -114,7 +118,7 @@ class LookupHelper
                         ];
                         $company->setSocialCache($cache);
                         if ($checkAuto) {
-                            $this->companyModel->getRepository()->saveEntity($company);
+                            $this->companyRepository->saveEntity($company);
                         } else {
                             $this->companyModel->saveEntity($company);
                         }
@@ -126,12 +130,17 @@ class LookupHelper
         }
     }
 
-    public function validateRequest($oid)
+    /**
+     * @return array{notify: mixed, entity: mixed, type: mixed}|false
+     */
+    public function validateRequest($oid): array|false
     {
         // prefix#entityId#hour#userId#nonce
         [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
         $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
         $type                              = (str_starts_with($w, 'fullcontactcomp')) ? 'company' : 'person';
+
+        $entity = null;
 
         switch ($type) {
             case 'person':
@@ -160,12 +169,7 @@ class LookupHelper
         return false;
     }
 
-    /**
-     * @param bool $person
-     *
-     * @return bool|FullContact_Company|FullContact_Person
-     */
-    protected function getFullContact($person = true)
+    private function getFullContact(bool $person = true): false|FullContact_Person|FullContact_Company
     {
         if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
             return false;
@@ -177,9 +181,8 @@ class LookupHelper
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }
 
-    protected function getCache($entity, $notify): array
+    private function getCache(Lead|Company $entity, $notify): array
     {
-        /** @var User $user */
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);
         $cacheId   = sprintf('fullcontact%s%s#', $entity instanceof Company ? 'comp' : '', $notify ? '_notify' : '').$entity->getId().'#'.gmdate('YmdH');

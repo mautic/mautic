@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -65,10 +67,7 @@ class FailedLeadEventLog
         return $this->log;
     }
 
-    /**
-     * @return FailedLeadEventLog
-     */
-    public function setLog(?LeadEventLog $log = null)
+    public function setLog(?LeadEventLog $log = null): static
     {
         $this->log = $log;
 
@@ -87,10 +86,7 @@ class FailedLeadEventLog
         return $this->dateAdded;
     }
 
-    /**
-     * @return FailedLeadEventLog
-     */
-    public function setDateAdded(?\DateTime $dateAdded = null)
+    public function setDateAdded(?\DateTime $dateAdded = null): static
     {
         if (null === $dateAdded) {
             $dateAdded = new \DateTime();
@@ -102,7 +98,7 @@ class FailedLeadEventLog
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getReason()
     {
@@ -111,10 +107,8 @@ class FailedLeadEventLog
 
     /**
      * @param string $reason
-     *
-     * @return FailedLeadEventLog
      */
-    public function setReason($reason)
+    public function setReason($reason): static
     {
         $this->reason = $reason;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -63,10 +65,8 @@ class PostCount
 
     /**
      * @param Monitoring $monitor
-     *
-     * @return $this
      */
-    public function setMonitor($monitor)
+    public function setMonitor($monitor): static
     {
         $this->monitor = $monitor;
 
@@ -83,10 +83,8 @@ class PostCount
 
     /**
      * @param int $postCount
-     *
-     * @return $this
      */
-    public function setPostCount($postCount)
+    public function setPostCount($postCount): static
     {
         $this->postCount = $postCount;
 
@@ -101,10 +99,7 @@ class PostCount
         return $this->postDate;
     }
 
-    /**
-     * @return $this
-     */
-    public function setPostDate($postDate)
+    public function setPostDate($postDate): static
     {
         $this->postDate = $postDate;
 

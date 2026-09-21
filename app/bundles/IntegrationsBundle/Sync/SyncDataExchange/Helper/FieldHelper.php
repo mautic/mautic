@@ -30,21 +30,15 @@ class FieldHelper
 
     private array $syncFields = [];
 
-    /**
-     * @var EventDispatcher
-     */
-    private $eventDispatcher;
-
     public function __construct(
-        private FieldModel $fieldModel,
-        private FieldsWithUniqueIdentifier $fieldWithUniqueIdentifier,
-        private VariableExpresserHelperInterface $variableExpresserHelper,
-        private ChannelListHelper $channelListHelper,
-        private TranslatorInterface $translator,
-        EventDispatcherInterface $eventDispatcher,
-        private ObjectProvider $objectProvider,
+        private readonly FieldModel $fieldModel,
+        private readonly FieldsWithUniqueIdentifier $fieldWithUniqueIdentifier,
+        private readonly VariableExpresserHelperInterface $variableExpresserHelper,
+        private readonly ChannelListHelper $channelListHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ObjectProvider $objectProvider,
     ) {
-        $this->eventDispatcher         = $eventDispatcher;
     }
 
     public function getFieldList(string $object): array
@@ -118,7 +112,7 @@ class FieldHelper
         $this->syncFields[$objectName]['mautic_internal_id'] = $this->translator->trans('mautic.core.id');
 
         if (Contact::NAME !== $objectName) {
-            uksort($this->syncFields[$objectName], 'strnatcmp');
+            uksort($this->syncFields[$objectName], strnatcmp(...));
 
             return $this->syncFields[$objectName];
         }
@@ -132,7 +126,7 @@ class FieldHelper
         // Add the timeline link
         $this->syncFields[$objectName]['mautic_internal_contact_timeline'] = $this->translator->trans('mautic.integration.sync.contact_timeline');
 
-        uksort($this->syncFields[$objectName], 'strnatcmp');
+        uksort($this->syncFields[$objectName], strnatcmp(...));
 
         return $this->syncFields[$objectName];
     }

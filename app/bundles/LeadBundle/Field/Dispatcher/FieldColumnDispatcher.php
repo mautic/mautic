@@ -18,8 +18,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class FieldColumnDispatcher
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private BackgroundSettings $backgroundSettings,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly BackgroundSettings $backgroundSettings,
     ) {
     }
 

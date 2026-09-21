@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Entity\Result;
 
-class CountResult
+final class CountResult
 {
-    private int $count;
+    private readonly int $count;
 
-    private int $minId;
+    private readonly int $minId;
 
-    private int $maxId;
+    private readonly int $maxId;
 
     public function __construct($count, $minId, $maxId)
     {

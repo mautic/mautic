@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 
-class LeadNoteEvent extends CommonEvent
+final class LeadNoteEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

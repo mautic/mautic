@@ -1,0 +1,79 @@
+{% set max = field.properties.star_count|default(5) %}
+{% set starColor = field.properties.star_color|default('f5b301') %}
+{% set baseColor = field.properties.base_color|default('cccccc') %}
+{% set symbol = field.properties.symbol|default('★') %}
+
+{% set containerType = 'rating' %}
+{% set type = 'radio' %}
+{% set formName = formName|default('') %}
+{% set order = field.order|default(0) %}
+{% set validationMessage = '' %}
+
+{% set inputAttributes = htmlAttributesStringToArray(field.inputAttributes|default('')) %}
+{% set labelAttributes = htmlAttributesStringToArray(field.labelAttributes|default('')) %}
+{% set inputAttributes = inputAttributes|merge({
+        'name': 'mauticform[' ~ field.alias ~ ']',
+        'class': inputAttributes.class|default([])|merge(['mauticform-rating-radio']),
+}) %}
+{% set labelAttributes = labelAttributes|merge({
+        'class': labelAttributes.class|default([])|merge(['mauticform-label']),
+        'for': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
+}) %}
+
+{% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
+{% set containerAttributes = containerAttributes|merge({
+        'id': 'mauticform' ~ formName ~ '_' ~ id,
+        'class': containerAttributes.class|default([])|merge([
+          'mauticform-row',
+          'mauticform-rating',
+          'mauticform-field-' ~ order,
+        ]),
+        'style': 'width: ' ~ field.fieldWidth ~ '; --star-color: #' ~ starColor ~ '; --base-color: #' ~ baseColor
+}) %}
+
+{% if field.parent and fields[field.parent] is defined %}
+  {% set values = field.conditions.values|join('|') %}
+  {%- if field.conditions.any != false and 'notIn' != field.conditions.expr -%}
+    {% set values = '*' %}
+  {% endif %}
+  {% set containerAttributes = containerAttributes|merge({
+          'data-mautic-form-show-on': fields[field.parent].alias ~ ':' ~ values,
+          'data-mautic-form-expr': field.conditions.expr,
+          'class': containerAttributes.class|merge(['mauticform-field-hidden']),
+  }) %}
+{% endif %}
+
+{% if field.isRequired is defined and field.isRequired %}
+  {% set validationMessage = field.validationMessage %}
+  {% if validationMessage is empty %}
+    {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators', language|default(null)) %}
+  {% endif %}
+  {% set containerAttributes = containerAttributes|merge({
+          'class': containerAttributes.class|merge(['mauticform-required']),
+          'data-validate': field.alias,
+          'data-validation-type': field.type,
+  }) %}
+{% endif %}
+
+<div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+  {% if field.showLabel %}
+    <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</label>
+  {% endif %}
+  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
+
+  <div class="mauticform-rating-row">
+    {% for i in range(max, 1, -1) %}
+      {% set id = field.alias ~ '_' ~ i ~ loop.index0 %}
+      {% set listInputAttributes = inputAttributes|merge({
+              'id': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
+              'type': type,
+              'value': i|e,
+      }) %}
+
+      <input id="mauticform_{{ containerType }}_{{ type }}_{{ id }}" {% for attrName, attrValue in listInputAttributes|filter((v, k) => k != 'id') %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
+      <label class="mauticform-rating-label" id="mauticform_{{ containerType }}_label_{{ id }}" for="mauticform_{{ containerType }}_{{ type }}_{{ id }}">{{ symbol }}</label>
+    {% endfor %}
+  </div>
+
+  <span class="mauticform-errormsg" style="display:none;">{{ validationMessage }}</span>
+</div>

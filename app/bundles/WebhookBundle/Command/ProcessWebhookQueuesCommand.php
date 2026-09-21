@@ -19,42 +19,37 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: ProcessWebhookQueuesCommand::COMMAND_NAME,
     description: 'Process queued webhook payloads'
 )]
-class ProcessWebhookQueuesCommand extends Command
+final class ProcessWebhookQueuesCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:webhooks:process';
 
-    public function __construct(private WebhookModel $webhookModel,
-        private CoreParametersHelper $coreParametersHelper,
-        private WebhookService $webhookService,
+    public function __construct(
+        private readonly WebhookModel $webhookModel,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly WebhookService $webhookService,
     ) {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption(
             '--webhook-id',
             '-i',
             InputOption::VALUE_OPTIONAL,
-            'Process payload for a specific webhook.  If not specified, all webhooks will be processed.',
-            null
+            'Process payload for a specific webhook.  If not specified, all webhooks will be processed.'
         )
             ->addOption(
                 '--min-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Sets the minimum webhook queue ID to process (so called range mode).',
-                null
+                'Sets the minimum webhook queue ID to process (so called range mode).'
             )
             ->addOption(
                 '--max-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Sets the maximum webhook queue ID to process (so called range mode).',
-                null
+                'Sets the maximum webhook queue ID to process (so called range mode).'
             );
     }
 
@@ -116,9 +111,9 @@ class ProcessWebhookQueuesCommand extends Command
         }
 
         if (!count($webhooks)) {
-            $output->writeln('<error>No published/Healthy webhooks found. Try again later.</error>');
+            $output->writeln('There are no published webhooks to process.');
 
-            return Command::FAILURE;
+            return Command::SUCCESS;
         }
 
         $output->writeLn('<info>Processing Webhooks</info>');

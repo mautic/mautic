@@ -15,16 +15,16 @@ use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class TokenPersistenceTest extends TestCase
+final class TokenPersistenceTest extends TestCase
 {
     /**
-     * @var MockObject|IntegrationsHelper
+     * @var MockObject&IntegrationsHelper
      */
     private MockObject $integrationsHelper;
 
     private TokenPersistence $tokenPersistence;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->integrationsHelper = $this->createMock(IntegrationsHelper::class);
         $this->tokenPersistence   = new TokenPersistence($this->integrationsHelper);
@@ -35,7 +35,7 @@ class TokenPersistenceTest extends TestCase
     {
         $this->expectException(IntegrationNotSetException::class);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $this->tokenPersistence->restoreToken($token);
     }
 
@@ -74,7 +74,7 @@ class TokenPersistenceTest extends TestCase
     {
         $this->expectException(IntegrationNotSetException::class);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $this->tokenPersistence->saveToken($token);
     }
 
@@ -121,7 +121,7 @@ class TokenPersistenceTest extends TestCase
     {
         $this->expectException(IntegrationNotSetException::class);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $this->tokenPersistence->saveToken($token);
     }
 
@@ -158,8 +158,8 @@ class TokenPersistenceTest extends TestCase
         $this->assertFalse($this->tokenPersistence->hasToken());
 
         $apiKeys = $integration->getApiKeys();
-        $this->assertFalse(isset($apiKeys['access_token']));
-        $this->assertFalse(isset($apiKeys['expires_in']));
+        $this->assertArrayNotHasKey('access_token', $apiKeys);
+        $this->assertArrayNotHasKey('expires_in', $apiKeys);
 
         $newToken = $this->tokenPersistence->restoreToken($token);
         $this->assertTrue($newToken->isExpired());

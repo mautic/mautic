@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -146,7 +147,8 @@ class DownloadRepository extends CommonRepository
             ->join('a', MAUTIC_TABLE_PREFIX.'pages', 'p', 'a.source_id = p.id');
 
         if (is_array($pageId)) {
-            $q->where($q->expr()->in('p.id', $pageId))
+            $q->where($q->expr()->in('p.id', ':pageIds'))
+                ->setParameter('pageIds', $pageId, ArrayParameterType::INTEGER)
                 ->groupBy('p.id, a.source_id, p.title, p.hits');
         } else {
             $q->where($q->expr()->eq('p.id', ':page'))
@@ -156,7 +158,7 @@ class DownloadRepository extends CommonRepository
         $q->andWhere('a.source = "page"')
             ->andWhere('a.code = 200');
 
-        if (null != $fromDate) {
+        if (null !== $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('a.date_download', ':date'))
                 ->setParameter('date', $dh->toUtcString());
@@ -178,7 +180,7 @@ class DownloadRepository extends CommonRepository
      *
      * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByEmail($emailId, ?\DateTime $fromDate = null): array
+    public function getDownloadCountsByEmail($emailId, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
         // link email to page hit tracking id to download tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -187,7 +189,8 @@ class DownloadRepository extends CommonRepository
             ->join('a', MAUTIC_TABLE_PREFIX.'emails', 'e', 'a.email_id = e.id');
 
         if (is_array($emailId)) {
-            $q->where($q->expr()->in('e.id', $emailId))
+            $q->where($q->expr()->in('e.id', ':emailIds'))
+                ->setParameter('emailIds', $emailId, ArrayParameterType::INTEGER)
                 ->groupBy('e.id, e.subject, e.variant_sent_count');
         } else {
             $q->where($q->expr()->eq('e.id', ':email'))
@@ -196,10 +199,16 @@ class DownloadRepository extends CommonRepository
 
         $q->andWhere('a.code = 200');
 
-        if (null != $fromDate) {
+        if (null !== $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('a.date_download', ':date'))
                 ->setParameter('date', $dh->toUtcString());
+        }
+
+        if (null !== $toDate) {
+            $dh = new DateTimeHelper($toDate);
+            $q->andWhere($q->expr()->lte('a.date_download', ':dateTo'))
+                ->setParameter('dateTo', $dh->toUtcString());
         }
 
         $results = $q->executeQuery()->fetchAllAssociative();

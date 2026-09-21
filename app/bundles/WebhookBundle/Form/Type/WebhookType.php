@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Webhook>
  */
-class WebhookType extends AbstractType
+final class WebhookType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

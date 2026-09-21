@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
 
-class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
+final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
     public function testAssetDownloadReportWithDncListColumn(): void
     {
@@ -78,7 +78,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $assetDownload->setLead($contact);
         $assetDownload->setDateDownload(new \DateTime());
         $assetDownload->setCode(200);
-        $assetDownload->setTrackingId(random_int(1, 99999));
+        $assetDownload->setTrackingId((string) random_int(1, 99999));
         $this->em->persist($assetDownload);
         $this->em->flush();
 

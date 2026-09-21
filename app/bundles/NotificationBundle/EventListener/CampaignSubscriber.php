@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
 use Mautic\NotificationBundle\Form\Type\NotificationSendType;
@@ -43,12 +44,13 @@ class CampaignSubscriber implements EventSubscriberInterface
     protected const MAX_PLAYER_IDS_PER_REQUEST = 2000;
 
     public function __construct(
-        private IntegrationHelper $integrationHelper,
-        private NotificationModel $notificationModel,
-        private AbstractNotificationApi $notificationApi,
-        private EventDispatcherInterface $dispatcher,
-        private DoNotContactModel $doNotContact,
-        private TranslatorInterface $translator,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly NotificationModel $notificationModel,
+        private readonly AbstractNotificationApi $notificationApi,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly DoNotContactModel $doNotContact,
+        private readonly TranslatorInterface $translator,
+        private readonly NotificationRepository $notificationRepository,
     ) {
     }
 
@@ -142,7 +144,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             $playerIds = $this->getLeadPlayerIds($event, $log);
 
-            if (!$playerIds) {
+            if ([] === $playerIds) {
                 continue;
             }
 
@@ -207,7 +209,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $playerIds[] = $pushID->getPushID();
         }
 
-        if (!$playerIds) {
+        if ([] === $playerIds) {
             $event->passWithError($log, $this->translator->trans('mautic.notification.campaign.failed.not_subscribed'));
         }
 
@@ -265,7 +267,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $this->notificationModel->createStatEntry($notification, $log->getLead(), 'campaign.event', $event->getEvent()->getId());
-        $this->notificationModel->getRepository()->upCount($notification->getId());
+        $this->notificationRepository->upCount($notification->getId());
 
         $result = [
             'status'  => 'mautic.notification.timeline.status.delivered',
@@ -293,7 +295,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             $playerIds = $this->getLeadPlayerIds($event, $log);
 
-            if (!$playerIds) {
+            if ([] === $playerIds) {
                 continue;
             }
 

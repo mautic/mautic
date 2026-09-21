@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command\Api;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('withContactCountsProvider')]
+    #[DataProvider('withContactCountsProvider')]
     public function testCampaignAPI(string $withContactCounts, bool $fromCache, int $expectedContacts): void
     {
         $contact  = $this->createLead('Test');
@@ -23,7 +24,8 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $cacheProvider = self::getContainer()->get('mautic.cache.provider');
+        /** @var CacheProvider $cacheProvider */
+        $cacheProvider = self::getContainer()->get(CacheProvider::class);
         if ($fromCache) {
             $contactCountDetail = [
                 'contactCount'   => $expectedContacts,
@@ -35,30 +37,17 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         }
         $this->client->request(Request::METHOD_GET, '/api/campaigns?withContactCounts='.$withContactCounts);
         $clientResponse = $this->client->getResponse();
-        $this->assertTrue($clientResponse->isOk());
+        $this->assertResponseIsSuccessful();
         $response = json_decode($clientResponse->getContent(), true);
-        Assert::assertArrayHasKey('campaigns', $response);
-        Assert::assertArrayHasKey($campaign->getId(), $response['campaigns']);
+        $this->assertArrayHasKey('campaigns', $response);
+        $this->assertArrayHasKey($campaign->getId(), $response['campaigns']);
         if ('true' === $withContactCounts) {
-            Assert::assertArrayHasKey(
-                'contactCount',
-                $response['campaigns'][$campaign->getId()],
-            );
-            Assert::assertArrayHasKey(
-                'contactCountFetchedAt',
-                $response['campaigns'][$campaign->getId()],
-            );
-            Assert::assertSame($expectedContacts, $response['campaigns'][$campaign->getId()]['contactCount']);
+            $this->assertArrayHasKey('contactCount', $response['campaigns'][$campaign->getId()]);
+            $this->assertArrayHasKey('contactCountFetchedAt', $response['campaigns'][$campaign->getId()]);
+            $this->assertSame($expectedContacts, $response['campaigns'][$campaign->getId()]['contactCount']);
         } else {
-            Assert::assertArrayNotHasKey(
-                'contactCount',
-                $response['campaigns'][$campaign->getId()],
-                'contactCount should not be present without withContactCounts parameter'
-            );
-            Assert::assertArrayNotHasKey(
-                'contactCountFetchedAt',
-                $response['campaigns'][$campaign->getId()],
-            );
+            $this->assertArrayNotHasKey('contactCount', $response['campaigns'][$campaign->getId()], 'contactCount should not be present without withContactCounts parameter');
+            $this->assertArrayNotHasKey('contactCountFetchedAt', $response['campaigns'][$campaign->getId()]);
         }
         if ($fromCache) {
             $cacheProvider->deleteItem(sprintf('%s.%s.%s', 'campaign', $campaign->getId(), 'lead'));

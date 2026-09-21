@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
 use Symfony\Component\HttpFoundation\Request;
 
-class ProfileControllerTest extends MauticMysqlTestCase
+final class ProfileControllerTest extends MauticMysqlTestCase
 {
     use CreateEntityTrait;
     use LoginUserWithSamlTrait;
@@ -32,9 +32,9 @@ class ProfileControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, 's/account');
 
         $clientResponse = $this->client->getResponse();
-        $this->assertEquals(200, $clientResponse->getStatusCode());
-        $this->assertStringNotContainsString('user[plainPassword][password]', $clientResponse->getContent());
-        $this->assertStringNotContainsString('user[plainPassword][confirm]', $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('user[plainPassword][password]', (string) $clientResponse->getContent());
+        $this->assertStringNotContainsString('user[plainPassword][confirm]', (string) $clientResponse->getContent());
     }
 
     public function testPasswordOnAccountPageWithoutSaml(): void
@@ -47,8 +47,8 @@ class ProfileControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, 's/account');
 
         $clientResponse = $this->client->getResponse();
-        $this->assertEquals(200, $clientResponse->getStatusCode());
-        $this->assertStringContainsString('user[plainPassword][password]', $clientResponse->getContent());
-        $this->assertStringContainsString('user[plainPassword][confirm]', $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('user[plainPassword][password]', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('user[plainPassword][confirm]', (string) $clientResponse->getContent());
     }
 }

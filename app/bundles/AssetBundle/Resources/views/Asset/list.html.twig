@@ -66,7 +66,9 @@
                         'tooltip': 'mautic.asset.asset.searchcommand.ispending.description',
                         'icon': 'ri-timer-line'
                     }
-                ]
+                ],
+                'searchScopes': searchScopes|default([]),
+                'searchScopeHint': searchScopeHint|default(''),
             }) -}}
 			<div class="page-list">
 				{{ block('listResults') }}
@@ -192,7 +194,7 @@
                                     },
                                     1: {
                                         'attr' : {
-                                            'data-copy' : url('mautic_asset_download', {'slug': item.getId() ~ ':' ~ item.getAlias()}),
+                                            'data-copy' : url('mautic_asset_download', {'slug': item.getSlug()}),
                                             'data-toggle' : 'none',
                                         },
                                         'btnText'   : 'mautic.core.copy_download_link'|trans,
@@ -216,7 +218,7 @@
                                 {'objectAction' : 'view', 'objectId' : item.getId()}
                             ) }}"
                                data-toggle="ajax">
-                                {{ item.getTitle() }} ({{ item.getAlias() }})
+                                {{ item.getTitle() }}
                             </a>
                             <i class="{{ item.getIconClass() }}"></i>
                             {{ customContent('asset.name', _context) }}

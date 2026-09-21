@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;
@@ -134,4 +136,9 @@ interface ThemeHelperInterface
     public function getCurrentTheme(string $template, string $specificFeature): string;
 
     public function toggleVisibility(string $themeName): void;
+
+    /**
+     * @param array<string, mixed> $params
+     */
+    public function renderThemeTemplate(string $template, array $params): string;
 }

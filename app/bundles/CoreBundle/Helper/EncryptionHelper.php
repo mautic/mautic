@@ -23,7 +23,7 @@ class EncryptionHelper
         $nonCipherArgs = 1;
         for ($i = $nonCipherArgs; $i < func_num_args(); ++$i) {
             $possibleCipher = func_get_arg($i);
-            if (!($possibleCipher instanceof SymmetricCipherInterface)) {
+            if (!$possibleCipher instanceof SymmetricCipherInterface) {
                 throw new \InvalidArgumentException($possibleCipher::class.' has to implement '.SymmetricCipherInterface::class);
             }
             if (!$possibleCipher->isSupported()) {

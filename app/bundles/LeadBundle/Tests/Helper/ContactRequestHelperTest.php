@@ -22,55 +22,35 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
+final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|LeadModel
+     * @var MockObject&LeadModel
      */
     private MockObject $leadModel;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
     private MockObject $contactTracker;
 
     /**
-     * @var MockObject|IpLookupHelper
+     * @var MockObject&IpLookupHelper
      */
     private MockObject $ipLookupHelper;
 
     /**
-     * @var MockObject|EventDispatcher
+     * @var MockObject&EventDispatcher
      */
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject|RequestStack
-     */
-    private MockObject $requestStack;
-
-    /**
-     * @var MockObject|Logger
-     */
-    private MockObject $logger;
-
-    /**
-     * @var MockObject|StatRepository
-     */
-    private MockObject $statRepository;
-
-    /**
-     * @var MockObject|BotRatioHelper
-     */
-    private MockObject $botRatioHelper;
-
-    /**
-     * @var MockObject|Lead
+     * @var MockObject&Lead
      */
     private MockObject $trackedContact;
 
     /**
-     * @var MockObject|ContactMerger
+     * @var MockObject&ContactMerger
      */
     private MockObject $contactMerger;
 
@@ -81,13 +61,9 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->leadModel                = $this->createMock(LeadModel::class);
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $this->requestStack             = $this->createMock(RequestStack::class);
-        $this->logger                   = $this->createMock(Logger::class);
         $this->dispatcher               = $this->createMock(EventDispatcher::class);
         $this->trackedContact           = $this->createMock(Lead::class);
         $this->contactMerger            = $this->createMock(ContactMerger::class);
-        $this->statRepository           = $this->createMock(StatRepository::class);
-        $this->botRatioHelper           = $this->createMock(BotRatioHelper::class);
 
         $this->trackedContact->method('getId')
             ->willReturn(1);
@@ -147,7 +123,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $contact = new Lead();
 
         $this->dispatcher->method('dispatch')
-            ->willReturnCallback(function (ContactIdentificationEvent $event) use ($contact) {
+            ->willReturnCallback(function (ContactIdentificationEvent $event) use ($contact): ContactIdentificationEvent {
                 $event->setIdentifiedContact($contact, 'email');
 
                 return $event;
@@ -159,7 +135,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $helper       = $this->getContactRequestHelper();
         $foundContact = $helper->getContactFromQuery($query);
 
-        $this->assertTrue($contact === $foundContact);
+        $this->assertSame($foundContact, $contact);
     }
 
     private function getContactRequestHelper(): ContactRequestHelper
@@ -168,12 +144,12 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             $this->leadModel,
             $this->contactTracker,
             $this->ipLookupHelper,
-            $this->requestStack,
-            $this->logger,
+            $this->createStub(RequestStack::class),
+            $this->createStub(Logger::class),
             $this->dispatcher,
             $this->contactMerger,
-            $this->statRepository,
-            $this->botRatioHelper
+            $this->createStub(StatRepository::class),
+            $this->createStub(BotRatioHelper::class)
         );
     }
 }

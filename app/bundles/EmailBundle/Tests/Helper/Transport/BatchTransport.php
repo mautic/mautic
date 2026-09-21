@@ -11,16 +11,19 @@ use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 
-class BatchTransport extends AbstractTransport implements TokenTransportInterface
+final class BatchTransport extends AbstractTransport implements TokenTransportInterface
 {
     use TokenTransportTrait;
 
     /**
      * @var array<string, mixed>
      */
-    private $transports = []; // @phpstan-ignore-line
+    private array $transports = []; // @phpstan-ignore-line
 
-    private $metadatas  = [];
+    /**
+     * @var mixed[]
+     */
+    private array $metadatas  = [];
 
     /**
      * @var string[]
@@ -32,10 +35,18 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
      */
     private array $fromNames = [];
 
+    /**
+     * @var string[]
+     */
+    private array $replyToAddresses = [];
+
     private ?MauticMessage $message = null;
 
-    public function __construct(private bool $validate = false, private int $maxRecipients = 4, private int $numberToFail = 1)
-    {
+    public function __construct(
+        private bool $validate = false,
+        private int $maxRecipients = 4,
+        private int $numberToFail = 1,
+    ) {
         $this->transports['main'] = $this;
 
         parent::__construct();
@@ -64,9 +75,10 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
             }
         }
 
-        $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
-        $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
-        $this->message         = $message;
+        $this->fromAddresses[]    = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+        $this->fromNames[]        = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
+        $this->replyToAddresses[] = !empty($message->getReplyTo()) ? $message->getReplyTo()[0]->getAddress() : null;
+        $this->message            = $message;
     }
 
     public function getMaxBatchLimit(): int
@@ -93,6 +105,14 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
     public function getFromNames(): array
     {
         return $this->fromNames;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getReplyToAddresses(): array
+    {
+        return $this->replyToAddresses;
     }
 
     public function getMessage(): ?MauticMessage

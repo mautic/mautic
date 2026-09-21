@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -25,14 +26,12 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
-use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\Service\WebhookService;
 use Mautic\WebhookBundle\WebhookEvents;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
@@ -45,7 +44,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class WebhookControllerTest extends TestCase
+final class WebhookControllerTest extends TestCase
 {
     #[DataProvider('provideNewOrUpdate')]
     public function testPayloadsAreSame(bool $isNew): void
@@ -57,7 +56,7 @@ class WebhookControllerTest extends TestCase
         $disableLimit   = 50;
 
         $mauticBundlesPath = realpath(__DIR__.'/../../../../');
-        Assert::assertNotFalse($mauticBundlesPath);
+        $this->assertNotFalse($mauticBundlesPath);
 
         if ($isNew) {
             $leadPayloadJson = file_get_contents($mauticBundlesPath.'/LeadBundle/Assets/WebhookPayload/lead_post_save_new.json');
@@ -65,12 +64,12 @@ class WebhookControllerTest extends TestCase
             $leadPayloadJson = file_get_contents($mauticBundlesPath.'/LeadBundle/Assets/WebhookPayload/lead_post_save_update.json');
         }
 
-        Assert::assertNotFalse($leadPayloadJson);
+        $this->assertNotFalse($leadPayloadJson);
         $leadPayload = json_decode($leadPayloadJson, true, 512, JSON_THROW_ON_ERROR);
-        Assert::assertIsArray($leadPayload);
+        $this->assertIsArray($leadPayload);
 
-        Assert::assertArrayHasKey(0, $leadPayload);
-        Assert::assertArrayHasKey('contact', $leadPayload[0]);
+        $this->assertArrayHasKey(0, $leadPayload);
+        $this->assertArrayHasKey('contact', $leadPayload[0]);
         $contactPayload = $leadPayload[0]['contact'];
 
         // Test payload contains old timestamp from the JSON file, while "real" payload contains a "now" timestamp.
@@ -78,22 +77,22 @@ class WebhookControllerTest extends TestCase
             $eventUnderTest => $leadPayload,
         ];
 
-        Assert::assertArrayHasKey('timestamp', $leadPayload[0]);
+        $this->assertArrayHasKey('timestamp', $leadPayload[0]);
         $leadPayload[0]['timestamp'] = (new \DateTime())->format(\DateTimeInterface::ATOM);
         $realTestPayload             = [
             $eventUnderTest => $leadPayload,
         ];
 
         $controller = new AjaxController(
-            $this->createMock(ManagerRegistry::class),
-            $this->createMock(ModelFactory::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(FlashBag::class),
-            $this->createMock(RequestStack::class),
-            $this->createMock(CorePermissions::class),
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
+            $this->createStub(RequestStack::class),
+            $this->createStub(CorePermissions::class),
         );
 
         $parameterBag = $this->createMock(ParameterBagInterface::class);
@@ -117,11 +116,7 @@ class WebhookControllerTest extends TestCase
         $client->expects($this->once())
             ->method('post')
             ->willReturnCallback(function (string $url, array $payload) use ($testPayload): GuzzleResponse {
-                Assert::assertSame(
-                    $payload,
-                    $testPayload,
-                    json_encode($payload, JSON_THROW_ON_ERROR),
-                );
+                $this->assertSame($payload, $testPayload, json_encode($payload, JSON_THROW_ON_ERROR));
 
                 return new GuzzleResponse();
             });
@@ -133,7 +128,7 @@ class WebhookControllerTest extends TestCase
         $testResponse = $controller->sendHookTestAction($request, $client, $pathsHelper);
         // If you encounter errors here, please check \Mautic\WebhookBundle\Controller\AjaxController::processWebhookTest
         // or inside the Client mock.
-        Assert::assertSame(Response::HTTP_OK, $testResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $testResponse->getStatusCode());
 
         $changes = ['dateIdentified' => $isNew];
 
@@ -156,11 +151,19 @@ class WebhookControllerTest extends TestCase
         $client = $this->createMock(Client::class);
         $client->expects($this->once())
             ->method('post')
-            ->willReturnCallback(function (string $callUrl, array $callPayload, string $callSecret) use ($realTestPayload, $clientResponse, $secret, $url): GuzzleResponse {
-                Assert::assertSame($url, $callUrl);
-                Assert::assertSame($realTestPayload, $callPayload);
+            ->willReturnCallback(function (string $callUrl, array $callPayload, string $callSecret) use ($eventUnderTest, $realTestPayload, $clientResponse, $secret, $url): GuzzleResponse {
+                $this->assertSame($url, $callUrl);
+                $this->assertArrayHasKey($eventUnderTest, $callPayload);
+                $this->assertArrayHasKey(0, $callPayload[$eventUnderTest]);
+                $this->assertArrayHasKey('timestamp', $callPayload[$eventUnderTest][0]);
 
-                Assert::assertSame($secret, $callSecret);
+                // Timestamp is created when queue item is built and can differ by a second.
+                $normalizedPayload                                      = $realTestPayload;
+                $normalizedPayload[$eventUnderTest][0]['timestamp']     = $callPayload[$eventUnderTest][0]['timestamp'];
+
+                $this->assertSame($normalizedPayload, $callPayload);
+
+                $this->assertSame($secret, $callSecret);
 
                 return $clientResponse;
             });
@@ -185,7 +188,7 @@ class WebhookControllerTest extends TestCase
             ->with($eventUnderTest)
             ->willReturn([$webhookEvent]);
 
-        $webhookQueueRepository = $this->createMock(WebhookQueueRepository::class);
+        $webhookQueueRepository = $this->createStub(WebhookQueueRepository::class);
 
         $webhookRepository = $this->createMock(WebhookRepository::class);
         $webhookRepository->expects($this->once())
@@ -197,20 +200,13 @@ class WebhookControllerTest extends TestCase
         $logRepository->expects($this->never())
             ->method('getSuccessVsErrorStatusCodeRatio');
 
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->exactly(3))
-            ->method('getRepository')
-            ->willReturnMap([
-                [Event::class, $webhookEventRepository],
-                [WebhookQueue::class, $webhookQueueRepository],
-                [Webhook::class, $webhookRepository],
-            ]);
+        $em = $this->createStub(EntityManager::class);
 
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('serialize')
             ->willReturnCallback(function (array $data, string $type) use ($contactPayload): string {
-                Assert::assertArrayHasKey('contact', $data);
-                Assert::assertSame('json', $type);
+                $this->assertArrayHasKey('contact', $data);
+                $this->assertSame('json', $type);
 
                 return json_encode(['contact' => $contactPayload], JSON_THROW_ON_ERROR);
             });
@@ -226,7 +222,7 @@ class WebhookControllerTest extends TestCase
             ->willReturn(false);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->method('get')
+        $coreParametersHelper->expects($this->exactly(10))->method('get')
             ->willReturnMap([
                 ['webhook_limit', 10, 5],
                 ['webhook_time_limit', 600, 500],
@@ -245,17 +241,21 @@ class WebhookControllerTest extends TestCase
             $serializer,
             $client,
             $em,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(WebhookService::class)
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(WebhookService::class),
+            $webhookRepository, // $webhookRepository
+            $webhookQueueRepository, // $webhookQueueRepository
+            $webhookEventRepository, // $eventRepository
+            $logRepository, // $logRepository
         );
-        $leadModel = $this->createMock(LeadModel::class);
+        $leadModel = $this->createStub(LeadModel::class);
 
-        $subscriber = new WebhookSubscriber($webhookModel, $leadModel);
+        $subscriber = new WebhookSubscriber($webhookModel, $leadModel, $this->createStub(LeadRepository::class));
         $subscriber->onLeadNewUpdate($event);
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Stats\Helper;
 
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;

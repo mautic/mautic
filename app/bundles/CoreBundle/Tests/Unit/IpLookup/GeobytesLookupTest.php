@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\IpLookup\GeobytesLookup;
 
-class GeobytesLookupTest extends \PHPUnit\Framework\TestCase
+final class GeobytesLookupTest extends \PHPUnit\Framework\TestCase
 {
-    private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
+    private string $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 
     public function testIpLookupSuccessful(): void
     {

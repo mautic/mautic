@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -11,7 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-class CampaignConditionSubscriberTest extends TestCase
+final class CampaignConditionSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&EmailValidator
@@ -107,7 +109,7 @@ class CampaignConditionSubscriberTest extends TestCase
         $this->validator->expects($this->once())
             ->method('validate')
             ->with($lead->getEmail(), true)
-            ->willReturnCallback(function () {
+            ->willReturnCallback(function (): void {
                 // Do nothing, as the method is void
             });
 

@@ -8,26 +8,30 @@ use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DeleteLeadListsCommand extends Command
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Hard-delete segment(s) and all its references.'
+)]
+final class DeleteLeadListsCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:segment:delete';
 
     public function __construct(
-        private ListModel $listModel,
-        private LeadListRepository $leadListRepository,
+        private readonly ListModel $listModel,
+        private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Hard-delete segment(s) and all its references.')
+        $this
             ->addArgument(
                 'list-id',
                 InputArgument::OPTIONAL,
@@ -46,36 +50,34 @@ class DeleteLeadListsCommand extends Command
                 $output->writeln("<info>segment {$listId} has been deleted.</info>");
 
                 return ExitCode::SUCCESS;
-            } else {
-                $output->writeln("<info>segment {$listId} couldn't be deleted as it was not found.</info>");
-
-                return ExitCode::FAILURE;
             }
-        } else {
-            // All soft deleted segments
-            $prefix = $this->leadListRepository->getTableAlias();
+            $output->writeln("<info>segment {$listId} couldn't be deleted as it was not found.</info>");
 
-            /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $leadLists */
-            $leadLists = $this->leadListRepository->getEntities([
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => $prefix.'.deleted',
-                            'expr'   => 'isNotNull',
-                        ],
+            return ExitCode::FAILURE;
+        }
+        // All soft deleted segments
+        $prefix = $this->leadListRepository->getTableAlias();
+
+        /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $leadLists */
+        $leadLists = $this->leadListRepository->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => $prefix.'.deleted',
+                        'expr'   => 'isNotNull',
                     ],
                 ],
-                'ignore_paginator'  => true,
-                'iterable_mode'     => true,
-            ]);
-            foreach ($leadLists as $list) {
-                $listId = $list->getId();
-                $this->deleteLeadList($list);
-                $output->writeln("<info>segment {$listId} has been deleted.</info>");
-            }
-
-            return ExitCode::SUCCESS;
+            ],
+            'ignore_paginator'  => true,
+            'iterable_mode'     => true,
+        ]);
+        foreach ($leadLists as $list) {
+            $listId = $list->getId();
+            $this->deleteLeadList($list);
+            $output->writeln("<info>segment {$listId} has been deleted.</info>");
         }
+
+        return ExitCode::SUCCESS;
     }
 
     private function deleteLeadList(LeadList $list): void

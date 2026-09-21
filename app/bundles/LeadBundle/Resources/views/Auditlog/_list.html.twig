@@ -100,10 +100,10 @@
           {% for event in events.events %}
               {% set counter = loop.index0 + 1 %}
               {% set icon = event.icon|default('ri-history-line') %}
-              {% set eventLabel = event.eventLabel|default(event.eventType) %}
-              {% if eventLabel is iterable %}
-                  {% set linkType = eventLabel.isExternal is defined ? 'data-toggle="ajax"' : 'target="_new"' %}
-                  {% set eventLabel = '<a href="'~eventLabel.href~'" '~linkType~'>'~eventLabel.label~'</a>' %}
+              {% set userName = event.userName|default(event.eventType) %}
+              {% if userName is iterable %}
+                  {% set linkType = userName.isExternal is defined ? 'data-toggle="ajax"' : 'target="_new"' %}
+                  {% set userName = '<a href="'~userName.href~'" '~linkType~'>'~userName.label~'</a>' %}
               {% endif %}
 
               {% set rowStripe = cycle(['', 'timeline-row-highlighted'], loop.index0) %}
@@ -126,7 +126,7 @@
                          <span class="ri-arrow-down-s-line"></span>
                       </a>
                   </td>
-                  <td class="timeline-name">{{ eventLabel }}</td>
+                  <td class="timeline-name">{{ userName }}</td>
                   <td class="timeline-type">{% if event.eventType is defined %}{{ ('mautic.lead.event.'~event.eventType)|trans }}{% endif %}
               </td>
                   <td class="timeline-timestamp">{{ dateToText(event.timestamp, 'local', 'Y-m-d H:i:s', true) }}</td>

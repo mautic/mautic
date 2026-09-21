@@ -14,15 +14,16 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<Tag>
  */
-class TagEntityType extends AbstractType
+final class TagEntityType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('buttons', FormButtonsType::class);
+        $builder->addEventSubscriber(new CleanFormSubscriber(['tag' => 'string']));
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
 
         // We only allow to set tag field value if we are creating new tag.
-        $tagReadOnly = !empty($options['data']) && $options['data']->getId() ? true : false;
+        $tagReadOnly = !empty($options['data']) && $options['data']->getId();
 
         $builder->add(
             'tag',
@@ -33,9 +34,7 @@ class TagEntityType extends AbstractType
                 'attr'        => ['class' => 'form-control', 'readonly' => $tagReadOnly],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

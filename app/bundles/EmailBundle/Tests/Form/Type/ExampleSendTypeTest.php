@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -18,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExampleSendTypeTest extends TestCase
+final class ExampleSendTypeTest extends TestCase
 {
     private ExampleSendType $form;
 
@@ -28,16 +29,16 @@ class ExampleSendTypeTest extends TestCase
     private MockObject $translator;
 
     /**
-     * @var CorePermissions&MockObject
+     * @var MockObject&CorePermissions
      */
     private MockObject $security;
 
     /**
-     * @var UserHelper|MockObject
+     * @var MockObject&UserHelper
      */
-    private $userHelperMock;
+    private MockObject $userHelperMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->translator     = $this->createMock(TranslatorInterface::class);
         $this->security       = $this->createMock(CorePermissions::class);
@@ -51,9 +52,9 @@ class ExampleSendTypeTest extends TestCase
     {
         $userId  = 37;
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = self::exactly(2);
+        $matcher = $this->exactly(2);
         $builder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('emails', $parameters[0]);
                     $this->assertSame(SortableListType::class, $parameters[1]);
@@ -77,20 +78,20 @@ class ExampleSendTypeTest extends TestCase
                 return $builder;
             });
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(false);
 
         $userMock = $this->createMock(User::class);
-        $userMock->expects(self::once())
+        $userMock->expects($this->once())
             ->method('getId')
             ->willReturn($userId);
 
-        $this->userHelperMock->expects(self::once())
+        $this->userHelperMock->expects($this->once())
             ->method('getUser')
             ->willReturn($userMock);
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('hasEntityAccess')
             ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(false);
@@ -101,9 +102,9 @@ class ExampleSendTypeTest extends TestCase
     public function testBuildFormWithContact(): void
     {
         $userId  = 37;
-        $matcher = self::exactly(2);
+        $matcher = $this->exactly(2);
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 
@@ -114,12 +115,14 @@ class ExampleSendTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = self::exactly(4);
+        $matcher = $this->exactly(4);
         $builder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('emails', $parameters[0]);
                     $this->assertSame(SortableListType::class, $parameters[1]);
@@ -163,20 +166,20 @@ class ExampleSendTypeTest extends TestCase
                 return $builder;
             });
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(false);
 
         $userMock = $this->createMock(User::class);
-        $userMock->expects(self::once())
+        $userMock->expects($this->once())
             ->method('getId')
             ->willReturn($userId);
 
-        $this->userHelperMock->expects(self::once())
+        $this->userHelperMock->expects($this->once())
             ->method('getUser')
             ->willReturn($userMock);
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('hasEntityAccess')
             ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(true);

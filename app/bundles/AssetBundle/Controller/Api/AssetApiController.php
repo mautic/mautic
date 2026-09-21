@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Asset>
  */
-class AssetApiController extends CommonApiController
+final class AssetApiController extends CommonApiController
 {
     /**
      * @var AssetModel|null
@@ -37,15 +37,13 @@ class AssetApiController extends CommonApiController
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
         RequestStack $requestStack,
-        private CoreParametersHelper $parametersHelper,
+        private readonly CoreParametersHelper $parametersHelper,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        AssetModel $assetModel,
     ) {
-        $assetModel = $modelFactory->getModel('asset');
-        \assert($assetModel instanceof AssetModel);
-
         $this->model            = $assetModel;
         $this->entityClass      = Asset::class;
         $this->entityNameOne    = 'asset';
@@ -60,6 +58,12 @@ class AssetApiController extends CommonApiController
      */
     protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
+        // During delete responses Doctrine may already de-reference the entity ID.
+        // In that case, generating a public slug is not possible and should be skipped.
+        if (null === $entity->getId()) {
+            return;
+        }
+
         $entity->setDownloadUrl(
             $this->model->generateUrl($entity, true)
         );

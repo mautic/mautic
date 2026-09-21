@@ -2,8 +2,13 @@
   "name": "Confirm Me",
   "author": "Mautic team",
   "authorUrl": "https://mautic.org",
-  "builder": ["grapesjsbuilder"],
+  "builder": [
+    "grapesjsbuilder"
+  ],
   "features": [
     "email"
+  ],
+  "tags": [
+    "transactional"
   ]
 }

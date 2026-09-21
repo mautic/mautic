@@ -11,8 +11,10 @@ use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
+use Mautic\UserBundle\Model\RoleModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ProjectControllerTest extends MauticMysqlTestCase
@@ -43,7 +45,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('indexUrlsProvider')]
+    #[DataProvider('indexUrlsProvider')]
     public function testIndexActionDisplaysProjects(string $url): void
     {
         $this->client->request('GET', $url);
@@ -51,8 +53,8 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $clientResponseContent = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('project1', $clientResponseContent, 'The return must contain project1');
-        $this->assertStringContainsString('project2', $clientResponseContent, 'The return must contain project2');
+        $this->assertStringContainsString('project1', (string) $clientResponseContent, 'The return must contain project1');
+        $this->assertStringContainsString('project2', (string) $clientResponseContent, 'The return must contain project2');
     }
 
     /**
@@ -71,8 +73,8 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $clientResponseContent  = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('project1', $clientResponseContent, 'The return must contain project1');
-        $this->assertStringNotContainsString('project2', $clientResponseContent, 'The return must not contain project2');
+        $this->assertStringContainsString('project1', (string) $clientResponseContent, 'The return must contain project1');
+        $this->assertStringNotContainsString('project2', (string) $clientResponseContent, 'The return must not contain project2');
     }
 
     public function testProjectDeletion(): void
@@ -93,7 +95,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $this->client->request('POST', '/s/projects/delete/'.$projectId);
 
         $this->assertResponseIsSuccessful();
-        $this->assertSame($this->projectRepository->find($projectId), null, 'Assert that project is deleted');
+        $this->assertNull($this->projectRepository->find($projectId), 'Assert that project is deleted');
         $this->assertCount(0, $this->em->find(LeadList::class, $segment->getId())->getProjects());
     }
 
@@ -105,7 +107,41 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($project->getName(), $clientResponseContent, 'The return must contain project');
+        $this->assertStringContainsString($project->getName(), (string) $clientResponseContent, 'The return must contain project');
+    }
+
+    public function testViewActionOpensTheOnlyEditableEntityTypeDirectly(): void
+    {
+        $project = $this->projectRepository->findOneBy([]);
+
+        $this->createAndLoginUser([
+            'project:project' => ['view'],
+            'asset:assets'    => ['viewown', 'editown'],
+        ]);
+
+        $this->client->request('GET', '/s/projects/view/'.$project->getId());
+        $content = (string) $this->client->getResponse()->getContent();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('/s/projects/addEntity/', $content);
+        $this->assertStringContainsString('entityType=asset', $content);
+    }
+
+    public function testViewActionOpensEntityTypeSelectorWhenSeveralEntityTypesAreEditable(): void
+    {
+        $project = $this->projectRepository->findOneBy([]);
+
+        $this->createAndLoginUser([
+            'project:project' => ['view'],
+            'asset:assets'    => ['viewown', 'editown'],
+            'email:emails'    => ['viewown', 'editown'],
+        ]);
+
+        $this->client->request('GET', '/s/projects/view/'.$project->getId());
+        $content = (string) $this->client->getResponse()->getContent();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('/s/projects/selectEntityType/', $content);
     }
 
     public function testViewActionNotFound(): void
@@ -123,8 +159,8 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $crawler                = $this->client->request('GET', '/s/projects/edit/'.$project->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
-        $this->assertStringContainsString('Edit project: '.$project->getName(), $clientResponseContent, 'The return must contain \'Edit project\' text');
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Edit project: '.$project->getName(), (string) $clientResponseContent, 'The return must contain \'Edit project\' text');
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['project_entity[name]']->setValue($projectName);
@@ -157,9 +193,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     public function testBatchDeleteAction(): void
     {
         $projects   = $this->projectRepository->findAll();
-        $projectsId = array_map(function (Project $project) {
-            return $project->getId();
-        }, $projects);
+        $projectsId = array_map(fn (Project $project): ?int => $project->getId(), $projects);
         $this->client->request('POST', '/s/projects/batchDelete?ids='.json_encode($projectsId));
         $this->assertResponseIsSuccessful();
         $this->assertEmpty($this->projectRepository->count([]), 'All projects must be deleted.');
@@ -175,7 +209,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $form->setValues(['project_entity[name]' => '']);
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('A name is required.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('A name is required.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testEditProjectWithNoPermission(): void
@@ -186,10 +220,16 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(403, (string) $this->client->getResponse()->getStatusCode());
     }
 
-    private function createAndLoginUser(): User
+    /**
+     * @param array<string, array<int, string>> $permissions
+     */
+    private function createAndLoginUser(array $permissions = []): User
     {
         // Create non-admin role
         $role = $this->createRole();
+        /** @var RoleModel $roleModel */
+        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel->setRolePermissions($role, $permissions);
         // Create non-admin user
         $user = $this->createUser($role);
 
@@ -221,8 +261,8 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername(self::USERNAME);
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);
 

@@ -16,6 +16,7 @@ class Group extends FormEntity implements UuidInterface
     use UuidTrait;
 
     public const TABLE_NAME  = 'point_groups';
+
     public const ENTITY_NAME = 'point_group';
 
     private ?int $id             = null;
@@ -41,9 +42,7 @@ class Group extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

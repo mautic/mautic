@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Tests\EventListener;
 
 use Mautic\ApiBundle\EventListener\ConfigSubscriber;
@@ -7,7 +9,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Tests\CommonMocks;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ConfigSubscriberTest extends CommonMocks
+final class ConfigSubscriberTest extends CommonMocks
 {
     public function testWithUnsetApiBasicAuthSetting(): void
     {

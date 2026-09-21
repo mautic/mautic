@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\UtmTag;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class UtmTagTest extends \PHPUnit\Framework\TestCase
+final class UtmTagTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('setUtmTag')]
+    #[DataProvider('setUtmTag')]
     public function testSetUtmContent(string $utmContent, int $expected): void
     {
         $utmTag = new UtmTag();
         $utmTag->setUtmContent($utmContent);
 
-        Assert::assertEquals($expected, mb_strlen($utmTag->getUtmContent()));
+        $this->assertSame($expected, mb_strlen($utmTag->getUtmContent()));
     }
 
     /**
@@ -27,7 +27,7 @@ class UtmTagTest extends \PHPUnit\Framework\TestCase
         yield ['UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 UTM content longer like 191 ', 191];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('utmTagsDataProvider')]
+    #[DataProvider('utmTagsDataProvider')]
     public function testHasUtmTags(?string $utmCampaign, ?string $utmSource, ?string $utmMedium, ?string $utmContent, ?string $utmTerm, bool $expectedResult): void
     {
         $utmTag = new UtmTag();
@@ -37,22 +37,20 @@ class UtmTagTest extends \PHPUnit\Framework\TestCase
         $utmTag->setUtmContent($utmContent);
         $utmTag->setUtmTerm($utmTerm);
 
-        $this->assertEquals($expectedResult, $utmTag->hasUtmTags());
+        $this->assertSame($expectedResult, $utmTag->hasUtmTags());
     }
 
     /**
-     * @return array<string|array<bool|string|''>>
+     * @return \Iterator<(int|string), (array<(bool|string)>|string)>
      */
-    public static function utmTagsDataProvider(): array
+    public static function utmTagsDataProvider(): \Iterator
     {
-        return [
-            'All tags are empty'       => ['', '', '', '', '', false],
-            'Only utmCampaign is set'  => ['campaign', '', '', '', '', true],
-            'Only utmSource is set'    => ['', 'source', '', '', '', true],
-            'Only utmMedium is set'    => ['', '', 'medium', '', '', true],
-            'Only utmContent is set'   => ['', '', '', 'content', '', true],
-            'Only utmTerm is set'      => ['', '', '', '', 'term', true],
-            'All tags are set'         => ['campaign', 'source', 'medium', 'content', 'term', true],
-        ];
+        yield 'All tags are empty' => ['', '', '', '', '', false];
+        yield 'Only utmCampaign is set' => ['campaign', '', '', '', '', true];
+        yield 'Only utmSource is set' => ['', 'source', '', '', '', true];
+        yield 'Only utmMedium is set' => ['', '', 'medium', '', '', true];
+        yield 'Only utmContent is set' => ['', '', '', 'content', '', true];
+        yield 'Only utmTerm is set' => ['', '', '', '', 'term', true];
+        yield 'All tags are set' => ['campaign', 'source', 'medium', 'content', 'term', true];
     }
 }

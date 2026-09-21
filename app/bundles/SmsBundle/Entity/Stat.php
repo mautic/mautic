@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -159,17 +161,14 @@ class Stat
     }
 
     /**
-     * @return Sms
+     * @return Sms|null
      */
     public function getSms()
     {
         return $this->sms;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setSms(Sms $sms)
+    public function setSms(Sms $sms): static
     {
         $this->sms = $sms;
 
@@ -177,17 +176,14 @@ class Stat
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -195,17 +191,14 @@ class Stat
     }
 
     /**
-     * @return LeadList
+     * @return LeadList|null
      */
     public function getList()
     {
         return $this->list;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setList(LeadList $list)
+    public function setList(LeadList $list): static
     {
         $this->list = $list;
 
@@ -213,17 +206,14 @@ class Stat
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setIpAddress(IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 
@@ -231,7 +221,7 @@ class Stat
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -240,10 +230,8 @@ class Stat
 
     /**
      * @param \DateTime $dateSent
-     *
-     * @return Stat
      */
-    public function setDateSent($dateSent)
+    public function setDateSent($dateSent): static
     {
         $this->dateSent = $dateSent;
 
@@ -251,7 +239,7 @@ class Stat
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTrackingHash()
     {
@@ -260,10 +248,8 @@ class Stat
 
     /**
      * @param string $trackingHash
-     *
-     * @return Stat
      */
-    public function setTrackingHash($trackingHash)
+    public function setTrackingHash($trackingHash): static
     {
         $this->trackingHash = $trackingHash;
 
@@ -271,7 +257,7 @@ class Stat
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSource()
     {
@@ -280,10 +266,8 @@ class Stat
 
     /**
      * @param string $source
-     *
-     * @return Stat
      */
-    public function setSource($source)
+    public function setSource($source): static
     {
         $this->source = $source;
 
@@ -291,7 +275,7 @@ class Stat
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getSourceId()
     {
@@ -300,10 +284,8 @@ class Stat
 
     /**
      * @param int $sourceId
-     *
-     * @return Stat
      */
-    public function setSourceId($sourceId)
+    public function setSourceId($sourceId): static
     {
         $this->sourceId = $sourceId;
 
@@ -311,17 +293,14 @@ class Stat
     }
 
     /**
-     * @return array
+     * @return array<array-key, mixed>
      */
     public function getTokens()
     {
         return $this->tokens;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setTokens(array $tokens)
+    public function setTokens(array $tokens): static
     {
         $this->tokens = $tokens;
 
@@ -330,10 +309,8 @@ class Stat
 
     /**
      * @param bool $isFailed
-     *
-     * @return Stat
      */
-    public function setIsFailed($isFailed)
+    public function setIsFailed($isFailed): static
     {
         $this->isFailed = $isFailed;
 
@@ -341,7 +318,7 @@ class Stat
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function isFailed()
     {
@@ -349,7 +326,7 @@ class Stat
     }
 
     /**
-     * @return array
+     * @return array<array-key, mixed>
      */
     public function getDetails()
     {
@@ -358,10 +335,8 @@ class Stat
 
     /**
      * @param array $details
-     *
-     * @return Stat
      */
-    public function setDetails($details)
+    public function setDetails($details): static
     {
         $this->details = $details;
 
@@ -371,10 +346,8 @@ class Stat
     /**
      * @param string $type
      * @param string $detail
-     *
-     * @return Stat
      */
-    public function addDetail($type, $detail)
+    public function addDetail($type, $detail): static
     {
         $this->details[$type][] = $detail;
 

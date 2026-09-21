@@ -7,7 +7,7 @@ use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Renderer\RendererInterface;
 use Twig\Environment;
 
-class MenuRenderer implements RendererInterface
+final readonly class MenuRenderer implements RendererInterface
 {
     private array $defaultOptions;
 

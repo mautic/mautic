@@ -10,13 +10,13 @@ use Mautic\EmailBundle\Entity\Email;
 class EmailEditSubmitEvent extends CommonEvent
 {
     public function __construct(
-        private Email $previousEmail,
-        private Email $currentEmail,
-        private bool $saveAndClose,
-        private bool $apply,
-        private bool $saveAsDraft,
-        private bool $applyDraft,
-        private bool $discardDraft,
+        private readonly Email $previousEmail,
+        private readonly Email $currentEmail,
+        private readonly bool $saveAndClose,
+        private readonly bool $apply,
+        private readonly bool $saveAsDraft,
+        private readonly bool $applyDraft,
+        private readonly bool $discardDraft,
     ) {
     }
 

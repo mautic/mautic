@@ -30,10 +30,10 @@ class CompanyObjectHelper implements ObjectHelperInterface
     private array $companiesCreated = [];
 
     public function __construct(
-        private CompanyModel $model,
-        private CompanyRepository $repository,
-        private Connection $connection,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly CompanyModel $model,
+        private readonly CompanyRepository $repository,
+        private readonly Connection $connection,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 
@@ -94,7 +94,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
     {
         $updatedMappedObjects = [];
 
-        if (!$ids) {
+        if ([] === $ids) {
             return $updatedMappedObjects;
         }
 
@@ -184,8 +184,9 @@ class CompanyObjectHelper implements ObjectHelperInterface
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->where(
-                $qb->expr()->in('id', $ids)
-            );
+                $qb->expr()->in('id', ':ids')
+            )
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
         return $qb->executeQuery()->fetchAllAssociative();
     }
@@ -198,7 +199,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
 
         foreach ($fields as $col => $val) {
             // Use andWhere because Mautic treats conflicting unique identifiers as different objects
-            $q->{$this->repository->getUniqueIdentifiersWherePart()}("c.$col = :".$col)
+            $q->{$this->repository->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col)
                 ->setParameter($col, $val);
         }
 
@@ -207,7 +208,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
 
     public function findOwnerIds(array $objectIds): array
     {
-        if (empty($objectIds)) {
+        if ([] === $objectIds) {
             return [];
         }
 

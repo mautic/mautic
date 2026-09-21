@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class DetermineWinnerEvent extends Event
+final class DetermineWinnerEvent extends Event
 {
     /**
      * @var array{
-     *             winners: array,
+     *             winners: array<int, int|string>,
      *             support?: mixed,
+     *             basedOn?: string,
      *             supportTemplate?: string
      *             }
      */
@@ -17,47 +20,49 @@ class DetermineWinnerEvent extends Event
 
     /**
      * @param array{
-     *   parent?: \Mautic\PageBundle\Entity\Page|\Mautic\EmailBundle\Entity\Email,
+     *   parent?: \Mautic\CoreBundle\Entity\VariantEntityInterface|mixed,
      *   children?: array<mixed>,
      *   page?: \Mautic\PageBundle\Entity\Page,
-     *   email?: \Mautic\EmailBundle\Entity\Email
+     *   email?: \Mautic\EmailBundle\Entity\Email|\Mautic\CoreBundle\Entity\VariantEntityInterface
      * } $parameters
      */
     public function __construct(
-        private array $parameters,
+        private readonly array $parameters,
     ) {
     }
 
     /**
      * @return array{
-     *                parent?: \Mautic\PageBundle\Entity\Page|\Mautic\EmailBundle\Entity\Email,
+     *                parent?: \Mautic\CoreBundle\Entity\VariantEntityInterface|mixed,
      *                children?: array<mixed>,
      *                page?: \Mautic\PageBundle\Entity\Page,
-     *                email?: \Mautic\EmailBundle\Entity\Email
+     *                email?: \Mautic\EmailBundle\Entity\Email|\Mautic\CoreBundle\Entity\VariantEntityInterface
      *                }
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
     /**
      * @return array{
-     *                winners:array,
-     *                support?:mixed,
-     *                supportTemplate?:string
+     *                winners: array<int, int|string>,
+     *                support?: mixed,
+     *                basedOn?: string,
+     *                supportTemplate?: string
      *                }
      */
-    public function getAbTestResults()
+    public function getAbTestResults(): ?array
     {
         return $this->abTestResults;
     }
 
     /**
      * @param array{
-     *   winners:array,
-     *   support?:mixed,
-     *   supportTemplate?:string
+     *   winners: array<int, int|string>,
+     *   support?: mixed,
+     *   basedOn?: string,
+     *   supportTemplate?: string
      * } $abTestResults The following parameters are available:
      * - (required) winners - Array of IDs of the winners (empty array in case of a tie)
      * - (optional) support - Data passed to the view defined by supportTemplate below in order to render visual support for the winners (such as a graph, etc)

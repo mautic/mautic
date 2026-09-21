@@ -20,14 +20,57 @@
 <div class="row">
     <div class="col-md-12">
         <div class="characters-count">
-            <label class="control-label" for="" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="{{ 'mautic.sms.form.nbcharacter.infobox'|trans }}">
+            <span class="control-label" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="{{ 'mautic.sms.form.nbcharacter.infobox'|trans }}">
                 {{ 'mautic.sms.form.nbcharacter.counter'|trans }}
                 <span size="sm" class="label label-gray" id="sms_nb_char">0</span>
-            </label>
+            </span>
         </div>
         {{ form_row(form.message) }}
         <i class="text-secondary">{{ 'mautic.sms.token.dropdown.hint'|trans|purify }}</i>
 
+    </div>
+</div>
+
+<div class="row {% if not sms.getIsMms() %}hide{% endif %}" id="media_div">
+    <div class="col-md-12">
+        <div class="control-label">{{ form.media.vars.label|trans }}</div>
+    </div>
+    <div class="col-md-5">
+        <button type="button" id="upload_mms_media" class="btn btn-primary" onclick="javascript:Mautic.loadNewWindow({windowUrl:'{{ path('mautic_base_index') }}elfinder?editor=media_form'})">
+            <i class="ri-file-upload-line"></i> {{ 'mautic.lead.import.upload'|trans }}
+        </button>
+    </div>
+    <div class="col-md-2">
+        {{ 'mautic.core.or'|trans }}
+    </div>
+    <div class="col-md-5">
+        <div class="input-group sms-media-url-group">
+            <input type="text" id="media_url" class="form-control" placeholder="{{ 'mautic.sms.type_media_url'|trans }}" />
+            <button type="button" class="btn btn-secondary sms-media-upload-btn" onclick="Mautic.addMediaFromUrl()" aria-label="{{ 'mautic.sms.type_media_url'|trans }}">
+                <i class="ri-file-upload-line"></i>
+            </button>
+        </div>
+        <p id="media_url_error" class="help-block text-danger hide"></p>
+    </div>
+    <div class="col-md-12">
+        <ul id="media_row">
+        {% for field in form.media %}
+            {% set url = field.vars.value %}
+            {% set id = field.vars.id %}
+            <li id="li_{{ id }}">
+                {{ form_widget(field) }}
+                <label for="{{ id }}"><img src="{{ url }}" alt="{{ 'mautic.sms.type_media_url'|trans }}" /></label>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-12">
+        <div class="has-error">{{ form_errors(form.media) }}</div>
+    </div>
+    <div class="col-md-12">
+        <div class="alert alert-info mt-10">
+            {{ 'mautic.sms.form.mms.media.infobox'|trans|raw }}
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -45,6 +88,7 @@
         'data-end': 'mautic.core.form.available_until_scheduled_end'
     }
 }) }}
+{{ form_row(form.isMms) }}
 
 <div id="leadList"{% if 'template' == type %} class="hide"{% endif %}>
     {{ form_row(form.lists) }}

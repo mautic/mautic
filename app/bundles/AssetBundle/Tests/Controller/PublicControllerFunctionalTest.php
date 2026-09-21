@@ -1,21 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicControllerFunctionalTest extends AbstractAssetTestCase
+final class PublicControllerFunctionalTest extends AbstractAssetTestCase
 {
     /**
      * Download action should return the file content.
      */
     public function testDownloadActionStreamByDefault(): void
     {
-        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
-
-        $this->client->request('GET', '/asset/'.$assetSlug);
+        $this->client->request('GET', '/asset/'.$this->asset->getSlug());
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -25,7 +26,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($this->expectedPngContent, $content);
+        $this->assertSame($this->expectedPngContent, $content);
     }
 
     /**
@@ -33,9 +34,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testDownloadActionStreamIsZero(): void
     {
-        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
-
-        $this->client->request('GET', '/asset/'.$assetSlug.'?stream=0');
+        $this->client->request('GET', '/asset/'.$this->asset->getSlug().'?stream=0');
         ob_start();
         $response = $this->client->getResponse();
         $response->sendContent();
@@ -44,7 +43,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertStringStartsWith($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($this->expectedPngContent, $content);
+        $this->assertSame($this->expectedPngContent, $content);
     }
 
     /**
@@ -61,8 +60,9 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
-        $this->assertStringContainsString('404 Not Found', $content);
+        $this->assertResponseIsSuccessful();
+        $this->assertStringStartsWith($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
+        $this->assertSame($this->expectedPngContent, $content);
     }
 
     /**
@@ -71,7 +71,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
     public function testDownloadActionWithUTM(): void
     {
         $this->logoutUser();
-        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias().'?utm_source=test2&utm_medium=test3&utm_campaign=test6&utm_term=test4&utm_content=test5';
+        $assetSlug = $this->asset->getSlug().'?utm_source=test2&utm_medium=test3&utm_campaign=test6&utm_term=test4&utm_content=test5';
 
         $this->client->request('GET', '/asset/'.$assetSlug);
         ob_start();
@@ -83,12 +83,12 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($this->expectedPngContent, $content);
+        $this->assertSame($this->expectedPngContent, $content);
 
         $downloadRepo = $this->em->getRepository(Download::class);
 
         $download = $downloadRepo->findOneBy(['asset' => $this->asset]);
-        \assert($download instanceof Download);
+        $this->assertInstanceOf(Download::class, $download);
         $this->assertSame('test2', $download->getUtmSource());
         $this->assertSame('test3', $download->getUtmMedium());
         $this->assertSame('test4', $download->getUtmTerm());
@@ -108,8 +108,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $asset = $this->createAsset(['title' => 'Unpublished Asset', 'isPublished' => false]);
         $this->em->flush();
 
-        $assetSlug = $asset->getId().':'.$asset->getAlias();
-        $this->client->request('GET', '/asset/'.$assetSlug);
+        $this->client->request('GET', '/asset/'.$asset->getSlug());
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
@@ -126,23 +125,19 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->em->clear();
 
-        $assetSlug = $asset->getId().':'.$asset->getAlias();
-
         // Don't follow redirects automatically
         $this->client->followRedirects(false);
-        $this->client->request('GET', '/asset/'.$assetSlug);
-
-        $response = $this->client->getResponse();
-
+        $this->client->request('GET', '/asset/'.$asset->getSlug());
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
-        $this->assertSame($remotePath, $response->headers->get('Location'));
+        $this->assertResponseRedirects($remotePath);
     }
 
     public function testDownloadActionWithMissingLocalFile(): void
     {
         $this->logoutUser();
         $asset                = $this->createAsset(['title' => 'Missing Local File Asset']);
-        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $asset->setUploadDir($coreParametersHelper->get('upload_dir'));
         $this->em->flush();
 
@@ -152,8 +147,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertFileExists($assetPath, 'Expected asset file to exist before deletion');
         unlink($assetPath);
 
-        $assetSlug = $asset->getId().':'.$asset->getAlias();
-        $this->client->request('GET', '/asset/'.$assetSlug);
+        $this->client->request('GET', '/asset/'.$this->asset->getSlug());
 
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
@@ -165,8 +159,7 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $asset->setDisallow(true);
         $this->em->flush();
 
-        $assetSlug = $asset->getId().':'.$asset->getAlias();
-        $this->client->request('GET', '/asset/'.$assetSlug);
+        $this->client->request('GET', '/asset/'.$this->asset->getSlug());
 
         $this->assertResponseIsSuccessful();
         $this->assertSame('noindex, nofollow, noarchive', $this->client->getResponse()->headers->get('X-Robots-Tag'));

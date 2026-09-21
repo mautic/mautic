@@ -10,16 +10,22 @@ return function (ContainerConfigurator $configurator): void {
         ->defaults()
         ->autowire()
         ->autoconfigure()
+        ->bind('string $projectDir', '%kernel.project_dir%')
         ->public();
 
     $excludes = [
         'node_modules',
+        'vendor',
     ];
 
     $services->load('MauticPlugin\\GrapesJsBuilderBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('MauticPlugin\\GrapesJsBuilderBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->set('grapesjsbuilder.config', MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class);
+    $services->alias(MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class, 'grapesjsbuilder.config');
+    $services->set('grapesjsbuilder.helper.filemanager', MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class);
+    $services->alias(MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class, 'grapesjsbuilder.helper.filemanager');
 
     $services->alias('grapesjsbuilder.model', MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel::class);
     // Basic definitions with name, display name and icon

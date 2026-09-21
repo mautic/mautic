@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Event;
 
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class AbstractReportEvent extends Event
+abstract class AbstractReportEvent extends Event
 {
     protected ?string $context = null;
 
@@ -39,15 +41,14 @@ class AbstractReportEvent extends Event
         }
 
         if (is_array($context)) {
-            $res = array_filter($context, fn ($elem) => 0 === stripos($this->context, (string) $elem));
+            $res = array_filter($context, fn ($elem): bool => 0 === stripos($this->context, (string) $elem));
 
             return count($res) > 0;
-        } elseif ($this->context == $context) {
-            return true;
-        } elseif (0 === stripos($this->context, (string) $context)) {
-            return true;
-        } else {
-            return false;
         }
+        if ($this->context == $context) {
+            return true;
+        }
+
+        return 0 === stripos($this->context, (string) $context);
     }
 }

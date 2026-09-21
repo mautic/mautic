@@ -3,15 +3,14 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-class RouterSubscriber implements EventSubscriberInterface
+final class RouterSubscriber implements EventSubscriberInterface
 {
-    private string|int $httpsPort;
+    private readonly string|int $httpsPort;
 
-    private string|int $httpPort;
+    private readonly string|int $httpPort;
 
     /**
      * @param string|null $scheme
@@ -21,7 +20,7 @@ class RouterSubscriber implements EventSubscriberInterface
      * @param string|null $baseUrl
      */
     public function __construct(
-        private RouterInterface $router,
+        private readonly RouterInterface $router,
         private $scheme,
         private $host,
         $httpsPort,
@@ -35,7 +34,8 @@ class RouterSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => ['setRouterRequestContext', 1],
+            KernelEvents::REQUEST        => ['setRouterRequestContext', 1],
+            KernelEvents::FINISH_REQUEST => ['setRouterRequestContext', -1],
         ];
     }
 
@@ -44,13 +44,9 @@ class RouterSubscriber implements EventSubscriberInterface
      * in order to prevent mismatches between cached URLs generated during web requests and URLs generated
      * via CLI/cron jobs.
      */
-    public function setRouterRequestContext(RequestEvent $event): void
+    public function setRouterRequestContext(): void
     {
         if (empty($this->host)) {
-            return;
-        }
-
-        if (!$event->isMainRequest()) {
             return;
         }
 

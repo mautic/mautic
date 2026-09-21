@@ -119,8 +119,6 @@ class UtmTag
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -128,12 +126,7 @@ class UtmTag
         return $this->id;
     }
 
-    /**
-     * Set date added.
-     *
-     * @return UtmTag
-     */
-    public function setDateAdded(\DateTimeInterface $date)
+    public function setDateAdded(\DateTimeInterface $date): static
     {
         $this->dateAdded = $date;
 
@@ -141,8 +134,6 @@ class UtmTag
     }
 
     /**
-     * Get date added.
-     *
      * @return \DateTimeInterface
      */
     public function getDateAdded()
@@ -158,10 +149,7 @@ class UtmTag
         return $this->lead;
     }
 
-    /**
-     * @return UtmTag
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -178,10 +166,8 @@ class UtmTag
 
     /**
      * @param array $query
-     *
-     * @return UtmTag
      */
-    public function setQuery($query)
+    public function setQuery($query): static
     {
         $this->query = $query;
 
@@ -189,13 +175,9 @@ class UtmTag
     }
 
     /**
-     * Set referer.
-     *
      * @param string $referer
-     *
-     * @return UtmTag
      */
-    public function setReferer($referer)
+    public function setReferer($referer): static
     {
         $this->referer = $referer;
 
@@ -203,9 +185,7 @@ class UtmTag
     }
 
     /**
-     * Get referer.
-     *
-     * @return string
+     * @return string|null
      */
     public function getReferer()
     {
@@ -213,13 +193,9 @@ class UtmTag
     }
 
     /**
-     * Set remoteHost.
-     *
      * @param string $remoteHost
-     *
-     * @return UtmTag
      */
-    public function setRemoteHost($remoteHost)
+    public function setRemoteHost($remoteHost): static
     {
         $this->remoteHost = $remoteHost;
 
@@ -227,9 +203,7 @@ class UtmTag
     }
 
     /**
-     * Get remoteHost.
-     *
-     * @return string
+     * @return string|null
      */
     public function getRemoteHost()
     {
@@ -237,13 +211,9 @@ class UtmTag
     }
 
     /**
-     * Set url.
-     *
      * @param string $url
-     *
-     * @return UtmTag
      */
-    public function setUrl($url)
+    public function setUrl($url): static
     {
         $this->url = $url;
 
@@ -251,8 +221,6 @@ class UtmTag
     }
 
     /**
-     * Get url.
-     *
      * @return string
      */
     public function getUrl()
@@ -261,13 +229,9 @@ class UtmTag
     }
 
     /**
-     * Set userAgent.
-     *
      * @param string $userAgent
-     *
-     * @return UtmTag
      */
-    public function setUserAgent($userAgent)
+    public function setUserAgent($userAgent): static
     {
         $this->userAgent = $userAgent;
 
@@ -275,9 +239,7 @@ class UtmTag
     }
 
     /**
-     * Get userAgent.
-     *
-     * @return string
+     * @return string|null
      */
     public function getUserAgent()
     {
@@ -285,7 +247,7 @@ class UtmTag
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUtmCampaign()
     {
@@ -294,10 +256,8 @@ class UtmTag
 
     /**
      * @param string $utmCampaign
-     *
-     * @return UtmTag
      */
-    public function setUtmCampaign($utmCampaign)
+    public function setUtmCampaign($utmCampaign): static
     {
         $this->utmCampaign = $utmCampaign;
 
@@ -305,7 +265,7 @@ class UtmTag
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUtmContent()
     {
@@ -314,10 +274,8 @@ class UtmTag
 
     /**
      * @param string $utmContent
-     *
-     * @return UtmTag
      */
-    public function setUtmContent($utmContent)
+    public function setUtmContent($utmContent): static
     {
         $utmContent       = mb_strlen($utmContent) <= ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH ? $utmContent : mb_substr($utmContent, 0, ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH);
         $this->utmContent = $utmContent;
@@ -326,7 +284,7 @@ class UtmTag
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUtmMedium()
     {
@@ -335,10 +293,8 @@ class UtmTag
 
     /**
      * @param string $utmMedium
-     *
-     * @return UtmTag
      */
-    public function setUtmMedium($utmMedium)
+    public function setUtmMedium($utmMedium): static
     {
         $this->utmMedium = $utmMedium;
 
@@ -346,7 +302,7 @@ class UtmTag
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUtmSource()
     {
@@ -355,10 +311,8 @@ class UtmTag
 
     /**
      * @param string $utmSource
-     *
-     * @return UtmTag
      */
-    public function setUtmSource($utmSource)
+    public function setUtmSource($utmSource): static
     {
         $this->utmSource = $utmSource;
 
@@ -366,7 +320,7 @@ class UtmTag
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUtmTerm()
     {
@@ -375,10 +329,8 @@ class UtmTag
 
     /**
      * @param string $utmTerm
-     *
-     * @return UtmTag
      */
-    public function setUtmTerm($utmTerm)
+    public function setUtmTerm($utmTerm): static
     {
         $this->utmTerm = $utmTerm;
 

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Helper\PointActionHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
 {
@@ -20,7 +21,7 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
         $this->pointActionHelper = $this->getContainer()->get(PointActionHelper::class);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideReturnsWithinAndAfterCases')]
+    #[DataProvider('provideReturnsWithinAndAfterCases')]
     public function testValidateUrlHitReturnsWithinAndAfter(
         int $previousOffset,
         ?int $returnsWithin,
@@ -70,11 +71,11 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
     public static function provideReturnsWithinAndAfterCases(): \Generator
     {
         yield 'returns_within true' => [
-            -20,
+            -10,
             20,
             null,
             true,
-            'Should return true when returns_within is 20 and hit difference is 20',
+            'Should return true when returns_within is 20 and hit difference is less than 20',
         ];
         yield 'returns_within false' => [
             -21,
@@ -156,6 +157,101 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($resultAfter, 'Should return false when no previous hit is present and returns_after is set');
     }
 
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function repositoryUrlFilterProvider(): iterable
+    {
+        yield 'plain text substring' => [
+            'product/123',
+            'Plain text URL filters should match persisted hits via repository lookups.',
+        ];
+        yield 'legacy wildcard' => [
+            '*product/123*',
+            'Legacy wildcard URL filters should still match persisted hits via repository lookups.',
+        ];
+    }
+
+    #[DataProvider('repositoryUrlFilterProvider')]
+    public function testValidateUrlHitMatchesRepositoryQueries(string $pageUrlFilter, string $message): void
+    {
+        $lead       = $this->createLead();
+        $currentHit = $this->createProductHits($lead);
+
+        $action = [
+            'properties' => [
+                'page_url'          => $pageUrlFilter,
+                'returns_within'    => 40,
+                'returns_after'     => null,
+                'first_time'        => false,
+                'accumulative_time' => null,
+                'page_hits'         => 2,
+            ],
+        ];
+
+        $result = $this->pointActionHelper->validateUrlHit($currentHit, $action);
+        $this->assertTrue($result, $message);
+    }
+
+    public function testValidateUrlHitTreatsSqlWildcardsAsPlainTextForRepositoryQueries(): void
+    {
+        $lead = $this->createLead();
+        $now  = new \DateTimeImmutable();
+
+        $this->createHit(
+            $lead,
+            'https://example.com/product/nameX100-anything-25',
+            $now->modify('-30 seconds'),
+            200,
+            'test-tracking-id-1',
+            $now->modify('-20 seconds')
+        );
+
+        $currentHit = $this->createHit(
+            $lead,
+            'https://example.com/product/name_100%25',
+            $now,
+            200,
+            'test-tracking-id-2'
+        );
+
+        $action = [
+            'properties' => [
+                'page_url'          => 'name_100%25',
+                'returns_within'    => 40,
+                'returns_after'     => null,
+                'first_time'        => false,
+                'accumulative_time' => null,
+                'page_hits'         => 2,
+            ],
+        ];
+
+        $result = $this->pointActionHelper->validateUrlHit($currentHit, $action);
+        $this->assertFalse($result, 'SQL wildcard characters in plain text URL filters should not broaden repository matches.');
+    }
+
+    private function createProductHits(Lead $lead): Hit
+    {
+        $now  = new \DateTimeImmutable();
+
+        $this->createHit(
+            $lead,
+            'https://example.com/product/1234',
+            $now->modify('-30 seconds'),
+            200,
+            'test-tracking-id-1',
+            $now->modify('-20 seconds')
+        );
+
+        return $this->createHit(
+            $lead,
+            'https://example.com/product/1234',
+            $now,
+            200,
+            'test-tracking-id-2'
+        );
+    }
+
     private function createLead(): Lead
     {
         $lead = new Lead();
@@ -167,12 +263,15 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private function createHit(Lead $lead, string $url, \DateTimeImmutable $dateHit, int $code, string $trackingId): Hit
+    private function createHit(Lead $lead, string $url, \DateTimeImmutable $dateHit, int $code, string $trackingId, ?\DateTimeImmutable $dateLeft = null): Hit
     {
         $hit = new Hit();
         $hit->setLead($lead);
         $hit->setUrl($url);
         $hit->setDateHit(\DateTime::createFromImmutable($dateHit));
+        if (null !== $dateLeft) {
+            $hit->setDateLeft(\DateTime::createFromImmutable($dateLeft));
+        }
         $hit->setCode($code);
         $hit->setTrackingId($trackingId);
         $this->em->persist($hit);
