@@ -50,8 +50,6 @@ final class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $requestStack         = new RequestStack();
 
         $this->controller = new InstallController(
-            $this->createStub(Configurator::class),
-            $this->installer,
             $this->createStub(ManagerRegistry::class),
             $this->createStub(ModelFactory::class),
             $this->createStub(UserHelper::class),
@@ -61,6 +59,10 @@ final class InstallControllerTest extends \PHPUnit\Framework\TestCase
             $this->createStub(FlashBag::class),
             $requestStack,
             $this->createStub(CorePermissions::class)
+        );
+        $this->controller->autowireInstallController(
+            $this->createStub(Configurator::class),
+            $this->installer
         );
         $this->controller->setContainer($containerMock);
         $sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));

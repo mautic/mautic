@@ -12,13 +12,14 @@ use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class FormImportExportSubscriber implements EventSubscriberInterface
 {
@@ -26,11 +27,12 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private FormRepository $formRepository,
         private FormModel $formModel,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private EventDispatcherInterface $dispatcher,
-        private DenormalizerInterface $serializer,
+        private ImportEntityDenormalizer $serializer,
     ) {
     }
 
@@ -85,7 +87,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $this->mergeExportData($data, $subEvent);
 
             $event->addDependencyEntity(Form::ENTITY_NAME, [
-                Form::ENTITY_NAME       => (int) $formId,
+                Form::ENTITY_NAME       => $formId,
                 Field::ENTITY_NAME      => (int) $field->getId(),
             ]);
         }
@@ -97,7 +99,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $this->mergeExportData($data, $subEvent);
 
             $event->addDependencyEntity(Form::ENTITY_NAME, [
-                Form::ENTITY_NAME       => (int) $formId,
+                Form::ENTITY_NAME       => $formId,
                 Action::ENTITY_NAME     => (int) $action->getId(),
             ]);
         }
@@ -119,7 +121,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $formData) {
-            $form  = $this->entityManager->getRepository(Form::class)->findOneBy(['uuid' => $formData['uuid']]);
+            $form  = $this->formRepository->findOneBy(['uuid' => $formData['uuid']]);
             $isNew = !$form;
 
             $form ??= new Form();
@@ -159,7 +161,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(Form::class)->find($id);
+            $entity = $this->formRepository->find($id);
 
             if ($entity) {
                 $this->entityManager->remove($entity);

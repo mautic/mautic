@@ -9,7 +9,7 @@ use LightSaml\Store\Credential\CredentialStoreInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
-class CredentialsStore implements CredentialStoreInterface
+final class CredentialsStore implements CredentialStoreInterface
 {
     private ?X509Credential $credentials = null;
 

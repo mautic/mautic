@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ArrayHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -45,7 +46,7 @@ final class ArrayHelperTest extends \PHPUnit\Framework\TestCase
      * @param mixed[] $value
      * @param mixed[] $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('removeEmptyValuesProvider')]
+    #[DataProvider('removeEmptyValuesProvider')]
     public function testRemoveEmptyValues(array $value, array $expected): void
     {
         $this->assertSame($expected, ArrayHelper::removeEmptyValues($value));

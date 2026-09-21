@@ -6,6 +6,7 @@ namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -107,7 +108,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, mixed>|null $additionalValues
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideFieldTypesData')]
+    #[DataProvider('provideFieldTypesData')]
     public function testFieldWithLinkInLabel(
         string $fieldType,
         string $label,

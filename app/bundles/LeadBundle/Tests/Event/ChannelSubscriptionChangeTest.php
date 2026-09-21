@@ -7,10 +7,11 @@ namespace Mautic\LeadBundle\Tests\Event;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
+use PHPUnit\Framework\Attributes\TestDox;
 
 final class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Tests that getters returns same values as the contstruct')]
+    #[TestDox('Tests that getters returns same values as the contstruct')]
     public function testGetterReturnConstruct(): void
     {
         $lead      = new Lead();
@@ -28,7 +29,7 @@ final class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('unsubscribed', $event->getNewStatusVerb());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the default verb is unsubscribed if not recongized')]
+    #[TestDox('Test that the default verb is unsubscribed if not recongized')]
     public function testGetStatusVerbReturnsUnsubscribedForUnrecognized(): void
     {
         $lead      = new Lead();

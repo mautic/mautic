@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
 use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -77,7 +78,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('getContactPendingEvents');
 
         $responses = $this->getExecutioner()->execute('something');
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
+        $this->assertInstanceOf(Responses::class, $responses);
 
         $this->assertSame(0, $responses->containsResponses());
     }
@@ -101,7 +102,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something');
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
+        $this->assertInstanceOf(Responses::class, $responses);
 
         $this->assertSame(0, $responses->containsResponses());
     }
@@ -132,7 +133,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something', null, 'page');
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
+        $this->assertInstanceOf(Responses::class, $responses);
 
         $this->assertSame(0, $responses->containsResponses());
     }
@@ -211,7 +212,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 1);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
+        $this->assertInstanceOf(Responses::class, $responses);
 
         $this->assertSame(0, $responses->containsResponses());
     }
@@ -246,7 +247,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('evaluateForContact');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
+        $this->assertInstanceOf(Responses::class, $responses);
 
         $this->assertSame(0, $responses->containsResponses());
     }
@@ -304,7 +305,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('executeEventsForContact');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
+        $this->assertInstanceOf(Responses::class, $responses);
 
         $this->assertSame(0, $responses->containsResponses());
     }
@@ -335,7 +336,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->willReturn([$event]);
 
         $responses = $this->getExecutioner()->execute('something');
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
+        $this->assertInstanceOf(Responses::class, $responses);
 
         $this->assertSame(0, $responses->containsResponses());
     }

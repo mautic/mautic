@@ -509,6 +509,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
     public function getIsMms(): bool
     {
-        return (bool) $this->isMms;
+        return $this->isMms;
     }
 }

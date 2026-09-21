@@ -31,12 +31,8 @@ final class UserInviteType extends AbstractType
                     'placeholder' => 'mautic.user.invite.email.label',
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.user.invite.error.email_required',
-                    ]),
-                    new Email([
-                        'message' => 'mautic.user.invite.error.email_invalid',
-                    ]),
+                    new NotBlank(message: 'mautic.user.invite.error.email_required'),
+                    new Email(message: 'mautic.user.invite.error.email_invalid'),
                 ],
             ]
         );
@@ -57,9 +53,7 @@ final class UserInviteType extends AbstractType
                     ->where('r.isPublished = true')
                     ->orderBy('r.name', 'ASC'),
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.user.invite.error.role_required',
-                    ]),
+                    new NotBlank(message: 'mautic.user.invite.error.role_required'),
                 ],
             ]
         );

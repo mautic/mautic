@@ -7,21 +7,19 @@ namespace Mautic\FormBundle\Tests\Helper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FormFieldHelper
-     */
-    protected $fixture;
+    private FormFieldHelper $fixture;
 
     protected function setUp(): void
     {
         $this->fixture = new FormFieldHelper($this->createStub(Translator::class), $this->createStub(ValidatorInterface::class));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldProvider')]
+    #[DataProvider('fieldProvider')]
     public function testPopulateField(Field $field, mixed $value, string &$formHtml, mixed $expectedValue, string $message): void
     {
         $this->fixture->populateField($field, $value, 'mautic', $formHtml);
@@ -118,7 +116,7 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
             4 => '★',
             5 => '★',
             6 => '★',
-        ], self::getRatingList($field));
+        ], $this->getRatingList($field));
     }
 
     public function testRatingListIsParsedForTemplateChoices(): void
@@ -126,7 +124,7 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $field = self::getField('Rating', 'rating');
         $field->setProperties(['star_count' => 6]);
 
-        $this->assertSame(self::getRatingList($field), \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList(self::getRatingList($field)));
+        $this->assertSame($this->getRatingList($field), \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList($this->getRatingList($field)));
     }
 
     public function testRatingTemplateUsesDescendingRadioValues(): void
@@ -140,7 +138,7 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array<int, string>
      */
-    private static function getRatingList(Field $field): array
+    private function getRatingList(Field $field): array
     {
         $max  = $field->getProperties()['star_count'] ?? 5;
         $list = [];
@@ -151,7 +149,7 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         return $list;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('selectAutoFillProvider')]
+    #[DataProvider('selectAutoFillProvider')]
     public function testPopulateFieldSelectAutoFill(string $type, string $value, string $options, string $expectedOptions, string $message): void
     {
         $open = '<select name="mauticform['.$type.']" id="mauticform_input_mautic_'.$type.'" class="form-control">';

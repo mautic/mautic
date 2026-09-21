@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterCrate::class)]
+#[CoversClass(ContactSegmentFilterCrate::class)]
 final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmptyFilter(): void
@@ -195,7 +197,7 @@ final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
+    #[DataProvider('specialFieldsToConvertToEmptyProvider')]
     public function testSpecialFieldsToConvertToNotEmpty(string $field): void
     {
         $filter = [
@@ -221,7 +223,7 @@ final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
+    #[DataProvider('specialFieldsToConvertToEmptyProvider')]
     public function testSpecialFieldsToConvertToEmpty(string $field): void
     {
         $filter = [

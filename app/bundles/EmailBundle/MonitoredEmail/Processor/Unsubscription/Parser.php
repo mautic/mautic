@@ -5,10 +5,10 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 
-class Parser
+final readonly class Parser
 {
     public function __construct(
-        protected Message $message,
+        private Message $message,
     ) {
     }
 

@@ -7,8 +7,10 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Integration\DataGeneratorTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ConnectwiseApi::class)]
+#[CoversClass(ConnectwiseApi::class)]
 final class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
 {
     use DataGeneratorTrait;
@@ -16,7 +18,7 @@ final class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
     /**
      * @throws \Mautic\PluginBundle\Exception\ApiErrorException
      */
-    #[\PHPUnit\Framework\Attributes\TestDox('Tests that fetchAllRecords loops until all records are obtained')]
+    #[TestDox('Tests that fetchAllRecords loops until all records are obtained')]
     public function testResultPagination(): void
     {
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)

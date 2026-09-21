@@ -4,39 +4,31 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Controller\Package;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class InstallController extends CommonController
+final class InstallController extends CommonController
 {
-    public function __construct(
-        private readonly PackageModel $packageModel,
-        private readonly RouteProvider $routeProvider,
-        private readonly Config $config,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private PackageModel $packageModel;
+
+    private RouteProvider $routeProvider;
+
+    private Config $config;
+
+    #[Required]
+    public function autowireInstallController(
+        PackageModel $packageModel,
+        RouteProvider $routeProvider,
+        Config $config,
+    ): void {
+        $this->packageModel  = $packageModel;
+        $this->routeProvider = $routeProvider;
+        $this->config        = $config;
     }
 
     public function viewAction(string $vendor, string $package): Response
@@ -45,8 +37,14 @@ class InstallController extends CommonController
             return $this->notFound();
         }
 
-        if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)
-            || !$this->config->isComposerEnabled()) {
+        if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
+            $this->throwAccessDenied();
+        }
+
+        $packageDetail = $this->packageModel->getPackageDetail("{$vendor}/{$package}");
+        $isResource    = 'mautic-resource' === ($packageDetail->packageBase->type ?? '');
+
+        if (!$isResource && !$this->config->isComposerEnabled()) {
             $this->throwAccessDenied();
         }
 
@@ -54,7 +52,7 @@ class InstallController extends CommonController
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'packageDetail'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
+                    'packageDetail'  => $packageDetail,
                 ],
                 'contentTemplate' => '@Marketplace/Package/install.html.twig',
                 'passthroughVars' => [

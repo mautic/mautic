@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Extension\PurifyExtension;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class PurifyExtensionTest extends TestCase
@@ -16,7 +17,7 @@ final class PurifyExtensionTest extends TestCase
         $this->extension = new PurifyExtension();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('purifyHtmlDataProvider')]
+    #[DataProvider('purifyHtmlDataProvider')]
     public function testPurifyAllowTargetBlank(?string $input, string $expected): void
     {
         $result = $this->extension->purifyAllowTargetBlank($input);

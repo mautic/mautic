@@ -18,7 +18,7 @@
                 size: 'xs',
                 variant: 'tertiary',
                 icon: 'ri-arrow-left-line',
-                href: path(indexRoute, routeVars.close|default({})),
+                href: closeUrl is defined and closeUrl ? closeUrl : path(indexRoute, routeVars.close|default({})),
                 attributes: {
                     'data-toggle': 'ajax',
                     'class': 'btn-back mb-lg'

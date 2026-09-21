@@ -13,6 +13,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 final class SamlTest extends MauticMysqlTestCase
 {
@@ -20,7 +21,7 @@ final class SamlTest extends MauticMysqlTestCase
 
     public function testDiscoveryTemplateIsOverridden(): void
     {
-        $twig    = static::getContainer()->get('twig');
+        $twig    = self::getContainer()->get(Environment::class);
         $content = $twig->render('@LightSamlSp/discovery.html.twig', ['parties' => []]);
 
         $this->assertStringContainsString('SAML not configured or configured incorrectly.', (string) $content);

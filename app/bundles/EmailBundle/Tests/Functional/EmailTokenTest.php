@@ -61,7 +61,7 @@ final class EmailTokenTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var EmailModel $emailModel */
-        $emailModel = self::getContainer()->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get(EmailModel::class);
         $emailModel->sendEmail(
             $email,
             [
@@ -172,9 +172,9 @@ final class EmailTokenTest extends MauticMysqlTestCase
     private function createLeadWithAllFields(): Lead
     {
         /** @var LeadModel $leadModel */
-        $leadModel  = self::getContainer()->get('mautic.lead.model.lead');
+        $leadModel  = self::getContainer()->get(LeadModel::class);
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $lead = new Lead();
         $lead->setFirstname('Test');

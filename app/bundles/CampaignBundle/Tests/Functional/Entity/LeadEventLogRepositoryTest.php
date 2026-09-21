@@ -19,7 +19,7 @@ final class LeadEventLogRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->repository = $this->em->getRepository(LeadEventLog::class);
+        $this->repository = self::getContainer()->get(LeadEventLogRepository::class);
     }
 
     public function testThatRemoveEventLogsByCampaignIdMethodRemovesLogs(): void

@@ -11,7 +11,7 @@ use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 
-class BatchTransport extends AbstractTransport implements TokenTransportInterface
+final class BatchTransport extends AbstractTransport implements TokenTransportInterface
 {
     use TokenTransportTrait;
 
@@ -34,6 +34,11 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
      * @var string[]
      */
     private array $fromNames = [];
+
+    /**
+     * @var string[]
+     */
+    private array $replyToAddresses = [];
 
     private ?MauticMessage $message = null;
 
@@ -70,9 +75,10 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
             }
         }
 
-        $this->fromAddresses[] = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
-        $this->fromNames[]     = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
-        $this->message         = $message;
+        $this->fromAddresses[]    = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
+        $this->fromNames[]        = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
+        $this->replyToAddresses[] = !empty($message->getReplyTo()) ? $message->getReplyTo()[0]->getAddress() : null;
+        $this->message            = $message;
     }
 
     public function getMaxBatchLimit(): int
@@ -99,6 +105,14 @@ class BatchTransport extends AbstractTransport implements TokenTransportInterfac
     public function getFromNames(): array
     {
         return $this->fromNames;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getReplyToAddresses(): array
+    {
+        return $this->replyToAddresses;
     }
 
     public function getMessage(): ?MauticMessage

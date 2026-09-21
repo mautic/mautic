@@ -221,8 +221,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Get the latest hit.
-     *
      * @param array{
      *     leadId?: int,
      *     urls?: string[]|string|null,

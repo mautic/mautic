@@ -271,7 +271,7 @@ class ContactObjectHelper implements ObjectHelperInterface
 
     public function findOwnerIds(array $objectIds): array
     {
-        if (empty($objectIds)) {
+        if ([] === $objectIds) {
             return [];
         }
 
@@ -357,7 +357,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         }
     }
 
-    private function getDoNotContactReason($value): int
+    private function getDoNotContactReason(mixed $value): int
     {
         $value = (int) $value;
 

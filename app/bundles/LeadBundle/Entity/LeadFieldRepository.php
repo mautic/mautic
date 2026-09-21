@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<LeadField>
@@ -17,6 +18,15 @@ class LeadFieldRepository extends CommonRepository
      * @var array<int|string, array<string,mixed>>|null
      */
     private ?array $fields = null;
+
+    private LeadRepository $leadRepository;
+
+    #[Required]
+    public function autowireLeadFieldsRepository(
+        LeadRepository $leadRepository,
+    ): void {
+        $this->leadRepository = $leadRepository;
+    }
 
     /**
      * Retrieves array of aliases used to ensure unique alias for new fields.
@@ -59,7 +69,7 @@ class LeadFieldRepository extends CommonRepository
 
         if ($includeEntityFields) {
             // add lead main column names to prevent attempt to create a field with the same name
-            $leadRepo = $this->_em->getRepository(Lead::class)->getBaseColumns(Lead::class, true);
+            $leadRepo = $this->leadRepository->getBaseColumns(Lead::class, true);
             $aliases  = array_merge($aliases, $leadRepo);
         }
 

@@ -46,7 +46,7 @@ final class MauticWriteSubscriberTest extends TestCase
         $expected = [
             'kernel.view'=> ['addData', EventPriorities::PRE_WRITE],
         ];
-        $this->assertEquals($expected, MauticWriteSubscriber::getSubscribedEvents());
+        $this->assertSame($expected, MauticWriteSubscriber::getSubscribedEvents());
     }
 
     public function testAddDataWithWrongMethod(): void

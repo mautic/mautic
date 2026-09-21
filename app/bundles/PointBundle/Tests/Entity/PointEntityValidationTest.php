@@ -8,6 +8,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Point;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +18,7 @@ final class PointEntityValidationTest extends MauticMysqlTestCase
     /**
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('deltaScenariosProvider')]
+    #[DataProvider('deltaScenariosProvider')]
     public function testDeltaValidationOnCreate(int $delta, string $errorMessage = ''): void
     {
         $crawler       = $this->client->request(Request::METHOD_GET, '/s/points/new');
@@ -27,7 +28,7 @@ final class PointEntityValidationTest extends MauticMysqlTestCase
         $this->testPointData($form, $delta, $errorMessage);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('deltaScenariosProvider')]
+    #[DataProvider('deltaScenariosProvider')]
     public function testDeltaValidationOnCreateViaAPI(int $delta, string $errorMessage = ''): void
     {
         $this->client->request(
@@ -56,7 +57,7 @@ final class PointEntityValidationTest extends MauticMysqlTestCase
     /**
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('deltaScenariosProvider')]
+    #[DataProvider('deltaScenariosProvider')]
     public function testDeltaValidationOnUpdate(int $delta, string $errorMessage = ''): void
     {
         $point = new Point();

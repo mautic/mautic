@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PointActionType extends AbstractType
+final class PointActionType extends AbstractType
 {
     /**
      * @param FormBuilderInterface<array<mixed>|null> $builder

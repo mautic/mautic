@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ContactType extends AbstractType
+final class ContactType extends AbstractType
 {
     /**
      * @param FormBuilderInterface<array<mixed>|null> $builder
@@ -31,8 +31,8 @@ class ContactType extends AbstractType
                     'label_attr'  => ['class' => 'control-label'],
                     'attr'        => ['class' => 'form-control'],
                     'constraints' => [
-                        new NotBlank(['message' => 'Subject should not be blank.']),
-                        new Length(['min' => 3]),
+                        new NotBlank(message: 'Subject should not be blank.'),
+                        new Length(min: 3),
                     ],
                 ]
             )
@@ -47,8 +47,8 @@ class ContactType extends AbstractType
                         'rows'  => 10,
                     ],
                     'constraints' => [
-                        new NotBlank(['message' => 'Message should not be blank.']),
-                        new Length(['min' => 5]),
+                        new NotBlank(message: 'Message should not be blank.'),
+                        new Length(min: 5),
                     ],
                 ]
             )

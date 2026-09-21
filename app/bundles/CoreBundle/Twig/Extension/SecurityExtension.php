@@ -9,7 +9,7 @@ use Mautic\UserBundle\Entity\User;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class SecurityExtension extends AbstractExtension
+final class SecurityExtension extends AbstractExtension
 {
     public function __construct(
         private readonly SecurityHelper $securityHelper,

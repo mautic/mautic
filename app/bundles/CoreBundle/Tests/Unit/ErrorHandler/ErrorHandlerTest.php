@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\ErrorHandler;
 
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use PHPUnit\Framework\TestCase;
+use Twig\Error\LoaderError;
 
 final class ErrorHandlerTest extends TestCase
 {
@@ -64,7 +65,7 @@ final class ErrorHandlerTest extends TestCase
         $this->assertStringContainsString('<div class="container">', $content);
         $this->assertStringContainsString('<div class="alert alert-danger">', $content);
         $this->assertStringContainsString('<div id="previous"></div>', $content);
-        $this->assertStringNotContainsString(\Twig\Error\LoaderError::class, $content);
+        $this->assertStringNotContainsString(LoaderError::class, $content);
         $this->assertStringNotContainsString('directory does not exist', $content);
     }
 }

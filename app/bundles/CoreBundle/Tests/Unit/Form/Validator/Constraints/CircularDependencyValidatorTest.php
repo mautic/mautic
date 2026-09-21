@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -51,7 +52,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         $this->mockListModel->expects($this->never())
             ->method('getEntity');
 
-        $this->validator->validate([], new CircularDependency([]));
+        $this->validator->validate([], new CircularDependency());
     }
 
     /**
@@ -150,11 +151,11 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
      *
      * @param array<int, array<string, mixed>> $filters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
+    #[DataProvider('validateDataProvider')]
     public function testValidateOnInvalid(?string $message, int $currentSegmentId, array $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)
-            ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
+            ->validate($filters, new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists'));
     }
 
     /**
@@ -162,7 +163,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public static function validateDataProvider(): \Iterator
     {
-        $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
+        $constraint = new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists');
         // Segment 1 is dependent on Segment 2 which is dependent on segment 1 - circular
         yield [
             $constraint->message,

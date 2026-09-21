@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 
-class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
+final class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     public static function getServiceId(): string
     {

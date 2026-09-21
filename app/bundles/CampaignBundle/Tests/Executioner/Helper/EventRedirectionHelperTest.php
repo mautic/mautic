@@ -8,15 +8,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
-use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 final class EventRedirectionHelperTest extends TestCase
 {
-    use IsolatedTestTrait;
-
     /**
      * Test that handleEventRedirection correctly processes a single-level redirection.
      */

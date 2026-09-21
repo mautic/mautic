@@ -108,12 +108,12 @@ class Import extends FormEntity
     /**
      * @var int
      */
-    private $priority;
+    private $priority = self::LOW;
 
     /**
      * @var int
      */
-    private $status;
+    private $status = self::QUEUED;
 
     private ?\DateTimeInterface $dateStarted = null;
 
@@ -131,12 +131,6 @@ class Import extends FormEntity
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public function __construct()
-    {
-        $this->status   = self::QUEUED;
-        $this->priority = self::LOW;
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -166,11 +160,11 @@ class Import extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('dir', new Assert\NotBlank(
-            ['message' => 'mautic.lead.import.dir.notblank']
+            message: 'mautic.lead.import.dir.notblank'
         ));
 
         $metadata->addPropertyConstraint('file', new Assert\NotBlank(
-            ['message' => 'mautic.lead.import.file.notblank']
+            message: 'mautic.lead.import.file.notblank'
         ));
     }
 
@@ -206,7 +200,7 @@ class Import extends FormEntity
      */
     public function canProceed(): bool
     {
-        if (!in_array($this->getStatus(), [self::QUEUED, self::DELAYED])) {
+        if (!in_array($this->status, [self::QUEUED, self::DELAYED])) {
             $this->setStatusInfo('Import could not be triggered since it is not queued nor delayed');
 
             return false;
@@ -214,7 +208,7 @@ class Import extends FormEntity
 
         if (false === file_exists($this->getFilePath()) || false === is_readable($this->getFilePath())) {
             $this->setStatus(self::FAILED);
-            $this->setStatusInfo($this->getFile().' not found');
+            $this->setStatusInfo($this->file.' not found');
 
             return false;
         }
@@ -236,7 +230,7 @@ class Import extends FormEntity
      */
     public function isBackgroundProcess(): bool
     {
-        return self::MANUAL !== $this->getStatus();
+        return self::MANUAL !== $this->status;
     }
 
     /**
@@ -282,7 +276,7 @@ class Import extends FormEntity
      */
     public function getFilePath(): string
     {
-        return $this->getDir().'/'.$this->getFile();
+        return $this->dir.'/'.$this->file;
     }
 
     /**
@@ -342,7 +336,7 @@ class Import extends FormEntity
      */
     public function getName()
     {
-        return $this->getOriginalFile() ?: $this->getId();
+        return $this->originalFile ?: $this->id;
     }
 
     public function setLineCount(int $lineCount): self
@@ -417,7 +411,7 @@ class Import extends FormEntity
      */
     public function getProcessedRows(): int
     {
-        return $this->getInsertedCount() + $this->getUpdatedCount() + $this->getIgnoredCount();
+        return $this->insertedCount + $this->updatedCount + $this->ignoredCount;
     }
 
     /**
@@ -427,7 +421,7 @@ class Import extends FormEntity
     {
         $processed = $this->getProcessedRows();
 
-        if ($processed && $total = $this->getLineCount()) {
+        if ($processed && $total = $this->lineCount) {
             return round(($processed / $total) * 100, 2);
         }
 
@@ -505,7 +499,7 @@ class Import extends FormEntity
      */
     public function start(): self
     {
-        if (!$this->getDateStarted() instanceof \DateTimeInterface) {
+        if (!$this->dateStarted instanceof \DateTimeInterface) {
             $this->setDateStarted(new \DateTime());
         }
 
@@ -523,7 +517,7 @@ class Import extends FormEntity
     {
         $this->setDateEnded(new \DateTime());
 
-        if (self::IN_PROGRESS === $this->getStatus()) {
+        if (self::IN_PROGRESS === $this->status) {
             $this->setStatus(self::IMPORTED);
 
             if ($removeFile) {
@@ -554,10 +548,10 @@ class Import extends FormEntity
      */
     public function getRunTime()
     {
-        $startTime = $this->getDateStarted();
-        $endTime   = $this->getDateEnded();
+        $startTime = $this->dateStarted;
+        $endTime   = $this->dateEnded;
 
-        if (!$endTime && self::IN_PROGRESS === $this->getStatus()) {
+        if (!$endTime && self::IN_PROGRESS === $this->status) {
             $endTime = $this->getDateModified();
         }
 
@@ -575,10 +569,10 @@ class Import extends FormEntity
      */
     public function getRunTimeSeconds(): int|float
     {
-        $startTime = $this->getDateStarted();
-        $endTime   = $this->getDateEnded();
+        $startTime = $this->dateStarted;
+        $endTime   = $this->dateEnded;
 
-        if (!$endTime && self::IN_PROGRESS === $this->getStatus()) {
+        if (!$endTime && self::IN_PROGRESS === $this->status) {
             $endTime = $this->getDateModified();
         }
 
@@ -770,11 +764,11 @@ class Import extends FormEntity
      */
     public function setIsPublished($isPublished): static
     {
-        if ($isPublished && self::STOPPED === $this->getStatus()) {
+        if ($isPublished && self::STOPPED === $this->status) {
             $this->setStatus(self::QUEUED);
         }
 
-        if (!$isPublished && (self::IN_PROGRESS === $this->getStatus() || self::QUEUED === $this->getStatus())) {
+        if (!$isPublished && (self::IN_PROGRESS === $this->status || self::QUEUED === $this->status)) {
             $this->setStatus(self::STOPPED);
         }
 
@@ -789,9 +783,9 @@ class Import extends FormEntity
     public function getRowStatusesPieChart(Translator $translator): array
     {
         $chart = new PieChart();
-        $chart->setDataset($translator->trans('mautic.lead.import.inserted.count'), $this->getInsertedCount());
-        $chart->setDataset($translator->trans('mautic.lead.import.updated.count'), $this->getUpdatedCount());
-        $chart->setDataset($translator->trans('mautic.lead.import.ignored.count'), $this->getIgnoredCount());
+        $chart->setDataset($translator->trans('mautic.lead.import.inserted.count'), $this->insertedCount);
+        $chart->setDataset($translator->trans('mautic.lead.import.updated.count'), $this->updatedCount);
+        $chart->setDataset($translator->trans('mautic.lead.import.ignored.count'), $this->ignoredCount);
 
         return $chart->render();
     }

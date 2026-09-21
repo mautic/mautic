@@ -17,11 +17,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
 final class BounceTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the transport interface processes the message appropriately')]
+    #[TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void
     {
         $transport     = new TestTransport();
@@ -68,7 +69,7 @@ final class BounceTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($bouncer->process($message));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
+    #[TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         $transport     = new NullTransport();

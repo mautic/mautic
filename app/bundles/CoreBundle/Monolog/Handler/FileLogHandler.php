@@ -7,7 +7,7 @@ use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Level;
 
-class FileLogHandler extends RotatingFileHandler
+final class FileLogHandler extends RotatingFileHandler
 {
     public function __construct(CoreParametersHelper $coreParametersHelper, FormatterInterface $exceptionFormatter)
     {

@@ -8,7 +8,7 @@ use Symfony\Component\Intl\Languages;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
-class LanguageExtension extends AbstractExtension
+final class LanguageExtension extends AbstractExtension
 {
     public function __construct(
         private readonly Security $security,
