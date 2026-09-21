@@ -48,7 +48,6 @@ jobs:
                     - plugin-gmail
                     - plugin-grapesjs
                     - plugin-outlook
-                    - plugin-social
                     - plugin-tagmanager
                     - plugin-zapier
                     - theme-aurora
