@@ -1,12 +1,25 @@
 includes:
     - phpstan-baseline.neon
-    - phpstan-model-param-type-ignore.neon
+    #- phpstan-model-param-type-ignore.neon
+    # symplify/phpstan-rules sets
+    #- vendor/symplify/phpstan-rules/config/phpstan-extensions.neon
+    - vendor/symplify/phpstan-rules/config/symplify-rules.neon
+    - vendor/symplify/phpstan-rules/config/symfony-rules.neon
+    - vendor/symplify/phpstan-rules/config/symfony-config-rules.neon
+    - vendor/symplify/phpstan-rules/config/doctrine-rules.neon
+    - vendor/symplify/phpstan-rules/config/phpunit-rules.neon
+    # mock-rules and ctor-rules auto-loaded via phpstan/extension-installer
 
 parameters:
     tmpDir: ./var/phpstan-cache
     level: 6
 
     reportUnmatchedIgnoredErrors: false
+
+    symplify:
+        mocks: false
+        ctor: false
+
     treatPhpDocTypesAsCertain: false
 
     # see https://github.com/tomasVotruba/type-coverage
@@ -56,6 +69,54 @@ parameters:
             paths:
                 - */Tests/*
                 - */Test/*
+        - identifier: symplify.forbiddenNode
+        - identifier: symplify.noReference
+        - identifier: symplify.requireAttributeNamespace
+        - identifier: symplify.classNameRespectsParentSuffix
+        # @todo bulk-ignored, resolve per identifier later
+        - identifier: doctrine.noGetRepositoryOutsideService
+        - identifier: doctrine.noListenerWithoutContract
+        - identifier: doctrine.noRepositoryCallInDataFixtures
+        - identifier: doctrine.requireQueryBuilderOnRepository
+        - identifier: ignore.count
+        - identifier: mautic.modelMethodSingleParamMustHaveType
+        - identifier: phpunit.noAssertFuncCallInTests
+        - identifier: symfony.alreadyRegisteredAutodiscoveryService
+        - identifier: symfony.formTypeClassName
+        - identifier: symfony.noAbstractControllerConstructor
+        - identifier: symfony.noDuplicateArgsAutowireByType
+        - identifier: symfony.noFindTaggedServiceIdsCall
+        - identifier: symfony.noListenerWithoutContract
+        - identifier: symfony.noRequiredOutsideClass
+        - identifier: symfony.noServiceAutowireDuplicate
+        - identifier: symfony.preferAutowireAttributeOverConfigParam
+        - identifier: symfony.singleArgEventDispatch
+        - identifier: symfony.singleRequiredMethod
+        - identifier: symplify.explicitAbstractPrefixName
+        - identifier: symplify.explicitInterfaceSuffixName
+        - identifier: symplify.forbiddenArrayMethodCall
+        - identifier: symplify.forbiddenExtendOfNonAbstractClass
+        - identifier: symplify.forbiddenFuncCall
+        - identifier: symplify.forbiddenStaticClassConstFetch
+        - identifier: symplify.foreachCeption
+        - identifier: symplify.multipleClassLikeInFile
+        - identifier: symplify.noArrayMapWithArrayCallable
+        - identifier: symplify.noConstructorOverride
+        - identifier: symplify.noDynamicName
+        - identifier: symplify.noGlobalConst
+        - identifier: symplify.noNullableServiceInConstructor
+        - identifier: symplify.noReturnSetterMethod
+        - identifier: symplify.preferInterfaceInConstructor
+        - identifier: symplify.requireExceptionNamespace
+        - identifier: symplify.seeAnnotationToTest
+        # to be removed once all controllers are invokable
+        - identifier: symfony.requiredOnlyInAbstract
+        - identifier: symplify.requiredInterfaceContractNamespace
+
+        # CompanyLeadRepository is only needed by the static IdentifyCompanyHelper, exposed via getter to avoid threading it through 9 call sites
+        -
+            identifier: mautic.noServiceGetter
+            path: app/bundles/LeadBundle/Model/CompanyModel.php
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: symplify.noNullableServiceInConstructor

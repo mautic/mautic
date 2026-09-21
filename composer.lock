@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "692ce8e539b4afbfd5959a271b209af3",
+=======
+    "content-hash": "5e9bcb008d823406926ead3e498f87c5",
+>>>>>>> 5cba3a4a2b (add sets from symplify)
     "packages": [
         {
             "name": "api-platform/core",
@@ -2866,16 +2870,16 @@
         },
         {
             "name": "entropy/entropy",
-            "version": "0.4.13",
+            "version": "0.4.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/entropy.git",
-                "reference": "b2c703a93350f49ce67d150bb8560e886be01027"
+                "reference": "ac1cd962db108e674d897957f251e27ab49f5180"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/entropy/zipball/b2c703a93350f49ce67d150bb8560e886be01027",
-                "reference": "b2c703a93350f49ce67d150bb8560e886be01027",
+                "url": "https://api.github.com/repos/TomasVotruba/entropy/zipball/ac1cd962db108e674d897957f251e27ab49f5180",
+                "reference": "ac1cd962db108e674d897957f251e27ab49f5180",
                 "shasum": ""
             },
             "require": {
@@ -2910,9 +2914,9 @@
             "description": "Entropy framework",
             "support": {
                 "issues": "https://github.com/TomasVotruba/entropy/issues",
-                "source": "https://github.com/TomasVotruba/entropy/tree/0.4.13"
+                "source": "https://github.com/TomasVotruba/entropy/tree/0.4.14"
             },
-            "time": "2026-09-03T19:53:04+00:00"
+            "time": "2026-09-17T21:52:48+00:00"
         },
         {
             "name": "exercise/htmlpurifier-bundle",
@@ -6590,16 +6594,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v5.8.0",
+            "version": "v5.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "044a6a392ff8ad0d61f14370a5fbbd0a0107152f"
+                "reference": "9e33da9553fe7786f0962b35f4e4ecf01be89def"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/044a6a392ff8ad0d61f14370a5fbbd0a0107152f",
-                "reference": "044a6a392ff8ad0d61f14370a5fbbd0a0107152f",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/9e33da9553fe7786f0962b35f4e4ecf01be89def",
+                "reference": "9e33da9553fe7786f0962b35f4e4ecf01be89def",
                 "shasum": ""
             },
             "require": {
@@ -6641,9 +6645,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.8.0"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.9.0"
             },
-            "time": "2026-07-04T14:30:18+00:00"
+            "time": "2026-09-13T18:51:52+00:00"
         },
         {
             "name": "oneup/uploader-bundle",
@@ -18228,16 +18232,16 @@
         },
         {
             "name": "symplify/phpstan-rules",
-            "version": "14.15.0",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symplify/phpstan-rules.git",
-                "reference": "010d2ba98638618d985644c57a590814f5b18d1e"
+                "reference": "4dd9e08782687c7ad7292d36b9fc82a3700f4abe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/010d2ba98638618d985644c57a590814f5b18d1e",
-                "reference": "010d2ba98638618d985644c57a590814f5b18d1e",
+                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/4dd9e08782687c7ad7292d36b9fc82a3700f4abe",
+                "reference": "4dd9e08782687c7ad7292d36b9fc82a3700f4abe",
                 "shasum": ""
             },
             "require": {
@@ -18262,11 +18266,13 @@
                 "tomasvotruba/type-coverage": "^2.3",
                 "tomasvotruba/unused-public": "^2.2"
             },
+            "default-branch": true,
             "type": "phpstan-extension",
             "extra": {
                 "phpstan": {
                     "includes": [
                         "config/services/services.neon",
+                        "config/naming-rules.neon",
                         "config/ctor-rules.neon",
                         "config/mock-rules.neon",
                         "config/phpstan-extensions.neon"
@@ -18288,7 +18294,7 @@
             "description": "Set of Symplify rules, type extensions and error formatter for PHPStan",
             "support": {
                 "issues": "https://github.com/symplify/phpstan-rules/issues",
-                "source": "https://github.com/symplify/phpstan-rules/tree/14.15.0"
+                "source": "https://github.com/symplify/phpstan-rules/tree/main"
             },
             "funding": [
                 {
@@ -18300,7 +18306,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-21T11:23:08+00:00"
+            "time": "2026-09-24T05:51:08+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -18426,7 +18432,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "symplify/phpstan-rules": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {},

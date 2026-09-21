@@ -643,7 +643,7 @@ class LeadModel extends FormModel
     /**
      * Get list of entities for autopopulate fields.
      */
-    public function getLookupResults($type, string|array|null $filter = '', int|string|null $limit = 10, int $start = 0): array
+    public function getLookupResults(string $type, string|array|null $filter = '', int|string|null $limit = 10, int $start = 0): array
     {
         $results    = [];
 

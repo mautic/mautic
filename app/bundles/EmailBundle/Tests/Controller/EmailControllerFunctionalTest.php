@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
@@ -630,7 +631,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $emails = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->findBy([], ['id' => 'ASC']);
+        $emails = $this->getContainer()->get(EmailRepository::class)->findBy([], ['id' => 'ASC']);
         $this->assertCount(2, $emails);
 
         $firstEmail  = $emails[0];
