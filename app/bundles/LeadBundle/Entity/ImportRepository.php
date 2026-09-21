@@ -13,9 +13,9 @@ class ImportRepository extends CommonRepository
     /**
      * Count how many imports with the status is there.
      *
-     * @param float $ghostDelay when is the import ghost? In hours
+     * @param int $ghostDelay when is the import ghost? In hours
      */
-    public function getGhostImports(float $ghostDelay = 2, ?int $limit = null): array
+    public function getGhostImports(int $ghostDelay = 2, ?int $limit = null): array
     {
         $q = $this->getQueryForStatuses([Import::IN_PROGRESS]);
         $q->select($this->getTableAlias())
