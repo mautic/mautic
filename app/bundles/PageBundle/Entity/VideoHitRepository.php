@@ -56,7 +56,7 @@ final class VideoHitRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadHits(int $leadId, array $options = []): array
+    public function getLeadHits(int|string $leadId, array $options = []): array
     {
         $query = $this->createQueryBuilder('h');
         $query->select('h.userAgent, h.dateHit, h.dateLeft, h.referer, h.channel, h.channelId, h.url, h.duration, h.query, h.timeWatched')
