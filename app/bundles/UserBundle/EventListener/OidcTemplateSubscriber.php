@@ -8,13 +8,11 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\UserBundle\Security\OIDC\Settings;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Twig\Environment;
 
 final class OidcTemplateSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly Settings $settings,
-        private readonly Environment $twig,
     ) {
     }
 
@@ -27,43 +25,27 @@ final class OidcTemplateSubscriber implements EventSubscriberInterface
 
     public function onTemplateRender(CustomTemplateEvent $event): void
     {
-        $this->addConfig($event);
+        $template = $event->getTemplate();
 
-        if (!$this->settings->isEnabled()) {
-            return;
+        // Inject OIDC settings into login template
+        if ('@MauticUser/Security/login.html.twig' === $template) {
+            $vars = $event->getVars();
+            $vars['oidcSettings'] = $this->settings;
+            $event->setVars($vars);
         }
 
-        $this->addLoginButton($event);
-        $this->addUserFields($event);
-    }
-
-    private function addConfig(CustomTemplateEvent $event): void
-    {
-        if ('@MauticUser/FormTheme/Config/_config_userconfig_widget.html.twig' === $event->getTemplate()) {
-            $event->appendContent($this->twig->render('@MauticUser/Security/OIDC/oidc_config.html.twig', [
-                'form' => $event->getVars()['form'],
-            ]));
+        // Inject OIDC settings into user form template
+        if ('@MauticUser/User/form.html.twig' === $template) {
+            $vars = $event->getVars();
+            $vars['oidcSettings'] = $this->settings;
+            $event->setVars($vars);
         }
-    }
 
-    private function addLoginButton(CustomTemplateEvent $event): void
-    {
-        if ('@MauticUser/Security/login.html.twig' === $event->getTemplate()) {
-            $event->prependContent($this->twig->render('@MauticUser/Security/OIDC/oidc_login_top.html.twig', [
-                'parameters' => $this->settings,
-            ]));
-            $event->appendContent($this->twig->render('@MauticUser/Security/OIDC/oidc_login_bottom.html.twig', [
-                'parameters' => $this->settings,
-            ]));
-        }
-    }
-
-    private function addUserFields(CustomTemplateEvent $event): void
-    {
-        if ('@MauticUser/User/form.html.twig' === $event->getTemplate()) {
-            $event->appendContent($this->twig->render('@MauticUser/Security/OIDC/oidc_user_form.html.twig', [
-                'form' => $event->getVars()['form'],
-            ]));
+        // Inject OIDC settings into config widget template
+        if ('@MauticUser/FormTheme/Config/_config_userconfig_widget.html.twig' === $template) {
+            $vars = $event->getVars();
+            $vars['oidcSettings'] = $this->settings;
+            $event->setVars($vars);
         }
     }
 }
