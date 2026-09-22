@@ -465,35 +465,6 @@ class CampaignRepository extends CommonRepository
         return (bool) $results;
     }
 
-    /**
-     * Get lead data of a campaign.
-     *
-     * @param string[] $select
-     * @return mixed[]
-     */
-    public function getCampaignLeads(int $campaignId, int $start = 0, bool $limit = false, array $select = ['cl.lead_id']): array
-    {
-        $q = $this->getReplicaConnection()->createQueryBuilder();
-
-        $q->select(...$select)
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
-            ->where(
-                $q->expr()->and(
-                    $q->expr()->eq('cl.campaign_id', (string) $campaignId),
-                    $q->expr()->eq('cl.manually_removed', ':false')
-                )
-            )
-            ->setParameter('false', false, 'boolean')
-            ->orderBy('cl.lead_id', 'ASC');
-
-        if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
-        }
-
-        return $q->executeQuery()->fetchAllAssociative();
-    }
-
     public function getContactSingleSegmentByCampaign(int|string|null $contactId, int $campaignId): array|false
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
