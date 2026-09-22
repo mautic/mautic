@@ -172,8 +172,6 @@ final class NotificationController extends AbstractFormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $security = $this->security;
-
         /** @var Notification $notification */
         $notification = $this->notificationModel->getEntity($objectId);
         // set the page we came from
@@ -233,7 +231,7 @@ final class NotificationController extends AbstractFormController
                 'notification' => $notification,
                 'trackables'   => $trackableLinks,
                 'logs'         => $logs,
-                'permissions'  => $security->isGranted([
+                'permissions'  => $this->security->isGranted([
                     'notification:notifications:viewown',
                     'notification:notifications:viewother',
                     'notification:notifications:create',
@@ -244,7 +242,7 @@ final class NotificationController extends AbstractFormController
                     'notification:notifications:publishown',
                     'notification:notifications:publishother',
                 ], 'RETURN_ARRAY'),
-                'security'    => $security,
+                'security'    => $this->security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
                     'Mautic\NotificationBundle\Controller\NotificationController::contactsAction',

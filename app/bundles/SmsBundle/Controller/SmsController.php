@@ -722,10 +722,9 @@ final class SmsController extends FormController
 
     public function previewAction($objectId): Response
     {
-        $sms      = $this->smsModel->getEntity($objectId);
-        $security = $this->security;
+        $sms = $this->smsModel->getEntity($objectId);
 
-        if (null !== $sms && $security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
+        if (null !== $sms && $this->security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
             return $this->delegateView([
                 'viewParameters' => [
                     'sms' => $sms,
