@@ -118,7 +118,7 @@ final class PRedisConnectionHelper
             $clusterStrategy = $connection->getClusterStrategy();
 
             if ($clusterStrategy instanceof ClusterStrategy && !in_array(Unlink::ID, $clusterStrategy->getSupportedCommands())) {
-                $clusterStrategy->setCommandHandler(Unlink::ID, [$clusterStrategy, 'getKeyFromAllArguments']);
+                $clusterStrategy->setCommandHandler(Unlink::ID, $clusterStrategy->getKeyFromAllArguments(...));
             }
         }
 

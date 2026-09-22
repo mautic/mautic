@@ -63,7 +63,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
         $sendEvent = [
             'group'           => 'mautic.email.point.trigger',
             'label'           => 'mautic.email.point.trigger.sendemail',
-            'callback'        => [$this->pointEventHelper, 'sendEmail'],
+            'callback'        => $this->pointEventHelper->sendEmail(...),
             'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
             'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/emailsend_list_row.html.twig',

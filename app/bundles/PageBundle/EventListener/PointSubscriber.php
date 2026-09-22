@@ -43,7 +43,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
             'group'       => 'mautic.page.point.action',
             'label'       => 'mautic.page.point.action.urlhit',
             'description' => 'mautic.page.point.action.urlhit_descr',
-            'callback'    => [$this->pointActionHelper, 'validateUrlHit'],
+            'callback'    => $this->pointActionHelper->validateUrlHit(...),
             'formType'    => PointActionUrlHitType::class,
             'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
         ];
