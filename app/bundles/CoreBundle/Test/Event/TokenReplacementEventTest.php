@@ -44,10 +44,7 @@ final class TokenReplacementEventTest extends TestCase
     public function testGetClickthrough(): void
     {
         $leadId           = 1;
-
-        $leadEntity = [
-            'id' => $leadId,
-        ];
+        $leadEntity       = ['id' => $leadId];
         $clickthrough     = ['lead' => $leadEntity];
         $event            = new TokenReplacementEvent('', $leadEntity, $clickthrough);
         $this->assertSame(['lead' => 1], $event->getClickthrough());

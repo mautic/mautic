@@ -31,8 +31,7 @@ final class MonitoringRepository extends CommonRepository
         $q    = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($q);
         $q->where($expr);
-        $args       = [];
-        $args['qb'] = $q;
+        $args       = ['qb' => $q];
 
         return count(parent::getEntities($args));
     }

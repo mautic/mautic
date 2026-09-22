@@ -186,8 +186,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         if (isset($settings['feature_settings']['objects'])) {
             $cwObjects = $settings['feature_settings']['objects'];
         } else {
-            $cwObjects            = [];
-            $cwObjects['Contact'] = 'Contact';
+            $cwObjects            = ['Contact' => 'Contact'];
         }
         if (!$this->isAuthorized()) {
             return [];

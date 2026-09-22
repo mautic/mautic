@@ -3088,8 +3088,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (isset($matchedFields['mauticContactIsContactableByEmail']) && $this->updateDncByDate()) {
             $matchedFields['internal_entity_id']    = $lead->getId();
             $matchedFields['integration_entity_id'] = $sfData['Id__'.$object];
-            $record                                 = [];
-            $record[$lead->getEmail()]              = $matchedFields;
+            $record                                 = [$lead->getEmail() => $matchedFields];
             $this->pushLeadDoNotContactByDate($channel, $record, $object, $params);
 
             return $record[$lead->getEmail()];

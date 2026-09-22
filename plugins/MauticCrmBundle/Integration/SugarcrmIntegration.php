@@ -653,8 +653,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     {
         $settings['feature_settings']['objects'][] = $object;
         $fields                                    = array_keys($this->getAvailableLeadFields($settings));
-        $params                                    = [];
-        $params['fields']                          = implode(',', $fields);
+        $params                                    = ['fields' => implode(',', $fields)];
 
         $count  = 0;
         $entity = null;
@@ -1021,8 +1020,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         $fieldsToUpdateInLeadsSugar = $this->cleanSugarData($config, $fieldsToUpdateInSugar, $object);
         $leadFields                 = array_intersect_key($leadSugarFieldsToCreate, $fieldsToUpdateInLeadsSugar);
 
-        $mappedData          = [];
-        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object]);
+        $mappedData          = [$object => $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object])];
 
         $this->amendLeadDataBeforePush($mappedData[$object]);
 

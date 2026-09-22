@@ -96,8 +96,7 @@ final class AjaxController extends CommonAjaxController
 
     public function contactListAction(Request $request, LeadModel $model, CorePermissions $corePermissions): JsonResponse
     {
-        $filter           = [];
-        $filter['string'] = InputHelper::clean($request->query->get('filter'));
+        $filter           = ['string' => InputHelper::clean($request->query->get('filter'))];
 
         // Do not show other's contacts if do not have permission.
         if (!$corePermissions->isGranted(['lead:leads:viewother'], 'MATCH_ONE')) {
@@ -722,8 +721,7 @@ final class AjaxController extends CommonAjaxController
 
     public function setAsPrimaryCompanyAction(Request $request, LeadModel $leadModel): JsonResponse
     {
-        $dataArray            = [];
-        $dataArray['success'] = 1;
+        $dataArray            = ['success' => 1];
         $companyId            = InputHelper::clean($request->request->get('companyId'));
         $leadId               = InputHelper::clean($request->request->get('leadId'));
 
