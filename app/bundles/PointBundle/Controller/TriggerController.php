@@ -30,7 +30,7 @@ final class TriggerController extends FormController
     }
 
     #[Route(
-        '/s/points/triggers/{objectAction}/{objectId}',
+        path: '/s/points/triggers/{objectAction}/{objectId}',
         name: 'mautic_pointtrigger_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -41,7 +41,7 @@ final class TriggerController extends FormController
     }
 
     #[Route(
-        '/s/points/triggers/{page}',
+        path: '/s/points/triggers/{page}',
         name: 'mautic_pointtrigger_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

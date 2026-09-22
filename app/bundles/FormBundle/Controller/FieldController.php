@@ -52,7 +52,7 @@ final class FieldController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/field/{objectAction}/{objectId}',
+        path: '/s/forms/field/{objectAction}/{objectId}',
         name: 'mautic_formfield_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

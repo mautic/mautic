@@ -38,7 +38,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[OwnershipParent('lead')]
+#[OwnershipParent(association: 'lead')]
 class LeadCategory
 {
     /**

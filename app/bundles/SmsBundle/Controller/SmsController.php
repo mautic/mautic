@@ -37,7 +37,7 @@ final class SmsController extends FormController
     }
 
     #[Route(
-        '/s/sms/{objectAction}/{objectId}',
+        path: '/s/sms/{objectAction}/{objectId}',
         name: 'mautic_sms_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -51,7 +51,7 @@ final class SmsController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/sms/{page}',
+        path: '/s/sms/{page}',
         name: 'mautic_sms_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -740,7 +740,7 @@ final class SmsController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/sms/view/{objectId}/contact/{page}',
+        path: '/s/sms/view/{objectId}/contact/{page}',
         name: 'mautic_sms_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],

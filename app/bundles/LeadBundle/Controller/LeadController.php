@@ -149,7 +149,7 @@ final class LeadController extends FormController
     }
 
     #[Route(
-        '/s/contacts/{objectAction}/{objectId}',
+        path: '/s/contacts/{objectAction}/{objectId}',
         name: 'mautic_contact_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -163,7 +163,7 @@ final class LeadController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/contacts/{page}',
+        path: '/s/contacts/{page}',
         name: 'mautic_contact_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -2298,7 +2298,7 @@ final class LeadController extends FormController
     }
 
     #[Route(
-        '/s/contacts/contact/export/{contactId}',
+        path: '/s/contacts/contact/export/{contactId}',
         name: 'mautic_contact_export_action',
         requirements: ['contactId' => '\d+'],
     )]
@@ -2348,7 +2348,7 @@ final class LeadController extends FormController
     }
 
     #[Route(
-        '/s/contacts/export/download/{fileName}',
+        path: '/s/contacts/export/download/{fileName}',
         name: 'mautic_contact_export_download',
     )]
     public function downloadExportAction(string $fileName = ''): Response
@@ -2391,7 +2391,7 @@ final class LeadController extends FormController
      * Loads a specific lead statistic info.
      */
     #[Route(
-        '/s/contacts/view/{objectId}/stats',
+        path: '/s/contacts/view/{objectId}/stats',
         name: 'mautic_contact_stats',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

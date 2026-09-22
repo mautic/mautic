@@ -56,7 +56,7 @@ final class ListController extends FormController
     private array $listFilters = [];
 
     #[Route(
-        '/s/segments/{objectAction}/{objectId}',
+        path: '/s/segments/{objectAction}/{objectId}',
         name: 'mautic_segment_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -74,7 +74,7 @@ final class ListController extends FormController
      * @throws \Exception
      */
     #[Route(
-        '/s/segments/{page}',
+        path: '/s/segments/{page}',
         name: 'mautic_segment_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -950,7 +950,7 @@ final class ListController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/segment/view/{objectId}/contact/{page}',
+        path: '/s/segment/view/{objectId}/contact/{page}',
         name: 'mautic_segment_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],

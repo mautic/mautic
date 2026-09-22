@@ -42,7 +42,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[OwnershipParent('trigger')]
+#[OwnershipParent(association: 'trigger')]
 class TriggerEvent implements UuidInterface
 {
     use UuidTrait;

@@ -136,7 +136,7 @@ class Form extends FormEntity implements UuidInterface
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     #[ORM\OneToMany(targetEntity: Field::class, mappedBy: 'form', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC', 'id' => 'ASC'])]
+    #[ORM\OrderBy(value: ['order' => 'ASC', 'id' => 'ASC'])]
     private $fields;
 
     /**
@@ -144,7 +144,7 @@ class Form extends FormEntity implements UuidInterface
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     #[ORM\OneToMany(targetEntity: Action::class, mappedBy: 'form', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC'])]
+    #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $actions;
 
     /**
@@ -170,7 +170,7 @@ class Form extends FormEntity implements UuidInterface
      */
     #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateSubmitted' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateSubmitted' => 'DESC'])]
     private Collection $submissions;
 
     #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]

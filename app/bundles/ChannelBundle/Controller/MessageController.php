@@ -40,7 +40,7 @@ final class MessageController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/messages/{objectAction}/{objectId}',
+        path: '/s/messages/{objectAction}/{objectId}',
         name: 'mautic_message_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -69,7 +69,7 @@ final class MessageController extends AbstractStandardFormController
      * @param int $page
      */
     #[Route(
-        '/s/messages/{page}',
+        path: '/s/messages/{page}',
         name: 'mautic_message_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -240,7 +240,7 @@ final class MessageController extends AbstractStandardFormController
      * @param int $page
      */
     #[Route(
-        '/s/messages/contacts/{objectId}/{channel}/{page}',
+        path: '/s/messages/contacts/{objectId}/{channel}/{page}',
         name: 'mautic_message_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],

@@ -34,7 +34,7 @@ final class ConfigController extends FormController
     }
 
     #[Route(
-        '/s/config/{objectAction}/{objectId}',
+        path: '/s/config/{objectAction}/{objectId}',
         name: 'mautic_config_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

@@ -24,7 +24,7 @@ class SourceController extends CommonFormController
     }
 
     #[Route(
-        '/s/campaigns/sources/{objectAction}/{objectId}',
+        path: '/s/campaigns/sources/{objectAction}/{objectId}',
         name: 'mautic_campaignsource_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

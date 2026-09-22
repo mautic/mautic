@@ -23,7 +23,7 @@ final class CacheController extends CommonController
     }
 
     #[Route(
-        '/s/marketplace/clear/cache',
+        path: '/s/marketplace/clear/cache',
         name: 'mautic_marketplace_clear_cache',
         methods: ['GET'],
     )]

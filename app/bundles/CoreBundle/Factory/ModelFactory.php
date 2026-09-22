@@ -14,7 +14,7 @@ readonly class ModelFactory
 {
     public function __construct(
         #[AutowireLocator(
-            MauticModelInterface::class,
+            services: MauticModelInterface::class,
             defaultIndexMethod: 'getName'
         )]
         private ServiceLocator $container,

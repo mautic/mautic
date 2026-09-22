@@ -16,7 +16,7 @@ final class HandlerContainer
      * @param iterable<CallbackInterface> $callbackHandlers
      */
     public function __construct(
-        #[AutowireIterator('mautic.sms_callback_handler')]
+        #[AutowireIterator(tag: 'mautic.sms_callback_handler')]
         iterable $callbackHandlers = [],
     ) {
         foreach ($callbackHandlers as $callbackHandler) {

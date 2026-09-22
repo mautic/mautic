@@ -20,7 +20,7 @@ final class SysinfoController extends FormController
     }
 
     #[Route(
-        '/s/sysinfo',
+        path: '/s/sysinfo',
         name: 'mautic_sysinfo_index',
     )]
     public function indexAction(): Response

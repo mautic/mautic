@@ -54,7 +54,7 @@ final class WebhookController extends FormController
     }
 
     #[Route(
-        '/s/webhooks/{objectAction}/{objectId}',
+        path: '/s/webhooks/{objectAction}/{objectId}',
         name: 'mautic_webhook_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -68,7 +68,7 @@ final class WebhookController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/webhooks/{page}',
+        path: '/s/webhooks/{page}',
         name: 'mautic_webhook_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

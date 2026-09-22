@@ -35,7 +35,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[OwnershipParent('asset')]
+#[OwnershipParent(association: 'asset')]
 class Download
 {
     public const TABLE_NAME = 'asset_downloads';

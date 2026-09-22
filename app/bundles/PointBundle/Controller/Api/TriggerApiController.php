@@ -143,7 +143,7 @@ final class TriggerApiController extends CommonApiController
      * Return array of available point trigger event types.
      */
     #[Route(
-        '/api/points/triggers/events/types',
+        path: '/api/points/triggers/events/types',
         name: 'mautic_api_getpointtriggereventtypes',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -172,7 +172,7 @@ final class TriggerApiController extends CommonApiController
      * @param int $triggerId
      */
     #[Route(
-        '/api/points/triggers/{triggerId}/events/delete',
+        path: '/api/points/triggers/{triggerId}/events/delete',
         name: 'mautic_api_pointtriggerdeleteevents',
         requirements: ['triggerId' => '\d+'],
         defaults: ['_format' => 'json'],

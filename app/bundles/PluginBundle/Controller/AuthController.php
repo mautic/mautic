@@ -17,11 +17,11 @@ final class AuthController extends FormController
      * @param string $integration
      */
     #[Route(
-        '/s/plugins/integrations/authcallback/{integration}',
+        path: '/s/plugins/integrations/authcallback/{integration}',
         name: 'mautic_integration_auth_callback_secure',
     )]
     #[Route(
-        '/plugins/integrations/authcallback/{integration}',
+        path: '/plugins/integrations/authcallback/{integration}',
         name: 'mautic_integration_auth_callback',
     )]
     public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
@@ -76,11 +76,11 @@ final class AuthController extends FormController
     }
 
     #[Route(
-        '/s/plugins/integrations/authstatus/{integration}',
+        path: '/s/plugins/integrations/authstatus/{integration}',
         name: 'mautic_integration_auth_postauth_secure',
     )]
     #[Route(
-        '/plugins/integrations/authstatus/{integration}',
+        path: '/plugins/integrations/authstatus/{integration}',
         name: 'mautic_integration_auth_postauth',
     )]
     public function authStatusAction(Request $request, $integration): Response
@@ -110,7 +110,7 @@ final class AuthController extends FormController
     }
 
     #[Route(
-        '/plugins/integrations/authuser/{integration}',
+        path: '/plugins/integrations/authuser/{integration}',
         name: 'mautic_integration_auth_user',
     )]
     public function authUserAction(IntegrationHelper $integrationHelper, $integration): RedirectResponse

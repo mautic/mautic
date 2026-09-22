@@ -83,7 +83,7 @@ final class EmailMapStatsController extends AbstractController
      * @throws \Exception
      */
     #[Route(
-        '/s/emails-map-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
+        path: '/s/emails-map-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
         name: 'mautic_email_map_stats',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

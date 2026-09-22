@@ -110,7 +110,7 @@ class Trigger extends FormEntity implements UuidInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
     #[ORM\OneToMany(targetEntity: TriggerEvent::class, mappedBy: 'trigger', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC'])]
+    #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $events;
 
     #[Groups(['trigger:read', 'trigger:write'])]

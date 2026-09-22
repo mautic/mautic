@@ -65,7 +65,7 @@ final class SmsApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/smses/{id}/contact/{contactId}/send',
+        path: '/api/smses/{id}/contact/{contactId}/send',
         name: 'mautic_api_smses_send',
         requirements: ['id' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],

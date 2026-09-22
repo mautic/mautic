@@ -49,7 +49,7 @@ final class EventController extends CommonFormController
     }
 
     #[Route(
-        '/s/campaigns/events/{objectAction}/{objectId}',
+        path: '/s/campaigns/events/{objectAction}/{objectId}',
         name: 'mautic_campaignevent_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

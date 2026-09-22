@@ -13,8 +13,8 @@ use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-#[AsDoctrineListener(Events::loadClassMetadata)]
-#[AsDoctrineListener(ToolEvents::postGenerateSchema)]
+#[AsDoctrineListener(event: Events::loadClassMetadata)]
+#[AsDoctrineListener(event: ToolEvents::postGenerateSchema)]
 final class DoctrineEventsSubscriber
 {
     /**

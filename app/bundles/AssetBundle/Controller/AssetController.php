@@ -29,7 +29,7 @@ final class AssetController extends FormController
     }
 
     #[Route(
-        '/s/assets/{objectAction}/{objectId}',
+        path: '/s/assets/{objectAction}/{objectId}',
         name: 'mautic_asset_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -40,7 +40,7 @@ final class AssetController extends FormController
     }
 
     #[Route(
-        '/s/assets/{page}',
+        path: '/s/assets/{page}',
         name: 'mautic_asset_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -737,7 +737,7 @@ final class AssetController extends FormController
      * Renders the container for the remote file browser.
      */
     #[Route(
-        '/s/assets/remote',
+        path: '/s/assets/remote',
         name: 'mautic_asset_remote',
     )]
     public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response

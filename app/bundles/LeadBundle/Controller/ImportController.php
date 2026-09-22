@@ -66,7 +66,7 @@ final class ImportController extends FormController
     }
 
     #[Route(
-        '/s/{object}/import/{objectAction}/{objectId}',
+        path: '/s/{object}/import/{objectAction}/{objectId}',
         name: 'mautic_import_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -80,7 +80,7 @@ final class ImportController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/{object}/import/{page}',
+        path: '/s/{object}/import/{page}',
         name: 'mautic_import_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

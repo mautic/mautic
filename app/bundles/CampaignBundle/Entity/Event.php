@@ -49,7 +49,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ]
 )]
 #[EntityEvent]
-#[OwnershipParent('campaign')]
+#[OwnershipParent(association: 'campaign')]
 class Event implements ChannelInterface, UuidInterface
 {
     use UuidTrait;
@@ -198,7 +198,7 @@ class Event implements ChannelInterface, UuidInterface
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC'])]
+    #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $children;
 
     /**

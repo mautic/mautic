@@ -101,7 +101,7 @@ final class CompanyController extends FormController
     }
 
     #[Route(
-        '/s/companies/{objectAction}/{objectId}',
+        path: '/s/companies/{objectAction}/{objectId}',
         name: 'mautic_company_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -112,7 +112,7 @@ final class CompanyController extends FormController
     }
 
     #[Route(
-        '/s/companies/{page}',
+        path: '/s/companies/{page}',
         name: 'mautic_company_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -219,7 +219,7 @@ final class CompanyController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/company/{objectId}/contacts/{page}',
+        path: '/s/company/{objectId}/contacts/{page}',
         name: 'mautic_company_contacts_list',
         requirements: ['objectId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0, 'objectId' => 0],
@@ -673,7 +673,7 @@ final class CompanyController extends FormController
     }
 
     #[Route(
-        '/s/company/graph/{objectId}',
+        path: '/s/company/graph/{objectId}',
         name: 'mautic_company_graph',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -1225,7 +1225,7 @@ final class CompanyController extends FormController
      * Export company's data.
      */
     #[Route(
-        '/s/companies/company/export/{companyId}',
+        path: '/s/companies/company/export/{companyId}',
         name: 'mautic_company_export_action',
         requirements: ['companyId' => '\d+'],
     )]

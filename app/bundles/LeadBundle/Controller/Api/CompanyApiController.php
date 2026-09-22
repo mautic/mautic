@@ -92,7 +92,7 @@ final class CompanyApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     #[Route(
-        '/api/companies/{companyId}/contact/{contactId}/add',
+        path: '/api/companies/{companyId}/contact/{contactId}/add',
         name: 'mautic_api_companyaddcontact',
         requirements: ['companyId' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -126,7 +126,7 @@ final class CompanyApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     #[Route(
-        '/api/companies/{companyId}/contact/{contactId}/remove',
+        path: '/api/companies/{companyId}/contact/{contactId}/remove',
         name: 'mautic_api_companyremovecontact',
         requirements: ['companyId' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],

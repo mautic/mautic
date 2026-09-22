@@ -20,7 +20,7 @@ final class ABTestController extends AbstractFormController
     public const int TOTAL_WEIGHT = 10;
 
     #[Route(
-        '/s/email/abtest/generate/{objectId}',
+        path: '/s/email/abtest/generate/{objectId}',
         name: 'mautic_abtest_generate',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

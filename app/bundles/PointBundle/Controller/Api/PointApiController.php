@@ -64,7 +64,7 @@ final class PointApiController extends CommonApiController
      * Return array of available point action types.
      */
     #[Route(
-        '/api/points/actions/types',
+        path: '/api/points/actions/types',
         name: 'mautic_api_getpointactiontypes',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -89,7 +89,7 @@ final class PointApiController extends CommonApiController
      * @param int    $delta
      */
     #[Route(
-        '/api/contacts/{leadId}/points/{operator}/{delta}',
+        path: '/api/contacts/{leadId}/points/{operator}/{delta}',
         name: 'mautic_api_adjustcontactpoints',
         requirements: ['leadId' => '\d+'],
         defaults: ['_format' => 'json'],

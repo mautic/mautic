@@ -117,7 +117,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     #[Groups(['campaign:read', 'campaign:write'])]
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'campaign', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC'])]
+    #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $events;
 
     /**

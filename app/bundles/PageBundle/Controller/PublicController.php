@@ -46,7 +46,7 @@ final class PublicController extends AbstractFormController
      * @throws FileNotFoundException
      */
     #[Route(
-        '/{slug}',
+        path: '/{slug}',
         name: 'mautic_page_public',
         requirements: ['slug' => '^(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|plugins/)).+'],
     )]
@@ -288,7 +288,7 @@ final class PublicController extends AbstractFormController
      * @throws FileNotFoundException
      */
     #[Route(
-        '/page/preview/{id}/{objectType}',
+        path: '/page/preview/{id}/{objectType}',
         name: 'mautic_page_preview',
         defaults: ['objectType' => null],
     )]
@@ -370,7 +370,7 @@ final class PublicController extends AbstractFormController
     }
 
     #[Route(
-        '/mtracking.gif',
+        path: '/mtracking.gif',
         name: 'mautic_page_tracker',
     )]
     public function trackingImageAction(Request $request, PageModel $model): Response
@@ -381,7 +381,7 @@ final class PublicController extends AbstractFormController
     }
 
     #[Route(
-        '/mtc/event',
+        path: '/mtc/event',
         name: 'mautic_page_tracker_cors',
     )]
     public function trackingAction(
@@ -431,11 +431,11 @@ final class PublicController extends AbstractFormController
      * @throws \Exception
      */
     #[Route(
-        '/r/{redirectId}',
+        path: '/r/{redirectId}',
         name: 'mautic_url_redirect',
     )]
     #[Route(
-        '/redirect/{redirectId}',
+        path: '/redirect/{redirectId}',
         name: 'mautic_page_redirect',
     )]
     public function redirectAction(
@@ -559,7 +559,7 @@ final class PublicController extends AbstractFormController
      * Get the ID of the currently tracked Contact.
      */
     #[Route(
-        '/mtc',
+        path: '/mtc',
         name: 'mautic_page_tracker_getcontact',
     )]
     public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker): JsonResponse

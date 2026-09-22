@@ -18,7 +18,7 @@ class PreUpdateCheckHelper
      * @param iterable<AbstractPreUpdateCheck> $checks
      */
     public function __construct(
-        #[AutowireIterator('mautic.update_check')]
+        #[AutowireIterator(tag: 'mautic.update_check')]
         iterable $checks = [],
     ) {
         foreach ($checks as $check) {

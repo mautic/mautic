@@ -33,7 +33,7 @@ final class NotificationController extends AbstractFormController
     }
 
     #[Route(
-        '/s/notifications/{objectAction}/{objectId}',
+        path: '/s/notifications/{objectAction}/{objectId}',
         name: 'mautic_notification_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -47,7 +47,7 @@ final class NotificationController extends AbstractFormController
      * @param int $page
      */
     #[Route(
-        '/s/notifications/{page}',
+        path: '/s/notifications/{page}',
         name: 'mautic_notification_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -728,7 +728,7 @@ final class NotificationController extends AbstractFormController
      * @param int $page
      */
     #[Route(
-        '/s/notifications/view/{objectId}/contact/{page}',
+        path: '/s/notifications/view/{objectId}/contact/{page}',
         name: 'mautic_notification_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
