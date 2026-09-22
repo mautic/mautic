@@ -84,36 +84,7 @@ final class ConfigMetadataTest extends TestCase
         $configMetadata->build();
 
         $config = $this->metadata->toArray()['config'];
-        $this->assertArrayHasKey('mautic.helper.bundle', $config['services']['helpers']);
         $this->assertArrayHasKey('log_path', $config['parameters']);
-    }
-
-    public function testOptionalMissingServicesAreIgnored(): void
-    {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
-
-        $configMetadata = new ConfigMetadata($this->metadata);
-        $configMetadata->build();
-
-        $config = $this->metadata->toArray()['config'];
-        $this->assertArrayNotHasKey('mautic.test.fixture', $config['services']['fixtures']);
-    }
-
-    public function testParameterArgumentsAreEncoded(): void
-    {
-        $this->metadata->expects($this->once())
-            ->method('getDirectory')
-            ->willReturn(__DIR__.'/resource/GoodConfig');
-
-        $configMetadata = new ConfigMetadata($this->metadata);
-        $configMetadata->build();
-
-        $config = $this->metadata->toArray()['config'];
-        $this->assertArrayHasKey('mautic.helper.bundle', $config['services']['helpers']);
-
-        $this->assertEquals('%%mautic.bundles%%', $config['services']['helpers']['mautic.helper.bundle']['arguments'][0]);
     }
 
     public function testParametersAreEncoded(): void

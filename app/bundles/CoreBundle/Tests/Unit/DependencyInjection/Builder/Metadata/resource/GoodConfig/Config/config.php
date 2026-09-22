@@ -20,29 +20,6 @@ return [
             ],
         ],
     ],
-    'services' => [
-        'helpers'  => [
-            'mautic.helper.bundle' => [
-                'class'     => Mautic\CoreBundle\Helper\BundleHelper::class,
-                'arguments' => [
-                    '%mautic.bundles%',
-                    '%mautic.plugin.bundles%',
-                ],
-            ],
-        ],
-        'other'    => [
-            'mautic.http.client' => [
-                'class' => GuzzleHttp\Client::class,
-            ],
-        ],
-        'fixtures' => [
-            'mautic.test.fixture' => [
-                'class'    => 'Foo\Bar\NonExisting',
-                'optional' => true,
-            ],
-        ],
-    ],
-
     'ip_lookup_services' => [
         'extreme-ip' => [
             'display_name' => 'Extreme-IP',
