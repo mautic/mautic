@@ -304,8 +304,6 @@ final class EmailController extends FormController
      */
     public function viewAction(Request $request, EmailModel $model, EmailConfig $emailConfig, AbTestSettingsService $abTestSettingsService, AbTestResultService $abTestResultService, $objectId): Response
     {
-        $security = $this->security;
-
         /** @var Email $email */
         $email   = $model->getEntity($objectId);
         $session = $request->getSession();
@@ -457,7 +455,7 @@ final class EmailController extends FormController
                     'clickCountsSorting' => $clickCountsSorting,
                     'variants'           => $variants,
                     'translations'       => $translations,
-                    'permissions'        => $security->isGranted(
+                    'permissions'        => $this->security->isGranted(
                         [
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -474,7 +472,7 @@ final class EmailController extends FormController
                         'RETURN_ARRAY'
                     ),
                     'abTestResults'   => $abTestResults,
-                    'security'        => $security,
+                    'security'        => $this->security,
                     'draftPreviewUrl' => $draftPreviewUrl,
                     'previewUrl'      => $this->generateUrl(
                         'mautic_email_preview',
@@ -1865,7 +1863,7 @@ final class EmailController extends FormController
         );
     }
 
-    public function getModelName(): string
+    protected function getModelName(): string
     {
         return 'email';
     }

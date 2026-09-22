@@ -210,10 +210,9 @@ final class NoteController extends FormController
             }
         }
 
-        $security    = $this->security;
         $permissions = [
-            'edit'   => $security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy()),
-            'delete' => $security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy()),
+            'edit'   => $this->security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy()),
+            'delete' => $this->security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy()),
         ];
 
         if ($closeModal) {
@@ -295,15 +294,15 @@ final class NoteController extends FormController
             }
         }
 
-        $security    = $this->security;
         $permissions = [
-            'edit'   => $security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy()),
-            'delete' => $security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy()),
+            'edit'   => $this->security->hasEntityAccess('lead:notes:editown', 'lead:notes:editother', $note->getCreatedBy()),
+            'delete' => $this->security->hasEntityAccess('lead:notes:deleteown', 'lead:notes:deleteother', $note->getCreatedBy()),
         ];
 
         if ($closeModal) {
             // just close the modal
-            $passthroughVars['closeModal'] = 1;
+            $passthroughVars                = [];
+            $passthroughVars['closeModal']  = 1;
 
             if ($valid && !$cancelled) {
                 $passthroughVars['noteHtml'] = $this->renderView(
