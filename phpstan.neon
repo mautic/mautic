@@ -7,7 +7,6 @@ parameters:
     level: 6
 
     # reportUnmatchedIgnoredErrors: false
-
     treatPhpDocTypesAsCertain: false
 
     # see https://github.com/tomasVotruba/type-coverage
