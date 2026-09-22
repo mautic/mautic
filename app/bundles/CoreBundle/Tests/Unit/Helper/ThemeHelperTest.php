@@ -22,11 +22,9 @@ use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
-use Twig\Extension\AbstractExtension;
 use Twig\Loader\ArrayLoader;
 use Twig\Loader\FilesystemLoader;
 use Twig\RuntimeLoader\FactoryRuntimeLoader;
-use Twig\TwigFilter;
 
 #[AllowMockObjectsWithoutExpectations]
 final class ThemeHelperTest extends TestCase
@@ -601,26 +599,5 @@ final class ThemeHelperTest extends TestCase
         $rendered = $themeHelper->renderThemeTemplate('@themes/test/html/page.html.twig', ['value' => 'runtime ok']);
 
         $this->assertSame('runtime ok [runtime]', $rendered);
-    }
-}
-
-final class ThemeHelperRuntimeBackedFilterExtension extends AbstractExtension
-{
-    /**
-     * @return TwigFilter[]
-     */
-    public function getFilters(): array
-    {
-        return [
-            new TwigFilter('runtime_backed', [ThemeHelperRuntimeBackedFilterRuntime::class, 'transform']),
-        ];
-    }
-}
-
-final class ThemeHelperRuntimeBackedFilterRuntime
-{
-    public function transform(string $value): string
-    {
-        return $value.' [runtime]';
     }
 }

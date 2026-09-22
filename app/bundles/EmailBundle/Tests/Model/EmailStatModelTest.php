@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailStatEvent;
 use Mautic\EmailBundle\Event\EmailStatPostSaveEvent;
@@ -72,20 +71,5 @@ final class EmailStatModelTest extends TestCase
         $emailStatModel->saveEntity($emailStat);
 
         $this->assertSame(2, $dispatcher->dispatchMethodCounter);
-    }
-}
-
-final class StatTest extends Stat
-{
-    private ?string $id = null;
-
-    public function setId(string $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): ?string
-    {
-        return $this->id;
     }
 }

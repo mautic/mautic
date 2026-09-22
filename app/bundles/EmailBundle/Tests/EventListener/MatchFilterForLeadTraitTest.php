@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -679,26 +678,5 @@ final class MatchFilterForLeadTraitTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $trait->match($filter, $lead);
-    }
-}
-
-final class MatchFilterForLeadTraitTestable
-{
-    use MatchFilterForLeadTrait;
-
-    private LeadListRepository $segmentRepository;
-
-    public function setRepository(LeadListRepository $segmentRepository): void
-    {
-        $this->segmentRepository = $segmentRepository;
-    }
-
-    /**
-     * @param array<int, array<string, mixed>> $filter
-     * @param array<string, mixed>             $lead
-     */
-    public function match(array $filter, array $lead): bool
-    {
-        return $this->matchFilterForLead($filter, $lead);
     }
 }

@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Form;
 
-use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Validator\MultipleEmailsValidValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Validation;
@@ -119,28 +116,5 @@ final class ToBcBccFieldsTraitTest extends TypeTestCase
         $form->submit(['to' => '', 'cc' => 'invalid', 'bcc' => 'also-invalid']);
 
         $this->assertFalse($form->isValid());
-    }
-}
-
-/**
- * @extends AbstractType<mixed>
- */
-final class ToBcBccStubFormType extends AbstractType
-{
-    use ToBcBccFieldsTrait;
-
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        $this->addToBcBccFields($builder);
-    }
-}
-
-final class RequiredToBcBccStubFormType extends AbstractType
-{
-    use ToBcBccFieldsTrait;
-
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        $this->addToBcBccFields($builder, true);
     }
 }

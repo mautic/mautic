@@ -9,28 +9,12 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Services\PeakInteractionTimer;
 use Mautic\PageBundle\Entity\HitRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
-
-final class TestablePeakInteractionTimer extends PeakInteractionTimer
-{
-    private \DateTime $testTime;
-
-    public function setCurrentDateTime(\DateTime $dateTime): void
-    {
-        $this->testTime = $dateTime;
-    }
-
-    protected function getCurrentDateTime(\DateTimeZone $timezone): \DateTime
-    {
-        return clone $this->testTime;
-    }
-}
 
 #[AllowMockObjectsWithoutExpectations]
 final class PeakInteractionTimerTest extends TestCase

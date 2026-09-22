@@ -8,47 +8,6 @@ use Doctrine\DBAL\Types\Type;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 
-final class ExampleClassWithPrivateProperty
-{
-    /**
-     * @phpstan-ignore-next-line
-     */
-    private string $test = 'value';
-}
-
-final class ExampleClassWithProtectedProperty
-{
-    /**
-     * @phpstan-ignore-next-line
-     */
-    private string $test = 'value';
-}
-
-final class ExampleClassWithPublicProperty
-{
-    /**
-     * @phpstan-ignore-next-line
-     */
-    public $test = 'value';
-}
-
-final class ExampleClassDeprecatedOnWakeup
-{
-    /**
-     * @phpstan-ignore-next-line
-     */
-    public $test = 'value';
-
-    public function __wakeup(): void
-    {
-        trigger_error('This shape is deprecated.', E_USER_DEPRECATED);
-    }
-}
-
-final class ExampleClassWithoutDeclaredProperty
-{
-}
-
 final class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     public const string MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
