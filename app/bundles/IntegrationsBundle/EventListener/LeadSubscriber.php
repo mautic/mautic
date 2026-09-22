@@ -149,6 +149,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         $lead = $event->getLead();
 
         // This mechanism is not able to record multiple company changes.
+        $changes            = [];
         $changes['company'] = [
             0 => '',
             1 => $lead->getCompany(),

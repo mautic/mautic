@@ -332,6 +332,7 @@ final class PageType extends AbstractType
             'mapped' => false,
         ]);
 
+        $extraButtons                      = [];
         $extraButtons['pre_extra_buttons'] = [
             [
                 'name'  => 'builder',

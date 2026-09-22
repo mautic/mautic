@@ -119,6 +119,7 @@ final class FetchLeadsCommand extends Command
 
         $config['objects'] ??= [];
 
+        $params             = [];
         $params['start']    = $startDate;
         $params['end']      = $endDate;
         $params['limit']    = $limit;

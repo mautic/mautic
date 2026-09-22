@@ -666,6 +666,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $emailIds = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
 
         $emailStats            = $this->statRepository->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds);
+        $results               = [];
         $results['read_count'] = $results['clicked_through_count'] = [];
 
         foreach ($emailStats as $e) {

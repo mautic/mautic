@@ -61,6 +61,7 @@ final class PostCountModel extends AbstractCommonModel
 
         $q->setParameter('date', $postDate, 'date');
         $q->where($expr);
+        $args       = [];
         $args['qb'] = $q;
 
         // ignore paginator so we can use the array later

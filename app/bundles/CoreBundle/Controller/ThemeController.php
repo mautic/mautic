@@ -241,6 +241,7 @@ final class ThemeController extends FormController
                 $flashNumber = count($flashes);
                 unset($flashes);
 
+                $flashes   = [];
                 $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => 'mautic.core.theme.notice.batch_deleted',

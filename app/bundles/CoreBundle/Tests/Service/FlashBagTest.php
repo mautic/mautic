@@ -87,6 +87,7 @@ final class FlashBagTest extends TestCase
     public function testAddWithChoices(): void
     {
         $message                      = 'message';
+        $messageVars                  = [];
         $messageVars['%count%']       = 2;
         $translatedMessage            = 'translatedMessage';
         $level                        = FlashBag::LEVEL_NOTICE;

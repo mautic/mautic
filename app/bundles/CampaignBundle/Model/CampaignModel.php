@@ -838,6 +838,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getCountryStats(Campaign $entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo): array
     {
+        $results             = [];
         $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom, $dateTo);
 
         if ($entity->isEmailCampaign()) {

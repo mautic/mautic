@@ -186,6 +186,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         if (isset($settings['feature_settings']['objects'])) {
             $cwObjects = $settings['feature_settings']['objects'];
         } else {
+            $cwObjects            = [];
             $cwObjects['Contact'] = 'Contact';
         }
         if (!$this->isAuthorized()) {
@@ -575,7 +576,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             $personFound = true;
         }
 
-        $personData = [];
+        $personData          = [];
+        $integrationEntities = [];
 
         try {
             if ($personFound) {

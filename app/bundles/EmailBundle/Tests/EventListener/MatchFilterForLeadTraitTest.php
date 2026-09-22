@@ -290,6 +290,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
     #[DataProvider('segmentMembershipFilterProvider')]
     public function testIsContactSegmentRelationshipValidEmpty(string $filterField): void
     {
+        $lead       = [];
         $lead['id'] = 1;
         $segmentId  = 1;
         $operator   = OperatorOptions::EMPTY;
@@ -489,6 +490,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
 
     public function testIsContactSegmentRelationshipValidNotEmpty(): void
     {
+        $lead       = [];
         $lead['id'] = 1;
         $segmentId  = 1;
         $operator   = OperatorOptions::NOT_EMPTY;
@@ -521,6 +523,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
 
     public function testIsContactSegmentRelationshipValidIn(): void
     {
+        $lead       = [];
         $lead['id'] = 1;
         $segmentId  = 1;
         $operator   = OperatorOptions::INCLUDING_ANY;
@@ -554,6 +557,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
 
     public function testIsContactSegmentRelationshipValidNotIn(): void
     {
+        $lead       = [];
         $lead['id'] = 1;
         $segmentId  = 1;
         $operator   = OperatorOptions::EXCLUDING_ANY;
@@ -587,6 +591,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
 
     public function testIsContactSegmentRelationshipValidInAll(): void
     {
+        $lead       = [];
         $lead['id'] = 1;
         $segmentId  = 1;
         $operator   = OperatorOptions::INCLUDING_ALL;
@@ -620,6 +625,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
 
     public function testIsContactSegmentRelationshipValidNotInAll(): void
     {
+        $lead       = [];
         $lead['id'] = 1;
         $segmentId  = 1;
         $operator   = OperatorOptions::EXCLUDING_ALL;
@@ -653,6 +659,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
 
     public function testIsContactSegmentRelationshipValidInvalidOperator(): void
     {
+        $lead       = [];
         $lead['id'] = 1;
         $segmentId  = 1;
         $operator   = 'invalid';

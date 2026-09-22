@@ -1042,6 +1042,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
+        $data           = [];
         $data['values'] = [];
         $data['labels'] = [];
 
@@ -1086,6 +1087,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         ];
 
         $chart      = new BarChart($data['labels']);
+        $datasets   = [];
         $datasets[] = array_merge($baseData, $chart->generateColors(3));
 
         return [
@@ -1104,6 +1106,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
+        $data           = [];
         $data['values'] = [];
         $data['labels'] = [];
 
@@ -1150,6 +1153,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         ];
 
         $chart      = new BarChart($data['labels']);
+        $datasets   = [];
         $datasets[] = array_merge($baseData, $chart->generateColors(2));
 
         return [

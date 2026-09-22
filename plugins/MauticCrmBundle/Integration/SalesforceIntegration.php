@@ -967,6 +967,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         /** @var SalesforceApi $apiHelper */
         $apiHelper = $this->getApiHelper();
 
+        $salesForceObjects   = [];
         $salesForceObjects[] = 'Lead';
         if (isset($config['objects']) && !empty($config['objects'])) {
             $salesForceObjects = $config['objects'];
@@ -1552,6 +1553,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             }
 
+            $request                     = [];
             $request['allOrNone']        = 'false';
             $request['compositeRequest'] = array_values($mauticData);
 
@@ -2428,6 +2430,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $fieldsToCreate     = $this->prepareFieldsForSync($config['companyFields'], $fieldKeys, 'Account');
             $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config, 'Account', 'mautic_company');
 
+            $fieldMapping             = [];
             $fieldMapping[$object]    = [
                 'update' => !empty($fieldsToUpdateInSf) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
                 'create' => $fieldsToCreate,
@@ -2659,6 +2662,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fieldsToCreate     = $this->prepareFieldsForSync($config['companyFields'], $fieldKeys, $sfObject);
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config, $sfObject, 'mautic_company');
 
+        $objectFields            = [];
         $objectFields['company'] = [
             'update' => !empty($fieldsToUpdateInSf) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
             'create' => $fieldsToCreate,
@@ -3084,6 +3088,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (isset($matchedFields['mauticContactIsContactableByEmail']) && $this->updateDncByDate()) {
             $matchedFields['internal_entity_id']    = $lead->getId();
             $matchedFields['integration_entity_id'] = $sfData['Id__'.$object];
+            $record                                 = [];
             $record[$lead->getEmail()]              = $matchedFields;
             $this->pushLeadDoNotContactByDate($channel, $record, $object, $params);
 
