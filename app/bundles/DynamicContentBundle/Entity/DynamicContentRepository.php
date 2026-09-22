@@ -136,16 +136,9 @@ final class DynamicContentRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $topLevel
-     * @param array  $ignoreIds
-     * @param string $where
-     *
-     * @return array
+     * @param string|array<int|string> $search
      */
-    public function getDynamicContentList($search = '', $limit = 10, $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $where = null)
+    public function getDynamicContentList(string|array $search = '', int $limit = 10, int $start = 0, bool $viewOther = false, bool|string $topLevel = false, array $ignoreIds = [], ?string $where = null): array
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
@@ -173,7 +166,7 @@ final class DynamicContentRepository extends CommonRepository
             $q->andWhere($q->expr()->isNull('e.variantParent'));
         }
 
-        if (!empty($ignoreIds)) {
+        if ($ignoreIds !== []) {
             $q->andWhere($q->expr()->notIn('e.id', ':dwc_ids'))
                 ->setParameter('dwc_ids', $ignoreIds);
         }

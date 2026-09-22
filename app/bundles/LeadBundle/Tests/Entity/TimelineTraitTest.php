@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;

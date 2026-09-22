@@ -64,7 +64,7 @@ class ObjectMappingRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'i')
+        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping i')
             ->set('integration_object_name', ':newObjectName')
             ->set('integration_object_id', ':newObjectId')
             ->where(
@@ -136,7 +136,7 @@ class ObjectMappingRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'm')
+        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping m')
             ->set('is_deleted', 1)
             ->where(
                 $qb->expr()->and(

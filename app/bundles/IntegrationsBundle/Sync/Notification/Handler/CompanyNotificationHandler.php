@@ -30,7 +30,7 @@ final readonly class CompanyNotificationHandler implements HandlerInterface
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
     public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void

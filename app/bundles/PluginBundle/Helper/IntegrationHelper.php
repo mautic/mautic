@@ -66,7 +66,7 @@ class IntegrationHelper
      *
      * @return array<AbstractIntegration>
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false): array
     {

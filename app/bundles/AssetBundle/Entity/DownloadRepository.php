@@ -30,7 +30,7 @@ class DownloadRepository extends CommonRepository
         $q2->where(
             $q2->expr()->and(
                 $q2->expr()->eq('d.tracking_id', ':id'),
-                $q2->expr()->eq('d.asset_id', $assetId)
+                $q2->expr()->eq('d.asset_id', (string) $assetId)
             )
         );
 
@@ -73,14 +73,10 @@ class DownloadRepository extends CommonRepository
     /**
      * Get list of assets ordered by it's download count.
      *
-     * @param QueryBuilder $query
-     * @param int          $limit
-     * @param int          $offset
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostDownloaded($query, $limit = 10, $offset = 0): array
+    public function getMostDownloaded(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('a.title, a.id, count(ad.id) as downloads')
             ->groupBy('a.id, a.title')
@@ -94,14 +90,10 @@ class DownloadRepository extends CommonRepository
     /**
      * Get list of asset referrals ordered by it's count.
      *
-     * @param QueryBuilder $query
-     * @param int          $limit
-     * @param int          $offset
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getTopReferrers($query, $limit = 10, $offset = 0): array
+    public function getTopReferrers(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('ad.referer, count(ad.referer) as downloads')
             ->groupBy('ad.referer')

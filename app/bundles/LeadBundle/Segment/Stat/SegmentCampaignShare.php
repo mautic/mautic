@@ -30,12 +30,7 @@ final readonly class SegmentCampaignShare
         return $campaigns;
     }
 
-    /**
-     * @param int $segmentId
-     *
-     * @return array
-     */
-    public function getCampaignList($segmentId)
+    public function getCampaignList(int $segmentId): array
     {
         $q = $this->entityManager->getConnection()->createQueryBuilder();
         $q->select('c.id, c.name, null as share')

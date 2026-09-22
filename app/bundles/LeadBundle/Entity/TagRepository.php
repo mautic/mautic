@@ -225,7 +225,7 @@ class TagRepository extends CommonRepository
             ->setParameter('tag', $tagIds, ArrayParameterType::INTEGER)
             ->executeQuery()->fetchAllKeyValue();
 
-        if (empty($tagsIdName)) {
+        if ($tagsIdName === []) {
             return [];
         }
 

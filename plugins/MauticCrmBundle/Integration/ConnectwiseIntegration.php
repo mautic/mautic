@@ -535,7 +535,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             [$entity->getId()]
         );
 
-        if ($integrationEntities) {
+        if ($integrationEntities !== []) {
             $integrationEntity = reset($integrationEntities);
             $integrationEntity->setLastSyncDate(new \DateTime());
         } else {

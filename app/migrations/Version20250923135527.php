@@ -6,6 +6,7 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 
 final class Version20250923135527 extends PreUpAssertionMigration
 {
@@ -30,7 +31,7 @@ final class Version20250923135527 extends PreUpAssertionMigration
             $table->addIndex([self::COLUMN_NAME], 'IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT');
 
             $table->addForeignKeyConstraint(
-                $table,
+                AssetName::of($table),
                 [self::COLUMN_NAME],
                 ['id'],
                 ['onDelete' => 'CASCADE'],

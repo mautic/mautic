@@ -135,7 +135,7 @@ class Form extends FormEntity implements UuidInterface
      * @var ArrayCollection<int, Field>
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
-    #[ORM\OneToMany(mappedBy: 'form', targetEntity: Field::class, cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Field::class, mappedBy: 'form', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     #[ORM\OrderBy(['order' => 'ASC', 'id' => 'ASC'])]
     private $fields;
 
@@ -143,7 +143,7 @@ class Form extends FormEntity implements UuidInterface
      * @var ArrayCollection<string, Action>
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
-    #[ORM\OneToMany(mappedBy: 'form', targetEntity: Action::class, cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Action::class, mappedBy: 'form', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     #[ORM\OrderBy(['order' => 'ASC'])]
     private $actions;
 
@@ -169,7 +169,7 @@ class Form extends FormEntity implements UuidInterface
      * @var Collection<int, Submission>
      */
     #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
-    #[ORM\OneToMany(mappedBy: 'form', targetEntity: Submission::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['dateSubmitted' => 'DESC'])]
     private Collection $submissions;
 

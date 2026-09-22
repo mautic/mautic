@@ -16,11 +16,9 @@ class DoNotContactRepository extends CommonRepository
     /**
      * Get a list of DNC entries based on channel and lead_id.
      *
-     * @param string $channel
-     *
      * @return DoNotContact[]
      */
-    public function getEntriesByLeadAndChannel(Lead $lead, $channel)
+    public function getEntriesByLeadAndChannel(Lead $lead, string $channel): array
     {
         return $this->findBy(['channel' => $channel, 'lead' => $lead]);
     }
@@ -124,7 +122,7 @@ class DoNotContactRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc');
 
         if ($leadId) {
-            $query->where($query->expr()->eq('dnc.lead_id', (int) $leadId));
+            $query->where($query->expr()->eq('dnc.lead_id', (string) ((int) $leadId)));
         }
 
         if (isset($options['search']) && $options['search']) {
@@ -138,7 +136,7 @@ class DoNotContactRepository extends CommonRepository
 
     /**
      * @param string|null    $channel
-     * @param string[]|int[] $contacts Array of contact IDs to filter by
+     * @param string[]|int[]|null $contacts Array of contact IDs to filter by
      *
      * @return mixed[]
      */

@@ -17,6 +17,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
@@ -261,7 +262,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var ArrayCollection<Stat>
      */
-    #[ORM\OneToMany(mappedBy: 'email', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'email', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
@@ -324,7 +325,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'download:read'])]
     private $queuedCount = 0;
 
-    #[ORM\OneToOne(mappedBy: 'email', targetEntity: EmailDraft::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToOne(targetEntity: EmailDraft::class, mappedBy: 'email', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private ?EmailDraft $draft = null;
 
     private bool $isCloned = false;
@@ -410,8 +411,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->build();
 
         $builder->addNullableField('template', Types::STRING);
-        $builder->addNullableField('content', Types::ARRAY);
-        $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
+        $builder->addNullableField('content', ArrayType::ARRAY);
+        $builder->addNullableField('utmTags', ArrayType::ARRAY, 'utm_tags');
         $builder->addNullableField('plainText', Types::TEXT, 'plain_text');
         $builder->addNullableField('customHtml', Types::TEXT, 'custom_html');
         $builder->addNullableField('emailType', Types::TEXT, 'email_type');

@@ -32,6 +32,23 @@ final class ExampleClassWithPublicProperty
     public $test = 'value';
 }
 
+final class ExampleClassDeprecatedOnWakeup
+{
+    /**
+     * @phpstan-ignore-next-line
+     */
+    public $test = 'value';
+
+    public function __wakeup(): void
+    {
+        trigger_error('This shape is deprecated.', E_USER_DEPRECATED);
+    }
+}
+
+final class ExampleClassWithoutDeclaredProperty
+{
+}
+
 final class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     public const string MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
@@ -172,5 +189,48 @@ final class ArrayTypeTest extends \PHPUnit\Framework\TestCase
             ],
             $result
         );
+    }
+
+    /**
+     * DBAL let deprecations through rather than turning them into a conversion failure.
+     * Throwing on one discards the whole stored array, unrelated values included.
+     */
+    public function testGivenUserDeprecationDuringUnserializeWhenConvertsToPHPValueThenKeepsTheArray(): void
+    {
+        $array = serialize([
+            'before' => 'kept',
+            'object' => new ExampleClassDeprecatedOnWakeup(),
+            'after'  => 'also kept',
+        ]);
+
+        $result = $this->arrayType->convertToPHPValue($array, $this->platform);
+
+        $this->assertEquals(
+            [
+                'before' => 'kept',
+                'object' => new ExampleClassDeprecatedOnWakeup(),
+                'after'  => 'also kept',
+            ],
+            $result
+        );
+    }
+
+    /**
+     * The realistic trigger: since PHP 8.2 unserializing a property the class no longer
+     * declares raises E_DEPRECATED for the dynamic property.
+     */
+    public function testGivenDynamicPropertyDeprecationWhenConvertsToPHPValueThenKeepsTheArray(): void
+    {
+        $class = ExampleClassWithoutDeclaredProperty::class;
+        $array = sprintf(
+            'a:2:{s:6:"before";s:4:"kept";s:6:"object";O:%d:"%s":1:{s:7:"removed";s:5:"value";}}',
+            strlen($class),
+            $class
+        );
+
+        $result = $this->arrayType->convertToPHPValue($array, $this->platform);
+
+        $this->assertIsArray($result);
+        $this->assertSame('kept', $result['before'] ?? null);
     }
 }

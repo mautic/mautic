@@ -2,9 +2,9 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Query;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -301,14 +301,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @param string $type
-     * @param string $filter
-     * @param int    $limit
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults(string $type, string $filter = '', int $limit = 10): array
     {
         $results = [];
         if ('page' === $type) {
@@ -907,10 +901,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get pie chart data of dwell times.
-     *
-     * @param array $filters
      */
-    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $timesOnSite = $this->hitRepository->getDwellTimeLabels();
         $chart       = new PieChart();
@@ -951,7 +943,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         $chart   = new PieChart();
 
-        if (empty($results)) {
+        if ($results === []) {
             $results[] = [
                 'device' => $this->translator->trans('mautic.report.report.noresults'),
                 'count'  => 0,
@@ -969,11 +961,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of popular (by hits) pages.
-     *
-     * @param int   $limit
-     * @param array $filters
      */
-    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getPopularPages(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -997,11 +986,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of pages created in a date range.
-     *
-     * @param int   $limit
-     * @param array $filters
      */
-    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getPageList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')
