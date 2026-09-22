@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
  * See @see https://github.com/doctrine/doctrine2/pull/1326/.
  */
-class ClassMetadataBuilder extends OrmClassMetadataBuilder
+final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 {
     /**
      * Max length of indexed VARCHAR fields for UTF8MB4 encoding.

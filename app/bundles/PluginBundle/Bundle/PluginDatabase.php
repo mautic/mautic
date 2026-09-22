@@ -12,13 +12,13 @@ use Mautic\IntegrationsBundle\Migration\Engine;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class PluginDatabase
+final readonly class PluginDatabase
 {
-    private readonly string $mauticDbPrefix;
+    private string $mauticDbPrefix;
 
     public function __construct(
-        private readonly EntityManagerInterface $em,
-        private readonly Connection $connection,
+        private EntityManagerInterface $em,
+        private Connection $connection,
         #[Autowire(env: 'MAUTIC_TABLE_PREFIX')]
         ?string $mauticDbPrefix,
     ) {
@@ -44,7 +44,7 @@ class PluginDatabase
 
         foreach ($installQueries as $q) {
             // Check if the query is a DDL statement
-            if (self::isDDLStatement($q)) {
+            if ($this->isDDLStatement($q)) {
                 // Execute DDL statements outside of a transaction
                 $this->connection->executeStatement($q);
             } else {
@@ -102,7 +102,7 @@ class PluginDatabase
         }
     }
 
-    private static function isDDLStatement(string $query): bool|int
+    private function isDDLStatement(string $query): bool|int
     {
         return preg_match('/^(CREATE|ALTER|DROP|RENAME|TRUNCATE|COMMENT)\s/i', $query);
     }

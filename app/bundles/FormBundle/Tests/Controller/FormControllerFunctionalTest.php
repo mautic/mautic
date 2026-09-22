@@ -162,7 +162,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $filesystem->mirror($translationsPath, $languagePath);
 
         /** @var LanguageHelper $languageHelper */
-        $languageHelper = $this->getContainer()->get('mautic.helper.language');
+        $languageHelper = $this->getContainer()->get(LanguageHelper::class);
 
         $formPayload = [
             'name'       => 'Test Form',
@@ -425,7 +425,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
-        $translator = $this->getContainer()->get('translator');
+        $translator = $this->getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         foreach ($expectedMessages as $expectedMessage) {

@@ -23,7 +23,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @var mixed[]
      */
-    private $filter = [
+    private array $filter = [
         0 => [
             'display' => null,
             'field'   => 'custom',
@@ -684,7 +684,7 @@ final class MatchFilterForLeadTraitTest extends TestCase
     }
 }
 
-class MatchFilterForLeadTraitTestable
+final class MatchFilterForLeadTraitTestable
 {
     use MatchFilterForLeadTrait;
 

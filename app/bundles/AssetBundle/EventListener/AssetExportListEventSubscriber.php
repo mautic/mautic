@@ -27,7 +27,7 @@ final readonly class AssetExportListEventSubscriber implements EventSubscriberIn
     {
         $data = $event->getEntityData();
 
-        if (empty($data)) {
+        if ([] === $data) {
             return;
         }
 

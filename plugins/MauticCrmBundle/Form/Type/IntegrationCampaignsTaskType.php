@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class IntegrationCampaignsTaskType extends AbstractType
+final class IntegrationCampaignsTaskType extends AbstractType
 {
     public function __construct(
         private readonly ConnectwiseIntegration $connectwiseIntegration,

@@ -16,14 +16,15 @@ class EmailDraftModel extends AbstractCommonModel
     private EmailDraftRepository $emailDraftRepository;
 
     #[Required]
-    public function autowireEmailDraftModel(EmailDraftRepository $emailDraftRepository): void
-    {
+    public function autowireEmailDraftModel(
+        EmailDraftRepository $emailDraftRepository,
+    ): void {
         $this->emailDraftRepository = $emailDraftRepository;
     }
 
     public function createDraft(Email $email, string $html, string $template, bool $publicPreview = true): EmailDraft
     {
-        $emailDraft = $this->getRepository()->findOneBy(['email' => $email]);
+        $emailDraft = $this->emailDraftRepository->findOneBy(['email' => $email]);
         if (null !== $emailDraft) {
             throw new \Exception(sprintf('Draft already exists for email %d', $email->getId()));
         }

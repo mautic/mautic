@@ -6,6 +6,8 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 trait ApiTestUserTrait
@@ -20,7 +22,7 @@ trait ApiTestUserTrait
         $this->em->persist($role);
         $this->em->flush();
 
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel = static::getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
 
@@ -31,7 +33,7 @@ trait ApiTestUserTrait
         $user->setEmail('lead.api.'.uniqid().'@example.com');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         \assert($hasher instanceof PasswordHasherInterface);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
 

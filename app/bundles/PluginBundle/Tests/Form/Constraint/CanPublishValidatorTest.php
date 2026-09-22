@@ -55,7 +55,7 @@ final class CanPublishValidatorTest extends TestCase
 
         $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
-        $this->canPublishValidator->validate(1, new CanPublish('testIntegration'));
+        $this->canPublishValidator->validate(1, new CanPublish(integrationName: 'testIntegration'));
     }
 
     public function testEventNotDispatchedIfUnpublished(): void
@@ -75,7 +75,7 @@ final class CanPublishValidatorTest extends TestCase
 
         $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
-        $this->canPublishValidator->validate(0, new CanPublish('testIntegration'));
+        $this->canPublishValidator->validate(0, new CanPublish(integrationName: 'testIntegration'));
     }
 
     public function testExceptionIsThrown(): void

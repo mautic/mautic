@@ -10,13 +10,14 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends AbstractCommonModel<PostCount>
  */
-class PostCountModel extends AbstractCommonModel
+final class PostCountModel extends AbstractCommonModel
 {
     private PostCountRepository $postCountRepository;
 
     #[Required]
-    public function autowirePostCountModel(PostCountRepository $postCountRepository): void
-    {
+    public function autowirePostCountModel(
+        PostCountRepository $postCountRepository,
+    ): void {
         $this->postCountRepository = $postCountRepository;
     }
 
@@ -26,12 +27,11 @@ class PostCountModel extends AbstractCommonModel
     public function getEntity($id = null): ?PostCount
     {
         if (null !== $id) {
-            $repo = $this->getRepository();
-            if (method_exists($repo, 'getEntity')) {
-                return $repo->getEntity($id);
+            if (method_exists($this->postCountRepository, 'getEntity')) {
+                return $this->postCountRepository->getEntity($id);
             }
 
-            return $repo->find($id);
+            return $this->postCountRepository->find($id);
         }
 
         return new PostCount();
@@ -51,8 +51,8 @@ class PostCountModel extends AbstractCommonModel
     public function updatePostCount($monitor, \DateTime $postDate): bool
     {
         // query the db for posts on this date
-        $q    = $this->getRepository()->createQueryBuilder($this->getRepository()->getTableAlias());
-        $expr = $q->expr()->eq($this->getRepository()->getTableAlias().'.postDate', ':date');
+        $q    = $this->postCountRepository->createQueryBuilder($this->postCountRepository->getTableAlias());
+        $expr = $q->expr()->eq($this->postCountRepository->getTableAlias().'.postDate', ':date');
 
         $q->setParameter('date', $postDate, 'date');
         $q->where($expr);
@@ -61,10 +61,8 @@ class PostCountModel extends AbstractCommonModel
         // ignore paginator so we can use the array later
         $args['ignore_paginator'] = true;
 
-        $postCountsRepository = $this->getRepository();
-
         // get any existing records
-        $postCounts = $postCountsRepository->getEntities($args);
+        $postCounts = $this->postCountRepository->getEntities($args);
 
         // if there isn't anything then create it
         if (!count($postCounts)) {
@@ -81,7 +79,7 @@ class PostCountModel extends AbstractCommonModel
         $postCount->setPostCount($postCount->getPostCount() + 1);
 
         // now save it
-        $postCountsRepository->saveEntity($postCount);
+        $this->postCountRepository->saveEntity($postCount);
 
         // nothing went wrong so return true here
         return true;

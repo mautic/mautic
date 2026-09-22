@@ -163,7 +163,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $contact = new Lead();
         $contact->setFirstName('John');
         /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
         $contactModel->deleteEntity($contact);

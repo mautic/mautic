@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class LeadPermissions extends AbstractPermissions
+final class LeadPermissions extends AbstractPermissions
 {
     public const LISTS_VIEW         = 'lead:lists:view';
 

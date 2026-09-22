@@ -12,12 +12,12 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInterface
+final readonly class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly NotificationModel $notificationModel,
-        private readonly TranslatorInterface $translator,
-        private readonly ContactExportAdminNotification $contactExportAdminNotification,
+        private NotificationModel $notificationModel,
+        private TranslatorInterface $translator,
+        private ContactExportAdminNotification $contactExportAdminNotification,
     ) {
     }
 

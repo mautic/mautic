@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Tests\Helper;
 
 use Doctrine\DBAL\Schema\Schema;

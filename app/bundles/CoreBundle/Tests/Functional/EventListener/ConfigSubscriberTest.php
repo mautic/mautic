@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 final class ConfigSubscriberTest extends MauticMysqlTestCase
 {
@@ -46,7 +47,10 @@ final class ConfigSubscriberTest extends MauticMysqlTestCase
 
     private function getConfigPath(): string
     {
-        return self::getContainer()->get('kernel')->getLocalConfigFile();
+        /** @var \AppKernel $kernel */
+        $kernel = self::getContainer()->get(KernelInterface::class);
+
+        return $kernel->getLocalConfigFile();
     }
 
     public function testFailConfigMediaPathWithDots(): void

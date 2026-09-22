@@ -14,7 +14,8 @@ abstract class AbstractConstructorAndAutowireController
     }
 
     #[Required]
-    public function autowireAbstractConstructorAndAutowireController(SomeModel $someModel): void
-    {
+    public function autowireAbstractConstructorAndAutowireController(
+        SomeModel $someModel,
+    ): void {
     }
 }

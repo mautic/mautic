@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,15 +22,27 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Tweet>
  */
-class TweetApiController extends CommonApiController
+final class TweetApiController extends CommonApiController
 {
     /**
      * @var TweetModel|null
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, TweetModel $tweetModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        TweetModel $tweetModel,
+    ) {
         $this->model           = $tweetModel;
         $this->entityClass     = Tweet::class;
         $this->entityNameOne   = 'tweet';

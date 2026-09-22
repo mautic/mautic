@@ -66,7 +66,9 @@
                         'tooltip': 'mautic.asset.asset.searchcommand.ispending.description',
                         'icon': 'ri-timer-line'
                     }
-                ]
+                ],
+                'searchScopes': searchScopes|default([]),
+                'searchScopeHint': searchScopeHint|default(''),
             }) -}}
 			<div class="page-list">
 				{{ block('listResults') }}

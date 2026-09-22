@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class IP2LocationAPILookup extends AbstractRemoteDataLookup
+final class IP2LocationAPILookup extends AbstractRemoteDataLookup
 {
     public function getAttribution(): string
     {

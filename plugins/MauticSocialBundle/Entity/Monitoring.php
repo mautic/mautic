@@ -141,11 +141,11 @@ class Monitoring extends FormEntity implements UuidInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('title', new Assert\NotBlank(
-            ['message' => 'mautic.core.title.required']
+            message: 'mautic.core.title.required'
         ));
 
         $metadata->addPropertyConstraint('networkType', new Assert\NotBlank(
-            ['message' => 'mautic.social.network.type']
+            message: 'mautic.social.network.type'
         ));
     }
 
@@ -357,14 +357,14 @@ class Monitoring extends FormEntity implements UuidInterface
      */
     public function cleanMonitorData(): void
     {
-        $property = $this->getProperties();
+        $property = $this->properties;
 
         if (!array_key_exists('checknames', $property)) {
             $property['checknames'] = 0;
         }
 
         // clean up property array for the twitter handle
-        if ('twitter_handle' == $this->getNetworkType()) {
+        if ('twitter_handle' == $this->networkType) {
             $this->setProperties(
                 [
                     'handle'     => $property['handle'],
@@ -374,7 +374,7 @@ class Monitoring extends FormEntity implements UuidInterface
         }
 
         // clean up property array for the hashtag
-        if ('twitter_hashtag' == $this->getNetworkType()) {
+        if ('twitter_hashtag' == $this->networkType) {
             $this->setProperties(
                 [
                     'hashtag'    => $property['hashtag'],
@@ -384,7 +384,7 @@ class Monitoring extends FormEntity implements UuidInterface
         }
 
         // clean up clean up property array for the custom action
-        if ('twitter_custom' == $this->getNetworkType()) {
+        if ('twitter_custom' == $this->networkType) {
             $this->setProperties(
                 [
                     'custom' => $property['custom'],
@@ -393,7 +393,7 @@ class Monitoring extends FormEntity implements UuidInterface
         }
 
         // if the property is not new and the old property doesn't match the new one
-        if (!$this->isNew() && $property != $this->getProperties()) {
+        if (!$this->isNew() && $property != $this->properties) {
             // reset stats on save of edited
             $this->setStats([]);
         }

@@ -27,7 +27,7 @@ final class PageRepositoryTest extends TestCase
             'mautic.page.searchcommand.ispending' => 'is:pending',
             default                               => $id,
         });
-        $repository->setTranslator($translator);
+        $repository->autowireCommonRepository($translator);
 
         return $repository;
     }

@@ -19,13 +19,14 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Monitoring>
  */
-class MonitoringModel extends FormModel
+final class MonitoringModel extends FormModel
 {
     private MonitoringRepository $monitoringRepository;
 
     #[Required]
-    public function autowireMonitoringModel(MonitoringRepository $monitoringRepository): void
-    {
+    public function autowireMonitoringModel(
+        MonitoringRepository $monitoringRepository,
+    ): void {
         $this->monitoringRepository = $monitoringRepository;
     }
 

@@ -19,14 +19,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @extends CommonApiController<User>
  */
-class UserApiController extends CommonApiController
+final class UserApiController extends CommonApiController
 {
     /**
      * @var UserModel|null
@@ -40,7 +39,6 @@ class UserApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private readonly UserPasswordHasherInterface $hasher,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
@@ -74,7 +72,7 @@ class UserApiController extends CommonApiController
     /**
      * Creates a new user.
      */
-    public function newEntityAction(Request $request)
+    public function newEntityAction(Request $request): Response
     {
         $entity = $this->model->getEntity();
 
@@ -86,7 +84,7 @@ class UserApiController extends CommonApiController
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
-            $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
+            $entity->setPassword($this->model->checkNewPassword($entity, $submittedPassword));
         }
 
         return $this->processForm($request, $entity, $parameters, 'POST');
@@ -97,11 +95,9 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return Response
-     *
      * @throws NotFoundHttpException
      */
-    public function editEntityAction(Request $request, $id)
+    public function editEntityAction(Request $request, $id): Response
     {
         $entity     = $this->model->getEntity($id);
         $parameters = $request->request->all();
@@ -121,7 +117,7 @@ class UserApiController extends CommonApiController
             $entity = $this->model->getEntity();
             if (isset($parameters['plainPassword']['password'])) {
                 $submittedPassword = $parameters['plainPassword']['password'];
-                $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
+                $entity->setPassword($this->model->checkNewPassword($entity, $submittedPassword));
             }
         } else {
             // Changing passwords via API is forbidden
@@ -153,19 +149,16 @@ class UserApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
-        switch ($action) {
-            case 'new':
-                $submittedPassword = null;
-                if (isset($parameters['plainPassword'])) {
-                    if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
-                        $submittedPassword = $parameters['plainPassword']['password'];
-                    } else {
-                        $submittedPassword = $parameters['plainPassword'];
-                    }
+        if ('new' === $action) {
+            $submittedPassword = null;
+            if (isset($parameters['plainPassword'])) {
+                if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
+                    $submittedPassword = $parameters['plainPassword']['password'];
+                } else {
+                    $submittedPassword = $parameters['plainPassword'];
                 }
-
-                $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword, true));
-                break;
+            }
+            $entity->setPassword($this->model->checkNewPassword($entity, $submittedPassword, true));
         }
     }
 

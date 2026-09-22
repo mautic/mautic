@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Campaign>
  */
-class CampaignType extends AbstractType
+final class CampaignType extends AbstractType
 {
     public function __construct(
         private readonly CorePermissions $security,

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class TranslatorExtension extends AbstractExtension
+final class TranslatorExtension extends AbstractExtension
 {
     public function __construct(
         private readonly Translator $translator,

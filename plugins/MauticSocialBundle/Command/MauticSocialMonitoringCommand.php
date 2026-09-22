@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
+use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -14,10 +14,10 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'mautic:social:monitoring',
     description: 'Looks at the records of monitors and iterates through them.'
 )]
-class MauticSocialMonitoringCommand extends Command
+final class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
-        private readonly MonitoringModel $monitoringModel,
+        private readonly MonitoringRepository $monitoringRepository,
     ) {
         parent::__construct();
     }
@@ -72,20 +72,18 @@ class MauticSocialMonitoringCommand extends Command
     /**
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    protected function getMonitors($id = null)
+    private function getMonitors($id = null)
     {
         $filter = [
             'start' => 0,
             'limit' => 100,
         ];
 
-        $repository = $this->monitoringModel->getRepository();
-
         if (null !== $id) {
             $filter['filter'] = [
                 'force' => [
                     [
-                        'column' => $repository->getTableAlias().'.id',
+                        'column' => $this->monitoringRepository->getTableAlias().'.id',
                         'expr'   => 'eq',
                         'value'  => (int) $id,
                     ],
@@ -93,13 +91,13 @@ class MauticSocialMonitoringCommand extends Command
             ];
         }
 
-        return $repository->getPublishedEntities($filter);
+        return $this->monitoringRepository->getPublishedEntities($filter);
     }
 
     /**
      * @throws \Exception
      */
-    protected function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
+    private function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
     {
         // @todo set this up to use the command type per-monitor record.
         $networkType = $listItem->getNetworkType();

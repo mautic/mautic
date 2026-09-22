@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -120,7 +121,9 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     private function getConfigParameters(): array
     {
         $parameters = [];
-        include self::getContainer()->get('kernel')->getLocalConfigFile();
+        /** @var \AppKernel $kernel */
+        $kernel = self::getContainer()->get(KernelInterface::class);
+        include $kernel->getLocalConfigFile();
 
         return $parameters;
     }

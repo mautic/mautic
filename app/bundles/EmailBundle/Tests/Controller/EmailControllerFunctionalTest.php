@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
@@ -41,6 +42,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     private const SUBJECT_B      = 'Subject B';
 
     private const SUBJECT_C      = 'Subject C';
+
+    private const SEGMENT_B      = 'Segment B';
 
     private const CLICK_URL_LOW  = 'https://example.com/low';
 
@@ -205,7 +208,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix      = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -291,6 +294,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]')->html();
         $this->assertStringNotContainsString('disabled', $html, $html);
+    }
+
+    public function testEmailListOffersSendExampleWithoutOpeningTheDetail(): void
+    {
+        $email = $this->createEmail('Automation test email', self::SUBJECT_A, 'template', 'blank', 'test html');
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $button  = $crawler->filter("#row_email_{$email->getId()} a[href=\"/s/emails/sendExample/{$email->getId()}\"]");
+
+        $this->assertCount(1, $button);
+        $this->assertSame('ajaxmodal', $button->attr('data-toggle'));
+        $this->assertSame('Send example', trim($button->text()));
     }
 
     public function testEmailDetailPageForListEmailShowsScheduleButton(): void
@@ -600,7 +616,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testCloneAction(): void
     {
-        $segment = $this->createSegment('Segment B', 'segment-B');
+        $segment = $this->createSegment(self::SEGMENT_B, 'segment-B');
         $email   = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment);
         $this->em->flush();
 
@@ -750,9 +766,56 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(0, $pendingCountQuery);
     }
 
+    #[DataProvider('segmentViewPermissionProvider')]
+    public function testSegmentEmailDetailsShowSegmentsBasedOnViewPermission(bool $canViewSegments): void
+    {
+        $firstSegment  = $this->createSegment('Segment A', 'segment-a');
+        $secondSegment = $this->createSegment(self::SEGMENT_B, 'segment-b');
+        $email         = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Test html', $firstSegment);
+        $email->addList($secondSegment);
+        $this->em->flush();
+
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
+        $this->assertInstanceOf(User::class, $user);
+
+        foreach ($user->getRole()->getPermissions() as $permission) {
+            $user->getRole()->removePermission($permission);
+            $this->em->remove($permission);
+        }
+
+        $this->addPermission($user->getRole(), 'email', 'emails', 6);
+        if ($canViewSegments) {
+            $this->addPermission($user->getRole(), 'lead', 'lists', 6);
+        }
+        $this->em->flush();
+        $this->loginUser($user);
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+        $this->assertResponseIsSuccessful();
+
+        $segmentsUsed = $crawler->filter('#email-segments-used');
+        $this->assertCount(1, $segmentsUsed);
+        $this->assertStringContainsString('Segments used', $segmentsUsed->text());
+        $this->assertStringContainsString('Segment A', $segmentsUsed->text());
+        $this->assertStringContainsString(self::SEGMENT_B, $segmentsUsed->text());
+        $this->assertCount(1, $segmentsUsed->filter('.label-gray'));
+        $this->assertCount(1, $segmentsUsed->filter('.label-red'));
+        $this->assertCount(0, $segmentsUsed->filter('.label i'));
+        $this->assertCount($canViewSegments ? 2 : 0, $segmentsUsed->filter('a'));
+    }
+
+    /**
+     * @return iterable<string, array{canViewSegments: bool}>
+     */
+    public static function segmentViewPermissionProvider(): iterable
+    {
+        yield 'segment links are shown with view permission' => ['canViewSegments' => true];
+        yield 'segment names are shown without view permission' => ['canViewSegments' => false];
+    }
+
     public function testAbTestAction(): void
     {
-        $segment        = $this->createSegment('Segment B', 'segment-B');
+        $segment        = $this->createSegment(self::SEGMENT_B, 'segment-B');
         $varientSetting = ['totalWeight' => 100, 'winnerCriteria' => 'email.openrate'];
         $email          = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment, $varientSetting);
         $this->em->flush();
@@ -1205,7 +1268,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $email = $this->createEmail('Email A', self::SUBJECT_A, 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
         $this->em->persist($email);
-        $this->em->flush($email);
+        $this->em->flush();
 
         // Schedule the email to be sent
         $crawler       = $this->client->request(Request::METHOD_GET, "/s/emails/scheduleSend/{$email->getId()}");
@@ -1252,7 +1315,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $email = $this->createEmail('Email A', self::SUBJECT_A, 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
         $this->em->persist($email);
-        $this->em->flush($email);
+        $this->em->flush();
 
         // Schedule the email to be sent
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/scheduleSend/{$email->getId()}");
@@ -1602,10 +1665,20 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     private function setPermission(Role $role, array $permissions): void
     {
         /** @var RoleModel $roleModel */
-        $roleModel = $this->getContainer()->get('mautic.user.model.role');
+        $roleModel = $this->getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
+    }
+
+    private function addPermission(Role $role, string $bundle, string $name, int $bitwise): void
+    {
+        $permission = new Permission();
+        $permission->setBundle($bundle);
+        $permission->setName($name);
+        $permission->setBitwise($bitwise);
+        $role->addPermission($permission);
+        $this->em->persist($permission);
     }
 
     private function assertEmailVersion(int $id, int $expectedVersion, string $message = ''): void

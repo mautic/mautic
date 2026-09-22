@@ -21,11 +21,11 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     public function testNewFieldVarcharFieldLength(int $expectedLength, ?int $inputLength = null): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $field      = $this->createField('a', 'text', [], $inputLength);
         $fieldModel->saveEntity($field);
 
-        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
         $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
         $this->assertEquals($expectedLength, $columns[$field->getAlias()]->getLength());
     }
@@ -33,11 +33,11 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     public function testNewMultiSelectField(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $field      = $this->createField('s', 'select', ['properties' => ['list' => ['choice_a' => 'Choice A']]]);
         $fieldModel->saveEntity($field);
 
-        $tablePrefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
         $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
         $this->assertArrayHasKey('field_s', $columns);
     }
@@ -66,7 +66,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     public function testFieldDeleteValidationUsedInSegment(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel       = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel       = self::getContainer()->get(FieldModel::class);
         $field_first      = $this->createField('First');
         $fieldModel->saveEntity($field_first);
 

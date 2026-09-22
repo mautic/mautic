@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Exception;
 
-class RecordCanNotUnpublishException extends \Exception
+final class RecordCanNotUnpublishException extends \Exception
 {
 }

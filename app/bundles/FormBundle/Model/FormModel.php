@@ -395,7 +395,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getLeadSubmissions(Form $form, $leadId, $limit = 200): array
     {
-        return $this->getRepository()->getFormResults(
+        return $this->formRepository->getFormResults(
             $form,
             [
                 'leadId' => $leadId,
@@ -473,7 +473,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
             if ($persist) {
                 // bypass model function as events aren't needed for this
-                $this->getRepository()->saveEntity($entity);
+                $this->formRepository->saveEntity($entity);
             }
         }
 
@@ -743,6 +743,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function populateValuesWithLead(Form $form, &$formHtml, ?string $formName = null): void
     {
+        if (!(bool) $this->coreParametersHelper->get('form_field_autofill', false)) {
+            return;
+        }
+
         $formName ??= $form->generateFormName();
         $fields            = $form->getFields();
         $autoFillFields    = [];
@@ -1088,13 +1092,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         if (!$this->canViewOthersEntity()) {
             $filter['force'][] = [
-                'column' => $this->getRepository()->getTableAlias().'.createdBy',
+                'column' => $this->formRepository->getTableAlias().'.createdBy',
                 'expr'   => 'eq',
                 'value'  => $this->userHelper->getUser()->getId(),
             ];
         }
 
-        return $this->getRepository()->getEntitiesForGlobalSearch($filter);
+        return $this->formRepository->getEntitiesForGlobalSearch($filter);
     }
 
     private function compareFieldOrder(Field $a, Field $b): int

@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -254,7 +255,7 @@ final class WebhookControllerTest extends TestCase
         );
         $leadModel = $this->createStub(LeadModel::class);
 
-        $subscriber = new WebhookSubscriber($webhookModel, $leadModel);
+        $subscriber = new WebhookSubscriber($webhookModel, $leadModel, $this->createStub(LeadRepository::class));
         $subscriber->onLeadNewUpdate($event);
     }
 

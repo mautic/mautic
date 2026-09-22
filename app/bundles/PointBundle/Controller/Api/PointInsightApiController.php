@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<PointInsight>
  */
-class PointInsightApiController extends CommonApiController
+final class PointInsightApiController extends CommonApiController
 {
     /**
      * @var InsightModel

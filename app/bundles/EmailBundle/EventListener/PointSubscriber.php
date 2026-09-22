@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -18,12 +18,12 @@ use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly PointModel $pointModel,
-        private readonly EntityManager $entityManager,
-        private readonly PointEventHelper $pointEventHelper,
+        private PointModel $pointModel,
+        private EntityManagerInterface $entityManager,
+        private PointEventHelper $pointEventHelper,
     ) {
     }
 

@@ -10,10 +10,10 @@ use Mautic\CoreBundle\Twig\Helper\MenuHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class MenuExtension extends AbstractExtension
+final class MenuExtension extends AbstractExtension
 {
     public function __construct(
-        protected MenuHelper $menuHelper,
+        private readonly MenuHelper $menuHelper,
     ) {
     }
 

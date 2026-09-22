@@ -11,7 +11,7 @@ final class ColumnCollectEvent extends Event
     /**
      * @var array<string, mixed>
      */
-    private array $columns;
+    private array $columns = [];
 
     /**
      * @param array<string, mixed> $properties
@@ -20,7 +20,6 @@ final class ColumnCollectEvent extends Event
         private readonly string $object,
         private readonly array $properties = [],
     ) {
-        $this->columns = [];
     }
 
     public function getObject(): string

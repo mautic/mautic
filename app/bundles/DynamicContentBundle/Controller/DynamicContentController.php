@@ -6,16 +6,15 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Helper\DynamicContentSearchScopeProvider;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class DynamicContentController extends FormController
+final class DynamicContentController extends FormController
 {
     private TrackableModel $trackableModel;
 
@@ -56,7 +55,7 @@ class DynamicContentController extends FormController
         );
     }
 
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, DynamicContentSearchScopeProvider $dynamicContentSearchScopeProvider, $page = 1): Response
     {
         $permissions = $this->getPermissions();
 
@@ -112,8 +111,9 @@ class DynamicContentController extends FormController
                     'route'         => $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]),
                 ],
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'items'       => $entities,
+                    'searchValue'     => $search,
+                    'searchScopes'    => $dynamicContentSearchScopeProvider->getScopes(),
+                    'items'           => $entities,
                     'categories'  => $categories,
                     'page'        => $page,
                     'limit'       => $limit,
@@ -125,7 +125,7 @@ class DynamicContentController extends FormController
         );
     }
 
-    public function newAction(Request $request, $entity = null)
+    public function newAction(Request $request, $entity = null): Response
     {
         if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')) {
             $this->throwAccessDenied();
@@ -235,10 +235,8 @@ class DynamicContentController extends FormController
      * Generate's edit form and processes post data.
      *
      * @param bool|false $ignorePost
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         $entity = $this->dynamicContentModel->getEntity($objectId);
         $page   = $request->getSession()->get('mautic.dynamicContent.page', 1);
@@ -427,10 +425,7 @@ class DynamicContentController extends FormController
         );
     }
 
-    /**
-     * @return JsonResponse|RedirectResponse|Response
-     */
-    public function cloneAction(Request $request, $objectId)
+    public function cloneAction(Request $request, $objectId): Response
     {
         $entity = $this->dynamicContentModel->getEntity($objectId);
 
@@ -453,10 +448,8 @@ class DynamicContentController extends FormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.dynamicContent.page', 1);
         $returnUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
@@ -559,7 +552,7 @@ class DynamicContentController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->dynamicContentModel->deleteEntities($deleteIds);
 
                 $flashes[] = [

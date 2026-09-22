@@ -20,7 +20,7 @@ final class OwnerSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->dispatcher = $this->getContainer()->get('event_dispatcher');
+        $this->dispatcher = $this->getContainer()->get(EventDispatcherInterface::class);
     }
 
     public function testUrlTokenReplaceEventReplacesOwnerFieldToken(): void

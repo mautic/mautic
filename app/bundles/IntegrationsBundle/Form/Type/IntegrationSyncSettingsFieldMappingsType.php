@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class IntegrationSyncSettingsFieldMappingsType extends AbstractType
+final class IntegrationSyncSettingsFieldMappingsType extends AbstractType
 {
     public function __construct(
         private readonly LoggerInterface $logger,

@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<FormFieldNumberType>
  */
-class FormFieldNumberType extends AbstractType
+final class FormFieldNumberType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -11,12 +11,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuthController extends FormController
+final class AuthController extends FormController
 {
     /**
      * @param string $integration
-     *
-     * @return JsonResponse
      */
     public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
     {

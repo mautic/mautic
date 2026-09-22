@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -11,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailUtmTagsType extends AbstractType
+final class EmailUtmTagsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

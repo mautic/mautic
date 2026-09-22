@@ -230,7 +230,7 @@ final class PageModelTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var RedirectModel $redirectModel */
-        $redirectModel = $this->getContainer()->get('mautic.page.model.redirect');
+        $redirectModel = $this->getContainer()->get(RedirectModel::class);
         $redirectURL   = $redirectModel->generateRedirectUrl($redirect, $clickThrough);
         // Send Request
         $server = [

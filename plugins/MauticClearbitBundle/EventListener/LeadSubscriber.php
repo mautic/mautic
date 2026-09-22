@@ -8,10 +8,10 @@ use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LookupHelper $lookupHelper,
+        private LookupHelper $lookupHelper,
     ) {
     }
 

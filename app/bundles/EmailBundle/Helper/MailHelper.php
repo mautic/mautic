@@ -27,6 +27,7 @@ use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Psr\Log\LoggerInterface;
@@ -254,6 +255,7 @@ class MailHelper
         private readonly RedirectModel $redirectModel,
         private readonly SMimeHelper $sMimeHelper,
         private readonly EmailStatModel $emailStatModel,
+        private readonly CopyRepository $copyRepository,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -321,11 +323,13 @@ class MailHelper
         if (empty($this->message->getReplyTo()) && !empty($this->getReplyTo())) {
             $this->setMessageReplyTo($this->getReplyTo());
         }
-        // Set system return path if applicable
+        // Sender wins over Return-Path in Symfony's envelope resolution, so drop it whenever a Return-Path is set.
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->returnPath($bounceEmail);
+            $this->message->getHeaders()->remove('Sender');
         } elseif (!empty($this->returnPath)) {
             $this->message->returnPath($this->returnPath);
+            $this->message->getHeaders()->remove('Sender');
         }
 
         $this->dispatchPreSendEvent();
@@ -545,7 +549,7 @@ class MailHelper
                 $this->message->to();
                 $this->errors = [];
 
-                $email = $this->getEmail();
+                $email = $this->email;
 
                 if (!empty($metadatum['from'])) {
                     $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
@@ -732,10 +736,8 @@ class MailHelper
      *
      * @param string $template
      * @param bool   $returnContent
-     *
-     * @return void|string
      */
-    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null): ?string
     {
         $content = $this->twig->render($template, $vars);
 
@@ -747,6 +749,8 @@ class MailHelper
 
         $this->setBody($content, 'text/html', $charset);
         unset($content);
+
+        return null;
     }
 
     public function setSubject($subject): void
@@ -1319,7 +1323,7 @@ class MailHelper
             - if 'Disable unsubscribe link in header' setting is true in email configuration
         */
 
-        $email               = $this->getEmail();
+        $email               = $this->email;
         $unsubscribeBodyText = $this->coreParametersHelper->get('unsubscribe_text') ?? '';
         if (!$email
             || $email->getSendToDnc()
@@ -1360,7 +1364,7 @@ class MailHelper
     private function getUnsubscribeHeader(): string|false
     {
         if ($this->idHash) {
-            $lead    = $this->getLead();
+            $lead    = $this->lead;
             $toEmail = null;
             if (is_array($lead) && array_key_exists('email', $lead) && is_string($lead['email'])) {
                 $toEmail = $lead['email'];
@@ -1577,7 +1581,7 @@ class MailHelper
     protected function createAssetDownloadEntries(): void
     {
         // Nothing was sent out so bail
-        if ($this->fatal || empty($this->assetStats)) {
+        if ($this->fatal || [] === $this->assetStats) {
             return;
         }
 
@@ -1589,7 +1593,7 @@ class MailHelper
         }
 
         // Create a download entry if there is an Asset attachment
-        if (!empty($this->assetStats)) {
+        if ([] !== $this->assetStats) {
             foreach ($this->assets as $asset) {
                 foreach ($this->assetStats as $stat) {
                     $this->assetModel->trackDownload(
@@ -1613,7 +1617,7 @@ class MailHelper
      */
     protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null): void
     {
-        if ($this->internalSend || empty($this->assets)) {
+        if ($this->internalSend || [] === $this->assets) {
             return;
         }
 
@@ -1706,7 +1710,7 @@ class MailHelper
         // Note if sent from a lead list
         if (null !== $listId) {
             try {
-                $stat->setList($this->entityManager->getReference(\Mautic\LeadBundle\Entity\LeadList::class, $listId));
+                $stat->setList($this->entityManager->getReference(LeadList::class, $listId));
             } catch (ORMException) {
                 // keep IDE happy
             }
@@ -1720,21 +1724,18 @@ class MailHelper
 
         $stat->setTokens($this->getTokens());
 
-        $emailCopyRepository = $this->entityManager->getRepository(Copy::class);
-        \assert($emailCopyRepository instanceof CopyRepository);
-
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
         $id = $emailExists ? $this->email->getId() : md5($this->subject.$this->body['content']);
         if (!isset($this->copies[$id])) {
             $hash = (32 !== strlen($id)) ? md5($this->subject.$this->body['content']) : $id;
 
-            $copy        = $emailCopyRepository->findByHash($hash);
+            $copy        = $this->copyRepository->findByHash($hash);
             $copyCreated = false;
             if (null === $copy) {
                 $contentToPersist = strtr($this->body['content'], array_flip($this->embedImagesReplaces));
-                if (!$emailCopyRepository->saveCopy($hash, $this->subject, $contentToPersist, $this->plainText)) {
+                if (!$this->copyRepository->saveCopy($hash, $this->subject, $contentToPersist, $this->plainText)) {
                     // Try one more time to find the ID in case there was overlap when creating
-                    $copy = $emailCopyRepository->findByHash($hash);
+                    $copy = $this->copyRepository->findByHash($hash);
                 } else {
                     $copyCreated = true;
                 }
@@ -1871,7 +1872,7 @@ class MailHelper
         $headers = $this->getCustomHeaders();
 
         // Set custom headers
-        if (!empty($headers)) {
+        if ([] !== $headers) {
             $tokens = $this->getTokens();
             // Replace tokens
             $messageHeaders = $this->message->getHeaders();
@@ -1945,7 +1946,7 @@ class MailHelper
     private function setDefaultFrom(AddressDTO $systemFrom): void
     {
         $this->systemFrom = $systemFrom;
-        $this->from       = $this->systemFrom;
+        $this->from       = $systemFrom;
     }
 
     private function setDefaultReplyTo(?string $systemReplyToEmail = null, ?AddressDTO $systemFromEmail = null): void
@@ -1961,7 +1962,7 @@ class MailHelper
 
     private function setFromForSingleMessage(): void
     {
-        $email = $this->getEmail();
+        $email = $this->email;
 
         if ($this->lead && $email && $email->getUseOwnerAsMailer()) {
             if (!isset($this->lead['owner_id'])) {
@@ -2095,7 +2096,7 @@ class MailHelper
         $this->skip               = $event->isSkip();
         $this->fatal              = $event->isFatal();
         $errors                   = $event->getErrors();
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $currentErrors = [];
             if (isset($this->errors['failures']) && is_array($this->errors['failures'])) {
                 $currentErrors = $this->errors['failures'];

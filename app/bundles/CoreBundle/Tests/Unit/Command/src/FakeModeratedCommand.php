@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Command\src;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\LockInterface;
@@ -11,13 +12,13 @@ use Symfony\Component\Lock\LockInterface;
 #[AsCommand(
     name: 'mautic:fake:command'
 )]
-class FakeModeratedCommand extends ModeratedCommand
+final class FakeModeratedCommand extends ModeratedCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->checkRunStatus($input, $output);
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     public function forceCompleteRun(): void

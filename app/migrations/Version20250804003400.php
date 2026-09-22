@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
-class Version20250804003400 extends AbstractMauticMigration
+final class Version20250804003400 extends AbstractMauticMigration
 {
     private string $leadListsTable;
 

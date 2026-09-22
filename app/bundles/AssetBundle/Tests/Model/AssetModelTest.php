@@ -9,8 +9,10 @@ use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,7 +20,9 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory;
@@ -116,9 +120,10 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->userHelper,
             $this->logger,
             $this->coreParametersHelper,
-            $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class), // $emailRepository
+            $this->createStub(EmailRepository::class),
             $this->assetRepository,
-            $this->createStub(\Mautic\AssetBundle\Entity\DownloadRepository::class), // $downloadRepository
+            $this->createStub(DownloadRepository::class),
+            $this->createStub(CategoryRepository::class),
         );
     }
 
@@ -223,9 +228,11 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
+        $trackedDevice = $this->createMock(LeadDevice::class);
+        $trackedDevice->method('getTrackingId')->willReturn('test-tracking-id');
         $this->deviceTrackingService->expects($this->once())
             ->method('getTrackedDevice')
-            ->willReturn(null);
+            ->willReturn($trackedDevice);
 
         $this->assetRepository->expects($this->once())
             ->method('upDownloadCount')
@@ -315,9 +322,10 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->userHelper,
                 $this->logger,
                 $this->coreParametersHelper,
-                $this->createStub(\Mautic\EmailBundle\Entity\EmailRepository::class),
+                $this->createStub(EmailRepository::class),
                 $this->createStub(AssetRepository::class),
-                $this->createStub(\Mautic\AssetBundle\Entity\DownloadRepository::class),
+                $this->createStub(DownloadRepository::class),
+                $this->createStub(CategoryRepository::class),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();
