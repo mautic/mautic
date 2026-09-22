@@ -28,7 +28,7 @@ class TokenReplacementEvent extends CommonEvent
      * @param mixed $passthrough
      */
     public function __construct(
-        array|string|null $content,
+        array|string|null|Lead $content,
         protected \Mautic\LeadBundle\Entity\Lead|array|null $lead = null,
         protected array $clickthrough = [],
         protected $passthrough = null,
@@ -41,9 +41,6 @@ class TokenReplacementEvent extends CommonEvent
         $this->content      = $content;
     }
 
-    /**
-     * @return CommonEntity|string|null
-     */
     public function getContent(): string|array
     {
         return $this->content;

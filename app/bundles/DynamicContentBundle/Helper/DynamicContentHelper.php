@@ -69,7 +69,7 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getDynamicContentSlotForLead($slotName, $lead)
+    public function getDynamicContentSlotForLead($slotName, $lead): string|array
     {
         $leadArray = [];
         if ($lead instanceof Lead) {
@@ -157,7 +157,7 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getRealDynamicContent($slot, Lead|array|null $lead, DynamicContent $dwc)
+    public function getRealDynamicContent($slot, Lead|array|null $lead, DynamicContent $dwc): string|array
     {
         $content = $dwc->getContent();
         // Determine a translation based on contact's preferred locale
