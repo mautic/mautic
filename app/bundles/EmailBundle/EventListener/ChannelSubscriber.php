@@ -11,13 +11,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-const CHANNEL_COLUMN_CATEGORY_ID     = 'category_id';
-const CHANNEL_COLUMN_NAME            = 'name';
-const CHANNEL_COLUMN_DESCRIPTION     = 'description';
-const CHANNEL_COLUMN_DATE_ADDED      = 'date_added';
-const CHANNEL_COLUMN_CREATED_BY      = 'created_by';
-const CHANNEL_COLUMN_CREATED_BY_USER = 'created_by_user';
-
 final class ChannelSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
