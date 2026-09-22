@@ -75,7 +75,6 @@ final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
     {
         $this->kickoffContactFinder->expects($this->once())
             ->method('getContactCount')
-            ->with($this->isInt())
             ->willReturn(2);
 
         $this->kickoffContactFinder->expects($this->exactly(3))

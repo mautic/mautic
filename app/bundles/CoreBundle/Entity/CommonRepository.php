@@ -1808,7 +1808,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected function parseSearchFilters(\stdClass|array $parseFilters, QueryBuilder|DbalQueryBuilder $qb, array &$expressions, &$parameters)
     {
-        foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
+        foreach ($parseFilters as $f) {
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
 
             if ([] !== $params) {
