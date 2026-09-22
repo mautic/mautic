@@ -191,14 +191,13 @@ return function (ContainerConfigurator $configurator): void {
 
     // Explicitly register our Twig extension with high priority
     $services->set(Mautic\CoreBundle\Twig\Extension\OverrideIncludeExtension::class)
-        ->autowire()
         ->tag('twig.extension', ['priority' => 100]);
 
     $services->get(Mautic\CoreBundle\Twig\Extension\FormExtension::class)
         ->arg('$formRenderer', \Symfony\Component\DependencyInjection\Loader\Configurator\service('twig.form.renderer'));
 
-    $services->set('mautic.http.client', GuzzleHttp\Client::class)->autowire();
-    $services->set(Mautic\CoreBundle\Doctrine\MigrationFactoryDecorator::class)->autowire();
+    $services->set('mautic.http.client', GuzzleHttp\Client::class);
+    $services->set(Mautic\CoreBundle\Doctrine\MigrationFactoryDecorator::class);
 
     $services->set(StringExtension::class);
 
