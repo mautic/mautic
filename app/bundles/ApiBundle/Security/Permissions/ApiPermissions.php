@@ -10,6 +10,8 @@ final class ApiPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->permissions = [
             'access' => [
                 'full' => 1024,

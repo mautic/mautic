@@ -14,6 +14,8 @@ final class RouteLoader extends Loader
         private readonly EventDispatcherInterface $dispatcher,
         private readonly CoreParametersHelper $coreParameters,
     ) {
+        parent::__construct();
+
     }
 
     /**

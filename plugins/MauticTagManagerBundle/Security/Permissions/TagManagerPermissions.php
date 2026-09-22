@@ -11,6 +11,8 @@ class TagManagerPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addStandardPermissions(['tagManager'], false);
     }
 

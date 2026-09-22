@@ -11,6 +11,8 @@ final class CampaignPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addExtendedPermissions('campaigns');
         $this->addStandardPermissions(['categories']);
         $this->addStandardPermissions(['imports']);

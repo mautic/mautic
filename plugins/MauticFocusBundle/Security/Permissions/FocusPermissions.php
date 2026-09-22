@@ -9,6 +9,8 @@ final class FocusPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addStandardPermissions('categories');
         $this->addExtendedPermissions('items');
     }

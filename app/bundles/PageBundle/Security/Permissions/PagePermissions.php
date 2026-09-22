@@ -9,6 +9,8 @@ final class PagePermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addExtendedPermissions('pages');
         $this->addStandardPermissions('categories');
         $this->addExtendedPermissions('preference_center');

@@ -10,6 +10,8 @@ final class UserPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->permissions = [
             'profile' => [
                 'editusername' => 1,

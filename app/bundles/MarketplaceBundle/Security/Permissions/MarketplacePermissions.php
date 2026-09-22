@@ -23,6 +23,8 @@ final class MarketplacePermissions extends AbstractPermissions
     public function __construct(
         private readonly Config $config,
     ) {
+        parent::__construct();
+
         $this->addStandardPermissions(self::PACKAGES, false);
     }
 

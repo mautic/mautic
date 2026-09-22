@@ -10,6 +10,8 @@ final class EmailPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addStandardPermissions('categories');
         $this->addExtendedPermissions('emails');
         $this->permissions['emails']['sendtodnc'] = 1;

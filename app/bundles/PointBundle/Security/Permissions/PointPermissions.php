@@ -11,6 +11,8 @@ final class PointPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addStandardPermissions(['points', 'triggers', 'groups', 'categories', 'insights']);
     }
 

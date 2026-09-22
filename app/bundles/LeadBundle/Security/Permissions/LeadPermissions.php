@@ -28,6 +28,8 @@ final class LeadPermissions extends AbstractPermissions
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->permissions = [
             'fields' => [
                 'full' => 1024,

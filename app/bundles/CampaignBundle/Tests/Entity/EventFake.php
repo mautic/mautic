@@ -14,6 +14,8 @@ final class EventFake extends Event
     public function __construct(
         private readonly ?int $id = null,
     ) {
+        parent::__construct();
+
     }
 
     public function getId(): ?int

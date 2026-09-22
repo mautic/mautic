@@ -9,6 +9,8 @@ final class WebhookPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addExtendedPermissions('webhooks');
         $this->addStandardPermissions('categories');
     }

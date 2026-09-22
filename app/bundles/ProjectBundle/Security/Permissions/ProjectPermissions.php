@@ -24,6 +24,8 @@ final class ProjectPermissions extends AbstractPermissions
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->addStandardPermissions([$this->getName()], false);
 
         // Add the associate permission directly to the permissions array

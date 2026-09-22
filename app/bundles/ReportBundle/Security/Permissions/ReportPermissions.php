@@ -11,6 +11,8 @@ final class ReportPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addExtendedPermissions('reports');
         $this->addCustomPermission('export', ['enable' => 1024]);
     }

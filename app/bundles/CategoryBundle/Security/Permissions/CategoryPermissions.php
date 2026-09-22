@@ -9,6 +9,8 @@ final class CategoryPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addStandardPermissions('categories');
     }
 

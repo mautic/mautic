@@ -9,6 +9,8 @@ final class PluginPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addManagePermission('plugins');
     }
 

@@ -8,6 +8,8 @@ final class SystemPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addStandardPermissions('themes');
     }
 

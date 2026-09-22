@@ -11,6 +11,8 @@ final class AssetPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addExtendedPermissions(['assets']);
         $this->addStandardPermissions(['categories']);
     }

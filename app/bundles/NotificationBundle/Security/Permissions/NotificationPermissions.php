@@ -9,6 +9,8 @@ final class NotificationPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addStandardPermissions('categories');
         $this->addExtendedPermissions('notifications');
         $this->addExtendedPermissions('mobile_notifications');

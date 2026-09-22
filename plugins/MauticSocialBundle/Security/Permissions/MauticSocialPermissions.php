@@ -9,6 +9,8 @@ final class MauticSocialPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addStandardPermissions('categories');
         $this->addStandardPermissions('monitoring');
         $this->addExtendedPermissions('tweets');

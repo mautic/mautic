@@ -19,6 +19,8 @@ final class StagePermissions extends AbstractPermissions
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->addStandardPermissions('stages');
         $this->addStandardPermissions('categories');
     }

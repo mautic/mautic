@@ -9,6 +9,8 @@ final class FormPermissions extends AbstractPermissions
 {
     public function __construct()
     {
+        parent::__construct();
+
         $this->addCustomPermission('export', ['enable' => 1024]);
         $this->addExtendedPermissions('forms');
         $this->addStandardPermissions('categories');
