@@ -78,7 +78,6 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
             $translatorMock,
             $contactSegmentFilterDictionary
         );
-        $this->validator->initialize($this->executionContextMock);
     }
 
     public function testAddValidationFailure(): void
@@ -95,7 +94,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->executionContextMock->expects($this->once())->method('addViolation')->with('mautic.lead.field.keyword.invalid');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 
     public function testAddValidationSuccess(): void
@@ -112,7 +111,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->executionContextMock->expects($this->never())->method('addViolation');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 
     public function testEditValidationFailure(): void
@@ -131,7 +130,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->executionContextMock->expects($this->once())->method('addViolation')->with('mautic.lead.field.keyword.invalid');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 
     public function testEditValidationSuccess(): void
@@ -150,7 +149,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->executionContextMock->expects($this->never())->method('addViolation');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 
     public function testEditWithoutChangesValidationSuccess(): void
@@ -169,7 +168,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->executionContextMock->expects($this->never())->method('addViolation');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 
     public function testFailureReservedKeyWords(): void
@@ -188,6 +187,6 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
         $field->setObject('lead');
         $field->setAlias('contact_id');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 }

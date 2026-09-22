@@ -21,7 +21,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     private readonly ValidatorInterface $validator;
 
     /**
-     * @var array<string, array<string|array<string, array<string, string>>>>
+     * @var array<string, array<string|array<string, array<string, bool|string>>>>
      */
     private array $types = [
         'captcha' => [
@@ -70,7 +70,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'url'       => [
             'filter'      => 'url',
             'constraints' => [
-                Url::class => ['message' => 'mautic.form.submission.url.invalid'],
+                Url::class => ['message' => 'mautic.form.submission.url.invalid', 'requireTld' => false],
             ],
         ],
         'file' => [],
@@ -92,7 +92,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @return array<string, array<string|array<string, array<string, string>>>>
+     * @return array<string, array<string|array<string, array<string, bool|string>>>>
      */
     public function getTypes(): array
     {
@@ -134,7 +134,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
 
                 /** @var ConstraintViolationList $violations */
-                $violations = $this->validator->validate($value, new $constraint($opts));
+                $violations = $this->validator->validate($value, new $constraint(...$opts));
 
                 if (count($violations)) {
                     /** @var ConstraintViolation $v */

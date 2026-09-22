@@ -31,38 +31,37 @@ final class NoNestingValidatorTest extends TestCase
         $this->validator  = new NoNestingValidator();
         $this->context    = $this->createContext();
         $this->context->setConstraint($this->constraint);
-        $this->validator->initialize($this->context);
     }
 
     public function testValidateWithInvalidConstraint(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(sprintf('Expected argument of type "%s"', NoNesting::class));
-        $this->validator->validate('value', new NotBlank());
+        $this->validator->validateInContext('value', new NotBlank(), $this->context);
     }
 
     public function testValidateWithInvalidType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "string", "stdClass" given');
-        $this->validator->validate(new \stdClass(), $this->constraint);
+        $this->validator->validateInContext(new \stdClass(), $this->constraint, $this->context);
     }
 
     public function testValidateWithNull(): void
     {
-        $this->validator->validate(null, $this->constraint);
+        $this->validator->validateInContext(null, $this->constraint, $this->context);
         $this->assertCount(0, $this->context->getViolations(), 'No violation should be added for a null value.');
     }
 
     public function testValidateWithValidValue(): void
     {
-        $this->validator->validate('Some valid value', $this->constraint);
+        $this->validator->validateInContext('Some valid value', $this->constraint, $this->context);
         $this->assertCount(0, $this->context->getViolations(), 'No violation should be added for a valid value.');
     }
 
     public function testValidateWithInvalidValue(): void
     {
-        $this->validator->validate('Some invalid value {dwc=some}', $this->constraint);
+        $this->validator->validateInContext('Some invalid value {dwc=some}', $this->constraint, $this->context);
         $this->assertCount(1, $this->context->getViolations(), 'There should be one violation for an invalid value.');
         $this->assertSame(self::TRANSLATED_MESSAGE, $this->context->getViolations()->get(0)->getMessage());
     }

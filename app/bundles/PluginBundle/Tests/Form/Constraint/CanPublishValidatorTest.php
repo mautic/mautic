@@ -52,9 +52,8 @@ final class CanPublishValidatorTest extends TestCase
             ->method('dispatch')
             ->willReturn($this->event);
 
-        $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
-        $this->canPublishValidator->validate(1, new CanPublish(integrationName: 'testIntegration'));
+        $this->canPublishValidator->validateInContext(1, new CanPublish(integrationName: 'testIntegration'), $this->createStub(ExecutionContext::class));
     }
 
     public function testEventNotDispatchedIfUnpublished(): void
@@ -72,9 +71,8 @@ final class CanPublishValidatorTest extends TestCase
             ->with($this->isInstanceOf(PluginIsPublishedEvent::class))
             ->willReturn($this->event);
 
-        $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
-        $this->canPublishValidator->validate(0, new CanPublish(integrationName: 'testIntegration'));
+        $this->canPublishValidator->validateInContext(0, new CanPublish(integrationName: 'testIntegration'), $this->createStub(ExecutionContext::class));
     }
 
     public function testExceptionIsThrown(): void
@@ -92,10 +90,9 @@ final class CanPublishValidatorTest extends TestCase
             ->with($this->isInstanceOf(PluginIsPublishedEvent::class))
             ->willReturn($this->event);
 
-        $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
         $this->expectException(UnexpectedTypeException::class);
 
-        $this->canPublishValidator->validate(1, new class() extends Constraint {});
+        $this->canPublishValidator->validateInContext(1, new class() extends Constraint {}, $this->createStub(ExecutionContext::class));
     }
 }

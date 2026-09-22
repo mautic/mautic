@@ -29,6 +29,18 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
         parent::setUp();
         $this->themesDir = self::getContainer()->getParameter('kernel.project_dir').'/themes';
 
+        $this->removeSandboxThemes();
+    }
+
+    protected function beforeTearDown(): void
+    {
+        // The themes directory is shared state: a theme left behind here changes
+        // the theme count that other tests assert on.
+        $this->removeSandboxThemes();
+    }
+
+    private function removeSandboxThemes(): void
+    {
         foreach (glob($this->themesDir.'/sandbox_test_*') ?: [] as $dir) {
             $this->removeDirectory($dir);
         }

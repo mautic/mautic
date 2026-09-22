@@ -13,7 +13,7 @@ final class LengthValidatorTest extends \PHPUnit\Framework\TestCase
     #[DoesNotPerformAssertions]
     public function testValidate(): void
     {
-        $constraint = new Length(['min' => 3]);
+        $constraint = new Length(min: 3);
         $validator  = new LengthValidator();
 
         $validator->validate('valid', $constraint);
