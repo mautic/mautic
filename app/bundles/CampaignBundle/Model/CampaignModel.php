@@ -750,10 +750,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    /**
-     * @param int $limit
-     */
-    public function rebuildCampaignLeads(Campaign $campaign, $limit = 1000, bool $maxLeads = false, ?OutputInterface $output = null): int
+    public function rebuildCampaignLeads(Campaign $campaign, int $limit = 1000, int $maxLeads = 0, ?OutputInterface $output = null): int
     {
         $contactLimiter = new ContactLimiter($limit);
 
