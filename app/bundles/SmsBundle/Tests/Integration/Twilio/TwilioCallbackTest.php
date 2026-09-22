@@ -8,7 +8,6 @@ use Mautic\SmsBundle\Helper\ContactHelper;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use Mautic\SmsBundle\Integration\Twilio\TwilioCallback;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -31,13 +30,10 @@ final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createStub(Request::class);
-        $inputBag         = new InputBag([
+        $request = new Request([], [
             'AccountSid' => '123',
             'From'       => '',
         ]);
-
-        $request->request = $inputBag;
 
         $this->getCallback()->getMessage($request);
     }
@@ -46,14 +42,11 @@ final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createStub(Request::class);
-        $inputBag         = new InputBag([
+        $request = new Request([], [
             'AccountSid' => '123',
             'From'       => '321',
             'Body'       => '',
         ]);
-
-        $request->request = $inputBag;
 
         $this->getCallback()->getMessage($request);
     }
@@ -62,12 +55,9 @@ final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createStub(Request::class);
-        $inputBag         = new InputBag([
+        $request = new Request([], [
             'AccountSid' => '321',
         ]);
-
-        $request->request = $inputBag;
 
         $this->getCallback()->getMessage($request);
     }

@@ -112,7 +112,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CoreBundle\Helper\BundleHelper::class)
         ->arg('$coreBundles', param('mautic.bundles'))
         ->arg('$pluginBundles', param('mautic.plugin.bundles'));
-    $services->alias('mautic.helper.bundle', Mautic\CoreBundle\Helper\BundleHelper::class);
+
     $services->set('mautic.configurator', Mautic\CoreBundle\Configurator\Configurator::class);
     $services->alias(Mautic\CoreBundle\Configurator\Configurator::class, 'mautic.configurator');
     $services->set(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class);

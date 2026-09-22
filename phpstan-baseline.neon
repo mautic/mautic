@@ -1945,8 +1945,8 @@ parameters:
 			path: app/bundles/CoreBundle/Menu/MenuHelper.php
 
 		-
-			message: '#^Entity manager must not fetch the "Mautic\\CoreBundle\\Entity\\FormEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
-			identifier: mautic.noEntityManagerGetRepository
+			message: '#^Do not fetch the "Mautic\\CoreBundle\\Entity\\FormEntity" repository by entity constant\. Inject the repository as a typed dependency instead, to make the dependency and its type explicit\.$#'
+			identifier: mautic.noGetRepository
 			count: 1
 			path: app/bundles/CoreBundle/Model/AbstractCommonModel.php
 
