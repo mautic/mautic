@@ -16,7 +16,7 @@ final class Version20210112162046 extends AbstractMauticMigration
     {
         $this->skipIf(
             $this->indexExists($schema),
-            sprintf('Index `%s` already exists. Skipping the migration', static::INDEX_NAME)
+            sprintf('Index `%s` already exists. Skipping the migration', self::INDEX_NAME)
         );
     }
 
@@ -25,7 +25,7 @@ final class Version20210112162046 extends AbstractMauticMigration
         $this->addSql(sprintf(
             'ALTER TABLE `%s` ADD INDEX `%s` (`integration`, `internal_object_name`, `last_sync_date`);',
             $this->getPrefixedTableName(),
-            static::INDEX_NAME
+            self::INDEX_NAME
         ));
     }
 
@@ -33,7 +33,7 @@ final class Version20210112162046 extends AbstractMauticMigration
     {
         $this->skipIf(
             !$this->indexExists($schema),
-            sprintf('Index `%s` doesn\'t exist. Skipping reverting the migration', static::INDEX_NAME)
+            sprintf('Index `%s` doesn\'t exist. Skipping reverting the migration', self::INDEX_NAME)
         );
     }
 
@@ -42,12 +42,12 @@ final class Version20210112162046 extends AbstractMauticMigration
         $this->addSql(sprintf(
             'ALTER TABLE `%s` DROP INDEX `%s`;',
             $this->getPrefixedTableName(),
-            static::INDEX_NAME
+            self::INDEX_NAME
         ));
     }
 
     private function indexExists(Schema $schema): bool
     {
-        return $schema->getTable($this->getPrefixedTableName())->hasIndex(static::INDEX_NAME);
+        return $schema->getTable($this->getPrefixedTableName())->hasIndex(self::INDEX_NAME);
     }
 }
