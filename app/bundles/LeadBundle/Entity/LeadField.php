@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: LeadFieldRepository::class)]
 #[ORM\Table(name: 'lead_fields')]
-#[ORM\Index(columns: ['object', 'field_order', 'is_published'], name: 'idx_object_field_order_is_published')]
+#[ORM\Index(name: 'idx_object_field_order_is_published', columns: ['object', 'field_order', 'is_published'])]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(

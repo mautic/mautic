@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Event\CommonEvent;
 
 class LeadBuildSearchEvent extends CommonEvent

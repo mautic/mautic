@@ -15,9 +15,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'tweets')]
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
-#[ORM\Index(columns: ['sent_count'], name: 'sent_count_index')]
-#[ORM\Index(columns: ['favorite_count'], name: 'favorite_count_index')]
-#[ORM\Index(columns: ['retweet_count'], name: 'retweet_count_index')]
+#[ORM\Index(name: 'sent_count_index', columns: ['sent_count'])]
+#[ORM\Index(name: 'favorite_count_index', columns: ['favorite_count'])]
+#[ORM\Index(name: 'retweet_count_index', columns: ['retweet_count'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Tweet extends FormEntity
 {
@@ -106,7 +106,7 @@ class Tweet extends FormEntity
     /**
      * @var ArrayCollection<int, TweetStat>
      */
-    #[ORM\OneToMany(mappedBy: 'tweet', targetEntity: TweetStat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: TweetStat::class, mappedBy: 'tweet', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     public function __construct()

@@ -31,15 +31,12 @@ final class BroadcastQuery
         return $query->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getPendingCount(Sms $sms)
+    public function getPendingCount(Sms $sms): int
     {
         $query = $this->getBasicQuery($sms);
         $query->select('COUNT(DISTINCT l.id)');
 
-        return $query->executeQuery()->fetchOne();
+        return (int) $query->executeQuery()->fetchOne();
     }
 
     public function getBasicQuery(Sms $sms): QueryBuilder
@@ -73,7 +70,7 @@ final class BroadcastQuery
             ->where(
                 $statQb->expr()->and(
                     $statQb->expr()->eq('stat.lead_id', 'l.id'),
-                    $statQb->expr()->eq('stat.sms_id', $smsId)
+                    $statQb->expr()->eq('stat.sms_id', (string) $smsId)
                 )
             );
 

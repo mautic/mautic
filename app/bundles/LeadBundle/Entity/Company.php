@@ -67,7 +67,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     private $score = 0;
 
     #[Groups(['company:read', 'company:write'])]
-    #[ORM\ManyToOne(targetEntity: User::class, cascade: ['merge'])]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'owner_id', onDelete: 'SET NULL')]
     private ?User $owner = null;
 

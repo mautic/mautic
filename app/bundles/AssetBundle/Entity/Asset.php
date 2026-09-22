@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints\Sequentially;
 
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
 #[ORM\Table(name: 'assets')]
-#[ORM\Index(columns: ['alias'], name: 'asset_alias_search')]
+#[ORM\Index(name: 'asset_alias_search', columns: ['alias'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [

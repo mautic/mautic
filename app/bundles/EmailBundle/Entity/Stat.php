@@ -13,16 +13,16 @@ use Mautic\LeadBundle\Entity\LeadList;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['email_id', 'lead_id'], name: 'stat_email_search')]
-#[ORM\Index(columns: ['lead_id', 'email_id'], name: 'stat_email_search2')]
-#[ORM\Index(columns: ['is_failed'], name: 'stat_email_failed_search')]
-#[ORM\Index(columns: ['is_read', 'date_sent'], name: 'is_read_date_sent')]
-#[ORM\Index(columns: ['tracking_hash'], name: 'stat_email_hash_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_email_source_search')]
-#[ORM\Index(columns: ['date_sent'], name: 'email_date_sent')]
-#[ORM\Index(columns: ['date_read', 'lead_id'], name: 'email_date_read_lead')]
-#[ORM\Index(columns: ['lead_id', 'date_sent'], name: 'stat_email_lead_id_date_sent')]
-#[ORM\Index(columns: ['email_id', 'is_read'], name: 'stat_email_email_id_is_read')]
+#[ORM\Index(name: 'stat_email_search', columns: ['email_id', 'lead_id'])]
+#[ORM\Index(name: 'stat_email_search2', columns: ['lead_id', 'email_id'])]
+#[ORM\Index(name: 'stat_email_failed_search', columns: ['is_failed'])]
+#[ORM\Index(name: 'is_read_date_sent', columns: ['is_read', 'date_sent'])]
+#[ORM\Index(name: 'stat_email_hash_search', columns: ['tracking_hash'])]
+#[ORM\Index(name: 'stat_email_source_search', columns: ['source', 'source_id'])]
+#[ORM\Index(name: 'email_date_sent', columns: ['date_sent'])]
+#[ORM\Index(name: 'email_date_read_lead', columns: ['date_read', 'lead_id'])]
+#[ORM\Index(name: 'stat_email_lead_id_date_sent', columns: ['lead_id', 'date_sent'])]
+#[ORM\Index(name: 'stat_email_email_id_is_read', columns: ['email_id', 'is_read'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
@@ -33,7 +33,7 @@ class Stat
 
     public const TABLE_NAME = 'email_stats';
 
-    private ?string $id = null;
+    private int|string|null $id = null;
 
     /**
      * @var Email|null
@@ -132,7 +132,7 @@ class Stat
     /**
      * @var ArrayCollection|EmailReply[]
      */
-    #[ORM\OneToMany(mappedBy: 'stat', targetEntity: EmailReply::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: EmailReply::class, mappedBy: 'stat', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private $replies;
 
     /**
@@ -274,7 +274,12 @@ class Stat
         $this->email = $email;
     }
 
-    public function getId(): ?string
+    /**
+     * The id is a bigint, so it comes back as int within PHP's integer range and as
+     * string beyond it - the union DBAL's BigIntType itself returns. DBAL 3 always gave
+     * a string; normalising back to one here would hide which of the two it is.
+     */
+    public function getId(): int|string|null
     {
         return $this->id;
     }

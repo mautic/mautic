@@ -17,10 +17,7 @@ class AuditLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    /**
-     * @return int
-     */
-    public function getAuditLogsCount(Lead $lead, ?array $filters = null)
+    public function getAuditLogsCount(Lead $lead, ?array $filters = null): int
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'al')
@@ -44,16 +41,10 @@ class AuditLogRepository extends CommonRepository
             $query->andWhere('al.action not in ('.$excludeList.')');
         }
 
-        return $query->executeQuery()->fetchOne();
+        return (int) $query->executeQuery()->fetchOne();
     }
 
-    /**
-     * @param int $page
-     * @param int $limit
-     *
-     * @return array
-     */
-    public function getAuditLogs(Lead $lead, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25)
+    public function getAuditLogs(Lead $lead, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25): array
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -102,10 +93,7 @@ class AuditLogRepository extends CommonRepository
         return $query->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return array
-     */
-    public function getAuditLogsForLeads(array $listOfContacts, ?array $filters = null, ?array $orderBy = null, $dateAdded = null)
+    public function getAuditLogsForLeads(array $listOfContacts, ?array $filters = null, ?array $orderBy = null, $dateAdded = null): array
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -155,14 +143,8 @@ class AuditLogRepository extends CommonRepository
 
     /**
      * Get array of objects which belongs to the object.
-     *
-     * @param string|null $object
-     * @param string|null $id
-     * @param int         $limit
-     *
-     * @return array
      */
-    public function getLogForObject($object = null, $id = null, $limit = 10, $afterDate = null, $bundle = null)
+    public function getLogForObject(?string $object = null, ?string $id = null, int $limit = 10, $afterDate = null, $bundle = null): array
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
@@ -224,7 +206,7 @@ class AuditLogRepository extends CommonRepository
 
             $sqb->andWhere(
                 $sqb->expr()->and(
-                    $sqb->expr()->eq('l.object_id', $lead->getId()),
+                    $sqb->expr()->eq('l.object_id', (string) $lead->getId()),
                     $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dateTimeHelper->toUtcString($dateTimeFormat)))
                 )
             );

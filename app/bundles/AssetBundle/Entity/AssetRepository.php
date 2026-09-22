@@ -35,14 +35,7 @@ class AssetRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
-     */
-    public function getAssetList($search = '', $limit = 10, $start = 0, bool $viewOther = false)
+    public function getAssetList(string $search = '', int $limit = 10, int $start = 0, bool $viewOther = false): array
     {
         $q = $this->createQueryBuilder('a');
         $q->select('partial a.{id, title, path, alias, language}');
@@ -207,14 +200,10 @@ class AssetRepository extends CommonRepository
     }
 
     /**
-     * @param int $categoryId
-     *
-     * @return Asset
-     *
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getLatestAssetForCategory($categoryId)
+    public function getLatestAssetForCategory(int $categoryId): Asset
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where($this->getTableAlias().'.category = :categoryId');

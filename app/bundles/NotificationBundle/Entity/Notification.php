@@ -144,7 +144,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @var ArrayCollection<int, Stat>
      */
-    #[ORM\OneToMany(mappedBy: 'notification', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'notification', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**

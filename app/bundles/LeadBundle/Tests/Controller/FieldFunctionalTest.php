@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -26,7 +27,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($field);
 
         $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
-        $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
+        $columns     = ColumnIntrospector::listColumns($this->connection->createSchemaManager(), "{$tablePrefix}leads");
         $this->assertEquals($expectedLength, $columns[$field->getAlias()]->getLength());
     }
 
@@ -38,7 +39,7 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($field);
 
         $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
-        $columns     = $this->connection->createSchemaManager()->listTableColumns("{$tablePrefix}leads");
+        $columns     = ColumnIntrospector::listColumns($this->connection->createSchemaManager(), "{$tablePrefix}leads");
         $this->assertArrayHasKey('field_s', $columns);
     }
 

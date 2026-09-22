@@ -14,13 +14,9 @@ final class PluginRepository extends CommonRepository
     /**
      * Find an addon record by bundle name.
      *
-     * @param string $bundle
-     *
-     * @return mixed
-     *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findByBundle($bundle)
+    public function findByBundle(string $bundle): ?Plugin
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where($q->expr()->eq('p.bundle', ':bundle'))

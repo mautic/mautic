@@ -33,12 +33,8 @@ class PointRepository extends CommonRepository
 
     /**
      * Get array of published actions based on type.
-     *
-     * @param string $type
-     *
-     * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType(string $type): array
     {
         $q = $this->createQueryBuilder('p')
             ->select('partial p.{id, type, name, delta, repeatable, properties}')
@@ -68,7 +64,7 @@ class PointRepository extends CommonRepository
         $q->where(
             $q->expr()->and(
                 $q->expr()->eq('p.type', ':type'),
-                $q->expr()->eq('x.lead_id', (int) $leadId)
+                $q->expr()->eq('x.lead_id', (string) ((int) $leadId))
             )
         )
             ->setParameter('type', $type);
@@ -97,7 +93,7 @@ class PointRepository extends CommonRepository
         // make sure the published up and down dates are good
         $q->where(
             $q->expr()->and(
-                $q->expr()->eq('x.lead_id', (int) $leadId)
+                $q->expr()->eq('x.lead_id', (string) ((int) $leadId))
             )
         );
 

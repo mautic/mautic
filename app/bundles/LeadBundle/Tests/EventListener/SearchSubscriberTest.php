@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
@@ -36,7 +35,6 @@ final class SearchSubscriberTest extends TestCase
         $contactRepository = $this->createMock(LeadRepository::class);
         $emailRepository   = $this->createStub(EmailRepository::class);
         $connection        = $this->getMockedConnection();
-        $mockPlatform      = $this->createMock(AbstractPlatform::class);
         $leadModel         = $this->createStub(LeadModel::class);
         $companyModel      = $this->createStub(CompanyModel::class);
         $listModel         = $this->createStub(ListModel::class);
@@ -47,7 +45,7 @@ final class SearchSubscriberTest extends TestCase
 
         $contactRepository->method('applySearchQueryRelationship')
             ->willReturnCallback(
-                function (QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null): void {
+                function (QueryBuilder $q, array $tables, bool $innerJoinTables, $whereExpression = null, $having = null): void {
                     // the following code is taken from LeadRepository class
                     $primaryTable = $tables[0];
                     unset($tables[0]);
@@ -74,17 +72,11 @@ final class SearchSubscriberTest extends TestCase
                 }
             );
 
-        $connection->method('getExpressionBuilder')
+        $connection->method('createExpressionBuilder')
             ->willReturn(new ExpressionBuilder($connection));
-
-        $mockPlatform->method('getName')
-            ->willReturn('mysql');
 
         $contactRepository->method('getEntity')
             ->willReturn(null);
-
-        $contactRepository->method('createQueryBuilder')
-            ->willReturn(new QueryBuilder($connection));
 
         $translator
             ->method('trans')

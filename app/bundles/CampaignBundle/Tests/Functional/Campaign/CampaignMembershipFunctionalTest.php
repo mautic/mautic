@@ -68,7 +68,8 @@ final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
             ->select('rotation, is_scheduled')
             ->from($prefix.'campaign_lead_event_log', 'log')
             ->where('log.event_id = :eventId AND log.lead_id = :leadId')
-            ->setParameters(['eventId' => $eventId, 'leadId' => $contactId])
+            ->setParameter('eventId', $eventId)
+            ->setParameter('leadId', $contactId)
             ->executeQuery()->fetchAllAssociative();
 
         $this->assertCount(1, $logsPhase1, 'Phase 1: First trigger creates exactly 1 log');
@@ -104,7 +105,8 @@ final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
             ->select('rotation')
             ->from($prefix.'campaign_leads', 'cl')
             ->where('cl.campaign_id = :campaignId AND cl.lead_id = :leadId')
-            ->setParameters(['campaignId' => $campaignId, 'leadId' => $contactId])
+            ->setParameter('campaignId', $campaignId)
+            ->setParameter('leadId', $contactId)
             ->executeQuery()
             ->fetchOne();
 
@@ -120,7 +122,8 @@ final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
             ->from($prefix.'campaign_lead_event_log', 'log')
             ->where('log.event_id = :eventId AND log.lead_id = :leadId')
             ->orderBy('log.id', 'ASC')
-            ->setParameters(['eventId' => $eventId, 'leadId' => $contactId])
+            ->setParameter('eventId', $eventId)
+            ->setParameter('leadId', $contactId)
             ->executeQuery()->fetchAllAssociative();
 
         $this->assertCount(

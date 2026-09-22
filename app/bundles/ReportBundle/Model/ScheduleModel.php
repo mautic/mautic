@@ -23,7 +23,7 @@ readonly class ScheduleModel
     /**
      * @return Scheduler[]
      */
-    public function getScheduledReportsForExport(ExportOption $exportOption)
+    public function getScheduledReportsForExport(ExportOption $exportOption): array
     {
         return $this->schedulerRepository->getScheduledReportsForExport($exportOption);
     }

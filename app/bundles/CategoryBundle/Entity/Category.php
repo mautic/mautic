@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[ORM\Table(name: 'categories')]
-#[ORM\Index(columns: ['alias'], name: 'category_alias_search')]
+#[ORM\Index(name: 'category_alias_search', columns: ['alias'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [

@@ -3,9 +3,9 @@
 namespace Mautic\ReportBundle\Model;
 
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -516,7 +516,6 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             'dynamicFilters' => $options['dynamicFilters'] ?? [],
         ];
 
-        /** @var QueryBuilder $query */
         $query                 = $reportGenerator->getQuery($dataOptions);
         $options['translator'] = $this->translator;
 
@@ -541,9 +540,6 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
             if (!empty($selectedGraphs)) {
                 $availableGraphs = $this->getGraphData($entity->getSource());
-                if (empty($query)) {
-                    $query = $reportGenerator->getQuery();
-                }
 
                 $eventGraphs                     = [];
                 $defaultGraphOptions             = $options;

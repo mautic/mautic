@@ -13,9 +13,9 @@ trait MockedConnectionTrait
     public function getMockedConnection(): mixed
     {
         $platform = $this->createMock(AbstractPlatform::class);
-        // Following line is needed once we update to doctrine/dbal >= 3.8.0.
-        // This allows easy mocking of the createSelectSQLBuilder method without needing to mock the whole chain.
-        // $this->passThrough($platform, AbstractPlatform::class, 'createSelectSQLBuilder');
+        // DBAL builds a SELECT through the platform's SQL builder, so the mock has to hand
+        // back the real one or every query it is asked to build comes out empty.
+        $this->passThrough($platform, AbstractPlatform::class, 'createSelectSQLBuilder');
 
         $connection = $this->createMock(Connection::class);
         $connection->method('getDatabasePlatform')

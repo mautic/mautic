@@ -29,10 +29,8 @@ class TriggerRepository extends CommonRepository
 
     /**
      * Get a list of published triggers with color and points.
-     *
-     * @return array
      */
-    public function getTriggerColors()
+    public function getTriggerColors(): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('partial t.{id, color, points}')

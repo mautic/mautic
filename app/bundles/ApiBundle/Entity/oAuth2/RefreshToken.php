@@ -10,7 +10,7 @@ use Mautic\UserBundle\Entity\User;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'oauth2_refreshtokens')]
-#[ORM\Index(columns: ['token'], name: 'oauth2_refresh_token_search')]
+#[ORM\Index(name: 'oauth2_refresh_token_search', columns: ['token'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class RefreshToken extends BaseRefreshToken
 {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\FormBundle\Event as Events;
@@ -32,7 +34,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $formId = $form->deletedId;
         $foci   = $this->focusRepository->findByForm($formId);
 
-        if (empty($foci)) {
+        if ($foci === []) {
             return;
         }
 
