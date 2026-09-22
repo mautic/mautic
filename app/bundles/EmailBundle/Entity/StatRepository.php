@@ -512,7 +512,7 @@ class StatRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getIgnoredReadFailed(QueryBuilder $query): array
+    public function getIgnoredReadFailed(?\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $query = null): array
     {
         $query->select('count(es.id) as sent, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read", count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed');
 
