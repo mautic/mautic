@@ -325,6 +325,44 @@ HTML;
         $this->subscriber->decodeTokens($event);
     }
 
+    public function testDecodeTokensEscapesHrefAttributeContent(): void
+    {
+        $content    = '<html><body><a href="{dwc=link-token}">Click here</a>{dwc=link-token}</body></html>';
+        $dwcContent = '<p>https://example.com/?q=" onmouseover="alert(1)&raw=1&amp;encoded=2&quot;quoted</p>';
+        $contact    = new Lead();
+        $event      = $this->createMock(PageDisplayEvent::class);
+
+        $event->method('getLead')->willReturn($contact);
+        $event->method('getContent')->willReturn($content);
+
+        $this->dynamicContentHelper->expects($this->once())
+            ->method('findDwcTokens')
+            ->with($content, $contact)
+            ->willReturn([
+                '{dwc=link-token}' => [
+                    'content' => $dwcContent,
+                    'filters' => [],
+                ],
+            ]);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->willReturnCallback(function (string $output) use ($dwcContent): void {
+                $dom = new \DOMDocument();
+                $dom->loadHTML($output, LIBXML_NOERROR | LIBXML_NOWARNING);
+                $link = $dom->getElementsByTagName('a')->item(0);
+
+                self::assertInstanceOf(\DOMElement::class, $link);
+                self::assertSame(1, $link->attributes->length);
+                self::assertFalse($link->hasAttribute('onmouseover'));
+                self::assertSame('https://example.com/?q=" onmouseover="alert(1)&raw=1&encoded=2"quoted', $link->getAttribute('href'));
+                self::assertStringContainsString('href="https://example.com/?q=&quot; onmouseover=&quot;alert(1)&amp;raw=1&amp;encoded=2&quot;quoted"', $output);
+                self::assertStringContainsString($dwcContent, $output);
+            });
+
+        $this->subscriber->decodeTokens($event);
+    }
+
     public function testOnTokenReplacement(): void
     {
         $content = <<< HTML
