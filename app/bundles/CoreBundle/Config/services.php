@@ -131,10 +131,7 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$httponly', param('mautic.cookie_httponly'));
 
     $services->set(Mautic\CoreBundle\Helper\EncryptionHelper::class)
-        ->args([
-            service(Mautic\CoreBundle\Helper\CoreParametersHelper::class),
-            service(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class),
-        ]);
+        ->arg(1, service(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class));
 
     $services->set(Symfony\Component\Filesystem\Filesystem::class);
 
