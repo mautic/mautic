@@ -15,9 +15,11 @@ use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
+use Mautic\LeadBundle\Form\Type\HtmlType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -90,16 +92,16 @@ final class DynamicContentType extends AbstractType
         ListModel $listModel,
         private readonly TranslatorInterface $translator,
         LeadModel $leadModel,
-        private TypeList $typeList,
+        private readonly TypeList $typeList,
         private readonly RelativeDate $relativeDate,
         private readonly LeadRepository $leadRepository,
+        private readonly DynamicContentRepository $dynamicContentRepository,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
         $this->localeChoices   = FormFieldHelper::getLocaleChoices();
-        $this->typeList        = $typeList;
 
         $this->filterFieldChoices();
 
@@ -138,9 +140,50 @@ final class DynamicContentType extends AbstractType
                 'label'      => 'mautic.dynamicContent.send.slot_name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
+                    'class'                  => 'form-control',
+                    'tooltip'                => 'mautic.dynamicContent.send.slot_name.tooltip',
+                    'data-callback'          => 'activateSlotNameLookupField',
+                    'data-toggle'            => 'field-lookup',
+                    'data-chosen-lookup'     => 'dynamicContent:slotNameList',
+                    'placeholder'            => '',
+                    'data-no-record-message' => '',
+                    'onchange'               => 'Mautic.fetchDwcDisplayOrder(mQuery(this).val())',
                 ],
+            ]
+        );
+
+        $displayOrderArray = ['mautic.dynamicContent.choose.default.order' => 0];
+        $slotName          = $options['data']->getSlotName() ?? '';
+        $currentOrder      = $options['data']->getDisplayOrder() ?? 0;
+        $changes           = $options['data']->getChanges();
+        $isSlotNameChanged = isset($changes['slotName'][0]) && $changes['slotName'][0] !== $slotName;
+
+        if (!empty($slotName)) {
+            $dynamicContents = $this->dynamicContentRepository
+                ->getDynamicContentBySlotName($slotName);
+            foreach ($dynamicContents as $dynamicContent) {
+                if ($currentOrder != (int) $dynamicContent['display_order'] || $isSlotNameChanged) {
+                    $key                     = "({$dynamicContent['display_order']}) {$dynamicContent['name']}";
+                    $displayOrderArray[$key] = (int) $dynamicContent['display_order'];
+                }
+            }
+        }
+
+        $builder->add(
+            'displayOrder',
+            ChoiceType::class,
+            [
+                'label'      => 'mautic.dynamicContent.label.order',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'              => 'form-control',
+                    'tooltip'            => 'mautic.dynamicContent.label.order.tooltip',
+                    'data-current-order' => $options['data']->getDisplayOrder(),
+                    'data-current-slot'  => $slotName,
+                ],
+                'choices'     => $displayOrderArray,
+                'data'        => $options['data']->getDisplayOrder() - 1,
+                'placeholder' => 'mautic.dynamicContent.choose.placeholder',
             ]
         );
 
@@ -343,8 +386,6 @@ final class DynamicContentType extends AbstractType
 
     private function filterFieldChoices(): void
     {
-        unset($this->fieldChoices['company']);
-
         $customFields = $this->leadRepository->getCustomFieldList('lead');
 
         $this->fieldChoices['lead'] = array_filter(
@@ -368,8 +409,9 @@ final class DynamicContentType extends AbstractType
     {
         $enableEditor = TypeList::HTML === $type;
         $editorClass  = 'editor editor-advanced editor-builder-tokens';
+        $typeClass    = $enableEditor ? HtmlType::class : TextareaType::class;
 
-        $form->add('content', TextareaType::class, [
+        $form->add('content', $typeClass, [
             'label'      => 'mautic.dynamicContent.form.content',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -378,7 +420,7 @@ final class DynamicContentType extends AbstractType
                 'rows'                 => 15,
                 'data-editor-enable'   => $enableEditor,
                 'data-editor-class'    => $editorClass,
-                'data-token-callback'  => 'email:getBuilderTokens',
+                'data-token-callback'  => 'dynamicContent:getBuilderTokens',
                 'data-token-activator' => '{',
                 'allow-full-html'      => true,
             ],

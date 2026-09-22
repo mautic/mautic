@@ -23,10 +23,7 @@ export default class TokenPlugin extends Plugin {
                     tokenName = tokenName.substring(2);
                 }
 
-                if (itemId.match(/dwc=/i)){
-                    const tn = itemId.substr(5, itemId.length - 6);
-                    tokenName = tokenName + ' (' + tn + ')';
-                } else if (itemId.match(/contactfield=company/i) && !tokenName.match(/company/i)){
+                if (itemId.match(/contactfield=company/i) && !tokenName.match(/company/i)){
                     tokenName = 'Company ' + tokenName;
                 }
 
