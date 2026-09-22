@@ -4,7 +4,7 @@
         {% if headerTitle is defined and headerTitle is not empty %}
             {{ headerTitle|replace({'<': ' <'})|striptags|purify }} |
         {% endif %}
-        {{ pageTitle|default('Mautic') }}
+        ProEngine
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="icon" type="image/x-icon" href="{{ getOverridableUrl('images/favicon.ico') }}" />
@@ -17,4 +17,263 @@
     {% include('@MauticCore/Default/script.html.twig') %}
 
     {{ outputHeadDeclarations() }}
+<style id="proengine-dark">
+:root {
+    color-scheme: dark;
+    --background: #14171c;
+    --layer: #1c2027;
+    --layer-01: #1c2027;
+    --layer-02: #242a33;
+    --text-primary: #edf1f7;
+    --text-secondary: #b5bfce;
+    --border-subtle: #343b47;
+    --link-primary: #84dce9;
+}
+html, body, #app, #main, #content {
+    background: #14171c !important;
+    color: #edf1f7 !important;
+}
+.navbar, .navbar-nocollapse, .navbar-default,
+.sidebar, .sidebar-left, .app-sidebar,
+#app-header, #app-sidebar, #app-footer {
+    background: #181c22 !important;
+    color: #edf1f7 !important;
+    border-color: #303743 !important;
+}
+.panel, .panel-heading, .panel-body, .panel-footer,
+.modal-content, .modal-header, .modal-footer,
+.dropdown-menu, .well, .list-group-item,
+.page-header, .page-footer, .toolbar, .table-responsive {
+    background: #1c2027 !important;
+    color: #edf1f7 !important;
+    border-color: #343b47 !important;
+}
+h1, h2, h3, h4, h5, h6, label, .control-label {
+    color: #edf1f7 !important;
+}
+.text-muted, .text-secondary, small {
+    color: #b5bfce !important;
+}
+a { color: #8fdde8; }
+.nav > li > a, .dropdown-menu > li > a {
+    color: #d3dce9 !important;
+}
+.nav > li > a:hover, .nav > li.active > a,
+.dropdown-menu > li > a:hover {
+    background: #2a3240 !important;
+    color: #9eeafa !important;
+}
+.table, .table > tbody > tr > td {
+    background: #1c2027 !important;
+    color: #e0e6ef !important;
+    border-color: #343b47 !important;
+}
+.table > thead > tr > th {
+    background: #272e38 !important;
+    color: #f2f5fa !important;
+    border-color: #343b47 !important;
+}
+.table-striped > tbody > tr:nth-of-type(odd) > td {
+    background: #202630 !important;
+}
+.table-hover > tbody > tr:hover > td {
+    background: #2b3442 !important;
+}
+.form-control, .input-group-addon,
+.select2-container .select2-choice,
+.select2-container--default .select2-selection--single {
+    background: #14191f !important;
+    color: #edf1f7 !important;
+    border-color: #465264 !important;
+}
+input::placeholder, textarea::placeholder { color: #a7b2c3 !important; }
+.btn-default, .pagination > li > a, .pagination > li > span {
+    background: #252d38 !important;
+    color: #e6ecf5 !important;
+    border-color: #465264 !important;
+}
+.btn-primary {
+    background: #6551b8 !important;
+    color: #fff !important;
+    border-color: #8a76de !important;
+}
+.btn-primary:hover { background: #7863cc !important; }
+:focus-visible { outline: 2px solid #86e4ee !important; outline-offset: 2px; }
+.mautic-brand, .brand-logo--desktop, .brand-logo--mobile {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    clip-path: none !important;
+    overflow: visible !important;
+}
+img[alt="ProEngine"] {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    clip-path: none !important;
+    object-fit: contain !important;
+    mix-blend-mode: screen;
+    -webkit-mask-image: radial-gradient(ellipse, #000 48%, transparent 74%);
+    mask-image: radial-gradient(ellipse, #000 48%, transparent 74%);
+}
+.brand-logo--desktop img[alt="ProEngine"] {
+    width: 180px !important;
+    height: 54px !important;
+}
+.brand-logo--mobile img[alt="ProEngine"] {
+    width: 88px !important;
+    height: 44px !important;
+}
+</style>
+<style id="proengine-refinement">
+/* Wider, frameless header branding */
+.mautic-brand {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+.proengine-lockup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 54px;
+    white-space: nowrap;
+}
+.proengine-lockup img[alt="ProEngine"] {
+    width: 62px !important;
+    height: 48px !important;
+    object-fit: cover !important;
+    object-position: center 30%;
+    border: none !important;
+    border-radius: 0 !important;
+    mix-blend-mode: screen;
+    mask-image: radial-gradient(ellipse, black 25%, transparent 72%);
+    -webkit-mask-image: radial-gradient(ellipse, black 25%, transparent 72%);
+}
+.proengine-wordmark {
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    color: #d9f7fb !important;
+}
+.proengine-wordmark span { color: #b7a7f4 !important; }
+.brand-logo--desktop {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+}
+.brand-logo--mobile .proengine-wordmark { font-size: 17px; }
+.brand-logo--mobile .proengine-lockup img { display: none !important; }
+
+/* Readable tabs, table headings and action controls */
+.nav-tabs, .nav-pills {
+    background: #1c2027 !important;
+    border-color: #465264 !important;
+}
+.nav-tabs > li > a, .nav-pills > li > a,
+.nav-tabs > li > a *, .nav-pills > li > a * {
+    color: #e2e9f3 !important;
+}
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus,
+.nav-pills > li.active > a {
+    background: #30394a !important;
+    color: #a7eff6 !important;
+    border-bottom: 3px solid #9b88ef !important;
+}
+.table thead th, .table thead th a,
+.table thead th span, .table thead th i {
+    color: #e5edf8 !important;
+}
+.btn:not(.btn-primary):not(.btn-danger):not(.btn-success):not(.btn-warning),
+.btn-ghost, .search-button {
+    color: #e0e9f5 !important;
+    background-color: #252d38 !important;
+    border-color: #465264 !important;
+}
+.btn i, .btn .ri-more-2-fill, .search-button i {
+    color: inherit !important;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select, textarea, .input-group-addon,
+.select2-choice, .select2-selection,
+.select2-dropdown, .chosen-single, .chosen-drop,
+.bootstrap-select > .dropdown-toggle {
+    background-color: #202731 !important;
+    color: #e7eef8 !important;
+    border-color: #465264 !important;
+}
+.select2-selection__rendered, .select2-results__option,
+.chosen-results, .chosen-single span {
+    color: #e7eef8 !important;
+}
+input::placeholder, textarea::placeholder { color: #aebcd0 !important; }
+input[type="checkbox"], input[type="radio"] { accent-color: #9b88ef; }
+
+/* Very soft watermark; never intercepts clicks */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 60px 0 0 260px;
+    background: url('/media/images/proengine.jpg') center / min(68vw, 950px) auto no-repeat;
+    opacity: .025;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 1000;
+}
+@media (max-width: 767px) {
+    body::after { left: 0; background-size: 95vw auto; }
+}
+@media print {
+    body::after { display: none; }
+}
+</style>
+<style id="proengine-dashboard">
+.dashboard-widgets {
+    --background: #1c2027;
+    --layer: #242b35;
+    --layer-01: #242b35;
+    --layer-02: #293340;
+    --text-primary: #edf1f7;
+    --text-secondary: #bdc9d9;
+}
+.dashboard-widgets .tile,
+.dashboard-widgets .card-header,
+.dashboard-widgets .card-body {
+    background: #1c2027 !important;
+    color: #edf1f7 !important;
+    border-color: #343e4d !important;
+}
+.dashboard-widgets .tile {
+    border: 1px solid #343e4d !important;
+}
+.dashboard-widgets .bg-white,
+.dashboard-widgets .bg-gray,
+.dashboard-widgets .bg-gray-100,
+.dashboard-widgets .bg-gray-50,
+.dashboard-widgets .well {
+    background: #242b35 !important;
+    color: #bdc9d9 !important;
+}
+.dashboard-widgets h4,
+.dashboard-widgets .text-secondary,
+.dashboard-widgets .text-muted {
+    color: #d0dbea !important;
+}
+.dashboard-widgets .alert-warning {
+    background: #39321e !important;
+    color: #f5dfa1 !important;
+    border-color: #776236 !important;
+}
+.dashboard-widgets .alert-danger {
+    background: #3b232b !important;
+    color: #ffc3cd !important;
+    border-color: #854452 !important;
+}
+.dashboard-widgets hr {
+    border-color: #343e4d !important;
+}
+</style>
 </head>
