@@ -170,17 +170,7 @@ parameters:
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/Campaign.php
 
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:getContactSingleSegmentByCampaign\(\) has parameter \$contactId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
-		-
-			message: '#^Parameter \#1 \$maxResults of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:setMaxResults\(\) expects int\|null, true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\ChannelInterface\:\:setChannel\(\) has parameter \$channel with no type specified\.$#'
@@ -458,11 +448,6 @@ parameters:
 			count: 1
 			path: app/bundles/CampaignBundle/Model/CampaignModel.php
 
-		-
-			message: '#^Parameter \#3 \$runLimit of method Mautic\\CampaignBundle\\Membership\\MembershipBuilder\:\:build\(\) expects int, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CampaignBundle/Model/CampaignModel.php
 
 		-
 			message: '#^Call to an undefined method DateTimeInterface\:\:modify\(\)\.$#'
