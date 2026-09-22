@@ -50,7 +50,7 @@ final class RoleController extends FormController
     }
 
     #[Route(
-        '/s/roles/{objectAction}/{objectId}',
+        path: '/s/roles/{objectAction}/{objectId}',
         name: 'mautic_role_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -78,7 +78,7 @@ final class RoleController extends FormController
      * Generate's default role list view.
      */
     #[Route(
-        '/s/roles/{page}',
+        path: '/s/roles/{page}',
         name: 'mautic_role_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

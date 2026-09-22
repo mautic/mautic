@@ -162,7 +162,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<int, PointsChangeLog>
      */
     #[ORM\OneToMany(targetEntity: PointsChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateAdded' => 'DESC'])]
     private $pointsChangeLog;
 
     private ?int $actualPoints = null;
@@ -171,7 +171,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<int, CompanyChangeLog>
      */
     #[ORM\OneToMany(targetEntity: CompanyChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateAdded' => 'DESC'])]
     private $companyChangeLog;
 
     /**
@@ -244,7 +244,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<int, LeadNote>
      */
     #[ORM\OneToMany(targetEntity: LeadNote::class, mappedBy: 'lead', cascade: ['detach'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateAdded' => 'DESC'])]
     private $notes;
 
     /**
@@ -265,7 +265,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     #[ORM\JoinTable(name: 'lead_tags_xref')]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'tag_id', nullable: false)]
-    #[ORM\OrderBy(['tag' => 'ASC'])]
+    #[ORM\OrderBy(value: ['tag' => 'ASC'])]
     private $tags;
 
     /**
@@ -280,7 +280,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<int, StagesChangeLog>
      */
     #[ORM\OneToMany(targetEntity: StagesChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateAdded' => 'DESC'])]
     private $stageChangeLog;
 
     /**
@@ -293,7 +293,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<int, FrequencyRule>
      */
     #[ORM\OneToMany(targetEntity: FrequencyRule::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true, indexBy: 'channel')]
-    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateAdded' => 'DESC'])]
     private $frequencyRules;
 
     /**

@@ -23,7 +23,7 @@ final class ReplyController extends AbstractController
      * @throws \Exception
      */
     #[Route(
-        '/sms/{transport}/callback',
+        path: '/sms/{transport}/callback',
         name: 'mautic_sms_callback',
     )]
     public function callbackAction(Request $request, $transport): Response

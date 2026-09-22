@@ -61,7 +61,7 @@ class FormController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/{objectAction}/{objectId}',
+        path: '/s/forms/{objectAction}/{objectId}',
         name: 'mautic_form_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -72,7 +72,7 @@ class FormController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/{page}',
+        path: '/s/forms/{page}',
         name: 'mautic_form_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

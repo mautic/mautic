@@ -44,7 +44,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[OwnershipParent('form')]
+#[OwnershipParent(association: 'form')]
 class Field implements UuidInterface
 {
     use UuidTrait;

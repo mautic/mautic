@@ -31,7 +31,7 @@ class SyncIntegrationsHelper
     public function __construct(
         private readonly IntegrationsHelper $integrationsHelper,
         private readonly ObjectProvider $objectProvider,
-        #[AutowireIterator('mautic.sync_integration')]
+        #[AutowireIterator(tag: 'mautic.sync_integration')]
         iterable $integrations = [],
     ) {
         foreach ($integrations as $integration) {

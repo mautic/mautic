@@ -51,7 +51,7 @@ final class PublicController extends CommonFormController
     private array $tokens = [];
 
     #[Route(
-        '/form/submit',
+        path: '/form/submit',
         name: 'mautic_form_postresults',
     )]
     public function submitAction(
@@ -494,7 +494,7 @@ final class PublicController extends CommonFormController
      * Displays a message.
      */
     #[Route(
-        '/form/message',
+        path: '/form/message',
         name: 'mautic_form_postmessage',
     )]
     public function messageAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper): Response
@@ -527,7 +527,7 @@ final class PublicController extends CommonFormController
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
     #[Route(
-        '/form/{id}',
+        path: '/form/{id}',
         name: 'mautic_form_preview',
         defaults: ['id' => '0'],
     )]
@@ -597,7 +597,7 @@ final class PublicController extends CommonFormController
      * Generates JS file for automatic form generation.
      */
     #[Route(
-        '/form/generate.js',
+        path: '/form/generate.js',
         name: 'mautic_form_generateform',
     )]
     public function generateAction(Request $request): Response
@@ -625,7 +625,7 @@ final class PublicController extends CommonFormController
     }
 
     #[Route(
-        '/form/embed/{id}',
+        path: '/form/embed/{id}',
         name: 'mautic_form_embed',
     )]
     public function embedAction(Request $request): Response
@@ -680,7 +680,7 @@ final class PublicController extends CommonFormController
     }
 
     #[Route(
-        '/form/company-lookup/autocomplete',
+        path: '/form/company-lookup/autocomplete',
         name: 'mautic_form_company_lookup',
         methods: ['POST'],
     )]

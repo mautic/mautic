@@ -26,7 +26,7 @@ final class ClientController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/credentials/{objectAction}/{objectId}',
+        path: '/s/credentials/{objectAction}/{objectId}',
         name: 'mautic_client_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -40,7 +40,7 @@ final class ClientController extends AbstractStandardFormController
      * Generate's default client list.
      */
     #[Route(
-        '/s/credentials/{page}',
+        path: '/s/credentials/{page}',
         name: 'mautic_client_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

@@ -23,7 +23,7 @@ final class StatsApiController extends CommonApiController
      * @param array  $where
      */
     #[Route(
-        '/api/stats/{table}',
+        path: '/api/stats/{table}',
         name: 'mautic_core_api_stats',
         defaults: ['table' => '', '_format' => 'json'],
         methods: ['GET']

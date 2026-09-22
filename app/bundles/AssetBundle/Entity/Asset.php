@@ -76,7 +76,7 @@ class Asset extends FormEntity implements UuidInterface
     private ?string $path = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
-    #[Sequentially([
+    #[Sequentially(constraints: [
         new Assert\Url(message: 'mautic.asset.validation.error.url', requireTld: false),
         new SafeRemoteUrl(),
     ])]

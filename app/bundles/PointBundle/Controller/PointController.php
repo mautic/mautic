@@ -24,7 +24,7 @@ final class PointController extends AbstractFormController
     }
 
     #[Route(
-        '/s/points/{objectAction}/{objectId}',
+        path: '/s/points/{objectAction}/{objectId}',
         name: 'mautic_point_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -35,7 +35,7 @@ final class PointController extends AbstractFormController
     }
 
     #[Route(
-        '/s/points/{page}',
+        path: '/s/points/{page}',
         name: 'mautic_point_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

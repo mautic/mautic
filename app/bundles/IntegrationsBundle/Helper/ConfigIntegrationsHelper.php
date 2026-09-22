@@ -21,7 +21,7 @@ final class ConfigIntegrationsHelper
      */
     public function __construct(
         private readonly IntegrationsHelper $integrationsHelper,
-        #[AutowireIterator('mautic.config_integration')]
+        #[AutowireIterator(tag: 'mautic.config_integration')]
         iterable $integrations = [],
     ) {
         foreach ($integrations as $integration) {

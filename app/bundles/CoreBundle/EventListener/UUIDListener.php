@@ -11,7 +11,7 @@ use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Ramsey\Uuid\Uuid;
 
-#[AsDoctrineListener(Events::prePersist)]
+#[AsDoctrineListener(event: Events::prePersist)]
 final readonly class UUIDListener
 {
     public function __construct(

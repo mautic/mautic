@@ -63,7 +63,7 @@ final class ResultController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/results/{formId}/{objectAction}/{objectId}',
+        path: '/s/forms/results/{formId}/{objectAction}/{objectId}',
         name: 'mautic_form_results_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -74,7 +74,7 @@ final class ResultController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/results/{objectId}/{page}',
+        path: '/s/forms/results/{objectId}/{page}',
         name: 'mautic_form_results',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+', 'page' => '\d+'],
         defaults: ['objectId' => 0, 'page' => 0],
@@ -218,7 +218,7 @@ final class ResultController extends CommonFormController
     }
 
     #[Route(
-        '/forms/results/file/{submissionId}/{field}',
+        path: '/forms/results/file/{submissionId}/{field}',
         name: 'mautic_form_file_download',
     )]
     public function downloadFileAction(int $submissionId, string $field, FormUploader $formUploader): BinaryFileResponse
@@ -263,7 +263,7 @@ final class ResultController extends CommonFormController
     }
 
     #[Route(
-        '/forms/results/file/{fieldId}/filename/{fileName}',
+        path: '/forms/results/file/{fieldId}/filename/{fileName}',
         name: 'mautic_form_file_download_by_name',
     )]
     public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): BinaryFileResponse
@@ -302,7 +302,7 @@ final class ResultController extends CommonFormController
      * @throws \Exception
      */
     #[Route(
-        '/s/forms/results/{objectId}/export/{format}',
+        path: '/s/forms/results/{objectId}/export/{format}',
         name: 'mautic_form_export',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],
@@ -487,7 +487,7 @@ final class ResultController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/results/{objectId}/add-to-segment',
+        path: '/s/forms/results/{objectId}/add-to-segment',
         name: 'mautic_form_results_add_segment',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

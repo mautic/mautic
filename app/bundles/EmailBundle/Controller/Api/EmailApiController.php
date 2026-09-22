@@ -106,7 +106,7 @@ final class EmailApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     #[Route(
-        '/api/emails/{id}/send',
+        path: '/api/emails/{id}/send',
         name: 'mautic_api_sendemail',
         requirements: ['id' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -151,7 +151,7 @@ final class EmailApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     #[Route(
-        '/api/emails/{id}/contact/{leadId}/send',
+        path: '/api/emails/{id}/contact/{leadId}/send',
         name: 'mautic_api_sendcontactemail',
         requirements: ['id' => '\d+', 'leadId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -224,7 +224,7 @@ final class EmailApiController extends CommonApiController
      * @param string $trackingHash
      */
     #[Route(
-        '/api/emails/reply/{trackingHash}',
+        path: '/api/emails/reply/{trackingHash}',
         name: 'mautic_api_reply',
         defaults: ['_format' => 'json'],
         methods: ['POST']

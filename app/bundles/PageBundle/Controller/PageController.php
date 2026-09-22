@@ -38,7 +38,7 @@ final class PageController extends FormController
     }
 
     #[Route(
-        '/s/pages/{objectAction}/{objectId}',
+        path: '/s/pages/{objectAction}/{objectId}',
         name: 'mautic_page_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -49,7 +49,7 @@ final class PageController extends FormController
     }
 
     #[Route(
-        '/s/pages/{page}',
+        path: '/s/pages/{page}',
         name: 'mautic_page_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -997,7 +997,7 @@ final class PageController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/pages/results/{objectId}/{page}',
+        path: '/s/pages/results/{objectId}/{page}',
         name: 'mautic_page_results',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
@@ -1141,7 +1141,7 @@ final class PageController extends FormController
      * @throws \Exception
      */
     #[Route(
-        '/s/pages/results/{objectId}/export/{format}',
+        path: '/s/pages/results/{objectId}/export/{format}',
         name: 'mautic_page_export',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],

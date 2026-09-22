@@ -58,7 +58,7 @@ final class FileApiController extends CommonApiController
      * Uploads a file.
      */
     #[Route(
-        '/api/files/{dir}/new',
+        path: '/api/files/{dir}/new',
         name: 'mautic_core_api_file_create',
         defaults: ['_format' => 'json'],
         methods: ['POST']
@@ -101,7 +101,7 @@ final class FileApiController extends CommonApiController
      * List the files in /media directory.
      */
     #[Route(
-        '/api/files/{dir}',
+        path: '/api/files/{dir}',
         name: 'mautic_core_api_file_list',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -136,7 +136,7 @@ final class FileApiController extends CommonApiController
      * Delete a file from /media directory.
      */
     #[Route(
-        '/api/files/{dir}/{file}/delete',
+        path: '/api/files/{dir}/{file}/delete',
         name: 'mautic_core_api_file_delete',
         defaults: ['_format' => 'json'],
         methods: ['DELETE']

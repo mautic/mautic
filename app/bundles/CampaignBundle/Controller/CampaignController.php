@@ -158,7 +158,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/campaigns/{objectAction}/{objectId}',
+        path: '/s/campaigns/{objectAction}/{objectId}',
         name: 'mautic_campaign_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -468,7 +468,7 @@ class CampaignController extends AbstractStandardFormController
      * @param int|null   $count
      */
     #[Route(
-        '/s/campaigns/view/{objectId}/contact/{page}',
+        path: '/s/campaigns/view/{objectId}/contact/{page}',
         name: 'mautic_campaign_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
@@ -515,7 +515,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/campaigns/event/stats/{objectId}/{dateFromValue}/{dateToValue}',
+        path: '/s/campaigns/event/stats/{objectId}/{dateFromValue}/{dateToValue}',
         name: 'mautic_campaign_event_stats',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -572,7 +572,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/campaigns/graph/{objectId}/{dateFrom}/{dateTo}',
+        path: '/s/campaigns/graph/{objectId}/{dateFrom}/{dateTo}',
         name: 'mautic_campaign_graph',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -617,7 +617,7 @@ class CampaignController extends AbstractStandardFormController
      * @param int $page
      */
     #[Route(
-        '/s/campaigns/{page}',
+        path: '/s/campaigns/{page}',
         name: 'mautic_campaign_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

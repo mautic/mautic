@@ -60,7 +60,7 @@ final class WidgetApiController extends CommonApiController
      * Obtains a list of available widget types.
      */
     #[Route(
-        '/api/data',
+        path: '/api/data',
         name: 'mautic_widget_types',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -81,7 +81,7 @@ final class WidgetApiController extends CommonApiController
      * @param string $type of the widget
      */
     #[Route(
-        '/api/data/{type}',
+        path: '/api/data/{type}',
         name: 'mautic_widget_data',
         defaults: ['_format' => 'json'],
         methods: ['GET']

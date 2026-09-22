@@ -56,7 +56,7 @@ final class SecurityController extends CommonController implements EventSubscrib
      * Generates login form and processes login.
      */
     #[Route(
-        '/s/login',
+        path: '/s/login',
         name: 'login',
     )]
     public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper, TranslatorInterface $translator): Response
@@ -105,7 +105,7 @@ final class SecurityController extends CommonController implements EventSubscrib
      * The plugin should be handling this in it's listener.
      */
     #[Route(
-        '/s/sso_login/{integration}',
+        path: '/s/sso_login/{integration}',
         name: 'mautic_sso_login',
     )]
     public function ssoLoginAction(): RedirectResponse
@@ -117,7 +117,7 @@ final class SecurityController extends CommonController implements EventSubscrib
      * The plugin should be handling this in it's listener.
      */
     #[Route(
-        '/s/sso_login_check/{integration}',
+        path: '/s/sso_login_check/{integration}',
         name: 'mautic_sso_login_check',
     )]
     public function ssoLoginCheckAction(): RedirectResponse
@@ -128,7 +128,7 @@ final class SecurityController extends CommonController implements EventSubscrib
     }
 
     #[Route(
-        '/saml/login_retry',
+        path: '/saml/login_retry',
         name: 'mautic_saml_login_retry',
     )]
     public function samlLoginRetryAction(SAMLHelper $samlHelper, SessionInterface $session): Response

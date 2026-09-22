@@ -57,7 +57,7 @@ final class DynamicContentController extends FormController
     }
 
     #[Route(
-        '/s/dwc/{objectAction}/{objectId}',
+        path: '/s/dwc/{objectAction}/{objectId}',
         name: 'mautic_dynamicContent_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -68,7 +68,7 @@ final class DynamicContentController extends FormController
     }
 
     #[Route(
-        '/s/dwc/{page}',
+        path: '/s/dwc/{page}',
         name: 'mautic_dynamicContent_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

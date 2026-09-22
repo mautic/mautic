@@ -21,7 +21,7 @@ class Shortener
      */
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,
-        #[AutowireIterator('mautic.shortener.service')]
+        #[AutowireIterator(tag: 'mautic.shortener.service')]
         iterable $shortenerServices = [],
     ) {
         foreach ($shortenerServices as $shortenerService) {

@@ -101,7 +101,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ArrayCollection<int, Log>
      */
     #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'webhook', cascade: ['persist', 'detach'], fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateAdded' => Order::Descending->value])]
+    #[ORM\OrderBy(value: ['dateAdded' => Order::Descending->value])]
     private $logs;
 
     /**

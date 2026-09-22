@@ -66,7 +66,7 @@ final class PublicController extends CommonFormController
     }
 
     #[Route(
-        '/email/view/{idHash}',
+        path: '/email/view/{idHash}',
         name: 'mautic_email_webview',
     )]
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, string $idHash): Response
@@ -116,7 +116,7 @@ final class PublicController extends CommonFormController
     }
 
     #[Route(
-        '/email/{idHash}.gif',
+        path: '/email/{idHash}.gif',
         name: 'mautic_email_tracker',
     )]
     public function trackingImageAction(
@@ -141,7 +141,7 @@ final class PublicController extends CommonFormController
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
     #[Route(
-        '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
+        path: '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
         name: 'mautic_email_unsubscribe',
         defaults: ['urlEmail' => null, 'secretHash' => null],
     )]
@@ -341,7 +341,7 @@ final class PublicController extends CommonFormController
     }
 
     #[Route(
-        '/email/dnc/{idHash}/{urlEmail}/{secretHash}',
+        path: '/email/dnc/{idHash}/{urlEmail}/{secretHash}',
         name: 'mautic_email_unsubscribe_all',
         defaults: ['urlEmail' => null, 'secretHash' => null],
     )]
@@ -362,7 +362,7 @@ final class PublicController extends CommonFormController
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
     #[Route(
-        '/email/resubscribe/{idHash}',
+        path: '/email/resubscribe/{idHash}',
         name: 'mautic_email_resubscribe',
     )]
     public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, string $idHash): Response
@@ -456,7 +456,7 @@ final class PublicController extends CommonFormController
      * Handles mailer transport webhook post.
      */
     #[Route(
-        '/mailer/callback',
+        path: '/mailer/callback',
         name: 'mautic_mailer_transport_callback',
     )]
     public function mailerCallbackAction(Request $request): Response
@@ -471,13 +471,13 @@ final class PublicController extends CommonFormController
      * Preview email.
      */
     #[Route(
-        '/email/preview/{objectId}/{objectType}',
+        path: '/email/preview/{objectId}/{objectType}',
         name: 'mautic_email_preview',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectType' => null, 'objectId' => 0],
     )]
     #[Route(
-        '/s/campaign/preview/{objectId}',
+        path: '/s/campaign/preview/{objectId}',
         name: 'mautic_campaign_preview',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -691,7 +691,7 @@ final class PublicController extends CommonFormController
     }
 
     #[Route(
-        '/plugin/{integration}/tracking.gif',
+        path: '/plugin/{integration}/tracking.gif',
         name: 'mautic_plugin_tracker',
         requirements: ['integration' => Requirement::CATCH_ALL],
     )]

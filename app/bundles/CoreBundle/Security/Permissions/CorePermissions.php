@@ -36,7 +36,7 @@ class CorePermissions implements ResetInterface
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly array $bundles,
         private readonly array $pluginBundles,
-        #[AutowireIterator('mautic.permissions')]
+        #[AutowireIterator(tag: 'mautic.permissions')]
         iterable $permissionObjects = [],
     ) {
         $this->registerPermissionClasses();
