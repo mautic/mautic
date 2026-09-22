@@ -42,8 +42,6 @@ final class ConfigMetadata
                     case 'ip_lookup_services':
                         $this->ipLookupServices = array_merge($this->ipLookupServices, $configGroup->toArray());
                         break;
-                    case 'services':
-                        return $this->prepareServices($configGroup);
                     case 'parameters':
                         return $this->prepareParameters($configGroup);
                 }
@@ -58,36 +56,6 @@ final class ConfigMetadata
     public function getIpLookupServices(): array
     {
         return $this->ipLookupServices;
-    }
-
-    private function prepareServices(Collection $serviceGroups): array
-    {
-        $serviceGroups->transform(
-            function ($serviceGroup) {
-                if (!is_array($serviceGroup)) {
-                    return $serviceGroup;
-                }
-
-                $serviceGroup = new Collection($serviceGroup);
-                $filtered     = $serviceGroup->reject(
-                    fn ($serviceDefinition): bool =>
-                        // Remove optional services (has argument optional = true) if the service class does not exist
-                        is_array($serviceDefinition)
-                        && isset($serviceDefinition['optional'])
-                        && true === $serviceDefinition['optional']
-                        && isset($serviceDefinition['class'])
-                        && false === class_exists($serviceDefinition['class'])
-                );
-
-                $filtered->transform(
-                    fn ($serviceDefinition): mixed => $this->encodeParameters($serviceDefinition)
-                );
-
-                return $filtered->toArray();
-            }
-        );
-
-        return $serviceGroups->toArray();
     }
 
     private function prepareParameters(Collection $parameters): array
