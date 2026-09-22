@@ -4,15 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-<<<<<<< HEAD
     "content-hash": "b244e9390f9351c66c6f2c8b719875f6",
-=======
-    "content-hash": "52bbd1989710ce31bcdb231bd00c1cb7",
->>>>>>> 3bf88af3e0 (Reuse symplify/phpstan-rules 14.14.1, drop local duplicate rules; make PreferClassInDefinitionFetchRule collector-free)
-=======
-    "content-hash": "ee576981462fcc51e2eb583673f77772",
->>>>>>> 884099ba6f (Bump symplify/phpstan-rules to ^14.15)
     "packages": [
         {
             "name": "api-platform/core",
