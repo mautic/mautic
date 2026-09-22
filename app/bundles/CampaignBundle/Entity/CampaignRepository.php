@@ -494,7 +494,7 @@ class CampaignRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    public function getContactSingleSegmentByCampaign($contactId, int $campaignId): array|false
+    public function getContactSingleSegmentByCampaign(int|string|null $contactId, int $campaignId): array|false
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -502,7 +502,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'll')
             ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = ll.id and lll.lead_id = :contactId and lll.manually_removed = 0')
             ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'clx', 'clx.leadlist_id = ll.id and clx.campaign_id = :campaignId')
-            ->setParameter('contactId', (int) $contactId)
+            ->setParameter('contactId', $contactId)
             ->setParameter('campaignId', $campaignId)
             ->setMaxResults(1)
             ->executeQuery()
