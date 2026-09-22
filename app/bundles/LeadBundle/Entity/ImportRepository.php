@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
