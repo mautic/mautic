@@ -11,13 +11,13 @@ use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: MessageQueueRepository::class)]
 #[ORM\Table(name: 'message_queue')]
-#[ORM\Index(columns: ['status'], name: 'message_status_search')]
-#[ORM\Index(columns: ['date_sent'], name: 'message_date_sent')]
-#[ORM\Index(columns: ['scheduled_date'], name: 'message_scheduled_date')]
-#[ORM\Index(columns: ['priority'], name: 'message_priority')]
-#[ORM\Index(columns: ['success'], name: 'message_success')]
-#[ORM\Index(columns: ['channel', 'channel_id'], name: 'message_channel_search')]
-#[ORM\Index(columns: ['date_published'], name: 'message_queue_date_published')]
+#[ORM\Index(name: 'message_status_search', columns: ['status'])]
+#[ORM\Index(name: 'message_date_sent', columns: ['date_sent'])]
+#[ORM\Index(name: 'message_scheduled_date', columns: ['scheduled_date'])]
+#[ORM\Index(name: 'message_priority', columns: ['priority'])]
+#[ORM\Index(name: 'message_success', columns: ['success'])]
+#[ORM\Index(name: 'message_channel_search', columns: ['channel', 'channel_id'])]
+#[ORM\Index(name: 'message_queue_date_published', columns: ['date_published'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class MessageQueue
 {
@@ -34,7 +34,7 @@ class MessageQueue
     public const PRIORITY_HIGH   = 1;
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 
@@ -55,6 +55,8 @@ class MessageQueue
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -131,8 +133,6 @@ class MessageQueue
 
         $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');
-
-        $builder->addLead(false, 'CASCADE', false);
 
         $builder->createField('priority', 'smallint')
             ->columnName('priority')

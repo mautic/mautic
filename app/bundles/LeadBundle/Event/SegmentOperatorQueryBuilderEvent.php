@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -49,10 +48,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
         return in_array($this->filter->getOperator(), $operators, true);
     }
 
-    /**
-     * @param CompositeExpression|string $expression
-     */
-    public function addExpression($expression): void
+    public function addExpression(string|\Doctrine\DBAL\Query\Expression\CompositeExpression $expression): void
     {
         $this->queryBuilder->addLogic($expression, $this->filter->getGlue());
 

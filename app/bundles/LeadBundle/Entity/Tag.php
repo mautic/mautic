@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TagRepository::class)]
 #[ORM\Table(name: 'lead_tags')]
-#[ORM\Index(columns: ['tag'], name: 'lead_tag_search')]
+#[ORM\Index(name: 'lead_tag_search', columns: ['tag'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [

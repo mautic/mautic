@@ -10,7 +10,7 @@ use Mautic\StageBundle\Entity\Stage;
 
 #[ORM\Entity(repositoryClass: StagesChangeLogRepository::class)]
 #[ORM\Table(name: 'lead_stages_change_log')]
-#[ORM\Index(columns: ['date_added'], name: 'lead_stages_change_log_date_added')]
+#[ORM\Index(name: 'lead_stages_change_log_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class StagesChangeLog
 {
@@ -22,12 +22,14 @@ class StagesChangeLog
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'stageChangeLog')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
      * @var Stage|null
      */
-    #[ORM\ManyToOne(targetEntity: Stage::class, inversedBy: 'log')]
+    #[ORM\ManyToOne(targetEntity: Stage::class)]
     #[ORM\JoinColumn(name: 'stage_id', onDelete: 'CASCADE')]
     private $stage;
 
@@ -51,8 +53,6 @@ class StagesChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->addLead(false, 'CASCADE', false, 'stageChangeLog');
 
         $builder->createField('eventName', 'string')
             ->columnName('event_name')

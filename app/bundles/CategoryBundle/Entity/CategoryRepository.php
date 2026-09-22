@@ -27,14 +27,14 @@ class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @param string $bundle
-     * @param mixed  $search
-     * @param int    $limit
-     * @param int    $start
+     * $search is not typed because AssetModel::getLookupResults() calls this with
+     * ($filter, $limit, 0), so it arrives as the limit - see the is_array() branch below.
+     *
+     * @param mixed $search
      *
      * @return mixed[]
      */
-    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0, bool $includeGlobal = true)
+    public function getCategoryList(string $bundle, $search = '', int $limit = 10, int $start = 0, bool $includeGlobal = true): array
     {
         $q = $this->createQueryBuilder('c');
         $q->select('partial c.{id, title, alias, color, bundle}');

@@ -35,13 +35,9 @@ final class MessageRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
+     * @param string|array<int|string> $search
      */
-    public function getMessageList($search = '', $limit = 10, $start = 0)
+    public function getMessageList(string|array $search = '', int $limit = 10, int $start = 0): array
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($this->getTableAlias());
@@ -74,7 +70,7 @@ final class MessageRepository extends CommonRepository
             ->select('id, channel, channel_id, properties')
             ->where($q->expr()->eq('message_id', ':messageId'))
             ->setParameter('messageId', $messageId)
-            ->andWhere($q->expr()->eq('is_enabled', true));
+            ->andWhere($q->expr()->eq('is_enabled', '1'));
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -88,16 +84,16 @@ final class MessageRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return array<string, int|string|null>|false
      */
-    public function getChannelMessageByChannelId($channelId)
+    public function getChannelMessageByChannelId($channelId): array|false
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')
             ->select('id, channel, channel_id, properties, message_id')
             ->where($q->expr()->eq('id', ':channelId'))
             ->setParameter('channelId', $channelId)
-            ->andWhere($q->expr()->eq('is_enabled', true));
+            ->andWhere($q->expr()->eq('is_enabled', '1'));
 
         return $q->executeQuery()->fetchAssociative();
     }

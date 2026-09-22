@@ -193,7 +193,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
 
         // find all the actions for published points
         $availablePoints = $this->pointRepository->getPublishedByType($type);
-        if (empty($availablePoints)) {
+        if ($availablePoints === []) {
             return;
         }
         $ipAddress       = $this->ipLookupHelper->getIpAddress();

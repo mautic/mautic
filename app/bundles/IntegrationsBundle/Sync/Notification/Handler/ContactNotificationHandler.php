@@ -39,7 +39,7 @@ final class ContactNotificationHandler implements HandlerInterface
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void
     {
@@ -73,7 +73,7 @@ final class ContactNotificationHandler implements HandlerInterface
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     private function writeEventLogEntry(string $integration, int $contactId, string $message): void
     {

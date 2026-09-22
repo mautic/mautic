@@ -7,6 +7,7 @@ namespace Mautic\PointBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: LeadPointLogRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
@@ -26,6 +27,9 @@ class LeadPointLog
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -41,8 +45,6 @@ class LeadPointLog
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addLead(false, 'CASCADE', true);
 
         $builder->addIpAddress(true);
 

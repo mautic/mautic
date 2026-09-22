@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PointRepository::class)]
 #[ORM\Table(name: 'points')]
-#[ORM\Index(columns: ['type'], name: 'point_type_search')]
+#[ORM\Index(name: 'point_type_search', columns: ['type'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -115,7 +115,7 @@ class Point extends FormEntity implements UuidInterface
     /**
      * @var ArrayCollection<int,LeadPointLog>
      */
-    #[ORM\OneToMany(mappedBy: 'point', targetEntity: LeadPointLog::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: LeadPointLog::class, mappedBy: 'point', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**

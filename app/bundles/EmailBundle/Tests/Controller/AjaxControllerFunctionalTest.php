@@ -370,7 +370,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<int, mixed> $segments
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     private function createEmailWithParams(string $name, string $subject, string $emailType, string $template, string $customHtml, array $segments = []): Email
     {

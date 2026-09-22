@@ -9,8 +9,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: ListLeadRepository::class)]
 #[ORM\Table(name: 'lead_lists_leads')]
-#[ORM\Index(columns: ['manually_removed'], name: 'manually_removed')]
-#[ORM\Index(columns: ['lead_id', 'leadlist_id', 'manually_removed'], name: 'lead_id_lists_id_removed')]
+#[ORM\Index(name: 'manually_removed', columns: ['manually_removed'])]
+#[ORM\Index(name: 'lead_id_lists_id_removed', columns: ['lead_id', 'leadlist_id', 'manually_removed'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ListLead
 {
@@ -30,6 +30,9 @@ class ListLead
     /**
      * @var Lead
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -50,8 +53,6 @@ class ListLead
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addLead(false, 'CASCADE', true);
 
         $builder->addDateAdded();
 

@@ -11,14 +11,14 @@ use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: 'dynamic_content_stats')]
-#[ORM\Index(columns: ['dynamic_content_id', 'lead_id'], name: 'stat_dynamic_content_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_dynamic_content_source_search')]
-#[ORM\Index(columns: ['date_sent'], name: 'stat_dynamic_content_date_sent')]
+#[ORM\Index(name: 'stat_dynamic_content_search', columns: ['dynamic_content_id', 'lead_id'])]
+#[ORM\Index(name: 'stat_dynamic_content_source_search', columns: ['source', 'source_id'])]
+#[ORM\Index(name: 'stat_dynamic_content_date_sent', columns: ['date_sent'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 
@@ -32,6 +32,8 @@ class Stat
     /**
      * @var Lead|null
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private $lead;
 
     /**
@@ -74,8 +76,6 @@ class Stat
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->addLead(true, 'SET NULL');
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')

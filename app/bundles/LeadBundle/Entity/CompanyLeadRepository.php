@@ -69,7 +69,7 @@ class CompanyLeadRepository extends CommonRepository
 
         if ($onlyPrimary) {
             $q->andWhere(
-                $q->expr()->eq('cl.is_primary', true)
+                $q->expr()->eq('cl.is_primary', '1')
             );
         }
 
@@ -190,10 +190,7 @@ class CompanyLeadRepository extends CommonRepository
         return $qb->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEntitiesByLead(Lead $lead)
+    public function getEntitiesByLead(Lead $lead): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('cl')
@@ -259,9 +256,9 @@ class CompanyLeadRepository extends CommonRepository
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
         $qb->where(
-            $qb->expr()->eq('lead_id', $leadId)
+            $qb->expr()->eq('lead_id', (string) $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 1)
+            $qb->expr()->eq('is_primary', '1')
         )->executeStatement();
     }
 
@@ -279,9 +276,9 @@ class CompanyLeadRepository extends CommonRepository
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
         $qb->where(
-            $qb->expr()->eq('lead_id', $leadId)
+            $qb->expr()->eq('lead_id', (string) $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 0)
+            $qb->expr()->eq('is_primary', '0')
         )->executeStatement();
     }
 }

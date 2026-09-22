@@ -24,10 +24,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: FocusRepository::class)]
 #[ORM\Table(name: 'focus')]
-#[ORM\Index(columns: ['focus_type'], name: 'focus_type')]
-#[ORM\Index(columns: ['style'], name: 'focus_style')]
-#[ORM\Index(columns: ['form_id'], name: 'focus_form')]
-#[ORM\Index(columns: ['name'], name: 'focus_name')]
+#[ORM\Index(name: 'focus_type', columns: ['focus_type'])]
+#[ORM\Index(name: 'focus_style', columns: ['style'])]
+#[ORM\Index(name: 'focus_form', columns: ['form_id'])]
+#[ORM\Index(name: 'focus_name', columns: ['name'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [

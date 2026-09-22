@@ -12,14 +12,14 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 
 #[ORM\Entity(repositoryClass: StatDeviceRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['date_opened'], name: 'date_opened_search')]
+#[ORM\Index(name: 'date_opened_search', columns: ['date_opened'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class StatDevice
 {
     public const TABLE_NAME = 'email_stats_devices';
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 

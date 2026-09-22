@@ -35,7 +35,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: PageRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['alias'], name: 'page_alias_search')]
+#[ORM\Index(name: 'page_alias_search', columns: ['alias'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -199,7 +199,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $sessionId;
 
-    #[ORM\OneToOne(mappedBy: 'page', targetEntity: PageDraft::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToOne(targetEntity: PageDraft::class, mappedBy: 'page', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private ?PageDraft $draft = null;
 
     private bool $isCloned = false;

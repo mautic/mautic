@@ -12,14 +12,14 @@ use Mautic\LeadBundle\Entity\Lead as TheLead;
 
 #[ORM\Entity(repositoryClass: TweetStatRepository::class)]
 #[ORM\Table(name: 'tweet_stats')]
-#[ORM\Index(columns: ['tweet_id', 'lead_id'], name: 'stat_tweet_search')]
-#[ORM\Index(columns: ['lead_id', 'tweet_id'], name: 'stat_tweet_search2')]
-#[ORM\Index(columns: ['is_failed'], name: 'stat_tweet_failed_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_tweet_source_search')]
-#[ORM\Index(columns: ['favorite_count'], name: 'favorite_count_index')]
-#[ORM\Index(columns: ['retweet_count'], name: 'retweet_count_index')]
-#[ORM\Index(columns: ['date_sent'], name: 'tweet_date_sent')]
-#[ORM\Index(columns: ['twitter_tweet_id'], name: 'twitter_tweet_id_index')]
+#[ORM\Index(name: 'stat_tweet_search', columns: ['tweet_id', 'lead_id'])]
+#[ORM\Index(name: 'stat_tweet_search2', columns: ['lead_id', 'tweet_id'])]
+#[ORM\Index(name: 'stat_tweet_failed_search', columns: ['is_failed'])]
+#[ORM\Index(name: 'stat_tweet_source_search', columns: ['source', 'source_id'])]
+#[ORM\Index(name: 'favorite_count_index', columns: ['favorite_count'])]
+#[ORM\Index(name: 'retweet_count_index', columns: ['retweet_count'])]
+#[ORM\Index(name: 'tweet_date_sent', columns: ['date_sent'])]
+#[ORM\Index(name: 'twitter_tweet_id_index', columns: ['twitter_tweet_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class TweetStat
 {
@@ -42,6 +42,8 @@ class TweetStat
     /**
      * @var TheLead|null
      */
+    #[ORM\ManyToOne(targetEntity: TheLead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private $lead;
 
     /**
@@ -87,8 +89,6 @@ class TweetStat
             ->columnName('twitter_tweet_id')
             ->nullable()
             ->build();
-
-        $builder->addLead(true, 'SET NULL');
 
         $builder->createField('handle', 'string')
             ->build();

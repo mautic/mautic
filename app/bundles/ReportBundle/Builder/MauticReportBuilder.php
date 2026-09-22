@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -110,11 +111,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * @return QueryBuilder
-     *
      * @throws InvalidReportQueryException
      */
-    public function getQuery(array $options)
+    public function getQuery(array $options): TrackingQueryBuilder
     {
         $queryBuilder = $this->configureBuilder($options);
 
@@ -137,10 +136,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * This method configures the ReportBuilder. It has to return a configured Doctrine DBAL QueryBuilder.
      *
      * @param array<string, mixed> $options Options array
-     *
-     * @return QueryBuilder
      */
-    private function configureBuilder(array $options)
+    private function configureBuilder(array $options): TrackingQueryBuilder
     {
         $event = new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper);
 
@@ -254,9 +251,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 }
             }
 
-            $queryBuilder->addGroupBy($groupByColumns);
+            if ([] !== $groupByColumns) {
+                $queryBuilder->addGroupBy(...$groupByColumns);
+            }
         } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
-            $queryBuilder->addGroupBy($options['groupby']);
+            $queryBuilder->addGroupBy(...array_values((array) $options['groupby']));
         }
 
         // Build LIMIT clause
@@ -404,7 +403,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         });
 
-        $queryBuilder->addSelect($selectColumns);
+        // DBAL 4 requires at least one expression, so an empty list is skipped
+        if ([] !== $selectColumns) {
+            $queryBuilder->addSelect(...$selectColumns);
+        }
 
         // Add Aggregators
         $aggregatorSelect = [];
@@ -422,7 +424,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $aggregatorSelect[] = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
             }
 
-            $queryBuilder->addSelect($aggregatorSelect);
+            $queryBuilder->addSelect(...$aggregatorSelect);
         }
 
         return $queryBuilder;

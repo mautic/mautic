@@ -10,9 +10,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: LeadRepository::class)]
 #[ORM\Table(name: 'campaign_leads')]
-#[ORM\Index(columns: ['date_added'], name: 'campaign_leads_date_added')]
-#[ORM\Index(columns: ['date_last_exited'], name: 'campaign_leads_date_exited')]
-#[ORM\Index(columns: ['campaign_id', 'manually_removed', 'lead_id', 'rotation'], name: 'campaign_leads')]
+#[ORM\Index(name: 'campaign_leads_date_added', columns: ['date_added'])]
+#[ORM\Index(name: 'campaign_leads_date_exited', columns: ['date_last_exited'])]
+#[ORM\Index(name: 'campaign_leads', columns: ['campaign_id', 'manually_removed', 'lead_id', 'rotation'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Lead
 {
@@ -27,6 +27,9 @@ class Lead
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -60,8 +63,6 @@ class Lead
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addLead(false, 'CASCADE', true);
 
         $builder->addDateAdded();
 

@@ -27,7 +27,7 @@ class TrackableRepository extends CommonRepository
                 $q->expr()->and(
                     $q->expr()->eq('r.id', 't.redirect_id'),
                     $q->expr()->eq('t.channel', ':channel'),
-                    $q->expr()->eq('t.channel_id', (int) $channelId)
+                    $q->expr()->eq('t.channel_id', (string) ((int) $channelId))
                 )
             )
             ->setParameter('channel', $channel)
@@ -64,10 +64,8 @@ class TrackableRepository extends CommonRepository
 
     /**
      * Get an array of Trackable entities by Redirect URLs.
-     *
-     * @return array
      */
-    public function findByUrls(array $urls, $channel, $channelId)
+    public function findByUrls(array $urls, $channel, $channelId): array
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($alias)
@@ -97,9 +95,9 @@ class TrackableRepository extends CommonRepository
             ->set('hits', 'hits + '.(int) $increaseBy)
             ->where(
                 $q->expr()->and(
-                    $q->expr()->eq('redirect_id', (int) $redirectId),
+                    $q->expr()->eq('redirect_id', (string) ((int) $redirectId)),
                     $q->expr()->eq('channel', ':channel'),
-                    $q->expr()->eq('channel_id', (int) $channelId)
+                    $q->expr()->eq('channel_id', (string) ((int) $channelId))
                 )
             )
             ->setParameter('channel', $channel);

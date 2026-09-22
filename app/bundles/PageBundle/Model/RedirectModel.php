@@ -41,7 +41,7 @@ class RedirectModel extends FormModel
     /**
      * @return Redirect|null
      */
-    public function getRedirectById(string $identifier)
+    public function getRedirectById(string $identifier): ?object
     {
         return $this->redirectRepository->findOneBy(['redirectId' => $identifier]);
     }

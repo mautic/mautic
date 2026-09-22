@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -15,9 +16,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DownloadRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['tracking_id'], name: 'download_tracking_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'download_source_search')]
-#[ORM\Index(columns: ['date_download'], name: 'asset_date_download')]
+#[ORM\Index(name: 'download_tracking_search', columns: ['tracking_id'])]
+#[ORM\Index(name: 'download_source_search', columns: ['source', 'source_id'])]
+#[ORM\Index(name: 'asset_date_download', columns: ['date_download'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -34,12 +35,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent('asset')]
 class Download
 {
     public const TABLE_NAME = 'asset_downloads';
 
     /**
-     * @var string
+     * @var int|string
      */
     #[Groups(['download:read'])]
     private $id;
@@ -54,6 +56,8 @@ class Download
      * @var Asset|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\ManyToOne(targetEntity: Asset::class)]
+    #[ORM\JoinColumn(name: 'asset_id', onDelete: 'CASCADE')]
     private $asset;
 
     /**
@@ -62,6 +66,8 @@ class Download
     #[Groups(['download:read', 'download:write'])]
     private $ipAddress;
 
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     #[Groups(['download:read', 'download:write'])]
     private ?Lead $lead = null;
 
@@ -120,14 +126,7 @@ class Download
             ->columnName('date_download')
             ->build();
 
-        $builder->createManyToOne('asset', 'Asset')
-            ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
-            ->isOwnershipParent()
-            ->build();
-
         $builder->addIpAddress(true);
-
-        $builder->addLead(true, 'SET NULL');
 
         $builder->addField('code', 'integer');
 

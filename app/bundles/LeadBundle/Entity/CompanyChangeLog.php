@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: CompanyChangeLogRepository::class)]
 #[ORM\Table(name: 'lead_companies_change_log')]
-#[ORM\Index(columns: ['date_added'], name: 'company_date_added')]
+#[ORM\Index(name: 'company_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class CompanyChangeLog
 {
@@ -21,6 +21,8 @@ class CompanyChangeLog
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'companyChangeLog')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -53,8 +55,6 @@ class CompanyChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->addLead(false, 'CASCADE', false, 'companyChangeLog');
 
         $builder->createField('type', 'text')
             ->length(50)

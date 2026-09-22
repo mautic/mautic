@@ -48,7 +48,7 @@ final class LeadStageLogRepository extends CommonRepository
             ->setParameter('fromLeadId', $fromLeadId, ParameterType::STRING)
             ->setParameter('toLeadId', $toLeadId, ParameterType::STRING);
 
-        if (!empty($stageIds)) {
+        if ($stageIds !== []) {
             $q->andWhere(
                 $q->expr()->notIn('stage_id', ':stageIds')
             )->setParameter(

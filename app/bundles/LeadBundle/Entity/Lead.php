@@ -31,10 +31,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: LeadRepository::class)]
 #[ORM\Table(name: 'leads')]
-#[ORM\Index(columns: ['date_added'], name: 'lead_date_added')]
-#[ORM\Index(columns: ['date_modified'], name: 'lead_date_modified')]
-#[ORM\Index(columns: ['date_identified'], name: 'date_identified')]
-#[ORM\Index(columns: ['last_active'], name: 'last_active')]
+#[ORM\Index(name: 'lead_date_added', columns: ['date_added'])]
+#[ORM\Index(name: 'lead_date_modified', columns: ['date_modified'])]
+#[ORM\Index(name: 'date_identified', columns: ['date_identified'])]
+#[ORM\Index(name: 'last_active', columns: ['last_active'])]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -84,7 +84,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $availableSocialFields = [];
 
     /**
-     * @var string
+     * @var int|string
      */
     #[Groups(['contact:read', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $id;
@@ -161,7 +161,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, PointsChangeLog>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: PointsChangeLog::class, cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: PointsChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $pointsChangeLog;
 
@@ -170,20 +170,20 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, CompanyChangeLog>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: CompanyChangeLog::class, cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: CompanyChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $companyChangeLog;
 
     /**
      * @var Collection<string, DoNotContact>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: DoNotContact::class, cascade: ['persist', 'detach', 'merge'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: DoNotContact::class, mappedBy: 'lead', cascade: ['persist', 'detach'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     private $doNotContact;
 
     /**
      * @var Collection<string, IpAddress>
      */
-    #[ORM\ManyToMany(targetEntity: IpAddress::class, cascade: ['detach', 'merge', 'persist'], indexBy: 'ipAddress')]
+    #[ORM\ManyToMany(targetEntity: IpAddress::class, cascade: ['detach', 'persist'], indexBy: 'ipAddress')]
     #[ORM\JoinTable(name: 'lead_ips_xref')]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'ip_id', onDelete: 'CASCADE')]
@@ -192,13 +192,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, PushID>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: PushID::class, cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: PushID::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     private $pushIds;
 
     /**
      * @var ArrayCollection<int, LeadEventLog>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: LeadEventLog::class, cascade: ['persist', 'merge', 'detach'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: LeadEventLog::class, mappedBy: 'lead', cascade: ['persist', 'detach'], fetch: 'EXTRA_LAZY')]
     private $eventLog;
 
     /**
@@ -243,7 +243,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @var Collection<int, LeadNote>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: LeadNote::class, cascade: ['detach', 'merge'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: LeadNote::class, mappedBy: 'lead', cascade: ['detach'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $notes;
 
@@ -261,7 +261,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<string, Tag>
      */
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
-    #[ORM\ManyToMany(targetEntity: Tag::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'tag')]
+    #[ORM\ManyToMany(targetEntity: Tag::class, cascade: ['persist', 'detach'], fetch: 'LAZY', indexBy: 'tag')]
     #[ORM\JoinTable(name: 'lead_tags_xref')]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'tag_id', nullable: false)]
@@ -272,34 +272,34 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Stage|null
      */
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
-    #[ORM\ManyToOne(targetEntity: Stage::class, cascade: ['persist', 'merge', 'detach'])]
+    #[ORM\ManyToOne(targetEntity: Stage::class, cascade: ['persist', 'detach'])]
     #[ORM\JoinColumn(name: 'stage_id', onDelete: 'SET NULL')]
     private $stage;
 
     /**
      * @var Collection<int, StagesChangeLog>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: StagesChangeLog::class, cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: StagesChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $stageChangeLog;
 
     /**
      * @var Collection<int, UtmTag>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: UtmTag::class, cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: UtmTag::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
     private $utmtags;
 
     /**
      * @var Collection<int, FrequencyRule>
      */
-    #[ORM\OneToMany(mappedBy: 'lead', targetEntity: FrequencyRule::class, cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true, indexBy: 'channel')]
+    #[ORM\OneToMany(targetEntity: FrequencyRule::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true, indexBy: 'channel')]
     #[ORM\OrderBy(['dateAdded' => 'DESC'])]
     private $frequencyRules;
 
     /**
      * @var ArrayCollection<int,GroupContactScore>
      */
-    #[ORM\OneToMany(mappedBy: 'contact', targetEntity: GroupContactScore::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: GroupContactScore::class, mappedBy: 'contact', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private $groupScores;
 
     private int $previousId = 0;

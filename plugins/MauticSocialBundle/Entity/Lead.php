@@ -21,6 +21,9 @@ class Lead
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -34,8 +37,6 @@ class Lead
 
         $builder->setTable('monitoring_leads')
             ->setCustomRepositoryClass(LeadRepository::class);
-
-        $builder->addLead(false, 'CASCADE', true);
 
         $builder->addNamedField('dateAdded', 'datetime', 'date_added');
     }

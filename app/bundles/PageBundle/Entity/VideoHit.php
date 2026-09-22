@@ -12,9 +12,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: VideoHitRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['date_hit'], name: 'video_date_hit')]
-#[ORM\Index(columns: ['channel', 'channel_id'], name: 'video_channel_search')]
-#[ORM\Index(columns: ['guid', 'lead_id'], name: 'video_guid_lead_search')]
+#[ORM\Index(name: 'video_date_hit', columns: ['date_hit'])]
+#[ORM\Index(name: 'video_channel_search', columns: ['channel', 'channel_id'])]
+#[ORM\Index(name: 'video_guid_lead_search', columns: ['guid', 'lead_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class VideoHit
 {
@@ -58,6 +58,8 @@ class VideoHit
     /**
      * @var Lead|null
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private $lead;
 
     /**
@@ -148,8 +150,6 @@ class VideoHit
             ->columnName('date_left')
             ->nullable()
             ->build();
-
-        $builder->addLead(true, 'SET NULL');
 
         $builder->addIpAddress(true);
 

@@ -11,8 +11,8 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 
 #[ORM\Entity(repositoryClass: FrequencyRuleRepository::class)]
 #[ORM\Table(name: 'lead_frequencyrules')]
-#[ORM\Index(columns: ['channel'], name: 'channel_frequency')]
-#[ORM\Index(columns: ['lead_id', 'date_added'], name: 'idx_frequency_date_added')]
+#[ORM\Index(name: 'channel_frequency', columns: ['channel'])]
+#[ORM\Index(name: 'idx_frequency_date_added', columns: ['lead_id', 'date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FrequencyRule extends CommonEntity
 {
@@ -30,6 +30,8 @@ class FrequencyRule extends CommonEntity
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'frequencyRules')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -69,8 +71,6 @@ class FrequencyRule extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->addLead(false, 'CASCADE', false, 'frequencyRules');
 
         $builder->addDateAdded();
 

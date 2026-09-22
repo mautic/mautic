@@ -25,6 +25,9 @@ class CompanyLead
     /**
      * @var Lead
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -40,8 +43,6 @@ class CompanyLead
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addLead(false, 'CASCADE', true);
 
         $builder->addDateAdded();
 

@@ -17,11 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 #[AllowMockObjectsWithoutExpectations]
 final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        $this->useCleanupRollback = false;
-        parent::setUp();
-    }
+    protected $useCleanupRollback = false;
+
 
     public function testNewAction(): void
     {

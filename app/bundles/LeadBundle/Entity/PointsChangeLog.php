@@ -11,20 +11,22 @@ use Mautic\PointBundle\Entity\Group;
 
 #[ORM\Entity(repositoryClass: PointsChangeLogRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['date_added'], name: 'point_date_added')]
+#[ORM\Index(name: 'point_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PointsChangeLog
 {
     public const TABLE_NAME = 'lead_points_change_log';
 
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 
     /**
      * @var Lead
      */
+    #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'pointsChangeLog')]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
@@ -66,8 +68,6 @@ class PointsChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->addLead(false, 'CASCADE', false, 'pointsChangeLog');
 
         $builder->addIpAddress(true);
 

@@ -119,7 +119,7 @@ class ReportRepository extends CommonRepository
 
         if ($ownedBy) {
             $qb->andWhere(
-                $qb->expr()->eq('r.created_by', (int) $ownedBy)
+                $qb->expr()->eq('r.created_by', (string) ((int) $ownedBy))
             );
         }
 

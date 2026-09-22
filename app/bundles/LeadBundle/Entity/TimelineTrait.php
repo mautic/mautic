@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\Serializer;
@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\Serializer;
 trait TimelineTrait
 {
     /**
-     * @param QueryBuilder $query                 DBAL QueryBuilder
      * @param array<mixed> $options               Query optons from LeadTimelineEvent
      * @param string       $eventNameColumn       Name of column to sort event name by
      * @param string       $timestampColumn       Name of column to sort timestamp by

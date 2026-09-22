@@ -32,7 +32,7 @@ class HitRepository extends CommonRepository
 
         // If we know the lead, use that to determine uniqueness
         if (null !== $lead && $lead->getId()) {
-            $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', $lead->getId()));
+            $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', (string) $lead->getId()));
         } else {
             $expr = CompositeExpression::and($q2->expr()->eq('h.tracking_id', ':id'));
             $q->setParameter('id', $trackingId);
@@ -40,11 +40,11 @@ class HitRepository extends CommonRepository
 
         if ($page instanceof Page) {
             $expr = $expr->with(
-                $q2->expr()->eq('h.page_id', $page->getId())
+                $q2->expr()->eq('h.page_id', (string) $page->getId())
             );
         } elseif ($page instanceof Redirect) {
             $expr = $expr->with(
-                $q2->expr()->eq('h.redirect_id', $page->getId())
+                $q2->expr()->eq('h.redirect_id', (string) $page->getId())
             );
         }
 
@@ -93,36 +93,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * @return array
-     */
-    public function getHitCountForSource($source, $sourceId = null, $fromDate = null, $code = 200)
-    {
-        $query = $this->createQueryBuilder('h');
-        $query->select('count(distinct(h.trackingId)) as hitCount');
-        $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($source)));
-
-        if (null != $sourceId) {
-            if (is_array($sourceId)) {
-                $query->andWhere($query->expr()->in('h.sourceId', ':sourceIds'))
-                    ->setParameter('sourceIds', $sourceId);
-            } else {
-                $query->andWhere('h.sourceId = :sourceId')
-                ->setParameter('sourceId', $sourceId);
-            }
-        }
-
-        if (null != $fromDate) {
-            $query->andwhere($query->expr()->gte('h.dateHit', ':date'))
-                ->setParameter('date', $fromDate);
-        }
-
-        $query->andWhere('h.code = :code')
-        ->setParameter('code', $code);
-
-        return $query->getQuery()->getArrayResult();
-    }
-
-    /**
      * Get an array of hits via an email clickthrough.
      *
      * @param int $code
@@ -153,7 +123,7 @@ class HitRepository extends CommonRepository
                 ->setParameter('dateTo', $dateHelper->toUtcString());
         }
 
-        $q->andWhere($q->expr()->eq('h.code', (int) $code));
+        $q->andWhere($q->expr()->eq('h.code', (string) ((int) $code)));
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -238,7 +208,7 @@ class HitRepository extends CommonRepository
 
         if (isset($options['leadId'])) {
             $sq->andWhere(
-                $sq->expr()->eq('h.lead_id', $options['leadId'])
+                $sq->expr()->eq('h.lead_id', (string) $options['leadId'])
             );
         }
         if (isset($options['urls']) && $options['urls']) {
@@ -249,7 +219,7 @@ class HitRepository extends CommonRepository
             }
         }
         if (isset($options['second_to_last'])) {
-            $sq->andWhere($sq->expr()->neq('h.id', $options['second_to_last']));
+            $sq->andWhere($sq->expr()->neq('h.id', (string) $options['second_to_last']));
         }
 
         $latestHit = $sq->executeQuery()->fetchOne();
@@ -295,7 +265,7 @@ class HitRepository extends CommonRepository
         $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $expr = $q->expr()->and(
             $q->expr()->{$inOrEq}('h.page_id', $pageIds),
-            $q->expr()->eq('h.code', 200),
+            $q->expr()->eq('h.code', '200'),
             $q->expr()->isNull('h.date_left')
         );
 
@@ -427,7 +397,7 @@ class HitRepository extends CommonRepository
 
         if (isset($options['leadId']) && $options['leadId']) {
             $q->andWhere(
-                $q->expr()->eq('ph.lead_id', (int) $options['leadId'])
+                $q->expr()->eq('ph.lead_id', (string) ((int) $options['leadId']))
             );
         }
 
@@ -481,14 +451,10 @@ class HitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     * @param int                               $limit
-     * @param int                               $offset
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers($query, $limit = 10, $offset = 0): array
+    public function getReferers(\Doctrine\DBAL\Query\QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('ph.referer, count(ph.referer) as sessions')
             ->groupBy('ph.referer')
@@ -502,16 +468,10 @@ class HitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     * @param int                               $limit
-     * @param int                               $offset
-     * @param string                            $column
-     * @param string                            $as
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostVisited($query, $limit = 10, $offset = 0, $column = 'p.hits', $as = ''): array
+    public function getMostVisited(\Doctrine\DBAL\Query\QueryBuilder $query, int $limit = 10, int $offset = 0, string $column = 'p.hits', string $as = ''): array
     {
         if ($as) {
             $as = ' as "'.$as.'"';
