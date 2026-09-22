@@ -3,7 +3,7 @@ includes:
     #- phpstan-model-param-type-ignore.neon
     # symplify/phpstan-rules sets
     #- vendor/symplify/phpstan-rules/config/phpstan-extensions.neon
-    - vendor/symplify/phpstan-rules/config/symplify-rules.neon
+    #- vendor/symplify/phpstan-rules/config/symplify-rules.neon
     - vendor/symplify/phpstan-rules/config/symfony-rules.neon
     - vendor/symplify/phpstan-rules/config/symfony-config-rules.neon
     - vendor/symplify/phpstan-rules/config/doctrine-rules.neon
@@ -14,11 +14,12 @@ parameters:
     tmpDir: ./var/phpstan-cache
     level: 6
 
-    reportUnmatchedIgnoredErrors: false
+    # reportUnmatchedIgnoredErrors: false
 
     symplify:
         mocks: false
-        ctor: false
+        ctor: true
+        naming: false
 
     treatPhpDocTypesAsCertain: false
 
@@ -69,49 +70,8 @@ parameters:
             paths:
                 - */Tests/*
                 - */Test/*
-        - identifier: symplify.forbiddenNode
-        - identifier: symplify.noReference
-        - identifier: symplify.requireAttributeNamespace
-        - identifier: symplify.classNameRespectsParentSuffix
-        # @todo bulk-ignored, resolve per identifier later
+        # handled in https://github.com/mautic/mautic/pull/17503
         - identifier: doctrine.noGetRepositoryOutsideService
-        - identifier: doctrine.noListenerWithoutContract
-        - identifier: doctrine.noRepositoryCallInDataFixtures
-        - identifier: doctrine.requireQueryBuilderOnRepository
-        - identifier: ignore.count
-        - identifier: mautic.modelMethodSingleParamMustHaveType
-        - identifier: phpunit.noAssertFuncCallInTests
-        - identifier: symfony.alreadyRegisteredAutodiscoveryService
-        - identifier: symfony.formTypeClassName
-        - identifier: symfony.noAbstractControllerConstructor
-        - identifier: symfony.noDuplicateArgsAutowireByType
-        - identifier: symfony.noFindTaggedServiceIdsCall
-        - identifier: symfony.noListenerWithoutContract
-        - identifier: symfony.noRequiredOutsideClass
-        - identifier: symfony.noServiceAutowireDuplicate
-        - identifier: symfony.preferAutowireAttributeOverConfigParam
-        - identifier: symfony.singleArgEventDispatch
-        - identifier: symfony.singleRequiredMethod
-        - identifier: symplify.explicitAbstractPrefixName
-        - identifier: symplify.explicitInterfaceSuffixName
-        - identifier: symplify.forbiddenArrayMethodCall
-        - identifier: symplify.forbiddenExtendOfNonAbstractClass
-        - identifier: symplify.forbiddenFuncCall
-        - identifier: symplify.forbiddenStaticClassConstFetch
-        - identifier: symplify.foreachCeption
-        - identifier: symplify.multipleClassLikeInFile
-        - identifier: symplify.noArrayMapWithArrayCallable
-        - identifier: symplify.noConstructorOverride
-        - identifier: symplify.noDynamicName
-        - identifier: symplify.noGlobalConst
-        - identifier: symplify.noNullableServiceInConstructor
-        - identifier: symplify.noReturnSetterMethod
-        - identifier: symplify.preferInterfaceInConstructor
-        - identifier: symplify.requireExceptionNamespace
-        - identifier: symplify.seeAnnotationToTest
-        # to be removed once all controllers are invokable
-        - identifier: symfony.requiredOnlyInAbstract
-        - identifier: symplify.requiredInterfaceContractNamespace
 
         # CompanyLeadRepository is only needed by the static IdentifyCompanyHelper, exposed via getter to avoid threading it through 9 call sites
         -
@@ -121,12 +81,6 @@ parameters:
         -
             identifier: symplify.noNullableServiceInConstructor
             path: app/bundles/ReportBundle/Generator/ReportGenerator.php
-        # the concrete Config Loader and Messenger TransportFactory are the ones wired as services, no interface alias exists
-        -
-            identifier: symplify.preferInterfaceInConstructor
-            paths:
-                - app/bundles/CoreBundle/Event/RouteEvent.php
-                - app/bundles/MessengerBundle/Validator/DsnValidator.php
         # these services have no class name alias in the container, so only the string name can fetch them
         -
             identifier: mautic.noContainerGet
@@ -139,10 +93,8 @@ parameters:
                 - app/bundles/LeadBundle/Tests/Model/FieldModelTest.php
                 - app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
                 - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
-
         - identifier: missingType.generics
         # controllers - group missing parameter types to fix later
-
         -
             identifier: missingType.parameter
             path: *Controller.php
@@ -175,7 +127,6 @@ parameters:
             message: '#Property .+::\$(client|user) type mapping mismatch: property can contain .+but database expects#'
             path: app/bundles/ApiBundle/Entity/oAuth2/*.php
             identifier: doctrine.associationType
-
         # mocks
         - '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
         - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
@@ -184,8 +135,6 @@ parameters:
         # on purposelater
         #- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
 
-        # can't figure out what the right type should be for FormBuilderInterface
-        - '#buildForm\(\) expects Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null>, Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null> given#'
         # on purpose type check
         -
             message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
@@ -275,7 +224,6 @@ parameters:
         -
             identifier: symplify.noJustPropertyAssign
             path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
-
         # mixed return
         -
             identifier: return.unusedType
