@@ -29,7 +29,7 @@ return [
             ],
             'mautic_core_form_action' => [
                 'path'       => '/action/{objectAction}/{objectModel}/{objectId}',
-                'controller' => 'Mautic\CoreBundle\Controller\FormController::executeAction',
+                'controller' => 'Mautic\CoreBundle\Controller\LockController::executeAction',
                 'defaults'   => [
                     'objectModel' => '',
                 ],

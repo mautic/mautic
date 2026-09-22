@@ -2,7 +2,7 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\UserBundle\Entity;
 use Mautic\UserBundle\Entity\PermissionRepository;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class RoleController extends FormController
+final class RoleController extends AbstractFormController
 {
     private const string PERMISSION_VIEW = 'user:roles:view';
 
@@ -89,7 +89,7 @@ final class RoleController extends FormController
             $this->throwAccessDenied();
         }
 
-        $this->setListFilters();
+        $this->setListFilters($this->getSessionBase());
 
         $pageHelper = $pageHelperFactory->make('mautic.role', $page);
 
