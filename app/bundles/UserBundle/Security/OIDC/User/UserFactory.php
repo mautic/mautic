@@ -30,7 +30,7 @@ final readonly class UserFactory implements UserFactoryInterface
 
         $role = $this->getUserRole();
         if (!$role) {
-            $this->logger->error('Could not register user through OpenID Connect. Registered user role not found.', ['role' => $this->parameters->getRegisteredUserRole()]);
+            $this->logger->error('Could not register user through OpenID Connect. Registered user role not found.', ['roleId' => $this->parameters->getRegisteredUserRoleId()]);
             throw new OidcException('mautic.open_id.registration.exception.invalid_role');
         }
 
@@ -68,11 +68,11 @@ final readonly class UserFactory implements UserFactoryInterface
 
     private function getUserRole(): ?Role
     {
-        $role = $this->parameters->getRegisteredUserRole();
-        if (!$role) {
+        $roleId = $this->parameters->getRegisteredUserRoleId();
+        if (!$roleId) {
             return null;
         }
 
-        return $this->roleRepository->find($role->getId());
+        return $this->roleRepository->find($roleId);
     }
 }

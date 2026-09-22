@@ -40,7 +40,7 @@ final class UserTypeExtensionTest extends TestCase
             ->method('addModelTransformer')
             ->willReturn($formBuilder);
 
-        $userTypeExtension->buildForm($formBuilder, []);
+        $userTypeExtension->buildForm($formBuilder, ['data' => null]);
     }
 
     public function testBuildFormDoesNotAddSubjectIdWhenOpenIdIsDisabled(): void

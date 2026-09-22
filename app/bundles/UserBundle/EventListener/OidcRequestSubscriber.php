@@ -17,19 +17,12 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 final readonly class OidcRequestSubscriber implements EventSubscriberInterface
 {
-    private string $requiredUrl;
-    private string $loginUrl;
-    private string $dashboardUrl;
-
     public function __construct(
         private Settings $parameters,
         private TokenStorageInterface $tokenStorage,
-        UrlGeneratorInterface $urlGenerator,
+        private UrlGeneratorInterface $urlGenerator,
         private LoggerInterface $logger,
     ) {
-        $this->requiredUrl  = $urlGenerator->generate('open_id_login_required', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $this->loginUrl     = $urlGenerator->generate('login', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $this->dashboardUrl = $urlGenerator->generate('mautic_dashboard_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     public static function getSubscribedEvents(): array
@@ -66,7 +59,7 @@ final readonly class OidcRequestSubscriber implements EventSubscriberInterface
 
         $this->logger->debug('OpenID is disabled, redirecting to login page');
 
-        return new RedirectResponse($this->loginUrl);
+        return new RedirectResponse($this->urlGenerator->generate('login', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     private function redirectFromOpenIDWhenAuthenticated(?string $firewall, ?TokenInterface $token): ?RedirectResponse
@@ -77,7 +70,7 @@ final readonly class OidcRequestSubscriber implements EventSubscriberInterface
 
         $this->logger->debug('Redirecting from OpenID to dashboard, because user is authenticated.');
 
-        return new RedirectResponse($this->dashboardUrl);
+        return new RedirectResponse($this->urlGenerator->generate('mautic_dashboard_index', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     private function redirectFromMainWhenRequired(?string $firewall, ?TokenInterface $token): ?RedirectResponse
@@ -88,7 +81,7 @@ final readonly class OidcRequestSubscriber implements EventSubscriberInterface
 
         $this->logger->debug('Redirecting from main to OpenID login required, because user is not authenticated with OpenID Connect.');
 
-        return new RedirectResponse($this->requiredUrl);
+        return new RedirectResponse($this->urlGenerator->generate('open_id_login_required', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     private function redirectFromLoginWhenAuthenticated(?string $firewall, ?TokenInterface $token): ?RedirectResponse
@@ -99,7 +92,7 @@ final readonly class OidcRequestSubscriber implements EventSubscriberInterface
 
         $this->logger->debug('Redirecting from login to dashboard, because user is authenticated with OpenID Connect.');
 
-        return new RedirectResponse($this->dashboardUrl);
+        return new RedirectResponse($this->urlGenerator->generate('mautic_dashboard_index', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     private function isAnonymousToken(?TokenInterface $token): bool

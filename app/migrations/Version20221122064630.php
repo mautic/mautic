@@ -6,7 +6,7 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
-use Mautic\OpenIdBundle\Entity\SubjectId;
+use Mautic\UserBundle\Entity\OidcSubjectId;
 
 final class Version20221122064630 extends PreUpAssertionMigration
 {
@@ -18,13 +18,13 @@ final class Version20221122064630 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(function (Schema $schema) {
-            return $schema->hasTable($this->prefix.SubjectId::TABLE_NAME);
-        }, sprintf('Table %s already exists', SubjectId::TABLE_NAME));
+            return $schema->hasTable($this->prefix.OidcSubjectId::TABLE_NAME);
+        }, sprintf('Table %s already exists', OidcSubjectId::TABLE_NAME));
     }
 
     public function up(Schema $schema): void
     {
-        $table = $schema->createTable($this->prefix.SubjectId::TABLE_NAME);
+        $table = $schema->createTable($this->prefix.OidcSubjectId::TABLE_NAME);
         $table->addColumn('user_id', 'integer', ['unsigned' => true]);
         $table->addColumn('subject_id', 'string', ['length' => 255, 'default' => null, 'notnull' => false]);
         $table->addUniqueIndex(['subject_id'], 'openid_subject_id');
@@ -34,6 +34,6 @@ final class Version20221122064630 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
-        $schema->dropTable($this->prefix.SubjectId::TABLE_NAME);
+        $schema->dropTable($this->prefix.OidcSubjectId::TABLE_NAME);
     }
 }

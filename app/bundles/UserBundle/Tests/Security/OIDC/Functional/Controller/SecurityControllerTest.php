@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Security\OIDC\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\OIDC\Client\ClientInterface;
-use Mautic\UserBundle\Security\OIDC\Entity\SubjectId;
 use Mautic\UserBundle\Security\OIDC\Settings;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use Mautic\UserBundle\Tests\Security\OIDC\Functional\WebLoginTrait;
@@ -54,7 +54,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $unlinkedUser->setRole($role);
         $this->em->persist($unlinkedUser);
 
-        $subjectId = new SubjectId();
+        $subjectId = new OidcSubjectId();
         $subjectId->setUser($linkedUser);
         $subjectId->setSubjectID('linked_admin');
         $this->em->persist($subjectId);
@@ -239,7 +239,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
     public function testLoginActionLinksUser(ParametersBuilder $parametersBuilder): void
     {
         $userRepo      = $this->em->getRepository(User::class);
-        $subjectIdRepo = $this->em->getRepository(SubjectId::class);
+        $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
         $openIdClient  = $this->createMock(ClientInterface::class);
         $this->client->getContainer()->set('mautic.open_id.client', $openIdClient);
 
@@ -269,14 +269,14 @@ final class SecurityControllerTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
-        $this->assertInstanceOf(\Mautic\UserBundle\Security\OIDC\Entity\SubjectId::class, $subjectId);
+        $this->assertInstanceOf(OidcSubjectId::class, $subjectId);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testLoginActionCreatesUser(ParametersBuilder $parametersBuilder): void
     {
         $userRepo      = $this->em->getRepository(User::class);
-        $subjectIdRepo = $this->em->getRepository(SubjectId::class);
+        $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
         $openIdClient  = $this->createMock(ClientInterface::class);
         $this->client->getContainer()->set('mautic.open_id.client', $openIdClient);
 
@@ -319,13 +319,13 @@ final class SecurityControllerTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
-        $this->assertInstanceOf(\Mautic\UserBundle\Security\OIDC\Entity\SubjectId::class, $subjectId);
+        $this->assertInstanceOf(OidcSubjectId::class, $subjectId);
     }
 
     /**
      * @return iterable<string, array<int, ParametersBuilder>>
      */
-    public function enabledParametersProvider(): iterable
+    public static function enabledParametersProvider(): iterable
     {
         yield 'Everything Enabled' => [
             new ParametersBuilder(),

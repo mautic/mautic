@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC;
 
-use Mautic\UserBundle\Entity\Role;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class Settings
@@ -17,9 +16,8 @@ final readonly class Settings
         #[Autowire(param: 'mautic.open_id_is_user_registration_allowed')]
         private bool $isUserRegistrationAllowed,
         #[Autowire(param: 'mautic.open_id_registered_user_role')]
-        private ?Role $registeredUserRole = null
-    )
-    {
+        private ?int $registeredUserRoleId = null
+    ) {
     }
 
     public function isEnabled(): bool
@@ -37,8 +35,8 @@ final readonly class Settings
         return $this->isUserRegistrationAllowed;
     }
 
-    public function getRegisteredUserRole(): ?Role
+    public function getRegisteredUserRoleId(): ?int
     {
-        return $this->registeredUserRole;
+        return $this->registeredUserRoleId;
     }
 }

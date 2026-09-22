@@ -121,7 +121,7 @@ final class ConfigTypeExtension extends AbstractTypeExtension
             RoleListType::class,
             [
                 'label'      => 'mautic.open_id.config.registered_user_default_role',
-                'data'       => $this->config->getRegisteredUserRole() ? $this->config->getRegisteredUserRole()->getId() : 0,
+                'data'       => $this->config->getRegisteredUserRoleId() ?? 0,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
