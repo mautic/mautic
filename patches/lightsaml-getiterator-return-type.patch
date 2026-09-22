@@ -1,0 +1,11 @@
+--- a/src/LightSaml/Context/AbstractContext.php
++++ b/src/LightSaml/Context/AbstractContext.php
+@@ -154,7 +154,7 @@
+     /**
+      * @return \ArrayIterator
+      */
+-    public function getIterator()
++    public function getIterator(): \ArrayIterator
+     {
+         return new \ArrayIterator($this->subContexts);
+     }
