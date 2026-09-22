@@ -50,7 +50,7 @@
     "symfony/var-dumper": "~8.1.0",
     "symfony/web-profiler-bundle": "~8.1.0",
     "symplify/easy-coding-standard": "^13.3.0",
-    "symplify/phpstan-rules": "^14.10",
+    "symplify/phpstan-rules": "^14.15",
     "tomasvotruba/class-leak": "^2.2.3",
     "tomasvotruba/type-coverage": "^2.2.1"
   },

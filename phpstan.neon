@@ -42,8 +42,14 @@ parameters:
     ignoreErrors:
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
-            identifier: mautic.noNullableServiceInConstructor
+            identifier: symplify.noNullableServiceInConstructor
             path: app/bundles/ReportBundle/Generator/ReportGenerator.php
+        # the concrete Config Loader and Messenger TransportFactory are the ones wired as services, no interface alias exists
+        -
+            identifier: symplify.preferInterfaceInConstructor
+            paths:
+                - app/bundles/CoreBundle/Event/RouteEvent.php
+                - app/bundles/MessengerBundle/Validator/DsnValidator.php
         # these services have no class name alias in the container, so only the string name can fetch them
         -
             identifier: mautic.noContainerGet
@@ -219,18 +225,18 @@ parameters:
 rules:
     - Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
     - Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
-    - Utils\PHPStan\Rule\NoStringTargetEntityRule
+    - Symplify\PHPStanRules\Rules\Doctrine\NoStringTargetEntityRule
     - Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
     - Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
     - Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
     - Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
-    - Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
-    - Utils\PHPStan\Rule\ConstraintMustHaveAttributeRule
-    - Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
+    - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
+    - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
+    - Symplify\PHPStanRules\Rules\Symfony\NoNullableServiceInConstructorRule
     - Utils\PHPStan\Rule\NoGetRepositoryWithEntityRule
     - Utils\PHPStan\Rule\NoContainerGetRule
-    - Utils\PHPStan\Rule\PreferInterfaceInConstructorRule
-    - Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule
+    - Symplify\PHPStanRules\Rules\Symfony\PreferInterfaceInConstructorRule
+    - Symplify\PHPStanRules\Rules\Complexity\NoPropertyToPropertyAssignRule
     - Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
 
@@ -238,21 +244,21 @@ rules:
     - Utils\PHPStan\Rule\NoServiceInMethodParameterRule
     - Utils\PHPStan\Rule\NoUnusedServiceAliasRule
     - Utils\PHPStan\Rule\NoParentConstructorForwardingRule
-    - Utils\PHPStan\Rule\NoServiceJugglingRule
+    - Symplify\PHPStanRules\Rules\Symfony\NoServiceJugglingRule
     - Utils\PHPStan\Rule\NoUnusedServiceNameRule
     - Utils\PHPStan\Rule\NoClassNameServiceAliasRule
     - Utils\PHPStan\Rule\NoAlreadyLoadedServiceSetRule
-    - Utils\PHPStan\Rule\NoAutoconfiguredServiceTagRule
-    - Utils\PHPStan\Rule\PreferClassServiceReferenceRule
+    - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoAutoconfiguredServiceTagRule
+    - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\PreferClassServiceReferenceRule
     - Utils\PHPStan\Rule\NoRedundantAutowiredServiceArgumentRule
-    - Utils\PHPStan\Rule\NoServiceSetterCallRule
+    - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoServiceSetterCallRule
     - Utils\PHPStan\Rule\NoServiceGetterRule
-    - Utils\PHPStan\Rule\NoReadonlyEntityClassRule
+    - Symplify\PHPStanRules\Rules\Doctrine\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
-    - Utils\PHPStan\Rule\RequireArrayShapeReturnRule
+    - Symplify\PHPStanRules\Rules\RequireArrayShapeReturnRule
     # enable later, might not be needed
-    - Utils\PHPStan\Rule\NoDuplicateNonRepeatableAttributeRule
+    - Symplify\PHPStanRules\Rules\NoDuplicateNonRepeatableAttributeRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
@@ -281,10 +287,10 @@ services:
         tags:
             - phpstan.collector
     -
-        class: Utils\PHPStan\Collector\ClassTargetServiceAliasCollector
+        class: Symplify\PHPStanRules\Collector\ClassTargetServiceAliasCollector
         tags:
             - phpstan.collector
     -
-        class: Utils\PHPStan\Collector\ServiceStringReferenceCollector
+        class: Symplify\PHPStanRules\Collector\ServiceStringReferenceCollector
         tags:
             - phpstan.collector
