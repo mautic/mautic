@@ -676,10 +676,8 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         };
 
         $leadEvent1 =  new LeadEvent($leadsParams[0]['entity'], $leadsParams[0]['isNew']);
-        $leadEvent1->setEntityManager($this->entityManagerMock);
 
         $leadEvent2 =  new LeadEvent($leadsParams[1]['entity'], $leadsParams[1]['isNew']);
-        $leadEvent2->setEntityManager($this->entityManagerMock);
 
         $event = new SaveBatchLeadsEvent([
             $leadEvent1,

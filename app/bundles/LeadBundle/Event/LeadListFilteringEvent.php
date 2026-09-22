@@ -11,6 +11,8 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
  */
 final class LeadListFilteringEvent extends CommonEvent
 {
+    private readonly EntityManagerInterface $em;
+
     private bool $isFilteringDone = false;
 
     private string $subQuery = '';

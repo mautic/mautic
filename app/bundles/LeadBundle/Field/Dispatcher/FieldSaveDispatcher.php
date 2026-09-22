@@ -46,7 +46,6 @@ readonly class FieldSaveDispatcher
 
         if (null === $event) {
             $event = new LeadFieldEvent($entity, $isNew);
-            $event->setEntityManager($this->entityManager);
         }
 
         $this->dispatcher->dispatch($event, $action);

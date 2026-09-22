@@ -40,7 +40,6 @@ readonly class FieldDeleteDispatcher
 
         if (null === $event) {
             $event = new LeadFieldEvent($entity);
-            $event->setEntityManager($this->entityManager);
         }
 
         $this->dispatcher->dispatch($event, $action);
