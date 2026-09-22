@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO;
 
-use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Security\OIDC\Settings;
 
 final class ParametersBuilder
@@ -12,7 +11,7 @@ final class ParametersBuilder
     private bool $isEnabled                 = true;
     private bool $isRequired                = true;
     private bool $isUserRegistrationAllowed = true;
-    private ?Role $registeredUserRole       = null;
+    private ?int $registeredUserRoleId      = null;
 
     public function build(): Settings
     {
@@ -20,7 +19,7 @@ final class ParametersBuilder
             $this->isEnabled,
             $this->isRequired,
             $this->isUserRegistrationAllowed,
-            $this->registeredUserRole
+            $this->registeredUserRoleId
         );
     }
 
@@ -45,9 +44,9 @@ final class ParametersBuilder
         return $this;
     }
 
-    public function withRegisteredUserRole(?Role $registeredUserRole): self
+    public function withRegisteredUserRoleId(?int $registeredUserRoleId): self
     {
-        $this->registeredUserRole = $registeredUserRole;
+        $this->registeredUserRoleId = $registeredUserRoleId;
 
         return $this;
     }

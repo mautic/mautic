@@ -29,7 +29,6 @@ final class SecurityControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        self::bootKernel();
 
         $role = new Role();
         $role->setName('Admin');
@@ -60,8 +59,6 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $this->em->persist($subjectId);
 
         $this->em->flush();
-
-        $this->client = self::createClient();
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
@@ -194,7 +191,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $openIdClient->expects($this->once())
             ->method('authenticate')
             ->willReturn(new RedirectResponse('https://mautic.com'));
-        $this->client->getContainer()->set('mautic.open_id.client', $openIdClient);
+        $this->client->getContainer()->set(ClientInterface::class, $openIdClient);
         $this->makeRequest($parameters, self::LOGIN_PATH);
 
         self::assertResponseIsSuccessful();
@@ -218,7 +215,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $openIdClient->expects($this->once())
             ->method('authenticate')
             ->willReturn(new RedirectResponse('https://mautic.com'));
-        $this->client->getContainer()->set('mautic.open_id.client', $openIdClient);
+        $this->client->getContainer()->set(ClientInterface::class, $openIdClient);
         $this->makeRequest($parameters, self::LOGIN_PATH);
 
         self::assertResponseIsSuccessful();
@@ -241,8 +238,17 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $userRepo      = $this->em->getRepository(User::class);
         $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
         $openIdClient  = $this->createMock(ClientInterface::class);
-        $this->client->getContainer()->set('mautic.open_id.client', $openIdClient);
+        $this->client->getContainer()->set(ClientInterface::class, $openIdClient);
 
+        $openIdClient->expects($this->once())
+            ->method('requestUserInfo')
+            ->willReturn([
+                'sub'                => '123',
+                'email'              => 'unlinked_admin@mautic.local',
+                'preferred_username' => 'unlinked_admin',
+                'given_name'         => 'unlinked_admin',
+                'family_name'        => 'unlinked_admin',
+            ]);
         $openIdClient->expects($this->once())
             ->method('getVerifiedClaims')
             ->willReturn([
@@ -278,8 +284,17 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $userRepo      = $this->em->getRepository(User::class);
         $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
         $openIdClient  = $this->createMock(ClientInterface::class);
-        $this->client->getContainer()->set('mautic.open_id.client', $openIdClient);
+        $this->client->getContainer()->set(ClientInterface::class, $openIdClient);
 
+        $openIdClient->expects($this->once())
+            ->method('requestUserInfo')
+            ->willReturn([
+                'sub'                => '123',
+                'email'              => 'new_admin@mautic.local',
+                'preferred_username' => 'new_admin',
+                'given_name'         => 'new_admin',
+                'family_name'        => 'new_admin',
+            ]);
         $openIdClient->expects($this->once())
             ->method('getVerifiedClaims')
             ->willReturn([
@@ -299,7 +314,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $adminRole = $roleRepo->findOneBy(['name' => 'Admin']);
         $this->assertInstanceOf(Role::class, $adminRole);
 
-        $parameters = $parametersBuilder->withRegisteredUserRole($adminRole)->build();
+        $parameters = $parametersBuilder->withRegisteredUserRoleId($adminRole->getId())->build();
 
         $crawler = $this->makeRequest($parameters, self::LOGIN_PATH, [
             'code'  => 'code',
@@ -345,7 +360,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
      */
     private function makeRequest(Settings $parameters, string $path, array $requestParameters = []): Crawler
     {
-        $this->client->getContainer()->set('mautic.open_id.settings', $parameters);
+        $this->client->getContainer()->set(Settings::class, $parameters);
         $this->client->followRedirects();
         $this->client->disableReboot();
 

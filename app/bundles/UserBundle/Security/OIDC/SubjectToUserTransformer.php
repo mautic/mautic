@@ -30,6 +30,6 @@ final readonly class SubjectToUserTransformer implements DataTransformerInterfac
             return $value->getUser();
         }
 
-        throw new \InvalidArgumentException(\sprintf('Expected instance of %s. Given %s', SubjectId::class, get_debug_type($value)));
+        throw new \InvalidArgumentException(\sprintf('Expected instance of %s. Given %s', OidcSubjectId::class, get_debug_type($value)));
     }
 }

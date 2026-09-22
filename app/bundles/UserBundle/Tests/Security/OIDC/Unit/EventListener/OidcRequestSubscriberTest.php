@@ -75,7 +75,7 @@ final class OidcRequestSubscriberTest extends TestCase
         $settings     = $this->createSettings(true, false);
         $tokenStorage = $this->createStub(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
-        $router       = $this->getUrlGenerator();
+        $router       = $this->createStub(UrlGeneratorInterface::class);
         $requestEvent = $this->getRequestEvent(self::MAIN_FIREWALL);
 
         $subscriber = new OidcRequestSubscriber($settings, $tokenStorage, $router, $logger);
@@ -87,7 +87,7 @@ final class OidcRequestSubscriberTest extends TestCase
         $settings     = $this->createSettings(false, true);
         $tokenStorage = $this->createStub(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
-        $router       = $this->getUrlGenerator();
+        $router       = $this->createStub(UrlGeneratorInterface::class);
         $requestEvent = $this->getRequestEvent(self::MAIN_FIREWALL);
 
         $subscriber = new OidcRequestSubscriber($settings, $tokenStorage, $router, $logger);
@@ -111,7 +111,7 @@ final class OidcRequestSubscriberTest extends TestCase
         $settings     = $this->createSettings(true, true);
         $tokenStorage = $this->createStub(TokenStorageInterface::class);
         $logger       = $this->createStub(LoggerInterface::class);
-        $router       = $this->getUrlGenerator();
+        $router       = $this->createStub(UrlGeneratorInterface::class);
         $requestEvent = $this->getRequestEvent(self::LOGIN_FIREWALL);
 
         $subscriber = new OidcRequestSubscriber($settings, $tokenStorage, $router, $logger);
@@ -171,7 +171,7 @@ final class OidcRequestSubscriberTest extends TestCase
         $router->expects($this->atLeastOnce())
             ->method('generate')
             ->willReturnCallback(fn (string $route): string => match ($route) {
-                'open_id_login_required' => self::OPEN_ID_REQUIRED_PATH,
+                'mautic_oidc_required' => self::OPEN_ID_REQUIRED_PATH,
                 'login' => self::LOGIN_PATH,
                 'mautic_dashboard_index' => self::DASHBOARD_PATH,
                 default => throw new \RuntimeException("Unexpected route: $route"),

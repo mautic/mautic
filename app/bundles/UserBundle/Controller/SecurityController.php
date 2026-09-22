@@ -9,8 +9,11 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Exception\WeakPasswordException;
+use Mautic\UserBundle\Security\OIDC\ClientCredentials;
+use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
 use Mautic\UserBundle\Security\OIDC\Settings;
 use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,6 +44,11 @@ final class SecurityController extends CommonController implements EventSubscrib
         \assert(is_string($controller));
 
         if (!str_contains($controller, self::class)) {
+            return;
+        }
+
+        // Don't redirect from oidcRequiredAction - users need to link their account there
+        if (str_contains($controller, 'oidcRequiredAction')) {
             return;
         }
 
@@ -139,19 +147,18 @@ final class SecurityController extends CommonController implements EventSubscrib
         ]);
     }
 
-    /**
-     * OIDC login action.
-     */
     public function oidcLoginAction(
         Settings $oidcSettings,
-        \Mautic\UserBundle\Security\OIDC\Client\ClientInterface $oidcClient,
-        \Psr\Log\LoggerInterface $logger,
-    ): \Symfony\Component\HttpFoundation\RedirectResponse {
+        ClientFactoryInterface $clientFactory,
+        ClientCredentials $clientCredentials,
+        LoggerInterface $logger,
+    ): RedirectResponse {
         if (!$oidcSettings->isEnabled()) {
             return $this->redirectToRoute('login');
         }
 
         try {
+            $oidcClient = $clientFactory->create($clientCredentials);
             if ($authenticatedRedirect = $oidcClient->authenticate()) {
                 return $authenticatedRedirect;
             }

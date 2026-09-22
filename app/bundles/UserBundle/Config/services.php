@@ -30,8 +30,9 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     // Security folder is excluded by DEFAULT_EXCLUDES, load OIDC separately
+    // Exclude Client classes to prevent HTTP requests during container compilation
     $services->load('Mautic\\UserBundle\\Security\\OIDC\\', '../Security/OIDC/')
-        ->exclude('../Security/OIDC/DTO');
+        ->exclude('../Security/OIDC/{DTO,Client}');
 
     $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
@@ -64,11 +65,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(UserProvider::class);
     $services->alias('mautic.user.provider', UserProvider::class);
-
-    // OIDC Client is created by factory (not autowired directly)
-    $services->set(Mautic\UserBundle\Security\OIDC\Client\ClientInterface::class)
-        ->factory([service(Mautic\UserBundle\Security\OIDC\Factory\ClientFactory::class), 'create'])
-        ->args([service(Mautic\UserBundle\Security\OIDC\ClientCredentials::class)]);
 
     $services->load('Mautic\\UserBundle\\Security\\EntryPoint\\', '../Security/EntryPoint/*.php');
     $services->load('Mautic\\UserBundle\\Security\\Authentication\\Token\\Permissions\\', '../Security/Authentication/Token/Permissions/*.php');

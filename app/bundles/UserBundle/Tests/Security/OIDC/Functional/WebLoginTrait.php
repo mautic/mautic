@@ -8,24 +8,20 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 
 trait WebLoginTrait
 {
-    /**
-     * @inerhitDoc
-     */
-    protected static $container;
-
     protected KernelBrowser $client;
 
     private function logInWithPassword(string $username = 'linked_admin'): void
     {
-        $session = self::$container->get('session');
-        $user    = self::$container->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
+        $container = $this->client->getContainer();
+        $session   = $container->get('session');
+        $user      = $container->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
         \assert($user instanceof User);
 
-        $token = new UsernamePasswordToken($user, null, 'main', ['ROLE_ADMIN']);
+        $token = new UsernamePasswordToken($user, 'main', ['ROLE_ADMIN']);
         $session->set('_security_mautic', serialize($token));
         $session->save();
 
@@ -35,12 +31,12 @@ trait WebLoginTrait
 
     private function logInWithOpenID(string $username = 'linked_admin'): void
     {
-        $session = self::$container->get('session');
-        $user    = self::$container->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
+        $container = $this->client->getContainer();
+        $session   = $container->get('session');
+        $user      = $container->get('doctrine')->getRepository(User::class)->findOneBy(['username' => $username]);
         \assert($user instanceof User);
 
-        $token = new PostAuthenticationGuardToken($user, 'open_id', $user->getRoles());
-        $token->setAuthenticated(true);
+        $token = new PostAuthenticationToken($user, 'open_id', $user->getRoles());
         $session->set('_security_mautic', serialize($token));
         $session->save();
 

@@ -7,7 +7,7 @@
 <p class="mb-md">{{ 'mautic.open_id.required.switch_user_instructions'|trans({'%provider%': 'OpenID Connect'})|raw }}</p>
 
 <div>
-    <a href="{{ url('open_id_login') }}" class="btn btn-lg btn-primary">
+    <a href="{{ url('mautic_oidc_login') }}" class="btn btn-lg btn-primary">
         {{ 'mautic.open_id.required.link_button'|trans }}
     </a>
     <a href="{{ logout_url() }}" class="btn btn-lg btn-info">

@@ -17,6 +17,7 @@ use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 final class ConfigTypeExtensionTest extends TestCase
 {
@@ -35,18 +36,13 @@ final class ConfigTypeExtensionTest extends TestCase
         $parameters          = (new ParametersBuilder())->build();
         $clientCredentials   = new ClientCredentials('https://example.com', 'client_id', 'client_secret', 'sub');
         $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
-        $event               = $this->createMock(PreSubmitEvent::class);
-
-        $event->expects($this->once())
-            ->method('getData')
-            ->willReturn(['open_id_client_secret' => '']);
-
-        $event->expects($this->once())
-            ->method('setData')
-            ->with(['open_id_client_secret' => 'client_secret']);
+        $form                = $this->createStub(FormInterface::class);
+        $event               = new PreSubmitEvent($form, ['open_id_client_secret' => '']);
 
         $configTypeExtension = new ConfigTypeExtension($parameters, $clientCredentials, $subjectIdRepository);
         $configTypeExtension->onPreSubmit($event);
+
+        $this->assertSame('client_secret', $event->getData()['open_id_client_secret']);
     }
 
     public function testOnPreSubmitDoesNotSetSecretToParamValueIfNotEmpty(): void
@@ -54,17 +50,13 @@ final class ConfigTypeExtensionTest extends TestCase
         $parameters          = (new ParametersBuilder())->build();
         $clientCredentials   = new ClientCredentials('https://example.com', 'client_id', 'client_secret', 'sub');
         $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
-        $event               = $this->createMock(PreSubmitEvent::class);
-
-        $event->expects($this->once())
-            ->method('getData')
-            ->willReturn(['open_id_client_secret' => 'notNull']);
-
-        $event->expects($this->never())
-            ->method('setData');
+        $form                = $this->createStub(FormInterface::class);
+        $event               = new PreSubmitEvent($form, ['open_id_client_secret' => 'notNull']);
 
         $configTypeExtension = new ConfigTypeExtension($parameters, $clientCredentials, $subjectIdRepository);
         $configTypeExtension->onPreSubmit($event);
+
+        $this->assertSame('notNull', $event->getData()['open_id_client_secret']);
     }
 
     public function testOnPostEventTruncatesTableWhenMappingFieldIsChanged(): void
@@ -74,11 +66,8 @@ final class ConfigTypeExtensionTest extends TestCase
         $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
         $queryBuilder        = $this->createMock(QueryBuilder::class);
         $query               = $this->createMock(AbstractQuery::class);
-        $event               = $this->createMock(PostSubmitEvent::class);
-
-        $event->expects($this->once())
-            ->method('getData')
-            ->willReturn(['open_id_mapping_field' => 'platform_sub']);
+        $form                = $this->createStub(FormInterface::class);
+        $event               = new PostSubmitEvent($form, ['open_id_mapping_field' => 'platform_sub']);
 
         $subjectIdRepository->expects($this->once())
             ->method('createQueryBuilder')
@@ -104,11 +93,8 @@ final class ConfigTypeExtensionTest extends TestCase
         $parameters          = (new ParametersBuilder())->build();
         $clientCredentials   = new ClientCredentials('https://example.com', 'client_id', 'client_secret', 'sub');
         $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
-        $event               = $this->createMock(PostSubmitEvent::class);
-
-        $event->expects($this->once())
-            ->method('getData')
-            ->willReturn(['open_id_mapping_field' => 'sub']);
+        $form                = $this->createStub(FormInterface::class);
+        $event               = new PostSubmitEvent($form, ['open_id_mapping_field' => 'sub']);
 
         $subjectIdRepository->expects($this->never())
             ->method('createQueryBuilder');

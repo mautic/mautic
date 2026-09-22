@@ -8,8 +8,8 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
 use Mautic\UserBundle\Exception\OidcException;
+use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
 use Mautic\UserBundle\Security\OIDC\User\UserFactory;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +20,7 @@ final class UserFactoryTest extends TestCase
     public function testBuild(): void
     {
         $role       = $this->createStub(Role::class);
-        $parameters = (new ParametersBuilder())->withRegisteredUserRole($role)->build();
+        $parameters = (new ParametersBuilder())->withRegisteredUserRoleId(1)->build();
         $userRepo   = $this->createStub(UserRepository::class);
         $roleRepo   = $this->createMock(RoleRepository::class);
         $logger     = $this->createStub(LoggerInterface::class);
@@ -56,7 +56,7 @@ final class UserFactoryTest extends TestCase
     public function testBuildThrowsExceptionWhenEmailNotFound(): void
     {
         $role       = $this->createStub(Role::class);
-        $parameters = (new ParametersBuilder())->withRegisteredUserRole($role)->build();
+        $parameters = (new ParametersBuilder())->withRegisteredUserRoleId(1)->build();
         $userRepo   = $this->createStub(UserRepository::class);
         $roleRepo   = $this->createMock(RoleRepository::class);
         $logger     = $this->createStub(LoggerInterface::class);
@@ -74,7 +74,7 @@ final class UserFactoryTest extends TestCase
     public function testBuildThrowsExceptionWhenEmailIsTaken(): void
     {
         $role       = $this->createStub(Role::class);
-        $parameters = (new ParametersBuilder())->withRegisteredUserRole($role)->build();
+        $parameters = (new ParametersBuilder())->withRegisteredUserRoleId(1)->build();
         $userRepo   = $this->createMock(UserRepository::class);
         $roleRepo   = $this->createMock(RoleRepository::class);
         $logger     = $this->createStub(LoggerInterface::class);

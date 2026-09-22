@@ -81,7 +81,7 @@ final readonly class OidcRequestSubscriber implements EventSubscriberInterface
 
         $this->logger->debug('Redirecting from main to OpenID login required, because user is not authenticated with OpenID Connect.');
 
-        return new RedirectResponse($this->urlGenerator->generate('open_id_login_required', [], UrlGeneratorInterface::ABSOLUTE_URL));
+        return new RedirectResponse($this->urlGenerator->generate('mautic_oidc_required', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     private function redirectFromLoginWhenAuthenticated(?string $firewall, ?TokenInterface $token): ?RedirectResponse

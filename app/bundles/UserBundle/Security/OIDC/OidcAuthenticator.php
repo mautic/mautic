@@ -10,6 +10,7 @@ use Mautic\UserBundle\Exception\OidcException;
 use Mautic\UserBundle\Security\OIDC\Factory\UserCredentialsFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -17,9 +18,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class OidcAuthenticator extends AbstractAuthenticator
+final class OidcAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface
 {
     public function __construct(
         private readonly Settings $parameters,
@@ -73,6 +75,18 @@ final class OidcAuthenticator extends AbstractAuthenticator
 
         return new RedirectResponse(
             $this->urlGenerator->generate('login', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
+    }
+
+    /**
+     * Called when authentication is needed but not provided.
+     * This is the entry point that starts the authentication process.
+     */
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
+    {
+        // Redirect to the OIDC login page to start authentication
+        return new RedirectResponse(
+            $this->urlGenerator->generate('mautic_oidc_login', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
     }
 }
