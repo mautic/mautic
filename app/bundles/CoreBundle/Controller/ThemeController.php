@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class ThemeController extends FormController
+final class ThemeController extends AbstractFormController
 {
     #[Route(
         path: '/s/themes/{objectAction}/{objectId}',

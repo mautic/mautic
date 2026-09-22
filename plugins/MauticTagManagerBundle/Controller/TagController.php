@@ -7,7 +7,7 @@ namespace MauticPlugin\MauticTagManagerBundle\Controller;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class TagController extends FormController
+final class TagController extends AbstractFormController
 {
     private TagRepository $tagRepository;
 
@@ -374,7 +374,7 @@ final class TagController extends FormController
                         'objectAction' => 'edit',
                         'entity'       => $tag,
                         'objectId'     => $tag->getId(),
-                        'form'         => $this->getFormView($form, 'edit'),
+                        'form'         => $form->createView(),
                     ];
 
                     $response = $this->postActionRedirect($postActionVars);

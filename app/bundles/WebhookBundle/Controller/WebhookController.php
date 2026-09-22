@@ -2,55 +2,52 @@
 
 namespace Mautic\WebhookBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\WebhookBundle\Helper\WebhookSearchScopeProvider;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class WebhookController extends FormController
+final class WebhookController extends AbstractStandardFormController
 {
     /**
      * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
      */
     private ?array $indexSearchScopes = null;
 
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        $this->setStandardParameters(
-            'webhook.webhook', // model name
-            'webhook:webhooks', // permission base
-            'mautic_webhook', // route base
-            'mautic_webhook', // session base
-            'mautic.webhook', // lang string base
-            '@MauticWebhook/Webhook', // template base
-            'mautic_webhook', // activeLink
-            'mauticWebhook' // mauticContent
-        );
+    protected function getModelName(): string
+    {
+        return 'webhook.webhook';
+    }
 
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    protected function getPermissionBase(): string
+    {
+        return 'webhook:webhooks';
+    }
+
+    protected function getRouteBase(): string
+    {
+        return 'mautic_webhook';
+    }
+
+    protected function getSessionBase($objectId = null): string
+    {
+        return 'mautic.mautic_webhook';
+    }
+
+    protected function getTranslationBase(): string
+    {
+        return 'mautic.webhook';
+    }
+
+    protected function getTemplateBase(): string
+    {
+        return '@MauticWebhook/Webhook';
+    }
+
+    protected function getJsLoadMethodPrefix(): string
+    {
+        return 'mauticWebhook';
     }
 
     #[Route(
@@ -93,7 +90,6 @@ final class WebhookController extends FormController
             $this->indexSearchScopes                = null;
         }
 
-        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         return parent::getViewArguments($args, $action);
     }
 

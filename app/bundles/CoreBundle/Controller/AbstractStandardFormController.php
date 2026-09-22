@@ -36,7 +36,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     private AuditLogModel $auditLogModel;
 
     #[Required]
-    public function autowireAbstractFormController(
+    public function autowireAbstractStandardFormController(
         AuditLogModel $auditLogModel,
     ): void {
         $this->auditLogModel = $auditLogModel;

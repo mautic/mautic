@@ -4401,7 +4401,7 @@
         "path": "/s/action/{objectAction}/{objectModel}/{objectId}",
         "methods": [],
         "defaults": {
-            "_controller": "Mautic\\CoreBundle\\Controller\\FormController::executeAction",
+            "_controller": "Mautic\\CoreBundle\\Controller\\LockController::executeAction",
             "objectId": 0,
             "objectModel": ""
         },

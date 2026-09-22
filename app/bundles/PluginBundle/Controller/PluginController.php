@@ -3,7 +3,7 @@
 namespace Mautic\PluginBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Entity\PluginRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class PluginController extends FormController
+final class PluginController extends AbstractFormController
 {
     private PluginRepository $pluginRepository;
 
