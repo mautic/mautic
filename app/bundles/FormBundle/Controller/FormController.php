@@ -1187,7 +1187,7 @@ class FormController extends CommonFormController
         );
     }
 
-    public function getModelName(): string
+    protected function getModelName(): string
     {
         return 'form';
     }

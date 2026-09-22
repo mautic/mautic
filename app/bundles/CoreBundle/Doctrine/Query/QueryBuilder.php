@@ -433,7 +433,7 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @return string[]
      */
-    protected function getFromClauses(): array
+    private function getFromClauses(): array
     {
         $fromClauses  = [];
         $knownAliases = [];
@@ -464,7 +464,7 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @param array<array-key, true> $knownAliases
      */
-    protected function getSQLForJoins(string $fromAlias, array &$knownAliases): string
+    private function getSQLForJoins(string $fromAlias, array &$knownAliases): string
     {
         $sql = '';
 
@@ -496,7 +496,7 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @param array<array-key, true> $knownAliases
      */
-    protected function verifyAllAliasesAreKnown(array $knownAliases): void
+    private function verifyAllAliasesAreKnown(array $knownAliases): void
     {
         foreach ($this->queryParts['join'] as $fromAlias => $joins) {
             if (!isset($knownAliases[$fromAlias])) {

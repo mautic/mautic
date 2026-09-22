@@ -14,7 +14,7 @@ class NotificationRepository extends CommonRepository
         return 'n';
     }
 
-    public function getDefaultOrder(): array
+    protected function getDefaultOrder(): array
     {
         return [
             ['n.dateAdded', 'DESC'],

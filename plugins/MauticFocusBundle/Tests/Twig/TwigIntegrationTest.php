@@ -18,7 +18,7 @@ final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
     /**
      * @return ExtensionInterface[]
      */
-    public function getExtensions(): array
+    protected function getExtensions(): array
     {
         return [
             new FocusBundleExtension(),

@@ -80,7 +80,7 @@ abstract class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->em->getConnection()->executeStatement($sql);
     }
 
-    public function beforeTearDown(): void
+    protected function beforeTearDown(): void
     {
         $this->clientServer = $this->defaultClientServer;
     }

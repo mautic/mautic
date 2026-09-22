@@ -63,7 +63,7 @@ class FormController extends AbstractStandardFormController
     /**
      * @return mixed[]
      */
-    public function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, $action): array
     {
         return $args;
     }

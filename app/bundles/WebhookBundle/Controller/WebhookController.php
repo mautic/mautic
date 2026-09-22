@@ -86,7 +86,7 @@ final class WebhookController extends FormController
      *
      * @return array<string, mixed>
      */
-    public function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, $action): array
     {
         if ('index' === $action && null !== $this->indexSearchScopes) {
             $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;

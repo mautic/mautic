@@ -36,7 +36,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
     private ResourceInstaller $installer;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -65,7 +65,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         );
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         new Filesystem()->remove($this->tmpRoot);
         parent::tearDown();

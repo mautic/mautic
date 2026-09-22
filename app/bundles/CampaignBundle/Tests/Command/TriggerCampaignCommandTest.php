@@ -39,7 +39,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
     }
 
-    public function beforeTearDown(): void
+    protected function beforeTearDown(): void
     {
         parent::beforeTearDown();
 

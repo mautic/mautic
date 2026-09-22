@@ -45,7 +45,7 @@ class CreateCustomFieldCommand extends ModeratedCommand
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    public function configure(): void
+    protected function configure(): void
     {
         parent::configure();
 
