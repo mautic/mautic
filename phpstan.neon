@@ -40,12 +40,6 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     ignoreErrors:
-        # getEntities returns the DBAL count/results shape the base entity/paginator contract can't express
-        -
-            identifier: method.childReturnType
-            paths:
-                - app/bundles/FormBundle/Entity/SubmissionRepository.php
-                - app/bundles/FormBundle/Model/SubmissionModel.php
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: symplify.noNullableServiceInConstructor
