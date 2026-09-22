@@ -259,6 +259,72 @@ HTML;
         $this->subscriber->decodeTokens($event);
     }
 
+    public function testDecodeTokensWithDwcTokenInHrefAttribute(): void
+    {
+        $content = <<< HTML
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h2>Hello there!</h2>
+        <a href="{dwc=link-token}">Click here</a>
+        {dwc=link-token}
+    </body>
+</html>
+
+HTML;
+
+        $expected = <<< HTML
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h2>Hello there!</h2>
+        <a href="https://example.com/path">Click here</a>
+        <p>https://example.com/path</p>
+    </body>
+</html>
+
+HTML;
+        $dwcContent = '<p>https://example.com/path</p>';
+        $event      = $this->createMock(PageDisplayEvent::class);
+        $contact    = new Lead();
+
+        $event->expects($this->once())
+            ->method('getContent')
+            ->willReturn($content);
+
+        $event->method('getLead')
+            ->willReturn(null);
+
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
+        $this->contactTracker->expects($this->once())
+            ->method('getContact')
+            ->willReturn($contact);
+
+        $this->dynamicContentHelper->expects($this->once())
+            ->method('findDwcTokens')
+            ->with($content, $contact)
+            ->willReturn([
+                '{dwc=link-token}' => [
+                    'content' => $dwcContent,
+                    'filters' => [],
+                ],
+            ]);
+
+        $this->dynamicContentHelper->expects($this->never())
+            ->method('getDynamicContentForLead');
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->with($expected);
+
+        $this->subscriber->decodeTokens($event);
+    }
+
     public function testOnTokenReplacement(): void
     {
         $content = <<< HTML
