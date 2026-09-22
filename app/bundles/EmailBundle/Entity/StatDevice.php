@@ -81,7 +81,7 @@ class StatDevice
         return $this->ipAddress;
     }
 
-    public function setIpAddress(?IpAddress $ip): void
+    public function setIpAddress(IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
