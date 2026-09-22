@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
@@ -49,7 +50,7 @@ final class OidcAuthenticator extends AbstractAuthenticator
 
             // Return a self-validating passport since OIDC handles authentication
             return new SelfValidatingPassport(
-                new UserBadge($user->getUserIdentifier(), fn () => $user)
+                new UserBadge($user->getUserIdentifier(), fn (): UserInterface => $user)
             );
         } catch (OpenIDConnectClientException $e) {
             throw new AuthenticationException($e->getMessage(), 0, $e);

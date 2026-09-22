@@ -137,7 +137,7 @@ final class OidcRequestSubscriberTest extends TestCase
 
     private function createSettings(bool $enabled, bool $required): Settings
     {
-        return new Settings($enabled, $required, false, null);
+        return new Settings($enabled, $required, false);
     }
 
     private function createOpenIdPluginToken(): PluginToken
@@ -170,13 +170,11 @@ final class OidcRequestSubscriberTest extends TestCase
 
         $router->expects($this->atLeastOnce())
             ->method('generate')
-            ->willReturnCallback(function (string $route): string {
-                return match ($route) {
-                    'open_id_login_required' => self::OPEN_ID_REQUIRED_PATH,
-                    'login' => self::LOGIN_PATH,
-                    'mautic_dashboard_index' => self::DASHBOARD_PATH,
-                    default => throw new \RuntimeException("Unexpected route: $route"),
-                };
+            ->willReturnCallback(fn (string $route): string => match ($route) {
+                'open_id_login_required' => self::OPEN_ID_REQUIRED_PATH,
+                'login' => self::LOGIN_PATH,
+                'mautic_dashboard_index' => self::DASHBOARD_PATH,
+                default => throw new \RuntimeException("Unexpected route: $route"),
             });
 
         return $router;
@@ -194,7 +192,7 @@ final class OidcRequestSubscriberTest extends TestCase
         if ($targetUrl) {
             $requestEvent->expects($this->once())
                 ->method('setResponse')
-                ->with(self::callback(static fn($response): bool => $response->getTargetUrl() === $targetUrl));
+                ->with(self::callback(static fn ($response): bool => $response->getTargetUrl() === $targetUrl));
         } else {
             $requestEvent->expects($this->never())
                 ->method('setResponse');

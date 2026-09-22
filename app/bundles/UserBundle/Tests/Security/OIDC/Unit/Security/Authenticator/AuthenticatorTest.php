@@ -181,11 +181,11 @@ final class AuthenticatorTest extends TestCase
 
         return new OidcAuthenticator(
             $parameters,
-            $this->createMock(UserCredentialsFactoryInterface::class),
-            $this->createMock(CredentialsUserProviderInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(FlashBag::class),
-            $this->createMock(TranslatorInterface::class)
+            $this->createStub(UserCredentialsFactoryInterface::class),
+            $this->createStub(CredentialsUserProviderInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(FlashBag::class),
+            $this->createStub(TranslatorInterface::class)
         );
     }
 }
