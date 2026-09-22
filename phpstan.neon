@@ -227,9 +227,8 @@ rules:
     - Utils\PHPStan\Rule\CommandMustHaveAsCommandAttributeRule
     - Utils\PHPStan\Rule\ConstraintMustHaveAttributeRule
     - Utils\PHPStan\Rule\NoNullableServiceInConstructorRule
-    - Utils\PHPStan\Rule\NoGetRepositoryWithEntityInRepositoryRule
+    - Utils\PHPStan\Rule\NoGetRepositoryWithEntityRule
     - Utils\PHPStan\Rule\NoContainerGetRule
-    - Utils\PHPStan\Rule\NoEntityManagerGetRepositoryRule
     - Utils\PHPStan\Rule\PreferInterfaceInConstructorRule
     - Utils\PHPStan\Rule\NoPropertyToPropertyAssignRule
     - Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
@@ -251,7 +250,6 @@ rules:
     - Utils\PHPStan\Rule\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
-    - Utils\PHPStan\Rule\PreferCustomRepositoryOverGetRepositoryRule
     - Utils\PHPStan\Rule\RequireArrayShapeReturnRule
     # enable later, might not be needed
     - Utils\PHPStan\Rule\NoDuplicateNonRepeatableAttributeRule

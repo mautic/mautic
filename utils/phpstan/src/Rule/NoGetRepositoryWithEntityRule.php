@@ -22,19 +22,25 @@ use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\ObjectType;
 
 /**
- * getRepository(Entity::class) on an entity that declares a custom repository returns only a generic type,
- * hiding the concrete repository from the reader and static analysis. Inject that repository as a typed
- * dependency and use it directly.
+ * A repository must not be fetched by an entity class constant, e.g. getRepository(Lead::class).
  *
- * The custom repository class is read from the entity's loadMetadata() setCustomRepositoryClass() call.
+ * The returned repository has a generic type only, so the concrete repository methods are hidden from both the
+ * reader and static analysis. Inject the repository as a typed dependency instead.
+ *
+ * The call is reported when the caller is an entity manager, when it happens inside a repository, or when a
+ * manager registry fetches an entity that declares a custom repository via loadMetadata().
+ *
+ * Tests are skipped, as fetching an entity by its repository is a legit shortcut there.
  *
  * @implements Rule<MethodCall>
  */
-final class PreferCustomRepositoryOverGetRepositoryRule implements Rule
+final class NoGetRepositoryWithEntityRule implements Rule
 {
     private const string GET_REPOSITORY_METHOD = 'getRepository';
 
     private const string SET_CUSTOM_REPOSITORY_METHOD = 'setCustomRepositoryClass';
+
+    private const string REPOSITORY_SUFFIX = 'Repository.php';
 
     private ?Parser $parser = null;
 
@@ -60,6 +66,16 @@ final class PreferCustomRepositoryOverGetRepositoryRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
+        // inside a trait the scope file is the class using it, so the very same call would be reported
+        // once per using class, in a file that does not contain it
+        if ($scope->isInTrait()) {
+            return [];
+        }
+
+        if ($this->isTestFile($scope->getFile())) {
+            return [];
+        }
+
         if (!$node->name instanceof Node\Identifier) {
             return [];
         }
@@ -68,58 +84,65 @@ final class PreferCustomRepositoryOverGetRepositoryRule implements Rule
             return [];
         }
 
-        // tests may fetch entities directly through getRepository() for convenience
-        if (1 === preg_match('#/Tests?/#', $scope->getFile())) {
-            return [];
-        }
-
-        // only a Doctrine registry or entity manager exposes this getRepository()
-        $callerType = $scope->getType($node->var);
-        $isDoctrineCaller = new ObjectType(ManagerRegistry::class)->isSuperTypeOf($callerType)->yes()
-            || new ObjectType(ObjectManager::class)->isSuperTypeOf($callerType)->yes();
-        if (!$isDoctrineCaller) {
-            return [];
-        }
-
         $firstArg = $node->getArgs()[0] ?? null;
         if (!$firstArg instanceof Node\Arg) {
             return [];
         }
 
-        $entityClass = $this->resolveEntityClass($firstArg->value, $scope);
+        $entityClass = $this->resolveEntityClass($firstArg->value);
         if (null === $entityClass) {
             return [];
         }
 
-        $customRepositoryClass = $this->resolveCustomRepositoryClass($entityClass);
-        if (null === $customRepositoryClass) {
+        if (!$this->shouldReport($node, $scope, $entityClass)) {
             return [];
         }
 
         $ruleError = RuleErrorBuilder::message(sprintf(
-            'Entity "%s" declares the custom repository "%s". Inject and use that repository as a typed dependency instead of getRepository(), to make the dependency and its type explicit.',
-            $entityClass,
-            $customRepositoryClass
+            'Do not fetch the "%s" repository by entity constant. Inject the repository as a typed dependency instead, to make the dependency and its type explicit.',
+            $entityClass
         ))
-            ->identifier('mautic.preferCustomRepositoryOverGetRepository')
+            ->identifier('mautic.noGetRepository')
             ->build();
 
         return [$ruleError];
     }
 
-    private function resolveEntityClass(Node\Expr $expr, Scope $scope): ?string
+    private function shouldReport(MethodCall $methodCall, Scope $scope, string $entityClass): bool
+    {
+        $callerType = $scope->getType($methodCall->var);
+
+        // an entity manager, a property, a variable or any other expression alike
+        if (new ObjectType(ObjectManager::class)->isSuperTypeOf($callerType)->yes()) {
+            return true;
+        }
+
+        // a repository already knows its own entity, so reaching for another one hides a cross-repository dependency
+        if (str_ends_with($scope->getFile(), self::REPOSITORY_SUFFIX)) {
+            return true;
+        }
+
+        // a manager registry fetching an entity that declares its own repository class
+        return new ObjectType(ManagerRegistry::class)->isSuperTypeOf($callerType)->yes()
+            && null !== $this->resolveCustomRepositoryClass($entityClass);
+    }
+
+    private function resolveEntityClass(Node\Expr $expr): ?string
     {
         // only an exact entity constant, e.g. Lead::class
         if (!$expr instanceof ClassConstFetch) {
             return null;
         }
 
-        $constantStrings = $scope->getType($expr)->getConstantStrings();
-        if (1 !== count($constantStrings)) {
+        if (!$expr->class instanceof Name) {
             return null;
         }
 
-        return $constantStrings[0]->getValue();
+        if (!$expr->name instanceof Node\Identifier || 'class' !== $expr->name->toString()) {
+            return null;
+        }
+
+        return $expr->class->toString();
     }
 
     private function resolveCustomRepositoryClass(string $entityClass): ?string
@@ -178,5 +201,12 @@ final class PreferCustomRepositoryOverGetRepositoryRule implements Rule
     private function getParser(): Parser
     {
         return $this->parser ??= new ParserFactory()->createForNewestSupportedVersion();
+    }
+
+    private function isTestFile(string $filePath): bool
+    {
+        return 1 === preg_match('#/Tests?/#', $filePath)
+            || str_ends_with($filePath, 'Test.php')
+            || str_ends_with($filePath, 'TestCase.php');
     }
 }
