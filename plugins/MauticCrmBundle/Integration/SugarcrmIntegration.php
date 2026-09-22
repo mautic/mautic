@@ -652,11 +652,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     public function amendLeadDataBeforeMauticPopulate($data, $object): int
     {
         $settings['feature_settings']['objects'][] = $object;
-        $fields                                    = array_keys($this->getAvailableLeadFields($settings));
-        $params                                    = ['fields' => implode(',', $fields)];
 
         $count  = 0;
-        $entity = null;
 
         $sugarRejectedLeads = [];
         if (isset($data['entry_list'])) {
