@@ -91,7 +91,7 @@ class StatDevice
         return $this->stat;
     }
 
-    public function setStat(?Stat $stat): void
+    public function setStat(Stat $stat): void
     {
         $this->stat = $stat;
     }
