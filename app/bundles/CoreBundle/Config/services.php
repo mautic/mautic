@@ -131,10 +131,7 @@ return function (ContainerConfigurator $configurator): void {
         ->arg('$httponly', param('mautic.cookie_httponly'));
 
     $services->set(Mautic\CoreBundle\Helper\EncryptionHelper::class)
-        ->args([
-            service(Mautic\CoreBundle\Helper\CoreParametersHelper::class),
-            service(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class),
-        ]);
+        ->arg(1, service(Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class));
 
     $services->set(Symfony\Component\Filesystem\Filesystem::class);
 
@@ -191,14 +188,13 @@ return function (ContainerConfigurator $configurator): void {
 
     // Explicitly register our Twig extension with high priority
     $services->set(Mautic\CoreBundle\Twig\Extension\OverrideIncludeExtension::class)
-        ->autowire()
         ->tag('twig.extension', ['priority' => 100]);
 
     $services->get(Mautic\CoreBundle\Twig\Extension\FormExtension::class)
         ->arg('$formRenderer', \Symfony\Component\DependencyInjection\Loader\Configurator\service('twig.form.renderer'));
 
-    $services->set('mautic.http.client', GuzzleHttp\Client::class)->autowire();
-    $services->set(Mautic\CoreBundle\Doctrine\MigrationFactoryDecorator::class)->autowire();
+    $services->set('mautic.http.client', GuzzleHttp\Client::class);
+    $services->set(Mautic\CoreBundle\Doctrine\MigrationFactoryDecorator::class);
 
     $services->set(StringExtension::class);
 
