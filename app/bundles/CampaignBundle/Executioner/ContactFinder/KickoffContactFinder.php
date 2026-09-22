@@ -25,7 +25,7 @@ readonly class KickoffContactFinder
      *
      * @throws NoContactsFoundException
      */
-    public function getContacts(int $campaignId, ContactLimiter $limiter): ArrayCollection
+    public function getContacts(?int $campaignId, ContactLimiter $limiter): ArrayCollection
     {
         // Get list of all campaign leads; start is always zero in practice because of $pendingOnly
         $campaignContacts = $this->campaignRepository->getPendingContactIds($campaignId, $limiter);
