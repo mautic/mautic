@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\Dispatcher;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
@@ -15,7 +14,6 @@ readonly class FieldDeleteDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -38,9 +36,7 @@ readonly class FieldDeleteDispatcher
             throw new NoListenerException('There is no Listener for this event');
         }
 
-        if (null === $event) {
-            $event = new LeadFieldEvent($entity);
-        }
+        $event ??= new LeadFieldEvent($entity);
 
         $this->dispatcher->dispatch($event, $action);
 
