@@ -91,7 +91,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
      * @return array<int,array<int|string>>
      *
      * @throws DBALException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     protected function getContactWithAssignTwoCompanies(): array

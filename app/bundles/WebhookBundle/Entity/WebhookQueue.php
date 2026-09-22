@@ -16,7 +16,7 @@ class WebhookQueue
 {
     public const TABLE_NAME = 'webhook_queue';
 
-    private ?string $id = null;
+    private int|string|null $id = null;
 
     #[ORM\ManyToOne(targetEntity: Webhook::class)]
     #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
@@ -55,7 +55,12 @@ class WebhookQueue
             ->build();
     }
 
-    public function getId(): ?string
+    /**
+     * The id is a bigint, so it comes back as int within PHP's integer range and as
+     * string beyond it - the union DBAL's BigIntType itself returns. DBAL 3 always gave
+     * a string; normalising back to one here would hide which of the two it is.
+     */
+    public function getId(): int|string|null
     {
         return $this->id;
     }

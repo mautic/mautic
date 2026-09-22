@@ -66,11 +66,7 @@ class FieldChangeRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * @param int|null $afterObjectId
-     * @param int      $objectCount
-     */
-    public function findChangesBefore(string $integration, string $objectType, \DateTimeInterface $toDateTime, $afterObjectId = null, $objectCount = 100): array
+    public function findChangesBefore(string $integration, string $objectType, \DateTimeInterface $toDateTime, ?int $afterObjectId = null, int $objectCount = 100): array
     {
         // Get a list of object IDs so that we can get complete snapshots of the objects
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -96,13 +92,13 @@ class FieldChangeRepository extends CommonRepository
 
         if ($afterObjectId) {
             $qb->andWhere(
-                $qb->expr()->gt('f.object_id', (int) $afterObjectId)
+                $qb->expr()->gt('f.object_id', (string) ((int) $afterObjectId))
             );
         }
 
         $objectIds = $qb->executeQuery()->fetchFirstColumn();
 
-        if (!$objectIds) {
+        if ($objectIds === []) {
             return [];
         }
 
@@ -148,7 +144,7 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
             ->setParameter('objectId', (int) $objectId)
-            ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
+            ->orderBy('f.modified_at', 'ASC'); // Newer updated fields must override older updated fields
 
         return $qb->executeQuery()->fetchAllAssociative();
     }
@@ -186,7 +182,7 @@ class FieldChangeRepository extends CommonRepository
 
         $objectIds = $qb->executeQuery()->fetchFirstColumn();
 
-        if (!$objectIds) {
+        if ($objectIds === []) {
             return 0;
         }
 

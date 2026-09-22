@@ -209,8 +209,6 @@ class SmsRepository extends CommonRepository
 
     /**
      * @param array<int> $ignoreIds
-     *
-     * @return array
      */
     public function getSmsList(
         mixed $search = '',
@@ -220,7 +218,7 @@ class SmsRepository extends CommonRepository
         ?string $smsType = null,
         ?string $topLevel = null,
         array $ignoreIds = [],
-    ) {
+    ): array {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language, media}');
 

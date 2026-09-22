@@ -48,10 +48,8 @@ class UserRepository extends CommonRepository
      * Checks to ensure that a username and/or email is unique.
      *
      * @param array<string, mixed> $params
-     *
-     * @return array
      */
-    public function checkUniqueUsernameEmail(array $params)
+    public function checkUniqueUsernameEmail(array $params): array
     {
         $q = $this->createQueryBuilder('u');
 
@@ -88,14 +86,10 @@ class UserRepository extends CommonRepository
     /**
      * Get a list of users for an autocomplete input.
      *
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $permissionLimiter
-     *
-     * @return array
+     * The users API hands over the raw query parameters, so both arrive as string|null,
+     * and a null limit means "no limit".
      */
-    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
+    public function getUserList(?string $search = '', int|string|null $limit = 10, int $start = 0, array $permissionLimiter = []): array
     {
         $q = $this->getEntityManager()->createQueryBuilder();
 
@@ -123,7 +117,7 @@ class UserRepository extends CommonRepository
             ->setParameter('search', "{$search}%");
         }
 
-        if (!empty($permissionLimiter)) {
+        if ($permissionLimiter !== []) {
             // only get users with a role that has some sort of access to set permissions
             $expr = $q->expr()->andX();
             foreach ($permissionLimiter as $bundle => $level) {
@@ -177,13 +171,9 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
+     * $search arrives as null from UserModel::getLookupResults().
      */
-    public function getPositionList($search = '', $limit = 10, $start = 0)
+    public function getPositionList(?string $search = '', int $limit = 10, int $start = 0): array
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('u.position')

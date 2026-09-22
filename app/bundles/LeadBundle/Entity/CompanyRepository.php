@@ -88,10 +88,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return $this->getEntitiesWithCustomFields('company', $args);
     }
 
-    /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function getEntitiesDbalQueryBuilder()
+    public function getEntitiesDbalQueryBuilder(): \Mautic\CoreBundle\Doctrine\Query\QueryBuilder
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -169,7 +166,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         );
     }
 
-    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         $unique                  = $this->generateRandomParameterName();
@@ -347,7 +344,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
-        return ($results) ? $results[0] : null;
+        return ($results !== []) ? $results[0] : null;
     }
 
     public function getCompaniesForContacts(array $contacts): array
@@ -386,12 +383,10 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get companies grouped by column.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getCompaniesByGroup($query, $column): array
+    public function getCompaniesByGroup(\Doctrine\DBAL\Query\QueryBuilder $query, string $column): array
     {
         $query->select('count(comp.id) as companies, '.$column)
             ->addGroupBy($column)
@@ -579,7 +574,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $q->select('id, companyname, companycity, companystate')
             ->from(MAUTIC_TABLE_PREFIX.Company::TABLE_NAME)
-            ->where($q->expr()->eq('is_published', true))
+            ->where($q->expr()->eq('is_published', '1'))
             ->andWhere($q->expr()->like('companyname', ':filterVar'))
             ->setParameter('filterVar', '%'.$filterVal.'%')
             ->andWhere($q->expr()->isNull('deleted'))

@@ -225,7 +225,7 @@ class ContactMerger
     {
         $loserCompanyLeads = $this->companyLeadRepository->findBy(['lead' => $loser]);
 
-        if (!$loserCompanyLeads) {
+        if ($loserCompanyLeads === []) {
             return $this;
         }
 

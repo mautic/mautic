@@ -16,6 +16,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\DateAddedTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -25,9 +26,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['type', 'event_type'], name: 'campaign_event_search')]
-#[ORM\Index(columns: ['event_type'], name: 'campaign_event_type')]
-#[ORM\Index(columns: ['channel', 'channel_id'], name: 'campaign_event_channel')]
+#[ORM\Index(name: 'campaign_event_search', columns: ['type', 'event_type'])]
+#[ORM\Index(name: 'campaign_event_type', columns: ['event_type'])]
+#[ORM\Index(name: 'campaign_event_channel', columns: ['channel', 'channel_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -48,6 +49,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ]
 )]
 #[EntityEvent]
+#[OwnershipParent('campaign')]
 class Event implements ChannelInterface, UuidInterface
 {
     use UuidTrait;
@@ -187,13 +189,15 @@ class Event implements ChannelInterface, UuidInterface
      * @var Campaign
      */
     #[Groups(['event:write'])]
+    #[ORM\ManyToOne(targetEntity: Campaign::class, inversedBy: 'events')]
+    #[ORM\JoinColumn(name: 'campaign_id', nullable: false, onDelete: 'CASCADE')]
     private $campaign;
 
     /**
      * @var ArrayCollection<int, Event>
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent', indexBy: 'id')]
     #[ORM\OrderBy(['order' => 'ASC'])]
     private $children;
 
@@ -221,7 +225,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @var ArrayCollection<int, LeadEventLog>
      */
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: LeadEventLog::class, cascade: ['persist'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: LeadEventLog::class, mappedBy: 'event', cascade: ['persist'], fetch: 'EXTRA_LAZY')]
     private $log;
 
     /**
@@ -268,7 +272,7 @@ class Event implements ChannelInterface, UuidInterface
      *
      * @var ArrayCollection<int, Event>
      */
-    #[ORM\OneToMany(mappedBy: 'redirectEvent', targetEntity: self::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'redirectEvent', fetch: 'EXTRA_LAZY')]
     private Collection $redirectingEvents;
 
     public function __construct(?\DateTime $dateAdded = null)
@@ -302,13 +306,6 @@ class Event implements ChannelInterface, UuidInterface
         $builder->addIdColumns();
 
         $builder->addNullableField('deleted', 'datetime');
-
-        $builder->createManyToOne('campaign', 'Campaign')
-            ->inversedBy('events')
-            ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
-            ->build();
-
 
         $builder->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added')

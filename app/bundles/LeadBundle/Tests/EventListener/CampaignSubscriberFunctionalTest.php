@@ -39,6 +39,8 @@ use Symfony\Component\HttpFoundation\Response;
 #[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     use LeadFieldTestTrait;
 
     private LeadRepository $contactRepository;
@@ -86,12 +88,9 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        if ('testUpdatesContactCampaignActionWithBooleanFields' === $this->name()) {
-            $this->useCleanupRollback = false;
-        } else {
-            $this->useCleanupRollback = true;
-        }
-
+        // The cleanup transaction stays off for every test here: they create custom field
+        // columns, and DDL makes MySQL commit the open transaction, which then fails the
+        // ORM's own commit under ORM 3.
         parent::setUp();
 
         $this->contactRepository = self::getContainer()->get(LeadRepository::class);
@@ -258,7 +257,9 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'type'       => 'lead.stages',
                 'properties' => [
                     'type'   => 'lead.stages',
-                    'stages' => [0 => '1'],
+                    // The created stage's id, not a hard-coded 1: auto-increment does not
+                    // restart per test now that the cleanup transaction is off.
+                    'stages' => [0 => (string) $stageIds[0]],
                 ],
             ]);
 
@@ -1071,7 +1072,6 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('regexOperatorProvider')]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
-        $this->useCleanupRollback = false;
 
         // Create the custom date field
         $this->createField([

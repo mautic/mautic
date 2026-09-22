@@ -38,7 +38,7 @@ final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     #[DataProvider('hitBotScenariosProvider')]
     public function testIsHitByBotFunctional(string $trackingHash, string $sentBefore, string $userAgent, string $ipAddress, bool $isRead): void

@@ -169,7 +169,7 @@ final class TagController extends FormController
         }
 
         // retrieve the entity
-        $tag   = new \MauticPlugin\MauticTagManagerBundle\Entity\Tag();
+        $tag   = new Tag();
         // set the page we came from
         $page = $request->getSession()->get('mautic.tagmanager.page', 1);
         // set the return URL for post actions
@@ -198,7 +198,7 @@ final class TagController extends FormController
         return $response;
     }
 
-    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, FormInterface $form, string $returnUrl, int $page): ?Response
+    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, Tag $tag, FormInterface $form, string $returnUrl, int $page): ?Response
     {
         if (Request::METHOD_POST !== $request->getMethod()) {
             return null;
@@ -292,7 +292,6 @@ final class TagController extends FormController
     }
 
     /**
-     * @param \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag
      * @param array<string, mixed>                            $postActionVars
      */
     private function createTagModifyResponse(Request $request, Tag $tag, TagDependencies $tagDependencies, array $postActionVars, string $action, bool $ignorePost): Response
@@ -324,7 +323,6 @@ final class TagController extends FormController
     }
 
     /**
-     * @param \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag
      * @param array<string, mixed>                            $postActionVars
      */
     private function handleEditFormPost(Request $request, Tag $tag, TagDependencies $tagDependencies, FormInterface $form, array $postActionVars): ?Response

@@ -67,12 +67,9 @@ class LogRepository extends CommonRepository
      * 1 = 100% responses are successful
      * null = no log rows yet
      *
-     * @param int $webhookId
-     * @param int $limit
-     *
      * @return float|null
      */
-    public function getSuccessVsErrorStatusCodeRatio($webhookId, $limit): int|float|null
+    public function getSuccessVsErrorStatusCodeRatio(int $webhookId, ?int $limit): int|float|null
     {
         // Generate query to select last X = $limit rows
         $selectqb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -101,8 +98,8 @@ class LogRepository extends CommonRepository
         $countSuccessQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $countSuccessQb->select('COUNT('.$this->getTableAlias().'.id) AS thecount')
             ->from(sprintf('(%s)', $selectqb->getSQL()), $this->getTableAlias())
-            ->andWhere($countSuccessQb->expr()->gte($this->getTableAlias().'.status_code', 200))
-            ->andWhere($countSuccessQb->expr()->lt($this->getTableAlias().'.status_code', 300))
+            ->andWhere($countSuccessQb->expr()->gte($this->getTableAlias().'.status_code', '200'))
+            ->andWhere($countSuccessQb->expr()->lt($this->getTableAlias().'.status_code', '300'))
             ->setParameter('webhookId', $webhookId);
 
         $result = $countSuccessQb->executeQuery()->fetchAssociative();

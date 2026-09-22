@@ -135,12 +135,10 @@ final class StatRepository extends CommonRepository
     /**
      * Get pie graph data for Sent, Read and Failed notifications count.
      *
-     * @param QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostNotifications($query, $limit = 10, $offset = 0): array
+    public function getMostNotifications(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query
             ->setMaxResults($limit)

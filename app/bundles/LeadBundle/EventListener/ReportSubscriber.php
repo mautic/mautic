@@ -282,9 +282,9 @@ final class ReportSubscriber implements EventSubscriberInterface
                     ->andWhere(
                         $qb->expr()->and(
                             $qb->expr()->eq('e.event_type', $qb->expr()->literal('decision')),
-                            $qb->expr()->eq('log.is_scheduled', 0),
+                            $qb->expr()->eq('log.is_scheduled', '0'),
                             $qb->expr()->isNotNull('l.attribution'),
-                            $qb->expr()->neq('l.attribution', 0),
+                            $qb->expr()->neq('l.attribution', '0'),
                             $qb->expr()->lte("DATE({$localDateTriggered})", 'DATE(l.attribution_date)')
                         )
                     );
@@ -478,7 +478,7 @@ final class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.lead.graph.line.leads':
                     $chart          = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $parametersKeys = array_keys($queryBuilder->getParameters() ?? []);
+                    $parametersKeys = array_keys($queryBuilder->getParameters());
                     $leadListFilter = preg_grep('/leadlistid/', $parametersKeys);
                     $tablePrefix    = $leadListFilter ? 's' : 'l';
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', $tablePrefix);

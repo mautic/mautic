@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 class Redirect extends FormEntity
 {
     /**
-     * @var string
+     * @var int|string
      */
     private $id;
 
@@ -38,7 +38,7 @@ class Redirect extends FormEntity
     /**
      * @var ArrayCollection<int, Trackable>
      */
-    #[ORM\OneToMany(mappedBy: 'redirect', targetEntity: Trackable::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: Trackable::class, mappedBy: 'redirect', fetch: 'EXTRA_LAZY')]
     private $trackables;
 
     public function __construct()

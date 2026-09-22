@@ -6,8 +6,8 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -141,7 +141,7 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
             'somebody2@anywhere.com',
         ];
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->expects($this->once())
             ->method('setParameter')
             ->with('emails', $emails, ArrayParameterType::STRING)

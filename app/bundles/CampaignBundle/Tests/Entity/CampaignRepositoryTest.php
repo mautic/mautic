@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +25,7 @@ final class CampaignRepositoryTest extends TestCase
 
         $this->repository = $this->configureRepository(Campaign::class);
 
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): DbalQueryBuilder => new DbalQueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {

@@ -60,11 +60,16 @@ final class SimplePaginatorTest extends MauticMysqlTestCase
             $ipAddress3->getId() => $ipAddress3,
         ], iterator_to_array($paginator), 'Only 2 last records should be returned.');
 
-        $prefix  = self::getContainer()->getParameter('mautic.db_table_prefix');
-        $queries = $this->debugDataHolder->getData()['default'];
+        $prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
+
+        // DBAL 4 always nests transactions with savepoints, which is not what is counted here
+        $queries = array_values(array_filter(
+            $this->debugDataHolder->getData()['default'],
+            static fn (array $query): bool => !str_contains($query['sql'], 'SAVEPOINT')
+        ));
 
         $this->assertCount(5, $queries, 'There should be exactly 5 queries executed.');
-        $this->assertMatchesRegularExpression("/^SELECT count\((.{2}_)\.id\) AS sclr_0 FROM {$prefix}ip_addresses \\1$/", $queries[3]['sql'], 'Simple paginator should not use either a DISTINCT keyword or sub-queries.');
+        $this->assertMatchesRegularExpression("/^SELECT count\(\*\) AS sclr_0 FROM {$prefix}ip_addresses .{2}_$/", $queries[3]['sql'], 'Simple paginator should not use either a DISTINCT keyword or sub-queries.');
         $this->assertMatchesRegularExpression("/^SELECT (.{2}_)\.id AS id_0, \\1\.ip_address AS ip_address_1, \\1\.ip_details AS ip_details_2 FROM {$prefix}ip_addresses \\1 ORDER BY \\1\.id ASC LIMIT 5 OFFSET 1$/", $queries[4]['sql'], 'Ordering and limit/offset have to be reflected.');
     }
 }

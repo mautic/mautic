@@ -171,7 +171,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<int, mixed> $segments
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\Exception\ORMException
      */
     private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, array $segments = []): Email
     {
