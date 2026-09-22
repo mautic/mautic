@@ -4,7 +4,7 @@ namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
@@ -448,8 +448,9 @@ final class SubmissionModel extends CommonFormModel
     /**
      * @param array<string,mixed> $args
      *
-     * @return Submission[]|array<int,Submission>|iterable<Submission>|Paginator<Submission>|SimplePaginator<Submission>
+     * @return array{count: int, results: list<array<string, mixed>>}|list<array<string, Submission>>
      */
+    // @phpstan-ignore-next-line method.childReturnType
     public function getEntities(array $args = []): array
     {
         return $this->submissionRepository->getEntities($args);
