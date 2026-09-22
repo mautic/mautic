@@ -6,7 +6,7 @@ namespace Mautic\UserBundle\Security\OIDC;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final class ClientCredentials
+final readonly class ClientCredentials
 {
     private string $clientUrl;
     private string $clientId;

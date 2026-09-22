@@ -3,25 +3,19 @@
 namespace Mautic\UserBundle\Security\OIDC\User;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\OpenIdBundle\Entity\SubjectId;
-use Mautic\OpenIdBundle\Repository\SubjectIdRepository;
+use Mautic\UserBundle\Entity\OidcSubjectId;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Exception\OidcException;
 use Mautic\UserBundle\Exception\OidcIdTakenException;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 
 #[AsAlias(LinkerInterface::class)]
-final class Linker implements LinkerInterface
+final readonly class Linker implements LinkerInterface
 {
-    private EntityManagerInterface $entityManager;
-    private SubjectIdRepository $subjectIdRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private EntityManagerInterface $entityManager, private OidcSubjectIdRepository $subjectIdRepository)
     {
-        $this->entityManager       = $entityManager;
-        $subjectIdRepository       = $entityManager->getRepository(SubjectId::class);
-        \assert($subjectIdRepository instanceof SubjectIdRepository);
-        $this->subjectIdRepository = $subjectIdRepository;
     }
 
     public function findLinkedUser(string $identifier, ?User $user): ?User
@@ -49,7 +43,7 @@ final class Linker implements LinkerInterface
             throw new OidcException('mautic.open_id.link.exception.user_taken');
         }
 
-        $subjectIdEntity = new SubjectId();
+        $subjectIdEntity = new OidcSubjectId();
         $subjectIdEntity->setSubjectID($identifier);
         $subjectIdEntity->setUser($user);
         $this->subjectIdRepository->saveEntity($subjectIdEntity, $flush);
@@ -57,7 +51,7 @@ final class Linker implements LinkerInterface
         return $user;
     }
 
-    public function editLinkToUser(SubjectId $subjectId, User $user, bool $flush = true): void
+    public function editLinkToUser(OidcSubjectId $subjectId, User $user, bool $flush = true): void
     {
         if ($subjectId->getSubjectID()) {
             // persist the user to generate the ID when creating a new user

@@ -15,23 +15,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 
 #[AsAlias(UserFactoryInterface::class)]
-final class UserFactory implements UserFactoryInterface
+final readonly class UserFactory implements UserFactoryInterface
 {
-    private UserRepository $userRepository;
-    private RoleRepository $roleRepository;
-    private Settings $parameters;
-    private LoggerInterface $logger;
-
-    public function __construct(
-        Settings $parameters,
-        UserRepository $userRepository,
-        RoleRepository $roleRepository,
-        LoggerInterface $logger,
-    ) {
-        $this->parameters     = $parameters;
-        $this->userRepository = $userRepository;
-        $this->roleRepository = $roleRepository;
-        $this->logger         = $logger;
+    public function __construct(private Settings $parameters, private UserRepository $userRepository, private RoleRepository $roleRepository, private LoggerInterface $logger)
+    {
     }
 
     public function create(UserCredentials $credentials): User

@@ -55,7 +55,7 @@ class PluginToken extends AbstractToken
 
     public function isSupportUser(): bool
     {
-        return 'yes' == $this->isSupportUser;
+        return 'yes' === $this->isSupportUser;
     }
 
     public function getAuthenticatingService(): ?string

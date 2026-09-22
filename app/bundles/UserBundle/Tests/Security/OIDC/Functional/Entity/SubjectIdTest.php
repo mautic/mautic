@@ -6,22 +6,58 @@ namespace Mautic\UserBundle\Tests\Security\OIDC\Functional\Entity;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\OidcSubjectId;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Security\OIDC\Entity\SubjectId;
-use Mautic\UserBundle\Tests\Security\OIDC\Functional\LoadFixturesTrait;
 
 final class SubjectIdTest extends MauticMysqlTestCase
 {
-    use LoadFixturesTrait;
+    private User $linkedUser;
+    private User $unlinkedUser;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $role = new Role();
+        $role->setName('Admin');
+        $role->setIsAdmin(true);
+        $this->em->persist($role);
+
+        $this->linkedUser = new User();
+        $this->linkedUser->setUsername('linked_admin');
+        $this->linkedUser->setPassword('linked_admin');
+        $this->linkedUser->setFirstName('linked_admin');
+        $this->linkedUser->setLastName('linked_admin');
+        $this->linkedUser->setEmail('linked_admin@mautic.local');
+        $this->linkedUser->setRole($role);
+        $this->em->persist($this->linkedUser);
+
+        $this->unlinkedUser = new User();
+        $this->unlinkedUser->setUsername('unlinked_admin');
+        $this->unlinkedUser->setPassword('unlinked_admin');
+        $this->unlinkedUser->setFirstName('unlinked_admin');
+        $this->unlinkedUser->setLastName('unlinked_admin');
+        $this->unlinkedUser->setEmail('unlinked_admin@mautic.local');
+        $this->unlinkedUser->setRole($role);
+        $this->em->persist($this->unlinkedUser);
+
+        $subjectId = new OidcSubjectId();
+        $subjectId->setUser($this->linkedUser);
+        $subjectId->setSubjectID('linked_admin');
+        $this->em->persist($subjectId);
+
+        $this->em->flush();
+    }
 
     public function testInsertingNewSubjectId(): void
     {
         $subjectIdRepo         = $this->em->getRepository(OidcSubjectId::class);
         $subjectIdFromDatabase = $subjectIdRepo->findOneBy(['subjectID' => 'linked_admin']);
-        \assert($subjectIdFromDatabase instanceof SubjectId);
+        $this->assertInstanceOf(OidcSubjectId::class, $subjectIdFromDatabase);
 
-        self::assertEquals('linked_admin', $subjectIdFromDatabase->getSubjectID());
-        self::assertEquals('linked_admin', $subjectIdFromDatabase->getUser()->getUsername());
+        $this->assertSame('linked_admin', $subjectIdFromDatabase->getSubjectID());
+        $this->assertSame('linked_admin', $subjectIdFromDatabase->getUser()->getUsername());
     }
 
     public function testUpdateSubjectId(): void
@@ -29,13 +65,13 @@ final class SubjectIdTest extends MauticMysqlTestCase
         $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
 
         $subjectId = $subjectIdRepo->findOneBy(['subjectID' => 'linked_admin']);
-        \assert($subjectId instanceof SubjectId);
+        $this->assertInstanceOf(OidcSubjectId::class, $subjectId);
         $subjectId->setSubjectID('test2');
         $this->em->persist($subjectId);
         $this->em->flush();
 
         $subjectIdFromDatabase = $subjectIdRepo->findOneBy(['subjectID' => 'test2']);
-        \assert($subjectIdFromDatabase instanceof SubjectId);
+        $this->assertInstanceOf(OidcSubjectId::class, $subjectIdFromDatabase);
 
         $this->assertEquals($subjectId, $subjectIdFromDatabase);
     }
@@ -45,56 +81,43 @@ final class SubjectIdTest extends MauticMysqlTestCase
         $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
 
         $subjectId = $subjectIdRepo->findOneBy(['subjectID' => 'linked_admin']);
-        \assert($subjectId instanceof SubjectId);
+        $this->assertInstanceOf(OidcSubjectId::class, $subjectId);
         $this->em->remove($subjectId);
         $this->em->flush();
 
         $subjectIdFromDatabase = $subjectIdRepo->findOneBy(['subjectID' => 'test']);
-        $this->assertNull($subjectIdFromDatabase);
+        $this->assertNotInstanceOf(\Mautic\UserBundle\Entity\OidcSubjectId::class, $subjectIdFromDatabase);
     }
 
     public function testDeleteUserCascade(): void
     {
         $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
-        $userRepo      = $this->em->getRepository(User::class);
 
-        $user = $userRepo->findOneBy(['username' => 'linked_admin']);
-        \assert($user instanceof User);
-        $this->em->remove($user);
+        $this->em->remove($this->linkedUser);
         $this->em->flush();
 
         $subjectIdFromDatabase = $subjectIdRepo->findOneBy(['subjectID' => 'test']);
-        $this->assertNull($subjectIdFromDatabase);
+        $this->assertNotInstanceOf(\Mautic\UserBundle\Entity\OidcSubjectId::class, $subjectIdFromDatabase);
     }
 
     public function testSubjectUserIsUnique(): void
     {
-        $userRepo  = $this->em->getRepository(User::class);
-
-        $user = $userRepo->findOneBy(['username' => 'linked_admin']);
-        \assert($user instanceof User);
-
-        $subjectId = new SubjectId();
-        $subjectId->setUser($user);
+        $subjectId = new OidcSubjectId();
+        $subjectId->setUser($this->linkedUser);
         $subjectId->setSubjectID('test2');
 
-        self::expectException(UniqueConstraintViolationException::class);
+        $this->expectException(UniqueConstraintViolationException::class);
         $this->em->persist($subjectId);
         $this->em->flush();
     }
 
     public function testSubjectIdIsUnique(): void
     {
-        $userRepo  = $this->em->getRepository(User::class);
-
-        $user = $userRepo->findOneBy(['username' => 'unlinked_admin']);
-        \assert($user instanceof User);
-
-        $subjectId = new SubjectId();
-        $subjectId->setUser($user);
+        $subjectId = new OidcSubjectId();
+        $subjectId->setUser($this->unlinkedUser);
         $subjectId->setSubjectID('linked_admin');
 
-        self::expectException(UniqueConstraintViolationException::class);
+        $this->expectException(UniqueConstraintViolationException::class);
         $this->em->persist($subjectId);
         $this->em->flush();
     }

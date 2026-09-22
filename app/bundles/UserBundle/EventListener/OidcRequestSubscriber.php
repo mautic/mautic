@@ -15,17 +15,17 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-final class OidcRequestSubscriber implements EventSubscriberInterface
+final readonly class OidcRequestSubscriber implements EventSubscriberInterface
 {
     private string $requiredUrl;
     private string $loginUrl;
     private string $dashboardUrl;
 
     public function __construct(
-        private readonly Settings $parameters,
-        private readonly TokenStorageInterface $tokenStorage,
+        private Settings $parameters,
+        private TokenStorageInterface $tokenStorage,
         UrlGeneratorInterface $urlGenerator,
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
         $this->requiredUrl  = $urlGenerator->generate('open_id_login_required', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $this->loginUrl     = $urlGenerator->generate('login', [], UrlGeneratorInterface::ABSOLUTE_URL);

@@ -12,12 +12,12 @@ final class SettingsTest extends TestCase
 {
     public function testGetters(): void
     {
-        $role       = $this->createMock(Role::class);
+        $role       = $this->createStub(Role::class);
         $parameters = new Settings(true, true, true, $role);
 
-        self::assertTrue($parameters->isEnabled());
-        self::assertTrue($parameters->isRequired());
-        self::assertTrue($parameters->isUserRegistrationAllowed());
-        self::assertSame($role, $parameters->getRegisteredUserRole());
+        $this->assertTrue($parameters->isEnabled());
+        $this->assertTrue($parameters->isRequired());
+        $this->assertTrue($parameters->isUserRegistrationAllowed());
+        $this->assertSame($role, $parameters->getRegisteredUserRole());
     }
 }

@@ -4,207 +4,188 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Security\Authenticator;
 
+use Jumbojett\OpenIDConnectClientException;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Exception\OidcException;
+use Mautic\UserBundle\Security\OIDC\CredentialsUserProviderInterface;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
 use Mautic\UserBundle\Security\OIDC\Factory\UserCredentialsFactoryInterface;
-use Mautic\UserBundle\Security\OIDC\Repository\SubjectIdRepository;
-use Mautic\UserBundle\Security\OIDC\Security\Authenticator\Authenticator;
-use Mautic\UserBundle\Security\OIDC\Security\Provider\CredentialsUserProviderInterface;
+use Mautic\UserBundle\Security\OIDC\OidcAuthenticator;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AuthenticatorTest extends TestCase
 {
-    public function testStart(): void
-    {
-        $request       = self::createMock(Request::class);
-        $authenticator = $this->buildAuthenticator();
-        $response      = $authenticator->start($request);
-
-        self::assertInstanceOf(JsonResponse::class, $response);
-        self::assertEquals(Response::HTTP_UNAUTHORIZED, $response->getStatusCode());
-    }
-
     public function testSupportsIsTrueWhenEnabledAndWithCodeStateParams(): void
     {
-        $request = self::createMock(Request::class);
+        $request = $this->createMock(Request::class);
         $request->method('get')->willReturnOnConsecutiveCalls('code', 'state');
 
         $authenticator = $this->buildAuthenticator();
         $response      = $authenticator->supports($request);
 
-        self::assertTrue($response);
+        $this->assertTrue($response);
     }
 
     public function testSupportsIsFalseWhenDisabled(): void
     {
-        $request = self::createMock(Request::class);
+        $request = $this->createMock(Request::class);
         $request->method('get')->willReturnOnConsecutiveCalls('code', 'state');
 
         $authenticator = $this->buildAuthenticator(false);
         $response      = $authenticator->supports($request);
 
-        self::assertFalse($response);
+        $this->assertFalse($response);
     }
 
     public function testSupportsIsFalseWhenNoCodeStateParams(): void
     {
-        $request = self::createMock(Request::class);
-        $request->method('get')->willReturnOnConsecutiveCalls(null, null);
+        $request = $this->createMock(Request::class);
+        $request->method('get')->willReturn(null);
 
         $authenticator = $this->buildAuthenticator();
         $response      = $authenticator->supports($request);
 
-        self::assertFalse($response);
+        $this->assertFalse($response);
     }
 
-    public function testGetCredentials(): void
+    public function testAuthenticateSuccess(): void
     {
         $parameters         = (new ParametersBuilder())->build();
-        $credentialsFactory = self::createMock(UserCredentialsFactoryInterface::class);
-        $subjectIdRepo      = self::createMock(SubjectIdRepository::class);
-        $urlGenerator       = self::createMock(UrlGeneratorInterface::class);
-        $request            = self::createMock(Request::class);
-        $flashBag           = self::createMock(FlashBag::class);
-        $translator         = self::createMock(TranslatorInterface::class);
-        $credentials        = new UserCredentials('123', 'email', 'username', 'given_name', 'family_name');
+        $credentialsFactory = $this->createMock(UserCredentialsFactoryInterface::class);
+        $userProvider       = $this->createMock(CredentialsUserProviderInterface::class);
+        $urlGenerator       = $this->createStub(UrlGeneratorInterface::class);
+        $request            = $this->createStub(Request::class);
+        $flashBag           = $this->createStub(FlashBag::class);
+        $translator         = $this->createStub(TranslatorInterface::class);
+        $credentials        = new UserCredentials('123', 'email@example.com', 'username', 'given_name', 'family_name');
+        $user               = new User();
+        $user->setEmail('email@example.com');
 
-        $credentialsFactory->expects(self::once())
+        $credentialsFactory->expects($this->once())
             ->method('create')
             ->willReturn($credentials);
 
-        $authenticator            = new Authenticator($parameters, $credentialsFactory, $subjectIdRepo, $urlGenerator, $flashBag, $translator);
-        $authenticatedCredentials = $authenticator->getCredentials($request);
+        $userProvider->expects($this->once())
+            ->method('loadUserByCredentials')
+            ->with($credentials)
+            ->willReturn($user);
 
-        self::assertEquals($credentials, $authenticatedCredentials);
+        $authenticator = new OidcAuthenticator($parameters, $credentialsFactory, $userProvider, $urlGenerator, $flashBag, $translator);
+        $passport      = $authenticator->authenticate($request);
+
+        $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
     }
 
-    public function testGetUser(): void
+    public function testAuthenticateThrowsAuthenticationExceptionOnOpenIDConnectClientException(): void
     {
         $parameters         = (new ParametersBuilder())->build();
-        $credentialsFactory = self::createMock(UserCredentialsFactoryInterface::class);
-        $subjectIdRepo      = self::createMock(SubjectIdRepository::class);
-        $urlGenerator       = self::createMock(UrlGeneratorInterface::class);
-        $credentials        = new UserCredentials('123', 'email', 'username', 'given_name', 'family_name');
-        $userProvider       = self::createMock(CredentialsUserProviderInterface::class);
-        $flashBag           = self::createMock(FlashBag::class);
-        $translator         = self::createMock(TranslatorInterface::class);
+        $credentialsFactory = $this->createMock(UserCredentialsFactoryInterface::class);
+        $userProvider       = $this->createStub(CredentialsUserProviderInterface::class);
+        $urlGenerator       = $this->createStub(UrlGeneratorInterface::class);
+        $request            = $this->createStub(Request::class);
+        $flashBag           = $this->createStub(FlashBag::class);
+        $translator         = $this->createStub(TranslatorInterface::class);
 
-        $user = new User();
-        $userProvider->expects(self::once())->method('loadUserByCredentials')->willReturn($user);
+        $credentialsFactory->expects($this->once())
+            ->method('create')
+            ->willThrowException(new OpenIDConnectClientException('OIDC error'));
 
-        $authenticator     = new Authenticator($parameters, $credentialsFactory, $subjectIdRepo, $urlGenerator, $flashBag, $translator);
-        $authenticatedUser = $authenticator->getUser($credentials, $userProvider);
+        $authenticator = new OidcAuthenticator($parameters, $credentialsFactory, $userProvider, $urlGenerator, $flashBag, $translator);
 
-        self::assertSame($user, $authenticatedUser);
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('OIDC error');
+        $authenticator->authenticate($request);
     }
 
-    public function testCheckCredentialsIsTrueWhenSubjectIdIsFound(): void
+    public function testAuthenticateThrowsAuthenticationExceptionOnOidcException(): void
     {
         $parameters         = (new ParametersBuilder())->build();
-        $credentialsFactory = self::createMock(UserCredentialsFactoryInterface::class);
-        $subjectIdRepo      = self::createMock(SubjectIdRepository::class);
-        $urlGenerator       = self::createMock(UrlGeneratorInterface::class);
-        $flashBag           = self::createMock(FlashBag::class);
-        $translator         = self::createMock(TranslatorInterface::class);
-        $credentials        = new UserCredentials('123', 'email', 'username', 'given_name', 'family_name');
-        $user               = new User();
+        $credentialsFactory = $this->createMock(UserCredentialsFactoryInterface::class);
+        $userProvider       = $this->createStub(CredentialsUserProviderInterface::class);
+        $urlGenerator       = $this->createStub(UrlGeneratorInterface::class);
+        $request            = $this->createStub(Request::class);
+        $flashBag           = $this->createStub(FlashBag::class);
+        $translator         = $this->createMock(TranslatorInterface::class);
 
-        $subjectIdRepo->expects(self::once())->method('count')->willReturn(1);
+        $credentialsFactory->expects($this->once())
+            ->method('create')
+            ->willThrowException(new OidcException('mautic.user.auth.error.invalid_subject_id'));
 
-        $authenticator      = new Authenticator($parameters, $credentialsFactory, $subjectIdRepo, $urlGenerator, $flashBag, $translator);
-        $isValidCredentials = $authenticator->checkCredentials($credentials, $user);
+        $translator->expects($this->once())
+            ->method('trans')
+            ->with('mautic.user.auth.error.invalid_subject_id')
+            ->willReturn('Translated error message');
 
-        self::assertTrue($isValidCredentials);
-    }
+        $authenticator = new OidcAuthenticator($parameters, $credentialsFactory, $userProvider, $urlGenerator, $flashBag, $translator);
 
-    public function testCheckCredentialsIsFalseWhenSubjectIdIsNotFound(): void
-    {
-        $parameters         = (new ParametersBuilder())->build();
-        $credentialsFactory = self::createMock(UserCredentialsFactoryInterface::class);
-        $subjectIdRepo      = self::createMock(SubjectIdRepository::class);
-        $urlGenerator       = self::createMock(UrlGeneratorInterface::class);
-        $flashBag           = self::createMock(FlashBag::class);
-        $translator         = self::createMock(TranslatorInterface::class);
-        $credentials        = new UserCredentials('123', 'email', 'username', 'given_name', 'family_name');
-        $user               = new User();
-
-        $subjectIdRepo->expects(self::once())->method('count')->willReturn(0);
-
-        $authenticator      = new Authenticator($parameters, $credentialsFactory, $subjectIdRepo, $urlGenerator, $flashBag, $translator);
-        $isValidCredentials = $authenticator->checkCredentials($credentials, $user);
-
-        self::assertFalse($isValidCredentials);
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Translated error message');
+        $authenticator->authenticate($request);
     }
 
     public function testOnAuthenticationSuccess(): void
     {
         $parameters         = (new ParametersBuilder())->build();
-        $credentialsFactory = self::createMock(UserCredentialsFactoryInterface::class);
-        $subjectIdRepo      = self::createMock(SubjectIdRepository::class);
-        $urlGenerator       = self::createMock(UrlGeneratorInterface::class);
-        $request            = self::createMock(Request::class);
-        $token              = self::createMock(TokenInterface::class);
-        $flashBag           = self::createMock(FlashBag::class);
-        $translator         = self::createMock(TranslatorInterface::class);
-        $providerKey        = 'providerKey';
+        $credentialsFactory = $this->createStub(UserCredentialsFactoryInterface::class);
+        $userProvider       = $this->createStub(CredentialsUserProviderInterface::class);
+        $urlGenerator       = $this->createMock(UrlGeneratorInterface::class);
+        $request            = $this->createStub(Request::class);
+        $token              = $this->createStub(TokenInterface::class);
+        $flashBag           = $this->createStub(FlashBag::class);
+        $translator         = $this->createStub(TranslatorInterface::class);
+        $firewallName       = 'main';
 
-        $urlGenerator->expects(self::once())->method('generate')->willReturn('http://mautic.local');
+        $urlGenerator->expects($this->once())->method('generate')->willReturn('http://mautic.local');
 
-        $authenticator = new Authenticator($parameters, $credentialsFactory, $subjectIdRepo, $urlGenerator, $flashBag, $translator);
-        $result        = $authenticator->onAuthenticationSuccess($request, $token, $providerKey);
-        \assert($result instanceof RedirectResponse);
+        $authenticator = new OidcAuthenticator($parameters, $credentialsFactory, $userProvider, $urlGenerator, $flashBag, $translator);
+        $result        = $authenticator->onAuthenticationSuccess($request, $token, $firewallName);
+        $this->assertInstanceOf(RedirectResponse::class, $result);
 
-        self::assertSame(302, $result->getStatusCode());
-        self::assertSame('http://mautic.local', $result->getTargetUrl());
+        $this->assertSame(302, $result->getStatusCode());
+        $this->assertSame('http://mautic.local', $result->getTargetUrl());
     }
 
     public function testOnAuthenticationFailure(): void
     {
         $parameters         = (new ParametersBuilder())->build();
-        $credentialsFactory = self::createMock(UserCredentialsFactoryInterface::class);
-        $subjectIdRepo      = self::createMock(SubjectIdRepository::class);
-        $urlGenerator       = self::createMock(UrlGeneratorInterface::class);
-        $request            = self::createMock(Request::class);
-        $exception          = self::createMock(AuthenticationException::class);
-        $flashBag           = self::createMock(FlashBag::class);
-        $translator         = self::createMock(TranslatorInterface::class);
+        $credentialsFactory = $this->createStub(UserCredentialsFactoryInterface::class);
+        $userProvider       = $this->createStub(CredentialsUserProviderInterface::class);
+        $urlGenerator       = $this->createMock(UrlGeneratorInterface::class);
+        $request            = $this->createStub(Request::class);
+        $exception          = $this->createStub(AuthenticationException::class);
+        $flashBag           = $this->createStub(FlashBag::class);
+        $translator         = $this->createStub(TranslatorInterface::class);
 
-        $urlGenerator->expects(self::once())->method('generate')->willReturn('http://mautic.local');
+        $urlGenerator->expects($this->once())->method('generate')->willReturn('http://mautic.local');
 
-        $authenticator = new Authenticator($parameters, $credentialsFactory, $subjectIdRepo, $urlGenerator, $flashBag, $translator);
+        $authenticator = new OidcAuthenticator($parameters, $credentialsFactory, $userProvider, $urlGenerator, $flashBag, $translator);
         $result        = $authenticator->onAuthenticationFailure($request, $exception);
-        \assert($result instanceof RedirectResponse);
+        $this->assertInstanceOf(RedirectResponse::class, $result);
 
-        self::assertSame(302, $result->getStatusCode());
-        self::assertSame('http://mautic.local', $result->getTargetUrl());
+        $this->assertSame(302, $result->getStatusCode());
+        $this->assertSame('http://mautic.local', $result->getTargetUrl());
     }
 
-    public function testSupportsRememberMe(): void
+    private function buildAuthenticator(bool $isEnabled = true): OidcAuthenticator
     {
-        $authenticator = $this->buildAuthenticator();
+        $parameters = (new ParametersBuilder())->withIsEnabled($isEnabled)->build();
 
-        self::assertFalse($authenticator->supportsRememberMe());
-    }
-
-    private function buildAuthenticator(bool $isEnabled = true): Authenticator
-    {
-        $parameters         = (new ParametersBuilder())->withIsEnabled($isEnabled)->build();
-        $credentialsFactory = self::createMock(UserCredentialsFactoryInterface::class);
-        $subjectIdRepo      = self::createMock(SubjectIdRepository::class);
-        $urlGenerator       = self::createMock(UrlGeneratorInterface::class);
-        $flashBag           = self::createMock(FlashBag::class);
-        $translator         = self::createMock(TranslatorInterface::class);
-
-        return new Authenticator($parameters, $credentialsFactory, $subjectIdRepo, $urlGenerator, $flashBag, $translator);
+        return new OidcAuthenticator(
+            $parameters,
+            $this->createMock(UserCredentialsFactoryInterface::class),
+            $this->createMock(CredentialsUserProviderInterface::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(FlashBag::class),
+            $this->createMock(TranslatorInterface::class)
+        );
     }
 }

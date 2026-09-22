@@ -19,13 +19,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class OidcSubjectIdType extends AbstractType
 {
-    private LinkerInterface $linker;
-    private TranslatorInterface $translator;
-
-    public function __construct(LinkerInterface $linker, TranslatorInterface $translator)
+    public function __construct(private readonly LinkerInterface $linker, private readonly TranslatorInterface $translator)
     {
-        $this->linker      = $linker;
-        $this->translator  = $translator;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -39,12 +34,12 @@ final class OidcSubjectIdType extends AbstractType
             ],
             'required'    => false,
             'constraints' => [
-                new Assert\Type(['type' => 'string', 'groups' => ['subjectID']]),
-                new Assert\Length(['max' => 255, 'groups' => ['subjectID']]),
+                new Assert\Type(type: 'string', groups: ['subjectID']),
+                new Assert\Length(max: 255, groups: ['subjectID']),
             ],
         ]);
 
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
             if (!$event->getForm()->isValid()) {
                 return;
             }
@@ -70,7 +65,7 @@ final class OidcSubjectIdType extends AbstractType
         );
     }
 
-    public function getName(): string
+    public function getBlockPrefix(): string
     {
         return 'user_openid';
     }

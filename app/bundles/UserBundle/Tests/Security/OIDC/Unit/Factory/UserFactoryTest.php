@@ -10,10 +10,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
 use Mautic\UserBundle\Exception\OidcException;
-use Mautic\UserBundle\Exception\OidcException;
-use Mautic\UserBundle\Exception\OidcException;
-use Mautic\UserBundle\Exception\OidcException;
-use Mautic\UserBundle\Security\OIDC\Factory\UserFactory;
+use Mautic\UserBundle\Security\OIDC\User\UserFactory;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -22,11 +19,11 @@ final class UserFactoryTest extends TestCase
 {
     public function testBuild(): void
     {
-        $role       = self::createMock(Role::class);
+        $role       = $this->createStub(Role::class);
         $parameters = (new ParametersBuilder())->withRegisteredUserRole($role)->build();
-        $userRepo   = self::createMock(UserRepository::class);
-        $roleRepo   = self::createMock(RoleRepository::class);
-        $logger     = self::createMock(LoggerInterface::class);
+        $userRepo   = $this->createStub(UserRepository::class);
+        $roleRepo   = $this->createMock(RoleRepository::class);
+        $logger     = $this->createStub(LoggerInterface::class);
 
         $roleRepo->method('find')
             ->willReturn($role);
@@ -35,21 +32,21 @@ final class UserFactoryTest extends TestCase
         $userFactory = new UserFactory($parameters, $userRepo, $roleRepo, $logger);
         $user        = $userFactory->create($credentials);
 
-        self::assertEquals($credentials->getEmail(), $user->getEmail());
-        self::assertEquals($credentials->getGivenName(), $user->getFirstName());
-        self::assertEquals($credentials->getFamilyName(), $user->getLastName());
-        self::assertEquals($credentials->getEmail(), $user->getUsername());
-        self::assertTrue($user->getIsPublished());
+        $this->assertEquals($credentials->getEmail(), $user->getEmail());
+        $this->assertEquals($credentials->getGivenName(), $user->getFirstName());
+        $this->assertEquals($credentials->getFamilyName(), $user->getLastName());
+        $this->assertEquals($credentials->getEmail(), $user->getUsername());
+        $this->assertTrue($user->getIsPublished());
     }
 
     public function testBuildThrowsExceptionWhenRoleNotFound(): void
     {
         $parameters = (new ParametersBuilder())->build();
-        $userRepo   = self::createMock(UserRepository::class);
-        $roleRepo   = self::createMock(RoleRepository::class);
-        $logger     = self::createMock(LoggerInterface::class);
+        $userRepo   = $this->createStub(UserRepository::class);
+        $roleRepo   = $this->createStub(RoleRepository::class);
+        $logger     = $this->createStub(LoggerInterface::class);
 
-        self::expectException(RoleNotFoundException::class);
+        $this->expectException(OidcException::class);
 
         $credentials = new UserCredentials('id', 'email@mautic.local', 'givenName', 'familyName', 'preferredUsername');
         $userFactory = new UserFactory($parameters, $userRepo, $roleRepo, $logger);
@@ -58,16 +55,16 @@ final class UserFactoryTest extends TestCase
 
     public function testBuildThrowsExceptionWhenEmailNotFound(): void
     {
-        $role       = self::createMock(Role::class);
+        $role       = $this->createStub(Role::class);
         $parameters = (new ParametersBuilder())->withRegisteredUserRole($role)->build();
-        $userRepo   = self::createMock(UserRepository::class);
-        $roleRepo   = self::createMock(RoleRepository::class);
-        $logger     = self::createMock(LoggerInterface::class);
+        $userRepo   = $this->createStub(UserRepository::class);
+        $roleRepo   = $this->createMock(RoleRepository::class);
+        $logger     = $this->createStub(LoggerInterface::class);
 
         $roleRepo->method('find')
             ->willReturn($role);
 
-        self::expectException(EmailRequiredException::class);
+        $this->expectException(OidcException::class);
 
         $credentials = new UserCredentials('id', null, 'givenName', 'familyName', 'preferredUsername');
         $userFactory = new UserFactory($parameters, $userRepo, $roleRepo, $logger);
@@ -76,11 +73,11 @@ final class UserFactoryTest extends TestCase
 
     public function testBuildThrowsExceptionWhenEmailIsTaken(): void
     {
-        $role       = self::createMock(Role::class);
+        $role       = $this->createStub(Role::class);
         $parameters = (new ParametersBuilder())->withRegisteredUserRole($role)->build();
-        $userRepo   = self::createMock(UserRepository::class);
-        $roleRepo   = self::createMock(RoleRepository::class);
-        $logger     = self::createMock(LoggerInterface::class);
+        $userRepo   = $this->createMock(UserRepository::class);
+        $roleRepo   = $this->createMock(RoleRepository::class);
+        $logger     = $this->createStub(LoggerInterface::class);
 
         $roleRepo->method('find')
             ->willReturn($role);
@@ -90,7 +87,7 @@ final class UserFactoryTest extends TestCase
             ->with(['email' => 'email@mautic.local'])
             ->willReturn(new User());
 
-        self::expectException(EmailTakenException::class);
+        $this->expectException(OidcException::class);
 
         $credentials = new UserCredentials('id', 'email@mautic.local', 'givenName', 'familyName', 'preferredUsername');
         $userFactory = new UserFactory($parameters, $userRepo, $roleRepo, $logger);
@@ -100,11 +97,11 @@ final class UserFactoryTest extends TestCase
     public function testBuildThrowsExceptionWhenRegistrationIsDisabled(): void
     {
         $parameters = (new ParametersBuilder())->withIsUserRegistrationAllowed(false)->build();
-        $userRepo   = self::createMock(UserRepository::class);
-        $roleRepo   = self::createMock(RoleRepository::class);
-        $logger     = self::createMock(LoggerInterface::class);
+        $userRepo   = $this->createStub(UserRepository::class);
+        $roleRepo   = $this->createStub(RoleRepository::class);
+        $logger     = $this->createStub(LoggerInterface::class);
 
-        self::expectException(RegistrationNotAllowedException::class);
+        $this->expectException(OidcException::class);
 
         $credentials = new UserCredentials('id', 'email@mautic.local', 'givenName', 'familyName', 'preferredUsername');
         $userFactory = new UserFactory($parameters, $userRepo, $roleRepo, $logger);

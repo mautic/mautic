@@ -15,18 +15,18 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AsAlias(ClientFactoryInterface::class)]
-final class ClientFactory implements ClientFactoryInterface
+final readonly class ClientFactory implements ClientFactoryInterface
 {
     public function __construct(
-        private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly RequestStack $requestStack,
+        private UrlGeneratorInterface $urlGenerator,
+        private EventDispatcherInterface $eventDispatcher,
+        private RequestStack $requestStack,
     ) {
     }
 
     public function create(ClientCredentials $clientCredentials): ClientInterface
     {
-        $redirectUrl = $this->urlGenerator->generate('open_id_login_check', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $redirectUrl = $this->urlGenerator->generate('mautic_oidc_check', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $scopesEvent = new RegisterScopesEvent();
         $this->eventDispatcher->dispatch($scopesEvent);
         $scopes = $scopesEvent->getScopes();

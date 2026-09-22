@@ -7,13 +7,10 @@ namespace Mautic\UserBundle\Security\OIDC\Factory;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Security\OIDC\Settings;
 
-final class SettingsFactory
+final readonly class SettingsFactory
 {
-    private RoleRepository $roleRepository;
-
-    public function __construct(RoleRepository $roleRepository)
+    public function __construct(private RoleRepository $roleRepository)
     {
-        $this->roleRepository = $roleRepository;
     }
 
     public function create(?bool $isEnabled, ?bool $isRequired, ?bool $isUserCreationAllowed, ?int $newUserRole): Settings

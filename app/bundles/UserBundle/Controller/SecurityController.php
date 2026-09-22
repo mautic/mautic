@@ -7,7 +7,9 @@ namespace Mautic\UserBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Exception\WeakPasswordException;
+use Mautic\UserBundle\Security\OIDC\Settings;
 use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -141,10 +143,10 @@ final class SecurityController extends CommonController implements EventSubscrib
      * OIDC login action.
      */
     public function oidcLoginAction(
-        \Mautic\UserBundle\Security\OIDC\DTO\Settings $oidcSettings,
+        Settings $oidcSettings,
         \Mautic\UserBundle\Security\OIDC\Client\ClientInterface $oidcClient,
         \Psr\Log\LoggerInterface $logger,
-    ): Response {
+    ): \Symfony\Component\HttpFoundation\RedirectResponse {
         if (!$oidcSettings->isEnabled()) {
             return $this->redirectToRoute('login');
         }
@@ -153,7 +155,7 @@ final class SecurityController extends CommonController implements EventSubscrib
             if ($authenticatedRedirect = $oidcClient->authenticate()) {
                 return $authenticatedRedirect;
             }
-        } catch (\Mautic\UserBundle\Security\OIDC\Exception\AuthorizationRequestFailedException $e) {
+        } catch (\Mautic\UserBundle\Exception\OidcAuthorizationException $e) {
             $logger->error($e->getMessage(), ['exception' => $e]);
         }
 
@@ -172,14 +174,14 @@ final class SecurityController extends CommonController implements EventSubscrib
      * OIDC required action - prompts user to link their OIDC account.
      */
     public function oidcRequiredAction(
-        \Mautic\UserBundle\Security\OIDC\DTO\Settings $oidcSettings,
-        \Doctrine\ORM\EntityManagerInterface $entityManager,
+        Settings $oidcSettings,
+        OidcSubjectIdRepository $repository,
     ): Response {
         if (!$oidcSettings->isEnabled() || !($user = $this->getUser())) {
             return $this->redirectToRoute('login');
         }
 
-        if ($entityManager->getRepository(\Mautic\UserBundle\Entity\OidcSubjectId::class)->findOneBy(['user' => $user])) {
+        if ($repository->findOneBy(['user' => $user])) {
             return $this->redirectToRoute('mautic_oidc_login');
         }
 

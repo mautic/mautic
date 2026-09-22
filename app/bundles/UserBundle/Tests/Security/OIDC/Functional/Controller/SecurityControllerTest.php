@@ -8,10 +8,10 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Security\OIDC\Settings;
 use Mautic\UserBundle\Security\OIDC\Client\ClientInterface;
+use Mautic\UserBundle\Security\OIDC\Entity\SubjectId;
+use Mautic\UserBundle\Security\OIDC\Settings;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
-use Mautic\UserBundle\Tests\Security\OIDC\Functional\LoadFixturesTrait;
 use Mautic\UserBundle\Tests\Security\OIDC\Functional\WebLoginTrait;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -19,9 +19,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 final class SecurityControllerTest extends MauticMysqlTestCase
 {
     use WebLoginTrait;
-    use LoadFixturesTrait {
-        setUp as setUpFixtures;
-    }
 
     private const REQUIRED_LOGIN_PATH = '/s/open_id/required';
     private const LOGIN_CHECK_PATH    = '/s/open_id/login_check';
@@ -31,20 +28,50 @@ final class SecurityControllerTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        self::setUpFixtures();
-        $this->client = static::createClient();
+        parent::setUp();
+        self::bootKernel();
+
+        $role = new Role();
+        $role->setName('Admin');
+        $role->setIsAdmin(true);
+        $this->em->persist($role);
+
+        $linkedUser = new User();
+        $linkedUser->setUsername('linked_admin');
+        $linkedUser->setPassword('linked_admin');
+        $linkedUser->setFirstName('linked_admin');
+        $linkedUser->setLastName('linked_admin');
+        $linkedUser->setEmail('linked_admin@mautic.local');
+        $linkedUser->setRole($role);
+        $this->em->persist($linkedUser);
+
+        $unlinkedUser = new User();
+        $unlinkedUser->setUsername('unlinked_admin');
+        $unlinkedUser->setPassword('unlinked_admin');
+        $unlinkedUser->setFirstName('unlinked_admin');
+        $unlinkedUser->setLastName('unlinked_admin');
+        $unlinkedUser->setEmail('unlinked_admin@mautic.local');
+        $unlinkedUser->setRole($role);
+        $this->em->persist($unlinkedUser);
+
+        $subjectId = new SubjectId();
+        $subjectId->setUser($linkedUser);
+        $subjectId->setSubjectID('linked_admin');
+        $this->em->persist($subjectId);
+
+        $this->em->flush();
+
+        $this->client = self::createClient();
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testRequireLoginActionWhenNotLoggedIn(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
         $crawler    = $this->makeRequest($parameters, self::REQUIRED_LOGIN_PATH);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
     }
 
     public function testRequireLoginActionWhenNotLoggedInAndOpenIdIsDisabled(): void
@@ -53,12 +80,10 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $crawler    = $this->makeRequest($parameters, self::REQUIRED_LOGIN_PATH);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testRequireLoginActionWhenLoggedInUsingForm(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -67,17 +92,15 @@ final class SecurityControllerTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         if ($parameters->isRequired()) {
-            self::assertStringEndsWith(self::REQUIRED_LOGIN_PATH, $crawler->getUri());
+            $this->assertStringEndsWith(self::REQUIRED_LOGIN_PATH, $crawler->getUri());
 
             return;
         }
 
-        self::assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testRequireLoginActionWhenLoggedInUsingOpenId(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -85,7 +108,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $crawler = $this->makeRequest($parameters, self::REQUIRED_LOGIN_PATH);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
     public function testRequiredLoginActionWhenDisabledAndNotLoggedIn(): void
@@ -94,7 +117,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $crawler    = $this->makeRequest($parameters, self::REQUIRED_LOGIN_PATH);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
     }
 
     public function testRequiredLoginActionWhenDisabledAndLoggedInUsingForm(): void
@@ -104,12 +127,10 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $crawler = $this->makeRequest($parameters, self::REQUIRED_LOGIN_PATH);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testLoginCheckActionWhenNotLoggedIn(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -118,9 +139,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testLoginCheckActionWhenLoggedInUsingForm(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -134,12 +153,10 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         }
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testLoginCheckActionWhenLoggedInUsingOpenId(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -147,7 +164,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $crawler = $this->makeRequest($parameters, self::LOGIN_CHECK_PATH);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
     public function testLoginCheckActionWhenDisabledAndNotLoggedIn(): void
@@ -156,7 +173,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $crawler    = $this->makeRequest($parameters, self::LOGIN_CHECK_PATH);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
     }
 
     public function testLoginCheckActionWhenDisabledAndLoggedInUsingForm(): void
@@ -166,17 +183,15 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $crawler = $this->makeRequest($parameters, self::LOGIN_CHECK_PATH);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testLoginActionWhenNotLoggedIn(ParametersBuilder $parametersBuilder): void
     {
         $parameters    = $parametersBuilder->build();
-        $openIdClient  = self::createMock(ClientInterface::class);
-        $openIdClient->expects(self::once())
+        $openIdClient  = $this->createMock(ClientInterface::class);
+        $openIdClient->expects($this->once())
             ->method('authenticate')
             ->willReturn(new RedirectResponse('https://mautic.com'));
         $this->client->getContainer()->set('mautic.open_id.client', $openIdClient);
@@ -185,9 +200,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testLoginActionWhenLoggedInUsingForm(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -196,13 +209,13 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         if (!$parameters->isRequired()) {
             $crawler = $this->makeRequest($parameters, self::LOGIN_PATH);
             self::assertResponseIsSuccessful();
-            self::assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
+            $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
 
             return;
         }
 
-        $openIdClient = self::createMock(ClientInterface::class);
-        $openIdClient->expects(self::once())
+        $openIdClient = $this->createMock(ClientInterface::class);
+        $openIdClient->expects($this->once())
             ->method('authenticate')
             ->willReturn(new RedirectResponse('https://mautic.com'));
         $this->client->getContainer()->set('mautic.open_id.client', $openIdClient);
@@ -211,9 +224,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testLoginActionWhenLoggedInUsingOpenId(ParametersBuilder $parametersBuilder): void
     {
         $parameters = $parametersBuilder->build();
@@ -221,20 +232,18 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $crawler = $this->makeRequest($parameters, self::LOGIN_PATH);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
+        $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testLoginActionLinksUser(ParametersBuilder $parametersBuilder): void
     {
         $userRepo      = $this->em->getRepository(User::class);
-        $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
-        $openIdClient  = self::createMock(ClientInterface::class);
+        $subjectIdRepo = $this->em->getRepository(SubjectId::class);
+        $openIdClient  = $this->createMock(ClientInterface::class);
         $this->client->getContainer()->set('mautic.open_id.client', $openIdClient);
 
-        $openIdClient->expects(self::once())
+        $openIdClient->expects($this->once())
             ->method('getVerifiedClaims')
             ->willReturn([
                 'sub'                => '123',
@@ -243,7 +252,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
                 'given_name'         => 'unlinked_admin',
                 'family_name'        => 'unlinked_admin',
             ]);
-        $openIdClient->expects(self::atLeastOnce())
+        $openIdClient->expects($this->atLeastOnce())
             ->method('getMappingField')
             ->willReturn('sub');
 
@@ -255,25 +264,23 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         ]);
 
         $user      = $userRepo->findOneBy(['email' => 'unlinked_admin@mautic.local']);
-        \assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $subjectId = $subjectIdRepo->findOneBy(['user' => $user, 'subjectID' => '123']);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
-        self::assertNotNull($subjectId);
+        $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
+        $this->assertInstanceOf(\Mautic\UserBundle\Security\OIDC\Entity\SubjectId::class, $subjectId);
     }
 
-    /**
-     * @dataProvider enabledParametersProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enabledParametersProvider')]
     public function testLoginActionCreatesUser(ParametersBuilder $parametersBuilder): void
     {
         $userRepo      = $this->em->getRepository(User::class);
-        $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
-        $openIdClient  = self::createMock(ClientInterface::class);
+        $subjectIdRepo = $this->em->getRepository(SubjectId::class);
+        $openIdClient  = $this->createMock(ClientInterface::class);
         $this->client->getContainer()->set('mautic.open_id.client', $openIdClient);
 
-        $openIdClient->expects(self::once())
+        $openIdClient->expects($this->once())
             ->method('getVerifiedClaims')
             ->willReturn([
                 'sub'                => '123',
@@ -282,15 +289,15 @@ final class SecurityControllerTest extends MauticMysqlTestCase
                 'given_name'         => 'new_admin',
                 'family_name'        => 'new_admin',
             ]);
-        $openIdClient->expects(self::atLeastOnce())
+        $openIdClient->expects($this->atLeastOnce())
             ->method('getMappingField')
             ->willReturn('sub');
 
         $roleRepo = $this->em->getRepository(Role::class);
-        \assert($roleRepo instanceof RoleRepository);
+        $this->assertInstanceOf(RoleRepository::class, $roleRepo);
 
         $adminRole = $roleRepo->findOneBy(['name' => 'Admin']);
-        \assert($adminRole instanceof Role);
+        $this->assertInstanceOf(Role::class, $adminRole);
 
         $parameters = $parametersBuilder->withRegisteredUserRole($adminRole)->build();
 
@@ -301,18 +308,18 @@ final class SecurityControllerTest extends MauticMysqlTestCase
 
         if (!$parameters->isUserRegistrationAllowed()) {
             self::assertResponseIsSuccessful();
-            self::assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
+            $this->assertStringEndsWith(self::MAUTIC_LOGIN_PATH, $crawler->getUri());
 
             return;
         }
 
         $user      = $userRepo->findOneBy(['email' => 'new_admin@mautic.local']);
-        \assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
         $subjectId = $subjectIdRepo->findOneBy(['user' => $user, 'subjectID' => '123']);
 
         self::assertResponseIsSuccessful();
-        self::assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
-        self::assertNotNull($subjectId);
+        $this->assertStringEndsWith(self::DASHBOARD_PATH, $crawler->getUri());
+        $this->assertInstanceOf(\Mautic\UserBundle\Security\OIDC\Entity\SubjectId::class, $subjectId);
     }
 
     /**

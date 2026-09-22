@@ -4,203 +4,227 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Security\Provider;
 
+use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
-use Mautic\UserBundle\Security\OIDC\Entity\SubjectId;
-use Mautic\UserBundle\Security\OIDC\Factory\UserFactoryInterface;
-use Mautic\UserBundle\Security\OIDC\Security\Provider\UserProvider;
-use Mautic\UserBundle\Security\OIDC\Service\LinkerInterface;
+use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
+use Mautic\UserBundle\Security\OIDC\User\UserFactoryInterface;
+use Mautic\UserBundle\Security\OIDC\UserProvider;
 use Mautic\UserBundle\Security\Provider\UserProvider as MauticUserProvider;
-use PHPStan\Testing\TestCase;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Security;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
 final class UserProviderTest extends TestCase
 {
     public function testLoadUserByUsernameLoadsUserBySubjectID(): void
     {
-        $mauticUserProvider  = self::createMock(MauticUserProvider::class);
-        $security            = self::createMock(Security::class);
-        $linkerInterface     = self::createMock(LinkerInterface::class);
-        $userFactory         = self::createMock(UserFactoryInterface::class);
-        $subjectId           = new SubjectId();
-        $user                = new User();
+        $mauticUserProvider = $this->createMock(MauticUserProvider::class);
+        $security           = $this->createStub(TokenStorageInterface::class);
+        $linkerInterface    = $this->createMock(LinkerInterface::class);
+        $userFactory        = $this->createStub(UserFactoryInterface::class);
+        $subjectId          = new OidcSubjectId();
+        $user               = new User();
 
         $user->setUsername('test');
         $subjectId->setUser($user);
 
-        $linkerInterface->expects(self::once())
+        $linkerInterface->expects($this->once())
             ->method('findLinkedUser')
             ->willReturn($user);
 
-        $mauticUserProvider->expects(self::once())
-            ->method('loadUserByUsername')
+        $mauticUserProvider->expects($this->once())
+            ->method('loadUserByIdentifier')
             ->willReturn($user);
 
         $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
-        $loadedUser   = $userProvider->loadUserByUsername('subjectId');
-
-        self::assertSame($user, $loadedUser);
+        $loadedUser   = $userProvider->loadUserByIdentifier('subjectId');
+        $this->assertSame($user, $loadedUser);
     }
 
     public function testLoadUserByUsernameThrowsExceptionIfSubjectIDNotFound(): void
     {
-        $mauticUserProvider  = self::createMock(MauticUserProvider::class);
-        $security            = self::createMock(Security::class);
-        $linkerInterface     = self::createMock(LinkerInterface::class);
-        $userFactory         = self::createMock(UserFactoryInterface::class);
-        $subjectId           = new SubjectId();
-        $user                = new User();
+        $mauticUserProvider = $this->createStub(MauticUserProvider::class);
+        $security           = $this->createStub(TokenStorageInterface::class);
+        $linkerInterface    = $this->createStub(LinkerInterface::class);
+        $userFactory        = $this->createStub(UserFactoryInterface::class);
+        $subjectId          = new OidcSubjectId();
+        $user               = new User();
 
         $user->setUsername('test');
         $subjectId->setUser($user);
 
-        self::expectException(UsernameNotFoundException::class);
+        $this->expectException(UserNotFoundException::class);
 
         $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
-        $userProvider->loadUserByUsername('subjectId');
+        $userProvider->loadUserByIdentifier('subjectId');
     }
 
     public function testRefreshUser(): void
     {
-        $mauticUserProvider  = self::createMock(MauticUserProvider::class);
-        $security            = self::createMock(Security::class);
-        $linkerInterface     = self::createMock(LinkerInterface::class);
-        $userFactory         = self::createMock(UserFactoryInterface::class);
-        $subjectId           = new SubjectId();
-        $user                = new User();
+        $mauticUserProvider = $this->createMock(MauticUserProvider::class);
+        $security           = $this->createStub(TokenStorageInterface::class);
+        $linkerInterface    = $this->createStub(LinkerInterface::class);
+        $userFactory        = $this->createStub(UserFactoryInterface::class);
+        $subjectId          = new OidcSubjectId();
+        $user               = new User();
 
         $user->setUsername('test');
         $subjectId->setUser($user);
 
-        $mauticUserProvider->expects(self::once())
+        $mauticUserProvider->expects($this->once())
             ->method('refreshUser')
             ->willReturn($user);
 
         $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
         $loadedUser   = $userProvider->refreshUser($user);
 
-        self::assertSame($user, $loadedUser);
+        $this->assertSame($user, $loadedUser);
     }
 
     public function testSupportsClassIsTrueWhenMauticSupportsClass(): void
     {
-        $mauticUserProvider  = self::createMock(MauticUserProvider::class);
-        $security            = self::createMock(Security::class);
-        $linkerInterface     = self::createMock(LinkerInterface::class);
-        $userFactory         = self::createMock(UserFactoryInterface::class);
-        $subjectId           = new SubjectId();
+        $mauticUserProvider  = $this->createMock(MauticUserProvider::class);
+        $security            = $this->createStub(TokenStorageInterface::class);
+        $linkerInterface     = $this->createStub(LinkerInterface::class);
+        $userFactory         = $this->createStub(UserFactoryInterface::class);
+        $subjectId           = new OidcSubjectId();
         $user                = new User();
 
         $user->setUsername('test');
         $subjectId->setUser($user);
 
-        $mauticUserProvider->expects(self::once())
+        $mauticUserProvider->expects($this->once())
             ->method('supportsClass')
             ->willReturn(true);
 
         $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
         $loadedUser   = $userProvider->supportsClass(User::class);
 
-        self::assertTrue($loadedUser);
+        $this->assertTrue($loadedUser);
     }
 
     public function testSupportsClassIsFalseWhenMauticDoesNotSupportClass(): void
     {
-        $mauticUserProvider  = self::createMock(MauticUserProvider::class);
-        $security            = self::createMock(Security::class);
-        $linkerInterface     = self::createMock(LinkerInterface::class);
-        $userFactory         = self::createMock(UserFactoryInterface::class);
-        $subjectId           = new SubjectId();
+        $mauticUserProvider  = $this->createMock(MauticUserProvider::class);
+        $security            = $this->createStub(TokenStorageInterface::class);
+        $linkerInterface     = $this->createStub(LinkerInterface::class);
+        $userFactory         = $this->createStub(UserFactoryInterface::class);
+        $subjectId           = new OidcSubjectId();
         $user                = new User();
 
         $user->setUsername('test');
         $subjectId->setUser($user);
 
-        $mauticUserProvider->expects(self::once())
+        $mauticUserProvider->expects($this->once())
             ->method('supportsClass')
             ->willReturn(false);
 
         $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
         $loadedUser   = $userProvider->supportsClass(User::class);
 
-        self::assertFalse($loadedUser);
+        $this->assertFalse($loadedUser);
     }
 
     public function testLoadUserByCredentialsForLinkedUser(): void
     {
-        $mauticUserProvider  = self::createMock(MauticUserProvider::class);
-        $security            = self::createMock(Security::class);
-        $linkerInterface     = self::createMock(LinkerInterface::class);
-        $userFactory         = self::createMock(UserFactoryInterface::class);
-        $subjectId           = new SubjectId();
+        $mauticUserProvider  = $this->createMock(MauticUserProvider::class);
+        $security            = $this->createStub(TokenStorageInterface::class);
+        $linkerInterface     = $this->createMock(LinkerInterface::class);
+        $userFactory         = $this->createStub(UserFactoryInterface::class);
+        $subjectId           = new OidcSubjectId();
         $user                = new User();
         $credentials         = new UserCredentials('subjectId');
 
         $user->setUsername('test');
         $subjectId->setUser($user);
 
-        $linkerInterface->expects(self::once())
+        $linkerInterface->expects($this->once())
             ->method('findLinkedUser')
             ->willReturn($user);
 
-        $mauticUserProvider->expects(self::once())
-            ->method('loadUserByUsername')
+        $mauticUserProvider->expects($this->once())
+            ->method('loadUserByIdentifier')
             ->willReturn($user);
 
         $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
         $loadedUser   = $userProvider->loadUserByCredentials($credentials);
 
-        self::assertSame($user, $loadedUser);
+        $this->assertSame($user, $loadedUser);
     }
 
     public function testLoadUserByCredentialsForUnlinkedUserLinksToCurrentUser(): void
     {
-        $mauticUserProvider  = self::createMock(MauticUserProvider::class);
-        $security            = self::createMock(Security::class);
-        $linkerInterface     = self::createMock(LinkerInterface::class);
-        $userFactory         = self::createMock(UserFactoryInterface::class);
+        $mauticUserProvider  = $this->createMock(MauticUserProvider::class);
+        $security            = $this->createMock(TokenStorageInterface::class);
+        $linkerInterface     = $this->createMock(LinkerInterface::class);
+        $userFactory         = $this->createStub(UserFactoryInterface::class);
         $user                = new User();
         $credentials         = new UserCredentials('subjectId');
 
         $user->setUsername('test');
 
-        $security->expects(self::once())
-            ->method('getUser')
+        $token = $this->createMock(TokenInterface::class);
+        $token->method('getUser')->willReturn($user);
+
+        $security->method('getToken')->willReturn($token);
+
+        $linkerInterface->expects($this->once())
+            ->method('findLinkedUser')
+            ->willReturn(null);
+
+        $linkerInterface->expects($this->once())
+            ->method('linkToUser')
             ->willReturn($user);
 
-        $mauticUserProvider->expects(self::once())
-            ->method('loadUserByUsername')
+        $mauticUserProvider->expects($this->once())
+            ->method('loadUserByIdentifier')
             ->willReturn($user);
 
         $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
         $loadedUser   = $userProvider->loadUserByCredentials($credentials);
 
-        self::assertSame($user, $loadedUser);
+        $this->assertSame($user, $loadedUser);
     }
 
     public function testLoadUserByCredentialsForUnlinkedUserCreatesNewUser(): void
     {
-        $mauticUserProvider  = self::createMock(MauticUserProvider::class);
-        $security            = self::createMock(Security::class);
-        $linkerInterface     = self::createMock(LinkerInterface::class);
-        $userFactory         = self::createMock(UserFactoryInterface::class);
+        $mauticUserProvider  = $this->createMock(MauticUserProvider::class);
+        $security            = $this->createMock(TokenStorageInterface::class);
+        $linkerInterface     = $this->createMock(LinkerInterface::class);
+        $userFactory         = $this->createMock(UserFactoryInterface::class);
         $user                = new User();
         $credentials         = new UserCredentials('subjectId', 'email@mautic.com');
 
         $user->setUsername('test');
 
-        $mauticUserProvider->expects(self::once())
+        $token = $this->createMock(TokenInterface::class);
+        $token->method('getUser')->willReturn(null);
+        $security->method('getToken')->willReturn($token);
+
+        $linkerInterface->expects($this->once())
+            ->method('findLinkedUser')
+            ->willReturn(null);
+
+        $userFactory->method('create')->willReturn($user);
+
+        $mauticUserProvider->expects($this->once())
             ->method('saveUser')
             ->willReturn($user);
 
-        $mauticUserProvider->expects(self::once())
-            ->method('loadUserByUsername')
+        $linkerInterface->expects($this->once())
+            ->method('linkToUser')
+            ->willReturn($user);
+
+        $mauticUserProvider->expects($this->once())
+            ->method('loadUserByIdentifier')
+            ->with('test')
             ->willReturn($user);
 
         $userProvider = new UserProvider($linkerInterface, $userFactory, $mauticUserProvider, $security);
         $loadedUser   = $userProvider->loadUserByCredentials($credentials);
 
-        self::assertSame($user, $loadedUser);
+        $this->assertSame($user, $loadedUser);
     }
 }

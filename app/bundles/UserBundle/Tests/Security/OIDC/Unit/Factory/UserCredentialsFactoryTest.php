@@ -6,7 +6,6 @@ namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Factory;
 
 use Mautic\UserBundle\Exception\OidcAuthorizationException;
 use Mautic\UserBundle\Exception\OidcException;
-use Mautic\UserBundle\Exception\OidcException;
 use Mautic\UserBundle\Security\OIDC\Factory\UserCredentialsFactory;
 use Mautic\UserBundle\Security\OIDC\Client\ClientInterface;
 use PHPUnit\Framework\TestCase;
@@ -16,17 +15,17 @@ final class UserCredentialsFactoryTest extends TestCase
 {
     public function testBuildThrowsExceptionWhenClientIsNotAuthenticated(): void
     {
-        $logger     = self::createMock(LoggerInterface::class);
-        $client     = self::createMock(ClientInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
+        $client = $this->createMock(ClientInterface::class);
 
-        $client->expects(self::once())
+        $client->expects($this->once())
             ->method('requestUserInfo')
-            ->willThrowException(new AuthorizationRequestFailedException('foo'));
-        $client->expects(self::atLeastOnce())
+            ->willThrowException(new OidcAuthorizationException('foo'));
+        $client->expects($this->atLeastOnce())
             ->method('getMappingField')
             ->willReturn('sub');
 
-        self::expectException(UserInfoException::class);
+        $this->expectException(OidcException::class);
 
         $credentialsFactory = new UserCredentialsFactory($client, $logger);
         $credentialsFactory->create();
@@ -34,10 +33,10 @@ final class UserCredentialsFactoryTest extends TestCase
 
     public function testBuildThrowsExceptionWhenSubClaimIsNotExtracted(): void
     {
-        $logger     = self::createMock(LoggerInterface::class);
-        $client     = self::createMock(ClientInterface::class);
+        $logger     = $this->createStub(LoggerInterface::class);
+        $client     = $this->createMock(ClientInterface::class);
 
-        $client->expects(self::once())
+        $client->expects($this->once())
             ->method('getVerifiedClaims')
             ->willReturn([
                 'email'              => 'email',
@@ -45,11 +44,11 @@ final class UserCredentialsFactoryTest extends TestCase
                 'given_name'         => 'givenName',
                 'family_name'        => 'familyName',
             ]);
-        $client->expects(self::atLeastOnce())
+        $client->expects($this->atLeastOnce())
             ->method('getMappingField')
             ->willReturn('sub');
 
-        self::expectException(InvalidMappedIdentifierException::class);
+        $this->expectException(OidcException::class);
 
         $credentialsFactory = new UserCredentialsFactory($client, $logger);
         $credentialsFactory->create();
@@ -57,10 +56,10 @@ final class UserCredentialsFactoryTest extends TestCase
 
     public function testBuildReturnsCredentials(): void
     {
-        $logger     = self::createMock(LoggerInterface::class);
-        $client     = self::createMock(ClientInterface::class);
+        $logger     = $this->createStub(LoggerInterface::class);
+        $client     = $this->createMock(ClientInterface::class);
 
-        $client->expects(self::once())
+        $client->expects($this->once())
             ->method('getVerifiedClaims')
             ->willReturn([
                 'sub'                => 'sub',
@@ -69,32 +68,32 @@ final class UserCredentialsFactoryTest extends TestCase
                 'given_name'         => 'givenName',
                 'family_name'        => 'familyName',
             ]);
-        $client->expects(self::atLeastOnce())
+        $client->expects($this->atLeastOnce())
             ->method('getMappingField')
             ->willReturn('sub');
 
         $credentialsFactory = new UserCredentialsFactory($client, $logger);
         $credentials        = $credentialsFactory->create();
 
-        self::assertSame('sub', $credentials->getId());
-        self::assertSame('email', $credentials->getEmail());
-        self::assertSame('username', $credentials->getPreferredUsername());
-        self::assertSame('givenName', $credentials->getGivenName());
-        self::assertSame('familyName', $credentials->getFamilyName());
+        $this->assertSame('sub', $credentials->getId());
+        $this->assertSame('email', $credentials->getEmail());
+        $this->assertSame('username', $credentials->getPreferredUsername());
+        $this->assertSame('givenName', $credentials->getGivenName());
+        $this->assertSame('familyName', $credentials->getFamilyName());
     }
 
     public function testBuildReturnsCredentialsWhenUserInfoEndpointReturnsData(): void
     {
-        $logger     = self::createMock(LoggerInterface::class);
-        $client     = self::createMock(ClientInterface::class);
+        $logger     = $this->createStub(LoggerInterface::class);
+        $client     = $this->createMock(ClientInterface::class);
 
-        $client->expects(self::once())
+        $client->expects($this->once())
             ->method('getVerifiedClaims')
             ->willReturn([]);
-        $client->expects(self::atLeastOnce())
+        $client->expects($this->atLeastOnce())
             ->method('getMappingField')
             ->willReturn('sub');
-        $client->expects(self::once())
+        $client->expects($this->once())
             ->method('requestUserInfo')
             ->willReturn([
                 'sub'                => 'sub',
@@ -107,10 +106,10 @@ final class UserCredentialsFactoryTest extends TestCase
         $credentialsFactory = new UserCredentialsFactory($client, $logger);
         $credentials        = $credentialsFactory->create();
 
-        self::assertSame('sub', $credentials->getId());
-        self::assertSame('email', $credentials->getEmail());
-        self::assertSame('username', $credentials->getPreferredUsername());
-        self::assertSame('givenName', $credentials->getGivenName());
-        self::assertSame('familyName', $credentials->getFamilyName());
+        $this->assertSame('sub', $credentials->getId());
+        $this->assertSame('email', $credentials->getEmail());
+        $this->assertSame('username', $credentials->getPreferredUsername());
+        $this->assertSame('givenName', $credentials->getGivenName());
+        $this->assertSame('familyName', $credentials->getFamilyName());
     }
 }

@@ -12,15 +12,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 
 #[AsAlias(UserCredentialsFactoryInterface::class)]
-final class UserCredentialsFactory implements UserCredentialsFactoryInterface
+final readonly class UserCredentialsFactory implements UserCredentialsFactoryInterface
 {
-    private LoggerInterface $logger;
-    private ClientInterface $client;
-
-    public function __construct(ClientInterface $client, LoggerInterface $logger)
+    public function __construct(private ClientInterface $client, private LoggerInterface $logger)
     {
-        $this->logger     = $logger;
-        $this->client     = $client;
     }
 
     public function create(): UserCredentials
@@ -32,7 +27,7 @@ final class UserCredentialsFactory implements UserCredentialsFactoryInterface
             $tokens   = $this->client->getVerifiedClaims($claims);
         } catch (OidcAuthorizationException $e) {
             $this->logger->error($e->getMessage(), ['exception' => $e]);
-            throw new OidcException('mautic.open_id.login.exception.user_info');
+            throw new OidcException('mautic.open_id.login.exception.user_info', $e->getCode(), $e);
         }
 
         $this->logger->debug('OpenID Connect: User info', $userInfo);

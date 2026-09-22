@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Form\Extension;
 
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\UserType;
-use Mautic\UserBundle\Security\OIDC\Form\Extension\UserTypeExtension;
-use Mautic\UserBundle\Security\OIDC\Repository\SubjectIdRepository;
+use Mautic\UserBundle\Security\OIDC\UserTypeExtension;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,27 +16,27 @@ final class UserTypeExtensionTest extends TestCase
     public function testGetExtendedTypes(): void
     {
         $parameters          = (new ParametersBuilder())->build();
-        $subjectIdRepository = self::createMock(SubjectIdRepository::class);
+        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
         $userTypeExtension   = new UserTypeExtension($parameters, $subjectIdRepository);
 
-        self::assertEquals([UserType::class], $userTypeExtension::getExtendedTypes());
+        $this->assertEquals([UserType::class], $userTypeExtension::getExtendedTypes());
     }
 
     public function testBuildFormAddsSubjectIdWhenOpenIdIsEnabled(): void
     {
         $parameters          = (new ParametersBuilder())->build();
-        $subjectIdRepository = self::createMock(SubjectIdRepository::class);
+        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
         $userTypeExtension   = new UserTypeExtension($parameters, $subjectIdRepository);
-        $formBuilder         = self::createMock(FormBuilderInterface::class);
+        $formBuilder         = $this->createMock(FormBuilderInterface::class);
 
-        $formBuilder->expects(self::once())
+        $formBuilder->expects($this->once())
             ->method('add');
 
-        $formBuilder->expects(self::once())
+        $formBuilder->expects($this->once())
             ->method('create')
             ->willReturn($formBuilder);
 
-        $formBuilder->expects(self::once())
+        $formBuilder->expects($this->once())
             ->method('addModelTransformer')
             ->willReturn($formBuilder);
 
@@ -46,18 +46,18 @@ final class UserTypeExtensionTest extends TestCase
     public function testBuildFormDoesNotAddSubjectIdWhenOpenIdIsDisabled(): void
     {
         $parameters          = (new ParametersBuilder())->withIsEnabled(false)->build();
-        $subjectIdRepository = self::createMock(SubjectIdRepository::class);
+        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
         $userTypeExtension   = new UserTypeExtension($parameters, $subjectIdRepository);
-        $formBuilder         = self::createMock(FormBuilderInterface::class);
+        $formBuilder         = $this->createMock(FormBuilderInterface::class);
 
-        $formBuilder->expects(self::never())
+        $formBuilder->expects($this->never())
             ->method('add');
 
-        $formBuilder->expects(self::never())
+        $formBuilder->expects($this->never())
             ->method('create')
             ->willReturn($formBuilder);
 
-        $formBuilder->expects(self::never())
+        $formBuilder->expects($this->never())
             ->method('addModelTransformer')
             ->willReturn($formBuilder);
 

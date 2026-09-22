@@ -22,15 +22,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 final class ConfigTypeExtension extends AbstractTypeExtension
 {
     private const SHOW_IF_ENABLED = '{"config_userconfig_open_id_is_enabled_1":"checked"}';
-    private Settings $config;
-    private ClientCredentials $clientCredentials;
-    private OidcSubjectIdRepository $subjectIdRepository;
 
-    public function __construct(Settings $config, ClientCredentials $clientCredentials, OidcSubjectIdRepository $subjectIdRepository)
+    public function __construct(private readonly Settings $config, private readonly ClientCredentials $clientCredentials, private readonly OidcSubjectIdRepository $subjectIdRepository)
     {
-        $this->config              = $config;
-        $this->clientCredentials   = $clientCredentials;
-        $this->subjectIdRepository = $subjectIdRepository;
     }
 
     /**
@@ -46,13 +40,13 @@ final class ConfigTypeExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $requiredIfOpenIdIsEnabled = static function ($value, ExecutionContextInterface $context) {
+        $requiredIfOpenIdIsEnabled = static function ($value, ExecutionContextInterface $context): void {
             if ($context->getObject()->getParent()->getData()['open_id_is_enabled'] && null === $value) {
                 $context->addViolation('mautic.core.value.required');
             }
         };
 
-        $secretConstraints = [new Assert\Type(['type' => 'string'])];
+        $secretConstraints = [new Assert\Type(type: 'string')];
         if (!$this->clientCredentials->getClientSecret()) {
             $secretConstraints[] = new Assert\Callback($requiredIfOpenIdIsEnabled);
         }
@@ -64,8 +58,8 @@ final class ConfigTypeExtension extends AbstractTypeExtension
                 'label'       => 'mautic.open_id.config.is_enabled',
                 'data'        => $this->config->isEnabled(),
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'mautic.core.value.required']),
-                    new Assert\Choice(['choices' => [0, 1]]),
+                    new Assert\NotBlank(message: 'mautic.core.value.required'),
+                    new Assert\Choice(choices: [0, 1]),
                 ],
             ]
         );
@@ -81,8 +75,8 @@ final class ConfigTypeExtension extends AbstractTypeExtension
                     'tooltip'      => 'mautic.open_id.config.is_required.tooltip',
                 ],
                 'constraints' => [
-                    new Assert\Callback(['callback' => $requiredIfOpenIdIsEnabled]),
-                    new Assert\Choice(['choices' => [0, 1]]),
+                    new Assert\Callback(callback: $requiredIfOpenIdIsEnabled),
+                    new Assert\Choice(choices: [0, 1]),
                 ],
             ]
         );
@@ -99,8 +93,8 @@ final class ConfigTypeExtension extends AbstractTypeExtension
                     'data-show-on' => self::SHOW_IF_ENABLED,
                 ],
                 'constraints' => [
-                    new Assert\Callback(['callback' => $requiredIfOpenIdIsEnabled]),
-                    new Assert\Type(['type' => 'string']),
+                    new Assert\Callback(callback: $requiredIfOpenIdIsEnabled),
+                    new Assert\Type(type: 'string'),
                 ],
             ]
         );
@@ -116,8 +110,8 @@ final class ConfigTypeExtension extends AbstractTypeExtension
                     'tooltip'      => 'mautic.open_id.config.is_user_registration_allowed.tooltip',
                 ],
                 'constraints' => [
-                    new Assert\Callback(['callback' => $requiredIfOpenIdIsEnabled]),
-                    new Assert\Choice(['choices' => [0, 1]]),
+                    new Assert\Callback(callback: $requiredIfOpenIdIsEnabled),
+                    new Assert\Choice(choices: [0, 1]),
                 ],
             ]
         );
@@ -135,11 +129,11 @@ final class ConfigTypeExtension extends AbstractTypeExtension
                     'tooltip'      => 'mautic.open_id.config.registered_user_default_role.tooltip',
                 ],
                 'constraints' => [
-                    new Assert\Callback(['callback' => static function ($value, ExecutionContextInterface $context) {
+                    new Assert\Callback(callback: static function ($value, ExecutionContextInterface $context): void {
                         if ($context->getObject()->getParent()->getData()['open_id_is_user_registration_allowed'] && null === $value) {
                             $context->addViolation('mautic.core.value.required');
                         }
-                    }]),
+                    }),
                     new Assert\Positive(), // we cant get the values from the RoleListType, so positive is our best choice
                 ],
             ]
@@ -158,7 +152,7 @@ final class ConfigTypeExtension extends AbstractTypeExtension
                     'data-show-on' => self::SHOW_IF_ENABLED,
                 ],
                 'constraints' => [
-                    new Assert\Callback(['callback' => $requiredIfOpenIdIsEnabled]),
+                    new Assert\Callback(callback: $requiredIfOpenIdIsEnabled),
                     new Assert\Url(),
                 ],
             ]
@@ -176,8 +170,8 @@ final class ConfigTypeExtension extends AbstractTypeExtension
                     'data-show-on' => self::SHOW_IF_ENABLED,
                 ],
                 'constraints' => [
-                    new Assert\Callback(['callback' => $requiredIfOpenIdIsEnabled]),
-                    new Assert\Type(['type' => 'string']),
+                    new Assert\Callback(callback: $requiredIfOpenIdIsEnabled),
+                    new Assert\Type(type: 'string'),
                 ],
             ]
         );
@@ -201,8 +195,8 @@ final class ConfigTypeExtension extends AbstractTypeExtension
             ]
         );
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit']);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $this->onPreSubmit(...));
+        $builder->addEventListener(FormEvents::POST_SUBMIT, $this->onPostSubmit(...));
     }
 
     public function onPreSubmit(PreSubmitEvent $event): void

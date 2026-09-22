@@ -4,26 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC\DTO;
 
-final class UserCredentials
+final readonly class UserCredentials
 {
-    private string $id;
-    private ?string $email;
-    private ?string $preferredUsername;
-    private ?string $givenName;
-    private ?string $familyName;
-
-    public function __construct(
-        string $id,
-        ?string $email = null,
-        ?string $preferredUsername = null,
-        ?string $name = null,
-        ?string $familyName = null,
-    ) {
-        $this->id                = $id;
-        $this->email             = $email;
-        $this->preferredUsername = $preferredUsername;
-        $this->givenName         = $name;
-        $this->familyName        = $familyName;
+    public function __construct(private string $id, private ?string $email = null, private ?string $preferredUsername = null, private ?string $givenName = null, private ?string $familyName = null)
+    {
     }
 
     public function getId(): string

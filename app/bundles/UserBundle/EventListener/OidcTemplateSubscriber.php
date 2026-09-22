@@ -9,10 +9,10 @@ use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\UserBundle\Security\OIDC\Settings;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class OidcTemplateSubscriber implements EventSubscriberInterface
+final readonly class OidcTemplateSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly Settings $settings,
+        private Settings $settings,
     ) {
     }
 

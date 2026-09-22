@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Form\Transformer;
 
+use Mautic\UserBundle\Entity\OidcSubjectId;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Security\OIDC\Entity\SubjectId;
-use Mautic\UserBundle\Security\OIDC\Form\Transformer\SubjectToUserTransformer;
-use Mautic\UserBundle\Security\OIDC\Repository\SubjectIdRepository;
+use Mautic\UserBundle\Security\OIDC\SubjectToUserTransformer;
 use PHPUnit\Framework\TestCase;
 
 final class SubjectToUserTransformerTest extends TestCase
 {
     public function testTransformsUserWithSubjectId(): void
     {
-        $subjectIdRepository = self::createMock(SubjectIdRepository::class);
+        $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
         $user                = new User();
-        $subjectId           = new SubjectId();
+        $subjectId           = new OidcSubjectId();
 
         $subjectId->setUser($user);
-        $subjectIdRepository->expects(self::once())
+        $subjectIdRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['user' => $user])
             ->willReturn($subjectId);
@@ -27,15 +27,15 @@ final class SubjectToUserTransformerTest extends TestCase
         $subjectToUserTransformer = new SubjectToUserTransformer($subjectIdRepository);
         $subjectId                = $subjectToUserTransformer->transform($user);
 
-        self::assertSame($user, $subjectId->getUser());
+        $this->assertSame($user, $subjectId->getUser());
     }
 
     public function testTransformsUserWithoutSubjectId(): void
     {
-        $subjectIdRepository = self::createMock(SubjectIdRepository::class);
+        $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
         $user                = new User();
 
-        $subjectIdRepository->expects(self::once())
+        $subjectIdRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['user' => $user])
             ->willReturn(null);
@@ -43,73 +43,73 @@ final class SubjectToUserTransformerTest extends TestCase
         $subjectToUserTransformer = new SubjectToUserTransformer($subjectIdRepository);
         $subjectId                = $subjectToUserTransformer->transform($user);
 
-        self::assertSame($user, $subjectId->getUser());
+        $this->assertSame($user, $subjectId->getUser());
     }
 
     public function testTransformsUserWithWrongObjectType(): void
     {
-        $subjectIdRepository = self::createMock(SubjectIdRepository::class);
-        $subjectId           = new SubjectId();
+        $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
+        $subjectId           = new OidcSubjectId();
 
-        $subjectIdRepository->expects(self::never())
+        $subjectIdRepository->expects($this->never())
             ->method('findOneBy');
 
         $subjectToUserTransformer = new SubjectToUserTransformer($subjectIdRepository);
 
-        self::expectException(\InvalidArgumentException::class);
-        self::expectExceptionMessage(\sprintf('Expected instance of %s. Given %s', User::class, OidcSubjectId::class));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Expected instance of %s. Given %s', User::class, OidcSubjectId::class));
 
         $subjectToUserTransformer->transform($subjectId);
     }
 
     public function testTransformsUserWithWrongType(): void
     {
-        $subjectIdRepository = self::createMock(SubjectIdRepository::class);
+        $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
 
-        $subjectIdRepository->expects(self::never())
+        $subjectIdRepository->expects($this->never())
             ->method('findOneBy');
 
         $subjectToUserTransformer = new SubjectToUserTransformer($subjectIdRepository);
 
-        self::expectException(\InvalidArgumentException::class);
-        self::expectExceptionMessage(\sprintf('Expected instance of %s. Given bool', User::class));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Expected instance of %s. Given bool', User::class));
 
         $subjectToUserTransformer->transform(true);
     }
 
     public function testReverseTransformsSubjectId(): void
     {
-        $subjectIdRepository = self::createMock(SubjectIdRepository::class);
+        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
         $user                = new User();
-        $subjectId           = new SubjectId();
+        $subjectId           = new OidcSubjectId();
 
         $subjectId->setUser($user);
 
         $subjectToUserTransformer = new SubjectToUserTransformer($subjectIdRepository);
         $user                     = $subjectToUserTransformer->reverseTransform($subjectId);
 
-        self::assertSame($user, $subjectId->getUser());
+        $this->assertSame($user, $subjectId->getUser());
     }
 
     public function testReverseTransformsSubjectIdWithWrongObjectType(): void
     {
-        $subjectIdRepository      = self::createMock(SubjectIdRepository::class);
+        $subjectIdRepository      = $this->createStub(OidcSubjectIdRepository::class);
         $user                     = new User();
         $subjectToUserTransformer = new SubjectToUserTransformer($subjectIdRepository);
 
-        self::expectException(\InvalidArgumentException::class);
-        self::expectExceptionMessage(\sprintf('Expected instance of %s. Given %s', OidcSubjectId::class, User::class));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Expected instance of %s. Given %s', OidcSubjectId::class, User::class));
 
         $subjectToUserTransformer->reverseTransform($user);
     }
 
     public function testReverseTransformsSubjectIdWithWrongType(): void
     {
-        $subjectIdRepository      = self::createMock(SubjectIdRepository::class);
+        $subjectIdRepository      = $this->createStub(OidcSubjectIdRepository::class);
         $subjectToUserTransformer = new SubjectToUserTransformer($subjectIdRepository);
 
-        self::expectException(\InvalidArgumentException::class);
-        self::expectExceptionMessage(\sprintf('Expected instance of %s. Given bool', OidcSubjectId::class));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Expected instance of %s. Given bool', OidcSubjectId::class));
 
         $subjectToUserTransformer->reverseTransform(true);
     }
