@@ -37,7 +37,7 @@ class StatDevice
     private ?IpAddress $ipAddress = null;
 
     /**
-     * @var \DateTimeInterface
+     * @var string
      */
     private $dateOpened;
 
@@ -96,10 +96,7 @@ class StatDevice
         $this->stat = $stat;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateOpened()
+    public function getDateOpened(): string
     {
         return $this->dateOpened;
     }
