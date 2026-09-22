@@ -141,7 +141,7 @@ class CategoryRepository extends CommonRepository
      * @param string $alias
      * @param object $entity
      */
-    public function checkUniqueCategoryAlias($bundle, $alias, $entity = null): mixed
+    public function checkUniqueCategoryAlias($bundle, $alias, $entity = null): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as aliascount')

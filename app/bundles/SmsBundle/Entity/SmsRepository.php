@@ -3,7 +3,6 @@
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -14,11 +13,6 @@ class SmsRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    /**
-     * Get a list of entities.
-     *
-     * @return Paginator
-     */
     public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()

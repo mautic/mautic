@@ -7,7 +7,6 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -20,8 +19,6 @@ class AssetRepository extends CommonRepository
 
     /**
      * Get a list of entities.
-     *
-     * @return Paginator
      */
     public function getEntities(array $args = []): iterable
     {

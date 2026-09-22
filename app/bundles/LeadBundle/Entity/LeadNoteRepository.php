@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -10,11 +9,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class LeadNoteRepository extends CommonRepository
 {
-    /**
-     * {@inhertidoc}.
-     *
-     * @return Paginator
-     */
     public function getEntities(array $args = []): iterable
     {
         $q = $this

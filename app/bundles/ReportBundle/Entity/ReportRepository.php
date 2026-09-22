@@ -2,7 +2,6 @@
 
 namespace Mautic\ReportBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -10,11 +9,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class ReportRepository extends CommonRepository
 {
-    /**
-     * Get a list of entities.
-     *
-     * @return Paginator
-     */
     public function getEntities(array $args = []): iterable
     {
         $q = $this

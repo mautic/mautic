@@ -3,7 +3,6 @@
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -11,11 +10,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 final class NotificationRepository extends CommonRepository
 {
-    /**
-     * Get a list of entities.
-     *
-     * @return Paginator
-     */
     public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()
