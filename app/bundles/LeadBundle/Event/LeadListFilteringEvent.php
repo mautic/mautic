@@ -23,9 +23,8 @@ final class LeadListFilteringEvent extends CommonEvent
         private readonly string $alias,
         private readonly string $func,
         private readonly QueryBuilder $queryBuilder,
-        EntityManagerInterface $entityManager,
+        private readonly EntityManagerInterface $em,
     ) {
-        $this->em              = $entityManager;
         $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
 
@@ -49,10 +48,7 @@ final class LeadListFilteringEvent extends CommonEvent
         return $this->func;
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
-    public function getEntityManager()
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->em;
     }

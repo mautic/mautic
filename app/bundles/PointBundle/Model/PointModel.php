@@ -134,7 +134,6 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         if ($this->dispatcher->hasListeners($name)) {
             if (!$event instanceof Event) {
                 $event = new PointEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
             }
 
             $this->dispatcher->dispatch($event, $name);

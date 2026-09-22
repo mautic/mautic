@@ -6,6 +6,7 @@
 
 ## Removed code
 
+- Method `setEntityManager()` and the `protected $em` property removed from `Mautic\CoreBundle\Event\CommonEvent`. The entity manager was set on the event by every model but never read. `Mautic\LeadBundle\Event\LeadListFilteringEvent` was the only reader; it now holds its own `$em` property (unchanged constructor and `getEntityManager()`). Remove any `$event->setEntityManager(...)` calls.
 - Legacy `services` config group removed from bundle `Config/config.php` handling. `Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata` no longer reads a `services` array from `Config/config.php`. Register services as Symfony services in each bundle's `Config/services.php` instead.
 - Deprecated method `addLead()` removed from `Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder`. The 28 entities that used it now map their `lead` association with native `#[ORM\ManyToOne]` / `#[ORM\JoinColumn]` attributes (column `lead_id`, unchanged). Any custom entity calling `$builder->addLead(...)` in `loadMetadata()` must declare the mapping with Doctrine attributes instead.
 - Deprecated entity `Mautic\CoreBundle\Entity\Cache` removed with no replacement. It mapped the `cache_items` table but was never read or written anywhere in the codebase.
