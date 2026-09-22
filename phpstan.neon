@@ -17,6 +17,12 @@ parameters:
         # wait for PHP 8.3 before changing
         constant: 70.7
         declare: 74.0
+
+    # rules merged from rector/type-perfect, opt-in since type-coverage 2.3
+    type_perfect:
+        no_param_type_removal: true
+        no_isset_on_object: true
+        no_empty_on_object: true
     paths:
         - app/bundles
         - app/config
@@ -195,8 +201,6 @@ parameters:
         -
             identifier: symplify.noJustPropertyAssign
             path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
-        -
-            identifier: typePerfect.noArrayAccessOnObject
 
         # mixed return
         -
