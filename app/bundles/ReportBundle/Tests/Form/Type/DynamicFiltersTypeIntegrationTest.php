@@ -7,18 +7,28 @@ namespace Mautic\ReportBundle\Tests\Form\Type;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 final class DynamicFiltersTypeIntegrationTest extends TypeTestCase
 {
+    protected function getExtensions(): array
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+
+        return [new PreloadedExtension([new DynamicFiltersType($translator)], [])];
+    }
+
     public function testFilterWithValueIsSet(): void
     {
         $report = new Report();
         $report->setFilters([
             [
-                'column'  => 'country',
-                'dynamic' => 1,
+                'column'    => 'country',
+                'condition' => 'eq',
+                'dynamic'   => 1,
                 'value'   => '1',
             ],
         ]);
@@ -45,8 +55,9 @@ final class DynamicFiltersTypeIntegrationTest extends TypeTestCase
         $report = new Report();
         $report->setFilters([
             [
-                'column'  => 'country',
-                'dynamic' => 1,
+                'column'    => 'country',
+                'condition' => 'eq',
+                'dynamic'   => 1,
                 'value'   => '',
             ],
         ]);
@@ -74,8 +85,9 @@ final class DynamicFiltersTypeIntegrationTest extends TypeTestCase
         $report = new Report();
         $report->setFilters([
             [
-                'column'  => 'country',
-                'dynamic' => 1,
+                'column'    => 'country',
+                'condition' => 'eq',
+                'dynamic'   => 1,
                 'value'   => '1',
             ],
         ]);
@@ -105,8 +117,9 @@ final class DynamicFiltersTypeIntegrationTest extends TypeTestCase
         $report = new Report();
         $report->setFilters([
             [
-                'column'  => 'country',
-                'dynamic' => 1,
+                'column'    => 'country',
+                'condition' => 'eq',
+                'dynamic'   => 1,
                 'value'   => 'US',
             ],
         ]);
