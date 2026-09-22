@@ -50,7 +50,6 @@ class SubmissionRepository extends CommonRepository
      *
      * @return array{count: int, results: list<array<string, mixed>>}|list<array<string, Submission>>
      */
-    // @phpstan-ignore-next-line method.childReturnType
     public function getEntities(array $args = []): array
     {
         $form = $args['form'];
