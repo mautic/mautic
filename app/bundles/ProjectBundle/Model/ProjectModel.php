@@ -6,18 +6,13 @@ namespace Mautic\ProjectBundle\Model;
 
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Form\Type\ProjectEntityType;
 use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class ProjectModel extends FormModel implements AjaxLookupModelInterface
@@ -61,7 +56,7 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param ?int $id
+     * @param string|int|null $id
      */
     public function getEntity($id = null): ?object
     {
