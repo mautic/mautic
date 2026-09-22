@@ -352,12 +352,12 @@ HTML;
                 $dom->loadHTML($output, LIBXML_NOERROR | LIBXML_NOWARNING);
                 $link = $dom->getElementsByTagName('a')->item(0);
 
-                self::assertInstanceOf(\DOMElement::class, $link);
-                self::assertSame(1, $link->attributes->length);
-                self::assertFalse($link->hasAttribute('onmouseover'));
-                self::assertSame('https://example.com/?q=" onmouseover="alert(1)&raw=1&encoded=2"quoted', $link->getAttribute('href'));
-                self::assertStringContainsString('href="https://example.com/?q=&quot; onmouseover=&quot;alert(1)&amp;raw=1&amp;encoded=2&quot;quoted"', $output);
-                self::assertStringContainsString($dwcContent, $output);
+                $this->assertInstanceOf(\DOMElement::class, $link);
+                $this->assertSame(1, $link->attributes->length);
+                $this->assertFalse($link->hasAttribute('onmouseover'));
+                $this->assertSame('https://example.com/?q=" onmouseover="alert(1)&raw=1&encoded=2"quoted', $link->getAttribute('href'));
+                $this->assertStringContainsString('href="https://example.com/?q=&quot; onmouseover=&quot;alert(1)&amp;raw=1&amp;encoded=2&quot;quoted"', $output);
+                $this->assertStringContainsString($dwcContent, $output);
             });
 
         $this->subscriber->decodeTokens($event);
