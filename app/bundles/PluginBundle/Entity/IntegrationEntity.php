@@ -32,11 +32,13 @@ class IntegrationEntity extends CommonEntity
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'integration_entity', type: 'string', length: 191, nullable: true)]
     private $integrationEntity;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'integration_entity_id', type: 'string', length: 191, nullable: true)]
     private $integrationEntityId;
 
     /**
@@ -47,16 +49,19 @@ class IntegrationEntity extends CommonEntity
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'last_sync_date', type: 'datetime', nullable: true)]
     private $lastSyncDate;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'internal_entity', type: 'string', length: 191, nullable: true)]
     private $internalEntity;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'internal_entity_id', type: 'integer', nullable: true)]
     private $internalEntityId;
 
     /**
@@ -78,28 +83,6 @@ class IntegrationEntity extends CommonEntity
         $builder->addDateAdded();
 
         $builder->addNullableField('integration', 'string');
-
-        $builder->createField('integrationEntity', 'string')
-            ->columnName('integration_entity')
-            ->nullable()
-            ->build();
-        $builder->createField('integrationEntityId', 'string')
-            ->columnName('integration_entity_id')
-            ->nullable()
-            ->build();
-        $builder->createField('internalEntity', 'string')
-            ->columnName('internal_entity')
-            ->nullable()
-            ->build();
-        $builder->createField('internalEntityId', 'integer')
-            ->columnName('internal_entity_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastSyncDate', 'datetime')
-            ->columnName('last_sync_date')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('internal', 'array');
     }

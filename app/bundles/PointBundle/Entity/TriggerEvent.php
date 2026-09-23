@@ -69,18 +69,21 @@ class TriggerEvent implements UuidInterface
      * @var string
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var int
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(name: 'action_order', type: 'integer')]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
@@ -117,16 +120,6 @@ class TriggerEvent implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('action_order')
-            ->build();
-
-        $builder->addField('properties', 'array');
     }
 
     /**

@@ -108,18 +108,21 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var string|null
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $content;
 
     /**
      * @var array|null
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'utm_tags', type: Types::JSON, nullable: true)]
     private $utmTags = [];
 
     /**
      * @var int
      */
     #[Groups(['dynamicContent:read'])]
+    #[ORM\Column(name: 'sent_count', type: 'integer')]
     private $sentCount = 0;
 
     /**
@@ -133,12 +136,14 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var bool
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'is_campaign_based', type: 'boolean', options: ['default' => 1])]
     private $isCampaignBased = true;
 
     /**
      * @var string|null
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'slot_name', type: 'string', length: 191, nullable: true)]
     private $slotName;
 
     public function __construct()
@@ -184,33 +189,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
         $builder->addPublishDates();
 
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->build();
-
-        $builder->createField('content', 'text')
-            ->columnName('content')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTags', Types::JSON)
-            ->columnName('utm_tags')
-            ->nullable()
-            ->build();
-
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
         self::addFiltersMetadata($builder);
-
-        $builder->createField('isCampaignBased', 'boolean')
-                ->columnName('is_campaign_based')
-                ->option('default', 1)
-                ->build();
-
-        $builder->createField('slotName', 'string')
-                ->columnName('slot_name')
-                ->nullable()
-                ->build();
 
         self::addProjectsField($builder, 'dynamic_content_projects_xref', 'dynamic_content_id');
     }

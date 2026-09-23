@@ -78,12 +78,14 @@ class Point extends FormEntity implements UuidInterface
      */
     #[Groups(['point:read', 'point:write'])]
     #[Assert\NotBlank(message: 'mautic.point.type.notblank')]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var bool
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(type: 'boolean')]
     private $repeatable = false;
 
     /**
@@ -104,12 +106,14 @@ class Point extends FormEntity implements UuidInterface
     #[Groups(['point:read', 'point:write'])]
     #[Assert\NotBlank(message: 'mautic.point.delta.notblank')]
     #[Assert\Range(min: IntHelper::MIN_INTEGER_VALUE, max: IntHelper::MAX_INTEGER_VALUE)]
+    #[ORM\Column(type: 'integer')]
     private $delta = 0;
 
     /**
      * @var array
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
@@ -148,18 +152,7 @@ class Point extends FormEntity implements UuidInterface
 
         $builder->addIdColumns();
 
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
         $builder->addPublishDates();
-
-        $builder->createField('repeatable', 'boolean')
-            ->build();
-
-        $builder->addField('delta', 'integer');
-
-        $builder->addField('properties', 'array');
 
         $builder->addCategory();
 

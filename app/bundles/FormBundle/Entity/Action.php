@@ -70,18 +70,21 @@ class Action implements UuidInterface
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required', groups: ['action'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var int
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(name: 'action_order', type: 'integer')]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
@@ -108,16 +111,6 @@ class Action implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('action_order')
-            ->build();
-
-        $builder->addField('properties', 'array');
     }
 
     /**

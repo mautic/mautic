@@ -48,6 +48,7 @@ class IpAddress
      * @var mixed[]
      */
     #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
+    #[ORM\Column(name: 'ip_details', type: 'array', nullable: true)]
     private $ipDetails;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -55,16 +56,6 @@ class IpAddress
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createField('ipAddress', 'string')
-            ->columnName('ip_address')
-            ->length(45)
-            ->build();
-
-        $builder->createField('ipDetails', 'array')
-            ->columnName('ip_details')
-            ->nullable()
-            ->build();
     }
 
     /**
@@ -90,7 +81,7 @@ class IpAddress
     }
 
     public function __construct(
-        #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
+        #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])] #[ORM\Column(name: 'ip_address', type: 'string', length: 45)]
         private ?string $ipAddress = null,
     ) {
     }

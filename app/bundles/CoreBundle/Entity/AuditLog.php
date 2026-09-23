@@ -23,21 +23,25 @@ class AuditLog
     /**
      * @var int
      */
+    #[ORM\Column(name: 'user_id', type: 'integer')]
     protected $userId;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'user_name', type: 'string', length: 191)]
     protected $userName;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 50)]
     protected $bundle;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 50)]
     protected $object;
 
     /**
@@ -48,11 +52,13 @@ class AuditLog
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 50)]
     protected $action;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     protected $details = [];
 
     /**
@@ -63,6 +69,7 @@ class AuditLog
     /**
      * @var string
      */
+    #[ORM\Column(name: 'ip_address', type: 'string', length: 45)]
     protected $ipAddress;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -71,38 +78,9 @@ class AuditLog
 
         $builder->addBigIntIdField();
 
-        $builder->createField('userId', 'integer')
-            ->columnName('user_id')
-            ->build();
-
-        $builder->createField('userName', 'string')
-            ->columnName('user_name')
-            ->build();
-
-        $builder->createField('bundle', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('object', 'string')
-            ->length(50)
-            ->build();
-
         $builder->addBigIntIdField('objectId', 'object_id', false);
 
-        $builder->createField('action', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('details', 'array')
-            ->nullable()
-            ->build();
-
         $builder->addDateAdded();
-
-        $builder->createField('ipAddress', 'string')
-            ->columnName('ip_address')
-            ->length(45)
-            ->build();
     }
 
     public function getId(): int

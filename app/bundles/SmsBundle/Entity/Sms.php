@@ -95,6 +95,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      * @var string
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(type: 'text')]
     private $message;
 
     /**
@@ -113,6 +114,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      * @var int
      */
     #[Groups(['sms:read'])]
+    #[ORM\Column(name: 'sent_count', type: 'integer')]
     private $sentCount = 0;
 
     /**
@@ -141,6 +143,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      * @var string|null
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(name: 'sms_type', type: 'text', nullable: true)]
     private $smsType = 'template';
 
     /**
@@ -148,9 +151,11 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      */
     #[Groups(['sms:read', 'sms:write'])]
     #[Count(max: 10, maxMessage: 'mautic.sms.form.max.media.error')]
+    #[ORM\Column(type: Types::JSON)]
     private array $media = [];
 
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(name: 'is_mms', type: Types::BOOLEAN, options: ['default' => 0])]
     private bool $isMms = false;
 
     #[Groups(['sms:read'])]
@@ -186,30 +191,9 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
         $builder->addIdColumns();
 
-        $builder->createField('message', 'text')
-            ->build();
-
-        $builder->createField('smsType', 'text')
-            ->columnName('sms_type')
-            ->nullable()
-            ->build();
-
         $builder->addPublishDates();
 
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->build();
-
         $builder->addCategory();
-
-        $builder->createField('media', Types::JSON)
-            ->columnName('media')
-            ->build();
-
-        $builder->createField('isMms', Types::BOOLEAN)
-            ->columnName('is_mms')
-            ->option('default', 0)
-            ->build();
 
         self::addTranslationMetadata($builder, self::class);
 

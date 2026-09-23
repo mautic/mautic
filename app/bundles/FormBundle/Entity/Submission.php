@@ -52,16 +52,19 @@ class Submission
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191, nullable: true)]
     private $trackingId;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_submitted', type: 'datetime')]
     private $dateSubmitted;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text')]
     private $referer;
 
     /**
@@ -83,17 +86,6 @@ class Submission
         $builder->addBigIntIdField();
 
         $builder->addIpAddress(true);
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateSubmitted', 'datetime')
-            ->columnName('date_submitted')
-            ->build();
-
-        $builder->addField('referer', 'text');
     }
 
     /**

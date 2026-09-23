@@ -40,6 +40,7 @@ class LeadTriggerLog
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_fired', type: 'datetime')]
     private $dateFired;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -47,10 +48,6 @@ class LeadTriggerLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIpAddress(true);
-
-        $builder->createField('dateFired', 'datetime')
-            ->columnName('date_fired')
-            ->build();
     }
 
     /**

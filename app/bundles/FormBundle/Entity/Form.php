@@ -64,6 +64,7 @@ class Form extends FormEntity implements UuidInterface
     private $id;
 
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'lang', type: 'string', length: 191, nullable: true)]
     private ?string $language = null;
 
     /**
@@ -89,6 +90,7 @@ class Form extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $alias;
 
     /**
@@ -101,12 +103,14 @@ class Form extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'cached_html', type: 'text', nullable: true)]
     private $cachedHtml;
 
     /**
      * @var string
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'post_action', type: 'string', length: 191)]
     private $postAction = 'message';
 
     /**
@@ -117,6 +121,7 @@ class Form extends FormEntity implements UuidInterface
     #[Assert\NotBlank(message: 'mautic.form.form.postactionproperty_redirect.notblank', groups: ['urlRequired'])]
     #[Assert\NotBlank(message: 'mautic.form.form.postactionproperty_hideform.notblank', groups: ['hideformRequired'])]
     #[IsPostActionRedirectUrl(groups: ['urlRequired'])]
+    #[ORM\Column(name: 'post_action_property', type: Types::TEXT, nullable: true)]
     private $postActionProperty;
 
     /**
@@ -151,18 +156,21 @@ class Form extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $template;
 
     /**
      * @var bool|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'in_kiosk_mode', type: 'boolean', nullable: true)]
     private $inKioskMode = false;
 
     /**
      * @var bool|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'render_style', type: 'boolean', nullable: true)]
     private $renderStyle = false;
 
     /**
@@ -180,6 +188,7 @@ class Form extends FormEntity implements UuidInterface
      * @var bool|null
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'no_index', type: 'boolean', nullable: true)]
     private $noIndex = true;
 
     /**
@@ -193,8 +202,10 @@ class Form extends FormEntity implements UuidInterface
     private ?int $submissionLimit = null;
 
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    #[ORM\Column(name: 'submission_limit_message', type: Types::TEXT, nullable: true)]
     private ?string $submissionLimitMessage = null;
 
+    #[ORM\Column(name: 'submission_count', type: Types::INTEGER)]
     private int $submissionCount = 0;
 
     /**
@@ -226,60 +237,13 @@ class Form extends FormEntity implements UuidInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('alias', 'string');
-
-        $builder->createField('language', 'string')
-            ->columnName('lang')
-            ->nullable()
-            ->build();
-
         $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
         $builder->addCategory();
 
-        $builder->createField('cachedHtml', 'text')
-            ->columnName('cached_html')
-            ->nullable()
-            ->build();
-
-        $builder->createField('postAction', 'string')
-            ->columnName('post_action')
-            ->build();
-
-        $builder->createField('postActionProperty', Types::TEXT)
-            ->columnName('post_action_property')
-            ->nullable()
-            ->build();
-
         $builder->addPublishDates();
 
-        $builder->createField('template', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('inKioskMode', 'boolean')
-            ->columnName('in_kiosk_mode')
-            ->nullable()
-            ->build();
-
-        $builder->createField('renderStyle', 'boolean')
-            ->columnName('render_style')
-            ->nullable()
-            ->build();
-
         $builder->addNullableField('submissionLimit', Types::INTEGER, 'submission_limit');
-        $builder->createField('submissionLimitMessage', Types::TEXT)
-            ->columnName('submission_limit_message')
-            ->nullable()
-            ->build();
-        $builder->createField('submissionCount', Types::INTEGER)
-            ->columnName('submission_count')
-            ->build();
-
-        $builder->createField('noIndex', 'boolean')
-            ->columnName('no_index')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
 
