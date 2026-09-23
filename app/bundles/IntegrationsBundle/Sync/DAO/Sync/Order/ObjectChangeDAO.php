@@ -16,6 +16,8 @@ final class ObjectChangeDAO
 
     private ?ObjectMapping $objectMapping = null;
 
+    private \DateTimeInterface $changeDateTime;
+
     /**
      * @var array<string, FieldDAO[]>
      */
@@ -37,8 +39,9 @@ final class ObjectChangeDAO
         private $objectId,
         private readonly string $mappedObject,
         private $mappedId,
-        private ?\DateTimeInterface $changeDateTime = null,
+        ?\DateTimeInterface $changeDateTime = null,
     ) {
+        $this->changeDateTime = $changeDateTime ?? new \DateTime();
     }
 
     public function getIntegration(): string
@@ -176,7 +179,7 @@ final class ObjectChangeDAO
     /**
      * This is set after the ObjectMapping entity has been persisted to the database with the updates from this object.
      */
-    public function getObjectMapping(): ObjectMapping
+    public function getObjectMapping(): ?ObjectMapping
     {
         return $this->objectMapping;
     }

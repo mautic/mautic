@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
@@ -58,6 +60,10 @@ final class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 
     public function getResponse(): ResponseInterface
     {
+        if (null === $this->response) {
+            throw new \LogicException('Response has not been set on the event yet.');
+        }
+
         return $this->response;
     }
 

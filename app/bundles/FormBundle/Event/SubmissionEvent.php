@@ -257,7 +257,7 @@ final class SubmissionEvent extends CommonEvent
     /**
      * @return mixed[]
      */
-    public function getPostSubmitPayload(): array
+    public function getPostSubmitPayload(): ?array
     {
         return $this->postSubmitPayload;
     }
