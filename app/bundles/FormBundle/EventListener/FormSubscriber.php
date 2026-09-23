@@ -328,7 +328,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             }
         }
 
-        if (!$error && $response->getStatusCode() >= 300) {
+        if (!$error && ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300)) {
             $rawBody = (string) $response->getBody();
             $error   = !empty($rawBody) ? $rawBody : sprintf(
                 'Repost endpoint returned HTTP %d',
