@@ -1395,7 +1395,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var Email $updatedChild */
         $updatedChild      = $this->em->find(Email::class, $childEmail->getId());
         $translationParent = $updatedChild->getTranslationParent();
-        \assert($translationParent instanceof Email || null === $translationParent);
+        $this->assertTrue($translationParent instanceof Email || null === $translationParent);
 
         $this->assertInstanceOf(Email::class, $translationParent, 'Translation parent should be set.');
         $this->assertSame(

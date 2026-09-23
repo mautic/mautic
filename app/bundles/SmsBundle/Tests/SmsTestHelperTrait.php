@@ -18,7 +18,6 @@ trait SmsTestHelperTrait
         $messagingServiceSid = 'messaging_sid';
 
         $integration = $this->getContainer()->get(TwilioIntegration::class);
-        \assert($integration instanceof TwilioIntegration);
 
         $crawler  = $this->client->request(Request::METHOD_GET, 's/plugins/config/'.$integration->getName());
         $response = $this->client->getResponse();
@@ -39,7 +38,6 @@ trait SmsTestHelperTrait
         Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), (string) $response->getContent());
 
         $transportChain = $this->getContainer()->get(TransportChain::class);
-        \assert($transportChain instanceof TransportChain);
 
         // Replaces Twilio transport with ArrayTransport
         $transport = new ArrayTransport();

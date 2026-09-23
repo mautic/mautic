@@ -35,7 +35,6 @@ trait CampaignEntitiesTrait
         $field->setProperties($fieldDetails['properties']);
 
         $fieldModel = self::getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
         $fieldModel->saveEntity($field);
     }
 
@@ -86,7 +85,7 @@ trait CampaignEntitiesTrait
     protected function createLead(string $leadName, array $customField = []): Lead
     {
         $contactRepo = $this->em->getRepository(Lead::class);
-        \assert($contactRepo instanceof LeadRepository);
+        $this->assertInstanceOf(LeadRepository::class, $contactRepo);
         $lead        = new Lead();
         $lead->setFirstname($leadName);
         if ([] !== $customField) {
@@ -100,7 +99,6 @@ trait CampaignEntitiesTrait
                 ],
             ]);
             $leadModel = self::getContainer()->get(LeadModel::class);
-            \assert($leadModel instanceof LeadModel);
             $leadModel->setFieldValues($lead, [$customField['alias'] => $customField['value']]);
         }
         $contactRepo->saveEntity($lead);
@@ -114,7 +112,7 @@ trait CampaignEntitiesTrait
     public function createCompany(string $name, array $customField = []): Company
     {
         $companyRepo = $this->em->getRepository(Company::class);
-        \assert($companyRepo instanceof CompanyRepository);
+        $this->assertInstanceOf(CompanyRepository::class, $companyRepo);
         $company = new Company();
         $company->setName($name);
         if ([] !== $customField) {
@@ -127,7 +125,6 @@ trait CampaignEntitiesTrait
                 ],
             ]);
             $companyModel = self::getContainer()->get(CompanyModel::class);
-            \assert($companyModel instanceof CompanyModel);
             $companyModel->setFieldValues($company, [$customField['alias'] => $customField['value']]);
         }
         $companyRepo->saveEntity($company);
