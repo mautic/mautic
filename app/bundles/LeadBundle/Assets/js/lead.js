@@ -1695,8 +1695,10 @@ Mautic.setAsPrimaryCompany = function (companyId,leadId){
     Mautic.ajaxActionRequest('lead:setAsPrimaryCompany', {'companyId': companyId, 'leadId': leadId}, function(response) {
         if (response.success) {
             // Update the company icon
-            mQuery('.panel-companies .ri-user-star-fill').removeClass('ri-user-star-fill');
-            mQuery('.panel-companies .contained-list-item__content[href$="/' + response.newPrimary + '"]').find('i').addClass('ri-user-star-fill');
+            mQuery('.panel-companies .company-primary-icon').remove();
+            mQuery('.panel-companies [data-company-id="' + response.newPrimary + '"] .label').prepend(
+                '<i class="ri-user-star-fill company-primary-icon primary" aria-hidden="true" focusable="false"></i>'
+            );
         }
     });
 };
