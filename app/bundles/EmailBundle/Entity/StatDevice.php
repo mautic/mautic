@@ -93,12 +93,12 @@ class StatDevice
         $this->stat = $stat;
     }
 
-    public function getDateOpened(): \DateTimeInterface
+    public function getDateOpened(): ?\DateTimeInterface
     {
         return $this->dateOpened;
     }
 
-    public function setDateOpened(\DateTimeInterface $dateOpened): void
+    public function setDateOpened(?\DateTimeInterface $dateOpened): void
     {
         $this->dateOpened = $dateOpened;
     }
