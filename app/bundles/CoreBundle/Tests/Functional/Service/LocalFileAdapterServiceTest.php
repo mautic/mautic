@@ -49,6 +49,17 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 
                 return $result;
             }
+
+            // The real efconnect controller calls initBridge() again per-request; keep the bridge built
+            // here so the hash we compute below still matches the volume the actual request will hit.
+            public function initBridge(string $instance, array $efParameters): void
+            {
+                if (isset($this->bridge)) {
+                    return;
+                }
+
+                parent::initBridge($instance, $efParameters);
+            }
         };
 
         self::getContainer()->set('fm_elfinder.loader', $elFinderLoader);
@@ -58,9 +69,17 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $_SERVER['REQUEST_METHOD'] = Request::METHOD_POST;
+
+        // elFinder assigns volume hash prefixes from a process-wide static counter, so it can't be hardcoded here.
+        // Bootstrap the bridge via a throwaway request (the config reader needs a live request context),
+        // then reuse it (via the idempotent initBridge() override above) for the real mkdir request below.
+        $this->client->request(Request::METHOD_POST, 'efconnect?cmd=mkdir&name=throwaway&target=');
+        $rootHash = $elFinderLoader->encode('/');
+        $this->assertIsString($rootHash);
+
         $this->client->request(
             Request::METHOD_POST,
-            "efconnect?cmd=mkdir&name={$this->folderName}&target=fls1_Lw"
+            "efconnect?cmd=mkdir&name={$this->folderName}&target={$rootHash}"
         );
         self::assertResponseIsSuccessful();
         /** @var PathsHelper $pathsHelper */
