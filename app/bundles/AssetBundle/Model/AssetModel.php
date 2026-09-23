@@ -394,7 +394,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
                 $results = $this->assetRepository->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
-                $results = $this->categoryRepository->getCategoryList($filter, $limit, 0);
+                $results = $this->categoryRepository->getCategoryList('asset', $filter, $limit, 0);
                 break;
         }
 

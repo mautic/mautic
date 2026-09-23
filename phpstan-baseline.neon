@@ -18,11 +18,6 @@ parameters:
 			count: 4
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
 
-		-
-			message: '#^Parameter \#3 \$referenceType of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:generateUrl\(\) expects int, true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/ApiBundle/Controller/CommonApiController.php
 
 		-
 			message: '#^Method Mautic\\ApiBundle\\Entity\\oAuth2\\Client\:\:isChanged\(\) has parameter \$prop with no type specified\.$#'
@@ -144,11 +139,6 @@ parameters:
 			count: 1
 			path: app/bundles/CampaignBundle/Command/ValidateEventCommand.php
 
-		-
-			message: '#^Parameter \#3 \$referenceType of method Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController\:\:generateUrl\(\) expects int, true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
@@ -180,17 +170,7 @@ parameters:
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/Campaign.php
 
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\CampaignRepository\:\:getContactSingleSegmentByCampaign\(\) has parameter \$contactId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
-		-
-			message: '#^Parameter \#1 \$maxResults of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:setMaxResults\(\) expects int\|null, true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\ChannelInterface\:\:setChannel\(\) has parameter \$channel with no type specified\.$#'
@@ -468,11 +448,6 @@ parameters:
 			count: 1
 			path: app/bundles/CampaignBundle/Model/CampaignModel.php
 
-		-
-			message: '#^Parameter \#3 \$runLimit of method Mautic\\CampaignBundle\\Membership\\MembershipBuilder\:\:build\(\) expects int, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CampaignBundle/Model/CampaignModel.php
 
 		-
 			message: '#^Call to an undefined method DateTimeInterface\:\:modify\(\)\.$#'
@@ -3396,23 +3371,8 @@ parameters:
 			count: 1
 			path: app/bundles/FormBundle/Event/SubmissionEvent.php
 
-		-
-			message: '#^Parameter \#4 \$filters of method Mautic\\FormBundle\\Model\\SubmissionModel\:\:getTopSubmissionReferrers\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
 
-		-
-			message: '#^Parameter \#4 \$filters of method Mautic\\FormBundle\\Model\\SubmissionModel\:\:getTopSubmitters\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
 
-		-
-			message: '#^Parameter \#5 \$filter of method Mautic\\FormBundle\\Model\\SubmissionModel\:\:getSubmissionsLineChartData\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
 
 		-
 			message: '#^Parameter \#1 \$response of method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:parseResponse\(\) expects GuzzleHttp\\Psr7\\Response, Psr\\Http\\Message\\ResponseInterface given\.$#'
@@ -4824,17 +4784,7 @@ parameters:
 			count: 1
 			path: app/bundles/LeadBundle/Event/PointsChangeEvent.php
 
-		-
-			message: '#^Parameter \#3 \$filters of method Mautic\\LeadBundle\\Model\\LeadModel\:\:getAnonymousVsIdentifiedPieChartData\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
 
-		-
-			message: '#^Parameter \#4 \$filters of method Mautic\\LeadBundle\\Model\\LeadModel\:\:getLeadList\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\EventListener\\LeadSubscriber\:\:getChannelEntity\(\) has parameter \$channelId with no type specified\.$#'
