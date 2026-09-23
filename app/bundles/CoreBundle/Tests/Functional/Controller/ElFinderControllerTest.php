@@ -18,7 +18,7 @@ final class ElFinderControllerTest extends MauticMysqlTestCase
     #[DataProvider('xssPayloadProvider')]
     public function testXssInRenameCommandIsFixed(string $xssPayload): void
     {
-        $originalElfinderLoader = self::getContainer()->get('fm_elfinder.loader');
+        $originalElfinderLoader = self::getContainer()->get(ElFinderLoader::class);
         $elFinderLoader         = new class(self::getContainer()) extends ElFinderLoader {
             public function __construct(ContainerInterface $container)
             {
@@ -41,13 +41,16 @@ final class ElFinderControllerTest extends MauticMysqlTestCase
             }
         };
 
-        self::getContainer()->set('fm_elfinder.loader', $elFinderLoader);
+        self::getContainer()->set(ElFinderLoader::class, $elFinderLoader);
 
         $encodedXss = rawurlencode($xssPayload);
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
+
+        $originalRequestMethod     = $_SERVER['REQUEST_METHOD'] ?? null;
+        $_SERVER['REQUEST_METHOD'] = Request::METHOD_GET;
 
         try {
             $this->client->request(
@@ -71,8 +74,14 @@ final class ElFinderControllerTest extends MauticMysqlTestCase
 
             $this->assertArrayHasKey('error', $json);
         } finally {
-            // Restore so this test's mutation doesn't leak into other tests in the same process.
-            self::getContainer()->set('fm_elfinder.loader', $originalElfinderLoader);
+            // Restore so this test's mutations don't leak into other tests in the same process.
+            self::getContainer()->set(ElFinderLoader::class, $originalElfinderLoader);
+
+            if (null === $originalRequestMethod) {
+                unset($_SERVER['REQUEST_METHOD']);
+            } else {
+                $_SERVER['REQUEST_METHOD'] = $originalRequestMethod;
+            }
         }
     }
 
