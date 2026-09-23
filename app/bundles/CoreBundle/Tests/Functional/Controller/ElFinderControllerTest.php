@@ -18,7 +18,8 @@ final class ElFinderControllerTest extends MauticMysqlTestCase
     #[DataProvider('xssPayloadProvider')]
     public function testXssInRenameCommandIsFixed(string $xssPayload): void
     {
-        $elFinderLoader = new class(self::getContainer()) extends ElFinderLoader {
+        $originalElfinderLoader = self::getContainer()->get('fm_elfinder.loader');
+        $elFinderLoader         = new class(self::getContainer()) extends ElFinderLoader {
             public function __construct(ContainerInterface $container)
             {
                 /** @phpstan-ignore symfonyContainer.privateService, mautic.noContainerGet */
@@ -48,27 +49,31 @@ final class ElFinderControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
-        $_SERVER['REQUEST_METHOD'] = Request::METHOD_GET;
-        $this->client->request(
-            Request::METHOD_GET,
-            "/efconnect?cmd=rename&name=CHANGE.png&target={$encodedXss}&reqid=1975170e82727f"
-        );
+        try {
+            $this->client->request(
+                Request::METHOD_GET,
+                "/efconnect?cmd=rename&name=CHANGE.png&target={$encodedXss}&reqid=1975170e82727f"
+            );
 
-        $response = $this->client->getResponse();
-        $this->assertInstanceOf(JsonResponse::class, $response);
+            $response = $this->client->getResponse();
+            $this->assertInstanceOf(JsonResponse::class, $response);
 
-        $content = $response->getContent();
-        $this->assertNotEmpty($content, 'Response should not be empty');
+            $content = $response->getContent();
+            $this->assertNotEmpty($content, 'Response should not be empty');
 
-        $this->assertStringNotContainsString($xssPayload, $content);
+            $this->assertStringNotContainsString($xssPayload, (string) $content);
 
-        $json = json_decode($content, true);
-        $this->assertIsArray($json, 'Response JSON must decode properly');
+            $json = json_decode((string) $content, true);
+            $this->assertIsArray($json, 'Response JSON must decode properly');
 
-        $errorString = json_encode($json);
-        $this->assertStringNotContainsString($xssPayload, $errorString);
+            $errorString = json_encode($json);
+            $this->assertStringNotContainsString($xssPayload, (string) $errorString);
 
-        $this->assertArrayHasKey('error', $json);
+            $this->assertArrayHasKey('error', $json);
+        } finally {
+            // Restore so this test's mutation doesn't leak into other tests in the same process.
+            self::getContainer()->set('fm_elfinder.loader', $originalElfinderLoader);
+        }
     }
 
     /**
