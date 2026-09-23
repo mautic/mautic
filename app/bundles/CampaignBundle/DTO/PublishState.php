@@ -10,37 +10,40 @@ final class PublishState
 {
     private \DateTimeInterface $dateAdded;
 
-    private ?bool $published                 = null;
+    private bool $published;
 
-    private ?\DateTimeInterface $publishUp   = null;
+    private ?\DateTimeInterface $publishUp;
 
-    private ?\DateTimeInterface $publishDown = null;
+    private ?\DateTimeInterface $publishDown;
 
-    public function setFromAuditLog(AuditLog $auditLog, bool $defaultPublishState): void
+    public function __construct(AuditLog $auditLog, bool $defaultPublishState, ?self $previous = null)
     {
-        $this->dateAdded = \DateTimeImmutable::createFromInterface($auditLog->getDateAdded());
+        $this->dateAdded   = \DateTimeImmutable::createFromInterface($auditLog->getDateAdded());
+        $this->publishUp   = $previous?->publishUp;
+        $this->publishDown = $previous?->publishDown;
 
-        if (isset($auditLog->getDetails()['isPublished'][1])) {
-            $this->published = $auditLog->getDetails()['isPublished'][1];
+        $details = $auditLog->getDetails();
+
+        if (isset($details['isPublished'][1])) {
+            $this->published = $details['isPublished'][1];
         } elseif ('create' === $auditLog->getAction()) {
             // FormEntity is published by default so it doesn't create the change if published when created.
             $this->published = true;
-        } elseif (null === $this->published) {
-            // The current entity state is the best assumption we can make at this point.
-            $this->published = $defaultPublishState;
+        } else {
+            // keep the previous state, or fall back to the current entity state
+            $this->published = null !== $previous ? $previous->published : $defaultPublishState;
         }
-        // keep previous state
 
-        if (isset($auditLog->getDetails()['publishUp'][1])) {
-            $this->publishUp = new \DateTimeImmutable($auditLog->getDetails()['publishUp'][1])->setTimezone(new \DateTimeZone('UTC'));
+        if (isset($details['publishUp'][1])) {
+            $this->publishUp = new \DateTimeImmutable($details['publishUp'][1])->setTimezone(new \DateTimeZone('UTC'));
         }
 
         if ($this->publishUp < $this->dateAdded) {
             $this->publishUp = null; // reset if in the past
         }
 
-        if (isset($auditLog->getDetails()['publishDown'][1])) {
-            $this->publishDown = new \DateTimeImmutable($auditLog->getDetails()['publishDown'][1])->setTimezone(new \DateTimeZone('UTC'));
+        if (isset($details['publishDown'][1])) {
+            $this->publishDown = new \DateTimeImmutable($details['publishDown'][1])->setTimezone(new \DateTimeZone('UTC'));
         }
 
         if ($this->publishDown < $this->dateAdded) {
@@ -50,7 +53,7 @@ final class PublishState
 
     public function getPublished(): bool
     {
-        return $this->published ?? false;
+        return $this->published;
     }
 
     public function getPublishUp(): ?\DateTimeInterface
