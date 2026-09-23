@@ -37,21 +37,25 @@ class PointsChangeLog
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text', length: 50)]
     private $type;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_name', type: 'string', length: 191)]
     private $eventName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'action_name', type: 'string', length: 191)]
     private $actionName;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $delta;
 
     /**
@@ -70,20 +74,6 @@ class PointsChangeLog
         $builder->addBigIntIdField();
 
         $builder->addIpAddress(true);
-
-        $builder->createField('type', 'text')
-            ->length(50)
-            ->build();
-
-        $builder->createField('eventName', 'string')
-            ->columnName('event_name')
-            ->build();
-
-        $builder->createField('actionName', 'string')
-            ->columnName('action_name')
-            ->build();
-
-        $builder->addField('delta', 'integer');
 
         $builder->addDateAdded();
     }

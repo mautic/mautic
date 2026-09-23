@@ -36,6 +36,7 @@ class LeadDevice
     /**
      * @var array
      */
+    #[ORM\Column(name: 'client_info', type: 'array', nullable: true)]
     private $clientInfo = [];
 
     /**
@@ -46,36 +47,43 @@ class LeadDevice
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_os_name', type: 'string', length: 191, nullable: true)]
     private $deviceOsName;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_os_shortname', type: 'string', length: 191, nullable: true)]
     private $deviceOsShortName;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_os_version', type: 'string', length: 191, nullable: true)]
     private $deviceOsVersion;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_os_platform', type: 'string', length: 191, nullable: true)]
     private $deviceOsPlatform;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_brand', type: 'string', length: 191, nullable: true)]
     private $deviceBrand;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'device_model', type: 'string', length: 191, nullable: true)]
     private $deviceModel;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191, unique: true, nullable: true)]
     private $trackingId;
 
     /**
@@ -91,48 +99,7 @@ class LeadDevice
 
         $builder->addDateAdded();
 
-        $builder->createField('clientInfo', 'array')
-            ->columnName('client_info')
-            ->nullable()
-            ->build();
-
         $builder->addNullableField('device', 'string');
-
-        $builder->createField('deviceOsName', 'string')
-            ->columnName('device_os_name')
-            ->nullable()
-            ->build();
-
-        $builder->createField('deviceOsShortName', 'string')
-            ->columnName('device_os_shortname')
-            ->nullable()
-            ->build();
-
-        $builder->createField('deviceOsVersion', 'string')
-            ->columnName('device_os_version')
-            ->nullable()
-            ->build();
-
-        $builder->createField('deviceOsPlatform', 'string')
-            ->columnName('device_os_platform')
-            ->nullable()
-            ->build();
-
-        $builder->createField('deviceBrand', 'string')
-            ->columnName('device_brand')
-            ->nullable()
-            ->build();
-
-        $builder->createField('deviceModel', 'string')
-            ->columnName('device_model')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->unique()
-            ->nullable()
-            ->build();
     }
 
     /**
