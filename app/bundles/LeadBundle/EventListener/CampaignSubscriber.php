@@ -562,7 +562,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
                     // Otherwise CustomFieldHelper::fieldValueTransfomer would attempt to parse
                     // the regex as a DateTime string, which would throw an error
                     if (!in_array($operator, [OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP])) {
-                        $fieldValue = CustomFieldHelper::fieldValueTransfomer($fields[$field], $value, null, 'date' === $fieldType);
+                        $fieldValue = CustomFieldHelper::fieldValueTransfomer($fields[$field], $value);
                     }
                 }
 
