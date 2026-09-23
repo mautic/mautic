@@ -153,8 +153,18 @@ class CustomFieldColumn
         try {
             $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
         } catch (NoListenerException) {
-        } catch (AbortColumnUpdateException) { // if processing in background
-            return;
+        } catch (AbortColumnUpdateException $e) { // if processing in background
+            $leadsSchema  = $this->columnSchemaHelper->setName($leadField->getCustomFieldObject());
+            $columnExists = $leadsSchema->checkColumnExists($leadField->getAlias(), false);
+
+            // In case the column still does not exist: act if this is "create column".
+            if (!$columnExists) {
+                // Save the field metadata and throw the exception again to stop column update.
+                // As the column should be updated by a background job.
+                $this->leadFieldSaver->saveLeadFieldEntityWithoutColumnCreated($leadField);
+
+                throw $e;
+            }
         }
 
         $this->processUpdateLeadColumn($leadField);

@@ -9,12 +9,20 @@ use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class FieldControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    protected function setUp(): void
+    {
+        $this->configParams['create_custom_field_in_background'] = 'testAbortColumnCreateExceptionIsHandledOnEditAction' === $this->name();
+
+        parent::setUp();
+    }
 
     public function testLengthValidationOnLabelFieldWhenAddingCustomFieldFailure(): void
     {
@@ -42,6 +50,61 @@ final class FieldControllerTest extends MauticMysqlTestCase
 
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => $label]);
         $this->assertInstanceOf(LeadField::class, $field);
+    }
+
+    public function testAbortColumnCreateExceptionIsHandledOnEditAction(): void
+    {
+        // First create a field
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/new');
+        $form    = $crawler->selectButton('Save & Close')->form();
+        $label   = 'Test field for edit exception';
+        $alias   = 'test_field_edit_exception';
+        $form['leadfield[label]']->setValue($label);
+        $form['leadfield[alias]']->setValue($alias);
+
+        $this->client->submit($form);
+
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString('Your custom field is being created, we will notify you when complete', $response->getContent());
+
+        // Get the created field
+        $field = $this->em->getRepository(LeadField::class)->findOneBy(['alias' => $alias]);
+        $this->assertNotNull($field, 'Field was not created');
+        $this->assertSame($label, $field->getLabel());
+
+        // Now edit the field - just change the label, and check Mautic will "schedule" the update of the
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/edit/'.$field->getId());
+        $form    = $crawler->selectButton('Save & Close')->form([
+            'leadfield' => [
+                'label' => $label.'1',
+            ],
+        ]);
+        $this->client->submit($form);
+
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString($label, $response->getContent());
+        $this->assertStringContainsString('Your custom field is being updated, we will notify you when complete', $response->getContent());
+
+        // Run the background command to create the column
+        $commandTester = $this->testSymfonyCommand(CreateCustomFieldCommand::COMMAND_NAME, ['--id' => $field->getId()]);
+        $this->assertEquals(0, $commandTester->getStatusCode());
+
+        // Now edit the field again, see the Mautic reports a clean "was updated"
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/fields/edit/'.$field->getId());
+        $form    = $crawler->selectButton('Save & Close')->form([
+            'leadfield' => [
+                'label' => $label.'2',
+            ],
+        ]);
+
+        $this->client->submit($form);
+
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString($label, $response->getContent());
+        $this->assertStringContainsString('has been updated!', $response->getContent());
     }
 
     public function testCloneFieldSubmission(): void
