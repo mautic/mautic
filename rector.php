@@ -55,6 +55,16 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
 
         // Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
+
+        // conversion breaks form rendering + /api/emails/new functional tests, keep loadMetadata()
+        \Utils\Rector\LoadMetadataColumnToDoctrineAttributeRector::class => [
+            __DIR__.'/app/bundles/EmailBundle/Entity/Email.php',
+            __DIR__.'/app/bundles/FormBundle/Entity/Action.php',
+            __DIR__.'/app/bundles/FormBundle/Entity/Field.php',
+            __DIR__.'/app/bundles/FormBundle/Entity/Form.php',
+            __DIR__.'/app/bundles/FormBundle/Entity/Submission.php',
+        ],
+
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
         ],
