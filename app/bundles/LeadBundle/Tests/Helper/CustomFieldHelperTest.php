@@ -176,6 +176,8 @@ final class CustomFieldHelperTest extends TestCase
         $mockDateTimeHelper = $this->createMock(DateTimeHelper::class);
         $mockDateTimeHelper->method('toUtcString')
             ->willReturn('2023-05-20 00:00:00');
+        $mockDateTimeHelper->method('toLocalString')
+            ->willReturn('2023-05-20 00:00:00');
 
         $field  = ['type' => 'datetime'];
         $value  = 'now';
