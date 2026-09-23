@@ -36,7 +36,7 @@ class StatDevice
 
     private ?IpAddress $ipAddress = null;
 
-    private string $dateOpened;
+    private \DateTimeInterface $dateOpened;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -93,12 +93,12 @@ class StatDevice
         $this->stat = $stat;
     }
 
-    public function getDateOpened(): string
+    public function getDateOpened(): \DateTimeInterface
     {
         return $this->dateOpened;
     }
 
-    public function setDateOpened(string $dateOpened): void
+    public function setDateOpened(\DateTimeInterface $dateOpened): void
     {
         $this->dateOpened = $dateOpened;
     }

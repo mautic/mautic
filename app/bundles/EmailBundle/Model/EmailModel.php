@@ -517,7 +517,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $emailOpenStat = new StatDevice();
             $emailOpenStat->setIpAddress($ipAddress);
             $emailOpenStat->setDevice($trackedDevice);
-            $emailOpenStat->setDateOpened($readDateTime->toUtcString());
+            $emailOpenStat->setDateOpened($readDateTime->getDateTime());
             $emailOpenStat->setStat($stat);
 
             $this->em->persist($emailOpenStat);
