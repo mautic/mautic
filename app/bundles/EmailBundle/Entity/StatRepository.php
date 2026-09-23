@@ -509,8 +509,6 @@ class StatRepository extends CommonRepository
     /**
      * Get counts for Sent, Read and Failed emails.
      *
-     * @param QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -598,8 +596,8 @@ class StatRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'email_stats')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId)
             ->executeStatement();
     }
 
