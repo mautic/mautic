@@ -4509,7 +4509,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$response of method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:parseResponse\(\) expects GuzzleHttp\\Psr7\\Response, Psr\\Http\\Message\\ResponseInterface given\.$#'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: app/bundles/FormBundle/EventListener/FormSubscriber.php
 
 		-
