@@ -578,7 +578,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign1->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
-        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
+        $campaignLeads = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
 
         $this->assertCount(2, $campaignLeads);
         $this->assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
@@ -610,7 +610,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign1->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
-        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
+        $campaignLeads = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
 
         $this->assertCount(2, $campaignLeads);
         $this->assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());
@@ -635,12 +635,12 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
-        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead]);
+        $campaignLeads = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findBy(['lead' => $lead]);
         $this->assertCount(1, $campaignLeads);
         $this->assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
         $this->assertTrue($campaignLeads[0]->getManuallyRemoved());
 
-        $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']);
+        $campaignEventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']);
         $this->assertCount(1, $campaignEventLogs);
         $this->assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
         $this->assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
@@ -661,12 +661,12 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
-        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead]);
+        $campaignLeads = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findBy(['lead' => $lead]);
         $this->assertCount(1, $campaignLeads);
         $this->assertSame($campaign->getId(), $campaignLeads[0]->getCampaign()->getId());
         $this->assertTrue($campaignLeads[0]->getManuallyRemoved());
 
-        $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']);
+        $campaignEventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']);
         $this->assertCount(2, $campaignEventLogs);
         $this->assertSame($campaign->getId(), $campaignEventLogs[0]->getCampaign()->getId());
         $this->assertSame($event1->getId(), $campaignEventLogs[0]->getEvent()->getId());
@@ -689,7 +689,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--exclude' => [$campaign1->getId()], '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
-        $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
+        $campaignLeads = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
 
         $this->assertCount(2, $campaignLeads);
         $this->assertSame($campaign1->getId(), $campaignLeads[0]->getCampaign()->getId());

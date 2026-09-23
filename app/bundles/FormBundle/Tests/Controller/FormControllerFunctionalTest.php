@@ -656,7 +656,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $forms = $this->em->getRepository(Form::class)->findBy([], ['id' => 'ASC']);
+        $forms = $this->getContainer()->get(\Mautic\FormBundle\Entity\FormRepository::class)->findBy([], ['id' => 'ASC']);
         $this->assertCount(2, $forms);
 
         $originalForm = $forms[0];

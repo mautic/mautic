@@ -7,7 +7,6 @@ namespace Mautic\PageBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Page;
-use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,7 +37,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/xss-test?tags={$encodedPayload}");
         self::assertResponseIsSuccessful();
 
-        $tagRepository = $this->em->getRepository(Tag::class);
+        $tagRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\TagRepository::class);
         $tags          = $tagRepository->findAll();
 
         if ($expectedSanitized) {
@@ -120,7 +119,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
-        $this->loginUser($this->em->getRepository(User::class)->findOneBy(['username' => 'admin']));
+        $this->loginUser($this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']));
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
 

@@ -93,7 +93,7 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Debug: Verify the entity was actually persisted
-        $repository        = $this->em->getRepository(LeadCategory::class);
+        $repository        = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadCategoryRepository::class);
         $allLeadCategories = $repository->findAll();
         $this->assertGreaterThanOrEqual(1, count($allLeadCategories), 'LeadCategory should be in database');
 

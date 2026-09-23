@@ -196,7 +196,7 @@ final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCas
 
         $this->em->clear();
 
-        $imported = $this->em->getRepository(Email::class)->findOneBy(['uuid' => $exported['uuid']]);
+        $imported = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->findOneBy(['uuid' => $exported['uuid']]);
         $this->assertInstanceOf(Email::class, $imported);
 
         $this->assertSame($email->getCustomHtml(), $imported->getCustomHtml());

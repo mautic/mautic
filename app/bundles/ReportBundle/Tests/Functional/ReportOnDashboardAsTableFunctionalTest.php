@@ -15,7 +15,7 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
 {
     public function testReportOnDashboardAsTable(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy([]);
 
         $report = $this->createReport();
         $this->em->persist($report);

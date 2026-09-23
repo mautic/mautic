@@ -20,10 +20,10 @@ final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTest
         $exitCode = $this->createDataAndRunCommand(false);
         $this->assertSame(0, $exitCode);
 
-        $campaign = $this->em->getRepository(Campaign::class)->findAll();
+        $campaign = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->findAll();
         $this->assertCount(1, $campaign);
 
-        $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
+        $eventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findAll();
         $this->assertCount(2, $eventLogs); // Logs are preserved when events are deleted
     }
 
@@ -33,10 +33,10 @@ final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTest
 
         $this->assertSame(0, $exitCode);
 
-        $campaign = $this->em->getRepository(Campaign::class)->findAll();
+        $campaign = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->findAll();
         $this->assertCount(0, $campaign);
 
-        $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
+        $eventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findAll();
         $this->assertCount(0, $eventLogs);
     }
 

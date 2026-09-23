@@ -831,7 +831,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getUser(string $userName): ?User
     {
-        $repository = $this->em->getRepository(User::class);
+        $repository = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
 
         return $repository->findOneBy(['username' => $userName]);
     }

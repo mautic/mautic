@@ -147,7 +147,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Assert that the contact has the DNC record now.
-        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        $dncRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\DoNotContactRepository::class);
         $this->assertInstanceOf(DoNotContactRepository::class, $dncRepository);
         $dncRecords = $dncRepository->findBy(['lead' => $lead->getId()]);
         $this->assertCount(1, $dncRecords);
@@ -490,7 +490,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($message, (string) $clientResponse->getContent());
-        $doNotContacts       = $this->em->getRepository(DoNotContact::class)->findBy(['lead' => $this->leadId]);
+        $doNotContacts       = $this->getContainer()->get(\Mautic\LeadBundle\Entity\DoNotContactRepository::class)->findBy(['lead' => $this->leadId]);
         $isAddedDoNotContact = (bool) count($doNotContacts);
         $addedDoNotContact   = $isAddedDoNotContact ? $doNotContacts[0] : null;
         $this->assertSame($addedRow, $isAddedDoNotContact);
@@ -607,7 +607,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         /** @var DoNotContactRepository $dncRepository */
-        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        $dncRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\DoNotContactRepository::class);
 
         /** @var DoNotContact[] $dncRecords */
         $dncRecords = $dncRepository->findAll();
@@ -649,7 +649,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert that a DoNotContact record was created
         /** @var DoNotContactRepository $dncRepository */
-        $dncRepository = $this->em->getRepository(DoNotContact::class);
+        $dncRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\DoNotContactRepository::class);
 
         /** @var DoNotContact[] $dncRecords */
         $dncRecords = $dncRepository->findBy(['lead' => $lead]);

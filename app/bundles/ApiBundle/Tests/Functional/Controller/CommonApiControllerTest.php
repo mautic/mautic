@@ -135,7 +135,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
     private function lockEntityAsAdmin(object $entity): void
     {
-        $adminUser = $this->em->getRepository(User::class)->find(1);
+        $adminUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->find(1);
         $entity->setCheckedOut(new \DateTime())
             ->setCheckedOutBy($adminUser);
 
@@ -144,7 +144,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
     private function createAndAuthenticateApiUser(string $username, string $email): void
     {
-        $role = $this->em->getRepository(Role::class)->find(1);
+        $role = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->find(1);
         $this->assertInstanceOf(Role::class, $role);
 
         $user = new User()

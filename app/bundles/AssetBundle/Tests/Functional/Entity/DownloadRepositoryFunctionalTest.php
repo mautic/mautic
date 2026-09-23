@@ -19,7 +19,7 @@ final class DownloadRepositoryFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         /** @var DownloadRepository $repository */
-        $repository               = $this->em->getRepository(Download::class);
+        $repository               = $this->getContainer()->get(\Mautic\AssetBundle\Entity\DownloadRepository::class);
         $this->downloadRepository = $repository;
     }
 

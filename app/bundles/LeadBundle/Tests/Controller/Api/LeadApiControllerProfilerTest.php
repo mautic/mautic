@@ -66,7 +66,7 @@ final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
     private function getContacts(int $expectedCount, array $queryParams = []): void
     {
         // We have to reset the param counter to emulate 2 requests otherwise the counter will cause the queries to be different.
-        $leadRepository = $this->em->getRepository(Lead::class);
+        $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
         $this->assertInstanceOf(LeadRepository::class, $leadRepository);
         $reflection = new \ReflectionClass($leadRepository);
         $counter    = $reflection->getProperty('lastUsedParameterId');

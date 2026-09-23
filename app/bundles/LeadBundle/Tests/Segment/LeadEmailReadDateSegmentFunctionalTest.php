@@ -183,7 +183,7 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
     {
         return array_map(
             static fn (ListLead $member): int => (int) $member->getLead()->getId(),
-            $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()])
+            $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findBy(['list' => $segment->getId()])
         );
     }
 }

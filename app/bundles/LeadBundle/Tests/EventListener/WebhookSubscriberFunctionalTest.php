@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
-use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 
@@ -34,14 +33,14 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 
     public function testOnSegmentChange(): void
     {
-        $contactRepository = $this->em->getRepository(Lead::class);
+        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
         $this->assertInstanceOf(LeadRepository::class, $contactRepository);
 
         /** @var ListModel $segmentModel */
         $segmentModel = self::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $segmentModel);
 
-        $webhookQueueRepository = $this->em->getRepository(WebhookQueue::class);
+        $webhookQueueRepository = $this->getContainer()->get(\Mautic\WebhookBundle\Entity\WebhookQueueRepository::class);
         $this->assertInstanceOf(WebhookQueueRepository::class, $webhookQueueRepository);
 
         $webhook = $this->createWebhook();

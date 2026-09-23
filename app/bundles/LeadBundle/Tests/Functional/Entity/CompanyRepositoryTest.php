@@ -85,7 +85,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         );
         $this->client->submit($form);
 
-        return $this->em->getRepository(Lead::class)->findOneBy(
+        return $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(
             [
                 'firstname' => $firstName,
                 'email'     => $email,

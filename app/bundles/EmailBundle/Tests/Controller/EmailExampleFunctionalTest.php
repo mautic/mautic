@@ -123,7 +123,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $this->setUpSymfony($configParams);
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 

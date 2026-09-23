@@ -579,7 +579,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     private function findEventLog(CampaignEvent $event, Lead $leadOne): LeadEventLog
     {
-        $log = $this->em->getRepository(LeadEventLog::class)->findOneBy([
+        $log = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findOneBy([
             'event'    => $event->getId(),
             'lead'     => $leadOne,
             'rotation' => 1,

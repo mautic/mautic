@@ -39,7 +39,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->submitLandingPageFormWithoutCompanies($formAlias, $pageA->getAlias(), 'j@doe.com', 'John', 'Doe');
 
         /** @var SubmissionRepository $submissionRepo */
-        $submissionRepo = $this->em->getRepository(Submission::class);
+        $submissionRepo = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class);
 
         // Set tracking_id on submission using direct SQL (simulates device tracking which doesn't work in functional tests)
         $submissions = $submissionRepo->findBy(['page' => $pageA]);
@@ -89,7 +89,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
             'lastname'  => $lead->getLastname(), ]]);
 
         /** @var StatRepository $emailStatRepository */
-        $emailStatRepository = $this->em->getRepository(Stat::class);
+        $emailStatRepository = $this->getContainer()->get(\Mautic\EmailBundle\Entity\StatRepository::class);
 
         /** @var Stat|null $emailStat */
         $emailStat = $emailStatRepository->findOneBy(
@@ -117,7 +117,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         /** @var SubmissionRepository $submissionRepo */
-        $submissionRepo = $this->em->getRepository(Submission::class);
+        $submissionRepo = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class);
 
         // Verify submission is associated with the page
         $submissions = $submissionRepo->findBy(['page' => $pageA]);
@@ -141,7 +141,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->submitLandingPageFormWithoutCompanies($formAlias, $page->getAlias(), 'j@doe.com', 'John', 'Doe');
 
         /** @var SubmissionRepository $submissionRepo */
-        $submissionRepo = $this->em->getRepository(Submission::class);
+        $submissionRepo = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class);
 
         $this->assertEmpty($submissionRepo->validateSubmissions([9999999999999], $formId));
 

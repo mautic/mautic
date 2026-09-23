@@ -151,7 +151,7 @@ final class JumpToActionTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaignId]);
 
         $this->em->clear();
-        $contact = $this->em->getRepository(Lead::class)->find($contactId);
+        $contact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($contactId);
 
         $eventLogs = $this->getEventLogsForContact($contact);
 
@@ -172,7 +172,7 @@ final class JumpToActionTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaignId]);
 
         // Refresh contact after command
-        $contact   = $this->em->getRepository(Lead::class)->find($contactId);
+        $contact   = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($contactId);
         $eventLogs = $this->getEventLogsForContact($contact);
 
         $this->assertCount(3, $eventLogs); // This was 6 before the fix.
@@ -184,7 +184,7 @@ final class JumpToActionTest extends MauticMysqlTestCase
      */
     private function getEventLogsForContact(Lead $contact): array
     {
-        $eventLogRepository = $this->em->getRepository(LeadEventLog::class);
+        $eventLogRepository = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class);
 
         return $eventLogRepository->findBy(['lead' => $contact->getId()]);
     }

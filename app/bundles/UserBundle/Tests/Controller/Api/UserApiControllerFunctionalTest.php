@@ -231,7 +231,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey('username', $responseData);
 
             // Verify the user was actually created in the database
-            $userRepository = $this->em->getRepository(User::class);
+            $userRepository = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
             $user           = $userRepository->find($responseData['id']);
 
             $this->assertInstanceOf(User::class, $user);

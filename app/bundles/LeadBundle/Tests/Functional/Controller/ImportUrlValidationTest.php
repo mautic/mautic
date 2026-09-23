@@ -51,7 +51,7 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString('4 lines were processed, 2 items created, 0 items updated, 2 items ignored', $display);
 
-        $leadRepository = $this->em->getRepository(Lead::class);
+        $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
 
         $this->assertInstanceOf(Lead::class, $leadRepository->findOneBy(['email' => 'ok1@a.com']));
         $this->assertInstanceOf(Lead::class, $leadRepository->findOneBy(['email' => 'ok2@a.com']));

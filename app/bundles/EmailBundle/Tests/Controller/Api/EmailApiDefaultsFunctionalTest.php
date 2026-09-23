@@ -46,7 +46,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         ]));
 
         // Re-authenticate: setUpSymfony() destroys the previous client and its security token.
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
