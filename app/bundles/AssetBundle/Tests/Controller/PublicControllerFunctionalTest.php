@@ -8,6 +8,23 @@ use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
 class PublicControllerFunctionalTest extends AbstractAssetTest
 {
     /**
+     * Download action should not serve an asset whose path escapes the upload dir.
+     */
+    public function testDownloadActionWithTraversalPathIsNotServed(): void
+    {
+        $asset = $this->createAsset([
+            'title' => 'Traversal Asset',
+            'alias' => 'traversal-asset',
+            'path'  => '../../../../../../../../etc/passwd',
+        ]);
+
+        $this->client->request('GET', '/asset/'.$asset->getId().':'.$asset->getAlias());
+
+        $this->assertSame(404, $this->client->getResponse()->getStatusCode());
+        $this->assertStringNotContainsString('root:x:0:0', (string) $this->client->getResponse()->getContent());
+    }
+
+    /**
      * Download action should return the file content.
      */
     public function testDownloadActionStreamByDefault(): void
