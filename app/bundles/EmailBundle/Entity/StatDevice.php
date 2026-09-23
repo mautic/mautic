@@ -36,10 +36,7 @@ class StatDevice
 
     private ?IpAddress $ipAddress = null;
 
-    /**
-     * @var string
-     */
-    private $dateOpened;
+    private string $dateOpened;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
