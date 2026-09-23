@@ -24,17 +24,17 @@ final class ClientFactoryTest extends TestCase
         $session         = $this->createStub(SessionInterface::class);
         $requestStack    = $this->createMock(RequestStack::class);
 
-        $requestStack->expects($this->once())
-            ->method('getSession')
-            ->willReturn($session);
+        $requestStack->expects($this->once())->method('getSession')->willReturn($session);
 
         $clientFactory   = new ClientFactory($urlGenerator, $eventDispatcher, $requestStack);
 
         $eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(self::anything())
-            ->willReturnCallback(function (RegisterScopesEvent $event): void {
+            ->willReturnCallback(function (RegisterScopesEvent $event): object {
                 $event->addScopes(['openid', 'email', 'profile']);
+
+                return $event;
             });
 
         $urlGenerator->expects($this->once())

@@ -9,6 +9,7 @@ use Mautic\UserBundle\Security\OIDC\Settings;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -34,7 +35,8 @@ final readonly class OidcRequestSubscriber implements EventSubscriberInterface
 
     public function onKernelRequest(RequestEvent $requestEvent): void
     {
-        $firewall = $requestEvent->getRequest()->attributes->get('_firewall_context');
+        $request  = $requestEvent->getRequest();
+        $firewall = $request->attributes->get('_firewall_context');
         $token    = $this->tokenStorage->getToken();
 
         if ($this->isSupportUserToken($token)) {
@@ -42,7 +44,7 @@ final readonly class OidcRequestSubscriber implements EventSubscriberInterface
         }
 
         $redirect = $this->redirectFromOpenIDWhenDisabled($firewall)
-            ?? $this->redirectFromOpenIDWhenAuthenticated($firewall, $token)
+            ?? $this->redirectFromOpenIDWhenAuthenticated($firewall, $token, $request)
             ?? $this->redirectFromMainWhenRequired($firewall, $token)
             ?? $this->redirectFromLoginWhenAuthenticated($firewall, $token);
 
@@ -62,10 +64,23 @@ final readonly class OidcRequestSubscriber implements EventSubscriberInterface
         return new RedirectResponse($this->urlGenerator->generate('login', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
-    private function redirectFromOpenIDWhenAuthenticated(?string $firewall, ?TokenInterface $token): ?RedirectResponse
+    private function redirectFromOpenIDWhenAuthenticated(?string $firewall, ?TokenInterface $token, Request $request): ?RedirectResponse
     {
-        if (!$this->parameters->isEnabled() || 'security.firewall.map.context.open_id' !== $firewall || $this->isAnonymousToken($token) || (!$this->isOpenIdToken($token) && $this->parameters->isRequired())) {
+        if (!$this->parameters->isEnabled() || 'security.firewall.map.context.open_id' !== $firewall || $this->isAnonymousToken($token)) {
             return null;
+        }
+
+        // User is authenticated but not with OIDC, and OIDC is required - redirect to required page
+        // But don't redirect if already on the required page or login_check (to avoid loop / let controller handle it)
+        if (!$this->isOpenIdToken($token) && $this->parameters->isRequired()) {
+            $path = $request->getPathInfo();
+            if ('/s/open_id/required' === $path || '/s/open_id/login_check' === $path) {
+                return null; // Let the controller handle it
+            }
+
+            $this->logger->debug('Redirecting from OpenID to required page, because user is not authenticated with OpenID Connect.');
+
+            return new RedirectResponse($this->urlGenerator->generate('mautic_oidc_required', [], UrlGeneratorInterface::ABSOLUTE_URL));
         }
 
         $this->logger->debug('Redirecting from OpenID to dashboard, because user is authenticated.');
@@ -110,6 +125,11 @@ final readonly class OidcRequestSubscriber implements EventSubscriberInterface
         // Check if token has firewall attribute (set by Symfony's authenticator)
         if (method_exists($token, 'hasAttribute') && $token->hasAttribute('_firewall_name')) {
             return 'open_id' === $token->getAttribute('_firewall_name');
+        }
+
+        // Try getFirewallName() method on PostAuthenticationToken
+        if (method_exists($token, 'getFirewallName')) {
+            return 'open_id' === $token->getFirewallName();
         }
 
         // Fallback: check PluginToken's providerKey

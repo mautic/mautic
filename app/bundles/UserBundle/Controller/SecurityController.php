@@ -47,8 +47,9 @@ final class SecurityController extends CommonController implements EventSubscrib
             return;
         }
 
-        // Don't redirect from oidcRequiredAction - users need to link their account there
-        if (str_contains($controller, 'oidcRequiredAction')) {
+        // Don't redirect from OIDC actions - oidcRequiredAction needs user to link account,
+        // oidcCheckAction needs to return 404 for direct access
+        if (str_contains($controller, 'oidcRequiredAction') || str_contains($controller, 'oidcCheckAction')) {
             return;
         }
 
@@ -159,7 +160,8 @@ final class SecurityController extends CommonController implements EventSubscrib
 
         try {
             $oidcClient = $clientFactory->create($clientCredentials);
-            if ($authenticatedRedirect = $oidcClient->authenticate()) {
+            $authenticatedRedirect = $oidcClient->authenticate();
+            if ($authenticatedRedirect) {
                 return $authenticatedRedirect;
             }
         } catch (\Mautic\UserBundle\Exception\OidcAuthorizationException $e) {
@@ -171,10 +173,14 @@ final class SecurityController extends CommonController implements EventSubscrib
 
     /**
      * OIDC login check action (handled by authenticator).
+     * This endpoint should only be reached when the authenticator processes the OIDC callback.
+     * Direct GET requests should return 404.
      */
-    public function oidcCheckAction(): void
+    public function oidcCheckAction(): Response
     {
-        // This method is intercepted by the security system
+        // This method should be intercepted by the authenticator
+        // If we reach here, it means the request was not handled by the authenticator
+        throw $this->createNotFoundException('This endpoint is handled by the OIDC authenticator.');
     }
 
     /**

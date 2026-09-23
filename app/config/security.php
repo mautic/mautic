@@ -165,6 +165,8 @@ $container->loadFromExtension(
             ['path' => '^/s/saml/login$', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
             ['path' => '^/saml/discovery$', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
             ['path' => '^/oauth/v2/authorize', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
+            // OIDC endpoints must be public for authentication to work
+            ['path' => '^/s/open_id/', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
             // Second should be URIs that are defined as non-public.
             ['path' => '^/api', 'roles' => AuthenticatedVoter::IS_AUTHENTICATED_FULLY],
             ['path' => '^/(s/|elfinder|efconnect)', 'roles' => AuthenticatedVoter::IS_AUTHENTICATED],
