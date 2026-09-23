@@ -36,11 +36,13 @@ class StagesChangeLog
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_name', type: 'string', length: 191)]
     private $eventName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'action_name', type: 'string', length: 191)]
     private $actionName;
 
     /**
@@ -53,14 +55,6 @@ class StagesChangeLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createField('eventName', 'string')
-            ->columnName('event_name')
-            ->build();
-
-        $builder->createField('actionName', 'string')
-            ->columnName('action_name')
-            ->build();
 
         $builder->addDateAdded();
     }

@@ -38,6 +38,7 @@ class CompanyLead
     /**
      * @var bool|null
      */
+    #[ORM\Column(name: 'is_primary', type: 'boolean', nullable: true)]
     private $primary = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -45,11 +46,6 @@ class CompanyLead
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addDateAdded();
-
-        $builder->createField('primary', 'boolean')
-            ->columnName('is_primary')
-            ->nullable()
-            ->build();
     }
 
     /**

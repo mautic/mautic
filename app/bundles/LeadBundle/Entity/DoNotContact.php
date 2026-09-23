@@ -57,16 +57,19 @@ class DoNotContact
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $reason = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $comments;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
     private $channelId;
@@ -79,17 +82,7 @@ class DoNotContact
 
         $builder->addDateAdded();
 
-        $builder->createField('reason', 'smallint')
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->build();
-
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
-
-        $builder->createField('comments', 'text')
-            ->nullable()
-            ->build();
     }
 
     /**
