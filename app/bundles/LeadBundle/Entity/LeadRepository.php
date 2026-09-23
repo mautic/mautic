@@ -238,9 +238,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         // Get entities
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->select('l')
-            ->from(Lead::class, 'l');
+        $q = $this->createQueryBuilder('l');
 
         $q->where(
             $q->expr()->in('l.id', ':ids')
@@ -554,7 +552,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $alias           = $this->getTableAlias();
         $select          = [$alias, 'u', $order];
-        $q               = $this->getEntityManager()->createQueryBuilder();
+        $q               = $this->createQueryBuilder($alias, $alias.'.id');
         $joinIpAddresses = $args['joinIpAddresses'] ?? true;
 
         if ($joinIpAddresses) {
@@ -562,7 +560,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $q->select($select)
-            ->from(Lead::class, $alias, $alias.'.id')
             ->leftJoin($alias.'.owner', 'u')
             ->indexBy($alias, $alias.'.id');
 

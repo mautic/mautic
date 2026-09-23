@@ -14,10 +14,8 @@ class PointRepository extends CommonRepository
 
     public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
+        $q = $this->createQueryBuilder($this->getTableAlias())
             ->select($this->getTableAlias().', cat')
-            ->from(Point::class, $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat')
             ->leftJoin($this->getTableAlias().'.group', 'pl');
 
