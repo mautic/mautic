@@ -23,17 +23,13 @@ class Scheduler
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createField('scheduleDate', Types::DATETIME_MUTABLE)
-            ->columnName('schedule_date')
-            ->nullable(false)
-            ->build();
     }
 
     public function __construct(
         #[ORM\ManyToOne(targetEntity: Report::class)]
         #[ORM\JoinColumn(name: 'report_id', nullable: false, onDelete: 'CASCADE')]
         private readonly Report $report,
+        #[ORM\Column(name: 'schedule_date', type: Types::DATETIME_MUTABLE)]
         private readonly \DateTimeInterface $scheduleDate,
     ) {
     }
