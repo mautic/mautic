@@ -6,6 +6,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
+use Mautic\CoreBundle\Event\SearchHelpEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -261,10 +262,14 @@ final class EmailController extends FormController
         }
         $session->set('mautic.email.page', $page);
 
+        $searchHelpEvent = new SearchHelpEvent('mautic.email.help.searchcommands', 'email');
+        $this->dispatcher->dispatch($searchHelpEvent);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'searchValue'    => $search,
+                    'searchHelp'     => $searchHelpEvent->getHelp(),
                     'filters'        => $listFilters,
                     'items'          => $emails,
                     'totalItems'     => $count,

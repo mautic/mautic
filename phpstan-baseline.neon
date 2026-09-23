@@ -3652,12 +3652,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: '#^Property Mautic\\EmailBundle\\Helper\\MailHelper\:\:\$lead \(array\|Mautic\\LeadBundle\\Entity\\Lead\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\PointEventHelper\:\:validateEmail\(\) has parameter \$eventDetails with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4515,7 +4509,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$response of method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:parseResponse\(\) expects GuzzleHttp\\Psr7\\Response, Psr\\Http\\Message\\ResponseInterface given\.$#'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: app/bundles/FormBundle/EventListener/FormSubscriber.php
 
 		-

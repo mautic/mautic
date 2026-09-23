@@ -98,7 +98,7 @@ class MailHelper
     protected $errors = [];
 
     /**
-     * @var array|Lead
+     * @var array<string, mixed>|null
      */
     protected $lead;
 
@@ -1169,7 +1169,7 @@ class MailHelper
     }
 
     /**
-     * @return array|Lead
+     * @return array<string, mixed>|null
      */
     public function getLead()
     {
@@ -1177,7 +1177,7 @@ class MailHelper
     }
 
     /**
-     * @param array|Lead $lead
+     * @param array<string, mixed> $lead
      */
     public function setLead($lead, $interalSend = false): void
     {
@@ -1913,9 +1913,9 @@ class MailHelper
     {
         return [
             'name'        => $name,
-            'leadId'      => (empty($this->lead)) ? null : $this->lead['id'],
-            'emailId'     => (empty($this->email)) ? null : $this->email->getId(),
-            'emailName'   => (empty($this->email)) ? null : $this->email->getName(),
+            'leadId'      => $this->lead['id'] ?? null,
+            'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
+            'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
             'hashId'      => $this->idHash,
             'hashIdState' => $this->idHashState,
             'source'      => $this->source,
@@ -2016,7 +2016,7 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend && null !== $emailToSend->getFromAddress()) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
@@ -2043,7 +2043,7 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set and global reply-to is not configured.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend && null !== $emailToSend->getFromAddress()) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
