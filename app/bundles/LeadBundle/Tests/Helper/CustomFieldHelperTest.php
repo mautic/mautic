@@ -193,7 +193,7 @@ final class CustomFieldHelperTest extends TestCase
         $this->assertEquals('2023-05-20 00:00:00', $result, 'FieldValueTransformer was not able to transform time field properly');
     }
 
-    public function testFieldValueTransformerUsesTimezoneConversion(): void
+    public function testFieldValueTransformerKeepsDateAndTimeFieldsInLocalTimezone(): void
     {
         $originalTimezone             = date_default_timezone_get();
         $reflection                   = new \ReflectionClass(DateTimeHelper::class);
@@ -213,38 +213,21 @@ final class CustomFieldHelperTest extends TestCase
             $field  = ['type' => 'date'];
             $value  = '2025-01-24 00:30:00';
             $result = CustomFieldHelper::fieldValueTransfomer($field, $value);
-            $this->assertEquals('2025-01-23', $result, 'Date was not converted from Etc/GMT-2 to UTC correctly');
+            $this->assertEquals('2025-01-24', $result, 'Date was not kept in Etc/GMT-2 correctly');
+
+            $field  = ['type' => 'time'];
+            $value  = '2025-01-24 00:30:00';
+            $result = CustomFieldHelper::fieldValueTransfomer($field, $value);
+            $this->assertEquals('00:30:00', $result, 'Time was not kept in Etc/GMT-2 correctly');
 
             $field  = ['type' => 'date'];
             $value  = '2025-01-24';
             $result = CustomFieldHelper::fieldValueTransfomer($field, $value);
-            // Date strings without a time component are parsed using PHP's default timezone (UTC here),
-            // so the date remains unchanged.
-            $this->assertEquals('2025-01-24', $result, 'Date was not converted from Etc/GMT-2 to UTC correctly');
+            $this->assertEquals('2025-01-24', $result, 'Date was not kept in Etc/GMT-2 correctly');
         } finally {
             $property->setValue(null, $originalDefaultLocalTimezone);
             date_default_timezone_set($originalTimezone);
         }
     }
 
-    public function testFieldValueTransformerPreservesLocalDateForCampaignComparison(): void
-    {
-        $originalTimezone             = date_default_timezone_get();
-        $reflection                   = new \ReflectionClass(DateTimeHelper::class);
-        $property                     = $reflection->getProperty('defaultLocalTimezone');
-        $originalDefaultLocalTimezone = $property->getValue();
-
-        $property->setValue(null, 'Etc/GMT-2');
-        date_default_timezone_set('UTC');
-
-        try {
-            $field = ['type' => 'date'];
-            $value = '2025-01-24 00:30:00';
-
-            $this->assertSame('2025-01-24', CustomFieldHelper::fieldValueTransfomer($field, $value, null, true));
-        } finally {
-            $property->setValue(null, $originalDefaultLocalTimezone);
-            date_default_timezone_set($originalTimezone);
-        }
-    }
 }
