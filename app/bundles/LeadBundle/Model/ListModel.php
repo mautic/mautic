@@ -724,8 +724,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 );
             }
 
+            $isAlreadyCounted = false;
+
             if (null != $listLead) {
-                if ($manuallyAdded && $listLead->wasManuallyRemoved()) {
+                if ($manuallyAdded && ($listLead->wasManuallyRemoved() || !$listLead->wasManuallyAdded())) {
+                    $isAlreadyCounted = !$listLead->wasManuallyRemoved();
                     $listLead->setManuallyRemoved(false);
                     $listLead->setManuallyAdded($manuallyAdded);
 
@@ -746,6 +749,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
                 $persistLists[]   = $listLead;
                 $dispatchEvents[] = $listId;
+            }
+
+            if ($isAlreadyCounted) {
+                continue;
             }
 
             if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
