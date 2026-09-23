@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
-use Psr\Http\Message\ResponseInterface;
 
 final class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    private ?ResponseInterface $response = null;
-
     public function __construct(
         UnifiedIntegrationInterface $integration,
         private readonly string $url,
@@ -51,20 +48,6 @@ final class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
     public function getAuthType(): string
     {
         return $this->authType;
-    }
-
-    public function setResponse(ResponseInterface $response): void
-    {
-        $this->response = $response;
-    }
-
-    public function getResponse(): ResponseInterface
-    {
-        if (null === $this->response) {
-            throw new \LogicException('Response has not been set on the event yet.');
-        }
-
-        return $this->response;
     }
 
     public function getHeaders(): array
