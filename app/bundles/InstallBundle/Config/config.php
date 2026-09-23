@@ -22,7 +22,7 @@ return [
             ],
             'mautic_installer_remove_slash' => [
                 'path'       => '/installer/',
-                'controller' => 'Mautic\CoreBundle\Controller\CommonController::removeTrailingSlashAction',
+                'controller' => 'Mautic\CoreBundle\Controller\TrailingSlashController::removeTrailingSlashAction',
             ],
             'mautic_installer_catchcall' => [
                 'path'         => '/installer/{noerror}',

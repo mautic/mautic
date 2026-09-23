@@ -15,7 +15,7 @@ return [
             ],
             'mautic_remove_trailing_slash' => [
                 'path'         => '/{url}',
-                'controller'   => 'Mautic\CoreBundle\Controller\CommonController::removeTrailingSlashAction',
+                'controller'   => 'Mautic\CoreBundle\Controller\TrailingSlashController::removeTrailingSlashAction',
                 'requirements' => [
                     'url' => '.*/$',
                 ],
