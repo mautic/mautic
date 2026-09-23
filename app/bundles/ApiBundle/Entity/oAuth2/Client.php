@@ -203,7 +203,7 @@ class Client extends BaseClient
         return $this;
     }
 
-    public function getRole(): Role
+    public function getRole(): ?Role
     {
         return $this->role;
     }

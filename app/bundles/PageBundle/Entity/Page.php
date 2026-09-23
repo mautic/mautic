@@ -770,12 +770,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->isCloned;
     }
 
-    public function getCloneObjectId(): int
+    public function getCloneObjectId(): ?int
     {
         return $this->cloneObjectId;
     }
 
-    public function getPublicPreview(): bool
+    public function getPublicPreview(): ?bool
     {
         return $this->publicPreview;
     }
