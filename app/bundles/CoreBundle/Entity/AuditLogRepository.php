@@ -178,10 +178,7 @@ class AuditLogRepository extends CommonRepository
         return $query->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadIpLogs(?Lead $lead = null, array $options = [])
+    public function getLeadIpLogs(?Lead $lead = null, array $options = []): array
     {
         $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sqb = $this->getEntityManager()->getConnection()->createQueryBuilder();

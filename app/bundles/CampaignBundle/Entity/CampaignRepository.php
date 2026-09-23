@@ -21,7 +21,7 @@ class CampaignRepository extends CommonRepository
     use ReplicaConnectionTrait;
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().', cat')

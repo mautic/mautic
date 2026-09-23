@@ -687,7 +687,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadsByIp(string $ip)
+    public function getLeadsByIp(string $ip): array
     {
         return $this->getRepository()->getLeadsByIp($ip);
     }
@@ -780,10 +780,8 @@ class LeadModel extends FormModel
 
     /**
      * Returns flat array for single lead.
-     *
-     * @return array
      */
-    public function getLead(int $leadId)
+    public function getLead(int $leadId): array
     {
         return $this->getRepository()->getLead($leadId);
     }
@@ -836,7 +834,7 @@ class LeadModel extends FormModel
         if (count($uniqueFieldData)) {
             $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData);
 
-            if (!empty($existingLeads)) {
+            if ($existingLeads !== []) {
                 $this->logger->debug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
                 $lead = $existingLeads[0];
             }
@@ -847,10 +845,8 @@ class LeadModel extends FormModel
 
     /**
      * Get a list of segments this lead belongs to.
-     *
-     * @return mixed
      */
-    public function getLists(Lead $lead, bool $forLists = false, bool $arrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false)
+    public function getLists(Lead $lead, bool $forLists = false, bool $arrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {
         return $this->leadListRepository->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
@@ -2238,7 +2234,7 @@ class LeadModel extends FormModel
 
         if (!$newPrimaryCompany) {
             $latestCompany = $this->companyLeadRepository->getLatestCompanyForLead($leadId);
-            if (!empty($latestCompany)) {
+            if ($latestCompany !== []) {
                 $lead->addUpdatedField('company', $latestCompany['companyname'])
                     ->setDateModified(new \DateTime());
             }

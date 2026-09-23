@@ -15,7 +15,7 @@ class LeadDeviceRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
@@ -30,10 +30,7 @@ class LeadDeviceRepository extends CommonRepository
         return 'd';
     }
 
-    /**
-     * @return array
-     */
-    public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)
+    public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null): array
     {
         $selectQuery = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $selectQuery->select('es.id as id, es.device as device')
@@ -113,10 +110,8 @@ class LeadDeviceRepository extends CommonRepository
 
     /**
      * @param string $trackingId
-     *
-     * @return LeadDevice|null
      */
-    public function getByTrackingId($trackingId)
+    public function getByTrackingId($trackingId): ?LeadDevice
     {
         /** @var LeadDevice $leadDevice */
         $leadDevice = $this->findOneBy([

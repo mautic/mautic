@@ -543,7 +543,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     {
         $formId = ($form instanceof Form) ? $form->getId() : $form;
 
-        return $this->getRepository()->findByFormId($formId);
+        return $this->campaignRepository->findByFormId($formId);
     }
 
     /**

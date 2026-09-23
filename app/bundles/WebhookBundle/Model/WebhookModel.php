@@ -514,7 +514,7 @@ class WebhookModel extends FormModel
      *
      * @return iterable<object>
      */
-    public function getWebhookQueues(Webhook $webhook)
+    public function getWebhookQueues(Webhook $webhook): iterable
     {
         $webhookRetryTime = new \DateTimeImmutable()
             ->modify(sprintf('-%d seconds', $this->webhookRetryDelay))

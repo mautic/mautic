@@ -3,7 +3,6 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -66,12 +65,7 @@ class UserRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * Get a list of users.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('u')

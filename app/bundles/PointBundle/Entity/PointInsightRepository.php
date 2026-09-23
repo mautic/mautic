@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 final class PointInsightRepository extends CommonRepository
 {
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->getEntityManager()
             ->createQueryBuilder()

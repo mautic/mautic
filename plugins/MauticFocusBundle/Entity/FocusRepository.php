@@ -21,7 +21,7 @@ class FocusRepository extends CommonRepository
         );
     }
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $alias = $this->getTableAlias();
 

@@ -21,7 +21,7 @@ class EventRepository extends CommonRepository
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator<object>|object[]|mixed[]
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $select = 'e';
         $q      = $this

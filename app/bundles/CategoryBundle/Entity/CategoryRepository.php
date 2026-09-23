@@ -15,7 +15,7 @@ class CategoryRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('c')
@@ -140,10 +140,8 @@ class CategoryRepository extends CommonRepository
      * @param string $bundle
      * @param string $alias
      * @param object $entity
-     *
-     * @return mixed
      */
-    public function checkUniqueCategoryAlias($bundle, $alias, $entity = null)
+    public function checkUniqueCategoryAlias($bundle, $alias, $entity = null): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as aliascount')

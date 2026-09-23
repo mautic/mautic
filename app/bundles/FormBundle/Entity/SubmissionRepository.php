@@ -45,7 +45,10 @@ class SubmissionRepository extends CommonRepository
         }
     }
 
-    public function getEntities(array $args = [])
+    /**
+     * @param array<string, mixed> $args
+     */
+    public function getEntities(array $args = []): array
     {
         $form = $args['form'];
 
@@ -274,12 +277,10 @@ class SubmissionRepository extends CommonRepository
      *
      * @param array<string, mixed> $options
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getSubmissions(array $options = [])
+    public function getSubmissions(array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted", fs.lead_id')

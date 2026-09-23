@@ -125,10 +125,8 @@ class LeadListRepository extends CommonRepository
      * Get lists for a specific lead.
      *
      * @param int|Lead[] $lead Lead ID or array of Leads
-     *
-     * @return mixed
      */
-    public function getLeadLists($lead, bool $forList = false, bool $singleArrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false)
+    public function getLeadLists($lead, bool $forList = false, bool $singleArrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {
         if (is_array($lead)) {
             $q = $this->getEntityManager()->createQueryBuilder()

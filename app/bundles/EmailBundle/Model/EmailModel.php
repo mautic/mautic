@@ -637,10 +637,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $data;
     }
 
-    /**
-     * @return Stat|null
-     */
-    public function getEmailStatus(string $idHash)
+    public function getEmailStatus(string $idHash): ?\Mautic\EmailBundle\Entity\Stat
     {
         return $this->statRepository->getEmailStatus($idHash);
     }
@@ -962,8 +959,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param int   $maxContactId    Filter by max contact ID
      * @param bool  $countWithMaxMin Add min_id and max_id info to the count result
      * @param bool  $storeToCache    Whether to store the result to the cache
-     *
-     * @return int|array
      */
     public function getPendingLeads(
         Email $email,
@@ -977,7 +972,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         bool $storeToCache = true,
         ?int $maxThreads = null,
         ?int $threadId = null,
-    ) {
+    ): int|array {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
 
         $total      = $this->emailRepository->getEmailPendingLeads(

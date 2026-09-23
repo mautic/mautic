@@ -61,10 +61,8 @@ class HitRepository extends CommonRepository
      *
      * @param int|null             $leadId
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getLeadHits($leadId = null, array $options = [])
+    public function getLeadHits($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -149,10 +147,7 @@ class HitRepository extends CommonRepository
         return count($results);
     }
 
-    /**
-     * @return int
-     */
-    public function countEmailClickthrough()
+    public function countEmailClickthrough(): int
     {
         $q = $this->createQueryBuilder('h');
         $q->select('COUNT(h.email) as clicks');

@@ -14,7 +14,7 @@ class PageRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $select = ['p'];
 
@@ -39,10 +39,8 @@ class PageRepository extends CommonRepository
 
     /**
      * @param string $alias
-     *
-     * @return mixed
      */
-    public function checkPageUniqueAlias($alias, $ignoreIds = [])
+    public function checkPageUniqueAlias($alias, $ignoreIds = []): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as alias_count')

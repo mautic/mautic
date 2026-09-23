@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -38,11 +39,12 @@ final readonly class PageSubscriber implements EventSubscriberInterface
             // Check for an email stat
             $clickthrough = $event->getClickthroughData();
 
+            $stat = null;
             if (isset($clickthrough['stat'])) {
                 $stat = $this->emailModel->getEmailStatus($clickthrough['stat']);
             }
 
-            if (empty($stat)) {
+            if (! $stat instanceof Stat) {
                 if ($lead = $hit->getLead()) {
                     // Try searching by email and lead IDs
                     $stats = $this->emailModel->getEmailStati($hit->getSourceId(), $lead->getId());
