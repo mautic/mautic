@@ -231,4 +231,60 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         return $user;
     }
+
+    /**
+     * The recent-activity panel rendered on the user edit page (recent_activity.html.twig)
+     * builds `userPath`/`rolePath` by matching an audit-log row's details against the
+     * currently loaded users/roles. When the referenced user or role no longer exists
+     * (deleted), no match is found and the path array stays empty/undefined. Pre-fix,
+     * the template accessed `userPath[0]`/`rolePath[0]` unconditionally and threw a Twig
+     * RuntimeError ("Key \"0\" does not exist as the sequence/mapping is empty"). This
+     * asserts GET /s/users/edit/{id} renders successfully instead of returning a 500.
+     *
+     * AuditLogRepository::getLogsForUser() filters on `bundle = 'user'` AND
+     * `userId = :user_id` (the acting user, not objectId), so the log's userId must be
+     * the edited user's own id for it to appear in this panel at all.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataAuditLogObjectTypes')]
+    public function testEditActionDoesNotCrashWhenAuditLogReferencesDeletedEntity(string $auditLogObject): void
+    {
+        $role = new Role();
+        $role->setName('Audit Log Test Role');
+        $role->setIsAdmin(false);
+        $this->em->persist($role);
+
+        $user = $this->userSetter($role);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        // A nonexistent id stands in for a user/role that has since been deleted. The
+        // template never reads objectId directly (it matches on `details` against the
+        // currently loaded users/roles), but this documents the scenario under test.
+        $deletedEntityId = 999999;
+
+        $auditLog = $this->auditLogSetter(
+            $user->getId(),
+            $user->getUsername(),
+            'user',
+            $auditLogObject,
+            $deletedEntityId,
+            'update',
+            ['lastLogin' => ['2024-01-01 00:00:00', '2024-02-22 10:30:00']]
+        );
+        $this->em->persist($auditLog);
+        $this->em->flush();
+
+        $this->client->request('GET', '/s/users/edit/'.$user->getId());
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    /**
+     * @return iterable<string, array{0: string}>
+     */
+    public static function dataAuditLogObjectTypes(): iterable
+    {
+        yield 'deleted user reference' => ['user'];
+        yield 'deleted role reference' => ['role'];
+    }
 }
