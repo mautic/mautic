@@ -15,9 +15,6 @@ trait PushToIntegrationTrait
 {
     protected IntegrationHelper $integrationHelper;
 
-    /**
-     * Used by methodCalls to event subscribers.
-     */
     #[Required]
     public function autowirePushToIntegrationTrait(
         IntegrationHelper $integrationHelper,

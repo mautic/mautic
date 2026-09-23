@@ -50,7 +50,7 @@ final class IntegrationEntityModel extends FormModel
     /**
      * @return array<mixed, array<'id', mixed>>
      */
-    public function getRecordList($integrationObject): array
+    public function getRecordList(IntegrationObject $integrationObject): array
     {
         $recordList = [];
 

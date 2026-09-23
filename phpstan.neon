@@ -14,7 +14,8 @@ parameters:
     tmpDir: ./var/phpstan-cache
     level: 6
 
-    # reportUnmatchedIgnoredErrors: false
+    reportUnmatchedIgnoredErrors: false
+    errorFormat: symplify
 
     symplify:
         mocks: false
@@ -73,6 +74,7 @@ parameters:
         # handled in https://github.com/mautic/mautic/pull/17503
         - identifier: doctrine.noGetRepositoryOutsideService
         - identifier: doctrine.requireQueryBuilderOnRepository
+        - identifier: argument.count
 
         # will be handled by another PR
         - identifier: symfony.singleArgEventDispatch
@@ -255,17 +257,12 @@ parameters:
 rules:
     - Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
     - Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
-    - Symplify\PHPStanRules\Rules\Doctrine\NoStringTargetEntityRule
     - Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
     - Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
     - Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
     - Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
-    - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
-    - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
-    - Symplify\PHPStanRules\Rules\Symfony\NoNullableServiceInConstructorRule
     - Utils\PHPStan\Rule\NoGetRepositoryWithEntityRule
     - Utils\PHPStan\Rule\NoContainerGetRule
-    - Symplify\PHPStanRules\Rules\Symfony\PreferInterfaceInConstructorRule
     - Symplify\PHPStanRules\Rules\Complexity\NoPropertyToPropertyAssignRule
     - Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
@@ -275,16 +272,11 @@ rules:
     - Utils\PHPStan\Rule\NoServiceInMethodParameterRule
     - Utils\PHPStan\Rule\NoUnusedServiceAliasRule
     - Utils\PHPStan\Rule\NoParentConstructorForwardingRule
-    - Symplify\PHPStanRules\Rules\Symfony\NoServiceJugglingRule
     - Utils\PHPStan\Rule\NoUnusedServiceNameRule
     - Utils\PHPStan\Rule\NoClassNameServiceAliasRule
     - Utils\PHPStan\Rule\NoAlreadyLoadedServiceSetRule
-    - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoAutoconfiguredServiceTagRule
-    - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\PreferClassServiceReferenceRule
     - Utils\PHPStan\Rule\NoRedundantAutowiredServiceArgumentRule
-    - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoServiceSetterCallRule
     - Utils\PHPStan\Rule\NoServiceGetterRule
-    - Symplify\PHPStanRules\Rules\Doctrine\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
     - Symplify\PHPStanRules\Rules\RequireArrayShapeReturnRule

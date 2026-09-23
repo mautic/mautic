@@ -21,7 +21,7 @@ final class TestablePeakInteractionTimer extends PeakInteractionTimer
 {
     private \DateTime $testTime;
 
-    public function setCurrentDateTime(\DateTime $dateTime): void
+    public function __construct(\DateTime $dateTime)
     {
         $this->testTime = $dateTime;
     }
