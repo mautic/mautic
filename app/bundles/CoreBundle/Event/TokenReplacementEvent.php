@@ -41,9 +41,9 @@ class TokenReplacementEvent extends CommonEvent
         $this->content      = $content;
     }
 
-    public function getContent(): string|array
+    public function getContent(): string|array|null
     {
-        return $this->content ?? '';
+        return $this->content;
     }
 
     public function setContent(string $content): void
