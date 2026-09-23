@@ -260,6 +260,9 @@
       "symfony/form": {
         "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/symfony-form-spl-object-id.patch"
       },
+      "symfony/http-client": {
+        "PHP8.6+ Fix CURLOPT_WRITEFUNCTION set from callback": "patches/symfony-http-client-curl-writefunction-from-callback.patch"
+      },      
       "symfony/validator": {
         "PHP 8.6+ replace deprecated spl_object_hash() with spl_object_id()": "patches/symfony-validator-spl-object-id.patch"
       }
