@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 
 final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
@@ -77,7 +76,7 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLeadsByFieldValueArrayMapReturn(): void
     {
-        /** @var MockObject&LeadRepository */
+        /** @var MockObject&LeadRepository $repository */
         $repository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getEntities', 'buildQueryForGetLeadsByFieldValue'])
@@ -130,10 +129,7 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
             true
         );
 
-        Assert::assertSame(
-            'SELECT * FROM '.MAUTIC_TABLE_PREFIX.'table_a INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_b alias_b ON condition_b INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_c alias_c ON condition_c GROUP BY l.id',
-            $queryBuilder->getSQL()
-        );
+        $this->assertSame('SELECT * FROM '.MAUTIC_TABLE_PREFIX.'table_a INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_b alias_b ON condition_b INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_c alias_c ON condition_c GROUP BY l.id', $queryBuilder->getSQL());
     }
 
     public function testGetContactIdsByEmails(): void
@@ -163,10 +159,7 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('createQuery')
             ->willReturn($query);
 
-        self::assertSame(
-            [1, 2],
-            $this->repository->getContactIdsByEmails($emails)
-        );
+        $this->assertSame([1, 2], $this->repository->getContactIdsByEmails($emails));
     }
 
     public function testGetUniqueIdentifiersOperator(): void

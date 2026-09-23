@@ -18,8 +18,10 @@ final class QueueEvent extends Event
      * @param array<int, Lead>     $contacts
      * @param array<string, mixed> $options
      */
-    public function __construct(private array $contacts, private readonly array $options)
-    {
+    public function __construct(
+        private array $contacts,
+        private readonly array $options,
+    ) {
     }
 
     /**
@@ -48,7 +50,7 @@ final class QueueEvent extends Event
 
     public function queueContact(int $id): void
     {
-        array_push($this->queued, $id);
+        $this->queued[] = $id;
         unset($this->contacts[$id]);
     }
 

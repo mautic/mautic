@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class IntegrationSyncSettingsType extends AbstractType
+final class IntegrationSyncSettingsType extends AbstractType
 {
     /**
      * @throws IntegrationNotFoundException

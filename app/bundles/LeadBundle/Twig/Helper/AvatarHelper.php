@@ -88,8 +88,6 @@ final class AvatarHelper
     }
 
     /**
-     * Get avatar path.
-     *
      * @param bool $absolute
      */
     public function getAvatarPath($absolute = false): string

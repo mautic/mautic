@@ -340,7 +340,7 @@ final class CompanyObjectSubscriberTest extends TestCase
             ->with(1)
             ->willReturn($companyObj);
         $this->subscriber->findCompanyById($event);
-        self::assertSame($companyObj, $event->getEntity());
+        $this->assertSame($companyObj, $event->getEntity());
     }
 
     public function testFindCompanyByIdWithNoIdSet(): void
@@ -349,7 +349,7 @@ final class CompanyObjectSubscriberTest extends TestCase
         $this->companyObjectHelper->expects($this->never())
             ->method('findObjectById');
         $this->subscriber->findCompanyById($event);
-        self::assertNull($event->getEntity());
+        $this->assertNull($event->getEntity());
     }
 
     public function testFindCompanyByIdWithNoCompany(): void
@@ -361,6 +361,6 @@ final class CompanyObjectSubscriberTest extends TestCase
             ->with(1)
             ->willReturn(null);
         $this->subscriber->findCompanyById($event);
-        self::assertNull($event->getEntity());
+        $this->assertNull($event->getEntity());
     }
 }

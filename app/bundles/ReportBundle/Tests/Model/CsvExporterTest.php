@@ -40,7 +40,7 @@ final class CsvExporterTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->with('mautic.report.report.groupby.totals')
             ->willReturn('Totals');

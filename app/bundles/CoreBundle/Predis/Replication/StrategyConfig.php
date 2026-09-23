@@ -16,7 +16,7 @@ final readonly class StrategyConfig
      */
     public static function fromArray(array $options): self
     {
-        return new StrategyConfig($options['primaryOnly'] ?? false);
+        return new self($options['primaryOnly'] ?? false);
     }
 
     /**

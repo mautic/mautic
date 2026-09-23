@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Crate;
 
 use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileFieldCrate
+final readonly class FileFieldCrate
 {
     public function __construct(
-        private readonly UploadedFile $uploadedFile,
-        private readonly Field $field,
+        private UploadedFile $uploadedFile,
+        private Field $field,
     ) {
     }
 

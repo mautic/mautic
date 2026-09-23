@@ -123,7 +123,7 @@ class FrequencyRuleRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->select("ch.$statContactColumn, fr.frequency_number, fr.frequency_time")
+        $q->select("ch.{$statContactColumn}, fr.frequency_number, fr.frequency_time")
             ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
             ->join('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.{$statContactColumn} = fr.lead_id");
 
@@ -150,13 +150,13 @@ class FrequencyRuleRepository extends CommonRepository
         );
 
         $q->andWhere(
-            $q->expr()->in("ch.$statContactColumn", ':ids')
+            $q->expr()->in("ch.{$statContactColumn}", ':ids')
         )
         ->setParameter('ids', $leadIds, ArrayParameterType::INTEGER);
 
-        $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_number");
+        $q->groupBy("ch.{$statContactColumn}, fr.frequency_time, fr.frequency_number");
 
-        $q->having("count(ch.$statContactColumn) >= fr.frequency_number");
+        $q->having("count(ch.{$statContactColumn}) >= fr.frequency_number");
 
         return $q->executeQuery()->fetchAllAssociative();
     }
@@ -178,7 +178,7 @@ class FrequencyRuleRepository extends CommonRepository
     ): array {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $query->select("ch.$statContactColumn")
+        $query->select("ch.{$statContactColumn}")
             ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch');
 
         if (Stat::TABLE_NAME === $statTable) {
@@ -204,7 +204,7 @@ class FrequencyRuleRepository extends CommonRepository
             ->setParameter('frequencyTime', $since->format('Y-m-d H:i:s'));
 
         $query->andWhere(
-            $query->expr()->in("ch.$statContactColumn", ':ids')
+            $query->expr()->in("ch.{$statContactColumn}", ':ids')
         )
             ->setParameter('ids', $leadIds, ArrayParameterType::INTEGER);
 
@@ -222,9 +222,9 @@ class FrequencyRuleRepository extends CommonRepository
             );
         }
 
-        $query->groupBy("ch.$statContactColumn");
+        $query->groupBy("ch.{$statContactColumn}");
 
-        $query->having("count(ch.$statContactColumn) >= :defaultNumber")
+        $query->having("count(ch.{$statContactColumn}) >= :defaultNumber")
             ->setParameter('defaultNumber', $defaultFrequencyNumber);
 
         $results = $query->executeQuery()->fetchAllAssociative();

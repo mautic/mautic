@@ -10,8 +10,10 @@ class PluginIsPublishedEvent extends \Symfony\Contracts\EventDispatcher\Event
 
     private bool $canPublish = true;
 
-    public function __construct(private readonly int $value, private readonly string $integrationName)
-    {
+    public function __construct(
+        private readonly int $value,
+        private readonly string $integrationName,
+    ) {
     }
 
     public function getValue(): int

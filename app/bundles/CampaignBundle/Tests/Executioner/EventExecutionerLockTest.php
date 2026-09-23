@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\LoggerTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\LeadEvents;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class EventExecutionerLockTest extends MauticMysqlTestCase
@@ -31,10 +30,12 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
     protected function setUp(): void // @phpstan-ignore phpunit.callParent
     {
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+
         $this->loggerTraitSetup();
 
-        $this->eventExecutioner = self::getContainer()->get('mautic.campaign.event_executioner');
-        $this->eventDispatcher  = self::getContainer()->get('event_dispatcher');
+        $this->eventExecutioner = self::getContainer()->get(EventExecutioner::class);
+        $this->eventDispatcher  = self::getContainer()->get(EventDispatcherInterface::class);
     }
 
     public function testLogsAreSkippedWhenAlreadyExecuted(): void
@@ -43,24 +44,48 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $contact  = $this->createContact();
         $this->em->flush();
 
-        Assert::assertSame(0, $contact->getPoints());
+        $this->assertSame(0, $contact->getPoints());
 
         $contacts = new ArrayCollection([$contact->getId() => $contact]);
         $this->eventExecutioner->executeForContacts($event, $contacts);
-        Assert::assertSame(self::ADD_POINTS, $contact->getPoints(), 'Points should be added.');
+        $this->assertSame(self::ADD_POINTS, $contact->getPoints(), 'Points should be added.');
 
         $logs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(1, $logs);
+        $this->assertCount(1, $logs);
 
         $log = reset($logs);
         $this->assertInstanceOf(LeadEventLog::class, $log);
-        Assert::assertSame(2, $log->getVersion(), 'Version should be incremented.');
+        $this->assertSame(2, $log->getVersion(), 'Version should be incremented.');
 
         $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
-        Assert::assertSame(self::ADD_POINTS, $contact->getPoints(),  // @phpstan-ignore argument.unresolvableType
-            'Points should not be added as the log has been executed already.');
-        Assert::assertTrue($this->testHandler->hasErrorThatContains(sprintf(
+        $this->assertSame(self::ADD_POINTS, $contact->getPoints(), 'Points should not be added as the log has been executed already.');
+        $this->assertTrue($this->testHandler->hasErrorThatContains(sprintf(
             'Campaign event log ID "%s" was skipped as it had been executed already.',
+            $log->getId(),
+        )), 'There should be an error log regarding the skipped log.');
+    }
+
+    public function testConditionLogsAreSkippedWhenAlreadyExecuted(): void
+    {
+        $event    = $this->createConditionEvent($this->createCampaign());
+        $contact  = $this->createContact();
+        $this->em->flush();
+
+        $this->assertSame(0, $contact->getPoints());
+
+        $contacts = new ArrayCollection([$contact->getId() => $contact]);
+        $this->eventExecutioner->executeForContacts($event, $contacts);
+
+        $logs = $this->em->getRepository(LeadEventLog::class)->findAll();
+        $this->assertCount(1, $logs);
+
+        $log = reset($logs);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
+        $this->assertSame(2, $log->getVersion(), 'Version should be incremented.');
+
+        $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
+        $this->assertTrue($this->testHandler->hasErrorThatContains(sprintf(
+            'Campaign condition event log ID "%s" was skipped as it had been executed already.',
             $log->getId(),
         )), 'There should be an error log regarding the skipped log.');
     }
@@ -71,26 +96,24 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $contact  = $this->createContact();
         $this->em->flush();
 
-        Assert::assertSame(0, $contact->getPoints());
+        $this->assertSame(0, $contact->getPoints());
 
         $listener = $this->makeEventExecutionFail();
         $contacts = new ArrayCollection([$contact->getId() => $contact]);
         $this->eventExecutioner->executeForContacts($event, $contacts);
-        Assert::assertSame(0, $contact->getPoints(),
-            'Points should not be added as the execution failed.');
+        $this->assertSame(0, $contact->getPoints(), 'Points should not be added as the execution failed.');
 
         $logs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(1, $logs);
+        $this->assertCount(1, $logs);
 
         $log = reset($logs);
         $this->assertInstanceOf(LeadEventLog::class, $log);
-        Assert::assertSame(1, $log->getVersion(), 'Version should be reset when execution failed.');
+        $this->assertSame(1, $log->getVersion(), 'Version should be reset when execution failed.');
 
         $this->makeEventExecutionPass($listener);
         $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
-        Assert::assertSame(self::ADD_POINTS, $contact->getPoints(),
-            'Points should be added as the log\'s version has been reset when execution failed.');
-        Assert::assertFalse($this->testHandler->hasWarningThatContains(sprintf(
+        $this->assertSame(self::ADD_POINTS, $contact->getPoints(), 'Points should be added as the log\'s version has been reset when execution failed.');
+        $this->assertFalse($this->testHandler->hasWarningThatContains(sprintf(
             'Campaign event log ID "%s" was skipped as it had been executed already.',
             $log->getId(),
         )), 'There should not be any warning log regarding skipped logs.');
@@ -113,6 +136,23 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $event->setType('lead.changepoints');
         $event->setEventType('action');
         $event->setProperties(['points' => self::ADD_POINTS]);
+        $this->em->persist($event);
+
+        return $event;
+    }
+
+    private function createConditionEvent(Campaign $campaign): Event
+    {
+        $event = new Event();
+        $event->setCampaign($campaign);
+        $event->setName('Contact Field Condition');
+        $event->setType('lead.field_value');
+        $event->setEventType('condition');
+        $event->setProperties([
+            'field'    => 'points',
+            'operator' => 'gt',
+            'value'    => '4',
+        ]);
         $this->em->persist($event);
 
         return $event;

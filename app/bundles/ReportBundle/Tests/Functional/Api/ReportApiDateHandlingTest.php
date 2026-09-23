@@ -75,17 +75,17 @@ final class ReportApiDateHandlingTest extends MauticMysqlTestCase
         $responseData = json_decode($response->getContent(), true);
 
         // Verify report structure
-        Assert::assertArrayHasKey('report', $responseData);
-        Assert::assertArrayHasKey('data', $responseData);
-        Assert::assertArrayHasKey('totalResults', $responseData);
-        Assert::assertArrayHasKey('dateFrom', $responseData);
-        Assert::assertArrayHasKey('dateTo', $responseData);
+        $this->assertArrayHasKey('report', $responseData);
+        $this->assertArrayHasKey('data', $responseData);
+        $this->assertArrayHasKey('totalResults', $responseData);
+        $this->assertArrayHasKey('dateFrom', $responseData);
+        $this->assertArrayHasKey('dateTo', $responseData);
 
         // The key assertion: verify that only submissions within the time range are included
         // Given the dateFrom=2025-08-15T06:14:10 and dateTo=2025-08-15T07:13:23
         // Only submission1 (06:30:00) and submission2 (07:00:00) should be included
-        Assert::assertEquals(2, $responseData['totalResults'], 'Should return exactly 2 submissions within the date range');
-        Assert::assertCount(2, $responseData['data'], 'Data array should contain exactly 2 records');
+        $this->assertEquals(2, $responseData['totalResults'], 'Should return exactly 2 submissions within the date range');
+        $this->assertCount(2, $responseData['data'], 'Data array should contain exactly 2 records');
 
         // Now test that UI still show records for the whole day.
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$this->report->getId()}");
@@ -128,7 +128,7 @@ final class ReportApiDateHandlingTest extends MauticMysqlTestCase
         $responseData = json_decode($response->getContent(), true);
 
         // The submission at 14:30 UTC should be included in the range 10:00-16:00 NY time (14:00-20:00 UTC)
-        Assert::assertEquals(1, $responseData['totalResults'], 'Should include submission within timezone-converted range');
+        $this->assertEquals(1, $responseData['totalResults'], 'Should include submission within timezone-converted range');
     }
 
     public function testApiReportWithoutTime(): void
@@ -149,7 +149,7 @@ final class ReportApiDateHandlingTest extends MauticMysqlTestCase
         $responseData = json_decode($response->getContent(), true);
 
         // 1 submission should be included in the results as we consider dateFrom time as 00:00:00 and dateTo time as 23:59:59 UTC if not set.
-        Assert::assertEquals(1, $responseData['totalResults'], 'Should include submission within timezone-converted range');
+        $this->assertEquals(1, $responseData['totalResults'], 'Should include submission within timezone-converted range');
     }
 
     private function createSubmission(\DateTime $dateSubmitted): Submission

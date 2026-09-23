@@ -49,13 +49,10 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        self::assertSame(
-            [
-                CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
-                CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
-            ],
-            CampaignSubscriber::getSubscribedEvents()
-        );
+        $this->assertSame([
+            CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
+            CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
+        ], CampaignSubscriber::getSubscribedEvents());
     }
 
     public function testOnCampaignPostSaveNothingHappened(): void

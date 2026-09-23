@@ -145,7 +145,7 @@ class PartialObjectReportBuilder
                 }
             }
 
-            if ($missingFields) {
+            if ([] !== $missingFields) {
                 $this->objectsWithMissingFields[$syncObject->getObjectId()] = $missingFields;
             }
         }

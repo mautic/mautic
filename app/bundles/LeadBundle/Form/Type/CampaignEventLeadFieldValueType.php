@@ -4,8 +4,8 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\AbstractType;
@@ -20,12 +20,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadFieldValueType extends AbstractType
+final class CampaignEventLeadFieldValueType extends AbstractType
 {
     public function __construct(
-        protected Translator $translator,
-        protected LeadModel $leadModel,
-        protected FieldModel $fieldModel,
+        private readonly Translator $translator,
+        private readonly LeadModel $leadModel,
+        private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly FormFieldHelper $formFieldHelper,
     ) {
     }
 
@@ -50,7 +51,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.core.value.required']
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -67,7 +68,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
             $operator    = '=';
 
             if (isset($data['field'])) {
-                $field    = $this->fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
+                $field    = $this->leadFieldRepository->findOneBy(['alias' => $data['field']]);
                 $operator = $data['operator'];
 
                 if ($field) {
@@ -100,9 +101,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                             case 'date':
                             case 'datetime':
                                 if ('date' === $operator) {
-                                    $fieldHelper = new FormFieldHelper();
-                                    $fieldHelper->setTranslator($this->translator);
-                                    $fieldValues = $fieldHelper->getDateChoices();
+                                    $fieldValues = $this->formFieldHelper->getDateChoices();
                                     $customText  = $this->translator->trans('mautic.campaign.event.timed.choice.custom');
                                     $customValue = (empty($data['value']) || isset($fieldValues[$data['value']])) ? 'custom' : $data['value'];
                                     $fieldValues = array_merge(
@@ -155,7 +154,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     'required'    => true,
                     'constraints' => [
                         new NotBlank(
-                            ['message' => 'mautic.core.value.required']
+                            message: 'mautic.core.value.required'
                         ),
                     ],
                     'auto_initialize' => false,
@@ -192,7 +191,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         'attr'        => $attr,
                         'constraints' => ($supportsValue) ? [
                             new NotBlank(
-                                ['message' => 'mautic.core.value.required']
+                                message: 'mautic.core.value.required'
                             ),
                         ] : [],
                     ]

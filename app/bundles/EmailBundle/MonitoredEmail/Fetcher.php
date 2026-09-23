@@ -9,7 +9,7 @@ use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class Fetcher
+final class Fetcher
 {
     private ?array $mailboxes = null;
 
@@ -62,7 +62,7 @@ class Fetcher
                     $messages  = $this->getMessages($mailIds, $limit, $markAsSeen);
                     $processed = count($messages);
 
-                    if ($messages) {
+                    if ([] !== $messages) {
                         $event->setMessages($messages)
                             ->setKeys($mailboxes);
                         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PARSE);

@@ -10,8 +10,9 @@ use Mautic\EmailBundle\Entity\Email;
 
 class EmailVariantConverterService
 {
-    public function __construct(private readonly VariantConverterService $variantConverterService)
-    {
+    public function __construct(
+        private readonly VariantConverterService $variantConverterService,
+    ) {
     }
 
     public function convertWinnerVariant(Email $email): void

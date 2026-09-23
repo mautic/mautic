@@ -130,6 +130,29 @@ final class PageModelTest extends PageTestAbstract
         }
     }
 
+    public function testTimezoneQueryProcessPageHit(): void
+    {
+        $hit           = new Hit();
+        $page          = new Page();
+        $request       = new Request();
+        $contact       = new Lead();
+        $pageModel     = $this->getPageModel(false);
+
+        $hit->setIpAddress(new IpAddress());
+        $timezone = 'Europe/Paris';
+        $hit->setQuery(['timezone' => $timezone, 'timezone_offset' => -120]);
+
+        $pageModel->processPageHit($hit, $page, $request, $contact, false);
+        $this->assertSame($timezone, $contact->getTimezone());
+
+        $hit->setQuery(['timezone_offset' => -120]);
+
+        $contact       = new Lead();
+        $pageModel->processPageHit($hit, $page, $request, $contact, false);
+
+        $this->assertSame('Europe/Helsinki', $contact->getTimezone());
+    }
+
     /**
      * Test getHitQuery when the hit is a Redirect.
      */
@@ -170,7 +193,7 @@ final class PageModelTest extends PageTestAbstract
             ->willReturn(null);
 
         $result = $pageModel->hitPage($redirect, new Request());
-        self::assertFalse($result);
+        $this->assertFalse($result);
     }
 
     /**
@@ -185,7 +208,7 @@ final class PageModelTest extends PageTestAbstract
         // evaluate all utm tags that they contain the key name in the value
         foreach ($query as $key => $value) {
             if (str_contains($key, 'utm_')) {
-                $this->assertNotFalse(strpos($value, (string) $key), sprintf('%s not found in %s', $key, $value));
+                $this->assertStringContainsString($key, $value, sprintf('%s not found in %s', $key, $value));
             }
         }
     }

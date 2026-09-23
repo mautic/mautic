@@ -51,7 +51,7 @@ final readonly class FinalizeUpdateStep implements StepInterface
             if ($postMessage = $this->requestStack->getSession()->get('post_upgrade_message')) {
                 $postMessage = strip_tags($postMessage);
                 $this->requestStack->getSession()->remove('post_upgrade_message');
-                $output->writeln("\n\n<info>$postMessage</info>");
+                $output->writeln("\n\n<info>{$postMessage}</info>");
             }
         }
     }

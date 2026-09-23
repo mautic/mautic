@@ -8,12 +8,12 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\PointBundle\Model\TriggerModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 final class ModelFactoryTest extends TestCase
 {
     /**
-     * @var MockObject&ContainerInterface
+     * @var MockObject&ServiceLocator
      */
     private MockObject $container;
 
@@ -24,7 +24,7 @@ final class ModelFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerInterface::class);
+        $this->container = $this->createMock(ServiceLocator::class);
         $this->factory   = new ModelFactory($this->container);
     }
 

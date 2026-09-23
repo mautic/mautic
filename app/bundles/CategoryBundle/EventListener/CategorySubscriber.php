@@ -13,14 +13,14 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CategorySubscriber implements EventSubscriberInterface
+final readonly class CategorySubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly BundleHelper $bundleHelper,
-        private readonly IpLookupHelper $ipLookupHelper,
-        private readonly AuditLogModel $auditLogModel,
-        private readonly CategoryModel $categoryModel,
-        private readonly TranslatorInterface $translator,
+        private BundleHelper $bundleHelper,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
+        private CategoryModel $categoryModel,
+        private TranslatorInterface $translator,
     ) {
     }
 

@@ -2,11 +2,10 @@
 
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Exception\ExitMonitorException;
@@ -14,7 +13,7 @@ use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TwitterCommandHelper
+final class TwitterCommandHelper
 {
     private ?OutputInterface $output = null;
 
@@ -31,12 +30,13 @@ class TwitterCommandHelper
 
     public function __construct(
         private readonly LeadModel $leadModel,
-        private readonly FieldModel $fieldModel,
         private readonly MonitoringModel $monitoringModel,
         private readonly PostCountModel $postCountModel,
         private readonly Translator $translator,
-        private readonly EntityManagerInterface $em,
+        private readonly \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorLeadRepository,
         CoreParametersHelper $coreParametersHelper,
+        private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
         $this->twitterHandleField = $coreParametersHelper->get('twitter_handle_field', 'twitter');
@@ -77,12 +77,11 @@ class TwitterCommandHelper
     /**
      * Processes a list of tweets and creates / updates leads in Mautic.
      *
-     * @param array      $statusList
      * @param Monitoring $monitor
      */
-    public function createLeadsFromStatuses($statusList, $monitor): int
+    public function createLeadsFromStatuses(array $statusList, $monitor): int
     {
-        $leadField = $this->fieldModel->getRepository()->findOneBy(['alias' => $this->twitterHandleField]);
+        $leadField = $this->leadFieldRepository->findOneBy(['alias' => $this->twitterHandleField]);
 
         if (!$leadField) {
             // Field has been deleted or something
@@ -94,13 +93,13 @@ class TwitterCommandHelper
         $handleFieldGroup = $leadField->getGroup();
 
         // Just a means to let any LeadEvents listeners know that many leads are likely coming in case that matters to their logic
-        defined('MASS_LEADS_MANIPULATION') or define('MASS_LEADS_MANIPULATION', 1);
-        defined('SOCIAL_MONITOR_IMPORT') or define('SOCIAL_MONITOR_IMPORT', 1);
+        defined('MASS_LEADS_MANIPULATION') || define('MASS_LEADS_MANIPULATION', 1);
+        defined('SOCIAL_MONITOR_IMPORT') || define('SOCIAL_MONITOR_IMPORT', 1);
 
         // Get a list of existing leads to tone down on queries
         $usersByHandles    = [];
         $usersByName       = ['firstnames' => [], 'lastnames' => []];
-        $expr              = $this->leadModel->getRepository()->createQueryBuilder('f')->expr();
+        $expr              = $this->leadRepository->createQueryBuilder('f')->expr();
         $monitorProperties = $monitor->getProperties();
 
         if (!array_key_exists('checknames', $monitorProperties)) {
@@ -130,8 +129,8 @@ class TwitterCommandHelper
         }
         unset($expr);
 
-        if (!empty($usersByHandles)) {
-            $leads = $this->leadModel->getRepository()->getEntities(
+        if ([] !== $usersByHandles) {
+            $leads = $this->leadRepository->getEntities(
                 [
                     'filter' => [
                         'force' => [
@@ -159,7 +158,7 @@ class TwitterCommandHelper
         if ($monitorProperties['checknames']) {
             // Fetch existing contacts who have an unknown twitter
             // handle in Mautic but are found during monitoring.
-            $leadsByName = $this->leadModel->getRepository()->getEntities(
+            $leadsByName = $this->leadRepository->getEntities(
                 [
                     'filter' => [
                         'force' => [
@@ -342,10 +341,7 @@ class TwitterCommandHelper
         $monitorLead->setLead($lead);
         $monitorLead->setDateAdded(new \DateTime());
 
-        /** @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
-        $monitorRepository = $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\Lead::class);
-
-        $monitorRepository->saveEntity($monitorLead);
+        $this->monitorLeadRepository->saveEntity($monitorLead);
     }
 
     /**
@@ -353,7 +349,7 @@ class TwitterCommandHelper
      *
      * @param Monitoring $monitor
      */
-    private function incrementPostCount($monitor, $tweet): void
+    private function incrementPostCount($monitor, array $tweet): void
     {
         $date = new \DateTime($tweet['created_at']);
 

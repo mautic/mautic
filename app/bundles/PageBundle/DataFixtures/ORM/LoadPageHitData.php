@@ -8,12 +8,12 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Hit;
-use Mautic\PageBundle\Model\PageModel;
+use Mautic\PageBundle\Entity\PageRepository;
 
-class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private readonly PageModel $pageModel,
+        private readonly PageRepository $pageRepository,
     ) {
     }
 
@@ -27,22 +27,22 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
                 if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['page', 'ipAddress'])) {
-                        $hit->$setter($this->getReference($col.'-'.$val));
+                        $hit->{$setter}($this->getReference($col.'-'.$val));
                     } elseif (in_array($col, ['dateHit', 'dateLeft'])) {
-                        $hit->$setter(new \DateTime($val));
+                        $hit->{$setter}(new \DateTime($val));
                     } elseif ('browserLanguages' == $col) {
                         $val = Serializer::decode(stripslashes($val));
-                        $hit->$setter($val);
+                        $hit->{$setter}($val);
                     } else {
-                        $hit->$setter($val);
+                        $hit->{$setter}($val);
                     }
                 }
             }
-            $this->pageModel->getRepository()->saveEntity($hit);
+            $this->pageRepository->saveEntity($hit);
         }
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 8;
     }

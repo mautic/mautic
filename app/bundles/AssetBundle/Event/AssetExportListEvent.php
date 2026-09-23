@@ -16,8 +16,9 @@ final class AssetExportListEvent extends CommonEvent
     /**
      * @param list<array<string, array<string, mixed>>> $data
      */
-    public function __construct(private readonly array $data)
-    {
+    public function __construct(
+        private readonly array $data,
+    ) {
     }
 
     /**

@@ -7,7 +7,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<array<string>|null, string|null>
  */
-class ArrayLinebreakTransformer implements DataTransformerInterface
+final class ArrayLinebreakTransformer implements DataTransformerInterface
 {
     /**
      * @param array<string>|null $array
@@ -16,7 +16,7 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
      */
     public function transform(mixed $array): mixed
     {
-        if (null === $array) {
+        if (null === $array || '' === $array) {
             return '';
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -79,8 +81,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -89,8 +89,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Set text.
-     *
      * @param string $text
      */
     public function setText($text): static
@@ -102,8 +100,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get text.
-     *
      * @return string
      */
     public function getText()
@@ -112,8 +108,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
      */
     public function setType($type): static
@@ -125,8 +119,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get type.
-     *
      * @return string|null
      */
     public function getType()
@@ -140,7 +132,7 @@ class LeadNote extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('text', new NotBlank(
-            ['message' => 'mautic.lead.note.text.notblank']
+            message: 'mautic.lead.note.text.notblank'
         ));
     }
 

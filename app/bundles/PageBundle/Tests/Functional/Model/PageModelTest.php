@@ -12,7 +12,8 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
-use PHPUnit\Framework\Assert;
+use Mautic\PageBundle\Model\RedirectModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PageModelTest extends MauticMysqlTestCase
@@ -44,7 +45,7 @@ final class PageModelTest extends MauticMysqlTestCase
         $this->configParams['bot_helper_blocked_user_agents']  = self::BOT_BLOCKED_USER_AGENTS;
         $this->configParams['site_url']                        = 'https://mautic-cloud.local';
         parent::setUp();
-        $this->pageHitRepository = $this->em->getRepository(Hit::class);
+        $this->pageHitRepository = self::getContainer()->get(HitRepository::class);
         $this->logoutUser();
     }
 
@@ -64,10 +65,10 @@ final class PageModelTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/mtc/event', $requestParameters);
         /** @var Hit $pageHit */
         $pageHit = $this->pageHitRepository->findOneBy([]);
-        Assert::assertInstanceOf(Hit::class, $pageHit);
-        Assert::assertStringStartsWith($pageHit->getUrlTitle(), $requestParameters['page_title']);
-        Assert::assertStringStartsWith($pageHit->getPageLanguage(), $requestParameters['page_language']);
-        Assert::assertStringStartsWith($pageHit->getUrl(), $requestParameters['page_url']);
+        $this->assertInstanceOf(Hit::class, $pageHit);
+        $this->assertStringStartsWith($pageHit->getUrlTitle(), $requestParameters['page_title']);
+        $this->assertStringStartsWith($pageHit->getPageLanguage(), $requestParameters['page_language']);
+        $this->assertStringStartsWith($pageHit->getUrl(), $requestParameters['page_url']);
     }
 
     public function generateRandomString(int $length): string
@@ -92,7 +93,7 @@ final class PageModelTest extends MauticMysqlTestCase
         return $result;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('pageHitBotScenariosProvider')]
+    #[DataProvider('pageHitBotScenariosProvider')]
     public function testItNotRegistersPageHitsFromBot(string $trackingHash, string $sentBefore, string $userAgent, string $ipAddress, bool $isHit): void
     {
         $lead = new Lead();
@@ -150,12 +151,12 @@ final class PageModelTest extends MauticMysqlTestCase
         $pageHit = $this->pageHitRepository->findOneBy([]);
 
         if ($isHit) {
-            Assert::assertInstanceOf(Hit::class, $pageHit);
-            Assert::assertStringStartsWith($pageHit->getUrlTitle(), $requestParameters['page_title']);
-            Assert::assertStringStartsWith($pageHit->getPageLanguage(), $requestParameters['page_language']);
-            Assert::assertStringStartsWith($pageHit->getUrl(), $requestParameters['page_url']);
+            $this->assertInstanceOf(Hit::class, $pageHit);
+            $this->assertStringStartsWith($pageHit->getUrlTitle(), $requestParameters['page_title']);
+            $this->assertStringStartsWith($pageHit->getPageLanguage(), $requestParameters['page_language']);
+            $this->assertStringStartsWith($pageHit->getUrl(), $requestParameters['page_url']);
         } else {
-            Assert::assertNull($pageHit);
+            $this->assertNull($pageHit);
         }
     }
 
@@ -177,7 +178,7 @@ final class PageModelTest extends MauticMysqlTestCase
         yield 'Permanently blocked User Agent' => ['test_hash_bot_ratio_10', '-80 second', 'MSNBOT', self::IP_NOT_IN_ANY_BLOCK_LIST2, false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('pageHitBotScenariosProvider')]
+    #[DataProvider('pageHitBotScenariosProvider')]
     public function testRedirect(string $trackingHash, string $sentBefore, string $userAgent, string $ipAddress, bool $isHit): void
     {
         $lead = new Lead();
@@ -228,7 +229,8 @@ final class PageModelTest extends MauticMysqlTestCase
         $this->em->persist($redirect);
         $this->em->flush();
 
-        $redirectModel = $this->getContainer()->get('mautic.page.model.redirect');
+        /** @var RedirectModel $redirectModel */
+        $redirectModel = $this->getContainer()->get(RedirectModel::class);
         $redirectURL   = $redirectModel->generateRedirectUrl($redirect, $clickThrough);
         // Send Request
         $server = [
@@ -241,10 +243,10 @@ final class PageModelTest extends MauticMysqlTestCase
         $pageHit = $this->pageHitRepository->findOneBy([]);
 
         if ($isHit) {
-            Assert::assertInstanceOf(Hit::class, $pageHit);
-            Assert::assertStringStartsWith($pageHit->getUrl(), $page->getRedirectUrl());
+            $this->assertInstanceOf(Hit::class, $pageHit);
+            $this->assertStringStartsWith($pageHit->getUrl(), $page->getRedirectUrl());
         } else {
-            Assert::assertNull($pageHit);
+            $this->assertNull($pageHit);
         }
     }
 }

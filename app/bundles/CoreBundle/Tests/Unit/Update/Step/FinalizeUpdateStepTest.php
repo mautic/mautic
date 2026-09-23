@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Update\Step\FinalizeUpdateStep;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -66,7 +67,7 @@ final class FinalizeUpdateStepTest extends AbstractStepTestCase
         $matcher             = $this->exactly(2);
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $wrappingUpKey, $updateSuccessfulKey) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $wrappingUpKey, $updateSuccessfulKey): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($wrappingUpKey, $parameters[0]);
 
@@ -78,6 +79,8 @@ final class FinalizeUpdateStepTest extends AbstractStepTestCase
 
                     return $updateSuccessfulKey;
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->pathsHelper->expects($this->once())
@@ -125,7 +128,7 @@ final class FinalizeUpdateStepTest extends AbstractStepTestCase
             ->method('writeln')
             ->with("\n\n<info>This is an example message</info>");
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 

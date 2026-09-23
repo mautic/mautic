@@ -8,14 +8,14 @@ use Mautic\CoreBundle\Twig\Helper\ConfigHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ConfigExtension extends AbstractExtension
+final class ConfigExtension extends AbstractExtension
 {
     public function __construct(
         private readonly ConfigHelper $configHelper,
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('configGetParameter', $this->get(...)),

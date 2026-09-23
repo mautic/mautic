@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Mautic\CoreBundle\Shortener\Shortener;
+use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -34,10 +35,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
-    public function __construct(private readonly TranslatorInterface $translator, private readonly LanguageHelper $langHelper, private readonly IpLookupFactory $ipLookupFactory, private readonly ?AbstractLookup $ipLookup, private readonly Shortener $shortenerFactory, private readonly CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly LanguageHelper $langHelper,
+        private readonly IpLookupFactory $ipLookupFactory,
+        private readonly ?AbstractLookup $ipLookup,
+        private readonly Shortener $shortenerFactory,
+        private readonly CoreParametersHelper $coreParametersHelper,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -57,9 +64,7 @@ class ConfigType extends AbstractType
                 'default_protocol' => 'https',
                 'constraints'      => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -112,9 +117,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -132,9 +135,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -152,11 +153,9 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
-                    new Callback([$this, 'validateImagePath']),
+                    new Callback($this->validateImagePath(...)),
                 ],
             ]
         );
@@ -361,12 +360,8 @@ class ConfigType extends AbstractType
                     'postaddon_text' => $this->translator->trans('mautic.core.time.minutes'),
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
-                    new GreaterThanOrEqual([
-                        'value' => 0,
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ]
         );
@@ -383,9 +378,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -403,9 +396,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -423,9 +414,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -443,9 +432,7 @@ class ConfigType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -583,7 +570,7 @@ class ConfigType extends AbstractType
         );
 
         $enabledServices = $this->shortenerFactory->getEnabledServices();
-        $choices         = array_flip(array_map(fn ($enabledService) => $enabledService->getPublicName(), $enabledServices));
+        $choices         = array_flip(array_map(fn (ShortenerServiceInterface $enabledService): string => $enabledService->getPublicName(), $enabledServices));
 
         $builder->add(
             Shortener::SHORTENER_SERVICE,

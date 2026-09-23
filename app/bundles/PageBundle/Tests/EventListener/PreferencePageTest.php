@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -66,8 +65,8 @@ final class PreferencePageTest extends MauticMysqlTestCase
 
         $this->assertDefaultLabels($content);
 
-        Assert::assertStringContainsString($category->getTitle(), $content);
-        Assert::assertStringContainsString($segment->getName(), $content);
+        $this->assertStringContainsString($category->getTitle(), $content);
+        $this->assertStringContainsString($segment->getName(), $content);
     }
 
     public function testCustomLabelsWithoutForm(): void
@@ -87,20 +86,20 @@ final class PreferencePageTest extends MauticMysqlTestCase
 
         $this->assertCustomLabels($params, $content);
 
-        Assert::assertStringContainsString($params['channelfrequency']['label-text'], $content);
-        Assert::assertStringNotContainsString('mautic.lead.contact.me.label', $content);
+        $this->assertStringContainsString($params['channelfrequency']['label-text'], $content);
+        $this->assertStringNotContainsString('mautic.lead.contact.me.label', $content);
 
-        Assert::assertStringContainsString($params['channelfrequency']['label-text1'], $content);
-        Assert::assertStringNotContainsString('mautic.lead.list.frequency.number', $content);
+        $this->assertStringContainsString($params['channelfrequency']['label-text1'], $content);
+        $this->assertStringNotContainsString('mautic.lead.list.frequency.number', $content);
 
-        Assert::assertStringContainsString($params['channelfrequency']['label-text2'], $content);
-        Assert::assertStringNotContainsString('mautic.lead.list.frequency.times', $content);
+        $this->assertStringContainsString($params['channelfrequency']['label-text2'], $content);
+        $this->assertStringNotContainsString('mautic.lead.list.frequency.times', $content);
 
-        Assert::assertStringContainsString($params['channelfrequency']['label-text3'], $content);
-        Assert::assertStringNotContainsString('mautic.lead.frequency.dates.label', $content);
+        $this->assertStringContainsString($params['channelfrequency']['label-text3'], $content);
+        $this->assertStringNotContainsString('mautic.lead.frequency.dates.label', $content);
 
-        Assert::assertStringContainsString($params['channelfrequency']['label-text4'], $content);
-        Assert::assertStringNotContainsString('mautic.lead.frequency.contact.end.date', $content);
+        $this->assertStringContainsString($params['channelfrequency']['label-text4'], $content);
+        $this->assertStringNotContainsString('mautic.lead.frequency.contact.end.date', $content);
     }
 
     public function testCustomLabelsWithForm(): void
@@ -122,8 +121,8 @@ final class PreferencePageTest extends MauticMysqlTestCase
 
         $this->assertCustomLabels($params, $content);
 
-        Assert::assertStringContainsString($category->getTitle(), $content);
-        Assert::assertStringContainsString($segment->getName(), $content);
+        $this->assertStringContainsString($category->getTitle(), $content);
+        $this->assertStringContainsString($segment->getName(), $content);
     }
 
     private function createCategory(): Category
@@ -210,20 +209,20 @@ final class PreferencePageTest extends MauticMysqlTestCase
 
     private function assertDefaultLabels(string $content): void
     {
-        Assert::assertStringContainsString('mautic.lead.form.categories', $content);
-        Assert::assertStringContainsString('mautic.lead.contact.me.label', $content);
-        Assert::assertStringContainsString('mautic.lead.list.frequency.number', $content);
-        Assert::assertStringContainsString('mautic.lead.list.frequency.times', $content);
-        Assert::assertStringContainsString('mautic.lead.frequency.dates.label', $content);
-        Assert::assertStringContainsString('mautic.lead.frequency.contact.end.date', $content);
-        Assert::assertStringContainsString('mautic.lead.list.frequency.preferred.channel', $content);
-        Assert::assertStringContainsString('mautic.page.form.saveprefs', $content);
-        Assert::assertStringContainsString('mautic.lead.form.list', $content);
-        Assert::assertStringContainsString('mautic.lead.contact.me.label', $content);
-        Assert::assertStringContainsString('mautic.lead.list.frequency.number', $content);
-        Assert::assertStringContainsString('mautic.lead.list.frequency.times', $content);
-        Assert::assertStringContainsString('mautic.lead.frequency.dates.label', $content);
-        Assert::assertStringContainsString('mautic.lead.frequency.contact.end.date', $content);
+        $this->assertStringContainsString('mautic.lead.form.categories', $content);
+        $this->assertStringContainsString('mautic.lead.contact.me.label', $content);
+        $this->assertStringContainsString('mautic.lead.list.frequency.number', $content);
+        $this->assertStringContainsString('mautic.lead.list.frequency.times', $content);
+        $this->assertStringContainsString('mautic.lead.frequency.dates.label', $content);
+        $this->assertStringContainsString('mautic.lead.frequency.contact.end.date', $content);
+        $this->assertStringContainsString('mautic.lead.list.frequency.preferred.channel', $content);
+        $this->assertStringContainsString('mautic.page.form.saveprefs', $content);
+        $this->assertStringContainsString('mautic.lead.form.list', $content);
+        $this->assertStringContainsString('mautic.lead.contact.me.label', $content);
+        $this->assertStringContainsString('mautic.lead.list.frequency.number', $content);
+        $this->assertStringContainsString('mautic.lead.list.frequency.times', $content);
+        $this->assertStringContainsString('mautic.lead.frequency.dates.label', $content);
+        $this->assertStringContainsString('mautic.lead.frequency.contact.end.date', $content);
     }
 
     /**
@@ -231,17 +230,17 @@ final class PreferencePageTest extends MauticMysqlTestCase
      */
     private function assertCustomLabels(array $params, string $content): void
     {
-        Assert::assertStringContainsString($params['categorylist']['label-text'], $content);
-        Assert::assertStringNotContainsString('mautic.lead.form.categories', $content);
+        $this->assertStringContainsString($params['categorylist']['label-text'], $content);
+        $this->assertStringNotContainsString('mautic.lead.form.categories', $content);
 
-        Assert::assertStringContainsString($params['preferredchannel']['label-text'], $content);
-        Assert::assertStringNotContainsString('mautic.lead.list.frequency.preferred.channel', $content);
+        $this->assertStringContainsString($params['preferredchannel']['label-text'], $content);
+        $this->assertStringNotContainsString('mautic.lead.list.frequency.preferred.channel', $content);
 
-        Assert::assertStringContainsString($params['saveprefsbutton']['btnText'], $content);
-        Assert::assertStringNotContainsString('mautic.page.form.saveprefs', $content);
+        $this->assertStringContainsString($params['saveprefsbutton']['btnText'], $content);
+        $this->assertStringNotContainsString('mautic.page.form.saveprefs', $content);
 
-        Assert::assertStringContainsString($params['segmentlist']['label-text'], $content);
-        Assert::assertStringNotContainsString('mautic.lead.form.list', $content);
+        $this->assertStringContainsString($params['segmentlist']['label-text'], $content);
+        $this->assertStringNotContainsString('mautic.lead.form.list', $content);
     }
 
     private function disableTranslations(Translator $translator): void

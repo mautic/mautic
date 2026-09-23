@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -20,10 +21,11 @@ final class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
     /**
      * @param array<int, array<string, array<string, array<string, array<int,string>>|string>|string>> $properties
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('normalizeData')]
+    #[DataProvider('normalizeData')]
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        /** @var FieldModel $fieldModel */
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $field = new LeadField();
         $field->setType($type);
@@ -77,61 +79,57 @@ final class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, array<string, array<string, array<string, array<int,string>>|string>|string>> $properties
+     * @return \Iterator<int, array<string, (array<string, (array<string, array<int, string>>|string)>|string)>> $properties
      */
-    public static function normalizeData(): array
+    public static function normalizeData(): \Iterator
     {
-        return [
-            // Test for boolean custom field
-            [
-                'value'      => '1',
-                'type'       => 'boolean',
-                'properties' => [
-                    'yes' => 'True',
-                    'no'  => 'False',
-                ],
-                'expected'   => 'True',
+        // Test for boolean custom field
+        yield [
+            'value'      => '1',
+            'type'       => 'boolean',
+            'properties' => [
+                'yes' => 'True',
+                'no'  => 'False',
             ],
-            [
-                'value'      => '0',
-                'type'       => 'boolean',
-                'properties' => [
-                    'yes' => 'True',
-                    'no'  => 'False',
-                ],
-                'expected'   => 'False',
+            'expected'   => 'True',
+        ];
+        yield [
+            'value'      => '0',
+            'type'       => 'boolean',
+            'properties' => [
+                'yes' => 'True',
+                'no'  => 'False',
             ],
-
-            // Test for select custom field
-            [
-                'value'      => '2',
-                'type'       => 'select',
-                'properties' => [
+            'expected'   => 'False',
+        ];
+        // Test for select custom field
+        yield [
+            'value'      => '2',
+            'type'       => 'select',
+            'properties' => [
+                'list' => [
                     'list' => [
-                        'list' => [
-                            1 => 'Option 1',
-                            2 => 'Option 2',
-                        ],
+                        1 => 'Option 1',
+                        2 => 'Option 2',
                     ],
                 ],
-                'expected'   => 'Option 2',
             ],
-
-            // Test for multiselect custom field
-            [
-                'value'      => '1|3',
-                'type'       => 'multiselect',
-                'properties' => [
+            'expected'   => 'Option 2',
+        ];
+        // Test for multiselect custom field
+        yield [
+            'value'      => '1|3',
+            'type'       => 'multiselect',
+            'properties' => [
+                'list' => [
                     'list' => [
-                        'list' => [
-                            1 => 'Option 1',
-                            2 => 'Option 2',
-                            3 => 'Option 3',
-                        ],
+                        1 => 'Option 1',
+                        2 => 'Option 2',
+                        3 => 'Option 3',
                     ],
                 ],
-                'expected'   => 'Option 1|Option 3',
             ],
+            'expected'   => 'Option 1|Option 3',
         ];
     }
 

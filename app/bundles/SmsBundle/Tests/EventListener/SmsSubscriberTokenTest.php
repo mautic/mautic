@@ -12,7 +12,6 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Tests\SmsTestHelperTrait;
-use PHPUnit\Framework\Assert;
 
 final class SmsSubscriberTokenTest extends MauticMysqlTestCase
 {
@@ -28,10 +27,12 @@ final class SmsSubscriberTokenTest extends MauticMysqlTestCase
     public function testSmsTokenReplacement(): void
     {
         $transport = $this->configureTwilioWithArrayTransport();
-        $smsModel  = $this->getContainer()->get('mautic.sms.model.sms');
+        /** @var SmsModel $smsModel */
+        $smsModel  = $this->getContainer()->get(SmsModel::class);
         $this->assertInstanceOf(SmsModel::class, $smsModel);
 
-        $contactModel = $this->getContainer()->get('mautic.lead.model.lead');
+        /** @var LeadModel $contactModel */
+        $contactModel = $this->getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
 
         $page = new Page();
@@ -61,7 +62,7 @@ final class SmsSubscriberTokenTest extends MauticMysqlTestCase
         $smsModel->saveEntity($sms);
         $smsModel->sendSms($sms, $contactModel->getEntity($contact->getId()));
 
-        Assert::assertCount(1, $transport->smses);
+        $this->assertCount(1, $transport->smses);
 
         $ctRegex        = 'ct=([a-zA-Z0-9%]+)';
         $domainRegex    = 'https?:\/\/([a-zA-Z0-9.-]+)';
@@ -69,9 +70,6 @@ final class SmsSubscriberTokenTest extends MauticMysqlTestCase
         $pageLinkRegex  = $domainRegex.'\/test-page\?'.$ctRegex;
         $trackingRegex  = $domainRegex.'\/r\/([a-zA-Z0-9]+)\?'.$ctRegex;
 
-        Assert::assertMatchesRegularExpression(
-            "/Hello John, download {$assetLinkRegex} or visit {$pageLinkRegex} or {$trackingRegex}/",
-            $transport->smses[0]['content']
-        );
+        $this->assertMatchesRegularExpression("/Hello John, download {$assetLinkRegex} or visit {$pageLinkRegex} or {$trackingRegex}/", $transport->smses[0]['content']);
     }
 }

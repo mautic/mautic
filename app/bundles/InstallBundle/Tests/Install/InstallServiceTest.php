@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Mautic\InstallBundle\Tests\Install;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
@@ -39,11 +40,6 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
     private MockObject $pathsHelper;
 
     /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $entityManager;
-
-    /**
      * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
@@ -52,6 +48,11 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&ValidatorInterface
      */
     private MockObject $validator;
+
+    /**
+     * @var MockObject&UserRepository
+     */
+    private MockObject $userRepository;
 
     private InstallService $installer;
 
@@ -62,23 +63,21 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->configurator         = $this->createMock(Configurator::class);
         $this->cacheHelper          = $this->createMock(CacheHelper::class);
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
-        $this->entityManager        = $this->createMock(EntityManager::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $kernel                     = $this->createMock(KernelInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
-        $hasher                     = $this->createMock(UserPasswordHasher::class);
-        $fixtureLoader              = $this->createMock(FixturesLoaderInterface::class);
+        $this->userRepository       = $this->createMock(UserRepository::class);
 
         $this->installer = new InstallService(
             $this->configurator,
             $this->cacheHelper,
             $this->pathsHelper,
-            $this->entityManager,
+            $this->createStub(EntityManager::class),
             $this->translator,
-            $kernel,
+            $this->createStub(KernelInterface::class),
             $this->validator,
-            $hasher,
-            $fixtureLoader
+            $this->createStub(UserPasswordHasher::class),
+            $this->createStub(FixturesLoaderInterface::class),
+            $this->userRepository
         );
     }
 
@@ -178,6 +177,28 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn('test');
 
         $this->assertSame($messages, $this->installer->checkOptionalSettings($step));
+    }
+
+    public function testCheckOptionalSettingsPassesMemoryLimitParameter(): void
+    {
+        $step = $this->createMock(StepInterface::class);
+        $step->expects($this->once())
+            ->method('checkOptionalSettings')
+            ->willReturn(['mautic.install.memory.limit']);
+
+        $translated = 'The memory_limit setting is lower than the suggested minimum limit of 512M.';
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                'mautic.install.memory.limit',
+                ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT],
+                null,
+                null
+            )
+            ->willReturn($translated);
+
+        $this->assertSame([$translated], $this->installer->checkOptionalSettings($step));
     }
 
     public function testSaveConfigurationWhenNoCacheClear(): void
@@ -323,14 +344,9 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateAdminUserStepWhenPasswordIsMissing(): void
     {
-        $mockRepo = $this->createMock(EntityRepository::class);
-        $mockRepo->expects($this->once())
+        $this->userRepository->expects($this->once())
             ->method('find')
-            ->willReturn(0);
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($mockRepo);
+            ->willReturn(null);
 
         $data = [
             'firstname' => 'Demo',
@@ -344,14 +360,9 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateAdminUserStepWhenPasswordIsNotLongEnough(): void
     {
-        $mockRepo = $this->createMock(EntityRepository::class);
-        $mockRepo->expects($this->once())
+        $this->userRepository->expects($this->once())
             ->method('find')
             ->willReturn(new User());
-
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($mockRepo);
 
         $data = [
             'firstname' => 'Demo',

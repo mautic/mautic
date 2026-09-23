@@ -6,8 +6,10 @@ namespace Mautic\CampaignBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -36,12 +38,11 @@ final class EventModelTest extends TestCase
 
     protected function setUp(): void
     {
-        $entityManagerMock         = $this->createMock(EntityManagerInterface::class);
         $this->eventRepositoryMock = $this->createMock(EventRepository::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
 
         $this->eventModel          = new EventModel(
-            $entityManagerMock,
+            $this->createStub(EntityManagerInterface::class),
             $this->createStub(CorePermissions::class),
             $this->dispatcherMock,
             $this->createStub(UrlGeneratorInterface::class),
@@ -51,10 +52,11 @@ final class EventModelTest extends TestCase
             $this->createStub(CoreParametersHelper::class)
         );
 
-        $entityManagerMock
-            ->method('getRepository')
-            ->with(Event::class)
-            ->willReturn($this->eventRepositoryMock);
+        $this->eventModel->autowireEventModel(
+            $this->eventRepositoryMock,
+            $this->createStub(CampaignRepository::class),
+            $this->createStub(LeadEventLogRepository::class)
+        );
     }
 
     public function testThatClonedEventsDoNotAttemptNullingParentInDeleteEvents(): void
@@ -152,15 +154,17 @@ final class EventModelTest extends TestCase
 
     public function testDeleteEventsByCampaignId(): void
     {
-        /** @var EventModel&MockObject */
+        /** @var EventModel&MockObject $mockModel */
         $mockModel = $this->getMockBuilder(EventModel::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getRepository', 'deleteEventsByEventIds'])
             ->getMock();
 
-        $mockModel->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->eventRepositoryMock);
+        $mockModel->autowireEventModel(
+            $this->eventRepositoryMock,
+            $this->createStub(CampaignRepository::class),
+            $this->createStub(LeadEventLogRepository::class),
+        );
 
         $campaignEvents = ['1', '2', '3'];
 

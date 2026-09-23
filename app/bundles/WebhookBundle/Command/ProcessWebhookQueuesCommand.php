@@ -19,21 +19,19 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: ProcessWebhookQueuesCommand::COMMAND_NAME,
     description: 'Process queued webhook payloads'
 )]
-class ProcessWebhookQueuesCommand extends Command
+final class ProcessWebhookQueuesCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:webhooks:process';
 
-    public function __construct(private readonly WebhookModel $webhookModel,
+    public function __construct(
+        private readonly WebhookModel $webhookModel,
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly WebhookService $webhookService,
     ) {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption(
             '--webhook-id',

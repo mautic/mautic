@@ -71,7 +71,7 @@ trait RequestTrait
                     }
 
                     // find property by value
-                    if (!empty($fields)) {
+                    if ([] !== $fields) {
                         $properties = ArrayHelper::getValue('properties', $fields[$name]);
                         if (is_array($properties)) {
                             $valuesAsKeys = array_flip(array_values($properties));
@@ -84,7 +84,7 @@ trait RequestTrait
                     $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
                     $data = (bool) $data;
                     try {
-                        $entity->$setter($data);
+                        $entity->{$setter}($data);
                         // Manually handled so remove from form processing
                         unset($form[$name], $params[$name]);
                         break;

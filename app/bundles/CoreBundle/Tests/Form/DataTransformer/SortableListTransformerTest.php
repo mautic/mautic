@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Form\DataTransformer;
 
 use Mautic\CoreBundle\Form\DataTransformer\SortableListTransformer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class SortableListTransformerTest extends TestCase
@@ -13,7 +14,7 @@ final class SortableListTransformerTest extends TestCase
      * @param array<string, array<int|string, string>>    $input
      * @param array<string, array<array<string, string>>> $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('standardListProvider')]
+    #[DataProvider('standardListProvider')]
     public function testTransformStandardListWithLabels(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: true, useKeyValuePairs: false);
@@ -26,7 +27,7 @@ final class SortableListTransformerTest extends TestCase
      * @param array<string, string>                       $input
      * @param array<string, array<array<string, string>>> $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('keyValuePairProvider')]
+    #[DataProvider('keyValuePairProvider')]
     public function testTransformKeyValuePairs(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: true, useKeyValuePairs: true);
@@ -39,7 +40,7 @@ final class SortableListTransformerTest extends TestCase
      * @param array<string, array<int|string, string>> $input
      * @param array<string, array<string>>             $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('standardListWithoutLabelsProvider')]
+    #[DataProvider('standardListWithoutLabelsProvider')]
     public function testTransformListWithoutLabels(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: false, useKeyValuePairs: false);
@@ -68,7 +69,7 @@ final class SortableListTransformerTest extends TestCase
      * @param array<string, array<array<string, string>>> $input
      * @param array<string, string>                       $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('reverseKeyValuePairProvider')]
+    #[DataProvider('reverseKeyValuePairProvider')]
     public function testReverseTransformKeyValuePairs(array $input, array $expected): void
     {
         $transformer = new SortableListTransformer(withLabels: true, useKeyValuePairs: true);
@@ -94,124 +95,116 @@ final class SortableListTransformerTest extends TestCase
     }
 
     /**
-     * @return array<string, array{input: array<string, array<int|string, string>>, expected: array<string, array<array<string, string>>>}>
+     * @return \Iterator<string, array{input: array<string, array<(int|string), string>>, expected: array<string, array<array<string, string>>>}>
      */
-    public static function standardListProvider(): array
+    public static function standardListProvider(): \Iterator
     {
-        return [
-            'simple list' => [
-                'input' => [
-                    'list' => [
-                        3 => 'a@example.com',
-                        2 => 'b@example.com',
-                    ],
-                ],
-                'expected' => [
-                    'list' => [
-                        ['label' => 'a@example.com', 'value' => 'a@example.com'],
-                        ['label' => 'b@example.com', 'value' => 'b@example.com'],
-                    ],
+        yield 'simple list' => [
+            'input' => [
+                'list' => [
+                    3 => 'a@example.com',
+                    2 => 'b@example.com',
                 ],
             ],
-            'non sequential indexes' => [
-                'input' => [
-                    'list' => ['item1', 'item2', 'item3'],
-                ],
-                'expected' => [
-                    'list' => [
-                        ['label' => 'item1', 'value' => 'item1'],
-                        ['label' => 'item2', 'value' => 'item2'],
-                        ['label' => 'item3', 'value' => 'item3'],
-                    ],
+            'expected' => [
+                'list' => [
+                    ['label' => 'a@example.com', 'value' => 'a@example.com'],
+                    ['label' => 'b@example.com', 'value' => 'b@example.com'],
                 ],
             ],
-            'empty list' => [
-                'input'    => ['list' => []],
-                'expected' => ['list' => []],
+        ];
+        yield 'non sequential indexes' => [
+            'input' => [
+                'list' => ['item1', 'item2', 'item3'],
             ],
+            'expected' => [
+                'list' => [
+                    ['label' => 'item1', 'value' => 'item1'],
+                    ['label' => 'item2', 'value' => 'item2'],
+                    ['label' => 'item3', 'value' => 'item3'],
+                ],
+            ],
+        ];
+        yield 'empty list' => [
+            'input'    => ['list' => []],
+            'expected' => ['list' => []],
         ];
     }
 
     /**
-     * @return array<string, array{input: array<string, array<int|string, string>>, expected: array<string, array<string>>}>
+     * @return \Iterator<string, array{input: array<string, array<(int|string), string>>, expected: array<string, array<string>>}>
      */
-    public static function standardListWithoutLabelsProvider(): array
+    public static function standardListWithoutLabelsProvider(): \Iterator
     {
-        return [
-            'simple list without labels' => [
-                'input' => [
-                    'list' => ['item1', 'item2', 'item3'],
-                ],
-                'expected' => [
-                    'list' => ['item1', 'item2', 'item3'],
+        yield 'simple list without labels' => [
+            'input' => [
+                'list' => ['item1', 'item2', 'item3'],
+            ],
+            'expected' => [
+                'list' => ['item1', 'item2', 'item3'],
+            ],
+        ];
+        yield 'non sequential indexes' => [
+            'input' => [
+                'list' => [
+                    6 => 'item1',
+                    3 => 'item2',
+                    4 => 'item3',
                 ],
             ],
-            'non sequential indexes' => [
-                'input' => [
-                    'list' => [
-                        6 => 'item1',
-                        3 => 'item2',
-                        4 => 'item3',
-                    ],
-                ],
-                'expected' => [
-                    'list' => ['item1', 'item2', 'item3'],
-                ],
+            'expected' => [
+                'list' => ['item1', 'item2', 'item3'],
             ],
-            'empty list' => [
-                'input'    => ['list' => []],
-                'expected' => ['list' => []],
-            ],
+        ];
+        yield 'empty list' => [
+            'input'    => ['list' => []],
+            'expected' => ['list' => []],
         ];
     }
 
     /**
-     * @return array<string, array{input: array<string, string>, expected: array<string, array<array<string, string>>>}>
+     * @return \Iterator<string, array{input: array<string, string>, expected: array<string, array<array<string, string>>>}>
      */
-    public static function keyValuePairProvider(): array
+    public static function keyValuePairProvider(): \Iterator
     {
-        return [
-            'key value pairs' => [
-                'input' => [
-                    'key1' => 'value1',
-                    'key2' => 'value2',
-                ],
-                'expected' => [
-                    'list' => [
-                        ['label' => 'key1', 'value' => 'value1'],
-                        ['label' => 'key2', 'value' => 'value2'],
-                    ],
+        yield 'key value pairs' => [
+            'input' => [
+                'key1' => 'value1',
+                'key2' => 'value2',
+            ],
+            'expected' => [
+                'list' => [
+                    ['label' => 'key1', 'value' => 'value1'],
+                    ['label' => 'key2', 'value' => 'value2'],
                 ],
             ],
-            'empty array' => [
-                'input'    => [],
-                'expected' => ['list' => []],
-            ],
+        ];
+        yield 'empty array' => [
+            'input'    => [],
+            'expected' => ['list' => []],
         ];
     }
 
     /**
-     * @return array<string, array{input: array<string, array<array<string, string>>>, expected: array<string, string>}>
+     * @return \Iterator<string, array{input: array<string, array<array<string, string>>>, expected: array<string, string>}>
      */
-    public static function reverseKeyValuePairProvider(): array
+    public static function reverseKeyValuePairProvider(): \Iterator
     {
-        return [
-            'standard key-value pairs' => [
-                'input' => [
-                    'list' => [
-                        ['label' => 'key1', 'value' => 'value1'],
-                        ['label' => 'key2', 'value' => 'value2'],
-                    ],
-                ],
-                'expected' => [
-                    'key1' => 'value1',
-                    'key2' => 'value2',
+        yield 'standard key-value pairs' => [
+            'input' => [
+                'list' => [
+                    ['label' => 'key1', 'value' => 'value1'],
+                    ['label' => 'key2', 'value' => 'value2'],
                 ],
             ],
-            'empty list' => [
-                'input'    => ['list' => []],
-                'expected' => [],
+            'expected' => [
+                'key1' => 'value1',
+                'key2' => 'value2',
             ],
+        ];
+        yield 'empty list' => [
+            'input'    => ['list' => []],
+            'expected' => [],
         ];
     }
 }

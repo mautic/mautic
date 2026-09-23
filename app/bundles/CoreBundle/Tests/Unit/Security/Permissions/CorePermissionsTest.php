@@ -26,12 +26,10 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $userHelper                 = $this->createMock(UserHelper::class);
-        $translator                 = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->corePermissions      = new CorePermissions(
-            $userHelper,
-            $translator,
+            $this->createStub(UserHelper::class),
+            $this->createStub(TranslatorInterface::class),
             $this->coreParametersHelper,
             [
                 $this->mockBundleArray(ApiPermissions::class),

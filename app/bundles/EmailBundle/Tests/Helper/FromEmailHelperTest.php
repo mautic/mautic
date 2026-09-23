@@ -558,7 +558,7 @@ final class FromEmailHelperTest extends TestCase
 
         $owner = $this->getHelper()->getContactOwner(1);
 
-        $this->assertTrue($user === $owner);
+        $this->assertSame($user, $owner);
     }
 
     public function testExceptionIsThrownWhenMailAsOwnerIsDisabled(): void

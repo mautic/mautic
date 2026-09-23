@@ -24,7 +24,7 @@ final class EvalutatedContactsTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $passed);
         $this->assertCount(1, $failed);
 
-        $this->assertTrue($passLead === $passed->first());
-        $this->assertTrue($failedLead === $failed->first());
+        $this->assertSame($passed->first(), $passLead);
+        $this->assertSame($failed->first(), $failedLead);
     }
 }

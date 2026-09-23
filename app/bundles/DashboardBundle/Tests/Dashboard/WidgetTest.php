@@ -42,7 +42,6 @@ final class WidgetTest extends TestCase
 
         $this->dashboardModel = $this->createMock(DashboardModel::class);
         $this->userHelper     = $this->createMock(UserHelper::class);
-        $requestStack         = $this->createMock(RequestStack::class);
 
         $this->user = $this->createMock(User::class);
         $this->user
@@ -52,7 +51,7 @@ final class WidgetTest extends TestCase
         $this->widget = new Widget(
             $this->dashboardModel,
             $this->userHelper,
-            $requestStack
+            $this->createStub(RequestStack::class)
         );
     }
 

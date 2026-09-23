@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -81,7 +82,6 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($leadColumns);
 
         $fieldsBuilderMock
-            ->expects($this->any())
             ->method('getLeadFilter')
             ->willReturn([
                 'tag' => [
@@ -211,16 +211,13 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getReportUtmTagSubscriber(): ReportUtmTagSubscriber
     {
-        $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock  = $this->createMock(CompanyReportData::class);
-
-        return new ReportUtmTagSubscriber($fieldsBuilderMock, $companyReportDataMock);
+        return new ReportUtmTagSubscriber($this->createStub(FieldsBuilder::class), $this->createStub(CompanyReportData::class));
     }
 
     /**
-     * @return ReportGeneratorEvent&\PHPUnit\Framework\MockObject\MockObject
+     * @return ReportGeneratorEvent&MockObject
      */
-    private function getReportGeneratorEventMock(): \PHPUnit\Framework\MockObject\MockObject
+    private function getReportGeneratorEventMock(): MockObject
     {
         $reportGeneratorEventMock = $this->createMock(ReportGeneratorEvent::class);
 
@@ -233,9 +230,9 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return QueryBuilder&\PHPUnit\Framework\MockObject\MockObject
+     * @return QueryBuilder&MockObject
      */
-    private function getQueryBuilderMock(): \PHPUnit\Framework\MockObject\MockObject
+    private function getQueryBuilderMock(): MockObject
     {
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
 
@@ -246,7 +243,7 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->any();
 
         $queryBuilderMock->expects($matcher)->method('leftJoin')
-            ->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilderMock): \PHPUnit\Framework\MockObject\MockObject {
+            ->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilderMock): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('utm', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $parameters[1]);

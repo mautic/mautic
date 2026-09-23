@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -39,8 +41,6 @@ class Scheduler
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()

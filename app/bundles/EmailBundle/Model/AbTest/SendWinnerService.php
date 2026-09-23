@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Model\AbTest;
 
+use Mautic\ChannelBundle\ChannelEvents;
+use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Exception\RecordNotFoundException;
 use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Exception\NotReadyToSendWinnerException;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Service for sending a winner variant email to remaining contacts.
@@ -23,8 +26,12 @@ final class SendWinnerService
 
     private bool $tryAgain = false;
 
-    public function __construct(private readonly EmailModel $emailModel, private readonly AbTestResultService $abTestResultService, private readonly AbTestSettingsService $abTestSettingsService)
-    {
+    public function __construct(
+        private readonly EmailModel $emailModel,
+        private readonly AbTestResultService $abTestResultService,
+        private readonly AbTestSettingsService $abTestSettingsService,
+        private readonly EventDispatcherInterface $eventDispatcher,
+    ) {
     }
 
     /**
@@ -44,7 +51,7 @@ final class SendWinnerService
             $emails = [$emailEntity];
         }
 
-        if (empty($emails)) {
+        if ([] === $emails) {
             $this->addOutputMessage('No emails to send');
 
             return;
@@ -86,7 +93,7 @@ final class SendWinnerService
 
         $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
 
-        if (true === $this->isAllowedToSendWinner($email, $abTestSettings)) {
+        if ($this->isAllowedToSendWinner($email, $abTestSettings)) {
             $winner = $this->getWinner($email, $abTestSettings['winnerCriteria']);
 
             if (null === $winner) {
@@ -96,7 +103,9 @@ final class SendWinnerService
             $this->emailModel->convertWinnerVariant($winner);
 
             // send winner email
-            $this->addOutputMessage('Winner email '.$winner->getId().' has been sent to remaining contacts.');
+            $this->dispatchChannelBroadCastEvent($winner->getId());
+
+            $this->addOutputMessage('Winner email '.$winner->getId().' will be send to remaining contacts.');
         }
     }
 
@@ -155,5 +164,12 @@ final class SendWinnerService
     private function addOutputMessage(string $message): void
     {
         $this->outputMessages[] = $message;
+    }
+
+    private function dispatchChannelBroadCastEvent(int $emailId): void
+    {
+        $event = new ChannelBroadcastEvent('email', $emailId);
+        $event->setAbTestWinner(true);
+        $this->eventDispatcher->dispatch($event, ChannelEvents::CHANNEL_BROADCAST);
     }
 }

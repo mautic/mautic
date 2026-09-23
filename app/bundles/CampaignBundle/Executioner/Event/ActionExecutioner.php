@@ -38,8 +38,8 @@ class ActionExecutioner implements EventInterface
     {
         \assert($config instanceof ActionAccessor);
 
-        /** @var LeadEventLog $firstLog */
-        if (!$firstLog = $logs->first()) {
+        $firstLog = $logs->first();
+        if (!$firstLog instanceof LeadEventLog) {
             return new EvaluatedContacts();
         }
 

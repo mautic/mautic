@@ -19,7 +19,7 @@ export default class ButtonBlock {
                         background-color:#4e5d9d;
                         font-size:16px;
                         color:#ffffff;
-                      }           
+                      }
                     </style>`;
     this.blockManager.add('button', {
       label: Mautic.translate('grapesjsbuilder.buttonBlockLabel'),

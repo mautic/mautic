@@ -44,7 +44,7 @@ class UploadFieldValidator
 
             return $file;
         } catch (FileInvalidException $e) {
-            throw new FileValidationException($e->getMessage());
+            throw new FileValidationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

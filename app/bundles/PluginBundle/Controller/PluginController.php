@@ -5,6 +5,7 @@ namespace Mautic\PluginBundle\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Entity\PluginRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
 use Mautic\PluginBundle\Facade\ReloadFacade;
@@ -18,20 +19,31 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PluginController extends FormController
+final class PluginController extends FormController
 {
+    private PluginRepository $pluginRepository;
+
+    private PluginModel $pluginModel;
+
+    #[Required]
+    public function autowirePluginController(
+        PluginModel $pluginModel,
+        PluginRepository $pluginRepository,
+    ): void {
+        $this->pluginModel = $pluginModel;
+        $this->pluginRepository = $pluginRepository;
+    }
+
     public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
         }
 
-        /** @var PluginModel $pluginModel */
-        $pluginModel = $this->getModel('plugin');
-
         // List of plugins for filter and to show as a single integration
-        $plugins = $pluginModel->getEntities(
+        $plugins = $this->pluginModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -154,11 +166,8 @@ class PluginController extends FormController
         }
         $session->set('mautic.plugin.'.$name.'.'.$object.'.start', $start);
         $session->set('mautic.plugin.'.$name.'.'.$object.'.page', $page);
-
-        /** @var PluginModel $pluginModel */
-        $pluginModel   = $this->getModel('plugin');
-        $leadFields    = $pluginModel->getLeadFields();
-        $companyFields = $pluginModel->getCompanyFields();
+        $leadFields    = $this->pluginModel->getLeadFields();
+        $companyFields = $this->pluginModel->getCompanyFields();
         /** @var AbstractIntegration $integrationObject */
         $entity                 = $integrationObject->getIntegrationSettings();
         $existingPublishedState = $entity->getIsPublished();
@@ -244,16 +253,15 @@ class PluginController extends FormController
                     }
 
                     if ($valid || $authorize) {
-                        $dispatcher = $this->dispatcher;
                         $mauticLogger->info('Dispatching integration config save event.');
-                        if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
+                        if ($this->dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
                             $mauticLogger->info('Event dispatcher has integration config save listeners.');
                             if (!$valid && !$existingPublishedState) {
                                 $integrationObject->getIntegrationSettings()->setIsPublished(false);
                             }
                             $event = new PluginIntegrationEvent($integrationObject);
 
-                            $dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
+                            $this->dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
 
                             $entity = $event->getEntity();
                         }
@@ -364,10 +372,7 @@ class PluginController extends FormController
             $this->throwAccessDenied();
         }
 
-        /** @var PluginModel $pluginModel */
-        $pluginModel = $this->getModel('plugin');
-
-        $bundle = $pluginModel->getRepository()->findOneBy(
+        $bundle = $this->pluginRepository->findOneBy(
             [
                 'bundle' => InputHelper::clean($name),
             ]

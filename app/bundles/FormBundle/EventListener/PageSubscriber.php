@@ -13,7 +13,7 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PageSubscriber implements EventSubscriberInterface
+final class PageSubscriber implements EventSubscriberInterface
 {
     private string $formRegex = '{form=(.*?)}';
 
@@ -56,7 +56,7 @@ class PageSubscriber implements EventSubscriberInterface
                 TokenFormatOptions::simplePrefix('mautic.form.form'),
                 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
             );
-            if ($tokens) {
+            if ([] !== $tokens) {
                 $event->addTokens($tokens);
             }
         }

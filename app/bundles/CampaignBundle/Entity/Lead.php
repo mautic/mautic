@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -20,7 +22,7 @@ class Lead
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $dateAdded;
 
     /**

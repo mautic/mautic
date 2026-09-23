@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
 
-class ReportSubscriberFunctionalTestCase extends AbstractReportSubscriberTestCase
+final class ReportSubscriberFunctionalTestCase extends AbstractReportSubscriberTestCase
 {
     public function testPageHitReportWithTimeSpent(): void
     {

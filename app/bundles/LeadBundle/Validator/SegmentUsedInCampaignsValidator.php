@@ -12,8 +12,10 @@ class SegmentUsedInCampaignsValidator
 {
     private string $errorMessage = '';
 
-    public function __construct(private readonly LeadListRepository $leadListRepository, private readonly TranslatorInterface $translator)
-    {
+    public function __construct(
+        private readonly LeadListRepository $leadListRepository,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     public function validate(LeadList $segment, string $action = 'unpublish'): bool

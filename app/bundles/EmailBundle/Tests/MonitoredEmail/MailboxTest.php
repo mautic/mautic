@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 
 final class MailboxTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,7 +25,7 @@ final class MailboxTest extends \PHPUnit\Framework\TestCase
 
         $pathsHelper = $this->createStub(PathsHelper::class);
 
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
         $this->assertEquals($expected, $mailbox->getMailboxSettings());
     }
@@ -63,7 +64,7 @@ final class MailboxTest extends \PHPUnit\Framework\TestCase
             ->method('getSystemPath')
             ->willReturn(__DIR__.'/../../../../cache/');
 
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
         $settings = $mailbox->getMailboxSettings('EmailBundle', 'bounces');
 
@@ -106,7 +107,7 @@ final class MailboxTest extends \PHPUnit\Framework\TestCase
             ->method('getSystemPath')
             ->willReturn(__DIR__.'/../../../../cache/');
 
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
         $settings = $mailbox->getMailboxSettings('EmailBundle', 'bounces');
 
@@ -137,7 +138,7 @@ final class MailboxTest extends \PHPUnit\Framework\TestCase
 
         $pathsHelper = $this->createMock(PathsHelper::class);
 
-        new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        new Mailbox($parametersHelper, $pathsHelper);
 
         // Test $this->settings['use_attachments'] == true
         // dir creation is not failing
@@ -164,7 +165,7 @@ final class MailboxTest extends \PHPUnit\Framework\TestCase
             ->with('tmp', true)
             ->willReturn(__DIR__.'/../../../../cache/tmp');
 
-        new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        new Mailbox($parametersHelper, $pathsHelper);
     }
 
     public function testIsConnectedReturnsFalseOnValueError(): void
@@ -183,7 +184,7 @@ final class MailboxTest extends \PHPUnit\Framework\TestCase
 
         $pathsHelper = $this->createStub(PathsHelper::class);
 
-        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
         $reflection = new \ReflectionClass($mailbox);
 

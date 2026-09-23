@@ -38,6 +38,7 @@ final class AuditLogControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => self::SALES_USER]);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $this->client->request('GET', '/s/contacts/auditlog/batchExport/'.$contact->getId());
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);

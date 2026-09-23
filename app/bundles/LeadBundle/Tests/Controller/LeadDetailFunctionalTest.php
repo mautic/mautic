@@ -8,7 +8,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
-use PHPUnit\Framework\Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadDetailFunctionalTest extends MauticMysqlTestCase
 {
@@ -86,9 +86,9 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
             ->first()
             ->filter('td:first-child')
             ->extract(['_text']);
-        $actualLabels = array_map('trim', $actualLabels);
+        $actualLabels = array_map(trim(...), $actualLabels);
 
-        Assert::assertSame($expectedLabels, $actualLabels);
+        $this->assertSame($expectedLabels, $actualLabels);
     }
 
     public function testLeadViewPreventsXSS(): void
@@ -106,11 +106,11 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $mouseOver  = $anchorTag->attr('onmouseover');
         $dataHeader = $anchorTag->attr('data-header');
 
-        Assert::assertNull($mouseOver);
-        Assert::assertSame(sprintf('Campaigns for %s', $firstName), $dataHeader);
+        $this->assertNull($mouseOver);
+        $this->assertSame(sprintf('Campaigns for %s', $firstName), $dataHeader);
         $response = $this->client->getResponse();
         // Make sure the data-target-url is not an absolute URL
-        Assert::assertStringContainsString(sprintf('data-target-url="/s/contacts/view/%s/stats"', $lead->getId()), $response->getContent());
+        $this->assertStringContainsString(sprintf('data-target-url="/s/contacts/view/%s/stats"', $lead->getId()), (string) $response->getContent());
     }
 
     public function testLeadDetailPageForSocialTabInDetailsCollapsibleForNoData(): void
@@ -125,7 +125,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $data    = $crawler->filterXPath('//div[@id="social"]//td');
         $this->assertCount(1, $data);
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertStringContainsString($translator->trans('mautic.lead.field.group.no_data'), $data->text());
     }
 

@@ -52,8 +52,6 @@ final class AssetsHelper
     }
 
     /**
-     * Gets asset prefix.
-     *
      * @param bool $includeEndingSlash
      *
      * @return string
@@ -108,13 +106,11 @@ final class AssetsHelper
     /**
      * Set asset url path.
      *
-     * @param string      $path
-     * @param string|null $packageName
-     * @param string|null $version
-     * @param bool|false  $absolute
-     * @param bool|false  $ignorePrefix
+     * @param string     $path
+     * @param bool|false $absolute
+     * @param bool|false $ignorePrefix
      */
-    public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
+    public function getUrl($path, ?string $packageName = null, ?string $version = null, $absolute = false, $ignorePrefix = false): string
     {
         // if we have http in the url it is absolute and we can just return it
         if (str_starts_with($path, 'http')) {
@@ -131,15 +127,13 @@ final class AssetsHelper
         $url  = $this->packages->getUrl($path, $packageName);
 
         if ($absolute) {
-            $url = $this->getBaseUrl().'/'.$path;
+            $url = $this->siteUrl.'/'.$path;
         }
 
         return $url;
     }
 
     /**
-     * Get base URL.
-     *
      * @return string
      */
     public function getBaseUrl()
@@ -320,7 +314,7 @@ final class AssetsHelper
         if (isset($this->assets[$this->context]['styleDeclarations'])) {
             $styles .= "<style data-source=\"mautic\">\n";
             foreach (array_reverse($this->assets[$this->context]['styleDeclarations']) as $d) {
-                $styles .= "$d\n";
+                $styles .= "{$d}\n";
             }
             $styles .= "</style>\n";
         }
@@ -345,14 +339,14 @@ final class AssetsHelper
         if (isset($this->assets[$this->context]['scriptDeclarations'][$location])) {
             echo "<script data-source=\"mautic\">\n";
             foreach (array_reverse($this->assets[$this->context]['scriptDeclarations'][$location]) as $d) {
-                echo "$d\n";
+                echo "{$d}\n";
             }
             echo "</script>\n";
         }
 
         if (isset($this->assets[$this->context]['customDeclarations'][$location])) {
             foreach (array_reverse($this->assets[$this->context]['customDeclarations'][$location]) as $d) {
-                echo "$d\n";
+                echo "{$d}\n";
             }
         }
     }
@@ -397,7 +391,7 @@ final class AssetsHelper
                             $headOutput .= "\n<script data-source=\"mautic\">";
                             $scriptOpen = true;
                         }
-                        $headOutput .= "\n$output";
+                        $headOutput .= "\n{$output}";
                         break;
                 }
             }
@@ -409,9 +403,6 @@ final class AssetsHelper
         return $headOutput;
     }
 
-    /**
-     * Output system stylesheets.
-     */
     public function outputSystemStylesheets(): void
     {
         $assets = $this->assetHelper->getAssets();
@@ -424,8 +415,6 @@ final class AssetsHelper
     }
 
     /**
-     * Output system scripts.
-     *
      * @param bool|false $includeEditor
      */
     public function outputSystemScripts($includeEditor = false): void
@@ -512,12 +501,10 @@ final class AssetsHelper
      */
     public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = ''): string
     {
-        return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '$onLoadCallback', '$alreadyLoadedCallback');</script>";
+        return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '{$onLoadCallback}', '{$alreadyLoadedCallback}');</script>";
     }
 
     /**
-     * Include stylesheet.
-     *
      * @param string $assetFilePath the path to the file location. Can use full path or relative to mautic web root
      */
     public function includeStylesheet($assetFilePath): string
@@ -545,7 +532,7 @@ final class AssetsHelper
         $links = [];
 
         // Extract existing links and tags
-        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links): string {
+        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function (array $match) use (&$links): string {
             return '<'.array_push($links, $match[1]).'>';
         }, $text);
 
@@ -558,23 +545,23 @@ final class AssetsHelper
                     }
                     $link = $this->escape($match[2] ?: $match[3]);
 
-                    return '<'.array_push($links, "<a $attr href=\"$protocol://$link\">$link</a>").'>';
+                    return '<'.array_push($links, "<a {$attr} href=\"{$protocol}://{$link}\">{$link}</a>").'>';
                 }, $text),
-                'mail' => preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr): string {
+                'mail' => preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function (array $match) use (&$links, $attr): string {
                     $match[1] = $this->escape($match[1]);
 
-                    return '<'.array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>").'>';
+                    return '<'.array_push($links, "<a {$attr} href=\"mailto:{$match[1]}\">{$match[1]}</a>").'>';
                 }, $text),
-                'twitter' => preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr): string {
+                'twitter' => preg_replace_callback('~(?<!\w)[@#](\w++)~', function (array $match) use (&$links, $attr): string {
                     $match[0] = $this->escape($match[0]);
                     $match[1] = $this->escape($match[1]);
 
-                    return '<'.array_push($links, "<a $attr href=\"https://twitter.com/".('@' == $match[0][0] ? '' : 'search/%23').$match[1]."\">{$match[0]}</a>").'>';
+                    return '<'.array_push($links, "<a {$attr} href=\"https://twitter.com/".('@' == $match[0][0] ? '' : 'search/%23').$match[1]."\">{$match[0]}</a>").'>';
                 }, $text),
-                default => preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
+                default => preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function (array $match) use ($protocol, &$links, $attr): string {
                     $match[1] = $this->escape($match[1]);
 
-                    return '<'.array_push($links, "<a $attr href=\"$protocol://{$match[1]}\">{$match[1]}</a>").'>';
+                    return '<'.array_push($links, "<a {$attr} href=\"{$protocol}://{$match[1]}\">{$match[1]}</a>").'>';
                 }, $text),
             };
         }

@@ -109,7 +109,7 @@ class LeadRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($campaigns)) {
+        if ([] !== $campaigns) {
             $q->andWhere(
                 $q->expr()->notIn('campaign_id', ':ids')
             )
@@ -129,10 +129,9 @@ class LeadRepository extends CommonRepository
     /**
      * Check Lead in campaign.
      *
-     * @param Lead  $lead
-     * @param array $options
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
      */
-    public function checkLeadInCampaigns($lead, $options = []): bool
+    public function checkLeadInCampaigns($lead, array $options = []): bool
     {
         if (empty($options['campaigns'])) {
             return false;
@@ -507,7 +506,7 @@ class LeadRepository extends CommonRepository
             ->executeStatement();
     }
 
-    private function getCampaignSegments($campaignId): array
+    private function getCampaignSegments(?int $campaignId): array
     {
         // Get published segments for this campaign
         $segmentResults = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -535,7 +534,7 @@ class LeadRepository extends CommonRepository
     {
         $membershipConditions = $qb->expr()->and(
             $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-            $qb->expr()->eq('cl.campaign_id', (int) $campaignId)
+            $qb->expr()->eq('cl.campaign_id', $campaignId)
         );
 
         if ($campaignCanBeRestarted) {
@@ -591,7 +590,7 @@ class LeadRepository extends CommonRepository
     /**
      * Exclude contacts with any previous campaign history; this is mainly BC for pre 2.14.0 where the membership entry was deleted.
      */
-    private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb): void
+    private function updateQueryWithHistoryExclusion(?int $campaignId, QueryBuilder $qb): void
     {
         $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')
@@ -620,7 +619,7 @@ class LeadRepository extends CommonRepository
         $leadAlias         = 'l';
 
         $queryBuilder->select(
-            "$leadAlias.country",
+            "{$leadAlias}.country",
             'count(id) AS contacts'
         )
         ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', $leadCampaignAlias)
@@ -628,13 +627,13 @@ class LeadRepository extends CommonRepository
             $leadCampaignAlias,
             MAUTIC_TABLE_PREFIX.'leads',
             $leadAlias,
-            "$leadAlias.id = $leadCampaignAlias.lead_id"
+            "{$leadAlias}.id = {$leadCampaignAlias}.lead_id"
         )
-        ->andWhere("$leadCampaignAlias.campaign_id = :campaign")
-        ->andWhere("$leadCampaignAlias.manually_removed = :false")
-        ->andWhere("$leadCampaignAlias.date_added BETWEEN :dateFrom AND :dateTo")
-        ->groupBy("$leadAlias.country")
-        ->orderBy("$leadAlias.country", 'ASC')
+        ->andWhere("{$leadCampaignAlias}.campaign_id = :campaign")
+        ->andWhere("{$leadCampaignAlias}.manually_removed = :false")
+        ->andWhere("{$leadCampaignAlias}.date_added BETWEEN :dateFrom AND :dateTo")
+        ->groupBy("{$leadAlias}.country")
+        ->orderBy("{$leadAlias}.country", 'ASC')
         ->setParameter('campaign', $campaign->getId())
         ->setParameter('false', false)
         ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))

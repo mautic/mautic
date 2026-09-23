@@ -23,18 +23,18 @@ final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCa
         $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
 
         $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
-        self::assertCount(2, $contactCompanies);
+        $this->assertCount(2, $contactCompanies);
 
         $this->testSymfonyCommand(DeleteContactSecondaryCompaniesCommand::NAME);
 
         $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
-        self::assertCount(2, $contactCompanies);
+        $this->assertCount(2, $contactCompanies);
 
         $this->setUpSymfony(['contact_allow_multiple_companies' => 0]);
         $this->testSymfonyCommand(DeleteContactSecondaryCompaniesCommand::NAME);
 
         $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
-        self::assertCount(1, $contactCompanies);
+        $this->assertCount(1, $contactCompanies);
     }
 
     /**
@@ -60,7 +60,7 @@ final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCa
         $this->em->flush();
 
         /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $this->assertTrue($leadModel->addToCompany($contact, $company));
         $this->assertTrue($leadModel->addToCompany($contact, $company2));
 

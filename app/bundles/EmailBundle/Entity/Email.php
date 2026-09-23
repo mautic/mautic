@@ -220,7 +220,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['email:read', 'email:write'])]
     private $category;
 
@@ -242,16 +242,20 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $stats;
 
     /**
-     * @var int
+     * Get's incremented every time an email is sent the same as the sentCount.
+     * But unlike sentCount it will be incremented only when the email is a variant.
+     * And unlike sentCount it will be cleared when a variant is updated.
      */
     #[Groups(['email:read', 'download:read'])]
-    private $variantSentCount = 0;
+    private int $variantSentCount = 0;
 
     /**
-     * @var int
+     * Get's incremented every time an email is read the same as the readCount.
+     * But unlike readCount it will be incremented only when the email is a variant.
+     * And unlike readCount it will be cleared when a variant is updated.
      */
     #[Groups(['email:read', 'download:read'])]
-    private $variantReadCount = 0;
+    private int $variantReadCount = 0;
 
     /**
      * @var Form|null
@@ -470,71 +474,48 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'name',
-            new Length(
-                [
-                    'max'        => self::MAX_NAME_SUBJECT_LENGTH,
-                    'maxMessage' => 'mautic.email.name.length',
-                ]
-            )
+            new Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.name.length')
         );
 
         $metadata->addPropertyConstraint(
             'subject',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.subject.required',
-                ]
+                message: 'mautic.core.subject.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'subject',
-            new Length(
-                [
-                    'max'        => self::MAX_NAME_SUBJECT_LENGTH,
-                    'maxMessage' => 'mautic.email.subject.length',
-                ]
-            )
+            new Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.subject.length')
         );
 
         $metadata->addPropertyConstraint(
             'preheaderText',
-            new Length(
-                [
-                    'max'        => 130,
-                    'maxMessage' => 'mautic.email.preheader_text.length',
-                ]
-            )
+            new Length(max: 130, maxMessage: 'mautic.email.preheader_text.length')
         );
 
         $metadata->addPropertyConstraint(
             'fromAddress',
-            new EmailOrEmailTokenList(['allowMultiple' => false]),
+            new EmailOrEmailTokenList(allowMultiple: false),
         );
 
         $metadata->addPropertyConstraint(
             'replyToAddress',
             new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
+                message: 'mautic.core.email.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'bccAddress',
             new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
+                message: 'mautic.core.email.required'
             )
         );
 
@@ -624,10 +605,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         self::addProjectsInLoadApiMetadata($metadata, 'email');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
@@ -678,7 +659,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    public function setId(int $id): Email
+    public function setId(int $id): self
     {
         $this->id = $id;
 
@@ -833,7 +814,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->sendToDnc;
     }
 
-    public function setSendToDnc(bool $sendToDnc): Email
+    public function setSendToDnc(bool $sendToDnc): self
     {
         $this->isChanged('sendToDnc', $sendToDnc);
         $this->sendToDnc = $sendToDnc;
@@ -903,7 +884,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->preheaderText;
     }
 
-    public function setPreheaderText(?string $preheaderText): Email
+    public function setPreheaderText(?string $preheaderText): self
     {
         $this->isChanged('preheaderText', $preheaderText);
         $this->preheaderText = $preheaderText;
@@ -951,7 +932,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function getPublishDown()
     {
-        if ($this->isSegmentEmail() && !$this->isContinueSending()) {
+        if ($this->isSegmentEmail() && !$this->continueSending) {
             return null;
         }
 
@@ -999,6 +980,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
+    public function increaseSentCount(): void
+    {
+        ++$this->sentCount;
+    }
+
     /**
      * @return int
      */
@@ -1007,7 +993,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantSentCount') : $this->variantSentCount;
     }
 
-    public function setVariantSentCount($variantSentCount): static
+    public function increaseVariantSentCount(): void
+    {
+        ++$this->variantSentCount;
+    }
+
+    public function setVariantSentCount(int $variantSentCount): static
     {
         $this->variantSentCount = $variantSentCount;
 
@@ -1022,9 +1013,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->lists;
     }
 
-    /**
-     * Add list.
-     */
     public function addList(LeadList $list): static
     {
         $this->listsChangedAdd('lists', $list->getId());
@@ -1045,9 +1033,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * Remove list.
-     */
     public function removeList(LeadList $list): void
     {
         $this->listsChangedRemove('lists', $list->getId());
@@ -1107,15 +1092,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getVariantReadCount()
+    public function getVariantReadCount(): int
     {
         return $this->variantReadCount;
     }
 
-    public function setVariantReadCount($variantReadCount): static
+    public function setVariantReadCount(int $variantReadCount): static
     {
         $this->variantReadCount = $variantReadCount;
 
@@ -1213,8 +1195,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * Get assetAttachments.
-     *
      * @return Collection
      */
     public function getAssetAttachments()
@@ -1348,12 +1328,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function isBackgroundSending(): bool
     {
-        return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
+        return $this->isPublished() && !empty($this->publishUp) && ($this->publishUp < new \DateTime());
     }
 
     public function isSegmentEmail(): bool
     {
-        return 'list' === $this->getEmailType();
+        return 'list' === $this->emailType;
     }
 
     private function listsChangedAdd(string $property, ?int $id): void
@@ -1380,12 +1360,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function hasDraft(): bool
     {
-        return null !== $this->getDraft();
+        return null !== $this->draft;
     }
 
     public function getDraftContent(): ?string
     {
-        return $this->getDraft()?->getHtml();
+        return $this->draft?->getHtml();
     }
 
     /**
@@ -1400,7 +1380,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private function initListChanges(string $property): void
     {
         if (!isset($this->changes[$property])) {
-            $list                     = $this->$property;
+            $list                     = $this->{$property};
             $current                  = $this->getListKeys($list);
             $this->changes[$property] = [$current, $current];
         }
@@ -1445,7 +1425,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $variantSettings = $this->getVariantParent() ? $this->getVariantParent()->getVariantSettings() : $this->getVariantSettings();
 
-        return true === (bool) ($variantSettings['enableAbTest'] ?? false) && 100 === (int) ($variantSettings['totalWeight'] ?? null);
+        return (bool) ($variantSettings['enableAbTest'] ?? false) && 100 === (int) ($variantSettings['totalWeight'] ?? null);
     }
 
     public function getSendingStatus(): string
@@ -1456,11 +1436,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             case 'published':
             case 'unpublished':
                 if ($this->isSegmentEmail() && $this->getIsPublished()) {
-                    if (!$this->isContinueSending() && !$this->getPendingCount() && $this->getSentCount(true)) {
+                    if (!$this->continueSending && !$this->pendingCount && $this->getSentCount(true)) {
                         return 'sent';
                     }
 
-                    if ($this->getPendingCount()) {
+                    if ($this->pendingCount) {
                         return 'sending';
                     }
                 }
@@ -1472,7 +1452,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function shouldCheckForUnpublishEmail(): bool
     {
-        if ($this->isContinueSending()) {
+        if ($this->continueSending) {
             return false;
         }
 
@@ -1504,7 +1484,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @param array<mixed> $settings
      */
-    public function setSettings(array $settings): Email
+    public function setSettings(array $settings): self
     {
         $this->isChanged('settings', $settings);
         $this->settings = $settings;

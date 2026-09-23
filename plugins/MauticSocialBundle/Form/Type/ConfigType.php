@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\LeadBundle\Field\FieldList;
@@ -10,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
         private readonly FieldList $fieldList,

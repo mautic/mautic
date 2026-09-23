@@ -14,11 +14,7 @@ final class ContentHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $dispatcherMock = $this->createMock(EventDispatcherInterface::class);
-
-        $delegationMock = $this->createMock(Environment::class);
-
-        $this->contentHelper = new ContentHelper($delegationMock, $dispatcherMock);
+        $this->contentHelper = new ContentHelper($this->createStub(Environment::class), $this->createStub(EventDispatcherInterface::class));
     }
 
     public function testShowScriptTagsContext(): void
@@ -38,7 +34,7 @@ final class ContentHelperTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->contentHelper->showScriptTags($sample);
 
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     private function doShowTagsContext(string $tag): void
@@ -65,6 +61,6 @@ final class ContentHelperTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->contentHelper->showScriptTags($sample);
 
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 }

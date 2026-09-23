@@ -2,40 +2,33 @@
 
 namespace Mautic\ChannelBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ChannelBundle\Model\ChannelActionModel;
 use Mautic\ChannelBundle\Model\FrequencyActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Form\Type\ContactChannelsType;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class BatchContactController extends AbstractFormController
+final class BatchContactController extends AbstractFormController
 {
-    public function __construct(
-        private readonly ChannelActionModel $channelActionModel,
-        private readonly FrequencyActionModel $frequencyActionModel,
-        private readonly LeadModel $contactModel,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private ChannelActionModel $channelActionModel;
+
+    private FrequencyActionModel $frequencyActionModel;
+
+    private LeadModel $contactModel;
+
+    #[Required]
+    public function autowireBatchContactController(
+        ChannelActionModel $channelActionModel,
+        FrequencyActionModel $frequencyActionModel,
+        LeadModel $contactModel,
+    ): void {
+        $this->channelActionModel   = $channelActionModel;
+        $this->frequencyActionModel = $frequencyActionModel;
+        $this->contactModel         = $contactModel;
     }
 
     /**
@@ -69,7 +62,7 @@ class BatchContactController extends AbstractFormController
     /**
      * View for batch action.
      */
-    public function indexAction(): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_channel_batch_contact_set');
 

@@ -14,8 +14,9 @@ final class EventPreview
      */
     public array $eventStats = [];
 
-    public function __construct(public Event $event)
-    {
+    public function __construct(
+        public Event $event,
+    ) {
     }
 
     public function isType(string $type): bool

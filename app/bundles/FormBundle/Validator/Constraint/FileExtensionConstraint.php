@@ -2,9 +2,21 @@
 
 namespace Mautic\FormBundle\Validator\Constraint;
 
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
-class FileExtensionConstraint extends Constraint
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+final class FileExtensionConstraint extends Constraint
 {
-    public $message = 'File extension contains an illegal extension: "{{ forbidden }}".';
+    /**
+     * @param string[]|null $groups
+     */
+    #[HasNamedArguments]
+    public function __construct(
+        public string $message = 'File extension contains an illegal extension: "{{ forbidden }}".',
+        ?array $groups = null,
+        mixed $payload = null,
+    ) {
+        parent::__construct(null, $groups, $payload);
+    }
 }

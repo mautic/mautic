@@ -8,17 +8,17 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class AssetExtension extends AbstractExtension
+final class AssetExtension extends AbstractExtension
 {
     public function __construct(
-        protected AssetsHelper $assetsHelper,
+        private readonly AssetsHelper $assetsHelper,
     ) {
     }
 
     /**
      * @see Twig_Extension::getFunctions()
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('outputScripts', $this->outputScripts(...), ['is_safe' => ['all']]),
@@ -113,12 +113,10 @@ class AssetExtension extends AbstractExtension
     }
 
     /**
-     * @param string|null $packageName
-     * @param string|null $version
-     * @param bool        $absolute
-     * @param bool        $ignorePrefix
+     * @param bool $absolute
+     * @param bool $ignorePrefix
      */
-    public function getAssetUrl(string $path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
+    public function getAssetUrl(string $path, ?string $packageName = null, ?string $version = null, $absolute = false, $ignorePrefix = false): string
     {
         return $this->assetsHelper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
     }

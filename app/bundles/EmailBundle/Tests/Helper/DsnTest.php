@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\Dsn\Dsn;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class DsnTest extends TestCase
@@ -13,54 +13,54 @@ final class DsnTest extends TestCase
     public function testGettersAndSetters(): void
     {
         $dsn = new Dsn('scheme', 'localhost', 'user', 'password', 3300, 'path', ['ttl' => '200']);
-        Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
+        $this->assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
 
         $newDsn = $dsn->setScheme('mysql');
-        Assert::assertNotSame($newDsn, $dsn);
-        Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
-        Assert::assertSame('mysql://user:password@localhost:3300/path?ttl=200', (string) $newDsn);
-        Assert::assertSame('mysql', $newDsn->getScheme());
+        $this->assertNotSame($newDsn, $dsn);
+        $this->assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
+        $this->assertSame('mysql://user:password@localhost:3300/path?ttl=200', (string) $newDsn);
+        $this->assertSame('mysql', $newDsn->getScheme());
 
         $newDsn = $dsn->setHost('db');
-        Assert::assertNotSame($newDsn, $dsn);
-        Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
-        Assert::assertSame('scheme://user:password@db:3300/path?ttl=200', (string) $newDsn);
-        Assert::assertSame('db', $newDsn->getHost());
+        $this->assertNotSame($newDsn, $dsn);
+        $this->assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
+        $this->assertSame('scheme://user:password@db:3300/path?ttl=200', (string) $newDsn);
+        $this->assertSame('db', $newDsn->getHost());
 
         $newDsn = $dsn->setUser('john');
-        Assert::assertNotSame($newDsn, $dsn);
-        Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
-        Assert::assertSame('scheme://john:password@localhost:3300/path?ttl=200', (string) $newDsn);
-        Assert::assertSame('john', $newDsn->getUser());
+        $this->assertNotSame($newDsn, $dsn);
+        $this->assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
+        $this->assertSame('scheme://john:password@localhost:3300/path?ttl=200', (string) $newDsn);
+        $this->assertSame('john', $newDsn->getUser());
 
         $newDsn = $dsn->setPassword('secret');
-        Assert::assertNotSame($newDsn, $dsn);
-        Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
-        Assert::assertSame('scheme://user:secret@localhost:3300/path?ttl=200', (string) $newDsn);
-        Assert::assertSame('secret', $newDsn->getPassword());
+        $this->assertNotSame($newDsn, $dsn);
+        $this->assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
+        $this->assertSame('scheme://user:secret@localhost:3300/path?ttl=200', (string) $newDsn);
+        $this->assertSame('secret', $newDsn->getPassword());
 
         $newDsn = $dsn->setPort(3301);
-        Assert::assertNotSame($newDsn, $dsn);
-        Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
-        Assert::assertSame('scheme://user:password@localhost:3301/path?ttl=200', (string) $newDsn);
-        Assert::assertSame(3301, $newDsn->getPort());
+        $this->assertNotSame($newDsn, $dsn);
+        $this->assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
+        $this->assertSame('scheme://user:password@localhost:3301/path?ttl=200', (string) $newDsn);
+        $this->assertSame(3301, $newDsn->getPort());
 
         $newDsn = $dsn->setPath('folder');
-        Assert::assertNotSame($newDsn, $dsn);
-        Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
-        Assert::assertSame('scheme://user:password@localhost:3300/folder?ttl=200', (string) $newDsn);
-        Assert::assertSame('folder', $newDsn->getPath());
+        $this->assertNotSame($newDsn, $dsn);
+        $this->assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
+        $this->assertSame('scheme://user:password@localhost:3300/folder?ttl=200', (string) $newDsn);
+        $this->assertSame('folder', $newDsn->getPath());
 
         $newDsn = $dsn->setOptions(['ttl' => '300', 'timeout' => '10']);
-        Assert::assertNotSame($newDsn, $dsn);
-        Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
-        Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=300&timeout=10', (string) $newDsn);
-        Assert::assertSame(['ttl' => '300', 'timeout' => '10'], $newDsn->getOptions());
-        Assert::assertSame('300', $newDsn->getOption('ttl'));
-        Assert::assertSame('10', $newDsn->getOption('timeout'));
+        $this->assertNotSame($newDsn, $dsn);
+        $this->assertSame('scheme://user:password@localhost:3300/path?ttl=200', (string) $dsn);
+        $this->assertSame('scheme://user:password@localhost:3300/path?ttl=300&timeout=10', (string) $newDsn);
+        $this->assertSame(['ttl' => '300', 'timeout' => '10'], $newDsn->getOptions());
+        $this->assertSame('300', $newDsn->getOption('ttl'));
+        $this->assertSame('10', $newDsn->getOption('timeout'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataInvalidFromString')]
+    #[DataProvider('dataInvalidFromString')]
     public function testInvalidFromString(string $dsn, string $exceptionMessage): void
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -69,7 +69,7 @@ final class DsnTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array<string|string>>
+     * @return iterable<string, array<string>>
      */
     public static function dataInvalidFromString(): iterable
     {
@@ -88,18 +88,18 @@ final class DsnTest extends TestCase
 
     public function testFromStringAllowedDns(): void
     {
-        Assert::assertSame('sync://', (string) Dsn::fromString('sync://'));
+        $this->assertSame('sync://', (string) Dsn::fromString('sync://'));
     }
 
     public function testFromString(): void
     {
-        Assert::assertSame('scheme://user:password@localhost:3300/path?ttl=300&timeout=10', (string) Dsn::fromString('scheme://user:password@localhost:3300/path?ttl=300&timeout=10'));
+        $this->assertSame('scheme://user:password@localhost:3300/path?ttl=300&timeout=10', (string) Dsn::fromString('scheme://user:password@localhost:3300/path?ttl=300&timeout=10'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataToString')]
+    #[DataProvider('dataToString')]
     public function testToString(Dsn $dsn, string $dsnString): void
     {
-        Assert::assertSame($dsnString, (string) $dsn);
+        $this->assertSame($dsnString, (string) $dsn);
     }
 
     /**
@@ -131,13 +131,13 @@ final class DsnTest extends TestCase
     public function testToStringUrlEncodesProperly(): void
     {
         $dsn = new Dsn('scheme', 'local+@$#/:*!host', 'us+@$#/:*!er', 'pass+@$#/:*!word', 3300, 'pa+@$#/:*!th', ['type' => 'ty+@$#/:*!pe']);
-        Assert::assertSame('scheme://'.urlencode('us+@$#/:*!er').':'.urlencode('pass+@$#/:*!word').'@'.urlencode('local+@$#/:*!host').':3300/'.urlencode('pa+@$#/:*!th').'?type='.urlencode('ty+@$#/:*!pe'), (string) $dsn);
+        $this->assertSame('scheme://'.urlencode('us+@$#/:*!er').':'.urlencode('pass+@$#/:*!word').'@'.urlencode('local+@$#/:*!host').':3300/'.urlencode('pa+@$#/:*!th').'?type='.urlencode('ty+@$#/:*!pe'), (string) $dsn);
 
         $dsnFromString = Dsn::fromString((string) $dsn);
-        Assert::assertSame('local+@$#/:*!host', $dsnFromString->getHost());
-        Assert::assertSame('us+@$#/:*!er', $dsnFromString->getUser());
-        Assert::assertSame('pass+@$#/:*!word', $dsnFromString->getPassword());
-        Assert::assertSame('pa+@$#/:*!th', $dsnFromString->getPath());
-        Assert::assertSame('ty+@$#/:*!pe', $dsnFromString->getOption('type'));
+        $this->assertSame('local+@$#/:*!host', $dsnFromString->getHost());
+        $this->assertSame('us+@$#/:*!er', $dsnFromString->getUser());
+        $this->assertSame('pass+@$#/:*!word', $dsnFromString->getPassword());
+        $this->assertSame('pa+@$#/:*!th', $dsnFromString->getPath());
+        $this->assertSame('ty+@$#/:*!pe', $dsnFromString->getOption('type'));
     }
 }

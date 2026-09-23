@@ -9,13 +9,13 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MenuBuilder
+final readonly class MenuBuilder
 {
     public function __construct(
-        private readonly FactoryInterface $factory,
-        private readonly MatcherInterface $matcher,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly MenuHelper $menuHelper,
+        private FactoryInterface $factory,
+        private MatcherInterface $matcher,
+        private EventDispatcherInterface $dispatcher,
+        private MenuHelper $menuHelper,
     ) {
     }
 
@@ -48,10 +48,12 @@ class MenuBuilder
                 if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
                     // current match
                     return $item;
-                } elseif ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
+                }
+                if ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
                     // route uri match
                     return $item;
-                } elseif (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {
+                }
+                if (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {
                     // route name match
                     return $item;
                 }
@@ -85,7 +87,7 @@ class MenuBuilder
 
             //  Clean menu items: remove dropdown menu entry if empty (need to do it after all events are dispatched)
             foreach ($menuItems['children'] as $key => $item) {
-                if (empty($item['route']) && empty($item['children'])) {
+                if (empty($item['route']) && empty($item['uri']) && empty($item['children'])) {
                     unset($menuItems['children'][$key]);
                 }
             }

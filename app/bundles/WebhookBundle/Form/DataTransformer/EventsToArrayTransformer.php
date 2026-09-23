@@ -10,17 +10,17 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<Collection<int, Event>, array<int, string>>
  */
-class EventsToArrayTransformer implements DataTransformerInterface
+final readonly class EventsToArrayTransformer implements DataTransformerInterface
 {
     public function __construct(
-        private readonly Webhook $webhook,
+        private Webhook $webhook,
     ) {
     }
 
     /**
      * Convert from the PersistentCollection of Event entities to a simple array.
      *
-     * @param $events Collection<int, Event>
+     * @param Collection<int, Event> $events
      *
      * @return array<int, string>
      */
@@ -37,7 +37,7 @@ class EventsToArrayTransformer implements DataTransformerInterface
     /**
      * Convert a simple array into a PersistentCollection of Event entities.
      *
-     * @param $submittedArray array<int, string>
+     * @param array<int, string> $submittedArray
      *
      * @return Collection<int, Event>
      */

@@ -17,11 +17,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
-        protected CoreParametersHelper $parameters,
-        protected TranslatorInterface $translator,
+        private readonly CoreParametersHelper $parameters,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -56,12 +56,7 @@ class ConfigType extends AbstractType
                 ],
                 'required'    => false,
                 'constraints' => [
-                    new File(
-                        [
-                            'mimeTypes'        => ['text/plain', 'text/xml', 'application/xml'],
-                            'mimeTypesMessage' => 'mautic.core.invalid_file_type',
-                        ]
-                    ),
+                    new File(mimeTypes: ['text/plain', 'text/xml', 'application/xml'], mimeTypesMessage: 'mautic.core.invalid_file_type'),
                 ],
             ]
         );
@@ -78,12 +73,7 @@ class ConfigType extends AbstractType
                 ],
                 'required'    => false,
                 'constraints' => [
-                    new File(
-                        [
-                            'mimeTypes'        => ['text/plain'],
-                            'mimeTypesMessage' => 'mautic.core.invalid_file_type',
-                        ]
-                    ),
+                    new File(mimeTypes: ['text/plain'], mimeTypesMessage: 'mautic.core.invalid_file_type'),
                 ],
             ]
         );
@@ -100,12 +90,7 @@ class ConfigType extends AbstractType
                 ],
                 'required'    => false,
                 'constraints' => [
-                    new File(
-                        [
-                            'mimeTypes'        => ['text/plain'],
-                            'mimeTypesMessage' => 'mautic.core.invalid_file_type',
-                        ]
-                    ),
+                    new File(mimeTypes: ['text/plain'], mimeTypesMessage: 'mautic.core.invalid_file_type'),
                 ],
             ]
         );

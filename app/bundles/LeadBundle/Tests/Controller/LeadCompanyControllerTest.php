@@ -18,6 +18,6 @@ final class LeadCompanyControllerTest extends MauticMysqlTestCase
     {
         $crawler     = $this->client->request('GET', 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
-        self::assertNull($multiple);
+        $this->assertNull($multiple);
     }
 }

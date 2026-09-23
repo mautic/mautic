@@ -3,8 +3,9 @@
 namespace Mautic\CoreBundle\Update;
 
 use Mautic\CoreBundle\Update\Step\StepInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class StepProvider
+final class StepProvider
 {
     /**
      * @var StepInterface[]
@@ -16,7 +17,19 @@ class StepProvider
      */
     private array $finalSteps = [];
 
-    public function addStep(StepInterface $step): void
+    /**
+     * @param iterable<StepInterface> $steps
+     */
+    public function __construct(
+        #[AutowireIterator('mautic.update_step')]
+        iterable $steps = [],
+    ) {
+        foreach ($steps as $step) {
+            $this->addStep($step);
+        }
+    }
+
+    private function addStep(StepInterface $step): void
     {
         if ($step->shouldExecuteInFinalStage()) {
             $this->finalSteps[] = $step;

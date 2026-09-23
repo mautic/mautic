@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
-use PHPUnit\Framework\Assert;
 
 final class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -93,43 +92,31 @@ final class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValueFromPropertiesListWithoutList(): void
     {
-        Assert::assertSame(
-            'value_1',
-            CustomFieldValueHelper::setValueFromPropertiesList([], 'value_1')
-        );
+        $this->assertSame('value_1', CustomFieldValueHelper::setValueFromPropertiesList([], 'value_1'));
     }
 
     public function testSetValueFromPropertiesListWithStringList(): void
     {
-        Assert::assertSame(
-            'value_1',
-            CustomFieldValueHelper::setValueFromPropertiesList(['list' => 'some|string'], 'value_1')
-        );
+        $this->assertSame('value_1', CustomFieldValueHelper::setValueFromPropertiesList(['list' => 'some|string'], 'value_1'));
     }
 
     public function testSetValueFromPropertiesListWithAssociativeArrayList(): void
     {
-        Assert::assertSame(
-            'value_1',
-            CustomFieldValueHelper::setValueFromPropertiesList(
-                ['list' => ['value_1' => 'Label 1']],
-                'value_1'
-            )
-        );
+        $this->assertSame('value_1', CustomFieldValueHelper::setValueFromPropertiesList(
+            ['list' => ['value_1' => 'Label 1']],
+            'value_1'
+        ));
     }
 
     public function testSetValueFromPropertiesListWithArrayList(): void
     {
-        Assert::assertSame(
-            'Label 1',
-            CustomFieldValueHelper::setValueFromPropertiesList(
-                [
-                    'list' => [
-                        ['value' => 'value_1', 'label' => 'Label 1'],
-                    ],
+        $this->assertSame('Label 1', CustomFieldValueHelper::setValueFromPropertiesList(
+            [
+                'list' => [
+                    ['value' => 'value_1', 'label' => 'Label 1'],
                 ],
-                'value_1'
-            )
-        );
+            ],
+            'value_1'
+        ));
     }
 }

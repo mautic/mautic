@@ -117,7 +117,7 @@ class AbTestSettingsService
     private function setVariantSettings(VariantEntityInterface $variant): void
     {
         $variantsSettings = $variant->getVariantSettings();
-        $weight           = $variantsSettings['weight'] ?? 0;
+        $weight           = (int) ($variantsSettings['weight'] ?? 0);
         $parentVariant    = $variant->getVariantParent();
 
         if ($parentVariant instanceof VariantEntityInterface) {
@@ -126,7 +126,7 @@ class AbTestSettingsService
 
         $this->setVariantSettingsWeight($variant, $weight);
 
-        if (true === $this->setCriteriaFromVariants && array_key_exists('winnerCriteria', $variantsSettings)) {
+        if ($this->setCriteriaFromVariants && array_key_exists('winnerCriteria', $variantsSettings)) {
             $this->setWinnerCriteriaFromVariant($variantsSettings['winnerCriteria']);
         }
     }

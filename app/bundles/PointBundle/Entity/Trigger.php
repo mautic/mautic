@@ -98,7 +98,7 @@ class Trigger extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['trigger:read', 'trigger:write'])]
     private $category;
 
@@ -165,9 +165,7 @@ class Trigger extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
     }
 
     /**
@@ -203,7 +201,7 @@ class Trigger extends FormEntity implements UuidInterface
      * @param string $prop
      * @param mixed  $val
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         if ('events' == $prop) {
             // changes are already computed so just add them
@@ -214,8 +212,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -224,8 +220,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      */
     public function setDescription($description): static
@@ -237,8 +231,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get description.
-     *
      * @return string|null
      */
     public function getDescription()
@@ -247,8 +239,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      */
     public function setName($name): static
@@ -260,8 +250,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()
@@ -291,8 +279,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get events.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getEvents()
@@ -301,8 +287,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
      */
     public function setPublishUp($publishUp): static
@@ -314,8 +298,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishUp()
@@ -324,8 +306,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
      */
     public function setPublishDown($publishDown): static
@@ -337,8 +317,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishDown()

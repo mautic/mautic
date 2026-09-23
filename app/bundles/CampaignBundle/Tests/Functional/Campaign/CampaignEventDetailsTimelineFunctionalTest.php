@@ -80,19 +80,32 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
         $this->testSymfonyCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
+        $operator = $translator->trans('mautic.lead.list.form.operator.in');
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead1->getId()));
         $this->assertStringContainsString(
-            $translator->trans('mautic.campaign.parent.details', ['%path%' => 'yes', '%type%' => 'condition', '%name%' => 'Field Value Condition']),
-            $this->client->getResponse()->getContent()
+            $translator->trans('mautic.campaign.event.condition.details', [
+                '%path%'            => 'yes',
+                '%field%'           => 'select_field',
+                '%operator%'        => $operator,
+                '%comparisonValue%' => 'v1,v3',
+                '%value%'           => 'v1,v3',
+            ]),
+            (string) $this->client->getResponse()->getContent()
         );
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead2->getId()));
         $this->assertStringContainsString(
-            $translator->trans('mautic.campaign.parent.details', ['%path%' => 'no', '%type%' => 'condition', '%name%' => 'Field Value Condition']),
-            $this->client->getResponse()->getContent()
+            $translator->trans('mautic.campaign.event.condition.details', [
+                '%path%'            => 'no',
+                '%field%'           => 'select_field',
+                '%operator%'        => $operator,
+                '%comparisonValue%' => 'v1,v3',
+                '%value%'           => 'v1,v3',
+            ]),
+            (string) $this->client->getResponse()->getContent()
         );
     }
 }

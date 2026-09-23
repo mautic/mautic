@@ -12,16 +12,16 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 {
+    public function __construct(
+        private readonly LeadRepository $leadRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
+    ) {
+    }
+
     public function load(ObjectManager $manager): void
     {
-        /** @var LeadRepository $leadRepo */
-        $leadRepo        = $manager->getRepository(Lead::class);
-
-        /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo = $manager->getRepository(CompanyLead::class);
-
         $today = new \DateTime();
         $leads = CsvHelper::csv_to_array(__DIR__.'/fakeleaddata.csv');
 
@@ -43,7 +43,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
                 $lead->addUpdatedField($col, $val);
             }
 
-            $leadRepo->saveEntity($lead);
+            $this->leadRepository->saveEntity($lead);
 
             $this->setReference('lead-'.$count, $lead);
 
@@ -56,16 +56,13 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
                     $companyLead->setCompany($this->getReference('company-'.$lastCharacter));
                     $companyLead->setDateAdded($today);
                     $companyLead->setPrimary(true);
-                    $companyLeadRepo->saveEntity($companyLead);
+                    $this->companyLeadRepository->saveEntity($companyLead);
                 }
             }
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 5;
     }

@@ -26,8 +26,12 @@ export default class DynamicContentCommands {
       ckEditors.forEach((value, key, map) => {
         const name = key.id;
         if (name.includes('dynamicContent')) {
+          const editor = map.get(key);
+          if (editor && typeof editor.updateSourceElement === 'function') {
+            editor.updateSourceElement();
+          }
           logger.debug(`Destroying Dynamic Content editor: ${name}`);
-          map.get(key).destroy();
+          editor.destroy();
           // eslint-disable-next-line no-undef
           ckEditors.delete(key);
         }
@@ -35,7 +39,7 @@ export default class DynamicContentCommands {
     }
 
     // empty the listeners, these are created when reopening
-    // otherwise the listeners are compounded and we get multiple CKEditors 
+    // otherwise the listeners are compounded and we get multiple CKEditors
     // for 1 textarea
     if (
       Mautic.internalDynamicContentItemCreateListeners &&

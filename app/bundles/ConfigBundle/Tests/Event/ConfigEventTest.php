@@ -101,7 +101,7 @@ final class ConfigEventTest extends \PHPUnit\Framework\TestCase
             ->willReturn($realPath);
 
         $this->assertSame($fileContent, $event->getFileContent($uploadedFile));
-        $this->assertFalse(file_exists($realPath));
+        $this->assertFileDoesNotExist($realPath);
     }
 
     public function testEncodeFileContents(): void
@@ -123,7 +123,7 @@ final class ConfigEventTest extends \PHPUnit\Framework\TestCase
 
         $origNormData = ['orig'];
 
-        $this->assertInstanceOf(ConfigEvent::class, $event->setOriginalNormData($origNormData));
+        $event->setOriginalNormData($origNormData);
         $this->assertSame($origNormData, $event->getOriginalNormData());
 
         $normData = ['norm'];

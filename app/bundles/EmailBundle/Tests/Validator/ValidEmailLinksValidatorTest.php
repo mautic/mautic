@@ -86,7 +86,7 @@ final class ValidEmailLinksValidatorTest extends TestCase
     {
         $this->expectException(UnexpectedTypeException::class);
 
-        $this->validator->validate(new Email(), $this->createMock(Constraint::class));
+        $this->validator->validate(new Email(), $this->createStub(Constraint::class));
     }
 
     private function expectViolation(string $path, string $url): void

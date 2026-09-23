@@ -84,7 +84,7 @@ final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 
         $request->request = $inputBag;
 
-        $this->assertEquals('Hello', $this->getCallback()->getMessage($request));
+        $this->assertSame('Hello', $this->getCallback()->getMessage($request));
     }
 
     private function getCallback(): TwilioCallback

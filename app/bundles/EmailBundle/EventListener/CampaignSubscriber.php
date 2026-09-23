@@ -34,15 +34,15 @@ use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EmailModel $emailModel,
-        private readonly RealTimeExecutioner $realTimeExecutioner,
-        private readonly SendEmailToUser $sendEmailToUser,
-        private readonly TranslatorInterface $translator,
-        private readonly LeadModel $leadModel,
-        private readonly StatRepository $statRepository,
+        private EmailModel $emailModel,
+        private RealTimeExecutioner $realTimeExecutioner,
+        private SendEmailToUser $sendEmailToUser,
+        private TranslatorInterface $translator,
+        private LeadModel $leadModel,
+        private StatRepository $statRepository,
     ) {
     }
 
@@ -225,11 +225,13 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $event->setResult(false);
 
                 return;
-            } elseif ($event->checkContext('email.open')) {
+            }
+            if ($event->checkContext('email.open')) {
                 $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
 
                 return;
-            } elseif ($event->checkContext('email.reply')) {
+            }
+            if ($event->checkContext('email.reply')) {
                 $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
 
                 return;
@@ -313,7 +315,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             if (!$options['ignoreDNC']) {
                 $categories = $this->leadModel->getUnsubscribedLeadCategoriesIds($contact);
-                if ($emailCategory && !empty($categories) && in_array($emailCategory, $categories)) {
+                if ($emailCategory && [] !== $categories && in_array($emailCategory, $categories)) {
                     // Pass with a note to the UI because no use retrying
                     $event->passWithError(
                         $pending->get($logId),

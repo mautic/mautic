@@ -43,7 +43,7 @@ class PointBuilderEvent extends Event
     public function addAction($key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
+            throw new InvalidArgumentException("The key, '{$key}' is already used by another action. Please use a different key.");
         }
 
         // check for required keys and that given functions are callable
@@ -102,7 +102,7 @@ class PointBuilderEvent extends Event
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $component)) {
-                throw new InvalidArgumentException("The key, '$k' is missing.");
+                throw new InvalidArgumentException("The key, '{$k}' is missing.");
             }
         }
 

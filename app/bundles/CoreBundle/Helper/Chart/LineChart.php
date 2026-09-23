@@ -5,15 +5,13 @@ namespace Mautic\CoreBundle\Helper\Chart;
 /**
  * Line chart requires the same data as Bar chart.
  */
-class LineChart extends AbstractChart implements ChartInterface
+final class LineChart extends AbstractChart implements ChartInterface
 {
     /**
      * Match date/time unit to a humanly readable label
      * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}.
-     *
-     * @var array
      */
-    protected $labelFormats = [
+    private array $labelFormats = [
         's' => 'H:i:s',
         'i' => 'H:i',
         'H' => 'M j ga',
@@ -35,9 +33,9 @@ class LineChart extends AbstractChart implements ChartInterface
      */
     public function __construct(
         ?string $unit = null,
-        $dateFrom = null,
-        $dateTo = null,
-        protected $dateFormat = null,
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
+        private $dateFormat = null,
     ) {
         $this->unit       = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
         $this->isTimeUnit = in_array($this->unit, ['H', 'i', 's']);

@@ -7,11 +7,13 @@ namespace Mautic\CoreBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ExportControllerTest extends MauticMysqlTestCase
@@ -35,7 +37,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         $this->createAndLoginUser($permissions);
 
         $this->client->request(Request::METHOD_GET, '/s/contacts');
-        $this->assertStringContainsString('Export to CSV', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Export to CSV', (string) $this->client->getResponse()->getContent());
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=csv');
         self::assertResponseIsSuccessful();
     }
@@ -51,7 +53,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         $formId = $this->createForm();
 
         $this->client->request(Request::METHOD_GET, '/s/forms/results/'.$formId);
-        $this->assertStringContainsString('Export to CSV', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Export to CSV', (string) $this->client->getResponse()->getContent());
         $this->client->request(Request::METHOD_GET, '/s/forms/results/'.$formId.'/export');
         self::assertResponseIsSuccessful();
     }
@@ -79,14 +81,14 @@ final class ExportControllerTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
         $this->assertResponseIsSuccessful();
 
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'');
-        $this->assertStringContainsString('Export to CSV', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Export to CSV', (string) $this->client->getResponse()->getContent());
         $this->client->request(Request::METHOD_GET, '/s/reports/view/'.$report->getId().'/export');
         $this->assertResponseIsSuccessful();
     }
@@ -142,7 +144,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);

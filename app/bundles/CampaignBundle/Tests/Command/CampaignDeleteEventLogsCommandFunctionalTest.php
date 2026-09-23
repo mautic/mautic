@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -19,26 +18,26 @@ final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTest
     public function testWithEventIds(): void
     {
         $exitCode = $this->createDataAndRunCommand(false);
-        Assert::assertSame(0, $exitCode);
+        $this->assertSame(0, $exitCode);
 
         $campaign = $this->em->getRepository(Campaign::class)->findAll();
-        Assert::assertCount(1, $campaign);
+        $this->assertCount(1, $campaign);
 
         $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(2, $eventLogs); // Logs are preserved when events are deleted
+        $this->assertCount(2, $eventLogs); // Logs are preserved when events are deleted
     }
 
     public function testWithCampaignId(): void
     {
         $exitCode = $this->createDataAndRunCommand(true);
 
-        Assert::assertSame(0, $exitCode);
+        $this->assertSame(0, $exitCode);
 
         $campaign = $this->em->getRepository(Campaign::class)->findAll();
-        Assert::assertCount(0, $campaign);
+        $this->assertCount(0, $campaign);
 
         $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
-        Assert::assertCount(0, $eventLogs);
+        $this->assertCount(0, $eventLogs);
     }
 
     private function createApplicationTester(): ApplicationTester

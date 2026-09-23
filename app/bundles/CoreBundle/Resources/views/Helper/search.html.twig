@@ -4,26 +4,51 @@
 {% set overlayEnabled = overlayDisabled is defined and overlayDisabled is not empty ? 'false' : 'true' %}
 {% set id = searchId|default('list-search') %}
 {% set tmpl = tmpl|default('list') %}
+{% set scopeCommands = [] %}
+{% if searchScopes is defined and searchScopes is not empty %}
+    {% for scope in searchScopes %}
+        {% if scope.disabled|default(false) is same as(false) %}
+            {% set scopeCommands = scopeCommands|merge([scope.command|default('')]) %}
+        {% endif %}
+    {% endfor %}
+    {% set parsedScope = search_scope_parse(searchValue, scopeCommands) %}
+    {% set displaySearchValue = parsedScope.command ? parsedScope.value : searchValue %}
+{% else %}
+    {% set parsedScope = {'command': '', 'value': searchValue} %}
+    {% set displaySearchValue = searchValue %}
+{% endif %}
+{% set hasActiveSearch = searchValue|default('')|trim is not empty %}
 
 {% include '@MauticCore/Helper/button.html.twig' with {
     buttons: [
         {
             label: 'mautic.core.search.clear',
             variant: 'ghost',
-            icon: 'ri-search-line ri-fw',
+            icon: hasActiveSearch ? 'ri-eraser-line ri-fw' : 'ri-search-line ri-fw',
             icon_only: true,
             size: 'lg',
             attributes: {
                 'type': 'button',
                 'id': 'btn-filter',
                 'data-livesearch-parent': id,
+                'data-livesearch-action': hasActiveSearch ? 'clear' : 'search',
                 'class': 'input-group-btn btn-search'
             }
         }
     ]
 } %}
 <div class="input-group d-flex fg-1">
-    <input type="search" class="form-control search" id="{{ id }}" name="search" placeholder="{% trans %}mautic.core.search.placeholder{% endtrans %}" value="{{ searchValue|escape }}" autocomplete="false" data-toggle="livesearch" data-target="{{ target }}" data-tmpl="{{ tmpl }}" data-action="{{ action }}" data-overlay="{{ overlayEnabled }}" data-overlay-text="{% trans %}mautic.core.search.livesearch{% endtrans %}" data-overlay-target="{{ overlayTarget }}" />
+    {% if searchScopes is defined and searchScopes is not empty %}
+        {{ include('@MauticCore/Helper/search_scope.html.twig', {
+            id: id,
+            searchValue: searchValue,
+            searchScopes: searchScopes,
+            searchScopeHint: searchScopeHint|default(null),
+            scopeCommands: scopeCommands,
+            parsedScope: parsedScope,
+        }) }}
+    {% endif %}
+    <input type="search" class="form-control search" id="{{ id }}" name="search" placeholder="{% trans %}mautic.core.search.placeholder{% endtrans %}" value="{{ displaySearchValue|escape }}" autocomplete="off" data-toggle="livesearch" data-target="{{ target }}" data-tmpl="{{ tmpl }}" data-action="{{ action }}" data-overlay="{{ overlayEnabled }}" data-overlay-text="{% trans %}mautic.core.search.livesearch{% endtrans %}" data-overlay-target="{{ overlayTarget }}" />
 </div>
 {% if (filters is defined and filters is not empty) or (quickFilters is defined and quickFilters is not empty) %}
 {% set filtering %}

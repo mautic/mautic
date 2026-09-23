@@ -346,13 +346,13 @@ final class RedirectUrlTokensFinderTest extends TestCase
     #[DataProvider('provideUrlToCheck')]
     public function testHasTokens(string $url, bool $expected): void
     {
-        self::assertSame($expected, $this->redirectUrlTokensFinder->hasTokens($url));
+        $this->assertSame($expected, $this->redirectUrlTokensFinder->hasTokens($url));
     }
 
     #[DataProvider('provideUrlToReplace')]
     public function testReplaceTokensWithDummyData(string $url, string $expected): void
     {
-        self::assertSame($expected, $this->redirectUrlTokensFinder->replaceTokensWithDummyData($url));
+        $this->assertSame($expected, $this->redirectUrlTokensFinder->replaceTokensWithDummyData($url));
     }
 
     protected function setUp(): void

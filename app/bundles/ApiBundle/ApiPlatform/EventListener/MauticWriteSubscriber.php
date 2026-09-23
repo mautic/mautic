@@ -15,11 +15,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 final readonly class MauticWriteSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private UserHelper $userHelper)
-    {
+    public function __construct(
+        private UserHelper $userHelper,
+    ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::VIEW => ['addData', EventPriorities::PRE_WRITE],

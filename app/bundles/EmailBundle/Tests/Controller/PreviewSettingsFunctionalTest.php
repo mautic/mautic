@@ -27,27 +27,18 @@ final class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
         $mainPageId = $emailMain->getId();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
-        self::assertStringContainsString($emailMain->getName(), $crawler->text());
+        $this->assertStringContainsString($emailMain->getName(), $crawler->text());
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$mainPageId}");
 
         // Translation choice is not visible
-        self::assertCount(
-            0,
-            $crawler->filterXPath('//*[@id="content_preview_settings_translation"]')
-        );
+        $this->assertCount(0, $crawler->filterXPath('//*[@id="content_preview_settings_translation"]'));
 
         // Variant choice is not visible
-        self::assertCount(
-            0,
-            $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
-        );
+        $this->assertCount(0, $crawler->filterXPath('//*[@id="content_preview_settings_variant"]'));
 
         // Contact lookup is not visible
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_contact"]'));
 
         $emailTranslated = new Email();
         $emailTranslated->setIsPublished(true);
@@ -82,31 +73,16 @@ final class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$mainPageId}");
 
         // Translation choice is visible
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_translation"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_translation"]'));
 
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_translation"]/option[@value="'.$emailTranslated->getId().'"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_translation"]/option[@value="'.$emailTranslated->getId().'"]'));
 
         // Variant choice is visible
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_variant"]'));
 
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_variant"]/option[@value="'.$emailVariant->getId().'"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_variant"]/option[@value="'.$emailVariant->getId().'"]'));
 
         // Contact lookup is visible
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_contact"]'));
     }
 }

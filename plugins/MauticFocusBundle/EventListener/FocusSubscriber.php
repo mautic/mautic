@@ -24,17 +24,17 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-class FocusSubscriber implements EventSubscriberInterface
+final readonly class FocusSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly RouterInterface $router,
-        private readonly IpLookupHelper $ipHelper,
-        private readonly AuditLogModel $auditLogModel,
-        private readonly TrackableModel $trackableModel,
-        private readonly PageTokenHelper $pageTokenHelper,
-        private readonly AssetTokenHelper $assetTokenHelper,
-        private readonly FocusModel $focusModel,
-        private readonly RequestStack $requestStack,
+        private RouterInterface $router,
+        private IpLookupHelper $ipHelper,
+        private AuditLogModel $auditLogModel,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
+        private FocusModel $focusModel,
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -49,8 +49,8 @@ class FocusSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /*
-     * Check and hijack the form's generate link if the ID has mf- in it
+    /**
+     * Check and hijack the form's generate link if the ID has mf- in it.
      */
     public function onKernelRequest(RequestEvent $event): void
     {

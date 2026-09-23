@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\FormBundle\Entity\Submission;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
@@ -21,7 +22,7 @@ class PageRepository extends CommonRepository
             // use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
             $sq = $this->_em->createQueryBuilder()
                 ->select('count(fs.id)')
-                ->from(\Mautic\FormBundle\Entity\Submission::class, 'fs')
+                ->from(Submission::class, 'fs')
                 ->where('fs.page = p');
 
             $select[] = '('.$sq->getDql().') as submission_count';
@@ -161,12 +162,12 @@ class PageRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr            = '('.$q->expr()->eq('p.language', ":$unique").' OR '.$q->expr()->like('p.language', ":$langUnique").')';
+                $expr            = '('.$q->expr()->eq('p.language', ":{$unique}").' OR '.$q->expr()->like('p.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.page.searchcommand.isprefcenter'):
             case $this->translator->trans('mautic.page.searchcommand.isprefcenter', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('p.isPreferenceCenter', ":$unique");
+                $expr            = $q->expr()->eq('p.isPreferenceCenter', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -189,7 +190,7 @@ class PageRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
@@ -250,8 +251,6 @@ class PageRepository extends CommonRepository
     }
 
     /**
-     * Up the hit count.
-     *
      * @param int        $increaseBy
      * @param bool|false $unique
      * @param bool|false $variant

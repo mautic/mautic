@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\FormBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,8 +17,10 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testDownloadFileByFileNameAction(): void
     {
-        $fieldModel   = static::getContainer()->get('mautic.form.model.field');
-        $formUploader = static::getContainer()->get('mautic.form.helper.form_uploader');
+        /** @var FieldModel $fieldModel */
+        $fieldModel   = self::getContainer()->get(FieldModel::class);
+        /** @var FormUploader $formUploader */
+        $formUploader = self::getContainer()->get(FormUploader::class);
         $fileName     = 'image.png';
 
         $this->createFile($fileName);
@@ -114,8 +118,8 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/forms/results/{$formId}/add-to-segment");
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('form', $response->getContent());
-        $this->assertStringContainsString('batch', $response->getContent());
+        $this->assertStringContainsString('form', (string) $response->getContent());
+        $this->assertStringContainsString('batch', (string) $response->getContent());
     }
 
     public function testEditButtonIsDisplayedOnFormResultsPage(): void

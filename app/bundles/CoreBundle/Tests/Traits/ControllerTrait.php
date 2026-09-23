@@ -22,12 +22,12 @@ trait ControllerTrait
 
         PageControllerTest::assertStringContainsString(
             'col-'.$routeAlias.'-dateAdded',
-            $responseContent,
+            (string) $responseContent,
             'The return must contain the created at date column'
         );
         PageControllerTest::assertStringContainsString(
             'col-'.$routeAlias.'-'.$column,
-            $responseContent,
+            (string) $responseContent,
             'The return must contain the modified date column'
         );
 

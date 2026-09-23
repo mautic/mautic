@@ -13,13 +13,13 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignReplySubscriber implements EventSubscriberInterface
+final readonly class CampaignReplySubscriber implements EventSubscriberInterface
 {
     public const TYPE = 'sms.reply';
 
     public function __construct(
-        private readonly TransportChain $transportChain,
-        private readonly RealTimeExecutioner $realTimeExecutioner,
+        private TransportChain $transportChain,
+        private RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
 

@@ -9,10 +9,10 @@ use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\LeadBundle\Entity\Lead;
 
-class DecisionHelper
+final readonly class DecisionHelper
 {
     public function __construct(
-        private readonly LeadRepository $leadRepository,
+        private LeadRepository $leadRepository,
     ) {
     }
 
@@ -33,11 +33,11 @@ class DecisionHelper
 
         // If channels do not match up at all (not even fuzzy logic i.e. page vs page.redirect), there's no need to go further
         if ($channel && $event->getChannel() && !str_contains($channel, $event->getChannel())) {
-            throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");
+            throw new DecisionNotApplicableException("Channels, {$channel} and {$event->getChannel()}, do not match.");
         }
 
         if ($channel && $channelId && $event->getChannelId() && (string) $channelId !== (string) $event->getChannelId()) {
-            throw new DecisionNotApplicableException("Channel IDs, $channelId and {$event->getChannelId()}, do not match for $channel.");
+            throw new DecisionNotApplicableException("Channel IDs, {$channelId} and {$event->getChannelId()}, do not match for {$channel}.");
         }
 
         // Check if parent taken path is the path of this event, otherwise exit
@@ -56,7 +56,8 @@ class DecisionHelper
 
             if (1 === $pathTaken && !$parentEvent->getNegativeChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take negative path, event {$event->getId()} is on positive path.");
-            } elseif (0 === $pathTaken && !$parentEvent->getPositiveChildren()->contains($event)) {
+            }
+            if (0 === $pathTaken && !$parentEvent->getPositiveChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take positive path, event {$event->getId()} is on negative path.");
             }
         }

@@ -145,16 +145,13 @@ class Action implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-            'groups'  => ['action'],
-        ]));
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank(message: 'mautic.core.name.required', groups: ['action']));
     }
 
-    private function isChanged(string $prop, $val): void
+    private function isChanged(string $prop, mixed $val): void
     {
-        if ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        if ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
         }
     }
 
@@ -167,8 +164,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -177,8 +172,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set order.
-     *
      * @param int $order
      */
     public function setOrder($order): static
@@ -191,8 +184,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get order.
-     *
      * @return int
      */
     public function getOrder()
@@ -201,8 +192,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set properties.
-     *
      * @param array $properties
      */
     public function setProperties($properties): static
@@ -215,8 +204,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get properties.
-     *
      * @return array
      */
     public function getProperties()
@@ -224,9 +211,6 @@ class Action implements UuidInterface
         return $this->properties;
     }
 
-    /**
-     * Set form.
-     */
     public function setForm(Form $form): static
     {
         $this->form = $form;
@@ -235,8 +219,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get form.
-     *
      * @return Form|null
      */
     public function getForm()
@@ -245,8 +227,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
      */
     public function setType($type): static
@@ -258,8 +238,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get type.
-     *
      * @return string|null
      */
     public function getType()
@@ -273,8 +251,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      */
     public function setDescription($description): static
@@ -286,8 +262,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get description.
-     *
      * @return string|null
      */
     public function getDescription()
@@ -296,8 +270,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      */
     public function setName($name): static
@@ -309,8 +281,6 @@ class Action implements UuidInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()
@@ -320,6 +290,6 @@ class Action implements UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getForm()?->getCreatedBy();
+        return $this->form?->getCreatedBy();
     }
 }

@@ -9,6 +9,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
@@ -19,7 +20,6 @@ use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\PageBundle\Model\RedirectModel;
@@ -57,7 +57,7 @@ final class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $requestStack = new RequestStack();
         $themeHelper  = $this->createMock(ThemeHelper::class);
-        $themeHelper->expects(self::never())
+        $themeHelper->expects($this->never())
             ->method('checkForTwigTemplate');
 
         $mailHashHelper = new MailHashHelper($coreParametersHelper);
@@ -95,6 +95,7 @@ final class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(RedirectModel::class),
             $this->createStub(SMimeHelper::class),
             $this->createStub(EmailStatModel::class),
+            $this->createStub(CopyRepository::class),
         );
         $mailHelper->setTokens($tokens);
 
@@ -149,14 +150,12 @@ CONTENT
             );
         $mailHelper->setEmail($email);
 
-        $lead = new Lead();
-        $lead->setEmail('hello@someone.com');
-        $mailHelper->setLead($lead);
+        $mailHelper->setLead(['id' => 1, 'email' => 'hello@someone.com']);
 
         $dispatcher           = new EventDispatcher();
         $primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
-        $primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
-            ->willReturn(['email' => 'hello@someone.com']);
+        $primaryCompanyHelper->method('mergePrimaryCompanyWithProfileFields')
+            ->willReturn(['id' => 1, 'email' => 'hello@someone.com']);
         $segmentRepository    = $this->createStub(LeadListRepository::class);
 
         /** @var TokenSubscriber $subscriber */
@@ -187,8 +186,8 @@ CONTENT
         MailHelper::searchReplaceTokens(array_keys($mailerTokens), $mailerTokens, $mailHelper->message);
         $parsedBody = $mailHelper->message->getHtmlBody();
 
-        $this->assertNotFalse(strpos($parsedBody, 'DEC value'));
-        $this->assertNotFalse(strpos($parsedBody, 'value test We'));
-        $this->assertNotFalse(strpos($parsedBody, 'Place your content here value'));
+        $this->assertStringContainsString('DEC value', (string) $parsedBody);
+        $this->assertStringContainsString('value test We', (string) $parsedBody);
+        $this->assertStringContainsString('Place your content here value', (string) $parsedBody);
     }
 }

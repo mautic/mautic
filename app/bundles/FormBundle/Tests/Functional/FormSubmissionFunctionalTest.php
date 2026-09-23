@@ -81,7 +81,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var EmailModel $emailModel */
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get(EmailModel::class);
         $emailModel->sendEmail($email, [[
             'id'        => $lead->getId(),
             'email'     => $lead->getEmail(),
@@ -98,6 +98,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
                 'lead'  => $lead->getId(),
             ]
         );
+        $this->assertInstanceOf(Stat::class, $emailStat);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/email/view/{$emailStat->getTrackingHash()}");
 

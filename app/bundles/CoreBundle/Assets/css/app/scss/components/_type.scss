@@ -400,8 +400,16 @@ code {
 
 pre {
   min-height: 40px;
-  max-height: 100px;
-  overflow: hidden;
+  overflow: auto;
+}
+
+.code-snippet--multi pre.code-snippet__code:before {
+  content: none;
+}
+
+.code-snippet--multi pre.code-snippet__code.code-snippet--scrollable {
+  max-height: 320px;
+  overflow: auto;
 }
 
 kbd {

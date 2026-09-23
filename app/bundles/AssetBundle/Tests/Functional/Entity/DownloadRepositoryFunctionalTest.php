@@ -43,10 +43,10 @@ final class DownloadRepositoryFunctionalTest extends MauticMysqlTestCase
             new \DateTime('2026-03-01 00:00:00', new \DateTimeZone('UTC'))
         );
 
-        self::assertArrayHasKey((string) $page->getId(), $result);
-        self::assertSame('1', (string) $result[(string) $page->getId()]['count']);
-        self::assertSame('Landing page', $result[(string) $page->getId()]['name']);
-        self::assertSame('77', (string) $result[(string) $page->getId()]['total']);
+        $this->assertArrayHasKey((string) $page->getId(), $result);
+        $this->assertSame('1', (string) $result[(string) $page->getId()]['count']);
+        $this->assertSame('Landing page', $result[(string) $page->getId()]['name']);
+        $this->assertSame('77', (string) $result[(string) $page->getId()]['total']);
     }
 
     public function testGetDownloadCountsByEmailRespectsFromDateFilter(): void
@@ -69,10 +69,10 @@ final class DownloadRepositoryFunctionalTest extends MauticMysqlTestCase
             new \DateTime('2026-03-01 00:00:00', new \DateTimeZone('UTC'))
         );
 
-        self::assertArrayHasKey((string) $email->getId(), $result);
-        self::assertSame('1', (string) $result[(string) $email->getId()]['count']);
-        self::assertSame('AB subject', $result[(string) $email->getId()]['name']);
-        self::assertSame('25', (string) $result[(string) $email->getId()]['total']);
+        $this->assertArrayHasKey((string) $email->getId(), $result);
+        $this->assertSame('1', (string) $result[(string) $email->getId()]['count']);
+        $this->assertSame('AB subject', $result[(string) $email->getId()]['name']);
+        $this->assertSame('25', (string) $result[(string) $email->getId()]['total']);
     }
 
     private function createDownload(

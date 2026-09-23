@@ -6,7 +6,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class StageBuilderEvent extends Event
+final class StageBuilderEvent extends Event
 {
     private array $actions = [];
 
@@ -43,7 +43,7 @@ class StageBuilderEvent extends Event
     public function addAction($key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
+            throw new InvalidArgumentException("The key, '{$key}' is already used by another action. Please use a different key.");
         }
 
         // check for required keys and that given functions are callable
@@ -60,9 +60,6 @@ class StageBuilderEvent extends Event
         $this->actions[$key] = $action;
     }
 
-    /**
-     * Get actions.
-     */
     public function getActions(): array
     {
         uasort($this->actions, fn ($a, $b): int => strnatcasecmp(
@@ -106,7 +103,7 @@ class StageBuilderEvent extends Event
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $component)) {
-                throw new InvalidArgumentException("The key, '$k' is missing.");
+                throw new InvalidArgumentException("The key, '{$k}' is missing.");
             }
         }
 

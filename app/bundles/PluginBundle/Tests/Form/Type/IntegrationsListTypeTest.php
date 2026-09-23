@@ -29,7 +29,7 @@ final class IntegrationsListTypeTest extends TestCase
         $integration1->expects($this->once())
             ->method('isPublished')
             ->willReturn(false);
-        $integration1->expects(self::never())
+        $integration1->expects($this->never())
             ->method('getPlugin');
 
         $plugin = $this->createMock(Plugin::class);
@@ -134,7 +134,7 @@ final class IntegrationsListTypeTest extends TestCase
             });
 
         $calledCallback = false;
-        $builder->expects(self::exactly(2))
+        $builder->expects($this->exactly(2))
             ->method('addEventListener')
             ->willReturnCallback(static function (string $eventName, callable $callback) use ($formEvent, &$calledCallback, $builder): FormBuilderInterface {
                 self::assertContains($eventName, [FormEvents::PRE_SET_DATA, FormEvents::PRE_SUBMIT]);
@@ -150,8 +150,8 @@ final class IntegrationsListTypeTest extends TestCase
         $integrationsListType = new IntegrationsListType($integrationHelper);
         $integrationsListType->buildForm($builder, ['supported_features' => 'features']);
 
-        self::assertSame(1, $callsBuilder);
-        self::assertSame(2, $callsForm);
+        $this->assertSame(1, $callsBuilder);
+        $this->assertSame(2, $callsForm);
     }
 
     public function testDataHaveIntegration(): void
@@ -162,7 +162,7 @@ final class IntegrationsListTypeTest extends TestCase
         $integration1->expects($this->once())
             ->method('isPublished')
             ->willReturn(false);
-        $integration1->expects(self::never())
+        $integration1->expects($this->never())
             ->method('getPlugin');
 
         $plugin = $this->createMock(Plugin::class);
@@ -247,16 +247,16 @@ final class IntegrationsListTypeTest extends TestCase
         ];
 
         $formEvent = $this->createMock(FormEvent::class);
-        $formEvent->expects(self::exactly(2))
+        $formEvent->expects($this->exactly(2))
             ->method('getForm')
             ->willReturn($form);
-        $formEvent->expects(self::exactly(2))
+        $formEvent->expects($this->exactly(2))
             ->method('getData')
             ->willReturn($data);
 
         $callsBuilder = 0;
         $builder      = $this->createMock(FormBuilderInterface::class);
-        \PHPUnit\Framework\Assert::assertInstanceOf(FormBuilderInterface::class, $builder);
+        $this->assertInstanceOf(FormBuilderInterface::class, $builder);
         $builder->method('add')
             ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use ($pluginName, &$callsBuilder, $builder): FormBuilderInterface {
                 if ('integration' === $key) {
@@ -275,7 +275,7 @@ final class IntegrationsListTypeTest extends TestCase
             });
 
         $calledCallback = 0;
-        $builder->expects(self::exactly(2))
+        $builder->expects($this->exactly(2))
             ->method('addEventListener')
             ->willReturnCallback(static function (string $eventName, callable $callback) use ($formEvent, &$calledCallback, $builder): FormBuilderInterface {
                 self::assertContains($eventName, [FormEvents::PRE_SET_DATA, FormEvents::PRE_SUBMIT]);
@@ -289,8 +289,8 @@ final class IntegrationsListTypeTest extends TestCase
         $integrationsListType = new IntegrationsListType($integrationHelper);
         $integrationsListType->buildForm($builder, ['supported_features' => 'features']);
 
-        self::assertSame(1, $callsBuilder);
-        self::assertSame(4, $callsForm, 'Because callback is called twice due to coverage.');
-        self::assertSame(2, $calledCallback);
+        $this->assertSame(1, $callsBuilder);
+        $this->assertSame(4, $callsForm, 'Because callback is called twice due to coverage.');
+        $this->assertSame(2, $calledCallback);
     }
 }

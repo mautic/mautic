@@ -9,6 +9,7 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -100,21 +101,21 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
         $submission = $submissions[0];
         $contact    = $submission->getLead();
 
-        $this->assertNotNull($contact, "Contact was not created for test: {$testName}");
+        $this->assertInstanceOf(Lead::class, $contact, "Contact was not created for test: {$testName}");
         $this->assertSame($contactEmail, $contact->getEmail());
 
         if ($expectedOwnerId) {
-            $this->assertNotNull($contact->getOwner(), "Owner not set for test: {$testName}");
+            $this->assertInstanceOf(User::class, $contact->getOwner(), "Owner not set for test: {$testName}");
             $this->assertSame($expectedOwnerId, $contact->getOwner()->getId(), "Incorrect owner set for test: {$testName}");
         } else {
-            $this->assertNull($contact->getOwner(), "Owner was set unexpectedly for test: {$testName}");
+            $this->assertNotInstanceOf(User::class, $contact->getOwner(), "Owner was set unexpectedly for test: {$testName}");
         }
 
         if ($expectedStageId) {
-            $this->assertNotNull($contact->getStage(), "Stage not set for test: {$testName}");
+            $this->assertInstanceOf(Stage::class, $contact->getStage(), "Stage not set for test: {$testName}");
             $this->assertSame($expectedStageId, $contact->getStage()->getId(), "Incorrect stage set for test: {$testName}");
         } else {
-            $this->assertNull($contact->getStage(), "Stage was set unexpectedly for test: {$testName}");
+            $this->assertNotInstanceOf(Stage::class, $contact->getStage(), "Stage was set unexpectedly for test: {$testName}");
         }
     }
 
@@ -140,7 +141,7 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
      */
     private function replacePlaceholders(array $data, array $replacements): array
     {
-        return array_map(fn ($value): string => str_replace(array_keys($replacements), array_values($replacements), $value), $data);
+        return array_map(fn (string $value): string => str_replace(array_keys($replacements), array_values($replacements), $value), $data);
     }
 
     /**

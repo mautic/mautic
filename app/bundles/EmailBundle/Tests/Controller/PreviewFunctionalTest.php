@@ -59,7 +59,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, $url);
         self::assertResponseIsSuccessful();
         foreach ($expectedContents as $expectedContent) {
-            self::assertStringContainsString($expectedContent, $crawler->text());
+            $this->assertStringContainsString($expectedContent, $crawler->text());
         }
     }
 
@@ -131,6 +131,82 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertPageContent($urlWithContact, $contentNoContactInfo, self::PREHEADER_TEXT);
     }
 
+    public function testPreviewEmailWithSegmentMembershipAndAdditionalCountryFilter(): void
+    {
+        // Create a segment
+        $segment = $this->createSegment('Test Segment');
+
+        // Create two contacts - one with country Austria, one with country Czech Republic
+        $leadWithAustria = $this->createLead('John', 'Austria', 'john.austria@test.com');
+        $leadWithAustria->setCountry('Austria');
+        $this->em->persist($leadWithAustria);
+
+        $leadWithCzech = $this->createLead('Jane', 'Czech', 'jane.czech@test.com');
+        $leadWithCzech->setCountry('Czech Republic');
+        $this->em->persist($leadWithCzech);
+
+        // Add both contacts to the segment
+        $this->addLeadToSegment($leadWithAustria, $segment);
+        $this->addLeadToSegment($leadWithCzech, $segment);
+
+        // Create email with dynamic content that filters by segment membership AND country
+        $email = $this->createEmail();
+        $email->setDynamicContent([
+            [
+                'tokenName' => 'Dynamic Content 1',
+                'content'   => '<p>Default content - not in segment or wrong country</p>',
+                'filters'   => [
+                    [
+                        'content' => '<p>You are in the segment AND from Czech Republic!</p>',
+                        'filters' => [
+                            [
+                                'glue'     => 'and',
+                                'field'    => 'leadlist',
+                                'object'   => 'lead',
+                                'type'     => 'leadlist',
+                                'filter'   => [$segment->getId()],
+                                'display'  => 'Segment Membership',
+                                'operator' => 'in',
+                            ],
+                            [
+                                'glue'     => 'and',
+                                'field'    => 'country',
+                                'object'   => 'lead',
+                                'type'     => 'country',
+                                'filter'   => 'Czech Republic',
+                                'display'  => null,
+                                'operator' => '=',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $email->setCustomHtml('<html><body>{dynamiccontent="Dynamic Content 1"}</body></html>');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $url = "/email/preview/{$email->getId()}";
+
+        // Contact with Austria (in segment but wrong country) - should get DEFAULT content
+        $urlWithAustriaContact = "{$url}?contactId={$leadWithAustria->getId()}";
+        $this->assertPageContent($urlWithAustriaContact, 'Default content - not in segment or wrong country', self::PREHEADER_TEXT);
+        $this->assertStringNotContainsString('You are in the segment AND from Czech Republic!', (string) $this->client->getResponse()->getContent());
+
+        // Contact with Czech Republic (in segment AND correct country) - should get VARIANT content
+        $urlWithCzechContact = "{$url}?contactId={$leadWithCzech->getId()}";
+        $this->assertPageContent($urlWithCzechContact, 'You are in the segment AND from Czech Republic!', self::PREHEADER_TEXT);
+        $this->assertStringNotContainsString('Default content - not in segment or wrong country', (string) $this->client->getResponse()->getContent());
+
+        // Without contact (admin preview) - should get DEFAULT content
+        $this->assertPageContent($url, 'Default content - not in segment or wrong country', self::PREHEADER_TEXT);
+
+        $this->logoutUser();
+
+        // Anonymous visitor - should get DEFAULT content
+        $this->assertPageContent($url, 'Default content - not in segment or wrong country', self::PREHEADER_TEXT);
+    }
+
     public function testPreviewEmailForDynamicContentVariantsWithCustomField(): void
     {
         // Create custom field
@@ -147,7 +223,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
             ]
         );
         self::assertResponseStatusCodeSame(201);
-        self::assertJson($this->client->getResponse()->getContent());
+        $this->assertJson($this->client->getResponse()->getContent());
 
         // Create some contacts
         $this->client->request(
@@ -245,7 +321,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/email/preview/5009');
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        self::assertStringContainsString('404 Not Found - Requested URL not found: /email/preview/5009', $crawler->text());
+        $this->assertStringContainsString('404 Not Found - Requested URL not found: /email/preview/5009', $crawler->text());
     }
 
     private function createSegment(string $name = 'Segment 1'): LeadList
@@ -293,6 +369,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $url                    = "/email/preview/{$email->getId()}";

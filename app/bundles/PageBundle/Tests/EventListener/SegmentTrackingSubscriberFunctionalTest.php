@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -29,7 +29,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['append_segment_id_tracking_url'] = 'testFeatureFlagIsDisabled' !== $this->name();
         parent::setUp();
-        $this->dispatcher = $this->getContainer()->get('event_dispatcher');
+        $this->dispatcher = $this->getContainer()->get(EventDispatcherInterface::class);
     }
 
     public function testFeatureFlagIsDisabled(): void
@@ -37,8 +37,8 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $lead      = $this->createContactWithSegments(2);
         $resultUrl = $this->dispatchUrlTokenReplaceEvent(self::TEST_URL, $lead);
 
-        Assert::assertSame(self::TEST_URL, $resultUrl, 'When feature flag is disabled, URL should not be modified');
-        Assert::assertStringNotContainsString('segment_ids', $resultUrl, 'URL should not contain segment_ids parameter when feature flag is disabled');
+        $this->assertSame(self::TEST_URL, $resultUrl, 'When feature flag is disabled, URL should not be modified');
+        $this->assertStringNotContainsString('segment_ids', $resultUrl, 'URL should not contain segment_ids parameter when feature flag is disabled');
     }
 
     public function testFeatureFlagIsEnabled(): void
@@ -46,11 +46,11 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $lead      = $this->createContactWithSegments(2);
         $resultUrl = $this->dispatchUrlTokenReplaceEvent(self::TEST_URL, $lead);
 
-        Assert::assertStringContainsString(self::SEGMENT_IDS_PARAM, $resultUrl, 'When feature flag is enabled, segment IDs should be appended');
-        Assert::assertStringStartsWith(self::TEST_URL.'?'.self::SEGMENT_IDS_PARAM, $resultUrl, 'Segment IDs should be appended as query parameter');
+        $this->assertStringContainsString(self::SEGMENT_IDS_PARAM, $resultUrl, 'When feature flag is enabled, segment IDs should be appended');
+        $this->assertStringStartsWith(self::TEST_URL.'?'.self::SEGMENT_IDS_PARAM, $resultUrl, 'Segment IDs should be appended as query parameter');
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideUrlVariations')]
+    #[DataProvider('provideUrlVariations')]
     public function testUrlVariationsHandledCorrectly(
         string $testCase,
         string $url,
@@ -60,11 +60,11 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $lead      = $this->createContactWithSegments(2);
         $resultUrl = $this->dispatchUrlTokenReplaceEvent($url, $lead);
 
-        Assert::assertStringContainsString(self::SEGMENT_IDS_PARAM, $resultUrl, $testCase);
-        Assert::assertStringContainsString($expectedSeparator.self::SEGMENT_IDS_PARAM, $resultUrl, $testCase);
+        $this->assertStringContainsString(self::SEGMENT_IDS_PARAM, $resultUrl, $testCase);
+        $this->assertStringContainsString($expectedSeparator.self::SEGMENT_IDS_PARAM, $resultUrl, $testCase);
 
         if (null !== $expectedContent) {
-            Assert::assertStringContainsString($expectedContent, $resultUrl, $testCase);
+            $this->assertStringContainsString($expectedContent, $resultUrl, $testCase);
         }
     }
 
@@ -111,8 +111,8 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $resultUrl = $this->dispatchUrlTokenReplaceEvent(self::TEST_URL, $lead);
 
-        Assert::assertSame(self::TEST_URL, $resultUrl, 'URL should not be modified when contact has no segments');
-        Assert::assertStringNotContainsString('segment_ids', $resultUrl, 'URL should not contain segment_ids');
+        $this->assertSame(self::TEST_URL, $resultUrl, 'URL should not be modified when contact has no segments');
+        $this->assertStringNotContainsString('segment_ids', $resultUrl, 'URL should not contain segment_ids');
     }
 
     public function testContactRemovedFromSegment(): void
@@ -140,11 +140,11 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $returnedIds = explode(',', $queryParams['segment_ids']);
 
-        Assert::assertCount(2, $returnedIds, 'Should return 2 segment IDs after removing one');
-        Assert::assertNotContains((string) $segmentIds[0], $returnedIds, 'Removed segment ID should not be present');
+        $this->assertCount(2, $returnedIds, 'Should return 2 segment IDs after removing one');
+        $this->assertNotContains((string) $segmentIds[0], $returnedIds, 'Removed segment ID should not be present');
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideSegmentCounts')]
+    #[DataProvider('provideSegmentCounts')]
     public function testSegmentIdsSortedAndFormattedCorrectly(int $segmentCount): void
     {
         $lead      = $this->createContactWithSegments($segmentCount);
@@ -154,16 +154,16 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         parse_str($parsedUrl['query'] ?? '', $queryParams);
 
         $segmentIds = explode(',', $queryParams['segment_ids']);
-        Assert::assertCount($segmentCount, $segmentIds, "Should return exactly {$segmentCount} segment IDs");
+        $this->assertCount($segmentCount, $segmentIds, "Should return exactly {$segmentCount} segment IDs");
 
         foreach ($segmentIds as $id) {
-            Assert::assertTrue(ctype_digit($id), "Segment ID '{$id}' should be numeric");
-            Assert::assertGreaterThan(0, (int) $id, 'Segment ID should be positive');
+            $this->assertTrue(ctype_digit($id), "Segment ID '{$id}' should be numeric");
+            $this->assertGreaterThan(0, (int) $id, 'Segment ID should be positive');
         }
 
-        $sortedIds = array_map('intval', $segmentIds);
+        $sortedIds = array_map(intval(...), $segmentIds);
         sort($sortedIds);
-        Assert::assertSame($sortedIds, array_map('intval', $segmentIds), 'Segment IDs should be sorted numerically');
+        $this->assertSame($sortedIds, array_map(intval(...), $segmentIds), 'Segment IDs should be sorted numerically');
     }
 
     /**
@@ -182,7 +182,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $event = new UrlTokenReplaceEvent(self::TEST_URL, $lead, 123);
         $this->dispatcher->dispatch($event);
 
-        Assert::assertStringContainsString(self::SEGMENT_IDS_PARAM, $event->getContent(), 'Should append segment IDs regardless of email ID parameter');
+        $this->assertStringContainsString(self::SEGMENT_IDS_PARAM, $event->getContent(), 'Should append segment IDs regardless of email ID parameter');
     }
 
     public function testUnpublishedSegmentsNotIncluded(): void
@@ -192,6 +192,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $firstSegmentId = array_key_first($segments);
         $segment        = $this->em->getRepository(LeadList::class)->find($firstSegmentId);
+        $this->assertInstanceOf(LeadList::class, $segment);
         $segment->setIsPublished(false);
         $this->em->persist($segment);
         $this->em->flush();
@@ -199,14 +200,14 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $resultUrl = $this->dispatchUrlTokenReplaceEvent(self::TEST_URL, $lead);
 
-        Assert::assertStringContainsString(self::SEGMENT_IDS_PARAM, $resultUrl, 'Should still append segment IDs for published segments');
-        Assert::assertStringNotContainsString((string) $firstSegmentId, $resultUrl, 'Unpublished segment ID should not be included');
+        $this->assertStringContainsString(self::SEGMENT_IDS_PARAM, $resultUrl, 'Should still append segment IDs for published segments');
+        $this->assertStringNotContainsString((string) $firstSegmentId, $resultUrl, 'Unpublished segment ID should not be included');
 
         $parsedUrl = parse_url($resultUrl);
         parse_str($parsedUrl['query'] ?? '', $queryParams);
         $segmentIds = explode(',', $queryParams['segment_ids']);
 
-        Assert::assertCount(2, $segmentIds, 'Should return 2 segment IDs (excluding unpublished)');
+        $this->assertCount(2, $segmentIds, 'Should return 2 segment IDs (excluding unpublished)');
     }
 
     public function testSegmentChangesReflectedInRealTime(): void
@@ -220,7 +221,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         parse_str($parsedUrl['query'] ?? '', $queryParams);
         $segmentIds = explode(',', $queryParams['segment_ids']);
 
-        Assert::assertCount($initialCount, $segmentIds, 'Should initially have 2 segment IDs');
+        $this->assertCount($initialCount, $segmentIds, 'Should initially have 2 segment IDs');
 
         $newSegment = new LeadList();
         $newSegment->setName(sprintf('New Segment %s', uniqid()));
@@ -244,8 +245,8 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         parse_str($parsedUrl2['query'], $queryParams2);
         $segmentIds2 = explode(',', $queryParams2['segment_ids']);
 
-        Assert::assertCount($initialCount + 1, $segmentIds2, 'Should now have 3 segment IDs after adding new segment');
-        Assert::assertContains((string) $newSegment->getId(), $segmentIds2, 'New segment ID should be included');
+        $this->assertCount($initialCount + 1, $segmentIds2, 'Should now have 3 segment IDs after adding new segment');
+        $this->assertContains((string) $newSegment->getId(), $segmentIds2, 'New segment ID should be included');
 
         $firstSegmentId = array_key_first($initialSegments);
         $listLead       = $this->em->getRepository(ListLead::class)->findOneBy([
@@ -265,8 +266,8 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         parse_str($parsedUrl3['query'], $queryParams3);
         $segmentIds3 = explode(',', $queryParams3['segment_ids']);
 
-        Assert::assertCount($initialCount, $segmentIds3, 'Should have 2 segment IDs after removing one');
-        Assert::assertNotContains((string) $firstSegmentId, $segmentIds3, 'Removed segment ID should not be included');
+        $this->assertCount($initialCount, $segmentIds3, 'Should have 2 segment IDs after removing one');
+        $this->assertNotContains((string) $firstSegmentId, $segmentIds3, 'Removed segment ID should not be included');
     }
 
     /**

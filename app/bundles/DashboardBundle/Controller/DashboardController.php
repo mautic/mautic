@@ -23,18 +23,26 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-class DashboardController extends AbstractFormController
+final class DashboardController extends AbstractFormController
 {
+    private DashboardModel $dashboardModel;
+
+    #[Required]
+    public function autowireDashboardController(
+        DashboardModel $dashboardModel,
+    ): void {
+        $this->dashboardModel = $dashboardModel;
+    }
+
     /**
      * Generates the default view.
      */
     public function indexAction(Request $request, WidgetService $widget, FormFactoryInterface $formFactory, PathsHelper $pathsHelper, RouterInterface $urlGenerator): Response
     {
-        $model   = $this->getModel('dashboard');
-        \assert($model instanceof DashboardModel);
-        $widgets = $model->getWidgets();
+        $widgets = $this->dashboardModel->getWidgets();
 
         // Apply the default dashboard if no widget exists
         if (!count($widgets) && $this->user->getId()) {
@@ -56,24 +64,24 @@ class DashboardController extends AbstractFormController
                 $request->getSession()->set('mautic.daterange.form.to', $to->format(DateTimeHelper::FORMAT_DB_DATE_ONLY.' 23:59:59'));
             }
 
-            $model->clearDashboardCache();
+            $this->dashboardModel->clearDashboardCache();
         }
 
         // Set new date range to the session, if present in POST
         $widget->setFilter($request);
 
         // Load date range from session
-        $filter = $model->getDefaultFilter();
+        $filter = $this->dashboardModel->getDefaultFilter();
 
         // Set the final date range to the form
         $dateRangeFilter['date_from'] = $filter['dateFrom']->format(WidgetService::FORMAT_HUMAN);
         $dateRangeFilter['date_to']   = $filter['dateTo']->format(WidgetService::FORMAT_HUMAN);
         $dateRangeForm                = $formFactory->create(DateRangeType::class, $dateRangeFilter, ['action' => $action]);
 
-        $model->populateWidgetsContent($widgets, $filter);
+        $this->dashboardModel->populateWidgetsContent($widgets, $filter);
         $releaseMetadata = ThisRelease::getMetadata();
 
-        $model->populateWidgetPreviews($widgets);
+        $this->dashboardModel->populateWidgetPreviews($widgets);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -128,13 +136,10 @@ class DashboardController extends AbstractFormController
     {
         // retrieve the entity
         $widget = new Widget();
-
-        $model  = $this->getModel('dashboard');
-        \assert($model instanceof DashboardModel);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'new']);
 
         // get the user form factory
-        $form       = $model->createForm($widget, $formFactory, $action);
+        $form       = $this->dashboardModel->createForm($widget, $formFactory, $action);
         $closeModal = false;
         $valid      = false;
 
@@ -145,7 +150,7 @@ class DashboardController extends AbstractFormController
                     $closeModal = true;
 
                     // form is valid so process the data
-                    $model->saveEntity($widget);
+                    $this->dashboardModel->saveEntity($widget);
                 }
             } else {
                 $closeModal = true;
@@ -159,8 +164,8 @@ class DashboardController extends AbstractFormController
                 'mauticContent' => 'widget',
             ];
 
-            $filter = $model->getDefaultFilter();
-            $model->populateWidgetContent($widget, $filter);
+            $filter = $this->dashboardModel->getDefaultFilter();
+            $this->dashboardModel->populateWidgetContent($widget, $filter);
 
             if ($valid && !$cancelled) {
                 $passthroughVars['upWidgetCount'] = 1;
@@ -190,13 +195,11 @@ class DashboardController extends AbstractFormController
      */
     public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId): JsonResponse|Response
     {
-        $model  = $this->getModel('dashboard');
-        \assert($model instanceof DashboardModel);
-        $widget = $model->getEntity($objectId);
+        $widget = $this->dashboardModel->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
         // get the user form factory
-        $form       = $model->createForm($widget, $formFactory, $action);
+        $form       = $this->dashboardModel->createForm($widget, $formFactory, $action);
         $closeModal = false;
         $valid      = false;
         // /Check for a submitted form and process it
@@ -206,7 +209,7 @@ class DashboardController extends AbstractFormController
                     $closeModal = true;
 
                     // form is valid so process the data
-                    $model->saveEntity($widget);
+                    $this->dashboardModel->saveEntity($widget);
                 }
             } else {
                 $closeModal = true;
@@ -220,8 +223,8 @@ class DashboardController extends AbstractFormController
                 'mauticContent' => 'widget',
             ];
 
-            $filter = $model->getDefaultFilter();
-            $model->populateWidgetContent($widget, $filter);
+            $filter = $this->dashboardModel->getDefaultFilter();
+            $this->dashboardModel->populateWidgetContent($widget, $filter);
 
             if ($valid && !$cancelled) {
                 $passthroughVars['upWidgetCount'] = 1;
@@ -257,13 +260,10 @@ class DashboardController extends AbstractFormController
 
         $flashes = [];
         $success = 0;
-
-        /** @var DashboardModel $model */
-        $model  = $this->getModel('dashboard');
-        $entity = $model->getEntity($objectId);
+        $entity = $this->dashboardModel->getEntity($objectId);
 
         if ($entity) {
-            $model->deleteEntity($entity);
+            $this->dashboardModel->deleteEntity($entity);
             $name      = $entity->getName();
             $flashes[] = [
                 'type'    => 'notice',
@@ -301,11 +301,8 @@ class DashboardController extends AbstractFormController
         }
 
         $name = $this->getNameFromRequest($request);
-
-        /** @var DashboardModel $dashboardModel */
-        $dashboardModel = $this->getModel('dashboard');
         try {
-            $dashboardModel->saveSnapshot($name);
+            $this->dashboardModel->saveSnapshot($name);
             $type = 'notice';
             $msg  = $this->translator->trans('mautic.dashboard.notice.save', [
                 '%name%'    => $name,
@@ -340,10 +337,8 @@ class DashboardController extends AbstractFormController
      */
     public function exportAction(Request $request): JsonResponse
     {
-        $dashboardModel = $this->getModel('dashboard');
-        \assert($dashboardModel instanceof DashboardModel);
         $filename = InputHelper::filename($this->getNameFromRequest($request), 'json');
-        $response = new JsonResponse($dashboardModel->toArray($filename));
+        $response = new JsonResponse($this->dashboardModel->toArray($filename));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');
@@ -366,7 +361,7 @@ class DashboardController extends AbstractFormController
         $type  = array_shift($parts);
         $name  = implode('.', $parts);
 
-        $dir  = $pathsHelper->getSystemPath("dashboard.$type");
+        $dir  = $pathsHelper->getSystemPath("dashboard.{$type}");
         $path = $dir.'/'.$name.'.json';
 
         if (file_exists($path) && is_writable($path)) {
@@ -391,7 +386,7 @@ class DashboardController extends AbstractFormController
         $type  = array_shift($parts);
         $name  = implode('.', $parts);
 
-        $dir  = $pathsHelper->getSystemPath("dashboard.$type");
+        $dir  = $pathsHelper->getSystemPath("dashboard.{$type}");
         $path = $dir.'/'.$name.'.json';
 
         if (!file_exists($path) || !is_readable($path)) {
@@ -406,23 +401,20 @@ class DashboardController extends AbstractFormController
         }
 
         if ($widgets) {
-            /** @var DashboardModel $model */
-            $model = $this->getModel('dashboard');
+            $this->dashboardModel->clearDashboardCache();
 
-            $model->clearDashboardCache();
-
-            $currentWidgets = $model->getWidgets();
+            $currentWidgets = $this->dashboardModel->getWidgets();
 
             if (count($currentWidgets)) {
                 foreach ($currentWidgets as $widget) {
-                    $model->deleteEntity($widget);
+                    $this->dashboardModel->deleteEntity($widget);
                 }
             }
 
-            $filter = $model->getDefaultFilter();
+            $filter = $this->dashboardModel->getDefaultFilter();
             foreach ($widgets as $widget) {
-                $widget = $model->populateWidgetEntity($widget);
-                $model->saveEntity($widget);
+                $widget = $this->dashboardModel->populateWidgetEntity($widget);
+                $this->dashboardModel->saveEntity($widget);
             }
         }
 
@@ -432,9 +424,6 @@ class DashboardController extends AbstractFormController
     public function importAction(Request $request, FormFactoryInterface $formFactory, PathsHelper $pathsHelper): Response
     {
         $preview = $request->get('preview');
-
-        /** @var DashboardModel $model */
-        $model = $this->getModel('dashboard');
 
         $directories = [
             'user'   => $pathsHelper->getSystemPath('dashboard.user'),
@@ -517,8 +506,8 @@ class DashboardController extends AbstractFormController
         if ($preview && isset($dashboards[$preview])) {
             // @todo check is_writable
             $widgets = $dashboards[$preview]['widgets'];
-            $filter  = $model->getDefaultFilter();
-            $model->populateWidgetsContent($widgets, $filter);
+            $filter  = $this->dashboardModel->getDefaultFilter();
+            $this->dashboardModel->populateWidgetsContent($widgets, $filter);
         } else {
             $widgets = [];
         }

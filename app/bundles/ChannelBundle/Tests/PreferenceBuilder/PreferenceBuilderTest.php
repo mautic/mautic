@@ -66,9 +66,9 @@ final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $preferences = $builder->getChannelPreferences();
 
         $this->assertCount(3, $preferences);
-        $this->assertTrue(isset($preferences['email']));
-        $this->assertTrue(isset($preferences['sms']));
-        $this->assertTrue(isset($preferences['push']));
+        $this->assertArrayHasKey('email', $preferences);
+        $this->assertArrayHasKey('sms', $preferences);
+        $this->assertArrayHasKey('push', $preferences);
 
         /** @var ChannelPreferences $email */
         $email = $preferences['email'];

@@ -10,7 +10,6 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use PHPUnit\Framework\Assert;
 
 final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
 {
@@ -22,7 +21,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $this->configParams['webhook_log_max']                      = 5;
         parent::setUp();
 
-        $this->webhookModel = static::getContainer()->get('mautic.webhook.model.webhook');
+        $this->webhookModel = self::getContainer()->get(WebhookModel::class);
     }
 
     public function testRemoveLogInstantly(): void
@@ -32,7 +31,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $logIds = [];
         for ($log = 1; $log <= 6; ++$log) {
             $addedLog = $this->createWebhookLog($webhook, 'test', 200);
-            array_push($logIds, $addedLog->getId());
+            $logIds[] = $addedLog->getId();
         }
 
         $this->assertLogs($webhook, 6, $logIds);
@@ -40,7 +39,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $this->webhookModel->addLog($webhook, 200, 15);
 
         array_shift($logIds);
-        array_push($logIds, end($logIds) + 1);
+        $logIds[] = end($logIds) + 1;
         $this->assertLogs($webhook, 6, $logIds);
     }
 
@@ -51,14 +50,14 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $logIds = [];
         for ($log = 1; $log <= 6; ++$log) {
             $addedLog = $this->createWebhookLog($webhook, 'test', 200);
-            array_push($logIds, $addedLog->getId());
+            $logIds[] = $addedLog->getId();
         }
 
         $this->assertLogs($webhook, 6, $logIds);
 
         $this->webhookModel->addLog($webhook, 200, 15);
 
-        array_push($logIds, end($logIds) + 1);
+        $logIds[] = end($logIds) + 1;
         $this->assertLogs($webhook, 7, $logIds);
     }
 
@@ -69,11 +68,11 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $logIds = [];
         for ($log = 1; $log <= 7; ++$log) {
             $addedLog = $this->createWebhookLog($webhook, 'test', 200);
-            array_push($logIds, $addedLog->getId());
+            $logIds[] = $addedLog->getId();
         }
 
         $output = $this->testSymfonyCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
-        Assert::assertStringContainsString('2 logs deleted successfully for webhook id - '.$webhook->getId(), $output->getDisplay());
+        $this->assertStringContainsString('2 logs deleted successfully for webhook id - '.$webhook->getId(), $output->getDisplay());
         array_shift($logIds);
         array_shift($logIds);
         $this->assertLogs($webhook, 5, $logIds);
@@ -82,7 +81,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
     public function testRemoveLogCommandForNoWebhook(): void
     {
         $output = $this->testSymfonyCommand(DeleteWebhookLogsCommand::COMMAND_NAME);
-        Assert::assertStringContainsString('There is 0 webhooks with logs more than defined limit.', $output->getDisplay());
+        $this->assertStringContainsString('There is 0 webhooks with logs more than defined limit.', $output->getDisplay());
     }
 
     /**
@@ -93,8 +92,8 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
         $logs   = $this->em->getRepository(Log::class)->findBy(['webhook' => $webhook]);
         $logIds = array_map(fn (Log $log) => $log->getId(), $logs);
 
-        Assert::assertCount($expectedCount, $logs);
-        Assert::assertSame($expectedIds, $logIds);
+        $this->assertCount($expectedCount, $logs);
+        $this->assertSame($expectedIds, $logIds);
     }
 
     private function createWebhook(string $name, string $url, string $secret): Webhook
