@@ -231,5 +231,4 @@ final class CustomFieldHelperTest extends TestCase
             date_default_timezone_set($originalTimezone);
         }
     }
-
 }
