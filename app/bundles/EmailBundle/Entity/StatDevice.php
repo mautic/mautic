@@ -36,7 +36,7 @@ class StatDevice
 
     private ?IpAddress $ipAddress = null;
 
-    private \DateTimeInterface $dateOpened;
+    private ?\DateTimeInterface $dateOpened = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
