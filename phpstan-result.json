@@ -1,0 +1,1437 @@
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/ApiBundle/ApiPlatform/EventListener/MauticDenyAccessListe[39m  
+         [32mner.php[39m                                                                
+ ------ ----------------------------------------------------------------------- 
+  17     There should be no listeners modified in config. Use                   
+         EventSubscriberInterface contract or #[AsEventListener] attribute and  
+         native PHP instead                                                     
+         🪪  symfony.noListenerWithoutContract                                  
+         at                                                                     
+         app/bundles/ApiBundle/ApiPlatform/EventListener/MauticDenyAccessListe  
+         ner.php:17                                                             
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CampaignBundle/Entity/CampaignRepository.php[39m              
+ ------ ---------------------------------------------------------------------- 
+  26     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/CampaignRepository.php:26        
+  69     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/CampaignRepository.php:69        
+  542    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/CampaignRepository.php:542       
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CampaignBundle/Entity/EventRepository.php[39m                 
+ ------ ---------------------------------------------------------------------- 
+  53     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/EventRepository.php:53           
+  65     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/EventRepository.php:65           
+  112    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/EventRepository.php:112          
+  144    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/EventRepository.php:144          
+  175    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/EventRepository.php:175          
+  284    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/EventRepository.php:284          
+  393    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/EventRepository.php:393          
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CampaignBundle/Entity/LeadRepository.php[39m                  
+ ------ ---------------------------------------------------------------------- 
+  26     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/LeadRepository.php:26            
+  56     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/LeadRepository.php:56            
+  71     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CampaignBundle/Entity/LeadRepository.php:71            
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CampaignBundle/Executioner/ContactFinder/Limiter/ContactL[39m  
+         [32mimiter.php[39m                                                             
+ ------ ----------------------------------------------------------------------- 
+  -1     Class                                                                  
+         "Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimit  
+         er" is always created with same 1 setter(s): "setBatchMinContactId()"  
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at                                                                     
+         app/bundles/CampaignBundle/Executioner/ContactFinder/Limiter/ContactL  
+         imiter.php:-1                                                          
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities[39m  
+         [32mTrait.php (in context of class[39m                                         
+         [32mMautic\CampaignBundle\Tests\Functional\Campaign\CampaignDecisionTest)[39m  
+ ------ ----------------------------------------------------------------------- 
+  38     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:38                                                           
+  89     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:89                                                           
+  103    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:103                                                          
+  117    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:117                                                          
+  130    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:130                                                          
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities[39m  
+         [32mTrait.php (in context of class[39m                                         
+         [32mMautic\CampaignBundle\Tests\Functional\Campaign\CampaignEventDetailsT[39m  
+         [32mimelineFunctionalTest)[39m                                                 
+ ------ ----------------------------------------------------------------------- 
+  38     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:38                                                           
+  89     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:89                                                           
+  103    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:103                                                          
+  117    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:117                                                          
+  130    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:130                                                          
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities[39m  
+         [32mTrait.php (in context of class[39m                                         
+         [32mMautic\CampaignBundle\Tests\Functional\Campaign\CampaignRestartFromSe[39m  
+         [32mgmentTest)[39m                                                             
+ ------ ----------------------------------------------------------------------- 
+  38     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:38                                                           
+  89     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:89                                                           
+  103    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:103                                                          
+  117    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:117                                                          
+  130    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntities  
+         Trait.php:130                                                          
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CampaignBundle/Tests/Functional/Fixtures/FixtureHelper.ph[39m  
+         [32mp[39m                                                                      
+ ------ ----------------------------------------------------------------------- 
+  -1     Class "Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper"  
+         is always created with same 1 setter(s): "addContactToCampaign()"      
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at                                                                     
+         app/bundles/CampaignBundle/Tests/Functional/Fixtures/FixtureHelper.ph  
+         p:-1                                                                   
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/ChannelBundle/Entity/MessageQueueRepository.php[39m            
+ ------ ----------------------------------------------------------------------- 
+         Ignored error pattern #^Method                                         
+         Mautic\\ChannelBundle\\Entity\\MessageQueueRepository\:\:findMessage\  
+         (\) has no return type specified\.$# (missingType.return) in path      
+         /var/www/mautic/app/bundles/ChannelBundle/Entity/MessageQueueReposito  
+         ry.php was not matched in reported errors.                             
+         🪪  ignore.unmatched [31m(non-ignorable)[39m                                   
+         at app/bundles/ChannelBundle/Entity/MessageQueueRepository.php:0       
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/DTO/GlobalSearchFilterDTO.php[39m                   
+ ------ ----------------------------------------------------------------------- 
+  -1     Class "Mautic\CoreBundle\DTO\GlobalSearchFilterDTO" is always created  
+         with same 1 setter(s): "setFilters()"                                  
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at app/bundles/CoreBundle/DTO/GlobalSearchFilterDTO.php:-1             
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/DependencyInjection/Compiler/ConfiguratorPass.[39m  
+         [32mphp[39m                                                                    
+ ------ ----------------------------------------------------------------------- 
+  21     Instead of "$this->findTaggedServiceIds()" use more reliable           
+         registerForAutoconfiguration() and tagged iterator attribute. Those    
+         work outside any configuration and avoid missed tag errors             
+         🪪  symfony.noFindTaggedServiceIdsCall                                 
+         at                                                                     
+         app/bundles/CoreBundle/DependencyInjection/Compiler/ConfiguratorPass.  
+         php:21                                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Doctrine/GeneratedColumn/GeneratedColumns.php[39m   
+ ------ ----------------------------------------------------------------------- 
+  -1     Class "Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns"    
+         is always created with same 1 setter(s): "add()"                       
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at                                                                     
+         app/bundles/CoreBundle/Doctrine/GeneratedColumn/GeneratedColumns.php:  
+         -1                                                                     
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Doctrine/Query/QueryBuilder.php[39m           
+ ------ ----------------------------------------------------------------- 
+  -1     Class "Mautic\CoreBundle\Doctrine\Query\QueryBuilder" is always  
+         created with same 1 setter(s): "add()"                           
+         Pass these values via constructor instead                        
+         🪪  symplify.newOverSetters                                      
+         at app/bundles/CoreBundle/Doctrine/Query/QueryBuilder.php:-1     
+ ------ ----------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Entity/CommonRepository.php[39m                    
+ ------ ---------------------------------------------------------------------- 
+  352    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/CoreBundle/Entity/CommonRepository.php:352             
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Event/BuilderEvent.php[39m                          
+ ------ ----------------------------------------------------------------------- 
+         Ignored error pattern #^Method                                         
+         Mautic\\CoreBundle\\Event\\BuilderEvent\:\:__construct\(\) has         
+         parameter \$requested with no type specified\.$#                       
+         (missingType.parameter) in path                                        
+         /var/www/mautic/app/bundles/CoreBundle/Event/BuilderEvent.php was not  
+         matched in reported errors.                                            
+         🪪  ignore.unmatched [31m(non-ignorable)[39m                                   
+         at app/bundles/CoreBundle/Event/BuilderEvent.php:0                     
+         Ignored error pattern #^Method                                         
+         Mautic\\CoreBundle\\Event\\BuilderEvent\:\:getRequested\(\) has        
+         parameter \$type with no type specified\.$# (missingType.parameter)    
+         in path /var/www/mautic/app/bundles/CoreBundle/Event/BuilderEvent.php  
+         was not matched in reported errors.                                    
+         🪪  ignore.unmatched [31m(non-ignorable)[39m                                   
+         at app/bundles/CoreBundle/Event/BuilderEvent.php:0                     
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Event/MaintenanceEvent.php[39m                      
+ ------ ----------------------------------------------------------------------- 
+         Ignored error pattern #^Method                                         
+         Mautic\\CoreBundle\\Event\\MaintenanceEvent\:\:setStat\(\) has         
+         parameter \$parameters with no type specified\.$#                      
+         (missingType.parameter) in path                                        
+         /var/www/mautic/app/bundles/CoreBundle/Event/MaintenanceEvent.php was  
+         not matched in reported errors.                                        
+         🪪  ignore.unmatched [31m(non-ignorable)[39m                                   
+         at app/bundles/CoreBundle/Event/MaintenanceEvent.php:0                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Event/RouteEvent.php[39m                          
+ ------ --------------------------------------------------------------------- 
+  14     Constructor dependency "$loader" is typed as concrete                
+         "Symfony\Component\Config\Loader\Loader". Use the                    
+         "Symfony\Component\Config\Loader\LoaderInterface" interface instead  
+         🪪  symplify.preferInterfaceInConstructor                            
+         at app/bundles/CoreBundle/Event/RouteEvent.php:14                    
+  14     Constructor dependency "$loader" is typed as concrete                
+         "Symfony\Component\Config\Loader\Loader". Use the                    
+         "Symfony\Component\Config\Loader\LoaderInterface" interface instead  
+         🪪  symplify.preferInterfaceInConstructor                            
+         at app/bundles/CoreBundle/Event/RouteEvent.php:14                    
+ ------ --------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/EventListener/ConsoleErrorListener.php[39m          
+ ------ ----------------------------------------------------------------------- 
+  10     There should be no listeners modified in config. Use                   
+         EventSubscriberInterface contract or #[AsEventListener] attribute and  
+         native PHP instead                                                     
+         🪪  symfony.noListenerWithoutContract                                  
+         at app/bundles/CoreBundle/EventListener/ConsoleErrorListener.php:10    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/EventListener/ConsoleTerminateListener.php[39m      
+ ------ ----------------------------------------------------------------------- 
+  8      There should be no listeners modified in config. Use                   
+         EventSubscriberInterface contract or #[AsEventListener] attribute and  
+         native PHP instead                                                     
+         🪪  symfony.noListenerWithoutContract                                  
+         at                                                                     
+         app/bundles/CoreBundle/EventListener/ConsoleTerminateListener.php:8    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/EventListener/DoctrineGeneratedColumnsListener[39m  
+         [32m.php[39m                                                                   
+ ------ ----------------------------------------------------------------------- 
+  12     There should be no listeners modified in config. Use                   
+         EventSubscriberInterface contract or #[AsEventListener] attribute and  
+         native PHP instead                                                     
+         🪪  symfony.noListenerWithoutContract                                  
+         at                                                                     
+         app/bundles/CoreBundle/EventListener/DoctrineGeneratedColumnsListener  
+         .php:12                                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/EventListener/ExceptionListener.php[39m             
+ ------ ----------------------------------------------------------------------- 
+  27     There should be no listeners modified in config. Use                   
+         EventSubscriberInterface contract or #[AsEventListener] attribute and  
+         native PHP instead                                                     
+         🪪  symfony.noListenerWithoutContract                                  
+         at app/bundles/CoreBundle/EventListener/ExceptionListener.php:27       
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/EventListener/UUIDListener.php[39m                 
+ ------ ---------------------------------------------------------------------- 
+  14     There should be no Doctrine listeners modified in config. Implement   
+         "Document\Event\EventSubscriber" to provide events in the class       
+         itself                                                                
+         🪪  doctrine.noListenerWithoutContract                                
+         at app/bundles/CoreBundle/EventListener/UUIDListener.php:14           
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Helper/CookieHelper.php[39m                        
+ ------ ---------------------------------------------------------------------- 
+  -1     Class "Mautic\CoreBundle\Helper\CookieHelper" is always created with  
+         same 1 setter(s): "setCookie()"                                       
+         Pass these values via constructor instead                             
+         🪪  symplify.newOverSetters                                           
+         at app/bundles/CoreBundle/Helper/CookieHelper.php:-1                  
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Helper/Update/PreUpdateChecks/CheckDatabaseDri[39m  
+         [32mverAndVersion.php[39m                                                      
+ ------ ----------------------------------------------------------------------- 
+  -1     Class                                                                  
+         "Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverA  
+         ndVersion" is always created with same 1 setter(s):                    
+         "setUpdateCandidateMetadata()"                                         
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at                                                                     
+         app/bundles/CoreBundle/Helper/Update/PreUpdateChecks/CheckDatabaseDri  
+         verAndVersion.php:-1                                                   
+ ------ ----------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Test/Extensions/SlowTest/SlowTest.php[39m         
+ ------ --------------------------------------------------------------------- 
+  110    Instead of assert() that can miss important checks, use native       
+         PHPUnit assert call                                                  
+         🪪  phpunit.noAssertFuncCallInTests                                  
+         at app/bundles/CoreBundle/Test/Extensions/SlowTest/SlowTest.php:110  
+ ------ --------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php (in context of[39m  
+         [32mclass[39m                                                                  
+         [32mMautic\CoreBundle\Tests\Command\PullTransifexCommandFunctionalTest)[39m    
+ ------ ----------------------------------------------------------------------- 
+  14     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php:14           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php (in context of[39m  
+         [32mclass[39m                                                                  
+         [32mMautic\CoreBundle\Tests\Command\PushTransifexCommandFunctionalTest)[39m    
+ ------ ----------------------------------------------------------------------- 
+  14     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php:14           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php (in context of[39m  
+         [32mclass[39m                                                                  
+         [32mMautic\CoreBundle\Tests\Functional\Controller\AjaxControllerTest)[39m      
+ ------ ----------------------------------------------------------------------- 
+  14     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php:14           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php (in context of[39m  
+         [32mclass[39m                                                                  
+         [32mMautic\MarketplaceBundle\Tests\Functional\Controller\DetailController[39m  
+         [32mTest)[39m                                                                  
+ ------ ----------------------------------------------------------------------- 
+  14     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php:14           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php (in context of[39m  
+         [32mclass[39m                                                                  
+         [32mMautic\MarketplaceBundle\Tests\Functional\Controller\ListControllerTe[39m  
+         [32mst)[39m                                                                    
+ ------ ----------------------------------------------------------------------- 
+  14     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php:14           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php (in context of[39m  
+         [32mclass[39m                                                                  
+         [32mMautic\WebhookBundle\Tests\Functional\Command\ProcessWebhookQueuesCom[39m  
+         [32mmandTest)[39m                                                              
+ ------ ----------------------------------------------------------------------- 
+  14     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php:14           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php (in context of[39m  
+         [32mclass Mautic\WebhookBundle\Tests\Functional\WebhookFunctionalTest)[39m     
+ ------ ----------------------------------------------------------------------- 
+  14     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/CoreBundle/Test/Guzzle/ClientMockTrait.php:14           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/DynamicContentBundle/Entity/DynamicContentRepository.php[39m   
+ ------ ----------------------------------------------------------------------- 
+  24     Avoid calling ->createQueryBuilder() directly on EntityManager as it   
+         requires select() + from() calls with specific values. Use             
+         $repository->createQueryBuilder() to be safe instead                   
+         🪪  doctrine.requireQueryBuilderOnRepository                           
+         at                                                                     
+         app/bundles/DynamicContentBundle/Entity/DynamicContentRepository.php:  
+         24                                                                     
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/EmailBundle/Entity/EmailRepository.php[39m                    
+ ------ ---------------------------------------------------------------------- 
+  121    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/EmailBundle/Entity/EmailRepository.php:121             
+  144    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/EmailBundle/Entity/EmailRepository.php:144             
+  940    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/EmailBundle/Entity/EmailRepository.php:940             
+ ------ ---------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/EmailBundle/Event/ParseEmailEvent.php[39m                   
+ ------ -------------------------------------------------------------------- 
+  -1     Class "Mautic\EmailBundle\Event\ParseEmailEvent" is always created  
+         with same 1 setter(s): "setCriteriaRequest()"                       
+         Pass these values via constructor instead                           
+         🪪  symplify.newOverSetters                                         
+         at app/bundles/EmailBundle/Event/ParseEmailEvent.php:-1             
+ ------ -------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/EmailBundle/Helper/PlainTextHelper.php[39m                   
+ ------ --------------------------------------------------------------------- 
+  -1     Class "Mautic\EmailBundle\Helper\PlainTextHelper" is always created  
+         with same 1 setter(s): "setHtml()"                                   
+         Pass these values via constructor instead                            
+         🪪  symplify.newOverSetters                                          
+         at app/bundles/EmailBundle/Helper/PlainTextHelper.php:-1             
+ ------ --------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/EmailBundle/Model/SendEmailToContact.php[39m                   
+ ------ ----------------------------------------------------------------------- 
+  -1     Class "Mautic\EmailBundle\Model\SendEmailToContact" is always created  
+         with same 1 setter(s): "setEmail()"                                    
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at app/bundles/EmailBundle/Model/SendEmailToContact.php:-1             
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/EmailBundle/Tests/Controller/EmailControllerFunctionalTes[39m  
+         [32mt.php[39m                                                                  
+ ------ ----------------------------------------------------------------------- 
+  1399   Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/EmailBundle/Tests/Controller/EmailControllerFunctionalTes  
+         t.php:1399                                                             
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/EmailBundle/Tests/EventListener/EmailSubscriberTest.php[39m    
+ ------ ----------------------------------------------------------------------- 
+  326    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/EmailBundle/Tests/EventListener/EmailSubscriberTest.php:3  
+         26                                                                     
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/EmailBundle/Tests/EventListener/MatchFilterForLeadTraitTe[39m  
+         [32mst.php[39m                                                                 
+ ------ ----------------------------------------------------------------------- 
+  -1     Class                                                                  
+         "Mautic\EmailBundle\Tests\EventListener\MatchFilterForLeadTraitTestab  
+         le" is always created with same 1 setter(s): "setRepository()"         
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at                                                                     
+         app/bundles/EmailBundle/Tests/EventListener/MatchFilterForLeadTraitTe  
+         st.php:-1                                                              
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/FormBundle/Entity/FormRepository.php[39m                      
+ ------ ---------------------------------------------------------------------- 
+  24     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/FormBundle/Entity/FormRepository.php:24                
+  124    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/FormBundle/Entity/FormRepository.php:124               
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/FormBundle/Form/Type/FormFieldTrait.php[39m                   
+ ------ ---------------------------------------------------------------------- 
+  15     Symfony #[Require]/@required should be used only in classes to avoid  
+         misuse                                                                
+         🪪  symfony.noRequiredOutsideClass                                    
+         at app/bundles/FormBundle/Form/Type/FormFieldTrait.php:15             
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/IntegrationsBundle/Entity/ObjectMappingRepository.php[39m      
+ ------ ----------------------------------------------------------------------- 
+  160    Avoid calling ->createQueryBuilder() directly on EntityManager as it   
+         requires select() + from() calls with specific values. Use             
+         $repository->createQueryBuilder() to be safe instead                   
+         🪪  doctrine.requireQueryBuilderOnRepository                           
+         at                                                                     
+         app/bundles/IntegrationsBundle/Entity/ObjectMappingRepository.php:160  
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/IntegrationsBundle/Event/InternalObjectFindByIdEvent.php[39m   
+ ------ ----------------------------------------------------------------------- 
+  -1     Class "Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent"    
+         is always created with same 1 setter(s): "setId()"                     
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at                                                                     
+         app/bundles/IntegrationsBundle/Event/InternalObjectFindByIdEvent.php:  
+         -1                                                                     
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/IntegrationsBundle/Sync/DAO/Mapping/MappingManualDAO.php[39m   
+ ------ ----------------------------------------------------------------------- 
+  -1     Class "Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO"    
+         is always created with same 1 setter(s): "addObjectMapping()"          
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at                                                                     
+         app/bundles/IntegrationsBundle/Sync/DAO/Mapping/MappingManualDAO.php:  
+         -1                                                                     
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/IntegrationsBundle/Sync/DAO/Mapping/ObjectMappingDAO.php[39m   
+ ------ ----------------------------------------------------------------------- 
+  -1     Class "Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO"    
+         is always created with same 1 setter(s): "addFieldMapping()"           
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at                                                                     
+         app/bundles/IntegrationsBundle/Sync/DAO/Mapping/ObjectMappingDAO.php:  
+         -1                                                                     
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/IntegrationsBundle/Sync/DAO/Sync/Order/OrderDAO.php[39m        
+ ------ ----------------------------------------------------------------------- 
+  -1     Class "Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO" is      
+         always created with same 1 setter(s): "addObjectChange()"              
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at app/bundles/IntegrationsBundle/Sync/DAO/Sync/Order/OrderDAO.php:-1  
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/IntegrationsBundle/Sync/DAO/Sync/Report/ReportDAO.php[39m     
+ ------ ---------------------------------------------------------------------- 
+  -1     Class "Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO" is   
+         always created with same 1 setter(s): "addObject()"                   
+         Pass these values via constructor instead                             
+         🪪  symplify.newOverSetters                                           
+         at                                                                    
+         app/bundles/IntegrationsBundle/Sync/DAO/Sync/Report/ReportDAO.php:-1  
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Controller/Api/CustomFieldsApiControllerTrait.[39m  
+         [32mphp[39m                                                                    
+ ------ ----------------------------------------------------------------------- 
+  208    Symfony #[Require]/@required should be used only in classes to avoid   
+         misuse                                                                 
+         🪪  symfony.noRequiredOutsideClass                                     
+         at                                                                     
+         app/bundles/LeadBundle/Controller/Api/CustomFieldsApiControllerTrait.  
+         php:208                                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Controller/Api/CustomFieldsApiControllerTrait.[39m  
+         [32mphp (in context of[39m                                                     
+         [32mclass@anonymous/app/bundles/LeadBundle/Tests/Controller/Api/CustomFie[39m  
+         [32mldsApiControllerTraitTest.php:40)[39m                                      
+ ------ ----------------------------------------------------------------------- 
+  135    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/LeadBundle/Controller/Api/CustomFieldsApiControllerTrait.  
+         php:135                                                                
+  157    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/LeadBundle/Controller/Api/CustomFieldsApiControllerTrait.  
+         php:157                                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Controller/Api/CustomFieldsApiControllerTrait.[39m  
+         [32mphp (in context of[39m                                                     
+         [32mclass@anonymous/app/bundles/LeadBundle/Tests/Controller/Api/CustomFie[39m  
+         [32mldsApiControllerTraitTest.php:89)[39m                                      
+ ------ ----------------------------------------------------------------------- 
+  135    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/LeadBundle/Controller/Api/CustomFieldsApiControllerTrait.  
+         php:135                                                                
+  157    Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/LeadBundle/Controller/Api/CustomFieldsApiControllerTrait.  
+         php:157                                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Controller/EntityContactsTrait.php[39m             
+ ------ ---------------------------------------------------------------------- 
+  15     Symfony #[Require]/@required should be used only in classes to avoid  
+         misuse                                                                
+         🪪  symfony.noRequiredOutsideClass                                    
+         at app/bundles/LeadBundle/Controller/EntityContactsTrait.php:15       
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Controller/FrequencyRuleTrait.php[39m              
+ ------ ---------------------------------------------------------------------- 
+  177    Symfony #[Require]/@required should be used only in classes to avoid  
+         misuse                                                                
+         🪪  symfony.noRequiredOutsideClass                                    
+         at app/bundles/LeadBundle/Controller/FrequencyRuleTrait.php:177       
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Controller/LeadDetailsTrait.php[39m                
+ ------ ---------------------------------------------------------------------- 
+  385    Symfony #[Require]/@required should be used only in classes to avoid  
+         misuse                                                                
+         🪪  symfony.noRequiredOutsideClass                                    
+         at app/bundles/LeadBundle/Controller/LeadDetailsTrait.php:385         
+  392    Symfony #[Require]/@required should be used only in classes to avoid  
+         misuse                                                                
+         🪪  symfony.noRequiredOutsideClass                                    
+         at app/bundles/LeadBundle/Controller/LeadDetailsTrait.php:392         
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/DataFixtures/ORM/LoadCategorizedLeadListData.p[39m  
+         [32mhp[39m                                                                     
+ ------ ----------------------------------------------------------------------- 
+  25     Refactor read-data fixtures to write-only, make use of references      
+         🪪  doctrine.noRepositoryCallInDataFixtures                            
+         at                                                                     
+         app/bundles/LeadBundle/DataFixtures/ORM/LoadCategorizedLeadListData.p  
+         hp:25                                                                  
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Entity/CompanyLeadRepository.php[39m               
+ ------ ---------------------------------------------------------------------- 
+  192    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/CompanyLeadRepository.php:192        
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Entity/CompanyRepository.php[39m                   
+ ------ ---------------------------------------------------------------------- 
+  102    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/CompanyRepository.php:102            
+  534    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/CompanyRepository.php:534            
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Entity/CustomFieldRepositoryTrait.php (in[39m      
+         [32mcontext of class Mautic\LeadBundle\Entity\CompanyRepository)[39m          
+ ------ ---------------------------------------------------------------------- 
+  121    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/CustomFieldRepositoryTrait.php:121   
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Entity/CustomFieldRepositoryTrait.php (in[39m      
+         [32mcontext of class Mautic\LeadBundle\Entity\LeadRepository)[39m             
+ ------ ---------------------------------------------------------------------- 
+  121    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/CustomFieldRepositoryTrait.php:121   
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Entity/LeadFieldRepository.php[39m                 
+ ------ ---------------------------------------------------------------------- 
+  102    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadFieldRepository.php:102          
+  185    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadFieldRepository.php:185          
+  495    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadFieldRepository.php:495          
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Entity/LeadListRepository.php[39m                  
+ ------ ---------------------------------------------------------------------- 
+  90     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadListRepository.php:90            
+  132    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadListRepository.php:132           
+  171    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadListRepository.php:171           
+  230    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadListRepository.php:230           
+  254    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadListRepository.php:254           
+  869    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadListRepository.php:869           
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Entity/LeadRepository.php[39m                      
+ ------ ---------------------------------------------------------------------- 
+  27     Found 3 @required methods. Use only one method to avoid unexpected    
+         behavior.                                                             
+         🪪  symfony.singleRequiredMethod                                      
+         at app/bundles/LeadBundle/Entity/LeadRepository.php:27                
+  241    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadRepository.php:241               
+  557    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/LeadBundle/Entity/LeadRepository.php:557               
+ ------ ---------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Event/CompanyEvent.php[39m                        
+ ------ --------------------------------------------------------------------- 
+  -1     Class "Mautic\LeadBundle\Event\CompanyEvent" is always created with  
+         same 1 setter(s): "setCompany()"                                     
+         Pass these values via constructor instead                            
+         🪪  symplify.newOverSetters                                          
+         at app/bundles/LeadBundle/Event/CompanyEvent.php:-1                  
+ ------ --------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Event/LeadListEvent.php[39m                        
+ ------ ---------------------------------------------------------------------- 
+  -1     Class "Mautic\LeadBundle\Event\LeadListEvent" is always created with  
+         same 1 setter(s): "setList()"                                         
+         Pass these values via constructor instead                             
+         🪪  symplify.newOverSetters                                           
+         at app/bundles/LeadBundle/Event/LeadListEvent.php:-1                  
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Form/Type/ActionRemoveDoNotContact.php[39m         
+ ------ ---------------------------------------------------------------------- 
+  12     Class extends "Symfony\Component\Form\AbstractType" must have "Type"  
+         suffix to make form explicit,                                         
+         "Mautic\LeadBundle\Form\Type\ActionRemoveDoNotContact" given          
+         🪪  symfony.formTypeClassName                                         
+         at app/bundles/LeadBundle/Form/Type/ActionRemoveDoNotContact.php:12   
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Form/Type/DashboardSegmentsBuildTime.php[39m        
+ ------ ----------------------------------------------------------------------- 
+  15     Class extends "Symfony\Component\Form\AbstractType" must have "Type"   
+         suffix to make form explicit,                                          
+         "Mautic\LeadBundle\Form\Type\DashboardSegmentsBuildTime" given         
+         🪪  symfony.formTypeClassName                                          
+         at app/bundles/LeadBundle/Form/Type/DashboardSegmentsBuildTime.php:15  
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Form/Type/FilterTrait.php[39m                      
+ ------ ---------------------------------------------------------------------- 
+  26     Symfony #[Require]/@required should be used only in classes to avoid  
+         misuse                                                                
+         🪪  symfony.noRequiredOutsideClass                                    
+         at app/bundles/LeadBundle/Form/Type/FilterTrait.php:26                
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Model/CompanyModel.php[39m                          
+ ------ ----------------------------------------------------------------------- 
+         Ignored error pattern mautic.noServiceGetter in path                   
+         /var/www/mautic/app/bundles/LeadBundle/Model/CompanyModel.php was not  
+         matched in reported errors.                                            
+         🪪  ignore.unmatched [31m(non-ignorable)[39m                                   
+         at app/bundles/LeadBundle/Model/CompanyModel.php:0                     
+  178    Parameter "$fields" of model method "organizeFieldsByGroup()" must     
+         declare a type.                                                        
+         🪪  mautic.modelMethodSingleParamMustHaveType                          
+         at app/bundles/LeadBundle/Model/CompanyModel.php:178                   
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Model/ImportModel.php[39m                           
+ ------ ----------------------------------------------------------------------- 
+         Ignored error pattern #^Method                                         
+         Mautic\\LeadBundle\\Model\\ImportModel\:\:getFailedRows\(\) should     
+         return array\|null but returns                                         
+         Doctrine\\ORM\\Tools\\Pagination\\Paginator\.$# (return.type) in path  
+         /var/www/mautic/app/bundles/LeadBundle/Model/ImportModel.php was not   
+         matched in reported errors.                                            
+         🪪  ignore.unmatched [31m(non-ignorable)[39m                                   
+         at app/bundles/LeadBundle/Model/ImportModel.php:0                      
+  456    Parameter "$row" of model method "isEmptyCsvRow()" must declare a      
+         type.                                                                  
+         🪪  mautic.modelMethodSingleParamMustHaveType                          
+         at app/bundles/LeadBundle/Model/ImportModel.php:456                    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Model/LeadModel.php[39m                           
+ ------ --------------------------------------------------------------------- 
+         Ignored error pattern #^Method                                       
+         Mautic\\LeadBundle\\Model\\LeadModel\:\:getLookupResults\(\) has     
+         parameter \$type with no type specified\.$# (missingType.parameter)  
+         in path /var/www/mautic/app/bundles/LeadBundle/Model/LeadModel.php   
+         was not matched in reported errors.                                  
+         🪪  ignore.unmatched [31m(non-ignorable)[39m                                 
+         at app/bundles/LeadBundle/Model/LeadModel.php:0                      
+  742    Parameter "$fields" of model method "organizeFieldsByGroup()" must   
+         declare a type.                                                      
+         🪪  mautic.modelMethodSingleParamMustHaveType                        
+         at app/bundles/LeadBundle/Model/LeadModel.php:742                    
+ ------ --------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Tests/Command/UpdateLeadListCommandFunctionalT[39m  
+         [32mest.php[39m                                                                
+ ------ ----------------------------------------------------------------------- 
+  78     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/LeadBundle/Tests/Command/UpdateLeadListCommandFunctionalT  
+         est.php:78                                                             
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Tests/Controller/Api/ApiTestUserTrait.php (in[39m   
+         [32mcontext of class[39m                                                       
+         [32mMautic\LeadBundle\Tests\Controller\Api\LeadApiControllerFunctionalTes[39m  
+         [32mt)[39m                                                                     
+ ------ ----------------------------------------------------------------------- 
+  37     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/LeadBundle/Tests/Controller/Api/ApiTestUserTrait.php:37    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Tests/Controller/Api/ApiTestUserTrait.php (in[39m   
+         [32mcontext of class[39m                                                       
+         [32mMautic\LeadBundle\Tests\Controller\Api\NoteApiControllerFunctionalTes[39m  
+         [32mt)[39m                                                                     
+ ------ ----------------------------------------------------------------------- 
+  37     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at                                                                     
+         app/bundles/LeadBundle/Tests/Controller/Api/ApiTestUserTrait.php:37    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Tests/Services/PeakInteractionTimerTest.php[39m     
+ ------ ----------------------------------------------------------------------- 
+  -1     Class "Mautic\LeadBundle\Tests\Services\TestablePeakInteractionTimer"  
+         is always created with same 1 setter(s): "setCurrentDateTime()"        
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at                                                                     
+         app/bundles/LeadBundle/Tests/Services/PeakInteractionTimerTest.php:-1  
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Tests/Traits/LeadFieldTestTrait.php (in[39m         
+         [32mcontext of class[39m                                                       
+         [32mMautic\CampaignBundle\Tests\Functional\Campaign\CampaignDecisionTest)[39m  
+ ------ ----------------------------------------------------------------------- 
+  28     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/LeadBundle/Tests/Traits/LeadFieldTestTrait.php:28       
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/LeadBundle/Tests/Traits/LeadFieldTestTrait.php (in[39m         
+         [32mcontext of class[39m                                                       
+         [32mMautic\LeadBundle\Tests\EventListener\CampaignSubscriberFunctionalTes[39m  
+         [32mt)[39m                                                                     
+ ------ ----------------------------------------------------------------------- 
+  28     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/LeadBundle/Tests/Traits/LeadFieldTestTrait.php:28       
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/MessengerBundle/Validator/DsnValidator.php[39m             
+ ------ ------------------------------------------------------------------- 
+  17     Constructor dependency "$transportFactory" is typed as concrete    
+         "Symfony\Component\Messenger\Transport\TransportFactory". Use the  
+         "Symfony\Component\Messenger\Transport\TransportFactoryInterface"  
+         interface instead                                                  
+         🪪  symplify.preferInterfaceInConstructor                          
+         at app/bundles/MessengerBundle/Validator/DsnValidator.php:17       
+  17     Constructor dependency "$transportFactory" is typed as concrete    
+         "Symfony\Component\Messenger\Transport\TransportFactory". Use the  
+         "Symfony\Component\Messenger\Transport\TransportFactoryInterface"  
+         interface instead                                                  
+         🪪  symplify.preferInterfaceInConstructor                          
+         at app/bundles/MessengerBundle/Validator/DsnValidator.php:17       
+ ------ ------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/NotificationBundle/Entity/NotificationRepository.php[39m      
+ ------ ---------------------------------------------------------------------- 
+  15     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at                                                                    
+         app/bundles/NotificationBundle/Entity/NotificationRepository.php:15   
+  33     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at                                                                    
+         app/bundles/NotificationBundle/Entity/NotificationRepository.php:33   
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/PageBundle/Controller/PublicController.php[39m           
+ ------ ----------------------------------------------------------------- 
+  -1     Class "Mautic\PageBundle\Controller\PublicController" is always  
+         created with same 1 setter(s): "setContainer()"                  
+         Pass these values via constructor instead                        
+         🪪  symplify.newOverSetters                                      
+         at app/bundles/PageBundle/Controller/PublicController.php:-1     
+ ------ ----------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/PageBundle/Entity/PageRepository.php[39m                      
+ ------ ---------------------------------------------------------------------- 
+  23     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/PageBundle/Entity/PageRepository.php:23                
+ ------ ---------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/PageBundle/Model/PageModel.php[39m                           
+ ------ --------------------------------------------------------------------- 
+  341    Parameter "$entity" of model method "generateSlug()" must declare a  
+         type.                                                                
+         🪪  mautic.modelMethodSingleParamMustHaveType                        
+         at app/bundles/PageBundle/Model/PageModel.php:341                    
+ ------ --------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/PluginBundle/Entity/PluginRepository.php[39m                  
+ ------ ---------------------------------------------------------------------- 
+  30     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/PluginBundle/Entity/PluginRepository.php:30            
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/PluginBundle/EventListener/PushToIntegrationTrait.php[39m     
+ ------ ---------------------------------------------------------------------- 
+  21     Symfony #[Require]/@required should be used only in classes to avoid  
+         misuse                                                                
+         🪪  symfony.noRequiredOutsideClass                                    
+         at                                                                    
+         app/bundles/PluginBundle/EventListener/PushToIntegrationTrait.php:21  
+ ------ ---------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/PluginBundle/Helper/EventHelper.php[39m                      
+ ------ --------------------------------------------------------------------- 
+         Ignored error pattern #^Method                                       
+         Mautic\\PluginBundle\\Helper\\EventHelper\:\:pushLead\(\) has        
+         parameter \$lead with no type specified\.$# (missingType.parameter)  
+         in path                                                              
+         /var/www/mautic/app/bundles/PluginBundle/Helper/EventHelper.php was  
+         not matched in reported errors.                                      
+         🪪  ignore.unmatched [31m(non-ignorable)[39m                                 
+         at app/bundles/PluginBundle/Helper/EventHelper.php:0                 
+ ------ --------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/PluginBundle/Model/IntegrationEntityModel.php[39m              
+ ------ ----------------------------------------------------------------------- 
+  57     Parameter "$integrationObject" of model method "getRecordList()" must  
+         declare a type.                                                        
+         🪪  mautic.modelMethodSingleParamMustHaveType                          
+         at app/bundles/PluginBundle/Model/IntegrationEntityModel.php:57        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/PointBundle/Entity/PointInsightRepository.php[39m             
+ ------ ---------------------------------------------------------------------- 
+  16     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/PointBundle/Entity/PointInsightRepository.php:16       
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/PointBundle/Entity/PointRepository.php[39m                    
+ ------ ---------------------------------------------------------------------- 
+  17     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/PointBundle/Entity/PointRepository.php:17              
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/PointBundle/Entity/TriggerRepository.php[39m                  
+ ------ ---------------------------------------------------------------------- 
+  18     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/PointBundle/Entity/TriggerRepository.php:18            
+  35     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/PointBundle/Entity/TriggerRepository.php:35            
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/ReportBundle/Tests/Model/ReportModelTest.php[39m         
+ ------ ----------------------------------------------------------------- 
+  147    Instead of assert() that can miss important checks, use native   
+         PHPUnit assert call                                              
+         🪪  phpunit.noAssertFuncCallInTests                              
+         at app/bundles/ReportBundle/Tests/Model/ReportModelTest.php:147  
+ ------ ----------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/SmsBundle/DependencyInjection/Compiler/SmsTransportPass.p[39m  
+         [32mhp[39m                                                                     
+ ------ ----------------------------------------------------------------------- 
+  17     Instead of "$this->findTaggedServiceIds()" use more reliable           
+         registerForAutoconfiguration() and tagged iterator attribute. Those    
+         work outside any configuration and avoid missed tag errors             
+         🪪  symfony.noFindTaggedServiceIdsCall                                 
+         at                                                                     
+         app/bundles/SmsBundle/DependencyInjection/Compiler/SmsTransportPass.p  
+         hp:17                                                                  
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/SmsBundle/Entity/SmsRepository.php[39m                        
+ ------ ---------------------------------------------------------------------- 
+  18     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/SmsBundle/Entity/SmsRepository.php:18                  
+  84     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/SmsBundle/Entity/SmsRepository.php:84                  
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/SmsBundle/Tests/DependencyInjection/Compiler/SmsTransport[39m  
+         [32mPassTest.php[39m                                                           
+ ------ ----------------------------------------------------------------------- 
+  54     Instead of "$this->findTaggedServiceIds()" use more reliable           
+         registerForAutoconfiguration() and tagged iterator attribute. Those    
+         work outside any configuration and avoid missed tag errors             
+         🪪  symfony.noFindTaggedServiceIdsCall                                 
+         at                                                                     
+         app/bundles/SmsBundle/Tests/DependencyInjection/Compiler/SmsTransport  
+         PassTest.php:54                                                        
+  57     Instead of "$this->findTaggedServiceIds()" use more reliable           
+         registerForAutoconfiguration() and tagged iterator attribute. Those    
+         work outside any configuration and avoid missed tag errors             
+         🪪  symfony.noFindTaggedServiceIdsCall                                 
+         at                                                                     
+         app/bundles/SmsBundle/Tests/DependencyInjection/Compiler/SmsTransport  
+         PassTest.php:57                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/SmsBundle/Tests/SmsTestHelperTrait.php (in context of[39m   
+         [32mclass Mautic\SmsBundle\Tests\EventListener\SmsSubscriberTokenTest)[39m  
+ ------ -------------------------------------------------------------------- 
+  21     Instead of assert() that can miss important checks, use native      
+         PHPUnit assert call                                                 
+         🪪  phpunit.noAssertFuncCallInTests                                 
+         at app/bundles/SmsBundle/Tests/SmsTestHelperTrait.php:21            
+  42     Instead of assert() that can miss important checks, use native      
+         PHPUnit assert call                                                 
+         🪪  phpunit.noAssertFuncCallInTests                                 
+         at app/bundles/SmsBundle/Tests/SmsTestHelperTrait.php:42            
+ ------ -------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/SmsBundle/Tests/SmsTestHelperTrait.php (in context of[39m      
+         [32mclass[39m                                                                  
+         [32mMautic\SmsBundle\Tests\Integration\Twilio\TwilioConfigurationFunction[39m  
+         [32malTest)[39m                                                                
+ ------ ----------------------------------------------------------------------- 
+  21     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/SmsBundle/Tests/SmsTestHelperTrait.php:21               
+  42     Instead of assert() that can miss important checks, use native         
+         PHPUnit assert call                                                    
+         🪪  phpunit.noAssertFuncCallInTests                                    
+         at app/bundles/SmsBundle/Tests/SmsTestHelperTrait.php:42               
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/StageBundle/Entity/StageRepository.php[39m                    
+ ------ ---------------------------------------------------------------------- 
+  133    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/StageBundle/Entity/StageRepository.php:133             
+  162    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/StageBundle/Entity/StageRepository.php:162             
+  184    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/StageBundle/Entity/StageRepository.php:184             
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/UserBundle/Entity/RoleRepository.php[39m                      
+ ------ ---------------------------------------------------------------------- 
+  20     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/UserBundle/Entity/RoleRepository.php:20                
+  56     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/UserBundle/Entity/RoleRepository.php:56                
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/UserBundle/Entity/UserInviteRepository.php[39m                
+ ------ ---------------------------------------------------------------------- 
+  25     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/UserBundle/Entity/UserInviteRepository.php:25          
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mapp/bundles/UserBundle/Entity/UserRepository.php[39m                      
+ ------ ---------------------------------------------------------------------- 
+  88     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/UserBundle/Entity/UserRepository.php:88                
+  172    Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at app/bundles/UserBundle/Entity/UserRepository.php:172               
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mplugins/GrapesJsBuilderBundle/Model/GrapesJsBuilderModel.php[39m           
+ ------ ----------------------------------------------------------------------- 
+  -1     Class "MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel"  
+         is always created with same 1 setter(s): "addOrEditEntity()"           
+         Pass these values via constructor instead                              
+         🪪  symplify.newOverSetters                                            
+         at plugins/GrapesJsBuilderBundle/Model/GrapesJsBuilderModel.php:-1     
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mplugins/MauticClearbitBundle/EventListener/ButtonSubscriber.php[39m        
+ ------ ----------------------------------------------------------------------- 
+         Ignored error pattern #^Parameter \#3 \$route of method                
+         Mautic\\CoreBundle\\Event\\CustomButtonEvent\:\:addButton\(\) expects  
+         string\|null, array<int, array<string, string>\|string> given\.$#      
+         (argument.type) in path                                                
+         /var/www/mautic/plugins/MauticClearbitBundle/EventListener/ButtonSubs  
+         criber.php was not matched in reported errors.                         
+         🪪  ignore.unmatched [31m(non-ignorable)[39m                                   
+         at plugins/MauticClearbitBundle/EventListener/ButtonSubscriber.php:0   
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------- 
+  [32mLine[39m   [32mplugins/MauticCrmBundle/Api/Zoho/Mapper.php[39m                     
+ ------ ---------------------------------------------------------------- 
+  -1     Class "MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper" is always  
+         created with same 1 setter(s): "setObject()"                    
+         Pass these values via constructor instead                       
+         🪪  symplify.newOverSetters                                     
+         at plugins/MauticCrmBundle/Api/Zoho/Mapper.php:-1               
+ ------ ---------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  [32mLine[39m   [32mplugins/MauticFocusBundle/Entity/FocusRepository.php[39m                  
+ ------ ---------------------------------------------------------------------- 
+  28     Avoid calling ->createQueryBuilder() directly on EntityManager as it  
+         requires select() + from() calls with specific values. Use            
+         $repository->createQueryBuilder() to be safe instead                  
+         🪪  doctrine.requireQueryBuilderOnRepository                          
+         at plugins/MauticFocusBundle/Entity/FocusRepository.php:28            
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  [32mLine[39m   [32mplugins/MauticFullContactBundle/EventListener/ButtonSubscriber.php[39m     
+ ------ ----------------------------------------------------------------------- 
+         Ignored error pattern #^Parameter \#3 \$route of method                
+         Mautic\\CoreBundle\\Event\\CustomButtonEvent\:\:addButton\(\) expects  
+         string\|null, array<int, array<string, string>\|string> given\.$#      
+         (argument.type) in path                                                
+         /var/www/mautic/plugins/MauticFullContactBundle/EventListener/ButtonS  
+         ubscriber.php was not matched in reported errors.                      
+         🪪  ignore.unmatched [31m(non-ignorable)[39m                                   
+         at                                                                     
+         plugins/MauticFullContactBundle/EventListener/ButtonSubscriber.php:0   
+ ------ ----------------------------------------------------------------------- 
+
+[37;41m                                                                                [39;49m
+[37;41m [ERROR] Found 158 errors                                                       [39;49m
+[37;41m                                                                                [39;49m
+

@@ -72,6 +72,10 @@ parameters:
                 - */Test/*
         # handled in https://github.com/mautic/mautic/pull/17503
         - identifier: doctrine.noGetRepositoryOutsideService
+        - identifier: doctrine.requireQueryBuilderOnRepository
+
+        # will be handled by another PR
+        - identifier: symfony.singleArgEventDispatch
 
         # CompanyLeadRepository is only needed by the static IdentifyCompanyHelper, exposed via getter to avoid threading it through 9 call sites
         -

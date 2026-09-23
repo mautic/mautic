@@ -122,7 +122,7 @@ final class MaxMindDoNotSellPurgeCommand extends Command
     {
         /** @var Lead $lead */
         $lead       = $this->leadRepository->findOneBy(['id' => $contactId]);
-        $matchedIps = array_filter($lead->getIpAddresses()->getValues(), fn ($item): bool => $item->getIpAddress() == $ip);
+        $matchedIps = array_filter($lead->getIpAddresses()->getValues(), fn (\Mautic\CoreBundle\Entity\IpAddress $item): bool => $item->getIpAddress() == $ip);
 
         if ([] === $matchedIps) {
             return;

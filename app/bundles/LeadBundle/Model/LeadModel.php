@@ -695,7 +695,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadsByIds(array $ids)
+    public function getLeadsByIds(array $ids): iterable
     {
         return $this->getEntities([
             'filter' => [
