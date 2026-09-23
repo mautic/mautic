@@ -69,12 +69,14 @@ class Category extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $alias;
 
     /**
      * @var string|null
      */
     #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
+    #[ORM\Column(type: 'string', length: 7, nullable: true)]
     private $color;
 
     /**
@@ -82,6 +84,7 @@ class Category extends FormEntity implements UuidInterface
      */
     #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     #[NotBlank(message: 'mautic.core.value.required')]
+    #[ORM\Column(type: 'string', length: 50)]
     private $bundle;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -89,17 +92,6 @@ class Category extends FormEntity implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns('title');
-
-        $builder->addField('alias', 'string');
-
-        $builder->createField('color', 'string')
-            ->nullable()
-            ->length(7)
-            ->build();
-
-        $builder->createField('bundle', 'string')
-            ->length(50)
-            ->build();
 
     }
 

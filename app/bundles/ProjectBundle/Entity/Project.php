@@ -66,6 +66,7 @@ class Project extends FormEntity implements UuidInterface
      * @var mixed[]
      */
     #[Groups(['project:read', 'project:write'])]
+    #[ORM\Column(type: Types::JSON)]
     private array $properties = [];
 
     /**
@@ -86,8 +87,6 @@ class Project extends FormEntity implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIdColumns();
-
-        $builder->addField('properties', Types::JSON);
 
     }
 

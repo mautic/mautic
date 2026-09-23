@@ -31,16 +31,19 @@ class Notification
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 25, nullable: true)]
     protected $type;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 512, nullable: true)]
     protected $header;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::TEXT)]
     protected $message;
 
     /**
@@ -51,16 +54,19 @@ class Notification
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'icon_class', type: Types::STRING, length: 191, nullable: true)]
     protected $iconClass;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_read', type: Types::BOOLEAN)]
     protected $isRead = false;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 32, nullable: true)]
     protected $deduplicate;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -69,33 +75,7 @@ class Notification
 
         $builder->addId();
 
-        $builder->createField('type', Types::STRING)
-            ->nullable()
-            ->length(25)
-            ->build();
-
-        $builder->createField('header', Types::STRING)
-            ->nullable()
-            ->length(512)
-            ->build();
-
-        $builder->addField('message', Types::TEXT);
-
         $builder->addDateAdded();
-
-        $builder->createField('iconClass', Types::STRING)
-            ->columnName('icon_class')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isRead', Types::BOOLEAN)
-            ->columnName('is_read')
-            ->build();
-
-        $builder->createField('deduplicate', 'string')
-            ->nullable()
-            ->length(32)
-            ->build();
     }
 
     /**
