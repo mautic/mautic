@@ -152,6 +152,23 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
+    /**
+     * Download action should not serve an asset whose path escapes the upload dir.
+     */
+    public function testDownloadActionWithTraversalPathIsNotServed(): void
+    {
+        $this->logoutUser();
+        $asset = $this->createAsset([
+            'title' => 'Traversal Asset',
+            'path'  => '../../../../../../../../etc/passwd',
+        ]);
+
+        $this->client->request('GET', '/asset/'.$asset->getSlug());
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+        $this->assertStringNotContainsString('root:x:0:0', (string) $this->client->getResponse()->getContent());
+    }
+
     public function testDownloadActionWithDisallowedAssetSetsRobotsTag(): void
     {
         $this->logoutUser();
