@@ -61,6 +61,19 @@ class StageRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
+    public function getContactCount(int $stageId): int
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('count(l.id) as thecount')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where(
+                $q->expr()->eq('l.stage_id', $stageId)
+            );
+
+        return (int) $q->executeQuery()->fetchOne();
+    }
+
     /**
      * @param string $type
      * @param int    $leadId
@@ -153,7 +166,7 @@ class StageRepository extends CommonRepository
             );
         }
 
-        $q->orderBy('s.name');
+        $q->orderBy('s.weight');
 
         return $q->getQuery()->getArrayResult();
     }
