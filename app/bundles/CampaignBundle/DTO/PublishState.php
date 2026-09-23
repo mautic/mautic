@@ -50,7 +50,7 @@ final class PublishState
 
     public function getPublished(): bool
     {
-        return $this->published;
+        return $this->published ?? false;
     }
 
     public function getPublishUp(): ?\DateTimeInterface
