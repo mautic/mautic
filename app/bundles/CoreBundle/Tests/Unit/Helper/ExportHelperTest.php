@@ -254,7 +254,7 @@ final class ExportHelperTest extends TestCase
     public function testExportDataAsInvalidData(): void
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('No or invalid data given');
+        $this->expectExceptionMessageIsOrContains('No or invalid data given');
         $this->exportHelper->exportDataAs([], ExportHelper::EXPORT_TYPE_EXCEL, 'demo.xlsx');
     }
 
@@ -298,7 +298,7 @@ final class ExportHelperTest extends TestCase
     public function testExportDataIntoFileInvalidData(): void
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('No or invalid data given');
+        $this->expectExceptionMessageIsOrContains('No or invalid data given');
         $iteratorExportDataModelMock = $this->iteratorDataMock();
         $this->exportHelper->exportDataIntoFile(
             $iteratorExportDataModelMock,

@@ -167,7 +167,7 @@ final class ImportHelperTest extends TestCase
         $this->paths[] = $zipFilePath;
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Suspicious compression ratio');
+        $this->expectExceptionMessageIsOrContains('Suspicious compression ratio');
 
         $this->importHelper->readZipFile($zipFilePath);
     }

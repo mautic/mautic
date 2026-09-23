@@ -56,7 +56,7 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnDispatcher = new FieldColumnDispatcher($dispatcher, $backgroundSettings);
 
         $this->expectException(AbortColumnCreateException::class);
-        $this->expectExceptionMessage('Column change will be processed in background job');
+        $this->expectExceptionMessageIsOrContains('Column change will be processed in background job');
 
         $fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
     }
@@ -88,7 +88,7 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnDispatcher = new FieldColumnDispatcher($dispatcher, $backgroundSettings);
 
         $this->expectException(AbortColumnUpdateException::class);
-        $this->expectExceptionMessage('Column change will be processed in background job');
+        $this->expectExceptionMessageIsOrContains('Column change will be processed in background job');
 
         $fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
     }
@@ -116,7 +116,7 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnDispatcher = new FieldColumnDispatcher($dispatcher, $backgroundSettings);
 
         $this->expectException(AbortColumnUpdateException::class);
-        $this->expectExceptionMessage('Column delete will be processed in background job');
+        $this->expectExceptionMessageIsOrContains('Column delete will be processed in background job');
 
         $fieldColumnDispatcher->dispatchPreDeleteColumnEvent($leadField);
     }

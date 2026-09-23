@@ -841,7 +841,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         if ($shouldThrowException) {
             $this->expectException(\Exception::class);
-            $this->expectExceptionMessage('email: Invalid email address');
+            $this->expectExceptionMessageIsOrContains('email: Invalid email address');
         }
 
         $this->leadModel->import($fields, $data);

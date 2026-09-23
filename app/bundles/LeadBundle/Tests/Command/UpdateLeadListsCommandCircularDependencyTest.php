@@ -27,7 +27,7 @@ final class UpdateLeadListsCommandCircularDependencyTest extends MauticMysqlTest
         $segmentA = $this->segments['Segment A'];
 
         $this->expectException(SegmentQueryException::class);
-        $this->expectExceptionMessage('Circular reference detected.');
+        $this->expectExceptionMessageIsOrContains('Circular reference detected.');
 
         $this->testSymfonyCommand(
             UpdateLeadListsCommand::NAME,

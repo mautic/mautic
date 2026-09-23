@@ -75,7 +75,7 @@ final class FileUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploader = new FileUploader($filePathResolverMock, $translatorMock);
 
         $this->expectException(FileUploadException::class);
-        $this->expectExceptionMessage('Could not create directory');
+        $this->expectExceptionMessageIsOrContains('Could not create directory');
 
         $fileUploader->upload($uploadDir, $fileMock);
     }
@@ -112,7 +112,7 @@ final class FileUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploader = new FileUploader($filePathResolverMock, $translatorMock);
 
         $this->expectException(FileUploadException::class);
-        $this->expectExceptionMessage('Could not upload file');
+        $this->expectExceptionMessageIsOrContains('Could not upload file');
 
         $fileUploader->upload($uploadDir, $fileMock);
     }

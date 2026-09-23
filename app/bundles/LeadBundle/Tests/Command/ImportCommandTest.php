@@ -51,7 +51,7 @@ final class ImportCommandTest extends TestCase
         $outputInterfaceMock = $this->createStub(OutputInterface::class);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Import does not have "modifiedBy" property set.');
+        $this->expectExceptionMessageIsOrContains('Import does not have "modifiedBy" property set.');
         $importCommand->getExecute($inputInterfaceMock, $outputInterfaceMock);
     }
 

@@ -40,7 +40,7 @@ final class FieldAliasToFqcnMapTest extends TestCase
     {
         $alias = 'invalid_type';
         $this->expectException(FieldNotFoundException::class);
-        $this->expectExceptionMessage("Field with alias {$alias} not found");
+        $this->expectExceptionMessageIsOrContains("Field with alias {$alias} not found");
         FieldAliasToFqcnMap::getFqcn($alias);
     }
 

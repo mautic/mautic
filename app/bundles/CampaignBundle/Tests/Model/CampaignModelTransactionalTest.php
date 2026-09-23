@@ -135,7 +135,7 @@ final class CampaignModelTransactionalTest extends TestCase
     public function testTransactionalCampaignUnPublishWithException(): void
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Database error');
+        $this->expectExceptionMessageIsOrContains('Database error');
 
         $campaignMock = $this->createCampaignMockForUnpublish();
 

@@ -145,7 +145,7 @@ final class QueryBuilderTest extends TestCase
             ->leftJoin('t', 'table2', 'j', 't.id = j.fid');
 
         $this->expectException(QueryException::class);
-        $this->expectExceptionMessage('Inserting condition to nonexistent join x');
+        $this->expectExceptionMessageIsOrContains('Inserting condition to nonexistent join x');
         $this->queryBuilder->addJoinCondition('x', $this->queryBuilder->expr()->eq('j.removed', 1));
     }
 

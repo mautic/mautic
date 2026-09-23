@@ -179,7 +179,7 @@ final class EmailValidatorTest extends \PHPUnit\Framework\TestCase
         $emailValidator = new EmailValidator($this->translator, $dispatcher);
 
         $this->expectException(InvalidEmailException::class);
-        $this->expectExceptionMessage('bad email');
+        $this->expectExceptionMessageIsOrContains('bad email');
 
         $emailValidator->doPluginValidation('bad@gmail.com');
     }

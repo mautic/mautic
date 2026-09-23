@@ -105,7 +105,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
             ->willReturn($extension);
 
         $this->expectException(FilePathException::class);
-        $this->expectExceptionMessage('Could not generate path');
+        $this->expectExceptionMessageIsOrContains('Could not generate path');
 
         $this->filePathResolver->getUniqueFileName($uploadDir, $this->fileMock);
     }
@@ -156,7 +156,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new IOException(''));
 
         $this->expectException(FilePathException::class);
-        $this->expectExceptionMessage('Could not create directory');
+        $this->expectExceptionMessageIsOrContains('Could not create directory');
 
         $this->filePathResolver->createDirectory($directory);
     }

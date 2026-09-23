@@ -57,7 +57,7 @@ final class HubspotApiTest extends TestCase
             ->willReturn('crm');
 
         $this->expectException(ApiErrorException::class);
-        $this->expectExceptionMessage($message);
+        $this->expectExceptionMessageIsOrContains($message);
         $this->expectExceptionCode($code);
 
         $api = new HubspotApi($integration, $this->createEmailValidator());
@@ -89,7 +89,7 @@ final class HubspotApiTest extends TestCase
             ->willReturn('oauth2');
 
         $this->expectException(ApiErrorException::class);
-        $this->expectExceptionMessage($message);
+        $this->expectExceptionMessageIsOrContains($message);
         $this->expectExceptionCode(0);
 
         $api = new HubspotApi($integration, $this->createEmailValidator());

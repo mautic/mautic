@@ -81,7 +81,7 @@ final class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->expectException(FileValidationException::class);
-        $this->expectExceptionMessage('Validation failed');
+        $this->expectExceptionMessageIsOrContains('Validation failed');
 
         $fileUploadValidator->processFileValidation($field, $request);
     }

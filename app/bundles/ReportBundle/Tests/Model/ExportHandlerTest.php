@@ -43,7 +43,7 @@ final class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $tmpDir = sys_get_temp_dir();
 
         $this->expectException(FileIOException::class);
-        $this->expectExceptionMessage('Could not create directory '.$tmpDir);
+        $this->expectExceptionMessageIsOrContains('Could not create directory '.$tmpDir);
 
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
@@ -69,7 +69,7 @@ final class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $tmpDir = 'xxx';
 
         $this->expectException(FileIOException::class);
-        $this->expectExceptionMessage('Could not open file xxx/myFile.csv');
+        $this->expectExceptionMessageIsOrContains('Could not open file xxx/myFile.csv');
 
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 

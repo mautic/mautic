@@ -103,7 +103,7 @@ final class ProcessSignalServiceTest extends TestCase
 
         $this->expectException(SignalCaughtException::class);
         $this->expectExceptionCode($signal);
-        $this->expectExceptionMessage(sprintf('Signal received: "%d"', $signal));
+        $this->expectExceptionMessageIsOrContains(sprintf('Signal received: "%d"', $signal));
 
         $this->processSignalService->throwExceptionIfSignalIsCaught();
     }

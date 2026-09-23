@@ -206,7 +206,7 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
         $this->entityManager->method('getClassMetadata')->willReturn($metadata);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('declares #[OwnershipParent(\'nonexistent\')] but has no such association. Available: form, category.');
+        $this->expectExceptionMessageIsOrContains('declares #[OwnershipParent(\'nonexistent\')] but has no such association. Available: form, category.');
 
         $this->extension->applyToCollection(
             $this->createQueryBuilderWithRootAlias(),
@@ -237,7 +237,7 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
         );
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('has neither an owner nor a createdBy field');
+        $this->expectExceptionMessageIsOrContains('has neither an owner nor a createdBy field');
 
         $this->extension->applyToCollection(
             $this->createQueryBuilderWithRootAlias(),

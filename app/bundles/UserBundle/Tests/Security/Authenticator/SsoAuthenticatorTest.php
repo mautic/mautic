@@ -503,7 +503,7 @@ final class SsoAuthenticatorTest extends TestCase
         $this->assertSame($username, $userBadge->getUserIdentifier());
 
         $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage($failedMessage);
+        $this->expectExceptionMessageIsOrContains($failedMessage);
 
         $userBadge->getUser();
     }

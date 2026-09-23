@@ -203,7 +203,7 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
             ->with($this->uploadDir.'/1/fieldId1/upload1.jpg');
 
         $this->expectException(FileUploadException::class);
-        $this->expectExceptionMessage('file2');
+        $this->expectExceptionMessageIsOrContains('file2');
 
         $formUploader->uploadFiles($filesToUpload, $submission);
 

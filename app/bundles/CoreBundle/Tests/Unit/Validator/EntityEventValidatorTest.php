@@ -36,7 +36,7 @@ final class EntityEventValidatorTest extends TestCase
     public function testInvalidValue(): void
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('Expected argument of type "object", "string" given');
+        $this->expectExceptionMessageIsOrContains('Expected argument of type "object", "string" given');
 
         $this->validator->validateInContext('invalidType', new EntityEvent(), $this->context);
     }

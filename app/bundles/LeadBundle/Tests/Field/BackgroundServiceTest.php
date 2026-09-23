@@ -75,7 +75,7 @@ final class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $this->expectException(LeadFieldWasNotFoundException::class);
-        $this->expectExceptionMessage('LeadField entity was not found');
+        $this->expectExceptionMessageIsOrContains('LeadField entity was not found');
 
         $this->backgroundService->addColumn(1, 3);
     }
@@ -95,7 +95,7 @@ final class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
             ->with($leadField, $userId);
 
         $this->expectException(ColumnAlreadyCreatedException::class);
-        $this->expectExceptionMessage('Column was already created');
+        $this->expectExceptionMessageIsOrContains('Column was already created');
 
         $this->backgroundService->addColumn(1, $userId);
     }
@@ -117,7 +117,7 @@ final class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new AbortColumnCreateException('Message'));
 
         $this->expectException(AbortColumnCreateException::class);
-        $this->expectExceptionMessage('Message');
+        $this->expectExceptionMessageIsOrContains('Message');
 
         $this->backgroundService->addColumn(1, $userId);
     }
@@ -138,7 +138,7 @@ final class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new AbortColumnUpdateException('Message'));
 
         $this->expectException(AbortColumnUpdateException::class);
-        $this->expectExceptionMessage('Message');
+        $this->expectExceptionMessageIsOrContains('Message');
 
         $this->backgroundService->updateColumn(1, $userId);
     }
@@ -167,7 +167,7 @@ final class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
             ->with($leadField, $userId);
 
         $this->expectException(CustomFieldLimitException::class);
-        $this->expectExceptionMessage('Limit');
+        $this->expectExceptionMessageIsOrContains('Limit');
 
         $this->backgroundService->addColumn(1, $userId);
     }

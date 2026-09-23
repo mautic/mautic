@@ -756,7 +756,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $stat->setEmail($emailMock);
 
         $this->expectException(FailedToSendToContactException::class);
-        $this->expectExceptionMessage('Email "test@mautic.com; test@mautic.com" does not comply with addr-spec of RFC 2822.');
+        $this->expectExceptionMessageIsOrContains('Email "test@mautic.com; test@mautic.com" does not comply with addr-spec of RFC 2822.');
 
         // Send should trigger the FailedToSendToContactException
         $model->setContact($this->contacts[0])->send();

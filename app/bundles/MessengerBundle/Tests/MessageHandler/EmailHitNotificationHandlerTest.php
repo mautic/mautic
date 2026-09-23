@@ -88,7 +88,7 @@ final class EmailHitNotificationHandlerTest extends TestCase
         $message  = new EmailHitNotification($hitId, $request);
         $handler  = new EmailHitNotificationHandler($emailModelMock, $parametersHelper);
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('got my argument?');
+        $this->expectExceptionMessageIsOrContains('got my argument?');
         $handler->__invoke($message);
     }
 }

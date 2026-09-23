@@ -20,7 +20,7 @@ final class GrapesJsControllerTest extends TestCase
         $controller = $this->getControllerForEditorState($this->createStub(CorePermissions::class), null);
 
         $this->expectException(ConflictHttpException::class);
-        $this->expectExceptionMessage('Object not authorized to load custom builder');
+        $this->expectExceptionMessageIsOrContains('Object not authorized to load custom builder');
 
         $controller->editorStateAction('asset', '1');
     }

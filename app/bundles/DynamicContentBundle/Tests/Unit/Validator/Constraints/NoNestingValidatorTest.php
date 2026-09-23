@@ -36,14 +36,14 @@ final class NoNestingValidatorTest extends TestCase
     public function testValidateWithInvalidConstraint(): void
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage(sprintf('Expected argument of type "%s"', NoNesting::class));
+        $this->expectExceptionMessageIsOrContains(sprintf('Expected argument of type "%s"', NoNesting::class));
         $this->validator->validateInContext('value', new NotBlank(), $this->context);
     }
 
     public function testValidateWithInvalidType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage('Expected argument of type "string", "stdClass" given');
+        $this->expectExceptionMessageIsOrContains('Expected argument of type "string", "stdClass" given');
         $this->validator->validateInContext(new \stdClass(), $this->constraint, $this->context);
     }
 

@@ -64,7 +64,7 @@ final class DsnTest extends TestCase
     public function testInvalidFromString(string $dsn, string $exceptionMessage): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage($exceptionMessage);
+        $this->expectExceptionMessageIsOrContains($exceptionMessage);
         Dsn::fromString($dsn);
     }
 

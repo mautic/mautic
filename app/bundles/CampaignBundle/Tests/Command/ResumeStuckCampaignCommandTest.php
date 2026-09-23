@@ -41,7 +41,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
     public function testCommandExecutionWithoutCampaignId(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Not enough arguments (missing: "campaign-id")');
+        $this->expectExceptionMessageIsOrContains('Not enough arguments (missing: "campaign-id")');
         $this->executeCommand([]);
     }
 

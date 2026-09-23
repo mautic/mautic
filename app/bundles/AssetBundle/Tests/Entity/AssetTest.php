@@ -48,7 +48,7 @@ final class AssetTest extends TestCase
         $asset = new Asset();
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
+        $this->expectExceptionMessageIsOrContains(
             'This asset must be saved before it can be used in a URL.'
         );
 

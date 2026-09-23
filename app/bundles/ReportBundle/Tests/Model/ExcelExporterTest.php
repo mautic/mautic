@@ -115,7 +115,7 @@ final class ExcelExporterTest extends TestCase
     public function testExportEmptyData(): void
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('No report data to be exported');
+        $this->expectExceptionMessageIsOrContains('No report data to be exported');
 
         $reportData         = Fixtures::getValidReportResultWithAggregatedColumns();
         $reportData['data'] = [];

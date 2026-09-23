@@ -36,7 +36,7 @@ final class ReportDataResultTest extends \PHPUnit\Framework\TestCase
     public function testNoDataProvided(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Keys 'data', 'dataColumns' and 'columns' have to be provided");
+        $this->expectExceptionMessageIsOrContains("Keys 'data', 'dataColumns' and 'columns' have to be provided");
 
         $data = Fixtures::getValidReportResult();
         unset($data['data']);
@@ -46,7 +46,7 @@ final class ReportDataResultTest extends \PHPUnit\Framework\TestCase
     public function testNoDataColumnProvided(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Keys 'data', 'dataColumns' and 'columns' have to be provided");
+        $this->expectExceptionMessageIsOrContains("Keys 'data', 'dataColumns' and 'columns' have to be provided");
 
         $data = Fixtures::getValidReportResult();
         unset($data['dataColumns']);
@@ -56,7 +56,7 @@ final class ReportDataResultTest extends \PHPUnit\Framework\TestCase
     public function testNoColumnProvided(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Keys 'data', 'dataColumns' and 'columns' have to be provided");
+        $this->expectExceptionMessageIsOrContains("Keys 'data', 'dataColumns' and 'columns' have to be provided");
 
         $data = Fixtures::getValidReportResult();
         unset($data['columns']);

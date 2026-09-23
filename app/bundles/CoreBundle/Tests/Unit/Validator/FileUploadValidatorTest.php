@@ -48,7 +48,7 @@ final class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $extensionErrorMsg = 'My message';
 
         $this->expectException(FileInvalidException::class);
-        $this->expectExceptionMessage('Extension is not allowed');
+        $this->expectExceptionMessageIsOrContains('Extension is not allowed');
 
         $fileUploadValidator->checkExtension($extension, $allowedExtensions, $extensionErrorMsg);
     }
@@ -84,7 +84,7 @@ final class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $sizeErrorMsg    = 'My message';
 
         $this->expectException(FileInvalidException::class);
-        $this->expectExceptionMessage('File size limit exceeded');
+        $this->expectExceptionMessageIsOrContains('File size limit exceeded');
 
         $fileUploadValidator->checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg);
     }
@@ -111,7 +111,7 @@ final class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $sizeErrorMsg    = 'My message';
 
         $this->expectException(FileInvalidException::class);
-        $this->expectExceptionMessage('Extension is not allowed<br />File size limit exceeded');
+        $this->expectExceptionMessageIsOrContains('Extension is not allowed<br />File size limit exceeded');
 
         $fileUploadValidator->validate($fileSize, $extension, $maxUploadSizeMB, $allowedExtensions, $extensionErrorMsg, $sizeErrorMsg);
     }

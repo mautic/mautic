@@ -37,7 +37,7 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
 
         $this->expectException(NoListenerException::class);
-        $this->expectExceptionMessage('There is no Listener for this event');
+        $this->expectExceptionMessageIsOrContains('There is no Listener for this event');
 
         $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent(new LeadField());
     }
@@ -50,7 +50,7 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
 
         $this->expectException(NoListenerException::class);
-        $this->expectExceptionMessage('There is no Listener for this event');
+        $this->expectExceptionMessageIsOrContains('There is no Listener for this event');
 
         $fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent(new LeadField());
     }
@@ -63,7 +63,7 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
 
         $this->expectException(NoListenerException::class);
-        $this->expectExceptionMessage('There is no Listener for this event');
+        $this->expectExceptionMessageIsOrContains('There is no Listener for this event');
 
         $fieldColumnBackgroundJobDispatcher->dispatchPreDeleteColumnEvent(new LeadField());
     }
@@ -115,7 +115,7 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
 
         $this->expectException(AbortColumnCreateException::class);
-        $this->expectExceptionMessage('Column cannot be created now');
+        $this->expectExceptionMessageIsOrContains('Column cannot be created now');
 
         $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent(new LeadField());
     }
@@ -134,7 +134,7 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
 
         $this->expectException(AbortColumnUpdateException::class);
-        $this->expectExceptionMessage('Column cannot be updated now');
+        $this->expectExceptionMessageIsOrContains('Column cannot be updated now');
 
         $fieldColumnBackgroundJobDispatcher->dispatchPreUpdateColumnEvent(new LeadField());
     }
@@ -153,7 +153,7 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $fieldColumnBackgroundJobDispatcher = new FieldColumnBackgroundJobDispatcher($this->dispatcher);
 
         $this->expectException(AbortColumnUpdateException::class);
-        $this->expectExceptionMessage('Column cannot be deleted now');
+        $this->expectExceptionMessageIsOrContains('Column cannot be deleted now');
 
         $fieldColumnBackgroundJobDispatcher->dispatchPreDeleteColumnEvent(new LeadField());
     }

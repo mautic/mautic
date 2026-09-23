@@ -35,7 +35,7 @@ final class CustomFieldObjectTest extends \PHPUnit\Framework\TestCase
         $leadField->setObject('xxx');
 
         $this->expectException(InvalidObjectTypeException::class);
-        $this->expectExceptionMessage('xxx has no associated object');
+        $this->expectExceptionMessageIsOrContains('xxx has no associated object');
 
         new CustomFieldObject($leadField);
     }

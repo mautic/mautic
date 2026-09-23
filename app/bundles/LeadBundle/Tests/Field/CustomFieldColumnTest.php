@@ -111,7 +111,7 @@ final class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->method('addColumn');
 
         $this->expectException(AbortColumnCreateException::class);
-        $this->expectExceptionMessage('Message');
+        $this->expectExceptionMessageIsOrContains('Message');
 
         $this->customFieldColumn->createLeadColumn(new LeadField());
     }
@@ -151,7 +151,7 @@ final class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($driverException);
 
         $this->expectException(CustomFieldLimitException::class);
-        $this->expectExceptionMessage('mautic.lead.field.max_column_error');
+        $this->expectExceptionMessageIsOrContains('mautic.lead.field.max_column_error');
 
         $this->customFieldColumn->processCreateLeadColumn($leadField);
     }
