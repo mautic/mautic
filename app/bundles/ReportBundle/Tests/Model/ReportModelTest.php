@@ -144,7 +144,7 @@ final class ReportModelTest extends \PHPUnit\Framework\TestCase
         $method = new \ReflectionMethod($this->reportModel, 'getOrderBySanitized');
 
         $result = $method->invoke($this->reportModel, $orderBys, $allowedColumns);
-        \assert(is_array($result));
+        $this->assertIsArray($result);
 
         return $result;
     }
