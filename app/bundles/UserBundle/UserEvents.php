@@ -10,62 +10,6 @@ namespace Mautic\UserBundle;
 final class UserEvents
 {
     /**
-     * The mautic.user_pre_save event is dispatched right before a user is persisted.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\UserEvent instance.
-     */
-    public const string USER_PRE_SAVE = 'mautic.user_pre_save';
-
-    /**
-     * The mautic.user_post_save event is dispatched right after a user is persisted.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\UserEvent instance.
-     */
-    public const string USER_POST_SAVE = 'mautic.user_post_save';
-
-    /**
-     * The mautic.user_pre_delete event is dispatched prior to when a user is deleted.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\UserEvent instance.
-     */
-    public const string USER_PRE_DELETE = 'mautic.user_pre_delete';
-
-    /**
-     * The mautic.user_post_delete event is dispatched after a user is deleted.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\UserEvent instance.
-     */
-    public const string USER_POST_DELETE = 'mautic.user_post_delete';
-
-    /**
-     * The mautic.role_pre_save event is dispatched right before a role is persisted.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\RoleEvent instance.
-     */
-    public const string ROLE_PRE_SAVE = 'mautic.role_pre_save';
-
-    /**
-     * The mautic.role_post_save event is dispatched right after a role is persisted.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\RoleEvent instance.
-     */
-    public const string ROLE_POST_SAVE = 'mautic.role_post_save';
-
-    /**
-     * The mautic.role_pre_delete event is dispatched prior a role being deleted.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\RoleEvent instance.
-     */
-    public const string ROLE_PRE_DELETE = 'mautic.role_pre_delete';
-
-    /**
-     * The mautic.role_post_delete event is dispatched after a role is deleted.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\RoleEvent instance.
-     */
-    public const string ROLE_POST_DELETE = 'mautic.role_post_delete';
-
-    /**
      * The mautic.user_logout event is dispatched during the logout routine giving a chance to carry out tasks before
      * the session is lost.
      *

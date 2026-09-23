@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\UserBundle\Entity\Role;
 
-final class RoleEvent extends CommonEvent
+abstract class RoleEvent extends CommonEvent
 {
     public function __construct(Role &$role, bool $isNew = false)
     {
