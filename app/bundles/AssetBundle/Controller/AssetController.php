@@ -761,7 +761,7 @@ final class AssetController extends FormController
         ]);
     }
 
-    public function getModelName(): string
+    protected function getModelName(): string
     {
         return 'asset';
     }

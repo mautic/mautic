@@ -456,7 +456,7 @@ final class ResultController extends CommonFormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
-    public function getPostActionRedirectArguments(array $args, $action): array
+    protected function getPostActionRedirectArguments(array $args, $action): array
     {
         if ('batchDelete' === $action) {
             $formId                             = $this->getFormIdFromRequest();

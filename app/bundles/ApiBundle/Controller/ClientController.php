@@ -443,7 +443,7 @@ final class ClientController extends AbstractStandardFormController
         );
     }
 
-    public function getModelName(): string
+    protected function getModelName(): string
     {
         return 'api.client';
     }

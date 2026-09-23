@@ -100,7 +100,7 @@ abstract class StandardImportTestHelper extends CommonMocks
         self::$largeCsvPath = $tmpFile;
     }
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
 

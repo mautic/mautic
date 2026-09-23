@@ -658,7 +658,7 @@ final class ImportController extends FormController
     /**
      * @return mixed[]
      */
-    public function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, $action): array
     {
         if ('view' === $action) {
             /** @var Import $entity */

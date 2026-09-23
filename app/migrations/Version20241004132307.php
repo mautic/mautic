@@ -12,7 +12,7 @@ final class Version20241004132307 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME = 'webhooks';
 
-    public function preUpAssertions(): void
+    protected function preUpAssertions(): void
     {
         $this->skipAssertion(function (Schema $schema) {
             $table = $schema->getTable($this->getPrefixedTableName());

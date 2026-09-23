@@ -936,7 +936,7 @@ final class ListController extends FormController
         );
     }
 
-    public function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, $action): array
     {
         if ('index' === $action) {
             $args['viewParameters']['filters'] = $this->listFilters;

@@ -37,7 +37,7 @@ final class DeleteCustomFieldCommand extends Command
         parent::__construct();
     }
 
-    public function configure(): void
+    protected function configure(): void
     {
         parent::configure();
 

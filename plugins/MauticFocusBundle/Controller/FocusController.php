@@ -115,7 +115,7 @@ final class FocusController extends AbstractStandardFormController
     /**
      * @throws \Exception
      */
-    public function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, $action): array
     {
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
 

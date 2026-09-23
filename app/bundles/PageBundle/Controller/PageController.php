@@ -1198,7 +1198,7 @@ final class PageController extends FormController
         return $submissionModel->exportResultsForPage($format, $activePage, $args);
     }
 
-    public function getModelName(): string
+    protected function getModelName(): string
     {
         return 'page';
     }
