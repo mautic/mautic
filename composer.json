@@ -42,7 +42,6 @@
     "phpstan/phpstan-symfony": "^2.0.20",
     "phpunit/phpunit": "^13.0",
     "rector/rector": "^2.6.5",
-    "rector/type-perfect": "^2.1.4",
     "symfony/browser-kit": "~8.1.0",
     "symfony/dom-crawler": "~8.1.0",
     "symfony/maker-bundle": "^1.64",
@@ -52,7 +51,7 @@
     "symplify/easy-coding-standard": "^13.3.0",
     "symplify/phpstan-rules": "^14.15",
     "tomasvotruba/class-leak": "^2.2.3",
-    "tomasvotruba/type-coverage": "^2.2.1"
+    "tomasvotruba/type-coverage": "^2.3"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",
