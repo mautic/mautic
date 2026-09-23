@@ -174,7 +174,7 @@ class PeakInteractionTimer
         return $this->getCurrentDateTime($timezone);
     }
 
-    protected function getCurrentDateTime(\DateTimeZone $timezone): \DateTime
+    protected function getCurrentDateTime(\DateTimeZone $timezone): ?\DateTime
     {
         return new \DateTime('now', $timezone);
     }

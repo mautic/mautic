@@ -310,7 +310,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Generate URL for a page.
      */
-    public function generateUrl(Page $entity, bool $absolute = true, array $clickthrough = []): string
+    public function generateUrl(VariantEntityInterface $entity, bool $absolute = true, array $clickthrough = []): string
     {
         // If this is a variant, then get the parent's URL
         $parent = $entity->getVariantParent();
@@ -326,7 +326,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Generates slug string.
      */
-    public function generateSlug(Page $entity): string
+    public function generateSlug(VariantEntityInterface $entity): string
     {
         $pageSlug = $entity->getAlias();
 

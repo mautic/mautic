@@ -61,7 +61,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use VariantEntityTrait<Page>
  */
 #[EntityEvent]
-class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface, OptimisticLockInterface
+class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface, OptimisticLockInterface, AliasAwareInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
@@ -394,10 +394,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getAlias()
+    public function getAlias(): ?string
     {
         return $this->alias;
     }

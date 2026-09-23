@@ -18,22 +18,9 @@ final class CompanyEvent extends CommonEvent
         $this->isNew  = $isNew;
     }
 
-    /**
-     * Returns the Company entity.
-     *
-     * @return Company
-     */
-    public function getCompany()
+    public function getCompany(): Company
     {
         return $this->entity;
-    }
-
-    /**
-     * Sets the Company entity.
-     */
-    public function setCompany(Company $company): void
-    {
-        $this->entity = $company;
     }
 
     public function changeScore(int $score): void

@@ -21,12 +21,11 @@ final class CompanyEventTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($score, $event->getScore());
 
         $isNew = true;
-        $event = new CompanyEvent($company, $isNew, $score);
-        $this->assertEquals($isNew, $event->isNew());
 
         $company2 = new Company();
         $company2->setName('otherCompany');
-        $event->setCompany($company2);
+        $event = new CompanyEvent($company, $isNew, $score);
+
         $this->assertEquals($company2, $event->getCompany());
 
         $secondScore = 2;

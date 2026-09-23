@@ -19,14 +19,14 @@ use Symfony\Component\Cache\CacheItem;
 
 final class TestablePeakInteractionTimer extends PeakInteractionTimer
 {
-    private \DateTime $testTime;
+    private ?\DateTime $testTime = null;
 
-    public function __construct(\DateTime $dateTime)
+    public function setCurrentDateTime(\DateTime $dateTime): void
     {
         $this->testTime = $dateTime;
     }
 
-    protected function getCurrentDateTime(\DateTimeZone $timezone): \DateTime
+    protected function getCurrentDateTime(\DateTimeZone $timezone): ?\DateTime
     {
         return clone $this->testTime;
     }
