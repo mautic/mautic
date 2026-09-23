@@ -266,12 +266,18 @@ final class PublishStateService
     private function buildPublishStates(Collection $rawAuditLogs, bool $defaultPublishState): array
     {
         $publishStates = [];
-        $previous      = null;
 
         // Build better structure of publish states that hold publish date values from previous states.
         foreach ($rawAuditLogs as $log) {
-            $previous        = new PublishState($log, $defaultPublishState, $previous);
-            $publishStates[] = $previous;
+            if (count($publishStates)) {
+                $publishState = clone $publishStates[array_key_last($publishStates)];
+            } else {
+                $publishState = new PublishState();
+            }
+
+            $publishState->setFromAuditLog($log, $defaultPublishState);
+
+            $publishStates[] = $publishState;
         }
 
         return $publishStates;

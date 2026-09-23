@@ -31,6 +31,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
+use Mautic\PluginBundle\Event\PluginIntegrationResponseEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
@@ -818,9 +819,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             ];
         }
         if (empty($settings['ignore_event_dispatch'])) {
-            $event->setResponse($result);
             $this->dispatcher->dispatch(
-                $event,
+                new PluginIntegrationResponseEvent($this, $result),
                 PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE
             );
         }
