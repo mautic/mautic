@@ -80,6 +80,7 @@ class Focus extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(name: 'html_mode', type: 'string', length: 191, nullable: true)]
     private $htmlMode;
 
     /**
@@ -110,6 +111,7 @@ class Focus extends FormEntity implements UuidInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
     #[NotBlank(message: 'mautic.focus.error.select_style')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $style;
 
     /**
@@ -134,6 +136,7 @@ class Focus extends FormEntity implements UuidInterface
      * @var array
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(name: 'utm_tags', type: 'array', nullable: true)]
     private $utmTags = [];
 
     /**
@@ -168,27 +171,15 @@ class Focus extends FormEntity implements UuidInterface
 
         $builder->addNamedField('type', 'string', 'focus_type');
 
-        $builder->addField('style', 'string');
-
         $builder->addNullableField('website', 'string');
 
         $builder->addPublishDates();
 
         $builder->addNullableField('properties', 'array');
 
-        $builder->createField('utmTags', 'array')
-            ->columnName('utm_tags')
-            ->nullable()
-            ->build();
-
         $builder->addNamedField('form', 'integer', 'form_id', true);
 
         $builder->addNullableField('cache', 'text');
-
-        $builder->createField('htmlMode', 'string')
-            ->columnName('html_mode')
-            ->nullable()
-            ->build();
 
         $builder->addNullableField('editor', 'text');
 

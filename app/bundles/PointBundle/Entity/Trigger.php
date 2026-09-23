@@ -85,18 +85,21 @@ class Trigger extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'integer')]
     private $points = 0;
 
     /**
      * @var string
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'string', length: 7)]
     private $color = 'a0acb8';
 
     /**
      * @var bool
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(name: 'trigger_existing_leads', type: 'boolean')]
     private $triggerExistingLeads = false;
 
     /**
@@ -138,16 +141,6 @@ class Trigger extends FormEntity implements UuidInterface
         $builder->addIdColumns();
 
         $builder->addPublishDates();
-
-        $builder->addField('points', 'integer');
-
-        $builder->createField('color', 'string')
-            ->length(7)
-            ->build();
-
-        $builder->createField('triggerExistingLeads', 'boolean')
-            ->columnName('trigger_existing_leads')
-            ->build();
 
         $builder->addCategory();
 

@@ -18,6 +18,7 @@ class EmailReply
 {
     private readonly string $id;
 
+    #[ORM\Column(name: 'date_replied', type: 'datetime')]
     private readonly \DateTimeInterface $dateReplied;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -25,14 +26,6 @@ class EmailReply
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addUuid();
-
-        $builder->createField('dateReplied', 'datetime')
-            ->columnName('date_replied')
-            ->build();
-
-        $builder->createField('messageId', 'string')
-            ->columnName('message_id')
-            ->build();
     }
 
     /**
@@ -55,6 +48,7 @@ class EmailReply
         #[ORM\ManyToOne(targetEntity: Stat::class, inversedBy: 'replies')]
         #[ORM\JoinColumn(name: 'stat_id', nullable: false, onDelete: 'CASCADE')]
         private readonly Stat $stat,
+        #[ORM\Column(name: 'message_id', type: 'string', length: 191)]
         private readonly ?string $messageId,
         ?\DateTime $dateReplied = null,
     ) {
