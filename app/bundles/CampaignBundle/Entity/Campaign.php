@@ -405,7 +405,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      *
      * @return Collection<int,Event>
      */
-    public function getEventsByType($type): ArrayCollection
+    public function getEventsByType($type): Collection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
         $events   = $this->events->matching($criteria);
@@ -416,7 +416,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return Collection<int, Event>
      */
-    public function getEmailSendEvents(): ArrayCollection
+    public function getEmailSendEvents(): Collection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('type', 'email.send'));
         $events   = $this->events->matching($criteria);

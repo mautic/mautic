@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
@@ -112,7 +112,7 @@ class RealTimeExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeAssociatedEvents(ArrayCollection $children, \DateTime $now): void
+    private function executeAssociatedEvents(Collection $children, \DateTime $now): void
     {
         $children = clone $children;
 

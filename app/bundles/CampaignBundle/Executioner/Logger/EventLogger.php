@@ -133,7 +133,7 @@ class EventLogger
         return $this;
     }
 
-    public function extractContactsFromLogs(ArrayCollection $logs): ArrayCollection
+    public function extractContactsFromLogs(Collection $logs): ArrayCollection
     {
         $contacts = new ArrayCollection();
 
@@ -149,7 +149,7 @@ class EventLogger
     /**
      * @return ArrayCollection
      */
-    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, bool $isInactiveEntry = false)
+    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, bool $isInactiveEntry = false)
     {
         $this->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
@@ -159,7 +159,7 @@ class EventLogger
     /**
      * @return ArrayCollection
      */
-    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, ArrayCollection $contacts, bool $isInactiveEntry)
+    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, bool $isInactiveEntry)
     {
         $isDecision = Event::TYPE_DECISION === $event->getEventType();
         $campaign   = $event->getCampaign();

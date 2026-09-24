@@ -13,23 +13,20 @@ use Mautic\LeadBundle\Entity\Lead;
 abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
-     * @var ArrayCollection
-     */
-    protected $logs;
-
-    /**
      * @var Collection<int, Lead>
      */
     private readonly Collection $contacts;
 
     private array $logContactXref = [];
 
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
     public function __construct(
         protected AbstractEventAccessor $config,
         protected Event $event,
-        ArrayCollection $logs,
+        protected Collection $logs,
     ) {
-        $this->logs     = $logs;
         $this->contacts = new ArrayCollection();
 
         $this->extractContacts();

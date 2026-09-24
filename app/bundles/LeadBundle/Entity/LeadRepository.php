@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception\DriverException;
@@ -1164,7 +1165,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @return Collection<int, Lead>
      */
-    public function getContactCollection(array $ids): ArrayCollection
+    public function getContactCollection(array $ids): Collection
     {
         if ([] === $ids) {
             return new ArrayCollection();

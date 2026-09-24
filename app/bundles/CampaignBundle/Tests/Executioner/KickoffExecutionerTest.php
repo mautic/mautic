@@ -94,7 +94,7 @@ final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             public ArrayCollection $rootEvents;
 
             /**
-             * @return Collection<int,Event>
+             * @return ArrayCollection<int,Event>
              */
             public function getRootEvents(): ArrayCollection
             {

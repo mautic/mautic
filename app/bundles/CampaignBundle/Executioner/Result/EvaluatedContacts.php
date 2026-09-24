@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Executioner\Result;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\LeadBundle\Entity\Lead;
 
 final readonly class EvaluatedContacts
@@ -32,7 +33,7 @@ final readonly class EvaluatedContacts
     /**
      * @return Collection<int, Lead>
      */
-    public function getPassed(): ArrayCollection
+    public function getPassed(): Collection
     {
         return $this->passed;
     }
@@ -40,7 +41,7 @@ final readonly class EvaluatedContacts
     /**
      * @return Collection<int, Lead>
      */
-    public function getFailed(): ArrayCollection
+    public function getFailed(): Collection
     {
         return $this->failed;
     }
