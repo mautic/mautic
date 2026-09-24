@@ -641,7 +641,7 @@ final class MonitoringController extends FormController
         );
     }
 
-    private function updateAuditLog(Monitoring $monitoring, IpLookupHelper $ipLookupHelper, $action): void
+    private function updateAuditLog(Monitoring $monitoring, IpLookupHelper $ipLookupHelper, string $action): void
     {
         $log = [
             'bundle'    => 'plugin.mauticSocial',
