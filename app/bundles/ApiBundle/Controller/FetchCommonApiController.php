@@ -689,9 +689,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * @param array<mixed> $parameters
      *
-     * @return array<string, array<mixed>|int|string|null>|bool|Response
+     * @return array<string, array<mixed>|int|string|null>|true|Response
      */
-    protected function validateBatchPayload(array $parameters)
+    protected function validateBatchPayload(array $parameters): \Symfony\Component\HttpFoundation\Response|array|true
     {
         $batchLimit = (int) $this->coreParametersHelper->get('api_batch_max_limit', 200);
         if (count($parameters) > $batchLimit) {

@@ -700,7 +700,7 @@ final class LeadApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
     {
         if ('edit' === $action) {
             // Merge existing duplicate contact based on unique fields if exist
@@ -810,6 +810,8 @@ final class LeadApiController extends CommonApiController
 
         $isPostOrPatch = 'POST' === $this->requestStack->getCurrentRequest()->getMethod() || 'PATCH' === $this->requestStack->getCurrentRequest()->getMethod();
         $this->setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch);
+
+        return null;
     }
 
     /**

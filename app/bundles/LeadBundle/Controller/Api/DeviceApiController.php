@@ -56,7 +56,7 @@ final class DeviceApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
     {
         $lead = null;
         if (!empty($parameters['lead'])) {
@@ -76,12 +76,13 @@ final class DeviceApiController extends CommonApiController
         } elseif ('new' === $action) {
             return $this->returnError('contact ID is mandatory', Response::HTTP_BAD_REQUEST);
         }
+        return null;
     }
 
     /**
      * @param LeadDevice|FormEntity $entity
      */
-    protected function checkEntityAccess($entity, $action = 'view')
+    protected function checkEntityAccess($entity, $action = 'view'): bool
     {
         return parent::checkEntityAccess($entity->getLead(), $action);
     }
