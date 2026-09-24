@@ -87,6 +87,7 @@ class Submission
 
         $builder->createField('dateSubmitted', 'datetime')
             ->columnName('date_submitted')
+            ->precision(3)
             ->build();
 
         $builder->addField('referer', 'text');
