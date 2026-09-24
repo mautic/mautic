@@ -76,6 +76,9 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      * @var int
      */
     #[Groups(['sms:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -83,42 +86,50 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      */
     #[Groups(['sms:read', 'sms:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(type: 'text')]
     private $message;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var int
      */
     #[Groups(['sms:read'])]
+    #[ORM\Column(name: 'sent_count', type: 'integer')]
     private $sentCount = 0;
 
     /**
      * @var Category|null
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
@@ -141,6 +152,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      * @var string|null
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(name: 'sms_type', type: 'text', nullable: true)]
     private $smsType = 'template';
 
     /**
@@ -148,9 +160,11 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      */
     #[Groups(['sms:read', 'sms:write'])]
     #[Count(max: 10, maxMessage: 'mautic.sms.form.max.media.error')]
+    #[ORM\Column(type: Types::JSON)]
     private array $media = [];
 
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(name: 'is_mms', type: Types::BOOLEAN, options: ['default' => 0])]
     private bool $isMms = false;
 
     #[Groups(['sms:read'])]
@@ -183,33 +197,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('message', 'text')
-            ->build();
-
-        $builder->createField('smsType', 'text')
-            ->columnName('sms_type')
-            ->nullable()
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->build();
-
-        $builder->addCategory();
-
-        $builder->createField('media', Types::JSON)
-            ->columnName('media')
-            ->build();
-
-        $builder->createField('isMms', Types::BOOLEAN)
-            ->columnName('is_mms')
-            ->option('default', 0)
-            ->build();
 
         self::addTranslationMetadata($builder, self::class);
 

@@ -6,7 +6,6 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: TrackableRepository::class)]
 #[ORM\Table(name: 'channel_url_trackables')]
@@ -44,14 +43,8 @@ class Trackable
     /**
      * @var int
      */
+    #[ORM\Column(name: 'unique_hits', type: 'integer')]
     private $uniqueHits = 0;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addNamedField('uniqueHits', 'integer', 'unique_hits');
-    }
 
     /**
      * Prepares the metadata for API usage.

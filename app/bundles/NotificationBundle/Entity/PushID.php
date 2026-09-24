@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: PushIDRepository::class)]
@@ -16,6 +15,9 @@ class PushID
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -28,35 +30,20 @@ class PushID
     /**
      * @var string
      */
+    #[ORM\Column(name: 'push_id', type: 'string', length: 191)]
     private $pushID;
 
     /**
      * @var bool
      */
+    #[ORM\Column(type: 'boolean')]
     private $enabled;
 
     /**
      * @var bool
      */
+    #[ORM\Column(type: 'boolean')]
     private $mobile;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
-
-        $builder->createField('pushID', 'string')
-            ->columnName('push_id')
-            ->nullable(false)
-            ->build();
-
-        $builder->createField('enabled', 'boolean')->build();
-        $builder->createField('mobile', 'boolean')->build();
-    }
 
     /**
      * @return int|null

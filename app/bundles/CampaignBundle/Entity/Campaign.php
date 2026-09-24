@@ -71,6 +71,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @var int
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -78,27 +81,32 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     #[Groups(['campaign:read', 'campaign:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     public ?\DateTimeInterface $deleted = null;
 
     // see Mautic\CampaignBundle\Enum\RepublishBehavior for available values.
@@ -110,6 +118,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @var Category|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
@@ -155,6 +165,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     private array $canvasSettings = [];
 
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'allow_restart', type: 'boolean')]
     private bool $allowRestart = false;
 
     public function __construct()
@@ -180,15 +191,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addPublishDates();
-
-        $builder->addCategory();
-
-        $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
-        $builder->addNullableField('deleted', 'datetime');
 
         self::addProjectsField($builder, 'campaign_projects_xref', 'campaign_id');
     }
