@@ -405,7 +405,7 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
                     break;
 
                 case 'length':
-                    $length = $this->intArg($call, 0);
+                    $length = $this->lengthArg($call);
                     if (null === $length) {
                         return null;
                     }
@@ -485,6 +485,7 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
         $length     = null;
         $nullable   = false;
         $unique     = false;
+        $options    = [];
 
         if (isset($call->args[2])) {
             if (!$call->args[2] instanceof Arg || !$call->args[2]->value instanceof Array_) {
@@ -508,7 +509,7 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
                         if (!$item->value instanceof Int_) {
                             return null;
                         }
-                        $length = $item->value->value;
+                        $length = $item->value;
                         break;
 
                     case 'nullable':
@@ -519,13 +520,35 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
                         $unique = $item->value instanceof ConstFetch && $this->isName($item->value, 'true');
                         break;
 
+                    case 'options':
+                        if (!$item->value instanceof Array_) {
+                            return null;
+                        }
+                        foreach ($item->value->items as $optionItem) {
+                            if (!$optionItem instanceof ArrayItem || !$optionItem->key instanceof String_) {
+                                return null;
+                            }
+                            $options[] = $optionItem;
+                        }
+                        break;
+
+                    // the deprecated top-level default lands in the column options in the schema
+                    case 'default':
+                        $options[] = new ArrayItem($item->value, new String_('default'));
+                        break;
+
                     default:
                         return null;
                 }
             }
         }
 
-        return [$fieldName => $this->columnAttributes($fieldName, $columnName, $typeExpr, $length, $nullable, $unique, [], false, false, null)];
+        // Mautic's addField() caps every string column to 191, overriding an explicit length
+        if ($this->isStringType($typeExpr)) {
+            $length = null;
+        }
+
+        return [$fieldName => $this->columnAttributes($fieldName, $columnName, $typeExpr, $length, $nullable, $unique, $options, false, false, null)];
     }
 
     /**
@@ -1012,7 +1035,7 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
         string $fieldName,
         ?string $columnName,
         Expr $typeExpr,
-        ?int $length,
+        Int_|ClassConstFetch|null $length,
         bool $nullable,
         bool $unique,
         array $options,
@@ -1029,11 +1052,11 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
         $args[] = $this->namedArg('type', $typeExpr);
 
         if (null === $length && $this->isStringType($typeExpr)) {
-            $length = self::DEFAULT_STRING_LENGTH;
+            $length = new Int_(self::DEFAULT_STRING_LENGTH);
         }
 
         if (null !== $length) {
-            $args[] = $this->namedArg('length', new Int_($length));
+            $args[] = $this->namedArg('length', $length);
         }
 
         // unique before nullable, matching the ORM\Column constructor parameter order that
@@ -1115,7 +1138,8 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
     }
 
     /**
-     * A column type argument: a string literal or a Types::* constant, passed through verbatim.
+     * A column type argument: a string literal or a class constant (Types::*, ArrayType::ARRAY),
+     * passed through verbatim.
      */
     private function typeExpr(MethodCall $call, int $index): ?Expr
     {
@@ -1129,7 +1153,7 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
             return $value;
         }
 
-        if ($value instanceof ClassConstFetch && $value->class instanceof Name && 'Types' === $value->class->getLast()) {
+        if ($value instanceof ClassConstFetch && $value->class instanceof Name) {
             return $value;
         }
 
@@ -1216,15 +1240,11 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
         return $value instanceof String_ ? $value->value : null;
     }
 
-    protected function intArg(MethodCall $call, int $index): ?int
+    private function lengthArg(MethodCall $call): Int_|ClassConstFetch|null
     {
-        if (!isset($call->args[$index]) || !$call->args[$index] instanceof Arg) {
-            return null;
-        }
+        $value = $this->argValue($call, 0);
 
-        $value = $call->args[$index]->value;
-
-        return $value instanceof Int_ ? $value->value : null;
+        return $value instanceof Int_ || $value instanceof ClassConstFetch ? $value : null;
     }
 
     protected function boolArg(MethodCall $call, int $index, bool $default): bool
@@ -1313,6 +1333,52 @@ abstract class AbstractLoadMetadataRector extends AbstractRector
         }
 
         return false;
+    }
+
+    /**
+     * Drops a class-level builder call the existing attribute already declares with the same value;
+     * a differing value stays, as loadMetadata still overrides the attribute.
+     */
+    protected function removeCallDuplicatedByAttribute(Class_ $node, ClassMethod $loadMetadata, string $methodName, string $attributeShortName, string $argName): ?Class_
+    {
+        $attribute = $this->findAttribute($node->attrGroups, [$attributeShortName]);
+        if (!$attribute instanceof Attribute) {
+            return null;
+        }
+
+        $attributeValue = null;
+        foreach ($attribute->args as $arg) {
+            if ($arg->name instanceof Identifier && $argName === $arg->name->toString()) {
+                $attributeValue = $arg->value;
+            }
+        }
+
+        if (null === $attributeValue) {
+            return null;
+        }
+
+        $owned = [];
+        foreach ((array) $loadMetadata->stmts as $stmt) {
+            if (!$stmt instanceof Expression || !$stmt->expr instanceof MethodCall) {
+                continue;
+            }
+
+            foreach ($this->flattenChain($stmt->expr) ?? [] as $call) {
+                $value = $this->argValue($call, 0);
+                if ($methodName === $this->methodName($call) && $value instanceof Expr && $this->nodeComparator->areNodesEqual($value, $attributeValue)) {
+                    $owned[] = $call;
+                }
+            }
+        }
+
+        if ([] === $owned) {
+            return null;
+        }
+
+        $this->removeOwnedCalls($loadMetadata, $owned);
+        $this->removeLoadMetadataIfEmpty($node, $loadMetadata);
+
+        return $node;
     }
 
     /**
