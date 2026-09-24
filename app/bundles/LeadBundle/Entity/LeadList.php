@@ -113,12 +113,14 @@ class LeadList extends FormEntity implements UuidInterface
      * @var bool
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'is_global', type: 'boolean')]
     private $isGlobal = true;
 
     /**
      * @var bool
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'is_preference_center', type: 'boolean')]
     private $isPreferenceCenter = false;
 
     /**
@@ -151,14 +153,6 @@ class LeadList extends FormEntity implements UuidInterface
         $builder->addIdColumns();
 
         $builder->addCategory();
-
-        $builder->createField('isGlobal', 'boolean')
-            ->columnName('is_global')
-            ->build();
-
-        $builder->createField('isPreferenceCenter', 'boolean')
-            ->columnName('is_preference_center')
-            ->build();
 
         self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
         $builder->addNullableField('deleted', 'datetime');
