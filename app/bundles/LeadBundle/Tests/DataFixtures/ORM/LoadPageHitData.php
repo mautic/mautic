@@ -9,6 +9,8 @@ use Mautic\PageBundle\Entity\Hit;
 
 final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
+    use ManagedLeadTrait;
+
     public function load(ObjectManager $manager): void
     {
         $hits = [
@@ -93,7 +95,7 @@ final class LoadPageHitData extends AbstractFixture implements OrderedFixtureInt
         $hit->setUrl($hitConfig['url']);
         $hit->setReferer($hitConfig['referer']);
         $hit->setUrlTitle($hitConfig['urlTitle']);
-        $hit->setLead($hitConfig['contact']);
+        $hit->setLead($this->getManagedLead($hitConfig['contact'], $manager));
         $hit->setDateHit($hitConfig['dateHit']);
         $hit->setCode($hitConfig['code']);
         $hit->setTrackingId($hitConfig['trackingId']);
