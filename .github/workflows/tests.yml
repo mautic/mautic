@@ -115,9 +115,9 @@ jobs:
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
         if [[ "$COVERAGE" == "true" ]]; then
-          php -d zend.assertions=1 -d pcov.enabled=1 vendor/bin/phpunit -d memory_limit=3G --bootstrap app/tests/bootstrap.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
+          php -d zend.assertions=1 -d pcov.enabled=1 vendor/bin/phpunit -d memory_limit=3G --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --log-junit=junit.xml
         else
-          php -d zend.assertions=1 vendor/bin/phpunit -d memory_limit=2G --bootstrap app/tests/bootstrap.php --configuration app/phpunit.xml.dist
+          php -d zend.assertions=1 vendor/bin/phpunit -d memory_limit=2G --configuration app/phpunit.xml.dist
         fi
 
     - name: Doctrine mapping validation
