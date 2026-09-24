@@ -9,6 +9,12 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
 
+    symplify:
+        naming: false
+        complexity: true
+        configurable: true
+        static: true
+
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
         return: 91.6
@@ -111,11 +117,6 @@ parameters:
         - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
         - '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
 
-        # on purposelater
-        #- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
-
-        # can't figure out what the right type should be for FormBuilderInterface
-        - '#buildForm\(\) expects Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null>, Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null> given#'
         # on purpose type check
         -
             message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
