@@ -193,6 +193,25 @@ input[type="radio"].mauticform-radiogrp-radio {
     vertical-align: -3px;
     margin-right: 4px;
 }
+/* Boolean field styling - reuse radio group */
+.mauticform-boolean .mauticform-radiogrp-row,
+.mauticform-boolean .mauticform-checkboxgrp-row { width: 100%; }
+.mauticform-boolean label { margin: 0;}
+
+.mauticform-boolean .mauticform-radiogrp-row:has(.mauticform-boolean-positive),
+.mauticform-boolean .mauticform-checkboxgrp-row:has(.mauticform-boolean-positive) {
+    background-color: hsl(from var(--support-success) h s l / 0.05);
+    border-left: 4px solid var(--support-success);
+}
+
+.mauticform-boolean .mauticform-radiogrp-row:has(.mauticform-boolean-negative),
+.mauticform-boolean .mauticform-checkboxgrp-row:has(.mauticform-boolean-negative) {
+    background-color: hsl(from var(--support-error) h s l / 0.05);
+    border-left: 4px solid var(--support-error);
+}
+
+.mauticform-boolean .mauticform-radiogrp-row { padding: 5px; }
+.mauticform-boolean .mauticform-checkboxgrp-row { padding: 10px; }
 
 .mauticform-button-wrapper .mauticform-button,
 .mauticform-pagebreak-wrapper .mauticform-pagebreak {
