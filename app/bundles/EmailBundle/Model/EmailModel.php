@@ -771,7 +771,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get a stats for email by list.
      *
-     * @param Email|int $email
      * @return array{labels: mixed[], datasets: mixed[]}
      */
     public function getEmailDeviceStats(Email $email, bool $includeVariants = false, ?DateTime $dateFrom = null, ?DateTime $dateTo = null): array
@@ -1937,8 +1936,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get pie chart data of ignored vs opened emails.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      */
     public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {

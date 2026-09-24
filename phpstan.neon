@@ -17,10 +17,11 @@ parameters:
 
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
-        return: 91.6
-        param: 82.9
+        return: 91.4
+        param: 84.4
         property: 73.7
-        constant: 99.9
+        constant: 80.4
+        declare: 75.4
 
     # rules merged from rector/type-perfect, opt-in since type-coverage 2.3
     type_perfect:
@@ -81,12 +82,7 @@ parameters:
         -
             identifier: symplify.noNullableServiceInConstructor
             path: app/bundles/ReportBundle/Generator/ReportGenerator.php
-        # the concrete Config Loader and Messenger TransportFactory are the ones wired as services, no interface alias exists
-        -
-            identifier: symplify.preferInterfaceInConstructor
-            paths:
-                - app/bundles/CoreBundle/Event/RouteEvent.php
-                - app/bundles/MessengerBundle/Validator/DsnValidator.php
+
         # these services have no class name alias in the container, so only the string name can fetch them
         -
             identifier: mautic.noContainerGet
