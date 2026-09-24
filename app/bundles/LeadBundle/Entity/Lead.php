@@ -331,6 +331,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->frequencyRules   = new ArrayCollection();
         $this->companyChangeLog = new ArrayCollection();
         $this->groupScores      = new ArrayCollection();
+        $this->notes            = new ArrayCollection();
+        $this->utmtags          = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -567,10 +569,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->ipAddresses->removeElement($ipAddress);
     }
 
-    /**
-     * @return Collection
-     */
-    public function getIpAddresses()
+    public function getIpAddresses(): Collection
     {
         return $this->ipAddresses;
     }
@@ -830,7 +829,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int, StagesChangeLog>
      */
-    public function getStageChangeLog()
+    public function getStageChangeLog(): Collection
     {
         return $this->stageChangeLog;
     }
@@ -840,10 +839,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->pointsChangeLog->removeElement($pointsChangeLog);
     }
 
-    /**
-     * @return Collection
-     */
-    public function getPointsChangeLog()
+    public function getPointsChangeLog(): Collection
     {
         return $this->pointsChangeLog;
     }
@@ -878,7 +874,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int,CompanyChangeLog>
      */
-    public function getCompanyChangeLog()
+    public function getCompanyChangeLog(): Collection
     {
         return $this->companyChangeLog;
     }
@@ -925,7 +921,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int, PushID>
      */
-    public function getPushIDs()
+    public function getPushIDs(): Collection
     {
         return $this->pushIds;
     }
@@ -1101,7 +1097,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int, LeadNote>
      */
-    public function getNotes()
+    public function getNotes(): Collection
     {
         return $this->notes;
     }
@@ -1178,7 +1174,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<string, Tag>
      */
-    public function getTags()
+    public function getTags(): Collection
     {
         return $this->tags;
     }
@@ -1193,7 +1189,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int, UtmTag>
      */
-    public function getUtmTags()
+    public function getUtmTags(): Collection
     {
         return $this->utmtags;
     }
@@ -1241,7 +1237,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int, FrequencyRule>
      */
-    public function getFrequencyRules()
+    public function getFrequencyRules(): Collection
     {
         return $this->frequencyRules;
     }

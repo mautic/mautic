@@ -374,7 +374,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return Collection<int, Event>
      */
-    public function getEvents()
+    public function getEvents(): Collection
     {
         return $this->events;
     }

@@ -185,7 +185,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * @return Collection<int, Permission>
      */
-    public function getPermissions()
+    public function getPermissions(): Collection
     {
         return $this->permissions;
     }
@@ -276,7 +276,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * @return ArrayCollection<int, User>
      */
-    public function getUsers()
+    public function getUsers(): Collection
     {
         return $this->users;
     }

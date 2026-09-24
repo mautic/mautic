@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -502,7 +503,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $contact->expects($this->exactly(2))
             ->method('getIpAddresses')
-            ->willReturn([]);
+            ->willReturn(new ArrayCollection());
 
         $contact->expects($this->exactly(2))
             ->method('isNewlyCreated')

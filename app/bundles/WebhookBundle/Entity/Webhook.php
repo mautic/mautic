@@ -290,7 +290,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @return Collection<int, Event>
      */
-    public function getEvents()
+    public function getEvents(): Collection
     {
         return $this->events;
     }
@@ -408,7 +408,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      *
      * @return ArrayCollection<int,Log>
      */
-    public function getLogs()
+    public function getLogs(): Collection
     {
         return $this->logs;
     }

@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -153,7 +154,7 @@ class Redirect extends FormEntity
     /**
      * @return ArrayCollection
      */
-    public function getTrackableList()
+    public function getTrackableList(): Collection
     {
         return $this->trackables;
     }

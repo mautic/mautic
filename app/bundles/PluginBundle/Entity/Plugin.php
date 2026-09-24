@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
@@ -147,7 +148,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     /**
      * @return ArrayCollection<int, Integration>
      */
-    public function getIntegrations()
+    public function getIntegrations(): Collection
     {
         return $this->integrations;
     }

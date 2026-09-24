@@ -409,7 +409,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     /**
      * @return Collection<int, LeadList>
      */
-    public function getLists()
+    public function getLists(): Collection
     {
         return $this->lists;
     }
@@ -429,7 +429,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     /**
      * @return ArrayCollection<int, Stat>
      */
-    public function getStats()
+    public function getStats(): Collection
     {
         return $this->stats;
     }

@@ -586,7 +586,7 @@ class Stat
     /**
      * @return Collection<int, EmailReply>
      */
-    public function getReplies()
+    public function getReplies(): Collection
     {
         return $this->replies;
     }
