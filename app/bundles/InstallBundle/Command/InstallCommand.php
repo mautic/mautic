@@ -382,6 +382,8 @@ final class InstallCommand extends Command
                     $step->site_url = $params['site_url'];
                 }
 
+                $this->installer->prepareDirectories();
+
                 $messages['requirements'] = $this->installer->checkRequirements($step);
                 $messages['optional']     = $this->installer->checkOptionalSettings($step);
                 break;
