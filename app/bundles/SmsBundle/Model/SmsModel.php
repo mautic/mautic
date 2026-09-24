@@ -86,7 +86,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         return 'sms:smses';
     }
 
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 

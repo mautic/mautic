@@ -111,7 +111,7 @@ class FormModel extends AbstractCommonModel
      *
      * @param T $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = $this->isNewEntity($entity);
 

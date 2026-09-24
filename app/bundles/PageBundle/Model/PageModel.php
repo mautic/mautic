@@ -163,7 +163,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Page $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $pageIds = $entity->getRelatedEntityIds();
 

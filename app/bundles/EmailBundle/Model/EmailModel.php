@@ -208,7 +208,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @param Email $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $type = $entity->getEmailType();
         if (empty($type)) {

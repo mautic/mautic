@@ -382,7 +382,7 @@ class LeadModel extends FormModel
     /**
      * @param Lead $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
