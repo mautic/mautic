@@ -200,9 +200,12 @@ final class LeadFieldRepository extends CommonRepository
 
     /**
      * Return property by field alias and join tables.
+<<<<<<< HEAD
      *
      * @param string                                                       $field
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+=======
+>>>>>>> 499b0ee936 ([types] narrow private method param types to passed types)
      */
     public function getPropertyByField($field, $q): string
     {

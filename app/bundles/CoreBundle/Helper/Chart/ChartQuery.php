@@ -63,8 +63,8 @@ class ChartQuery extends AbstractChart
      */
     public function __construct(
         protected Connection $connection,
-        \DateTime $dateFrom,
-        \DateTime $dateTo,
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo,
         ?string $unit = null,
     ) {
         $this->dateTimeHelper = new DateTimeHelper();
@@ -518,8 +518,6 @@ class ChartQuery extends AbstractChart
 
     /**
      * Count how many rows is between a range of date diff in seconds.
-     *
-     * @param QueryBuilder $query
      */
     public function fetchCountDateDiff($query): int
     {
@@ -544,7 +542,7 @@ class ChartQuery extends AbstractChart
         return MAUTIC_TABLE_PREFIX.$table;
     }
 
-    private function getDateConstruct(QueryBuilder $query, string $tablePrefix, string $column): string
+    private function getDateConstruct(TrackingQueryBuilder $query, string $tablePrefix, string $column): string
     {
         $generatedColumn = $this->getGeneratedColumnForDateColumn($query, $column, $tablePrefix);
 

@@ -11,6 +11,7 @@ use GuzzleHttp\Subscriber\Oauth\Oauth1;
 use Mautic\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
+use Mautic\IntegrationsBundle\Exception\InvalidCredentialsException;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
@@ -37,6 +38,10 @@ final class HttpFactory implements AuthProviderInterface
      */
     public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
     {
+        if (!$credentials instanceof CredentialsInterface) {
+            throw new InvalidCredentialsException(sprintf('Credentials must implement the %s interface', CredentialsInterface::class));
+        }
+
         // Return cached initialized client if there is one.
         if (!empty($this->initializedClients[$credentials->getConsumerKey() ?? ''])) {
             return $this->initializedClients[$credentials->getConsumerKey() ?? ''];

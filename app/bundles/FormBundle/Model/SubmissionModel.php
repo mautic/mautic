@@ -571,8 +571,11 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
+<<<<<<< HEAD
      * @param string               $format
      * @param object               $page
+=======
+>>>>>>> 499b0ee936 ([types] narrow private method param types to passed types)
      * @param array<string, mixed> $queryArgs
      *
      * @throws \Exception
@@ -823,8 +826,8 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of top submission referrers.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      * @param array  $filters
      */
     public function getTopSubmissionReferrers(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
@@ -852,8 +855,8 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of the most submisions per lead.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      * @param array  $filters
      */
     public function getTopSubmitters(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array

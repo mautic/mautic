@@ -15,7 +15,6 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorBagInterface;
 
 final class PreferencePageTest extends MauticMysqlTestCase
 {
@@ -242,7 +241,7 @@ final class PreferencePageTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('mautic.lead.form.list', $content);
     }
 
-    private function disableTranslations(TranslatorBagInterface $translator): void
+    private function disableTranslations(\Mautic\CoreBundle\Translation\MauticResourceTranslator $translator): void
     {
         $translator->getCatalogue()->replace([]);
     }

@@ -14,11 +14,13 @@ final readonly class EncryptionService
     }
 
     /**
-     * @param mixed $keys
-     *
      * @return string|string[]
      */
+<<<<<<< HEAD
     public function encrypt($keys): string|array
+=======
+    public function encrypt(array|string $keys): string|array
+>>>>>>> 499b0ee936 ([types] narrow private method param types to passed types)
     {
         if (!is_array($keys)) {
             return $this->encryptionHelper->encrypt($keys);
