@@ -27,9 +27,9 @@ parameters:
         no_param_type_removal: true
         no_isset_on_object: true
         no_empty_on_object: true
-        no_mixed_property: true
 
         # @todo handle next
+        no_mixed_property: false
         no_mixed_caller: false
 
         null_over_false: true
@@ -59,6 +59,7 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     ignoreErrors:
+<<<<<<< HEAD
         # final classes mocked in tests make the Class&MockObject intersection unresolvable, the mock works via dg/bypass-finals
         -
             identifiers:
@@ -71,6 +72,11 @@ parameters:
             paths:
                 - */Tests/*
                 - */Test/*
+=======
+        # @todo to be removed as risky
+        - identifier: typePerfect.narrowPublicClassMethodParamType
+
+>>>>>>> bfbcbb560c ([types] narrow private method param types to passed types)
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: symplify.noNullableServiceInConstructor

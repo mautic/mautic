@@ -471,10 +471,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->website;
     }
 
-    /**
-     * @param mixed $website
-     */
-    public function setWebsite($website): static
+    public function setWebsite(string $website): static
     {
         $this->isChanged('website', $website);
 
