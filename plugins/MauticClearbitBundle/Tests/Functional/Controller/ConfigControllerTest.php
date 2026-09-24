@@ -44,7 +44,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
         $this->saveConfigForm();
         $this->em->clear();
 
-        $integration = $this->em->getRepository(Integration::class)->findOneBy(['name' => 'Clearbit']);
+        $integration = $this->getContainer()->get(\Mautic\PluginBundle\Entity\IntegrationRepository::class)->findOneBy(['name' => 'Clearbit']);
         $this->assertInstanceOf(Integration::class, $integration);
         $this->assertTrue($integration->getIsPublished());
         $this->assertNotSame(self::API_KEY, $integration->getApiKeys()['apikey'] ?? null);

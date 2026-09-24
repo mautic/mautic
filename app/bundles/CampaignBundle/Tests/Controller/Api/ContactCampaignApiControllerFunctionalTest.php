@@ -21,7 +21,7 @@ final class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignT
         $this->em->persist($contact);
         $this->em->flush();
 
-        $campaignMemberRepository = $this->em->getRepository(CampaignMember::class);
+        $campaignMemberRepository = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class);
 
         // Add the contact to the campaign.
         $this->client->request(Request::METHOD_POST, "/api/campaigns/{$campaign->getId()}/contact/{$contact->getId()}/add");

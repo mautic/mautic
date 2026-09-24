@@ -325,7 +325,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->em->getRepository(Email::class)->find($email->getId());
+        $email = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->find($email->getId());
         $this->assertInstanceOf(Email::class, $email);
         $this->assertFalse($email->isPublished(), 'The email should not be published.');
         $this->assertInstanceOf(EmailEvent::class, $dispatchedEvent, 'The event should have been dispatched.');

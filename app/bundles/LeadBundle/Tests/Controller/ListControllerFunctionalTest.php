@@ -381,7 +381,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $segmentId = $segment->getId();
 
         // Number of segments before clone
-        $segmentsCountBefore = $this->em->getRepository(LeadList::class)->count([]);
+        $segmentsCountBefore = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class)->count([]);
         // Go to clone segment action
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$segmentId);
         $this->assertResponseIsSuccessful();
@@ -394,7 +394,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         // Number of segments after clone
-        $segmentsCountAfter = $this->em->getRepository(LeadList::class)->count([]);
+        $segmentsCountAfter = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class)->count([]);
         // Check that just one segment was created
         $this->assertSame($segmentsCountBefore + 1, $segmentsCountAfter);
     }

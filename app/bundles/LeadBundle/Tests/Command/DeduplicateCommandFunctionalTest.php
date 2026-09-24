@@ -26,7 +26,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
     public function testDeduplicateCommandWithUniqueEmail(): void
     {
-        $contactRepository = $this->em->getRepository(Lead::class);
+        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
 
         /** @var ContactDeduper $contactDeduper */
         $contactDeduper = self::getContainer()->get(ContactDeduper::class);
@@ -54,9 +54,9 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
     public function testDeduplicateCommandWithAnotherUniqueFieldAndAnd(): void
     {
-        $contactRepository = $this->em->getRepository(Lead::class);
+        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
 
-        $fieldRepository = $this->em->getRepository(LeadField::class);
+        $fieldRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadFieldRepository::class);
 
         $this->assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
@@ -86,9 +86,9 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
     public function testDeduplicateCommandWithAnotherUniqueFieldAndOr(): void
     {
-        $contactRepository = $this->em->getRepository(Lead::class);
+        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
 
-        $fieldRepository = $this->em->getRepository(LeadField::class);
+        $fieldRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadFieldRepository::class);
 
         $this->assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 

@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeleteContactSecondaryCompaniesCommand;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -20,7 +19,7 @@ final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCa
     {
         $contact          = $this->getContactWithCompanies();
         /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
+        $companyLeadRepo  = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyLeadRepository::class);
 
         $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
         $this->assertCount(2, $contactCompanies);

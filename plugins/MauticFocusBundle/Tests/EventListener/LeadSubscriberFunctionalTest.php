@@ -45,8 +45,8 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function searchPhrase(string $phrase, Lead $lead): array
     {
-        $searchViewStats  = $this->em->getRepository(Stat::class)->getStatsViewByLead($lead->getId(), ['search'=>$phrase]);
-        $searchClickStats = $this->em->getRepository(Stat::class)->getStatsClickByLead($lead->getId(), ['search'=>$phrase]);
+        $searchViewStats  = $this->getContainer()->get(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class)->getStatsViewByLead($lead->getId(), ['search'=>$phrase]);
+        $searchClickStats = $this->getContainer()->get(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class)->getStatsClickByLead($lead->getId(), ['search'=>$phrase]);
 
         return array_merge($searchViewStats, $searchClickStats);
     }

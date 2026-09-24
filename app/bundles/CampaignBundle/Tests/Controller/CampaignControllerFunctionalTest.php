@@ -304,7 +304,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful($response->getContent());
 
-        $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
+        $eventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findAll();
         $this->assertCount(0, $eventLogs);
     }
 

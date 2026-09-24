@@ -74,7 +74,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment]);
 
         // Emulate email reads
-        $statRepository = $this->em->getRepository(Stat::class);
+        $statRepository = $this->getContainer()->get(\Mautic\EmailBundle\Entity\StatRepository::class);
         $stats          = $statRepository->findBy([
             'email' => $email,
             'lead'  => $contacts,
@@ -716,7 +716,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var Email $winnerReloaded */
-        $winnerReloaded = $this->em->getRepository(Email::class)->find($winner->getId());
+        $winnerReloaded = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->find($winner->getId());
 
         $this->assertInstanceOf(Email::class, $winnerReloaded);
         $this->assertNotInstanceOf(VariantEntityInterface::class, $winnerReloaded->getVariantParent());

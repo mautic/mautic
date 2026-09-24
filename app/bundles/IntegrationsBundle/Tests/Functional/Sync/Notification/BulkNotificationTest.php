@@ -21,7 +21,7 @@ final class BulkNotificationTest extends MauticMysqlTestCase
 
     public function testNotifications(): void
     {
-        $notificationRepository = $this->em->getRepository(Notification::class);
+        $notificationRepository = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class);
 
         $this->bulkNotification->addNotification('dup1', 'message 1', 'Integration name', 'Lead', 'lead', 0, 'link 1');
         $this->bulkNotification->addNotification('dup2', 'message 2', 'Integration name', 'Lead', 'lead', 0, 'link 2');

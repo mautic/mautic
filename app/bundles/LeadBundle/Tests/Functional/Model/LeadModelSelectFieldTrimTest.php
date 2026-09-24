@@ -49,7 +49,7 @@ final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Modify custom field (add trailing spaces)
-        $updatedField = $this->em->getRepository(LeadField::class)
+        $updatedField = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadFieldRepository::class)
           ->findOneBy(['alias' => 'industry_type']);
         $this->assertInstanceOf(LeadField::class, $updatedField);
 
@@ -68,7 +68,7 @@ final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
         $eventModel = $this->getContainer()->get(EventModel::class);
 
         // Reload event after custom field change
-        $eventEntity = $this->em->getRepository(CampaignEvent::class)
+        $eventEntity = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\EventRepository::class)
           ->findOneBy(['name' => 'Update Industry']);
         $this->assertInstanceOf(CampaignEvent::class, $eventEntity);
 
@@ -78,7 +78,7 @@ final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Validate result
-        $reloadedEvent = $this->em->getRepository(CampaignEvent::class)
+        $reloadedEvent = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\EventRepository::class)
           ->findOneBy(['name' => 'Update Industry']);
         $this->assertInstanceOf(CampaignEvent::class, $reloadedEvent);
 

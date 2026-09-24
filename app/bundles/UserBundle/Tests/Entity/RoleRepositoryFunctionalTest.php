@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
 
@@ -25,7 +24,7 @@ final class RoleRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var RoleRepository $repo */
-        $repo = $this->em->getRepository(Role::class);
+        $repo = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class);
 
         $expected = [
             $roleOne->getId() => '2',

@@ -150,7 +150,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testUserBoundBearerTokenAuthenticatesOnApiV1AndApiV2(): void
     {
-        $adminUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $adminUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $adminUser);
 
         $accessToken = $this->createUserBoundAccessToken($adminUser);
@@ -183,7 +183,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     private function createUserBoundAccessToken(User $user): AccessToken
     {
-        $existingToken = $this->em->getRepository(AccessToken::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
+        $existingToken = $this->getContainer()->get(\Mautic\ApiBundle\Entity\oAuth2\AccessTokenRepository::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
         if ($existingToken instanceof AccessToken) {
             $this->em->remove($existingToken);
             $this->em->flush();
@@ -208,7 +208,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $reloadedToken = $this->em->getRepository(AccessToken::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
+        $reloadedToken = $this->getContainer()->get(\Mautic\ApiBundle\Entity\oAuth2\AccessTokenRepository::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
         $this->assertInstanceOf(AccessToken::class, $reloadedToken);
 
         return $reloadedToken;

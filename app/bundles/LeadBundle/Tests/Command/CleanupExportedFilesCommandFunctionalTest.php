@@ -81,7 +81,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
      */
     private function checkContactExportScheduler(int $count): array
     {
-        $repo    = $this->em->getRepository(ContactExportScheduler::class);
+        $repo    = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ContactExportSchedulerRepository::class);
         $allRows = $repo->findAll();
         $this->assertCount($count, $allRows);
 

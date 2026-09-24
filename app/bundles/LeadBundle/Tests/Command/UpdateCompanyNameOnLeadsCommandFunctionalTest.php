@@ -6,9 +6,7 @@ namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\UpdateCompanyNameOnLeadsCommand;
-use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
 
@@ -21,10 +19,10 @@ final class UpdateCompanyNameOnLeadsCommandFunctionalTest extends MauticMysqlTes
     public function testUpdateCompanies(): void
     {
         /** @var CompanyRepository $companyRepository */
-        $companyRepository = $this->em->getRepository(Company::class);
+        $companyRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
 
         /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->em->getRepository(Lead::class);
+        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
 
         $contact1 = $this->createContact();
         $contact2 = $this->createContact();

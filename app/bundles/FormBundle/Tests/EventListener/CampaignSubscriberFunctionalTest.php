@@ -105,7 +105,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($campaignEvent);
         $this->em->detach($campaign);
 
-        $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'testing@ampersand.select']);
+        $contact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(['email' => 'testing@ampersand.select']);
         $this->assertInstanceOf(Lead::class, $contact);
         $log = new LeadEventLog();
         $log->setLead($contact);

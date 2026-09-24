@@ -7,10 +7,8 @@ namespace Mautic\LeadBundle\Tests\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeleteCompanyLeads;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\CompanyRepository;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
 
@@ -23,13 +21,13 @@ final class DeleteCompanyLeadsFunctionalTest extends MauticMysqlTestCase
     public function testDeleteCompanies(): void
     {
         /** @var CompanyLeadRepository $companyLeadRepository */
-        $companyLeadRepository = $this->em->getRepository(CompanyLead::class);
+        $companyLeadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyLeadRepository::class);
 
         /** @var CompanyRepository $companyRepository */
-        $companyRepository = $this->em->getRepository(Company::class);
+        $companyRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
 
         /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->em->getRepository(Lead::class);
+        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
 
         $contact1 = $this->createContact();
         $contact2 = $this->createContact();

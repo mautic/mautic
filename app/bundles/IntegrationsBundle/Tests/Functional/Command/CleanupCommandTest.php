@@ -21,9 +21,9 @@ final class CleanupCommandTest extends MauticMysqlTestCase
         $this->assertSame(Command::SUCCESS, $response->getStatusCode());
         $this->assertStringContainsString('1 records deleted.', $response->getDisplay());
 
-        $fieldChangeRecordDeleted = $this->em->getRepository(FieldChange::class)->findOneBy(['id' => $fieldChangeNonExistLead->getId()]);
+        $fieldChangeRecordDeleted = $this->getContainer()->get(\Mautic\IntegrationsBundle\Entity\FieldChangeRepository::class)->findOneBy(['id' => $fieldChangeNonExistLead->getId()]);
         $this->assertNotInstanceOf(FieldChange::class, $fieldChangeRecordDeleted);
-        $fieldChangeRecordShouldNotDeleted = $this->em->getRepository(FieldChange::class)->findOneBy(['id' => $fieldChangeExistLead->getId()]);
+        $fieldChangeRecordShouldNotDeleted = $this->getContainer()->get(\Mautic\IntegrationsBundle\Entity\FieldChangeRepository::class)->findOneBy(['id' => $fieldChangeExistLead->getId()]);
         $this->assertInstanceOf(FieldChange::class, $fieldChangeRecordShouldNotDeleted);
     }
 

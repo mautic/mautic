@@ -474,7 +474,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->setUpSymfony($configParams);
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -522,7 +522,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->setUpSymfony($configParams);
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -545,7 +545,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     private function loginOtherUser(string $name): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => $name]);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => $name]);
         $this->assertInstanceOf(User::class, $user);
 
         $this->loginUser($user);

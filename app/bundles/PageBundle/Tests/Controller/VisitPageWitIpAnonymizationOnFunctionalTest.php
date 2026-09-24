@@ -40,7 +40,7 @@ final class VisitPageWitIpAnonymizationOnFunctionalTest extends MauticMysqlTestC
         $this->assertStringContainsString('Test Html', $pageContent->text());
 
         /** @var HitRepository $hitRepository */
-        $hitRepository = $this->em->getRepository(Hit::class);
+        $hitRepository = $this->getContainer()->get(\Mautic\PageBundle\Entity\HitRepository::class);
 
         /** @var Hit[] $hits */
         $hits = $hitRepository->findBy(['page' => $pageObject->getId()]);

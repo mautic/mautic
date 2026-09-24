@@ -105,7 +105,7 @@ final class ProcessMarketingMessagesQueueCommandFunctionalTest extends MauticMys
     private function assertEmailStatCreated(Email $email, Lead $lead): void
     {
         /** @var StatRepository $emailStatRepository */
-        $emailStatRepository = $this->em->getRepository(Stat::class);
+        $emailStatRepository = $this->getContainer()->get(\Mautic\EmailBundle\Entity\StatRepository::class);
 
         /** @var Stat|null $emailStat */
         $emailStat = $emailStatRepository->findOneBy([

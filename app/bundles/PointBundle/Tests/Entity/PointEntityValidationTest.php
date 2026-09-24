@@ -108,7 +108,7 @@ final class PointEntityValidationTest extends MauticMysqlTestCase
         $response = $this->client->getResponse()->getContent();
         $this->assertStringContainsString($errorMessage, (string) $response);
 
-        $pointDetail = $this->em->getRepository(Point::class)->findOneBy(['delta' => $delta]);
+        $pointDetail = $this->getContainer()->get(\Mautic\PointBundle\Entity\PointRepository::class)->findOneBy(['delta' => $delta]);
         '' === $errorMessage ? $this->assertInstanceOf(Point::class, $pointDetail) : $this->assertNotInstanceOf(Point::class, $pointDetail);
     }
 }

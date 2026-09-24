@@ -110,7 +110,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         );
 
         // Search the logs
-        $leadEventLogRepo = $this->em->getRepository(LeadEventLog::class);
+        $leadEventLogRepo = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class);
         $adjustEventLog   = $leadEventLogRepo->findOneBy(['event' => $adjustPointEvent->getId()]);
 
         $assertEventLog($adjustEventLog);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
-use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
@@ -118,9 +117,9 @@ final class LeadControllerTest extends MauticMysqlTestCase
         /** @var DateHelper $dateHelper */
         $dateHelper             = self::getContainer()->get(DateHelper::class);
         $requestedAt            = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
-        $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $requestingAdmin        = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
 
-        $requesterNotifications = $this->em->getRepository(Notification::class)->findBy(
+        $requesterNotifications = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class)->findBy(
             [
                 'user'   => $requestingAdmin,
                 'header' => 'mautic.lead.export.being.prepared.header',
@@ -128,7 +127,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         );
         $this->assertCount(1, $requesterNotifications);
 
-        $adminNotifications = $this->em->getRepository(Notification::class)->findBy(
+        $adminNotifications = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class)->findBy(
             [
                 'user'   => $secondaryAdmin,
                 'header' => 'mautic.lead.export.admin.notification.header',
@@ -142,7 +141,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($requestedAt, (string) $adminNotifications[0]->getMessage());
         $this->assertStringNotContainsString('http', (string) $adminNotifications[0]->getMessage());
 
-        $requesterAdminNotifications = $this->em->getRepository(Notification::class)->findBy(
+        $requesterAdminNotifications = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class)->findBy(
             [
                 'user'   => $requestingAdmin,
                 'header' => 'mautic.lead.export.admin.notification.header',
@@ -150,7 +149,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         );
         $this->assertCount(0, $requesterAdminNotifications);
 
-        $nonAdminNotifications = $this->em->getRepository(Notification::class)->findBy(
+        $nonAdminNotifications = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class)->findBy(
             [
                 'user'   => $user,
                 'header' => 'mautic.lead.export.admin.notification.header',
@@ -188,7 +187,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler = $this->checkContactExportScheduler(1)[0];
-        $requestingAdmin        = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $requestingAdmin        = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         /** @var DateHelper $dateHelper */
         $dateHelper      = self::getContainer()->get(DateHelper::class);
         $requestedAt     = $dateHelper->toFull($this->getScheduledDateTimeForDisplay($contactExportScheduler));
@@ -266,7 +265,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
      */
     private function checkContactExportScheduler(int $count): array
     {
-        $repo    = $this->em->getRepository(ContactExportScheduler::class);
+        $repo    = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ContactExportSchedulerRepository::class);
         $allRows = $repo->findAll();
         $this->assertCount($count, $allRows);
 
@@ -290,7 +289,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
 
     private function setAdminUser(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', 'admin');

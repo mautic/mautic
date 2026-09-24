@@ -1184,7 +1184,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 
     private function createStuckContactsTestData(): void
     {
-        $campaign = $this->em->getRepository(Campaign::class)->find(1);
+        $campaign = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->find(1);
         if (!$campaign) {
             $campaign = $this->createCampaign('Test Campaign');
             $campaign->setIsPublished(true);
@@ -1249,7 +1249,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
             $criteria['event'] = $eventId;
         }
 
-        return $this->em->getRepository(LeadEventLog::class)->findBy($criteria);
+        return $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy($criteria);
     }
     /**
      * The command prints a table, and matching a contact id anywhere in it also matches

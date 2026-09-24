@@ -120,7 +120,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(201);
         $this->assertGreaterThan(0, $segmentId);
 
-        return $this->em->getRepository(LeadList::class)->find($segmentId);
+        return $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class)->find($segmentId);
     }
 
     private function buildSegment(LeadList $segment, int $expectedCountInSegment): void
@@ -144,7 +144,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     {
         $this->em->remove($segment);
         foreach ($this->leads as $lead) {
-            $deleteLead = $this->em->getRepository(Lead::class)->find($lead->getId());
+            $deleteLead = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($lead->getId());
             $this->assertInstanceOf(Lead::class, $deleteLead);
             $this->em->remove($deleteLead);
         }

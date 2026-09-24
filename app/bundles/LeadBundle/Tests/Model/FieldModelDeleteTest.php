@@ -40,7 +40,7 @@ final class FieldModelDeleteTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($companyField);
         $this->em->flush();
 
-        $leadFieldRepository = $this->em->getRepository(LeadField::class);
+        $leadFieldRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadFieldRepository::class);
         $this->assertInstanceOf(LeadFieldRepository::class, $leadFieldRepository);
 
         $this->assertCount(1, $leadFieldRepository->findBy(['alias' => 'test_lead_field']));

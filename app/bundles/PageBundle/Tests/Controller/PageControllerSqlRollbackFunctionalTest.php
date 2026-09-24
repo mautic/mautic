@@ -66,7 +66,7 @@ final class PageControllerSqlRollbackFunctionalTest extends MauticMysqlTestCase
         // Re-enable redirect following for subsequent tests.
         $this->client->followRedirects();
 
-        $hitRepository = $this->em->getRepository(Hit::class);
+        $hitRepository = $this->getContainer()->get(\Mautic\PageBundle\Entity\HitRepository::class);
         /** @var Hit|null $hit */
         $hit = $hitRepository->findOneBy(['lead' => $lead]);
 
