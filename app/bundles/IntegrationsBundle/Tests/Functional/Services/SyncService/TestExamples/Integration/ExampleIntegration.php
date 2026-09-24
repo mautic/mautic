@@ -52,16 +52,15 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
 
     public function getMappingManual(): MappingManualDAO
     {
-        // Generate mapping manual that will be passed to the sync service. This instructs the sync service how to map Mautic fields to integration fields
-        $mappingManual = new MappingManualDAO(self::NAME);
-
         // Each object like lead, contact, user, company, account, etc, will need it's own ObjectMappingDAO
         // In this example, Mautic's Contact object is mapped to the Example's Lead object
         $leadObjectMapping = new ObjectMappingDAO(
             Contact::NAME,
             ExampleSyncDataExchange::OBJECT_LEAD
         );
-        $mappingManual->addObjectMapping($leadObjectMapping);
+
+        // Generate mapping manual that will be passed to the sync service. This instructs the sync service how to map Mautic fields to integration fields
+        $mappingManual = new MappingManualDAO(self::NAME, [$leadObjectMapping]);
 
         // Get field mapping as configured in Mautic's integration config
         $mappedFields = $this->getConfiguredFieldMapping();
