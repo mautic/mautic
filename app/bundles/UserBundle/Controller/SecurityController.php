@@ -49,7 +49,9 @@ final class SecurityController extends CommonController implements EventSubscrib
 
         // Don't redirect from OIDC actions - oidcRequiredAction needs user to link account,
         // oidcCheckAction needs to return 404 for direct access
-        if (str_contains($controller, 'oidcRequiredAction') || str_contains($controller, 'oidcCheckAction')) {
+        if (str_contains($controller, 'oidcRequiredAction')
+            || str_contains($controller, 'oidcCheckAction')
+            || str_contains($controller, 'oidcLoginAction')) {
             return;
         }
 

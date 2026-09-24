@@ -71,10 +71,10 @@ final readonly class OidcRequestSubscriber implements EventSubscriberInterface
         }
 
         // User is authenticated but not with OIDC, and OIDC is required - redirect to required page
-        // But don't redirect if already on the required page or login_check (to avoid loop / let controller handle it)
+        // But don't redirect if already on the required page, login, or login_check (to avoid loop / let controller handle it)
         if (!$this->isOpenIdToken($token) && $this->parameters->isRequired()) {
             $path = $request->getPathInfo();
-            if ('/s/open_id/required' === $path || '/s/open_id/login_check' === $path) {
+            if ('/s/open_id/required' === $path || '/s/open_id/login' === $path || '/s/open_id/login_check' === $path) {
                 return null; // Let the controller handle it
             }
 

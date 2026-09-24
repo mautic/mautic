@@ -44,7 +44,7 @@ final class ConfigSubscriberTest extends TestCase
 
         $this->configEvent->expects($this->exactly(2))
             ->method('getConfig')
-            ->willReturnCallback(function ($bundle = null) use ($userConfigData) {
+            ->willReturnCallback(function ($bundle = null) use ($userConfigData): array {
                 if (null === $bundle) {
                     return ['userconfig' => array_merge(['open_id_is_enabled' => 0], $userConfigData)];
                 }
@@ -61,7 +61,7 @@ final class ConfigSubscriberTest extends TestCase
 
         $this->configEvent->expects($this->exactly(2))
             ->method('getConfig')
-            ->willReturnCallback(function ($bundle = null) {
+            ->willReturnCallback(function ($bundle = null): array {
                 if (null === $bundle) {
                     return ['userconfig' => ['open_id_is_enabled' => 0]];
                 }
@@ -85,7 +85,7 @@ final class ConfigSubscriberTest extends TestCase
 
         $this->configEvent->expects($this->exactly(2))
             ->method('getConfig')
-            ->willReturnCallback(function ($bundle = null) use ($file) {
+            ->willReturnCallback(function ($bundle = null) use ($file): array {
                 if (null === $bundle) {
                     return ['userconfig' => ['open_id_is_enabled' => 0, 'saml_idp_metadata' => $file]];
                 }

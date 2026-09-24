@@ -34,7 +34,7 @@ final class Client implements ClientInterface
 
     public function getVerifiedClaims(array $claims): array
     {
-        if (empty(self::$verifiedClaimsResponse)) {
+        if ([] === self::$verifiedClaimsResponse) {
             return [
                 'sub' => 'test-subject-id',
                 'email' => 'test@example.com',
@@ -47,7 +47,7 @@ final class Client implements ClientInterface
 
     public function requestUserInfo(array $claims): array
     {
-        if (empty(self::$userInfoResponse)) {
+        if ([] === self::$userInfoResponse) {
             return [
                 'sub' => 'test-subject-id',
                 'email' => 'test@example.com',

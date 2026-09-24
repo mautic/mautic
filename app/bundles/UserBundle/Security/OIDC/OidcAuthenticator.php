@@ -10,7 +10,6 @@ use Mautic\UserBundle\Exception\OidcException;
 use Mautic\UserBundle\Security\OIDC\Factory\UserCredentialsFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -35,8 +34,10 @@ final class OidcAuthenticator extends AbstractAuthenticator implements Authentic
 
     public function supports(Request $request): bool
     {
-        // Check if this is the OIDC callback route with code and state parameters
+        // Only support the callback route (login_check), not the login initiation route
+        // The callback will have code and state parameters from the OIDC provider
         return $this->parameters->isEnabled()
+            && 'mautic_oidc_check' === $request->attributes->get('_route')
             && null !== $request->get('code')
             && null !== $request->get('state');
     }
@@ -82,7 +83,7 @@ final class OidcAuthenticator extends AbstractAuthenticator implements Authentic
      * Called when authentication is needed but not provided.
      * This is the entry point that starts the authentication process.
      */
-    public function start(Request $request, ?AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): RedirectResponse
     {
         // Redirect to the OIDC login page to start authentication
         return new RedirectResponse(
