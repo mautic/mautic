@@ -251,6 +251,7 @@ rules:
     - Symplify\PHPStanRules\Rules\Complexity\NoPropertyToPropertyAssignRule
     - Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
+    - Utils\PHPStan\Rule\NoPublicNonActionMethodInControllerRule
 
     - Utils\PHPStan\Rule\NoServicesInBundleConfigRule
     - Utils\PHPStan\Rule\NoServiceInMethodParameterRule

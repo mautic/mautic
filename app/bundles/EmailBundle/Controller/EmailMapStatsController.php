@@ -39,7 +39,7 @@ final class EmailMapStatsController extends AbstractController
      *
      * @throws Exception
      */
-    public function getData(Email $entity, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
+    private function getData(Email $entity, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
     {
         // get A/B test information
         $parent = $entity->getVariantParent();
@@ -57,7 +57,7 @@ final class EmailMapStatsController extends AbstractController
         );
     }
 
-    public function hasAccess(CorePermissions $security, Email $entity): bool
+    private function hasAccess(CorePermissions $security, Email $entity): bool
     {
         return $security->hasEntityAccess(
             'email:emails:viewown',
@@ -69,12 +69,12 @@ final class EmailMapStatsController extends AbstractController
     /**
      * @return array<string, array<string, string>>
      */
-    public function getMapOptions(): array
+    private function getMapOptions(): array
     {
         return self::MAP_OPTIONS;
     }
 
-    public function getMapOptionsTitle(): string
+    private function getMapOptionsTitle(): string
     {
         return 'mautic.email.stats.options.title';
     }

@@ -43,12 +43,12 @@ final class CampaignMapStatsController extends AbstractController
      *
      * @throws Exception
      */
-    public function getData(Campaign $entity, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
+    private function getData(Campaign $entity, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
     {
         return $this->model->getCountryStats($entity, $dateFromObject, $dateToObject);
     }
 
-    public function hasAccess(CorePermissions $security, Campaign $entity): bool
+    private function hasAccess(CorePermissions $security, Campaign $entity): bool
     {
         return $security->hasEntityAccess(
             'email:emails:viewown',
@@ -60,7 +60,7 @@ final class CampaignMapStatsController extends AbstractController
     /**
      * @return array<string,array<string, string>>
      */
-    public function getMapOptions(Campaign $entity): array
+    private function getMapOptions(Campaign $entity): array
     {
         if ($entity->isEmailCampaign()) {
             return self::MAP_OPTIONS;
@@ -71,7 +71,7 @@ final class CampaignMapStatsController extends AbstractController
         return [$key => self::MAP_OPTIONS[$key]];
     }
 
-    public function getMapOptionsTitle(): string
+    private function getMapOptionsTitle(): string
     {
         return '';
     }

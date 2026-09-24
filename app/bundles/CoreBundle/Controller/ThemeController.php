@@ -263,7 +263,7 @@ final class ThemeController extends FormController
         );
     }
 
-    public function deleteTheme(ThemeHelperInterface $themeHelper, $themeName): array
+    private function deleteTheme(ThemeHelperInterface $themeHelper, $themeName): array
     {
         $flashes = [];
 
@@ -311,7 +311,7 @@ final class ThemeController extends FormController
      *
      * @return array{returnUrl: string, contentTemplate: string, passthroughVars: array{activeLink: string, mauticContent: string}}
      */
-    public function getIndexPostActionVars(): array
+    private function getIndexPostActionVars(): array
     {
         return [
             'returnUrl'       => $this->generateUrl('mautic_themes_index'),

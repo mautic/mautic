@@ -665,7 +665,7 @@ final class LeadApiController extends CommonApiController
      *
      * @return object
      */
-    public function getNewEntity(array $params)
+    protected function getNewEntity(array $params)
     {
         return $this->model->checkForDuplicateContact($params);
     }

@@ -705,7 +705,7 @@ final class CompanyController extends FormController
      *
      * @return array<string, mixed>
      */
-    public function getCompanyContacts(Request $request, $companyId, $page = 0, $leadIds = []): array
+    private function getCompanyContacts(Request $request, $companyId, $page = 0, $leadIds = []): array
     {
         $this->setListFilters();
         $session = $request->getSession();

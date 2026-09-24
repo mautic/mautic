@@ -47,7 +47,7 @@ final class PublicController extends FormController
      * @param string $iconClass CSS class for the icon (e.g. ri-eye-line)
      * @param User   $user      User object; defaults to current user
      */
-    public function addNewNotification($message, $header, $iconClass, User $user): void
+    private function addNewNotification($message, $header, $iconClass, User $user): void
     {
         $this->notificationModel->addNotification($message, 'FullContact', false, $header, $iconClass, null, $user);
     }

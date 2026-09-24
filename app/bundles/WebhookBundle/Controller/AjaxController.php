@@ -100,7 +100,7 @@ final class AjaxController extends CommonAjaxController
      *
      * @return non-falsy-string[]
      */
-    public function getPayloadPaths($types, PathsHelper $pathsHelper): array
+    private function getPayloadPaths($types, PathsHelper $pathsHelper): array
     {
         $payloadPaths = [];
 
@@ -146,7 +146,7 @@ final class AjaxController extends CommonAjaxController
      *
      * @return mixed[]
      */
-    public function loadPayloads($paths): array
+    private function loadPayloads($paths): array
     {
         $payloads = [];
 

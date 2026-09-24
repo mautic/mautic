@@ -321,12 +321,12 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return object
      */
-    public function getNewEntity(array $params)
+    protected function getNewEntity(array $params)
     {
         return $this->model->getEntity();
     }
 
-    public function getCurrentRequest(): Request
+    protected function getCurrentRequest(): Request
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -344,7 +344,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return Response
      */
-    public function postActionRedirect(array $args = [])
+    protected function postActionRedirect(array $args = [])
     {
         return $this->notFound('mautic.contact.error.notfound');
     }

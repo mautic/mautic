@@ -51,7 +51,7 @@ final class TagApiController extends CommonApiController
      *
      * @throws \InvalidArgumentException
      */
-    public function getNewEntity(array $params): \Mautic\LeadBundle\Entity\Tag
+    protected function getNewEntity(array $params): \Mautic\LeadBundle\Entity\Tag
     {
         if (empty($params[$this->entityNameOne])) {
             throw new \InvalidArgumentException($this->translator->trans('mautic.lead.api.tag.required', [], 'validators'));

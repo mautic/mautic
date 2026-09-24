@@ -202,7 +202,7 @@ final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
     {
         $campaign = $this->createCampaignWithEmail();
 
-        $result = $this->mapController->getMapOptions($campaign);
+        $result = (new \ReflectionMethod($this->mapController, 'getMapOptions'))->invoke($this->mapController, $campaign);
         $this->assertSame(CampaignMapStatsController::MAP_OPTIONS, $result);
     }
 
@@ -217,7 +217,7 @@ final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         $this->em->persist($campaign);
         $this->em->flush();
 
-        $result = $this->mapController->getMapOptions($campaign);
+        $result = (new \ReflectionMethod($this->mapController, 'getMapOptions'))->invoke($this->mapController, $campaign);
         $this->assertSame(['contacts' => CampaignMapStatsController::MAP_OPTIONS['contacts']], $result);
     }
 

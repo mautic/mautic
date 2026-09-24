@@ -318,7 +318,7 @@ final class CampaignApiController extends CommonApiController
      *
      * @param array $events
      */
-    public function modifyCampaignEventArray($events): array
+    private function modifyCampaignEventArray($events): array
     {
         $updatedEvents = [];
 
