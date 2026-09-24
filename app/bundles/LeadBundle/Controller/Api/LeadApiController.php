@@ -34,6 +34,7 @@ use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -111,8 +112,27 @@ final class LeadApiController extends CommonApiController
         }
 
         $filter  = $request->query->get('filter');
-        $limit   = $request->query->get('limit');
-        $start   = $request->query->getInt('start');
+
+        try {
+            if (!$request->query->has('limit')) {
+                $limit = null;
+            } else {
+                $limit = $request->query->getInt('limit');
+
+                if ($limit <= 0) {
+                    return $this->badRequest();
+                }
+            }
+
+            $start = $request->query->getInt('start');
+
+            if ($start < 0) {
+                return $this->badRequest();
+            }
+        } catch (BadRequestException) {
+            return $this->badRequest();
+        }
+
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
         $view    = $this->view($users, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['userList']);

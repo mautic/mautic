@@ -15,6 +15,7 @@ use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -226,7 +227,21 @@ final class UserApiController extends CommonApiController
         }
 
         $filter = $request->query->get('filter');
-        $limit  = (int) $request->query->get('limit');
+
+        if (!$request->query->has('limit')) {
+            $limit = null;
+        } else {
+            try {
+                $limit = $request->query->getInt('limit');
+            } catch (BadRequestException) {
+                return $this->badRequest();
+            }
+
+            if ($limit <= 0) {
+                return $this->badRequest();
+            }
+        }
+
         $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);
