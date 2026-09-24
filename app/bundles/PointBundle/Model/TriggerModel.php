@@ -98,7 +98,7 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
     /**
      * @param Trigger $entity
      */
-    public function saveEntity(object $entity, bool $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 

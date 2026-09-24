@@ -141,7 +141,7 @@ final class WebhookModel extends FormModel
     /**
      * @param Webhook $entity
      */
-    public function saveEntity(object $entity, bool $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         if (null === $entity->getSecret()) {
             $entity->setSecret(EncryptionHelper::generateKey());

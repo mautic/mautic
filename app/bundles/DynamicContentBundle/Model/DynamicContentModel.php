@@ -66,7 +66,10 @@ final class DynamicContentModel extends FormModel implements AjaxLookupModelInte
         return $this->dynamicContentRepository;
     }
 
-    public function saveEntity(object $entity, bool $unlock = true): void
+    /**
+     * @param object $entity
+     */
+    public function saveEntity($entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 

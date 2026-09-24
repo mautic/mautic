@@ -15,14 +15,14 @@ parameters:
     level: 6
 
     reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
     errorFormat: symplify
 
+    # https://github.com/symplify/phpstan-rules
     symplify:
         mocks: false
-        ctor: true
+        ctor: false
         naming: false
-
-    treatPhpDocTypesAsCertain: false
 
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:

@@ -613,7 +613,7 @@ class FieldModel extends FormModel
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntity(object $entity, bool $unlock = true): void
+    public function saveEntity($entity, bool $unlock = true): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);

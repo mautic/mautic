@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-abstract class CommonEvent extends Event
+class CommonEvent extends Event
 {
     /**
      * @var object

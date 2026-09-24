@@ -33,7 +33,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-abstract class CommonController extends AbstractController implements MauticController
+class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
