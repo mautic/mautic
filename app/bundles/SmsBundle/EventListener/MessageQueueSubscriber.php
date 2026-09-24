@@ -54,7 +54,7 @@ final readonly class MessageQueueSubscriber implements EventSubscriberInterface
         }
 
         if (count($sendTo)) {
-            $options['resend_message_queue'] = $messagesByContact;
+            $options                         = ['resend_message_queue' => $messagesByContact];
             $results                         = $this->model->sendSms($sms, $sendTo, $options);
 
             foreach ($messagesByContact as $contactId => $message) {

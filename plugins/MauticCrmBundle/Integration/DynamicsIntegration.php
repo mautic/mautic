@@ -704,6 +704,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         $fields = 'l.'.$fields;
 
         $availableFields         = $this->getAvailableLeadFields(['feature_settings' => ['objects' => [$object]]]);
+        $fieldsToUpdate          = [];
         $fieldsToUpdate[$object] = array_values(array_intersect(array_keys($availableFields[$object]), $fieldsToUpdateInCrm));
         $fieldsToUpdate[$object] = array_intersect_key($config['leadFields'] ?? [], array_flip($fieldsToUpdate[$object]));
 
@@ -870,6 +871,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
     private function getExistingRecord(string $seachColumn, string $searchValue, string $object = 'contacts'): array
     {
         $availableFields    = $this->getAvailableLeadFields();
+        $oparams            = [];
         $oparams['$select'] = implode(',', array_keys($availableFields[$object]));
         $oparams['$filter'] = $seachColumn.' eq \''.$searchValue.'\'';
         $data               = $this->getApiHelper()->getLeads($oparams);

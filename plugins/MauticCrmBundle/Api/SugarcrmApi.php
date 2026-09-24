@@ -483,6 +483,7 @@ final class SugarcrmApi extends CrmApi
         }
         // TODO
 
+        $filter = [];
         if (isset($query['emails'])) {
             $filter[] = ['email_addresses.email_address' => ['$in' => $query['emails']]];
             $filter[] = ['deleted' => '0'];

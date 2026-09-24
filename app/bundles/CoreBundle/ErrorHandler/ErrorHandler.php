@@ -460,6 +460,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             } else {
                 if (empty($error['showExceptionMessage']) && empty($error['showExceptionDetails'])) {
                     unset($error);
+                    $error               = [];
                     $error['message']    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
                     $error['submessage'] = 'System administrators, check server logs for errors.';
                 }

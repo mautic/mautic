@@ -246,6 +246,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->method('getUser')
             ->willReturn(new User());
 
+        $mockLeadField          = [];
         $mockLeadField['email'] = [
             'label'        => 'Email',
             'alias'        => 'email',
@@ -325,6 +326,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $reflection            = new \ReflectionClass(SubmissionModel::class);
         $method                = $reflection->getMethod('normalizeValue');
         $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fields                = [];
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,
@@ -371,6 +373,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private function getTestFormFields(): array
     {
         $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fields                = [];
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,

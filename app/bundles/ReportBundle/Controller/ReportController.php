@@ -349,6 +349,7 @@ final class ReportController extends FormController
                 $entity->setColumns([]);
                 $oldSchedule = $entity->isScheduled() ? $entity->getSchedule() : null;
 
+                $newSchedule                             = [];
                 $newSchedule['schedule_unit']            = $request->request->all()['report']['scheduleUnit'];
                 $newSchedule['schedule_day']             = $request->request->all()['report']['scheduleDay'];
                 $newSchedule['schedule_month_frequency'] = $request->request->all()['report']['scheduleMonthFrequency'];

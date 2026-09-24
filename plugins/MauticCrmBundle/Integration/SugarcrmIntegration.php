@@ -418,6 +418,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         /** @var SugarcrmApi $apiHelper */
         $apiHelper = $this->getApiHelper();
 
+        $sugarObjects   = [];
         $sugarObjects[] = 'Leads';
         if (isset($config['objects']) && !empty($config['objects'])) {
             $sugarObjects = $config['objects'];
@@ -613,6 +614,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                 'rest_data'     => json_encode($loginParams),
             ];
 
+            $settings                      = [];
             $settings['auth_type']         = 'rest';
             $settings['authorize_session'] = true;
 
@@ -650,11 +652,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     public function amendLeadDataBeforeMauticPopulate($data, $object): int
     {
         $settings['feature_settings']['objects'][] = $object;
-        $fields                                    = array_keys($this->getAvailableLeadFields($settings));
-        $params['fields']                          = implode(',', $fields);
 
         $count  = 0;
-        $entity = null;
 
         $sugarRejectedLeads = [];
         if (isset($data['entry_list'])) {
@@ -1018,7 +1017,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         $fieldsToUpdateInLeadsSugar = $this->cleanSugarData($config, $fieldsToUpdateInSugar, $object);
         $leadFields                 = array_intersect_key($leadSugarFieldsToCreate, $fieldsToUpdateInLeadsSugar);
 
-        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object]);
+        $mappedData          = [$object => $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object])];
 
         $this->amendLeadDataBeforePush($mappedData[$object]);
 

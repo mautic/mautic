@@ -586,6 +586,7 @@ final class EventController extends CommonFormController
         }
 
         // Render the template and store it in the appropriate variable
+        $passThroughVars                  = [];
         $passThroughKey                   = ('edit' === $action) ? 'updateHtml' : 'eventHtml';
         $passThroughVars[$passThroughKey] = $this->renderView($template, $templateVars);
 

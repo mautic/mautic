@@ -2269,6 +2269,7 @@ final class LeadController extends FormController
                 '%total%' => number_format($totalContacts),
             ];
             $this->addFlashMessage('mautic.lead.export.limit.exceeded', $messageVars, FlashBag::LEVEL_ERROR);
+            $response            = [];
             $response['message'] = $this->translator->trans('mautic.lead.export.limit.exceeded', $messageVars, 'flashes');
             $response['flashes'] = $this->getFlashContent();
 
@@ -2286,6 +2287,7 @@ final class LeadController extends FormController
         );
         $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 
+        $details          = [];
         $details['total'] = $iterator->getTotal();
         $details['args']  = $iterator->getArgs();
 
@@ -2326,6 +2328,7 @@ final class LeadController extends FormController
         }
 
         $contactFields = $lead->getProfileFields();
+        $args          = [];
         $args[]        = [
             'lead'          => $contactId,
             'dataType'      => $dataType,
@@ -2381,6 +2384,7 @@ final class LeadController extends FormController
         );
 
         $this->addFlashMessage('mautic.lead.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
+        $response            = [];
         $response['message'] = 'Contact export scheduled for CSV file type.';
         $response['flashes'] = $this->getFlashContent();
 

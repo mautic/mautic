@@ -66,6 +66,7 @@ final class AuthController extends FormController
 
         $session->set('mautic.integration.postauth.message', [$message, $params, $type]);
 
+        $identifier               = [];
         $identifier[$integration] = null;
         $socialCache              = [];
         $userData                 = $integrationObject->getUserData($identifier, $socialCache);
@@ -117,6 +118,7 @@ final class AuthController extends FormController
     {
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
+        $settings                = [];
         $settings['method']      = 'GET';
         $settings['integration'] = $integrationObject->getName();
 

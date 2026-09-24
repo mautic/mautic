@@ -36,10 +36,7 @@ class StatDevice
 
     private ?IpAddress $ipAddress = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateOpened;
+    private ?\DateTimeInterface $dateOpened = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -81,7 +78,7 @@ class StatDevice
         return $this->ipAddress;
     }
 
-    public function setIpAddress(?IpAddress $ip): void
+    public function setIpAddress(IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
@@ -91,23 +88,17 @@ class StatDevice
         return $this->stat;
     }
 
-    public function setStat(?Stat $stat): void
+    public function setStat(Stat $stat): void
     {
         $this->stat = $stat;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateOpened()
+    public function getDateOpened(): ?\DateTimeInterface
     {
         return $this->dateOpened;
     }
 
-    /**
-     * @param mixed $dateOpened
-     */
-    public function setDateOpened($dateOpened): void
+    public function setDateOpened(?\DateTimeInterface $dateOpened): void
     {
         $this->dateOpened = $dateOpened;
     }

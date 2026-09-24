@@ -765,6 +765,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
     {
         $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
         $fieldSession2         = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fields                = [];
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,

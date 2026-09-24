@@ -426,6 +426,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                 $maxRecords          = 200;
                 $fields              = implode(',', $mappedData);
+                $oparams             = [];
                 $oparams['fields']   = $fields;
                 $oparams['per_page'] = $maxRecords; // maximum number of records
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
@@ -495,6 +496,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                 $maxRecords          = 200;
                 $fields              = implode(',', $mappedData);
+                $oparams             = [];
                 $oparams['fields']   = $fields;
                 $oparams['per_page'] = $maxRecords; // maximum number of records
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
@@ -794,6 +796,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
         $fields = 'l.'.$fields;
 
         $availableFields            = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
+        $fieldsToUpdate             = [];
         $fieldsToUpdate['Leads']    = array_values(array_intersect(array_keys($availableFields['Leads']), $fieldsToUpdateInZoho));
         $fieldsToUpdate['Contacts'] = array_values(array_intersect(array_keys($availableFields['Contacts']), $fieldsToUpdateInZoho));
         $fieldsToUpdate['Leads']    = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Leads']));
@@ -1006,6 +1009,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
         $fieldsToUpdateInZoho       = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $availableFields            = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
+        $fieldsToUpdate             = [];
         $fieldsToUpdate['Leads']    = array_values(array_intersect(array_keys($availableFields['Leads']), $fieldsToUpdateInZoho));
         $fieldsToUpdate['Contacts'] = array_values(array_intersect(array_keys($availableFields['Contacts']), $fieldsToUpdateInZoho));
         $fieldsToUpdate['Leads']    = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Leads']));

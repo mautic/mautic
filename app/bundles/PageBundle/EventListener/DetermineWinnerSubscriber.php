@@ -76,6 +76,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
 
                 // let's arrange by rate
                 $rates             = [];
+                $support           = [];
                 $support['data']   = [];
                 $support['labels'] = [];
                 $bounceLabel       = $this->translator->trans('mautic.page.abtest.label.bounces');
