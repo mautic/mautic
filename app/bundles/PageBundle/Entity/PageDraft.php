@@ -6,7 +6,6 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: PageDraftRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
@@ -18,26 +17,22 @@ class PageDraft
 
     public const string REGEX_DECODE_AMPERSAND = '/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i';
 
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 
     public function __construct(
         #[ORM\OneToOne(targetEntity: Page::class, inversedBy: 'draft')]
         #[ORM\JoinColumn(name: 'page_id', nullable: false)]
         private Page $page,
+        #[ORM\Column(type: Types::TEXT, nullable: true)]
         private ?string $html = null,
+        #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
         private ?string $template = null,
         #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, options: ['default' => 1])]
         private bool $publicPreview = true,
     ) {
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-        $builder->addNullableField('html', Types::TEXT);
-        $builder->addNullableField('template', Types::STRING);
     }
 
     /**

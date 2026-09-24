@@ -6,7 +6,6 @@ namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: MessageQueueRepository::class)]
@@ -36,13 +35,18 @@ class MessageQueue
     /**
      * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
+    #[ORM\Column(name: 'channel_id', type: 'integer')]
     private $channelId;
 
     /**
@@ -62,122 +66,74 @@ class MessageQueue
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $priority = 2;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'max_attempts', type: 'smallint')]
     private $maxAttempts = 3;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $attempts = 0;
 
     /**
      * @var bool
      */
+    #[ORM\Column(type: 'boolean')]
     private $success = false;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $status = self::STATUS_PENDING;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_published', type: 'datetime', nullable: true)]
     private $datePublished;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'scheduled_date', type: 'datetime', nullable: true)]
     private $scheduledDate;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'last_attempt', type: 'datetime', nullable: true)]
     private $lastAttempt;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'date_sent', type: 'datetime', nullable: true)]
     private $dateSent;
 
     /**
      * @var mixed[][]
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private array $options = [];
 
     /**
      * Used by listeners to note if the message had been processed in bulk.
-     *
-     * @var bool
      */
-    private $processed = false;
+    private bool $processed = false;
 
     /**
      * Used by listeners to tell the event dispatcher the message needs to be retried in 15 minutes.
-     *
-     * @var bool
      */
-    private $failed = false;
+    private bool $failed = false;
 
     private bool $metadataUpdated = false;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addField('channel', 'string');
-        $builder->addNamedField('channelId', 'integer', 'channel_id');
-
-        $builder->createField('priority', 'smallint')
-            ->columnName('priority')
-            ->build();
-
-        $builder->createField('maxAttempts', 'smallint')
-            ->columnName('max_attempts')
-            ->build();
-
-        $builder->createField('attempts', 'smallint')
-            ->columnName('attempts')
-            ->build();
-
-        $builder->createField('success', 'boolean')
-            ->columnName('success')
-            ->build();
-
-        $builder->createField('status', 'string')
-            ->columnName('status')
-            ->build();
-
-        $builder->createField('datePublished', 'datetime')
-            ->columnName('date_published')
-            ->nullable()
-            ->build();
-
-        $builder->createField('scheduledDate', 'datetime')
-            ->columnName('scheduled_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastAttempt', 'datetime')
-            ->columnName('last_attempt')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->nullable()
-            ->build();
-
-        $builder->createField('options', 'array')
-            ->nullable()
-            ->build();
-    }
 
     public function getId(): int
     {
@@ -411,10 +367,7 @@ class MessageQueue
         $this->success = $success;
     }
 
-    /**
-     * @return bool
-     */
-    public function isFailed()
+    public function isFailed(): bool
     {
         return $this->failed;
     }
@@ -426,10 +379,7 @@ class MessageQueue
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isProcessed()
+    public function isProcessed(): bool
     {
         return $this->processed;
     }

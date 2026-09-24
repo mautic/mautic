@@ -155,6 +155,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     private $description;
 
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $deleted = null;
 
     public function __construct()
@@ -188,8 +189,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addNullableField('deleted', Types::DATETIME_MUTABLE);
 
         self::loadFixedFieldMetadata(
             $builder,

@@ -5,7 +5,6 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
@@ -34,6 +33,9 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var int|string|null
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -60,6 +62,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var IpAddress|null
      */
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private $ipAddress;
 
     /**
@@ -95,6 +99,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var bool|null
      */
+    #[ORM\Column(name: 'non_action_path_taken', type: 'boolean', nullable: true)]
     private $nonActionPathTaken = false;
 
     /**
@@ -106,6 +111,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'channel_id', type: 'integer', nullable: true)]
     private $channelId;
 
     /**
@@ -132,19 +138,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     #[ORM\Column(name: 'date_queued', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateQueued = null;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->addNamedField('channelId', 'integer', 'channel_id', true);
-
-        $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
-    }
 
     /**
      * Prepares the metadata for API usage.
