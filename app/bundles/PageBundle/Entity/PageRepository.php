@@ -241,15 +241,15 @@ final class PageRepository extends CommonRepository
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'pages')
-            ->set('hits', 'hits + '.(int) $increaseBy)
-            ->where('id = '.(int) $id);
+            ->set('hits', 'hits + '.$increaseBy)
+            ->where('id = '.$id);
 
         if ($unique) {
-            $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
+            $q->set('unique_hits', 'unique_hits + '.$increaseBy);
         }
 
         if ($variant) {
-            $q->set('variant_hits', 'variant_hits + '.(int) $increaseBy);
+            $q->set('variant_hits', 'variant_hits + '.$increaseBy);
         }
 
         $q->executeStatement();
