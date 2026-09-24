@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
 
-class EmailEditSubmitEvent extends CommonEvent
+final class EmailEditSubmitEvent extends CommonEvent
 {
     public function __construct(
         private readonly Email $previousEmail,
