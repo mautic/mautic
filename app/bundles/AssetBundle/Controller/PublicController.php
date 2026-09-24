@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class PublicController extends CommonFormController
 {
@@ -78,9 +79,18 @@ class PublicController extends CommonFormController
 
                 // Display the file directly in the browser just for selected extensions
                 $stream = $request->get('stream', in_array($entity->getExtension(), $this->coreParametersHelper->get('streamed_extensions')));
-                if (!$stream) {
-                    $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());
-                }
+
+                // Send the original file name also for streamed files, otherwise browsers name the saved file after the URL
+                $filename         = str_replace(['/', '\\'], '_', (string) $entity->getOriginalFileName());
+                $filenameFallback = preg_replace('/[^\x20-\x7e]|%/u', '_', $filename);
+                $response->headers->set(
+                    'Content-Disposition',
+                    $response->headers->makeDisposition(
+                        $stream ? ResponseHeaderBag::DISPOSITION_INLINE : ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                        $filename,
+                        $filenameFallback
+                    )
+                );
                 $response->setContent($contents);
             }
 
