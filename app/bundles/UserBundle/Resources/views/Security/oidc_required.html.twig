@@ -1,16 +1,33 @@
-<h2 class="mb-md">{{ 'mautic.open_id.required.current_user'|trans({'%username%': app.user.username})|raw }}</h2>
+{% extends app.request.xmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticUser/Security/base.html.twig' %}
+{% block headerTitle %}{% trans with {'%provider%': 'OpenID Connect'} %}mautic.open_id.login_required.header{% endtrans %}{% endblock %}
 
-<h3 class="mb-md">{{ 'mautic.open_id.required.title'|trans({'%provider%': 'OpenID Connect'})|raw }}</h3>
+{% block content %}
+    {% if app.request.xmlHttpRequest %}
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-6 inline-login">
+                {{ block('mainContent') }}
+            </div>
+        </div>
+    {% else %}
+        {{ block('mainContent') }}
+    {% endif %}
+{% endblock %}
 
-<p class="mb-md">{{ 'mautic.open_id.required.link_instructions'|trans({'%provider%': 'OpenID Connect'})|raw }}</p>
+{% block mainContent %}
+    <h2 class="mb-md">{{ 'mautic.open_id.required.current_user'|trans({'%username%': app.user.username})|raw }}</h2>
 
-<p class="mb-md">{{ 'mautic.open_id.required.switch_user_instructions'|trans({'%provider%': 'OpenID Connect'})|raw }}</p>
+    <h3 class="mb-md">{{ 'mautic.open_id.required.title'|trans({'%provider%': 'OpenID Connect'})|raw }}</h3>
 
-<div>
-    <a href="{{ url('mautic_oidc_login') }}" class="btn btn-lg btn-primary">
-        {{ 'mautic.open_id.required.link_button'|trans }}
-    </a>
-    <a href="{{ logout_url() }}" class="btn btn-lg btn-info">
-        {{ 'mautic.open_id.required.logout'|trans }}
-    </a>
-</div>
+    <p class="mb-md">{{ 'mautic.open_id.required.link_instructions'|trans({'%provider%': 'OpenID Connect'})|raw }}</p>
+
+    <p class="mb-md">{{ 'mautic.open_id.required.switch_user_instructions'|trans({'%provider%': 'OpenID Connect'})|raw }}</p>
+
+    <div>
+        <a href="{{ url('mautic_oidc_login') }}" class="btn btn-lg btn-primary">
+            {{ 'mautic.open_id.required.link_button'|trans }}
+        </a>
+        <a href="{{ logout_url() }}" class="btn btn-lg btn-info">
+            {{ 'mautic.open_id.required.logout'|trans }}
+        </a>
+    </div>
+{% endblock %}
