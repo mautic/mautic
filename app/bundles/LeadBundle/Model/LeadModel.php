@@ -736,8 +736,10 @@ class LeadModel extends FormModel
 
     /**
      * Reorganizes a field list to be keyed by field's group then alias.
+     *
+     * @param object[]|mixed[] $fields
      */
-    public function organizeFieldsByGroup($fields): array
+    public function organizeFieldsByGroup(array $fields): array
     {
         $array = [];
 
