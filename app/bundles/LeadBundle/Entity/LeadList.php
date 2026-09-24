@@ -125,9 +125,11 @@ class LeadList extends FormEntity implements UuidInterface
     private $leads;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'last_built_date', type: 'datetime', nullable: true)]
     private \DateTime|\DateTimeInterface|null $lastBuiltDate = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'last_built_time', type: 'float', nullable: true)]
     private ?float $lastBuiltTime = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
@@ -161,16 +163,6 @@ class LeadList extends FormEntity implements UuidInterface
 
         $builder->createField('isPreferenceCenter', 'boolean')
             ->columnName('is_preference_center')
-            ->build();
-
-        $builder->createField('lastBuiltDate', 'datetime')
-            ->columnName('last_built_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastBuiltTime', 'float')
-            ->columnName('last_built_time')
-            ->nullable()
             ->build();
 
         self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
