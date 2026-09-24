@@ -24,7 +24,7 @@ final class ScheduleController extends CommonAjaxController
     #[Required]
     public function autowireScheduleController(
         ReportModel $reportModel,
-        ScheduleModel $scheduleModel
+        ScheduleModel $scheduleModel,
     ): void {
         $this->reportModel = $reportModel;
         $this->scheduleModel = $scheduleModel;
@@ -58,15 +58,13 @@ final class ScheduleController extends CommonAjaxController
         /** @var Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
-        $security = $this->security;
-
         if (!$report instanceof Report) {
             $this->addFlashMessage('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
 
             return $this->flushFlash(Response::HTTP_NOT_FOUND);
         }
 
-        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
+        if (!$this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
             $this->addFlashMessage('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
 
             return $this->flushFlash(Response::HTTP_FORBIDDEN);
