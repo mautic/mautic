@@ -92,7 +92,7 @@ final class FrequencyRuleRepository extends CommonRepository
         return $frequencyRules;
     }
 
-    public function getPreferredChannel($leadId): array
+    public function getPreferredChannel(int $leadId): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

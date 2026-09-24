@@ -226,7 +226,7 @@ class Stat
     /**
      * @param \DateTime $dateSent
      */
-    public function setDateSent($dateSent): static
+    public function setDateSent(\DateTimeInterface $dateSent): static
     {
         $this->dateSent = $dateSent;
 
@@ -241,10 +241,7 @@ class Stat
         return $this->trackingHash;
     }
 
-    /**
-     * @param string $trackingHash
-     */
-    public function setTrackingHash($trackingHash): static
+    public function setTrackingHash(string $trackingHash): static
     {
         $this->trackingHash = $trackingHash;
 
@@ -302,10 +299,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @param bool $isFailed
-     */
-    public function setIsFailed($isFailed): static
+    public function setIsFailed(bool $isFailed): static
     {
         $this->isFailed = $isFailed;
 
