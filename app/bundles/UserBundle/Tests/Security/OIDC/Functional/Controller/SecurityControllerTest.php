@@ -58,10 +58,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $unlinkedUser->setRole($role);
         $this->em->persist($unlinkedUser);
 
-        $subjectId = new OidcSubjectId();
-        $subjectId->setUser($linkedUser);
-        $subjectId->setSubjectID('linked_admin');
-        $this->em->persist($subjectId);
+        $this->em->persist(new OidcSubjectId($linkedUser, 'linked_admin'));
 
         $this->em->flush();
     }

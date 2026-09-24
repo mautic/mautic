@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Security\Provider;
 
-use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\OIDC\DTO\UserCredentials;
 use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
@@ -24,11 +23,9 @@ final class UserProviderTest extends TestCase
         $security           = $this->createStub(TokenStorageInterface::class);
         $linkerInterface    = $this->createMock(LinkerInterface::class);
         $userFactory        = $this->createStub(UserFactoryInterface::class);
-        $subjectId          = new OidcSubjectId();
         $user               = new User();
 
         $user->setUsername('test');
-        $subjectId->setUser($user);
 
         $linkerInterface->expects($this->once())
             ->method('findLinkedUser')
@@ -49,11 +46,9 @@ final class UserProviderTest extends TestCase
         $security           = $this->createStub(TokenStorageInterface::class);
         $linkerInterface    = $this->createStub(LinkerInterface::class);
         $userFactory        = $this->createStub(UserFactoryInterface::class);
-        $subjectId          = new OidcSubjectId();
         $user               = new User();
 
         $user->setUsername('test');
-        $subjectId->setUser($user);
 
         $this->expectException(UserNotFoundException::class);
 
@@ -67,11 +62,9 @@ final class UserProviderTest extends TestCase
         $security           = $this->createStub(TokenStorageInterface::class);
         $linkerInterface    = $this->createStub(LinkerInterface::class);
         $userFactory        = $this->createStub(UserFactoryInterface::class);
-        $subjectId          = new OidcSubjectId();
         $user               = new User();
 
         $user->setUsername('test');
-        $subjectId->setUser($user);
 
         $mauticUserProvider->expects($this->once())
             ->method('refreshUser')
@@ -89,11 +82,9 @@ final class UserProviderTest extends TestCase
         $security            = $this->createStub(TokenStorageInterface::class);
         $linkerInterface     = $this->createStub(LinkerInterface::class);
         $userFactory         = $this->createStub(UserFactoryInterface::class);
-        $subjectId           = new OidcSubjectId();
         $user                = new User();
 
         $user->setUsername('test');
-        $subjectId->setUser($user);
 
         $mauticUserProvider->expects($this->once())
             ->method('supportsClass')
@@ -111,11 +102,9 @@ final class UserProviderTest extends TestCase
         $security            = $this->createStub(TokenStorageInterface::class);
         $linkerInterface     = $this->createStub(LinkerInterface::class);
         $userFactory         = $this->createStub(UserFactoryInterface::class);
-        $subjectId           = new OidcSubjectId();
         $user                = new User();
 
         $user->setUsername('test');
-        $subjectId->setUser($user);
 
         $mauticUserProvider->expects($this->once())
             ->method('supportsClass')
@@ -133,12 +122,10 @@ final class UserProviderTest extends TestCase
         $security            = $this->createStub(TokenStorageInterface::class);
         $linkerInterface     = $this->createMock(LinkerInterface::class);
         $userFactory         = $this->createStub(UserFactoryInterface::class);
-        $subjectId           = new OidcSubjectId();
         $user                = new User();
         $credentials         = new UserCredentials('subjectId');
 
         $user->setUsername('test');
-        $subjectId->setUser($user);
 
         $linkerInterface->expects($this->once())
             ->method('findLinkedUser')

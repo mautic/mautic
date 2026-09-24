@@ -9,11 +9,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class OidcSubjectId
 {
-    private User $user;
-
-    private ?string $subjectID = null;
-
     public const TABLE_NAME = 'open_id_identifiers';
+
+    public function __construct(private readonly User $user, private ?string $subjectID = null)
+    {
+    }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -38,13 +38,6 @@ class OidcSubjectId
     public function getUser(): User
     {
         return $this->user;
-    }
-
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
     }
 
     public function getSubjectID(): ?string

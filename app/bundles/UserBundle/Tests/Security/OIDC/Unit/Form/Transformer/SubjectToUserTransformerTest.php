@@ -16,9 +16,8 @@ final class SubjectToUserTransformerTest extends TestCase
     {
         $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
         $user                = new User();
-        $subjectId           = new OidcSubjectId();
+        $subjectId           = new OidcSubjectId($user);
 
-        $subjectId->setUser($user);
         $subjectIdRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['user' => $user])
@@ -49,7 +48,7 @@ final class SubjectToUserTransformerTest extends TestCase
     public function testTransformsUserWithWrongObjectType(): void
     {
         $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
-        $subjectId           = new OidcSubjectId();
+        $subjectId           = new OidcSubjectId(new User());
 
         $subjectIdRepository->expects($this->never())
             ->method('findOneBy');
@@ -81,9 +80,7 @@ final class SubjectToUserTransformerTest extends TestCase
     {
         $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
         $user                = new User();
-        $subjectId           = new OidcSubjectId();
-
-        $subjectId->setUser($user);
+        $subjectId           = new OidcSubjectId($user);
 
         $subjectToUserTransformer = new SubjectToUserTransformer($subjectIdRepository);
         $user                     = $subjectToUserTransformer->reverseTransform($subjectId);

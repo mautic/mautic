@@ -18,7 +18,7 @@ final readonly class SubjectToUserTransformer implements DataTransformerInterfac
     public function transform($value): OidcSubjectId
     {
         if ($value instanceof User) {
-            return $this->subjectIdRepository->findOneBy(['user' => $value]) ?: (new OidcSubjectId())->setUser($value);
+            return $this->subjectIdRepository->findOneBy(['user' => $value]) ?: new OidcSubjectId($value);
         }
 
         throw new \InvalidArgumentException(\sprintf('Expected instance of %s. Given %s', User::class, get_debug_type($value)));

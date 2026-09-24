@@ -13,7 +13,6 @@ use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 #[AsAlias(LinkerInterface::class)]
 final readonly class Linker implements LinkerInterface
 {
-
     public function __construct(private EntityManagerInterface $entityManager, private OidcSubjectIdRepository $subjectIdRepository)
     {
     }
@@ -43,9 +42,7 @@ final readonly class Linker implements LinkerInterface
             throw new OidcException('mautic.open_id.link.exception.user_taken');
         }
 
-        $subjectIdEntity = new OidcSubjectId();
-        $subjectIdEntity->setSubjectID($identifier);
-        $subjectIdEntity->setUser($user);
+        $subjectIdEntity = new OidcSubjectId($user, $identifier);
         $this->subjectIdRepository->saveEntity($subjectIdEntity, $flush);
 
         return $user;

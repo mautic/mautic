@@ -23,22 +23,10 @@ final class SubjectIdTest extends TestCase
         $this->assertSame('subjectID', $metadata->getFieldMapping('subjectID')['fieldName']);
     }
 
-    public function testDefaultValues(): void
-    {
-        $subjectId = new OidcSubjectId();
-
-        $this->assertNull($subjectId->getSubjectID());
-        $this->expectException(\Error::class);
-        $subjectId->getUser();
-    }
-
     public function testSettersGetters(): void
     {
-        $subjectId = new OidcSubjectId();
         $user      = new User();
-
-        $subjectId->setUser($user);
-        $subjectId->setSubjectID('subjectID');
+        $subjectId = new OidcSubjectId($user, 'subjectID');
 
         $this->assertSame($user, $subjectId->getUser());
         $this->assertSame('subjectID', $subjectId->getSubjectID());

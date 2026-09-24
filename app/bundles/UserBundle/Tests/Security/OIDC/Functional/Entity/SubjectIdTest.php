@@ -42,9 +42,7 @@ final class SubjectIdTest extends MauticMysqlTestCase
         $this->unlinkedUser->setRole($role);
         $this->em->persist($this->unlinkedUser);
 
-        $subjectId = new OidcSubjectId();
-        $subjectId->setUser($this->linkedUser);
-        $subjectId->setSubjectID('linked_admin');
+        $subjectId = new OidcSubjectId($this->linkedUser, 'linked_admin');
         $this->em->persist($subjectId);
 
         $this->em->flush();
@@ -86,7 +84,7 @@ final class SubjectIdTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $subjectIdFromDatabase = $subjectIdRepo->findOneBy(['subjectID' => 'test']);
-        $this->assertNotInstanceOf(\Mautic\UserBundle\Entity\OidcSubjectId::class, $subjectIdFromDatabase);
+        $this->assertNotInstanceOf(OidcSubjectId::class, $subjectIdFromDatabase);
     }
 
     public function testDeleteUserCascade(): void
@@ -97,14 +95,12 @@ final class SubjectIdTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $subjectIdFromDatabase = $subjectIdRepo->findOneBy(['subjectID' => 'test']);
-        $this->assertNotInstanceOf(\Mautic\UserBundle\Entity\OidcSubjectId::class, $subjectIdFromDatabase);
+        $this->assertNotInstanceOf(OidcSubjectId::class, $subjectIdFromDatabase);
     }
 
     public function testSubjectUserIsUnique(): void
     {
-        $subjectId = new OidcSubjectId();
-        $subjectId->setUser($this->linkedUser);
-        $subjectId->setSubjectID('test2');
+        $subjectId = new OidcSubjectId($this->linkedUser, 'test2');
 
         $this->expectException(UniqueConstraintViolationException::class);
         $this->em->persist($subjectId);
@@ -113,9 +109,7 @@ final class SubjectIdTest extends MauticMysqlTestCase
 
     public function testSubjectIdIsUnique(): void
     {
-        $subjectId = new OidcSubjectId();
-        $subjectId->setUser($this->unlinkedUser);
-        $subjectId->setSubjectID('linked_admin');
+        $subjectId = new OidcSubjectId($this->unlinkedUser, 'linked_admin');
 
         $this->expectException(UniqueConstraintViolationException::class);
         $this->em->persist($subjectId);
