@@ -18,10 +18,12 @@ class SchedulerPlanner
     ) {
     }
 
-    public function computeScheduler(Report $report): void
+    public function computeScheduler(Report $report, bool $scheduleNextDownloadJob = true): void
     {
         $this->removeSchedulerOfReport($report);
-        $this->planScheduler($report);
+        if ($scheduleNextDownloadJob) {
+            $this->planScheduler($report);
+        }
     }
 
     private function planScheduler(Report $report): void
