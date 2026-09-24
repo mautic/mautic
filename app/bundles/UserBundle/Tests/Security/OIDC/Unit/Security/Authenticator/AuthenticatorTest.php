@@ -26,33 +26,24 @@ final class AuthenticatorTest extends TestCase
 {
     public function testSupportsIsTrueWhenEnabledAndWithCodeStateParams(): void
     {
-        $request = $this->createMock(Request::class);
-        $request->method('get')->willReturnOnConsecutiveCalls('code', 'state');
-
         $authenticator = $this->buildAuthenticator();
-        $response      = $authenticator->supports($request);
+        $response      = $authenticator->supports(new Request(['code' => 'code', 'state' => 'state'], [], ['_route' => 'mautic_oidc_check']));
 
         $this->assertTrue($response);
     }
 
     public function testSupportsIsFalseWhenDisabled(): void
     {
-        $request = $this->createMock(Request::class);
-        $request->method('get')->willReturnOnConsecutiveCalls('code', 'state');
-
         $authenticator = $this->buildAuthenticator(false);
-        $response      = $authenticator->supports($request);
+        $response      = $authenticator->supports(new Request(['code' => 'code', 'state' => 'state'], [], ['_route' => 'mautic_oidc_check']));
 
         $this->assertFalse($response);
     }
 
     public function testSupportsIsFalseWhenNoCodeStateParams(): void
     {
-        $request = $this->createMock(Request::class);
-        $request->method('get')->willReturn(null);
-
         $authenticator = $this->buildAuthenticator();
-        $response      = $authenticator->supports($request);
+        $response      = $authenticator->supports(new Request([], [], ['_route' => 'mautic_oidc_check']));
 
         $this->assertFalse($response);
     }

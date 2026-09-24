@@ -21,6 +21,7 @@ final class UserCredentialsFactoryTest extends TestCase
         $client        = $this->createMock(ClientInterface::class);
 
         $client->expects($this->once())->method('requestUserInfo')->willThrowException(new OidcAuthorizationException('foo'));
+        $client->expects($this->once())->method('getVerifiedClaims')->willThrowException(new OidcAuthorizationException('bar'));
         $client->expects($this->atLeastOnce())->method('getMappingField')->willReturn('sub');
         $clientFactory->expects($this->once())->method('create')->willReturn($client);
 

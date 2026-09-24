@@ -34,10 +34,12 @@ final class OidcAuthenticator extends AbstractAuthenticator implements Authentic
 
     public function supports(Request $request): bool
     {
-        // Only support the callback route (login_check), not the login initiation route
-        // The callback will have code and state parameters from the OIDC provider
+        // Support OIDC callback when code and state parameters are present
+        // This can come via either the login or login_check route depending on provider configuration
+        $route = $request->attributes->get('_route');
+
         return $this->parameters->isEnabled()
-            && 'mautic_oidc_check' === $request->attributes->get('_route')
+            && ('mautic_oidc_check' === $route || 'mautic_oidc_login' === $route)
             && null !== $request->query->get('code')
             && null !== $request->query->get('state');
     }
