@@ -35,7 +35,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @extends ServiceEntityRepository<T>
  */
-class CommonRepository extends ServiceEntityRepository
+abstract class CommonRepository extends ServiceEntityRepository
 {
     /**
      * @param class-string<T>|null $entityFQCN
