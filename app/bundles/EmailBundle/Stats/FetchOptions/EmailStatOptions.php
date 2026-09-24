@@ -52,9 +52,6 @@ final class EmailStatOptions extends FetchOptions
         return $this->companyId;
     }
 
-    /**
-     * @param int|null $companyId
-     */
     public function setCompanyId(int $companyId): self
     {
         $this->companyId = $companyId;
@@ -88,9 +85,6 @@ final class EmailStatOptions extends FetchOptions
         return $this->segmentId;
     }
 
-    /**
-     * @param int|null $segmentId
-     */
     public function setSegmentId(int $segmentId): self
     {
         $this->segmentId = $segmentId;

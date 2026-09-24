@@ -60,7 +60,7 @@ final class ServiceNameUsageCollector implements Collector
      * mark every "mautic.*.model.*" alias used, while ServiceModelKeyUsageCollector resolves the very
      * model keys asked for.
      */
-    private function matchServiceId(Node $node): ?string
+    private function matchServiceId(Scalar $node): ?string
     {
         if ($node instanceof String_) {
             return str_contains($node->value, '%s') ? null : $this->trimReferencePrefix($node->value);

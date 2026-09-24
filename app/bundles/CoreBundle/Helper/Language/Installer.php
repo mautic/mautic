@@ -72,7 +72,7 @@ final class Installer
         }
     }
 
-    private function copyBundle(\SplFileInfo $bundle): void
+    private function copyBundle(\Symfony\Component\Finder\SplFileInfo $bundle): void
     {
         $name            = $bundle->getFilename();
         $targetDirectory = $this->installDirectory.'/'.$name;

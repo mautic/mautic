@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -11,7 +11,7 @@ final class RouteEvent extends Event
     private readonly RouteCollection $collection;
 
     public function __construct(
-        private readonly Loader $loader,
+        private readonly LoaderInterface $loader,
         private readonly string $type = 'main',
     ) {
         $this->collection = new RouteCollection();

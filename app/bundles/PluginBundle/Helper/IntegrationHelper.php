@@ -16,7 +16,6 @@ use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\PluginBundle\Model\PluginModel;
-use MauticPlugin\MauticSocialBundle\Integration\SocialIntegration;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;
@@ -341,7 +340,7 @@ final class IntegrationHelper
      *
      * @todo Extend this method to allow plugins to add URLs to these arrays
      */
-    public function getSocialProfileUrlRegex(bool $find = true): array
+    public function getSocialProfileUrlRegex($find = true): array
     {
         if ($find) {
             // regex to find a match
@@ -529,7 +528,7 @@ final class IntegrationHelper
      *
      * @return bool
      */
-    public function getUserIdentifierField(SocialIntegration $integrationObject, array $fields)
+    public function getUserIdentifierField($integrationObject, $fields)
     {
         $identifierField = $integrationObject->getIdentifierFields();
         $identifier      = (is_array($identifierField)) ? [] : false;

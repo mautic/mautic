@@ -356,9 +356,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed $mainLogger
+         * @param LoggerInterface $mainLogger
          */
-        public function setMainLogger(LoggerInterface $mainLogger): static
+        public function setMainLogger($mainLogger): static
         {
             $this->mainLogger = $mainLogger;
 
