@@ -196,7 +196,7 @@ final class ConfigType extends AbstractType
                 'placeholder' => '',
             ]
         );
-    
+
         $requiredIfOpenIdIsEnabled = static function ($value, ExecutionContextInterface $context): void {
             if ($context->getObject()->getParent()->getData()['open_id_is_enabled'] && null === $value) {
                 $context->addViolation('mautic.core.value.required');
@@ -229,7 +229,7 @@ final class ConfigType extends AbstractType
                 'data'  => $this->config->isRequired(),
                 'attr'  => [
                     'data-disable-on' => self::DISABLED_IF,
-                    'tooltip'      => 'mautic.open_id.config.is_required.tooltip',
+                    'tooltip'         => 'mautic.open_id.config.is_required.tooltip',
                 ],
                 'constraints' => [
                     new Callback(callback: $requiredIfOpenIdIsEnabled),
@@ -246,8 +246,9 @@ final class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'data'       => $this->clientCredentials->getMappingField(),
                 'attr'       => [
-                    'class'        => 'form-control',
+                    'class'           => 'form-control',
                     'data-disable-on' => self::DISABLED_IF,
+                    'tooltip'         => 'mautic.open_id.config.mapping_field.tooltip',
                 ],
                 'constraints' => [
                     new Callback(callback: $requiredIfOpenIdIsEnabled),
@@ -264,7 +265,7 @@ final class ConfigType extends AbstractType
                 'data'  => $this->config->isUserRegistrationAllowed(),
                 'attr'  => [
                     'data-disable-on' => self::DISABLED_IF,
-                    'tooltip'      => 'mautic.open_id.config.is_user_registration_allowed.tooltip',
+                    'tooltip'         => 'mautic.open_id.config.is_user_registration_allowed.tooltip',
                 ],
                 'constraints' => [
                     new Callback(callback: $requiredIfOpenIdIsEnabled),
@@ -281,9 +282,9 @@ final class ConfigType extends AbstractType
                 'data'       => $this->config->getRegisteredUserRoleId() ?? 0,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'        => 'form-control',
+                    'class'           => 'form-control',
                     'data-disable-on' => self::DISABLED_IF,
-                    'tooltip'      => 'mautic.open_id.config.registered_user_default_role.tooltip',
+                    'tooltip'         => 'mautic.open_id.config.registered_user_default_role.tooltip',
                 ],
                 'constraints' => [
                     new Callback(callback: static function ($value, ExecutionContextInterface $context): void {
@@ -323,7 +324,7 @@ final class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'data'       => $this->clientCredentials->getClientId(),
                 'attr'       => [
-                    'class'        => 'form-control',
+                    'class'           => 'form-control',
                     'data-disable-on' => self::DISABLED_IF,
                 ],
                 'constraints' => [
