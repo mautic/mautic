@@ -163,6 +163,10 @@ export default class BuilderService {
     return this.context?.formName === 'page';
   }
 
+  isEmailContext() {
+    return this.context?.formName === 'emailform';
+  }
+
   normalizeSessionId(sessionValue) {
     return sessionValue || null;
   }
@@ -1680,14 +1684,24 @@ export default class BuilderService {
     const headingTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
     const inlineHeadingTags = ['span'];
 
-    if (headingTags.includes(tagName) || inlineHeadingTags.includes(tagName)) {
-      // [ee-patch-2026-09-09] disabled wrapper insertion: inserting
-      // gjs-heading-wrapper divs rewrote emails.custom_mjml/custom_html via
-      // the save path (setComponents -> getEditorMjmlContent) for every
-      // email opened in the builder, including emails created by a UI clone
-      // (the creation itself performs a builder save). Headings and styled
-      // spans stay unwrapped in the canvas, so the saved bytes keep the
-      // shipped structure; see upstream issue on builder content mutation.
+    if (headingTags.includes(tagName)) {
+      this.wrapHeadingComponentWithDiv(component, tagName);
+      return;
+    }
+
+    if (inlineHeadingTags.includes(tagName)) {
+      // A standalone <span> text component is inline flow content: wrapping it
+      // in a block gjs-heading-wrapper div splits the surrounding paragraph and
+      // the wrapper persists into custom_mjml/custom_html on every save,
+      // including for emails created by the clone flow (upstream issue #17288).
+      // Emails therefore keep spans unwrapped; spans nested inside a text
+      // component are already protected by hasTextComponentAncestor() above.
+      // Landing pages keep the wrapper so CKEditor heading/paragraph editing
+      // is unchanged.
+      if (this.isEmailContext()) {
+        return;
+      }
+      this.wrapHeadingComponentWithDiv(component, tagName);
       return;
     }
 
@@ -1695,9 +1709,11 @@ export default class BuilderService {
       return;
     }
 
-    // [ee-patch-2026-09-09] disabled p->div re-tagging for the same reason
-    // as above: the retag persisted into the stored email whenever the
-    // builder page was saved, so plain paragraphs keep their <p> element.
+    if (this.isPageContext() && this.isInsideDataSlotText(component)) {
+      return;
+    }
+
+    component.set('tagName', 'div');
   }
 
   hasTextComponentAncestor(component) {
