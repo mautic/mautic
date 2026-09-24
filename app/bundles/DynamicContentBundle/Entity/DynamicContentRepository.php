@@ -21,10 +21,7 @@ final class DynamicContentRepository extends CommonRepository
      */
     public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('e')
-            ->from(DynamicContent::class, 'e', 'e.id');
+        $q = $this->createQueryBuilder('e', 'e.id');
 
         if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');

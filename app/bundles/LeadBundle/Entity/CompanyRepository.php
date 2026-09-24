@@ -99,9 +99,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getEntitiesOrmQueryBuilder($order, array $args=[]): QueryBuilder
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
+        $q = $this->createQueryBuilder($this->getTableAlias(), $this->getTableAlias().'.id');
         $q->select($this->getTableAlias().','.$order)
-            ->from(Company::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->andWhere($q->expr()->isNull($this->getTableAlias().'.deleted'));
 
         return $q;
@@ -531,9 +530,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $companies[(int) $r['id']] = $r;
         }
 
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->select('c')
-            ->from(Company::class, 'c');
+        $q = $this->createQueryBuilder('c');
 
         $q->where(
             $q->expr()->in('c.id', ':ids')
