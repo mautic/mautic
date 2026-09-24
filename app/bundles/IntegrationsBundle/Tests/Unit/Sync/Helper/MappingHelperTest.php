@@ -64,7 +64,7 @@ final class MappingHelperTest extends TestCase
 
     public function testObjectReturnedIfKnownMappingExists(): void
     {
-        $mappingManual        = new MappingManualDAO('test');
+        $mappingManual        = new MappingManualDAO('test', []);
         $integrationObjectDAO = new ObjectDAO('Object', 1);
 
         $internalObjectDAO = [
