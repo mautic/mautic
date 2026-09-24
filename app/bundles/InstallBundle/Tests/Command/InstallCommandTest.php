@@ -117,4 +117,47 @@ final class InstallCommandTest extends TestCase
         $this->assertStringNotContainsString('</strong>', $display);
         $this->assertStringNotContainsString('%min_memory_limit%', $display);
     }
+
+    public function testCommandCreatesTheInstallDirectoriesBeforeCheckingRequirements(): void
+    {
+        $calls = [];
+
+        $this->installer->method('checkIfInstalled')->willReturn(false);
+        $this->installer->method('getStep')->willReturn($this->createStub(StepInterface::class));
+        $this->installer->method('prepareDirectories')->willReturnCallback(function () use (&$calls): void {
+            $calls[] = 'prepareDirectories';
+        });
+        $this->installer->method('checkRequirements')->willReturnCallback(function () use (&$calls): array {
+            $calls[] = 'checkRequirements';
+
+            return [];
+        });
+        $this->installer->method('checkOptionalSettings')->willReturn([]);
+        $this->doctrineRegistry->method('getConnection')->willReturn($this->createStub(ConnectionWrapper::class));
+
+        $input = new ArrayInput(
+            [
+                'site_url'          => 'localhost',
+                '--force'           => true,
+                '--admin_firstname' => 'Admin',
+                '--admin_lastname'  => 'Mautic',
+                '--admin_username'  => 'admin',
+                '--admin_email'     => 'admin@example.com',
+                '--admin_password'  => 'password',
+            ]
+        );
+        $this->command->run($input, new BufferedOutput());
+
+        // The directories have to exist before is_writable() is asked about them,
+        // otherwise the check reports a missing directory as unwritable.
+        $this->assertSame(['prepareDirectories', 'checkRequirements'], $calls);
+    }
+
+    public function testCommandDoesNotTouchTheFilesystemWhenAlreadyInstalled(): void
+    {
+        $this->installer->method('checkIfInstalled')->willReturn(true);
+        $this->installer->expects($this->never())->method('prepareDirectories');
+
+        $this->command->run(new ArrayInput(['site_url' => 'localhost']), new BufferedOutput());
+    }
 }
