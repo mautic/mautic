@@ -6,7 +6,6 @@ namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: SchedulerRepository::class)]
 #[ORM\Table(name: 'reports_schedulers')]
@@ -16,14 +15,10 @@ class Scheduler
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-    }
 
     public function __construct(
         #[ORM\ManyToOne(targetEntity: Report::class)]

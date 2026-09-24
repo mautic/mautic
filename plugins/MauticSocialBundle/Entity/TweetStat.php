@@ -7,7 +7,6 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Lead as TheLead;
 
@@ -27,6 +26,9 @@ class TweetStat
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -34,6 +36,7 @@ class TweetStat
      *
      * @var string|null
      */
+    #[ORM\Column(name: 'twitter_tweet_id', type: 'string', length: 191, nullable: true)]
     private $twitterTweetId;
 
     #[ORM\ManyToOne(targetEntity: Tweet::class, inversedBy: 'stats')]
@@ -47,75 +50,41 @@ class TweetStat
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $handle;
 
+    #[ORM\Column(name: 'date_sent', type: 'datetime', nullable: true)]
     private ?\DateTime $dateSent = null;
 
+    #[ORM\Column(name: 'is_failed', type: 'boolean', nullable: true)]
     private ?bool $isFailed = false;
 
+    #[ORM\Column(name: 'retry_count', type: 'integer', nullable: true)]
     private ?int $retryCount = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
+    #[ORM\Column(name: 'favorite_count', type: 'integer', nullable: true)]
     private ?int $favoriteCount = 0;
 
+    #[ORM\Column(name: 'retweet_count', type: 'integer', nullable: true)]
     private ?int $retweetCount = 0;
 
     /**
      * @var ?mixed[]
      */
+    #[ORM\Column(name: 'response_details', type: Types::JSON, nullable: true)]
     private ?array $responseDetails = [];
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->createField('twitterTweetId', 'string')
-            ->columnName('twitter_tweet_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('handle', 'string')
-            ->build();
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isFailed', 'boolean')
-            ->columnName('is_failed')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retryCount', 'integer')
-            ->columnName('retry_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('favoriteCount', 'integer', 'favorite_count');
-        $builder->addNullableField('retweetCount', 'integer', 'retweet_count');
-        $builder->addNullableField('responseDetails', Types::JSON, 'response_details');
-    }
 
     /**
      * Prepares the metadata for API usage.
