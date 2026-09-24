@@ -96,7 +96,7 @@ final class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    public function replaceJoinCondition($alias, $expr): static
+    public function replaceJoinCondition(string $alias, string $expr): static
     {
         $parts = $this->getQueryPart('join');
         foreach ($parts['l'] as $key => $part) {

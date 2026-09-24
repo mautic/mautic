@@ -208,7 +208,7 @@ final class VtigerIntegration extends CrmAbstractIntegration
         return parent::getFormNotes($section);
     }
 
-    public function amendLeadDataBeforePush(&$mappedData): void
+    public function amendLeadDataBeforePush(array &$mappedData): void
     {
         if (!empty($mappedData)) {
             // vtiger requires assigned_user_id so default to authenticated user

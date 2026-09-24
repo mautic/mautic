@@ -201,10 +201,7 @@ class Tweet extends FormEntity
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -277,10 +274,7 @@ class Tweet extends FormEntity
         return $this->text;
     }
 
-    /**
-     * @param string $text
-     */
-    public function setText($text): static
+    public function setText(string $text): static
     {
         $this->isChanged('text', $text);
         $this->text = $text;
@@ -296,7 +290,7 @@ class Tweet extends FormEntity
         return $this->sentCount;
     }
 
-    public function setSentCount($sentCount): static
+    public function setSentCount(int $sentCount): static
     {
         $this->isChanged('sentCount', $sentCount);
         $this->sentCount = $sentCount;

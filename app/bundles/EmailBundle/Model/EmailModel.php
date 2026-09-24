@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Model;
 
+use DateTime;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
@@ -645,7 +646,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Search for an email stat by email and lead IDs.
      */
-    public function getEmailStati($emailId, $leadId): array
+    public function getEmailStati(int $emailId, int $leadId): array
     {
         return $this->statRepository->findBy(
             [
@@ -773,7 +774,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param Email|int $email
      * @return array{labels: mixed[], datasets: mixed[]}
      */
-    public function getEmailDeviceStats($email, bool $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
+    public function getEmailDeviceStats(Email $email, bool $includeVariants = false, ?DateTime $dateFrom = null, ?DateTime $dateTo = null): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);

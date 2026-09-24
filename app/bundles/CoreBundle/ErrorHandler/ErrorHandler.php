@@ -338,10 +338,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $this;
         }
 
-        /**
-         * @param string $environment
-         */
-        public function setEnvironment($environment): static
+        public function setEnvironment(string $environment): static
         {
             self::$environment = $environment;
 
@@ -361,7 +358,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         /**
          * @param mixed $mainLogger
          */
-        public function setMainLogger($mainLogger): static
+        public function setMainLogger(LoggerInterface $mainLogger): static
         {
             $this->mainLogger = $mainLogger;
 

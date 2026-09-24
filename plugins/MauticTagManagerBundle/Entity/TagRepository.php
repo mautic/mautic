@@ -35,10 +35,7 @@ final class TagRepository extends BaseTagRepository
         return 'lt';
     }
 
-    /**
-     * @param string $tag
-     */
-    public function countOccurrences($tag): int
+    public function countOccurrences(string $tag): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

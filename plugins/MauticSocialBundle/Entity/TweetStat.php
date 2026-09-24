@@ -182,10 +182,7 @@ class TweetStat
         return $this->dateSent;
     }
 
-    /**
-     * @param \DateTime|null $dateSent
-     */
-    public function setDateSent($dateSent): void
+    public function setDateSent(\DateTime $dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -218,7 +215,7 @@ class TweetStat
         return $this->retryCount;
     }
 
-    public function setRetryCount(?int $retryCount): void
+    public function setRetryCount(int $retryCount): void
     {
         $this->retryCount = $retryCount;
     }
@@ -257,7 +254,7 @@ class TweetStat
         return $this->isFailed;
     }
 
-    public function setIsFailed(?bool $isFailed): void
+    public function setIsFailed(bool $isFailed): void
     {
         $this->isFailed = $isFailed;
     }
@@ -324,9 +321,9 @@ class TweetStat
     }
 
     /**
-     * @param ?mixed[] $responseDetails
+     * @param mixed[] $responseDetails
      */
-    public function setResponseDetails(?array $responseDetails): static
+    public function setResponseDetails(array $responseDetails): static
     {
         $this->responseDetails = $responseDetails;
 

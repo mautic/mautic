@@ -42,10 +42,7 @@ final class IntegrationObjectToken
         return $this->token;
     }
 
-    /**
-     * @param string $objectName
-     */
-    public function setObjectName($objectName): void
+    public function setObjectName(string $objectName): void
     {
         $this->objectName = $objectName;
     }
@@ -58,10 +55,7 @@ final class IntegrationObjectToken
         return $this->objectName;
     }
 
-    /**
-     * @param string $integration
-     */
-    public function setIntegration($integration): void
+    public function setIntegration(string $integration): void
     {
         $this->integration = $integration;
     }
@@ -84,10 +78,7 @@ final class IntegrationObjectToken
         return $this->defaultValue;
     }
 
-    /**
-     * @param string $linkText
-     */
-    public function setLinkText($linkText): void
+    public function setLinkText(string $linkText): void
     {
         $this->linkText = $linkText;
     }
@@ -100,10 +91,7 @@ final class IntegrationObjectToken
         return $this->linkText;
     }
 
-    /**
-     * @param string $baseURL
-     */
-    public function setBaseURL($baseURL): void
+    public function setBaseURL(string $baseURL): void
     {
         $this->baseURL = $baseURL;
     }

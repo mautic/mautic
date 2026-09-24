@@ -6,10 +6,8 @@ final class EmailAddressHelper
 {
     /**
      * Clean the email for comparison.
-     *
-     * @param string $email
      */
-    public function cleanEmail($email): string
+    public function cleanEmail(string $email): string
     {
         return strtolower(preg_replace("/[^a-z0-9\+\.@]/i", '', $email));
     }

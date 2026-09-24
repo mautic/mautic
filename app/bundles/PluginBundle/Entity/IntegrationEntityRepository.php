@@ -490,7 +490,7 @@ final class IntegrationEntityRepository extends CommonRepository
             ->executeStatement();
     }
 
-    public function findLeadsToDelete($internalEntity, $leadId): void
+    public function findLeadsToDelete(string $internalEntity, int $leadId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
@@ -503,7 +503,7 @@ final class IntegrationEntityRepository extends CommonRepository
             ->executeStatement();
     }
 
-    public function updateErrorLeads($internalEntity, $leadId): void
+    public function updateErrorLeads(string $internalEntity, int $leadId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'integration_entity')

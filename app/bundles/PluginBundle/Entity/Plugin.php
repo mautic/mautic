@@ -215,10 +215,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
         return $this->isMissing;
     }
 
-    /**
-     * @param mixed $isMissing
-     */
-    public function setIsMissing($isMissing): void
+    public function setIsMissing(bool $isMissing): void
     {
         $this->isMissing = $isMissing;
     }

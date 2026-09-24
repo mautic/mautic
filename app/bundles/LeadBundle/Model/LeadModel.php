@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
+use DateTime;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
@@ -737,7 +738,7 @@ class LeadModel extends FormModel
     /**
      * Reorganizes a field list to be keyed by field's group then alias.
      */
-    public function organizeFieldsByGroup($fields): array
+    public function organizeFieldsByGroup(array $fields): array
     {
         $array = [];
 
@@ -2113,10 +2114,8 @@ class LeadModel extends FormModel
 
     /**
      * Get engagement counts by time unit.
-     *
-     * @param string $unit
      */
-    public function getEngagementCount(Lead $lead, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $unit = 'm', ?ChartQuery $chartQuery = null): array
+    public function getEngagementCount(Lead $lead, ?DateTime $dateFrom = null, ?DateTime $dateTo = null, string $unit = 'm', ?ChartQuery $chartQuery = null): array
     {
         $event = new LeadTimelineEvent($lead);
         $event->setCountOnly($dateFrom, $dateTo, $unit, $chartQuery);

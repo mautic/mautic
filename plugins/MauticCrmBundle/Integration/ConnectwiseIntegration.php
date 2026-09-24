@@ -206,7 +206,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
         return $cwFields;
     }
 
-    public function setFields($fields): array
+    public function setFields(array $fields): array
     {
         $cwFields = [];
 
@@ -422,7 +422,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->getRecords($params, 'company');
     }
 
-    public function getRecords($params, $object): int
+    public function getRecords(array $params, string $object): int
     {
         if (!$this->isAuthorized()) {
             return 0;

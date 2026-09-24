@@ -82,10 +82,8 @@ final class SegmentContactsLineChartQuery extends ChartQuery
 
     /**
      * Get data about add/remove from segment based on LeadEventLog.
-     *
-     * @param string $action
      */
-    public function getDataFromLeadEventLog($action): array
+    public function getDataFromLeadEventLog(string $action): array
     {
         $qb = $this->prepareTimeDataQuery(
             'lead_event_log',

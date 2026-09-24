@@ -18,13 +18,11 @@ final class DayStat implements StatInterface
     }
 
     /**
-     * @param int $hour
-     *
      * @return HourStat
      *
      * @throws \Exception
      */
-    public function getHour($hour)
+    public function getHour(int $hour)
     {
         $key = new \DateTime("{$this->day} {$hour}:00:00")->format('Y-m-d H');
 

@@ -424,7 +424,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this;
     }
 
-    public function setCurrentPassword($currentPassword): static
+    public function setCurrentPassword(string $currentPassword): static
     {
         $this->currentPassword = $currentPassword;
 
@@ -527,10 +527,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->activePermissions;
     }
 
-    /**
-     * @param string $position
-     */
-    public function setPosition($position): static
+    public function setPosition(string $position): static
     {
         $this->isChanged('position', $position);
         $this->position = $position;
@@ -546,10 +543,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->position;
     }
 
-    /**
-     * @param string $timezone
-     */
-    public function setTimezone($timezone): static
+    public function setTimezone(string $timezone): static
     {
         $this->isChanged('timezone', $timezone);
         $this->timezone = $timezone;
@@ -649,10 +643,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $this->preferences = $preferences;
     }
 
-    /**
-     * @param string $signature
-     */
-    public function setSignature($signature): static
+    public function setSignature(string $signature): static
     {
         $this->isChanged('signature', $signature);
         $this->signature = $signature;

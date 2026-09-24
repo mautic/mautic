@@ -184,10 +184,8 @@ final class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set en error message.
-     *
-     * @param string $errorMessage
      */
-    public function setErrorMessage($errorMessage): void
+    public function setErrorMessage(string $errorMessage): void
     {
         $this->errorMessage = $errorMessage;
         $this->widget->setErrorMessage($errorMessage);

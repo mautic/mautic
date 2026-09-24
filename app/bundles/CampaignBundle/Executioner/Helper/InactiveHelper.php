@@ -110,7 +110,7 @@ final class InactiveHelper
     /**
      * @return Collection<int, Event>
      */
-    public function getCollectionByDecisionId($decisionId): Collection
+    public function getCollectionByDecisionId(int $decisionId): Collection
     {
         $collection = new ArrayCollection();
 

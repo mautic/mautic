@@ -244,7 +244,7 @@ final class MonitoringController extends FormController
         );
     }
 
-    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId, bool $ignorePost = false): Response
+    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, int $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:edit')) {
             $this->throwAccessDenied();

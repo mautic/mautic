@@ -146,7 +146,7 @@ class BuilderEvent extends Event
      *
      * @param string|array|null $tokenKeys
      */
-    public function tokensRequested($tokenKeys = null): bool
+    public function tokensRequested(?string $tokenKeys = null): bool
     {
         if ($requested = $this->getRequested('tokens')) {
             if (!empty($this->tokenFilter) && 'token' === $this->tokenFilterTarget) {

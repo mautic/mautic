@@ -86,7 +86,7 @@ final class TwitterIntegration extends SocialIntegration
         return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
     }
 
-    public function getApiUrl($endpoint): string
+    public function getApiUrl(string $endpoint): string
     {
         return "https://api.twitter.com/1.1/{$endpoint}.json";
     }

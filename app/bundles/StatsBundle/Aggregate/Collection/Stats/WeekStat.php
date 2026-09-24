@@ -13,18 +13,12 @@ final class WeekStat
         return $this->count;
     }
 
-    /**
-     * @param int $count
-     */
-    public function setCount($count): void
+    public function setCount(int $count): void
     {
         $this->count = (int) $count;
     }
 
-    /**
-     * @param int $count
-     */
-    public function addToCount($count): void
+    public function addToCount(int $count): void
     {
         $this->count += $count;
     }

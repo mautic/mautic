@@ -512,8 +512,6 @@ final class EmailController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @param Email $entity
      */
     public function newAction(
         Request $request,
@@ -522,7 +520,7 @@ final class EmailController extends FormController
         EmailConfig $emailConfig,
         EmailModel $model,
         ThemeHelper $themeHelper,
-        $entity = null,
+        ?Email $entity = null,
     ): Response {
         if (!$entity instanceof Email) {
             $entity = $model->getEntity();

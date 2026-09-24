@@ -147,7 +147,7 @@ final class ConfigEvent extends CommonEvent
         return $content;
     }
 
-    public function encodeFileContents($content): string
+    public function encodeFileContents(string $content): string
     {
         return base64_encode($content);
     }

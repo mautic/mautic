@@ -18,10 +18,7 @@ final readonly class SubmissionResultLoader implements MauticModelInterface
     ) {
     }
 
-    /**
-     * @param int $id
-     */
-    public function getSubmissionWithResult($id): ?Submission
+    public function getSubmissionWithResult(int $id): ?Submission
     {
         return $this->submissionRepository->getEntity($id);
     }

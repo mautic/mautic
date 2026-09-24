@@ -2,7 +2,9 @@
 
 namespace MauticPlugin\MauticSocialBundle\Model;
 
+use DateTime;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Entity\PostCount;
 use MauticPlugin\MauticSocialBundle\Entity\PostCountRepository;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -53,7 +55,7 @@ final class PostCountModel extends AbstractCommonModel
     /**
      * Updates a monitor record's post count on a daily basis.
      */
-    public function updatePostCount($monitor, \DateTime $postDate): bool
+    public function updatePostCount(Monitoring $monitor, DateTime $postDate): bool
     {
         // query the db for posts on this date
         $q    = $this->postCountRepository->createQueryBuilder($this->postCountRepository->getTableAlias());

@@ -26,7 +26,7 @@ final class ExportHandler
      *
      * @throws FileIOException
      */
-    public function getHandler($fileName)
+    public function getHandler(string $fileName)
     {
         $path = $this->getPath($fileName);
 
@@ -45,10 +45,7 @@ final class ExportHandler
         fclose($handler);
     }
 
-    /**
-     * @param string $fileName
-     */
-    public function removeFile($fileName): void
+    public function removeFile(string $fileName): void
     {
         try {
             $path = $this->getPath($fileName);
@@ -60,7 +57,7 @@ final class ExportHandler
     /**
      * @throws FileIOException
      */
-    public function getPath($fileName): string
+    public function getPath(string $fileName): string
     {
         try {
             $this->filePathResolver->createDirectory($this->dir);

@@ -405,7 +405,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param array<string> $content
      */
-    public function setContent($content): static
+    public function setContent(array $content): static
     {
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -459,10 +459,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->publishDown;
     }
 
-    /**
-     * @param int $hits
-     */
-    public function setHits($hits): static
+    public function setHits(int $hits): static
     {
         $this->hits = $hits;
 
@@ -477,10 +474,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getHits') : $this->hits;
     }
 
-    /**
-     * @param int $revision
-     */
-    public function setRevision($revision): static
+    public function setRevision(int $revision): static
     {
         $this->revision = $revision;
 
@@ -495,10 +489,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->revision;
     }
 
-    /**
-     * @param string $metaDescription
-     */
-    public function setMetaDescription($metaDescription): static
+    public function setMetaDescription(string $metaDescription): static
     {
         $this->isChanged('metaDescription', $metaDescription);
         $this->metaDescription = $metaDescription;
@@ -514,10 +505,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->metaDescription;
     }
 
-    /**
-     * @param string $headScript
-     */
-    public function setHeadScript($headScript): static
+    public function setHeadScript(string $headScript): static
     {
         $this->headScript = $headScript;
 
@@ -532,10 +520,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->headScript;
     }
 
-    /**
-     * @param string $footerScript
-     */
-    public function setFooterScript($footerScript): static
+    public function setFooterScript(string $footerScript): static
     {
         $this->footerScript = $footerScript;
 
@@ -550,10 +535,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->footerScript;
     }
 
-    /**
-     * @param ?string $redirectType
-     */
-    public function setRedirectType($redirectType): static
+    public function setRedirectType(string $redirectType): static
     {
         $this->isChanged('redirectType', $redirectType);
         $this->redirectType = $redirectType;
@@ -569,10 +551,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->redirectType;
     }
 
-    /**
-     * @param string $redirectUrl
-     */
-    public function setRedirectUrl($redirectUrl): static
+    public function setRedirectUrl(string $redirectUrl): static
     {
         $this->isChanged('redirectUrl', $redirectUrl);
         $this->redirectUrl = $redirectUrl;
@@ -695,10 +674,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         }
     }
 
-    /**
-     * @param int $uniqueHits
-     */
-    public function setUniqueHits($uniqueHits): static
+    public function setUniqueHits(int $uniqueHits): static
     {
         $this->uniqueHits = $uniqueHits;
 
@@ -721,10 +697,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantHits') : $this->variantHits;
     }
 
-    /**
-     * @param mixed $variantHits
-     */
-    public function setVariantHits($variantHits): void
+    public function setVariantHits(int $variantHits): void
     {
         $this->variantHits = $variantHits;
     }

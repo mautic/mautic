@@ -108,10 +108,7 @@ final class LeadDeviceRepository extends CommonRepository
         return $device[0] ?? [];
     }
 
-    /**
-     * @param string $trackingId
-     */
-    public function getByTrackingId($trackingId): ?LeadDevice
+    public function getByTrackingId(string $trackingId): ?LeadDevice
     {
         return $this->findOneBy([
             'trackingId' => $trackingId,
@@ -154,7 +151,7 @@ final class LeadDeviceRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_devices')

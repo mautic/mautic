@@ -63,7 +63,7 @@ final class MessageRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    public function getMessageChannels($messageId): array
+    public function getMessageChannels(int $messageId): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')
@@ -86,7 +86,7 @@ final class MessageRepository extends CommonRepository
     /**
      * @return array<string, int|string|null>|false
      */
-    public function getChannelMessageByChannelId($channelId): array|false
+    public function getChannelMessageByChannelId(int $channelId): array|false
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')

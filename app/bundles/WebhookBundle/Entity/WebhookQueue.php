@@ -66,7 +66,7 @@ class WebhookQueue
         return $this->webhook;
     }
 
-    public function setWebhook(?Webhook $webhook): static
+    public function setWebhook(Webhook $webhook): static
     {
         $this->webhook = $webhook;
 
@@ -78,7 +78,7 @@ class WebhookQueue
         return $this->dateAdded;
     }
 
-    public function setDateAdded(?\DateTime $dateAdded): static
+    public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 

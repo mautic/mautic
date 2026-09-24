@@ -1404,7 +1404,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return [$checkEmailsInSugar, $deletedSugarLeads];
     }
 
-    public function getSugarLeadId($lead): array
+    public function getSugarLeadId(object $lead): array
     {
         // try searching for lead as this has been changed before in updated done to the plugin
         $result = $this->integrationEntityRepository->getIntegrationsEntityId('Sugarcrm', null, 'lead', $lead->getId());

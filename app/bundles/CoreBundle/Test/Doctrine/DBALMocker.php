@@ -38,7 +38,7 @@ final class DBALMocker
     ) {
     }
 
-    public function setQueryResponse($queryResponse): void
+    public function setQueryResponse(array $queryResponse): void
     {
         $this->queryResponse = $queryResponse;
     }

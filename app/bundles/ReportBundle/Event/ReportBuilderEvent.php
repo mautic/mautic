@@ -121,7 +121,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * Returns lead columns.
      */
-    public function getLeadColumns($prefix = 'l.'): array
+    public function getLeadColumns(string $prefix = 'l.'): array
     {
         $fields = [];
 
@@ -159,10 +159,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Add category columns.
-     *
-     * @param string $prefix
      */
-    public function getCategoryColumns($prefix = 'c.'): array
+    public function getCategoryColumns(string $prefix = 'c.'): array
     {
         return [
             $prefix.'id' => [

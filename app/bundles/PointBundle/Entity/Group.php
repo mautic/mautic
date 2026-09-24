@@ -77,7 +77,7 @@ class Group extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setName(?string $name): self
+    public function setName(string $name): self
     {
         $this->isChanged('name', $name);
         $this->name = $name;

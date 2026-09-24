@@ -94,10 +94,7 @@ final class TriggerEventRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * @param int $leadId
-     */
-    public function getLeadTriggeredEvents($leadId): array
+    public function getLeadTriggeredEvents(int $leadId): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('e.*')
