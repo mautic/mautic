@@ -27,6 +27,15 @@ parameters:
         no_param_type_removal: true
         no_isset_on_object: true
         no_empty_on_object: true
+        no_mixed_property: true
+
+        # @todo handle next
+        no_mixed_caller: false
+
+        null_over_false: true
+        narrow_param: true
+        narrow_return: true
+
     paths:
         - app/bundles
         - app/config
