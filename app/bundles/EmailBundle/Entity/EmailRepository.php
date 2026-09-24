@@ -118,10 +118,7 @@ class EmailRepository extends CommonRepository
      */
     public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('e')
-            ->from(Email::class, 'e', 'e.id');
+        $q = $this->createQueryBuilder('e', 'e.id');
         if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
 
@@ -141,9 +138,8 @@ class EmailRepository extends CommonRepository
     public function getSentReadCount(): array
     {
         // Get entities
-        $q = $this->getEntityManager()->createQueryBuilder();
-        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
-            ->from(Email::class, 'e');
+        $q = $this->createQueryBuilder('e');
+        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         $results['sent_count'] ??= 0;
@@ -937,12 +933,10 @@ class EmailRepository extends CommonRepository
      */
     public function getPublishedEmailsWithVariant(): array
     {
-        $qb   = $this->getEntityManager()->createQueryBuilder();
+        $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateOrmExpression($qb, $this->getTableAlias());
 
-        $qb->select($this->getTableAlias())
-            ->from(Email::class, $this->getTableAlias())
-            ->innerJoin(Email::class, 'v', Expr\Join::WITH, $qb->expr()->andX(
+        $qb->innerJoin(Email::class, 'v', Expr\Join::WITH, $qb->expr()->andX(
                 $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
                 $qb->expr()->eq('v.isPublished', true)
             ))

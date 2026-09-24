@@ -27,9 +27,7 @@ final class PluginRepository extends CommonRepository
 
     public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
-        $q->select($this->getTableAlias())
-            ->from(Plugin::class, $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
+        $q = $this->createQueryBuilder($this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
 
         $args['qb']               = $q;
         $args['ignore_paginator'] = true;

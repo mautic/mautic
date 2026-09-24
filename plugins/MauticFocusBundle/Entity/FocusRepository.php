@@ -25,10 +25,7 @@ class FocusRepository extends CommonRepository
     {
         $alias = $this->getTableAlias();
 
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select($alias)
-            ->from(Focus::class, $alias, $alias.'.id');
+        $q = $this->createQueryBuilder($alias, $alias.'.id');
 
         if (empty($args['iterable_mode'])) {
             $q->leftJoin($alias.'.category', 'c');

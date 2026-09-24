@@ -87,8 +87,7 @@ class LeadListRepository extends CommonRepository
      */
     public function getLists(?User $user = null, string $alias = '', string|int|null $id = '', bool $justPublished = true): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(LeadList::class, 'l', 'l.id');
+        $q = $this->createQueryBuilder('l', 'l.id');
 
         $q->select('partial l.{id, name, alias}');
 
@@ -129,8 +128,7 @@ class LeadListRepository extends CommonRepository
     public function getLeadLists($lead, bool $forList = false, bool $singleArrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {
         if (is_array($lead)) {
-            $q = $this->getEntityManager()->createQueryBuilder()
-                ->from(LeadList::class, 'l', 'l.id');
+            $q = $this->createQueryBuilder('l', 'l.id');
 
             if ($forList) {
                 $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
@@ -168,8 +166,7 @@ class LeadListRepository extends CommonRepository
 
             return $return;
         }
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(LeadList::class, 'l', 'l.id');
+        $q = $this->createQueryBuilder('l', 'l.id');
 
         if ($forList) {
             $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
@@ -227,8 +224,7 @@ class LeadListRepository extends CommonRepository
      */
     public function getGlobalLists(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(LeadList::class, 'l', 'l.id');
+        $q = $this->createQueryBuilder('l', 'l.id');
 
         $q->select('partial l.{id, name, alias}')
             ->where($q->expr()->eq('l.isPublished', 'true'))
@@ -251,8 +247,7 @@ class LeadListRepository extends CommonRepository
      */
     public function getPreferenceCenterList(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(LeadList::class, 'l', 'l.id');
+        $q = $this->createQueryBuilder('l', 'l.id');
 
         $q->select('l.id, l.name, l.publicName, l.alias')
             ->where($q->expr()->eq('l.isPublished', ':published'))
@@ -866,9 +861,8 @@ SQL;
      */
     public function getLeadSegmentIds(int $leadId): array
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb = $this->createQueryBuilder('ll');
         $qb->select('ll.id')
-            ->from(LeadList::class, 'll')
             ->innerJoin('ll.leads', 'l')
             ->where(
                 $qb->expr()->eq('l.lead', ':leadId')

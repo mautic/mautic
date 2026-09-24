@@ -99,9 +99,7 @@ class LeadFieldRepository extends CommonRepository
      */
     public function getFieldsForObject(string $object): array
     {
-        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
-        $queryBuilder->select($this->getTableAlias());
-        $queryBuilder->from($this->getEntityName(), $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder = $this->createQueryBuilder($this->getTableAlias(), "{$this->getTableAlias()}.id");
         $queryBuilder->where("{$this->getTableAlias()}.object = :object");
         $queryBuilder->andWhere("{$this->getTableAlias()}.isPublished = 1");
         $queryBuilder->orderBy("{$this->getTableAlias()}.label");
@@ -182,9 +180,7 @@ class LeadFieldRepository extends CommonRepository
      */
     public function getListablePublishedFields(): ArrayCollection
     {
-        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
-        $queryBuilder->select($this->getTableAlias());
-        $queryBuilder->from($this->getEntityName(), $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder = $this->createQueryBuilder($this->getTableAlias(), "{$this->getTableAlias()}.id");
         $queryBuilder->where("{$this->getTableAlias()}.isListable = 1");
         $queryBuilder->andWhere("{$this->getTableAlias()}.isPublished = 1");
         $queryBuilder->orderBy("{$this->getTableAlias()}.object");
@@ -492,9 +488,8 @@ class LeadFieldRepository extends CommonRepository
      */
     public function getFieldSchemaData(string $object): array
     {
-        return $this->getEntityManager()->createQueryBuilder()
+        return $this->createQueryBuilder('f', 'f.alias')
             ->select('f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit')
-            ->from($this->getEntityName(), 'f', 'f.alias')
             ->where('f.object = :object')
             ->setParameter('object', $object)
             ->getQuery()

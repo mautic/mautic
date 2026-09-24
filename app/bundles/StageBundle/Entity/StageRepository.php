@@ -130,8 +130,7 @@ class StageRepository extends CommonRepository
             $user = $user->getId();
         }
 
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(Stage::class, 's', 's.id');
+        $q = $this->createQueryBuilder('s', 's.id');
 
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))
@@ -159,8 +158,7 @@ class StageRepository extends CommonRepository
             return null;
         }
 
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(Stage::class, 's', 's.id');
+        $q = $this->createQueryBuilder('s', 's.id');
 
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))
@@ -181,9 +179,7 @@ class StageRepository extends CommonRepository
 
     public function findByIdOrName(string|int $value): ?Stage
     {
-        $qb = $this->getEntityManager()->createQueryBuilder()
-            ->select('s')
-            ->from(Stage::class, 's');
+        $qb = $this->createQueryBuilder('s');
 
         if (is_numeric($value)) {
             // This is numeric value so check id and name

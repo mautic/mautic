@@ -80,6 +80,7 @@ class LeadList extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'public_name', type: 'string', length: 191)]
     private $publicName;
 
     /**
@@ -98,12 +99,14 @@ class LeadList extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $alias;
 
     /**
      * @var array
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'array')]
     private $filters = [];
 
     /**
@@ -125,9 +128,11 @@ class LeadList extends FormEntity implements UuidInterface
     private $leads;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'last_built_date', type: 'datetime', nullable: true)]
     private \DateTime|\DateTimeInterface|null $lastBuiltDate = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'last_built_time', type: 'float', nullable: true)]
     private ?float $lastBuiltTime = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
@@ -145,15 +150,7 @@ class LeadList extends FormEntity implements UuidInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('alias', 'string');
-
-        $builder->createField('publicName', 'string')
-            ->columnName('public_name')
-            ->build();
-
         $builder->addCategory();
-
-        $builder->addField('filters', 'array');
 
         $builder->createField('isGlobal', 'boolean')
             ->columnName('is_global')
@@ -161,16 +158,6 @@ class LeadList extends FormEntity implements UuidInterface
 
         $builder->createField('isPreferenceCenter', 'boolean')
             ->columnName('is_preference_center')
-            ->build();
-
-        $builder->createField('lastBuiltDate', 'datetime')
-            ->columnName('last_built_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastBuiltTime', 'float')
-            ->columnName('last_built_time')
-            ->nullable()
             ->build();
 
         self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');

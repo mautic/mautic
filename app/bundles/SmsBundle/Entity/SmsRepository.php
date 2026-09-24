@@ -15,10 +15,7 @@ class SmsRepository extends CommonRepository
 
     public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select($this->getTableAlias())
-            ->from(Sms::class, $this->getTableAlias(), $this->getTableAlias().'.id');
+        $q = $this->createQueryBuilder($this->getTableAlias(), $this->getTableAlias().'.id');
 
         if (empty($args['iterable_mode'])) {
             $q->leftJoin($this->getTableAlias().'.category', 'c');
@@ -81,9 +78,8 @@ class SmsRepository extends CommonRepository
      */
     public function getSentCount(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
-        $q->select('SUM(e.sentCount) as sent_count')
-            ->from(Sms::class, 'e');
+        $q = $this->createQueryBuilder('e');
+        $q->select('SUM(e.sentCount) as sent_count');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         $results['sent_count'] ??= 0;
