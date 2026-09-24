@@ -646,7 +646,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @return mixed
      */
-    public function companyMerge($mainCompany, object $secCompany)
+    public function companyMerge(Company $mainCompany, Company $secCompany)
     {
         $this->logger->debug('COMPANY: Merging companies');
 
