@@ -96,23 +96,14 @@ parameters:
             message: '#Call to an undefined method Mautic(.*?)Integration::getApiUrl\(\)#'
             path: plugins/*/Api/*
         - '#Parameter \$integration of method MauticPlugin\\MauticEmailMarketingBundle\\Api\\EmailMarketingApi::__construct\(\) has typehint with deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration#'
-        # Doctrine expects concrete types but traits use interfaces with generics
+
         -
-            message: '#Property .+::\$translationParent type mapping mismatch: property can contain .+TranslationEntityInterface\|null but database expects#'
-            path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
-            identifier: doctrine.associationType
-        -
-            message: '#Property .+::\$translationChildren type mapping mismatch: property can contain .+but database expects#'
-            path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
-            identifier: doctrine.associationType
-        -
-            message: '#Property .+::\$variantParent type mapping mismatch: property can contain .+VariantEntityInterface\|null but database expects#'
-            path: app/bundles/CoreBundle/Entity/VariantEntityTrait.php
-            identifier: doctrine.associationType
-        # oAuth2 entities redeclare FOS parent properties whose declared types (interfaces, int) differ from the concrete Doctrine mapping
-        -
-            message: '#Property .+::\$(client|user) type mapping mismatch: property can contain .+but database expects#'
-            path: app/bundles/ApiBundle/Entity/oAuth2/*.php
+            paths:
+                # oAuth2 entities redeclare FOS parent properties whose declared types (interfaces, int) differ from the concrete Doctrine mapping
+                - app/bundles/ApiBundle/Entity/oAuth2/*.php
+                - app/bundles/CoreBundle/Entity/VariantEntityTrait.php
+                # Doctrine expects concrete types but traits use interfaces with generics
+                - app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
             identifier: doctrine.associationType
 
         # mocks
