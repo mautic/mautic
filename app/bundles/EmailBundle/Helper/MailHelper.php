@@ -1623,7 +1623,7 @@ final class MailHelper
         }
 
         $stat->setTrackingHash($this->idHash);
-        if (!empty($this->source)) {
+        if ($this->source !== []) {
             $stat->setSource($this->source[0]);
             $stat->setSourceId($this->source[1]);
         }

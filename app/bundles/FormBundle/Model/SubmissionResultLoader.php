@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Model\MauticModelInterface;
