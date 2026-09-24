@@ -6,7 +6,6 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Ramsey\Uuid\Uuid;
 
 #[ORM\Entity(repositoryClass: EmailReplyRepository::class)]
@@ -16,24 +15,12 @@ use Ramsey\Uuid\Uuid;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class EmailReply
 {
+    #[ORM\Id]
+    #[ORM\Column(type: 'guid')]
     private readonly string $id;
 
+    #[ORM\Column(name: 'date_replied', type: 'datetime')]
     private readonly \DateTimeInterface $dateReplied;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addUuid();
-
-        $builder->createField('dateReplied', 'datetime')
-            ->columnName('date_replied')
-            ->build();
-
-        $builder->createField('messageId', 'string')
-            ->columnName('message_id')
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -55,6 +42,7 @@ class EmailReply
         #[ORM\ManyToOne(targetEntity: Stat::class, inversedBy: 'replies')]
         #[ORM\JoinColumn(name: 'stat_id', nullable: false, onDelete: 'CASCADE')]
         private readonly Stat $stat,
+        #[ORM\Column(name: 'message_id', type: 'string', length: 191)]
         private readonly ?string $messageId,
         ?\DateTime $dateReplied = null,
     ) {

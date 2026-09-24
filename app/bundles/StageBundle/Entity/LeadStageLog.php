@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\StageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -32,6 +31,8 @@ class LeadStageLog
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 
     /**
@@ -39,13 +40,6 @@ class LeadStageLog
      */
     #[ORM\Column(name: 'date_fired', type: 'datetime')]
     private $dateFired;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIpAddress(true);
-    }
 
     /**
      * @return \DateTimeInterface|null

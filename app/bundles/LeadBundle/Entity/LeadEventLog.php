@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
  * Store here contact events.
@@ -28,6 +27,9 @@ class LeadEventLog
     /**
      * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     protected $id;
 
     /**
@@ -40,61 +42,54 @@ class LeadEventLog
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'user_id', type: Types::INTEGER, nullable: true)]
     protected $userId;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'user_name', type: Types::STRING, length: 191, nullable: true)]
     protected $userName;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     protected $bundle;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     protected $object;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'object_id', type: Types::INTEGER, nullable: true)]
     protected $objectId;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     protected $action;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: Types::DATETIME_MUTABLE)]
     protected $dateAdded;
 
     /**
      * @var array|null
      */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private $properties = [];
 
     public function __construct()
     {
         $this->setDateAdded(new \DateTime());
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder
-            ->addBigIntIdField()
-            ->addNullableField('userId', Types::INTEGER, 'user_id')
-            ->addNullableField('userName', Types::STRING, 'user_name')
-            ->addNullableField('bundle', Types::STRING)
-            ->addNullableField('object', Types::STRING)
-            ->addNullableField('action', Types::STRING)
-            ->addNullableField('objectId', Types::INTEGER, 'object_id')
-            ->addNamedField('dateAdded', Types::DATETIME_MUTABLE, 'date_added')
-            ->addNullableField('properties', Types::JSON);
     }
 
     /**

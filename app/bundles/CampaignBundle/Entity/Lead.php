@@ -6,7 +6,6 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: LeadRepository::class)]
 #[ORM\Table(name: 'campaign_leads')]
@@ -35,11 +34,13 @@ class Lead
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_last_exited', type: 'datetime', nullable: true)]
     private $dateLastExited;
 
     /**
@@ -59,15 +60,6 @@ class Lead
      */
     #[ORM\Column(type: 'integer')]
     private $rotation = 1;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addDateAdded();
-
-        $builder->addNamedField('dateLastExited', 'datetime', 'date_last_exited', true);
-    }
 
     /**
      * Prepares the metadata for API usage.

@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 
 #[ORM\Entity(repositoryClass: RedirectRepository::class)]
@@ -17,6 +16,9 @@ class Redirect extends FormEntity
     /**
      * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -49,13 +51,6 @@ class Redirect extends FormEntity
     public function __construct()
     {
         $this->trackables = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'saml_id_entry')]
@@ -13,36 +12,24 @@ class IdEntry
     /**
      * @var string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'string', length: 191)]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
     protected $id;
 
     /**
      * @var string
      */
+    #[ORM\Id]
+    #[ORM\Column(name: 'entity_id', type: 'string', length: 191)]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
     protected $entityId;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     protected $expiryTimestamp;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('id', 'string')
-             ->makePrimaryKey()
-             ->generatedValue('NONE')
-             ->build();
-
-        $builder->createField('entityId', 'string')
-            ->columnName('entity_id')
-            ->makePrimaryKey()
-            ->generatedValue('NONE')
-            ->build();
-
-        $builder->createField('expiryTimestamp', 'integer')
-            ->build();
-    }
 
     /**
      * @return string|null
