@@ -52,12 +52,16 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         LeadFieldRepository $leadFieldRepository,
         LeadListRepository $leadListRepository,
         DoNotContactRepository $doNotContactRepository,
+        EventDispatcherInterface $dispatcher,
+        ListLeadRepository $listLeadRepository,
     ): void {
         $this->companyRepository = $companyRepository;
         $this->frequencyRuleRepository = $frequencyRuleRepository;
         self::$leadFieldRepository = $leadFieldRepository;
         $this->leadListRepository = $leadListRepository;
         $this->doNotContactRepository = $doNotContactRepository;
+        $this->dispatcher = $dispatcher;
+        $this->listLeadRepository = $listLeadRepository;
     }
 
     protected EventDispatcherInterface $dispatcher;
@@ -92,20 +96,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setTriggerModel(TriggerModel $triggerModel): void
     {
         $this->triggerModel = $triggerModel;
-    }
-
-    #[Required]
-    public function setDispatcher(
-        EventDispatcherInterface $dispatcher,
-    ): void {
-        $this->dispatcher = $dispatcher;
-    }
-
-    #[Required]
-    public function setListLeadRepository(
-        ListLeadRepository $listLeadRepository,
-    ): void {
-        $this->listLeadRepository = $listLeadRepository;
     }
 
     public static function getLeadFieldRepository(): LeadFieldRepository
