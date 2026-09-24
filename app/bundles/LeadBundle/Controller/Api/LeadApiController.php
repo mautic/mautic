@@ -111,8 +111,23 @@ final class LeadApiController extends CommonApiController
         }
 
         $filter  = $request->query->get('filter');
-        $limit   = $request->query->get('limit');
-        $start   = $request->query->getInt('start');
+
+        if (!$request->query->has('limit')) {
+            $limit = null;
+        } else {
+            $limit = $request->query->getInt('limit');
+
+            if ($limit <= 0) {
+                return $this->badRequest();
+            }
+        }
+
+        $start = $request->query->getInt('start');
+
+        if ($start < 0) {
+            return $this->badRequest();
+        }
+
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
         $view    = $this->view($users, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['userList']);

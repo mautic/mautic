@@ -50,8 +50,11 @@ final class RoleRepository extends CommonRepository
      * Get a list of roles.
      *
      * $search arrives as null from UserModel::getLookupResults().
+     *
+     * @param positive-int|null $limit
+     * @param non-negative-int $start
      */
-    public function getRoleList(?string $search = '', int $limit = 10, int $start = 0): array
+    public function getRoleList(?string $search = '', ?int $limit = 10, int $start = 0): array
     {
         $q = $this->createQueryBuilder('r');
 
@@ -64,7 +67,7 @@ final class RoleRepository extends CommonRepository
 
         $q->orderBy('r.name');
 
-        if (!empty($limit)) {
+        if (null !== $limit && $limit > 0) {
             $q->setFirstResult($start)
                 ->setMaxResults($limit);
         }

@@ -226,7 +226,17 @@ final class UserApiController extends CommonApiController
         }
 
         $filter = $request->query->get('filter');
-        $limit  = (int) $request->query->get('limit');
+
+        if (!$request->query->has('limit')) {
+            $limit = null;
+        } else {
+            $limit = $request->query->getInt('limit');
+
+            if ($limit <= 0) {
+                return $this->badRequest();
+            }
+        }
+
         $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);
