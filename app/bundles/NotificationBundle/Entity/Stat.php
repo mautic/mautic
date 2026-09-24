@@ -216,10 +216,7 @@ class Stat
         return $this->dateSent;
     }
 
-    /**
-     * @param mixed $dateSent
-     */
-    public function setDateSent($dateSent): void
+    public function setDateSent(\DateTimeInterface $dateSent): void
     {
         $this->dateSent = $dateSent;
     }

@@ -119,13 +119,11 @@ class TransportChain
     }
 
     /**
-     * @param string $content
-     *
      * @return mixed
      *
      * @throws \Exception
      */
-    public function sendSms(Lead $lead, $content, ?Stat $stat = null)
+    public function sendSms(Lead $lead, string $content, ?Stat $stat = null)
     {
         return $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
     }

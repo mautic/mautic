@@ -28,11 +28,7 @@ final readonly class FieldsBuilder
         return array_merge($baseColumns, $fieldColumns);
     }
 
-    /**
-     * @param string $prefix
-     * @param string $segmentPrefix
-     */
-    public function getLeadFilter($prefix, $segmentPrefix): array
+    public function getLeadFilter(string $prefix, string $segmentPrefix): array
     {
         $filters = $this->getLeadFieldsColumns($prefix);
 

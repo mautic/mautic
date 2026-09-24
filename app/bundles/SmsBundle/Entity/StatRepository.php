@@ -18,7 +18,7 @@ final class StatRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getSmsStatus($trackingHash): ?Stat
+    public function getSmsStatus(string $trackingHash): ?Stat
     {
         $q = $this->createQueryBuilder('s');
         $q->select('s')

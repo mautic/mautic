@@ -117,7 +117,7 @@ class PushID
         return $this->enabled;
     }
 
-    public function setEnabled($enabled): static
+    public function setEnabled(bool $enabled): static
     {
         $this->enabled = $enabled;
 
@@ -132,10 +132,7 @@ class PushID
         return $this->mobile;
     }
 
-    /**
-     * @param bool $mobile
-     */
-    public function setMobile($mobile): static
+    public function setMobile(bool $mobile): static
     {
         $this->mobile = $mobile;
 
