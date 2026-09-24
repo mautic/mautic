@@ -2,7 +2,6 @@
 
 namespace Mautic\ApiBundle\Controller;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -477,21 +476,17 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $chain         = array_reverse(class_parents($entity), true) + [$class => $class];
         $defaultValues = [];
 
-        $classMetdata = new ClassMetadata($class);
         foreach ($chain as $class) {
-            if (method_exists($class, 'loadMetadata')) {
-                $class::loadMetadata($classMetdata);
-            }
             $defaultValues += new \ReflectionClass($class)->getDefaultProperties();
         }
 
-        // These are the mapped columns
-        $fields = $classMetdata->getFieldNames();
+        // These are the mapped columns, whether mapped by attributes or loadMetadata()
+        $fields = $this->doctrine->getManager()->getClassMetadata($entity::class)->getFieldNames();
 
         // Merge values in with $fields
         $properties = [];
         foreach ($fields as $field) {
-            $properties[$field] = $defaultValues[$field];
+            $properties[$field] = $defaultValues[$field] ?? null;
         }
 
         return $properties;
