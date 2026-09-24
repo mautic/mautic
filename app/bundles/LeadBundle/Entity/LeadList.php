@@ -80,6 +80,7 @@ class LeadList extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'public_name', type: 'string', length: 191)]
     private $publicName;
 
     /**
@@ -98,12 +99,14 @@ class LeadList extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $alias;
 
     /**
      * @var array
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'array')]
     private $filters = [];
 
     /**
@@ -145,15 +148,7 @@ class LeadList extends FormEntity implements UuidInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('alias', 'string');
-
-        $builder->createField('publicName', 'string')
-            ->columnName('public_name')
-            ->build();
-
         $builder->addCategory();
-
-        $builder->addField('filters', 'array');
 
         $builder->createField('isGlobal', 'boolean')
             ->columnName('is_global')
