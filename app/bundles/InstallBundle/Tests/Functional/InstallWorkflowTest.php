@@ -184,7 +184,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
 
         return implode(PHP_EOL, $parts);
     }
-  
+
     public function testInstallerCreatesTheLogDirectoryWhenItIsMissing(): void
     {
         // Move it aside rather than deleting it: var/logs/.gitkeep is tracked.
