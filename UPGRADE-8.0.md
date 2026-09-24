@@ -630,6 +630,10 @@
     +    public function isLocked(object $entity): bool
     -    public function isNewEntity($entity): bool
     +    public function isNewEntity(object $entity): bool
+    -    public function saveEntity($entity, bool $unlock = true): void
+    +    public function saveEntity(object $entity, bool $unlock = true): void
+    -    public function saveAndDetachEntity($entity, bool $unlock = true): void
+    +    public function saveAndDetachEntity(object $entity, bool $unlock = true): void
     -    public function togglePublishStatus($entity): bool
     +    public function togglePublishStatus(object $entity): bool
     -    public function deleteEntity($entity): void
@@ -637,6 +641,8 @@
     -    public function deleteEntities($ids): array
     +    public function deleteEntities(array $ids): array
     ```
+
+    The `saveEntity()` overrides in `AssetModel`, `CategoryModel`, `MessageModel`, `DashboardModel`, `DynamicContentModel`, `EmailModel`, `Form\FormModel`, `CompanyModel`, `Lead\FieldModel`, `LeadModel`, `ListModel`, `NotificationModel`, `PageModel`, `TriggerModel`, `SmsModel`, `RoleModel`, `UserModel`, `WebhookModel`, `FocusModel` and `MonitoringModel` use the `object` type too.
 
     The `deleteEntity()` / `deleteEntities()` overrides in `CampaignModel`, `EmailModel`, `Form\FormModel`, `SubmissionModel`, `CompanyModel`, `Lead\FieldModel`, `LeadModel`, `ListModel`, `PageModel` and `RoleModel` use the same `object` / `array` types (the concrete entity stays in the `@param` docblock). Other typed methods per model:
 
@@ -657,7 +663,7 @@
     | `FormBundle\Model\ActionModel` | `getFormsIdsWithDependenciesOnSegment()` | `int` |
     | `FormBundle\Model\FieldModel` | `getSessionFields()` | `int\|string` |
     | `FormBundle\Model\FormModel` | `getFilterExpressionFunctions()` | `?string` |
-    | `LeadBundle\Model\CompanyModel` | `companyMerge()` (second parameter) | `object` |
+    | `LeadBundle\Model\CompanyModel` | `companyMerge()` (both parameters, now also returns `Company`) | `Company` |
     | `LeadBundle\Model\FieldModel` | `reorderFieldsByEntity()` | `LeadField` |
     | `LeadBundle\Model\FieldModel` | `getPublishedFieldArrays()` | `string` |
     | `LeadBundle\Model\FieldModel` | `getFieldListWithProperties()` | `string\|bool` |
