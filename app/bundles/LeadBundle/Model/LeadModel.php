@@ -181,8 +181,6 @@ class LeadModel extends FormModel
 
     public function getRepository(): LeadRepository
     {
-        $this->leadRepository->setDispatcher($this->dispatcher);
-
         if (!$this->repoSetup) {
             $this->repoSetup = true;
 
