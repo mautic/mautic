@@ -101,7 +101,6 @@ return RectorConfig::configure()
 
         // modified with reflection
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
-            __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
         ],
 
