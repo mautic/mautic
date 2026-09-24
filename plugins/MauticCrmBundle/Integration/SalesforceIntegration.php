@@ -1786,7 +1786,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
             $this->amendLeadDataBeforePush($body);
 
-            if ($body) {
+            if ($body !== []) {
                 $url = '/services/data/v38.0/sobjects/'.$object;
                 if ($objectId) {
                     $url .= '/'.$objectId;
