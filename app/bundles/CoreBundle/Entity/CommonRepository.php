@@ -1360,10 +1360,10 @@ abstract class CommonRepository extends ServiceEntityRepository
      */
     protected function buildLimiterClauses(QueryBuilder|DbalQueryBuilder $q, array $args): void
     {
-        $start = array_key_exists('start', $args) ? $args['start'] : 0;
-        $limit = array_key_exists('limit', $args) ? $args['limit'] : 0;
+        $start = array_key_exists('start', $args) && is_numeric($args['start']) ? (int) $args['start'] : 0;
+        $limit = array_key_exists('limit', $args) && is_numeric($args['limit']) ? (int) $args['limit'] : 0;
 
-        if (!empty($limit)) {
+        if ($limit > 0) {
             $q->setFirstResult($start)
                 ->setMaxResults($limit);
         }

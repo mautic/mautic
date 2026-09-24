@@ -1968,7 +1968,7 @@ final class LeadController extends AbstractFormController
                 ]
             );
         }
-        $users = $this->userRepository->getUserList('', 0);
+        $users = $this->userRepository->getUserList('', null);
         $items = [];
         foreach ($users as $user) {
             $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];
