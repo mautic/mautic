@@ -1544,7 +1544,6 @@ class LeadModel extends FormModel
      */
     public function setTags(Lead $lead, array $tags, bool $removeOrphans = false): void
     {
-        /** @var Tag[] $currentTags */
         $currentTags  = $lead->getTags();
         $leadModified = $tagsDeleted = false;
 

@@ -1254,10 +1254,8 @@ class MailHelper
         // Reset attachments
         $this->assets = $this->attachedAssets = [];
         if (empty($assetAttachments)) {
-            if ($assets = $email->getAssetAttachments()) {
-                foreach ($assets as $asset) {
-                    $this->attachAsset($asset);
-                }
+            foreach ($email->getAssetAttachments() as $asset) {
+                $this->attachAsset($asset);
             }
         } else {
             foreach ($assetAttachments as $asset) {
