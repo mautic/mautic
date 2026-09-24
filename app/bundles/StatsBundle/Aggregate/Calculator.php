@@ -44,11 +44,9 @@ final readonly class Calculator
     }
 
     /**
-     * @param string $labelFormat
-     *
      * @throws \Exception
      */
-    public function getSumsByMonth($labelFormat = 'Y-m'): StatDAO
+    public function getSumsByMonth(string $labelFormat = 'Y-m'): StatDAO
     {
         $statDAO   = new StatDAO();
         $lastMonth = $this->fromDateTime ? $this->fromDateTime->format('Y-m') : null;
@@ -72,11 +70,9 @@ final readonly class Calculator
     }
 
     /**
-     * @param string $labelFormat
-     *
      * @throws \Exception
      */
-    public function getSumsByDay($labelFormat = 'Y-m-d'): StatDAO
+    public function getSumsByDay(string $labelFormat = 'Y-m-d'): StatDAO
     {
         $statDAO   = new StatDAO();
         $yesterday = $this->fromDateTime ? $this->fromDateTime->format('Y-m-d') : null;
@@ -100,11 +96,9 @@ final readonly class Calculator
     }
 
     /**
-     * @param string $labelFormat
-     *
      * @throws \Exception
      */
-    public function getSumsByWeek($labelFormat = 'Y-W'): StatDAO
+    public function getSumsByWeek(string $labelFormat = 'Y-W'): StatDAO
     {
         $statDAO   = new StatDAO();
         $yesterday = $this->fromDateTime ? $this->fromDateTime->format('Y-W') : null;

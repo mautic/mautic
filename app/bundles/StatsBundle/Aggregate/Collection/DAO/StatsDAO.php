@@ -19,7 +19,7 @@ final class StatsDAO
     /**
      * @return YearStat
      */
-    public function getYear($year)
+    public function getYear(int $year)
     {
         $this->years[$year] ??= new YearStat($year);
 

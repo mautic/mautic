@@ -331,7 +331,7 @@ final class LeadEventLogRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -586,11 +586,9 @@ final class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param string $message
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function unscheduleEvents(Lead $campaignMember, $message): void
+    public function unscheduleEvents(Lead $campaignMember, string $message): void
     {
         $contactId  = $campaignMember->getLead()->getId();
         $campaignId = $campaignMember->getCampaign()->getId();

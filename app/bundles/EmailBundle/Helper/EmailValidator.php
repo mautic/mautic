@@ -47,7 +47,7 @@ final readonly class EmailValidator
     /**
      * Validates that email is in an acceptable format.
      */
-    public function isValidFormat($address): bool
+    public function isValidFormat(string $address): bool
     {
         return !empty($address) && filter_var($address, FILTER_VALIDATE_EMAIL);
     }
@@ -55,7 +55,7 @@ final readonly class EmailValidator
     /**
      * Validates that email does not have invalid characters.
      */
-    public function hasValidCharacters($address): string|false
+    public function hasValidCharacters(string $address): string|false
     {
         $invalidChar = strpbrk($address, '^&*%');
 
@@ -65,7 +65,7 @@ final readonly class EmailValidator
     /**
      * Validates if the domain of an email.
      */
-    public function hasValidDomain($address): bool
+    public function hasValidDomain(string $address): bool
     {
         [$user, $domain] = explode('@', $address);
 
@@ -77,7 +77,7 @@ final readonly class EmailValidator
      *
      * @throws InvalidEmailException
      */
-    public function doPluginValidation($address): void
+    public function doPluginValidation(string $address): void
     {
         $event = $this->dispatcher->dispatch(
             new EmailValidationEvent($address)

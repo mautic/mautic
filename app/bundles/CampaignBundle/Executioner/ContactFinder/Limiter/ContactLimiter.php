@@ -165,7 +165,7 @@ final class ContactLimiter
     /**
      * @throws \Exception
      */
-    public function reduceCampaignLimitRemaining($reduction): static
+    public function reduceCampaignLimitRemaining(int $reduction): static
     {
         if (!$this->hasCampaignLimit()) {
             throw new \Exception('Campaign Limit was not set');

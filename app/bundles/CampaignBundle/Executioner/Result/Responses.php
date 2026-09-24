@@ -52,11 +52,9 @@ final class Responses
     }
 
     /**
-     * @param string|null $type
-     *
      * @return array
      */
-    public function getActionResponses($type = null)
+    public function getActionResponses(?string $type = null)
     {
         if ($type) {
             return $this->actionResponses[$type] ?? [];

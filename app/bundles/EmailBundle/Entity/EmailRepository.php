@@ -68,11 +68,9 @@ class EmailRepository extends CommonRepository
     /**
      * Check to see if an email is set as do not contact.
      *
-     * @param string $email
-     *
      * @return false|array{id: numeric-string, unsubscribed: bool, bounced: bool, manual: bool, comments: string}
      */
-    public function checkDoNotEmail($email): false|array
+    public function checkDoNotEmail(string $email): false|array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('dnc.*')

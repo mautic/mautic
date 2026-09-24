@@ -14,11 +14,9 @@ final readonly class EncryptionService
     }
 
     /**
-     * @param mixed $keys
-     *
      * @return string|string[]
      */
-    public function encrypt($keys): string|array
+    public function encrypt(array|string $keys): string|array
     {
         if (!is_array($keys)) {
             return $this->encryptionHelper->encrypt($keys);
@@ -34,7 +32,7 @@ final readonly class EncryptionService
     /**
      * @return array|string
      */
-    public function decrypt($keys, bool $onlyPrimaryCipher = false)
+    public function decrypt(array $keys, bool $onlyPrimaryCipher = false)
     {
         if (!is_array($keys)) {
             return $this->encryptionHelper->decrypt($keys, $onlyPrimaryCipher);

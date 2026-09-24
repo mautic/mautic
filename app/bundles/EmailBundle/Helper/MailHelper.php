@@ -481,7 +481,7 @@ final class MailHelper
      *
      * @return bool
      */
-    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
+    public function flushQueue(array $resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
@@ -975,10 +975,9 @@ final class MailHelper
     /**
      * Add bcc address.
      *
-     * @param string  $address
      * @param ?string $name
      */
-    public function addBcc($address, $name = null): bool
+    public function addBcc(string $address, $name = null): bool
     {
         $this->checkBatchMaxRecipients(1, 'bcc');
 
@@ -1134,10 +1133,7 @@ final class MailHelper
         return $this->source;
     }
 
-    /**
-     * @param array $source
-     */
-    public function setSource($source): void
+    public function setSource(array $source): void
     {
         $this->source = $source;
     }
