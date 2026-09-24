@@ -193,7 +193,7 @@ final class HitRepository extends CommonRepository
      *     second_to_last?: int|null
      * } $options
      */
-    public function getLatestHit($options): ?\DateTime
+    public function getLatestHit(array $options): ?\DateTime
     {
         $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sq->select('h.date_hit')
@@ -377,10 +377,9 @@ final class HitRepository extends CommonRepository
     /**
      * Get the dwell times for bunch of URLs.
      *
-     * @param string               $url
      * @param array<string, mixed> $options
      */
-    public function getDwellTimesForUrl($url, array $options): array
+    public function getDwellTimesForUrl(string $url, array $options): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
@@ -429,10 +428,8 @@ final class HitRepository extends CommonRepository
 
     /**
      * Update a hit with the the time the user left.
-     *
-     * @param int $lastHitId
      */
-    public function updateHitDateLeft($lastHitId): void
+    public function updateHitDateLeft(int $lastHitId): void
     {
         $dt = new DateTimeHelper();
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -449,7 +446,7 @@ final class HitRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers(\Doctrine\DBAL\Query\QueryBuilder $query, int $limit = 10, int $offset = 0): array
+    public function getReferers(\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('ph.referer, count(ph.referer) as sessions')
             ->groupBy('ph.referer')
@@ -501,7 +498,7 @@ final class HitRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')

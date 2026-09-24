@@ -25,10 +25,7 @@ final class RedirectRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * @param int $increaseBy
-     */
-    public function upHitCount($id, $increaseBy = 1, bool $unique = false): void
+    public function upHitCount(int $id, int $increaseBy = 1, bool $unique = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
