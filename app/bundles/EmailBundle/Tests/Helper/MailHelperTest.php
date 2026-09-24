@@ -608,6 +608,61 @@ final class MailHelperTest extends TestCase
         $this->assertEquals('replytooverride@nowhere.com', $replyTo);
     }
 
+    #[DataProvider('emailReplyToProvider')]
+    public function testEmailReplyTo(string $expected, ?string $configFrom = null, ?string $configReplyTo = null, ?string $advancedFrom = null, ?string $advancedReplyTo = null): void
+    {
+        $this->coreParametersHelper->expects($this->atLeast(4))->method('get')->willReturnMap([
+            ['mailer_from_email', null, $configFrom],
+            ['mailer_from_name', null, 'No Body'],
+            ['mailer_reply_to_email', null, $configReplyTo],
+            ['mailer_address_length_limit', null, 320],
+        ]);
+
+        $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
+        $email  = new Email();
+        $email->setSubject('Subject');
+        $email->setCustomHtml('content');
+        $email->setFromAddress($advancedFrom);
+        $email->setReplyToAddress($advancedReplyTo);
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        $this->assertSame($expected, $mailer->message->getReplyTo()[0]->getAddress());
+    }
+
+    /**
+     * @return \Iterator<string, array<string, string>>
+     */
+    public static function emailReplyToProvider(): \Iterator
+    {
+        $systemFromAddress    = 'system.from@nowhere.com';
+        $systemReplyAddress   = 'system.reply@nowhere.com';
+        $advancedFromAddress  = 'advanced.from@nowhere.com';
+        $advancedReplyAddress = 'advanced.reply@nowhere.com';
+        yield 'Default to system from address' => [
+            'expected' => $systemFromAddress,
+            'configFrom' => $systemFromAddress,
+        ];
+        yield 'Prefer system reply to address over system from address' => [
+            'expected' => $systemReplyAddress,
+            'configFrom' => $systemFromAddress,
+            'configReplyTo' => $systemReplyAddress,
+        ];
+        yield 'Prefer advanced from address over system reply to address' => [
+            'expected' => $advancedFromAddress,
+            'configFrom' => $systemFromAddress,
+            'configReplyTo' => $systemReplyAddress,
+            'advancedFrom' => $advancedFromAddress,
+        ];
+        yield 'Prefer advanced reply address over advanced from address' => [
+            'expected' => $advancedReplyAddress,
+            'configFrom' => $systemFromAddress,
+            'configReplyTo' => $systemReplyAddress,
+            'advancedFrom' => $advancedFromAddress,
+            'advancedReplyTo' => $advancedReplyAddress,
+        ];
+    }
+
     public function testEmailReplyToWithFromEmail(): void
     {
         $this->coreParametersHelper->method('get')->willReturnMap($this->defaultParams);
@@ -645,7 +700,7 @@ final class MailHelperTest extends TestCase
         $mailer->send();
         $replyTo = $mailer->message->getReplyTo() ? $mailer->message->getReplyTo()[0]->getAddress() : null;
         // Expect from address in reply to
-        $this->assertEquals('admin@mautic.com', $replyTo);
+        $this->assertEquals('from@nowhere.com', $replyTo);
     }
 
     public function testStandardOwnerAsMailer(): void
@@ -929,11 +984,9 @@ final class MailHelperTest extends TestCase
         $email = new Email();
         $email->setSubject('Test');
         $email->setCustomHtml('<html>{unsubscribe_url}</html>');
-        $lead = new Lead();
-        $lead->setEmail('someemail@email.test');
         $mailer->setIdHash('hash');
         $mailer->setEmail($email);
-        $mailer->setLead($lead);
+        $mailer->setLead(['id' => 1, 'email' => 'someemail@email.test']);
 
         $email->setSendToDnc(false);
         $headers = $mailer->getCustomHeaders();
@@ -994,11 +1047,9 @@ final class MailHelperTest extends TestCase
         $email->setSubject('Test');
         $email->setCustomHtml('<html>{unsubscribe_url}</html>');
         $email->setSendToDnc(false);
-        $lead = new Lead();
-        $lead->setEmail('someemail@email.test');
         $mailer->setIdHash('hash');
         $mailer->setEmail($email);
-        $mailer->setLead($lead);
+        $mailer->setLead(['id' => 1, 'email' => 'someemail@email.test']);
 
         $headers = $mailer->getCustomHeaders();
 

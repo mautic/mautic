@@ -105,6 +105,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     private ?\DateTime $dateQueued = null;
 
+    private bool $isExecuted = false;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -539,5 +541,15 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         $this->dateQueued = $dateQueued;
 
         return $this;
+    }
+
+    public function isExecuted(): bool
+    {
+        return $this->isExecuted;
+    }
+
+    public function setIsExecuted(bool $isExecuted): void
+    {
+        $this->isExecuted = $isExecuted;
     }
 }

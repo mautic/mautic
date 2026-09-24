@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\TestScheduledExecutioner;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -106,6 +107,35 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(Counter::class, $counter);
 
         $this->assertEquals(2, $counter->getTotalEvaluated());
+    }
+
+    public function testAlreadyLockedScheduledEventIsNotSelectedAgain(): void
+    {
+        $campaign = $this->createCampaign();
+        $event    = $this->createEvent($campaign);
+        $contact  = $this->createContact();
+        $log      = $this->createScheduledLog($event, $contact, new \DateTime('-1 minute'));
+
+        $this->em->persist($campaign);
+        $this->em->persist($event);
+        $this->em->persist($contact);
+        $this->em->persist($log);
+        $this->em->flush();
+
+        $optimisticLockService = self::getContainer()->get(OptimisticLockServiceInterface::class);
+        $this->assertInstanceOf(OptimisticLockServiceInterface::class, $optimisticLockService);
+        $this->assertTrue($optimisticLockService->acquireLock($log));
+        $this->assertSame(2, $log->getVersion());
+
+        $this->em->clear();
+
+        $scheduledLogs = $this->em->getRepository(LeadEventLog::class)->getScheduled(
+            $event->getId(),
+            new \DateTime(),
+            new ContactLimiter(100, 0, 0, 0),
+        );
+
+        $this->assertCount(0, $scheduledLogs);
     }
 
     public function testEventsAreScheduled(): void

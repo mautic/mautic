@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FieldModel;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -152,6 +153,54 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
 
         $editButton = $crawler->filter('a[href*="/s/forms/edit/'.$formId.'"]');
         $this->assertCount(1, $editButton, 'Edit button should be present on form results page');
+    }
+
+    public function testResultSortLinksTargetTheViewedForm(): void
+    {
+        // Two forms, so the one under test cannot be ID 1 - the ID the JS fallback
+        // sorts by when no baseUrl reaches the template, which would let this pass
+        // while still broken.
+        $this->createFormViaApi('First sort form', 'firstsortform');
+        $formId = $this->createFormViaApi('Second sort form', 'secondsortform');
+        $this->assertGreaterThan(1, $formId);
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
+        $this->assertResponseIsSuccessful();
+
+        $onClickHandlers = $crawler->filter('a.table-sort')->each(
+            static fn (Crawler $sortLink): string => (string) $sortLink->attr('onclick')
+        );
+        $this->assertNotEmpty($onClickHandlers, 'Expected at least one sortable column header.');
+
+        // The quotes pin this to the whole baseUrl argument, so a link pointing at
+        // form 1 cannot satisfy it.
+        $expectedBaseUrl = "'/s/forms/results/{$formId}'";
+
+        foreach ($onClickHandlers as $onClickHandler) {
+            $this->assertStringContainsString($expectedBaseUrl, $onClickHandler, 'Sort links must carry the viewed form ID so sorting cannot switch to another form.');
+        }
+    }
+
+    private function createFormViaApi(string $name, string $alias): int
+    {
+        $this->client->request('POST', '/api/forms/new', [
+            'name'        => $name,
+            'formType'    => 'standalone',
+            'alias'       => $alias,
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label' => 'Email',
+                    'alias' => 'email',
+                    'type'  => 'email',
+                ],
+            ],
+            'postAction'  => 'return',
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+
+        return (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
     }
 
     private function createFile(string $filename): void
