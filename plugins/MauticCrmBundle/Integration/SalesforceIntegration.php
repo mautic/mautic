@@ -2453,7 +2453,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return $mappedData;
     }
 
-    public function amendLeadDataBeforePush(&$mappedData): void
+    public function amendLeadDataBeforePush(array &$mappedData): void
     {
         // normalize for multiselect field
         foreach ($mappedData as &$data) {
@@ -2466,11 +2466,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param string $object
-     *
      * @return array
      */
-    public function getFieldsForQuery($object)
+    public function getFieldsForQuery(string $object)
     {
         $fields = $this->getIntegrationSettings()->getFeatureSettings();
         switch ($object) {

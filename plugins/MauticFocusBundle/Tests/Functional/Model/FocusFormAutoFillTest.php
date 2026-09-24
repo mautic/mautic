@@ -55,7 +55,7 @@ final class FocusFormAutoFillTest extends MauticMysqlTestCase
         $focus->setStyle('bar');
         $focus->setForm($form);
         $focus->setHtmlMode('basic');
-        $focus->setWebsite(1);
+        $focus->setWebsite('some website');
         $focus->setProperties([
             'bar' => [
                 'push_page'  => true,

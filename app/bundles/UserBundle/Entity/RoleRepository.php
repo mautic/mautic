@@ -118,7 +118,7 @@ final class RoleRepository extends CommonRepository
         ];
     }
 
-    public function getUserCount($roleIds): mixed
+    public function getUserCount(array $roleIds): mixed
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

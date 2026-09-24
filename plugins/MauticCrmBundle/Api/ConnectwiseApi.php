@@ -165,13 +165,11 @@ final class ConnectwiseApi extends CrmApi
     }
 
     /**
-     * @param array $params
-     *
      * @return array
      *
      * @throws ApiErrorException
      */
-    public function postActivity($params = [])
+    public function postActivity(array $params = [])
     {
         return $this->request('sales/activities', $params, 'POST');
     }
@@ -187,7 +185,7 @@ final class ConnectwiseApi extends CrmApi
     /**
      * @throws ApiErrorException
      */
-    public function fetchAllRecords($endpoint): array
+    public function fetchAllRecords(string $endpoint): array
     {
         $page        = 1;
         $pageSize    = ConnectwiseIntegration::PAGESIZE;

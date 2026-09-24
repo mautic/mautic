@@ -12,6 +12,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\HttpFoundation\Request;
 
 final readonly class FileManager
 {
@@ -27,7 +28,7 @@ final readonly class FileManager
     /**
      * @throws FileUploadException
      */
-    public function uploadFiles($request): array
+    public function uploadFiles(Request $request): array
     {
         $uploadedFiles = [];
 
@@ -47,18 +48,12 @@ final readonly class FileManager
         return $uploadedFiles;
     }
 
-    /**
-     * @param string $fileName
-     */
-    public function deleteFile($fileName): void
+    public function deleteFile(string $fileName): void
     {
         $this->fileUploader->delete($this->getCompleteFilePath($fileName));
     }
 
-    /**
-     * @param string $fileName
-     */
-    public function getCompleteFilePath($fileName): string
+    public function getCompleteFilePath(string $fileName): string
     {
         $uploadDir = $this->getUploadDir();
 
@@ -70,7 +65,7 @@ final readonly class FileManager
         return $this->getGrapesJsImagesPath(true);
     }
 
-    public function getFullUrl($fileName, $separator = '/'): string
+    public function getFullUrl(string $fileName, $separator = '/'): string
     {
         // if a static_url (CDN) is configured use that, otherwise use the site url
         $url = $this->coreParametersHelper->get('static_url') ?? $this->coreParametersHelper->get('site_url');

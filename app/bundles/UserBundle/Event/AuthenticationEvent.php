@@ -96,7 +96,7 @@ final class AuthenticationEvent extends Event
         return $this->token;
     }
 
-    public function setToken(?string $service, TokenInterface $token): void
+    public function setToken(string $service, PluginToken $token): void
     {
         $this->token                 = $token;
         $this->authenticatingService = $service;
@@ -154,7 +154,7 @@ final class AuthenticationEvent extends Event
     /**
      * Set the message to display to the user for failing auth.
      */
-    public function setFailedAuthenticationMessage($message): void
+    public function setFailedAuthenticationMessage(string $message): void
     {
         $this->failedAuthMessage = $message;
     }

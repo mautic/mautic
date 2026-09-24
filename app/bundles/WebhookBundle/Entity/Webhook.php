@@ -195,10 +195,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->id;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -233,10 +230,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->description;
     }
 
-    /**
-     * @param string $webhookUrl
-     */
-    public function setWebhookUrl($webhookUrl): static
+    public function setWebhookUrl(string $webhookUrl): static
     {
         $this->isChanged('webhookUrl', $webhookUrl);
         $this->webhookUrl = $webhookUrl;
@@ -252,10 +246,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->webhookUrl;
     }
 
-    /**
-     * @param ?string $secret
-     */
-    public function setSecret($secret): static
+    public function setSecret(string $secret): static
     {
         $this->isChanged('secret', $secret);
         $this->secret = $secret;
@@ -352,10 +343,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * Check if an event exists comared to its type.
-     *
-     * @param string $key
      */
-    public function eventExists($key): bool
+    public function eventExists(string $key): bool
     {
         foreach ($this->events as $event) {
             if ($event->getEventType() === $key) {
@@ -384,10 +373,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @param string $eventsOrderbyDir
-     */
-    public function setEventsOrderbyDir($eventsOrderbyDir): static
+    public function setEventsOrderbyDir(string $eventsOrderbyDir): static
     {
         $this->isChanged('eventsOrderbyDir', $eventsOrderbyDir);
         $this->eventsOrderbyDir = $eventsOrderbyDir;
@@ -461,7 +447,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->payload;
     }
 
-    public function setPayload($payload): static
+    public function setPayload(array $payload): static
     {
         $this->payload = $payload;
 

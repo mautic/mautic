@@ -238,10 +238,7 @@ class Monitoring extends FormEntity implements UuidInterface
         $this->category = $category;
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription($description): static
+    public function setDescription(string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -260,7 +257,7 @@ class Monitoring extends FormEntity implements UuidInterface
         return $this;
     }
 
-    public function setNetworkType($networkType): static
+    public function setNetworkType(string $networkType): static
     {
         $this->isChanged('networkType', $networkType);
         $this->networkType = $networkType;
@@ -270,10 +267,8 @@ class Monitoring extends FormEntity implements UuidInterface
 
     /**
      * Set the revision counter.
-     *
-     * @param int $revision
      */
-    public function setRevision($revision): static
+    public function setRevision(int $revision): static
     {
         $this->isChanged('revision', $revision);
         $this->revision = $revision;
@@ -283,10 +278,8 @@ class Monitoring extends FormEntity implements UuidInterface
 
     /**
      * Set the statistics.
-     *
-     * @param array $stats
      */
-    public function setStats($stats): static
+    public function setStats(array $stats): static
     {
         $this->isChanged('stats', $stats);
         $this->stats = $stats;
@@ -296,10 +289,8 @@ class Monitoring extends FormEntity implements UuidInterface
 
     /**
      * Set name.
-     *
-     * @param string $title
      */
-    public function setTitle($title): static
+    public function setTitle(string $title): static
     {
         $this->isChanged('title', $title);
         $this->title = $title;
@@ -307,10 +298,7 @@ class Monitoring extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
