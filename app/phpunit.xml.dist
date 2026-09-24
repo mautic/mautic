@@ -40,6 +40,14 @@
   <testsuites>
     <testsuite name="Project Test Suite">
       <directory>bundles/*Bundle/Tests</directory>
+      <exclude>bundles/CoreBundle/Tests/Functional/DependencyInjection/ControllerSmokeTest.php</exclude>
+      <exclude>bundles/CoreBundle/Tests/Functional/DependencyInjection/CommandSmokeTest.php</exclude>
+      <exclude>bundles/CoreBundle/Tests/Functional/DependencyInjection/EventSubscriberSmokeTest.php</exclude>
+    </testsuite>
+    <testsuite name="Container smoke tests">
+      <file>bundles/CoreBundle/Tests/Functional/DependencyInjection/ControllerSmokeTest.php</file>
+      <file>bundles/CoreBundle/Tests/Functional/DependencyInjection/CommandSmokeTest.php</file>
+      <file>bundles/CoreBundle/Tests/Functional/DependencyInjection/EventSubscriberSmokeTest.php</file>
     </testsuite>
     <testsuite name="Plugin tests">
       <directory>./../plugins/*Bundle/Tests</directory>

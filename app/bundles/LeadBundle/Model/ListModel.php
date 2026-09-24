@@ -94,7 +94,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
     public function getRepository(): LeadListRepository
     {
         $this->leadListRepository->setDispatcher($this->dispatcher);
-        $this->leadListRepository->setTranslator($this->translator);
 
         return $this->leadListRepository;
     }
@@ -383,7 +382,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, ?OutputInterface $output = null): int
     {
-        defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
+        defined('MAUTIC_REBUILDING_LEAD_LISTS') || define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
         $segmentId = $leadList->getId();
 
@@ -490,7 +489,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                         $output->writeln('');
                     }
 
-                    return $leadsProcessed;
+                    return $this->finishRebuild($leadList, $leadsProcessed, $batchLimiters);
                 }
             }
 
@@ -571,7 +570,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                         $output->writeln('');
                     }
 
-                    return $leadsProcessed;
+                    return $this->finishRebuild($leadList, $leadsProcessed, $batchLimiters);
                 }
             }
 
@@ -581,14 +580,56 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
-            $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
-        } else {
-            $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
-            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        return $this->finishRebuild($leadList, $leadsProcessed, $batchLimiters, true);
+    }
+
+    /**
+     * Persist segment membership cache and mark the rebuild finished when no work remains.
+     *
+     * @param array<string, mixed> $batchLimiters
+     */
+    private function finishRebuild(LeadList $leadList, int $leadsProcessed, array $batchLimiters, bool $knownComplete = false): int
+    {
+        $segmentId = $leadList->getId();
+        $this->refreshSegmentContactCount($segmentId);
+
+        if ($knownComplete || $this->isSegmentRebuildComplete($leadList, $batchLimiters)) {
+            $leadList->setLastBuiltDateToCurrentDatetime();
+        } elseif (null !== $leadList->getLastBuiltDate()) {
+            $leadList->setLastBuiltDate(null);
         }
 
         return $leadsProcessed;
+    }
+
+    /**
+     * @param array<string, mixed> $batchLimiters
+     */
+    private function isSegmentRebuildComplete(LeadList $leadList, array $batchLimiters): bool
+    {
+        // Ignore maxId/dateTime caps from the current run so we detect any remaining work.
+        unset($batchLimiters['maxId'], $batchLimiters['dateTime']);
+
+        try {
+            return !$this->leadSegmentService->hasNewLeadListLeads($leadList, $batchLimiters)
+                && !$this->leadSegmentService->hasOrphanedLeadListLeads($leadList);
+        } catch (TableNotFoundException) {
+            // Invalid filter table: treat as incomplete (unlike rebuildListLeads() which aborts).
+            // FieldNotFoundException and SegmentNotFoundException are not thrown on this code path.
+            return false;
+        }
+    }
+
+    private function refreshSegmentContactCount(int $segmentId): void
+    {
+        if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+            $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
+
+            return;
+        }
+
+        $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
+        $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
     }
 
     /**
@@ -626,7 +667,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 }
             }
 
-            if (!empty($searchForLists)) {
+            if ([] !== $searchForLists) {
                 $listEntities = $this->getEntities([
                     'filter' => [
                         'force' => [
@@ -667,7 +708,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             if (-1 == $searchListLead) {
                 $listLead = null;
             } elseif ($searchListLead) {
-                $listLead = $this->getListLeadRepository()->findOneBy(
+                $listLead = $this->listLeadRepository->findOneBy(
                     [
                         'lead' => $lead,
                         'list' => $this->leadChangeLists[$listId],
@@ -682,8 +723,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 );
             }
 
+            $isAlreadyCounted = false;
+
             if (null != $listLead) {
-                if ($manuallyAdded && $listLead->wasManuallyRemoved()) {
+                if ($manuallyAdded && ($listLead->wasManuallyRemoved() || !$listLead->wasManuallyAdded())) {
+                    $isAlreadyCounted = !$listLead->wasManuallyRemoved();
                     $listLead->setManuallyRemoved(false);
                     $listLead->setManuallyAdded($manuallyAdded);
 
@@ -706,6 +750,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $dispatchEvents[] = $listId;
             }
 
+            if ($isAlreadyCounted) {
+                continue;
+            }
+
             if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
                 $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
             } else {
@@ -713,7 +761,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if (!empty($persistLists)) {
+        if ([] !== $persistLists) {
             $this->getRepository()->saveEntities($persistLists);
         }
 
@@ -723,7 +771,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
-        } elseif (!empty($dispatchEvents) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
             foreach ($dispatchEvents as $listId) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId]);
                 $this->dispatcher->dispatch($event, LeadEvents::LEAD_LIST_CHANGE);
@@ -763,7 +811,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 }
             }
 
-            if (!empty($searchForLists)) {
+            if ([] !== $searchForLists) {
                 $listEntities = $this->getEntities([
                     'filter' => [
                         'force' => [
@@ -803,7 +851,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
 
             $listLead = (!$skipFindOne) ?
-                $this->getListLeadRepository()->findOneBy([
+                $this->listLeadRepository->findOneBy([
                     'lead' => $lead,
                     'list' => $this->leadChangeLists[$listId],
                 ]) :
@@ -837,22 +885,22 @@ class ListModel extends FormModel implements GlobalSearchInterface
             unset($listLead);
         }
 
-        if (!empty($persistLists)) {
+        if ([] !== $persistLists) {
             $this->getRepository()->saveEntities($persistLists);
         }
 
-        if (!empty($deleteLists)) {
+        if ([] !== $deleteLists) {
             $this->getRepository()->deleteEntities($deleteLists);
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->getListLeadRepository()->detachEntities($persistLists);
-        $this->getListLeadRepository()->detachEntities($deleteLists);
+        $this->listLeadRepository->detachEntities($persistLists);
+        $this->listLeadRepository->detachEntities($deleteLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
-        } elseif (!empty($dispatchEvents) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
             foreach ($dispatchEvents as $listId) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId], false);
                 $this->dispatcher->dispatch($event, LeadEvents::LEAD_LIST_CHANGE);
@@ -866,7 +914,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     public function removeLeadsByListId(int $listId): void
     {
-        $this->getListLeadRepository()->removeLeadsByListId($listId);
+        $this->listLeadRepository->removeLeadsByListId($listId);
     }
 
     /**
@@ -1440,7 +1488,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             $criteria['createdBy'] = $this->userHelper->getUser()->getId();
         }
 
-        if (!empty($segmentsFilter)) {
+        if ([] !== $segmentsFilter) {
             $criteria['id'] = $segmentsFilter;
         }
 

@@ -395,7 +395,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getLeadSubmissions(Form $form, $leadId, $limit = 200): array
     {
-        return $this->getRepository()->getFormResults(
+        return $this->formRepository->getFormResults(
             $form,
             [
                 'leadId' => $leadId,
@@ -473,7 +473,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
             if ($persist) {
                 // bypass model function as events aren't needed for this
-                $this->getRepository()->saveEntity($entity);
+                $this->formRepository->saveEntity($entity);
             }
         }
 
@@ -666,23 +666,33 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $html       = $this->getContent($form, false);
         $formScript = $this->getFormScript($form);
 
-        // replace line breaks with literal symbol and escape quotations
-        $search        = ["\r\n", "\n", '"'];
-        $replace       = ['', '', '\"'];
-        $html          = str_replace($search, $replace, $html);
-        $oldFormScript = str_replace($search, $replace, $formScript);
+        // Remove line breaks for inline JavaScript string literals
+        $search  = ["\r\n", "\n"];
+        $replace = ['', ''];
+        $html    = str_replace($search, $replace, $html);
+
+        // generateJsScript uses createTextNode which can handle newlines,
+        // so pass the original formScript to preserve single-line // comments
         $newFormScript = $this->generateJsScript($formScript);
+
+        // The document.write fallback embeds formScript in a string literal,
+        // so newlines must be stripped there
+        $formScriptStripped = str_replace($search, $replace, $formScript);
+
+        // Use proper JSON encoding for JavaScript strings
+        $htmlEscaped       = json_encode($html, JSON_UNESCAPED_SLASHES);
+        $formScriptEscaped = json_encode($formScriptStripped, JSON_UNESCAPED_SLASHES);
 
         // Write html for all browser and fallback for IE
         $script = '
             var scr  = document.currentScript;
-            var html = "'.$html.'";
+            var html = '.$htmlEscaped.';
 
             if (scr !== undefined) {
                 scr.insertAdjacentHTML("afterend", html);
                 '.$newFormScript.'
             } else {
-                document.write("'.$oldFormScript.'"+html);
+                document.write('.$formScriptEscaped.'+html);
             }
         ';
 
@@ -743,6 +753,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function populateValuesWithLead(Form $form, &$formHtml, ?string $formName = null): void
     {
+        if (!(bool) $this->coreParametersHelper->get('form_field_autofill', false)) {
+            return;
+        }
+
         $formName ??= $form->generateFormName();
         $fields            = $form->getFields();
         $autoFillFields    = [];
@@ -971,10 +985,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                 document.getElementsByTagName('head')[0].appendChild(script{$key});";
             } else {
                 $scriptContent = $script->nodeValue;
-                $scriptContent = str_replace(["\r\n", "\n", '"'], ['', '', '\"'], $scriptContent);
+                // Use json_encode to properly escape content for JavaScript string
+                $escapedContent = json_encode($scriptContent, JSON_UNESCAPED_SLASHES);
 
                 $javascript .= "
-                var inlineScript{$key} = document.createTextNode(\"{$scriptContent}\");
+                var inlineScript{$key} = document.createTextNode($escapedContent);
                 var script{$key}       = document.createElement('script');
                 script{$key}.appendChild(inlineScript{$key});
                 document.getElementsByTagName('head')[0].appendChild(script{$key});";
@@ -1088,13 +1103,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         if (!$this->canViewOthersEntity()) {
             $filter['force'][] = [
-                'column' => $this->getRepository()->getTableAlias().'.createdBy',
+                'column' => $this->formRepository->getTableAlias().'.createdBy',
                 'expr'   => 'eq',
                 'value'  => $this->userHelper->getUser()->getId(),
             ];
         }
 
-        return $this->getRepository()->getEntitiesForGlobalSearch($filter);
+        return $this->formRepository->getEntitiesForGlobalSearch($filter);
     }
 
     private function compareFieldOrder(Field $a, Field $b): int

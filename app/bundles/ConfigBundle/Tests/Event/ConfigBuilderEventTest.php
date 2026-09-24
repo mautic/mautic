@@ -11,11 +11,9 @@ final class ConfigBuilderEventTest extends CommonMocks
 {
     public function testAddForm(): void
     {
-        $event  = $this->initEvent();
-        $form   = ['formAlias' => 'testform'];
-        $result = $event->addForm($form);
-
-        $this->assertInstanceOf(ConfigBuilderEvent::class, $result);
+        $event = $this->initEvent();
+        $form  = ['formAlias' => 'testform'];
+        $event->addForm($form);
 
         $forms = $event->getForms();
 

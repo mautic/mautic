@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ResultController extends CommonFormController
+final class ResultController extends CommonFormController
 {
     public function __construct(
         FormFactoryInterface $formFactory,
@@ -175,6 +175,14 @@ class ResultController extends CommonFormController
                     'page'           => $page,
                     'totalCount'     => $count,
                     'limit'          => $limit,
+                    // Must be explicit; otherwise the JS fallback rewrites the trailing URL segment
+                    'baseUrl'        => $this->generateUrl(
+                        'mautic_form_results',
+                        [
+                            'objectId' => $objectId,
+                            'page'     => $page,
+                        ]
+                    ),
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'canDelete'      => $this->security->hasEntityAccess(
                         'form:forms:editown',
@@ -240,7 +248,7 @@ class ResultController extends CommonFormController
         return $response;
     }
 
-    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): Response
+    public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): BinaryFileResponse
     {
         $fieldEntity = $fieldModel->getEntity($fieldId);
 
@@ -386,10 +394,7 @@ class ResultController extends CommonFormController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return $this->batchDeleteStandard($request);
     }
@@ -429,11 +434,9 @@ class ResultController extends CommonFormController
 
     public function getPostActionRedirectArguments(array $args, $action): array
     {
-        switch ($action) {
-            case 'batchDelete':
-                $formId                             = $this->getFormIdFromRequest();
-                $args['viewParameters']['objectId'] = $formId;
-                break;
+        if ('batchDelete' === $action) {
+            $formId                             = $this->getFormIdFromRequest();
+            $args['viewParameters']['objectId'] = $formId;
         }
 
         return $args;

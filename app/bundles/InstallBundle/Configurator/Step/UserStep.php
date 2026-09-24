@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\UserStepType;
 
-class UserStep implements StepInterface
+final class UserStep implements StepInterface
 {
     /**
      * User's first name.

@@ -32,9 +32,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 
-class ConfigController extends AbstractFormController
+final class ConfigController extends AbstractFormController
 {
     /**
      * @var BasicIntegration|ConfigFormInterface
@@ -78,7 +77,6 @@ class ConfigController extends AbstractFormController
         }
 
         // Clear the session of previously stored fields in case it got stuck
-        /** @var Session $session */
         $session = $request->getSession();
         $session->remove("{$integration}-fields");
 

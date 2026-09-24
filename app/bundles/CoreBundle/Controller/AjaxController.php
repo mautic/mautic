@@ -29,8 +29,9 @@ class AjaxController extends CommonController
     private NotificationModel $notificationModel;
 
     #[Required]
-    public function autowireCoreAjaxController(NotificationModel $notificationModel): void
-    {
+    public function autowireCoreAjaxController(
+        NotificationModel $notificationModel,
+    ): void {
         $this->notificationModel = $notificationModel;
     }
 
@@ -226,7 +227,7 @@ class AjaxController extends CommonController
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
-        if (!empty($post)) {
+        if ([] !== $post) {
             $extra = http_build_query($post);
         } else {
             $extra = '';

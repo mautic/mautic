@@ -15,7 +15,7 @@ final class CommandMustHaveAsCommandAttributeRuleTest extends RuleTestCase
 {
     protected function getRule(): Rule
     {
-        return new CommandMustHaveAsCommandAttributeRule();
+        return new CommandMustHaveAsCommandAttributeRule($this->createReflectionProvider());
     }
 
     public function testRule(): void

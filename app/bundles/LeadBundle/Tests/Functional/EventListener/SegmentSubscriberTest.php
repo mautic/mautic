@@ -35,7 +35,7 @@ final class SegmentSubscriberTest extends MauticMysqlTestCase
         $crawler   = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
         self::assertResponseIsSuccessful();
         /** @var TranslatorInterface $translator */
-        $translator = $this->getContainer()->get('translator');
+        $translator = $this->getContainer()->get(TranslatorInterface::class);
 
         $expectedTranslationString = implode(' ', array_map(fn (string $trans) => $translator->trans($trans), $expectedTranslations));
 
@@ -105,7 +105,7 @@ final class SegmentSubscriberTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId]);
 
         /** @var ListModel $listModel */
-        $listModel = $this->getContainer()->get('mautic.lead.model.list');
+        $listModel = $this->getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $listModel);
 
         $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);

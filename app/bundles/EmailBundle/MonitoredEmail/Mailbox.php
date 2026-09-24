@@ -1009,7 +1009,8 @@ class Mailbox
     {
         $newString = '';
         $elements  = imap_mime_header_decode($string);
-        for ($i = 0; $i < count($elements); ++$i) {
+        $counter = count($elements);
+        for ($i = 0; $i < $counter; ++$i) {
             if ('default' == $elements[$i]->charset) {
                 $elements[$i]->charset = 'iso-8859-1';
             }

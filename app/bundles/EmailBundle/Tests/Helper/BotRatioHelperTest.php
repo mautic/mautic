@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
+use DeviceDetector\DeviceDetector;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
@@ -28,7 +29,7 @@ final class BotRatioHelperTest extends TestCase
         float $botHelperBotRatioThreshold,
         bool $isBot,
     ): void {
-        $deviceDetectorMock = $this->createMock(\DeviceDetector\DeviceDetector::class);
+        $deviceDetectorMock = $this->createMock(DeviceDetector::class);
         $deviceDetectorMock->method('parse');
         $deviceDetectorMock->method('isBot')->willReturn(false);
 

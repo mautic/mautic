@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class CategoryBundlesType extends AbstractType
+final class CategoryBundlesType extends AbstractType
 {
     public function __construct(
         private readonly EventDispatcherInterface $dispatcher,
@@ -44,7 +44,7 @@ class CategoryBundlesType extends AbstractType
         return 'category_bundles_form';
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

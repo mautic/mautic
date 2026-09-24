@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
+use Mautic\ReportBundle\Helper\ReportSearchScopeProvider;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class ReportController extends FormController
+final class ReportController extends FormController
 {
     private ReportModel $reportModel;
 
@@ -32,7 +33,7 @@ class ReportController extends FormController
         $this->reportModel = $reportModel;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, ReportSearchScopeProvider $reportSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -109,8 +110,9 @@ class ReportController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'items'       => $reports,
+                    'searchValue'     => $search,
+                    'searchScopes'    => $reportSearchScopeProvider->getScopes(),
+                    'items'           => $reports,
                     'totalItems'  => $count,
                     'page'        => $page,
                     'limit'       => $limit,
@@ -155,12 +157,7 @@ class ReportController extends FormController
         return $this->newAction($request, $entity);
     }
 
-    /**
-     * Deletes the entity.
-     *
-     * @return array<string, string|array<string, string>>|bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
-     */
-    public function deleteAction(Request $request, int $objectId)
+    public function deleteAction(Request $request, int $objectId): bool|Response
     {
         $page      = $request->getSession()->get('mautic.report.page', 1);
         $returnUrl = $this->generateUrl('mautic_report_index', ['page' => $page]);
@@ -261,7 +258,7 @@ class ReportController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $this->reportModel->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -289,10 +286,8 @@ class ReportController extends FormController
      *
      * @param int  $objectId   Item ID
      * @param bool $ignorePost Flag to ignore POST data
-     *
-     * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, int $objectId, $ignorePost = false)
+    public function editAction(Request $request, int $objectId, $ignorePost = false): false|Response
     {
         $entity  = $this->reportModel->getEntity($objectId);
         $session = $request->getSession();
@@ -860,8 +855,6 @@ class ReportController extends FormController
      * @param int    $reportId
      * @param string $format
      *
-     * @return BinaryFileResponse
-     *
      * @throws \Exception
      */
     public function downloadAction(FileHandler $fileHandler, $reportId, $format = 'csv'): Response|BinaryFileResponse
@@ -873,7 +866,6 @@ class ReportController extends FormController
         /** @var Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
-        /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
         $security = $this->security;
 
         if (empty($report)) {

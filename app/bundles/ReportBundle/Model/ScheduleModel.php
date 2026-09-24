@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ReportBundle\Entity\Report;
@@ -16,7 +19,7 @@ use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 class ScheduleModel extends FormModel
 {
     public function __construct(
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
         private readonly SchedulerPlanner $schedulerPlanner,
         private readonly SchedulerRepository $schedulerRepository,
     ) {

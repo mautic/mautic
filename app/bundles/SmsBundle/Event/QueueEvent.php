@@ -50,7 +50,7 @@ final class QueueEvent extends Event
 
     public function queueContact(int $id): void
     {
-        array_push($this->queued, $id);
+        $this->queued[] = $id;
         unset($this->contacts[$id]);
     }
 

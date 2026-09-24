@@ -6,22 +6,23 @@ namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AssetsSubscriber implements EventSubscriberInterface
+final readonly class AssetsSubscriber implements EventSubscriberInterface
 {
-    private const ASSET_DIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
+    private const ASSET_DIR = 'GrapesJsBuilderBundle/Assets/library/js/dist';
 
     public function __construct(
-        private readonly Config $config,
-        private readonly InstallService $installer,
-        private readonly RequestStack $requestStack,
-        private readonly string $projectDir,
-        private readonly LoggerInterface $logger,
+        private Config $config,
+        private InstallService $installer,
+        private RequestStack $requestStack,
+        private PathsHelper $pathsHelper,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -42,7 +43,7 @@ class AssetsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $assetDir = $this->projectDir.'/'.self::ASSET_DIR;
+        $assetDir = $this->pathsHelper->getPluginsPath().'/'.self::ASSET_DIR;
         if (!is_file($assetDir.'/manifest.json')) {
             $this->logger->warning('GrapesJS builder assets are missing (no manifest.json). Run "composer gjs-build" to generate them.');
 
@@ -50,10 +51,10 @@ class AssetsSubscriber implements EventSubscriberInterface
         }
 
         if ($js = $this->resolveAsset('builder.js')) {
-            $assetsEvent->addScript(self::ASSET_DIR.'/'.$js);
+            $assetsEvent->addScript('plugins/'.self::ASSET_DIR.'/'.$js);
         }
         if ($css = $this->resolveAsset('builder.css')) {
-            $assetsEvent->addStylesheet(self::ASSET_DIR.'/'.$css);
+            $assetsEvent->addStylesheet('plugins/'.self::ASSET_DIR.'/'.$css);
         }
     }
 
@@ -66,7 +67,7 @@ class AssetsSubscriber implements EventSubscriberInterface
      */
     private function resolveAsset(string $logicalName): ?string
     {
-        $assetDir     = $this->projectDir.'/'.self::ASSET_DIR;
+        $assetDir     = $this->pathsHelper->getPluginsPath().'/'.self::ASSET_DIR;
         $manifestPath = $assetDir.'/manifest.json';
 
         if (!is_file($manifestPath)) {

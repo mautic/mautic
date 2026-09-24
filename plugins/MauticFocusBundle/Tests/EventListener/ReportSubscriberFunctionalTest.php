@@ -17,11 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testGenerateFocusItemReportWithAllAvailableColumns(): void
     {
         $this->fillDatabase();

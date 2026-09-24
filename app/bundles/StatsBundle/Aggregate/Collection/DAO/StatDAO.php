@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Aggregate\Collection\DAO;
 
-class StatDAO
+final class StatDAO
 {
     private array $stats = [];
 

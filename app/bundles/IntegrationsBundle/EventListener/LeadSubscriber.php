@@ -24,14 +24,14 @@ use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly FieldChangeRepository $fieldChangeRepo,
-        private readonly ObjectMappingRepository $objectMappingRepository,
-        private readonly VariableExpresserHelperInterface $variableExpressor,
-        private readonly SyncIntegrationsHelper $syncIntegrationsHelper,
-        private readonly EventDispatcherInterface $dispatcher,
+        private FieldChangeRepository $fieldChangeRepo,
+        private ObjectMappingRepository $objectMappingRepository,
+        private VariableExpresserHelperInterface $variableExpressor,
+        private SyncIntegrationsHelper $syncIntegrationsHelper,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

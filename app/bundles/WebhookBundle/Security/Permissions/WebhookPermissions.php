@@ -5,7 +5,7 @@ namespace Mautic\WebhookBundle\Security\Permissions;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class WebhookPermissions extends AbstractPermissions
+final class WebhookPermissions extends AbstractPermissions
 {
     /**
      * @param mixed[] $params

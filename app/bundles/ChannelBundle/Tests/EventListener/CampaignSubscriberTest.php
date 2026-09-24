@@ -26,6 +26,7 @@ use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\SmsEvents;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -63,7 +64,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                             'form.submit',
                         ],
                         'lookupFormType'             => 'sms_list',
-                        'repository'                 => \Mautic\SmsBundle\Entity\Sms::class,
+                        'repository'                 => Sms::class,
                     ],
                 ]
             );

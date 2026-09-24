@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuditlogController extends CommonController
+final class AuditlogController extends CommonController
 {
     use LeadAccessTrait;
     use LeadDetailsTrait;

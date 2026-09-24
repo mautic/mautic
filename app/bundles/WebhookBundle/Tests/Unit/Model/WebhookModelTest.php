@@ -13,6 +13,8 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\WebhookBundle\Entity\Event;
+use Mautic\WebhookBundle\Entity\EventRepository;
+use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
@@ -394,8 +396,8 @@ final class WebhookModelTest extends TestCase
             $this->createStub(WebhookService::class),
             $this->webhookRepository, // $webhookRepository
             $this->webhookQueueRepository, // $webhookQueueRepository
-            $this->createStub(\Mautic\WebhookBundle\Entity\EventRepository::class), // $eventRepository
-            $this->createStub(\Mautic\WebhookBundle\Entity\LogRepository::class), // $logRepository
+            $this->createStub(EventRepository::class), // $eventRepository
+            $this->createStub(LogRepository::class), // $logRepository
         );
 
         return $model;

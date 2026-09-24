@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
+use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
@@ -14,6 +15,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\EventListener\FormSubscriber;
+use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -84,6 +86,42 @@ New line',
             $postPayload['first_name'],
             $postPayload['notes'],
         ], 'Form data should be decode before posting to next form');
+    }
+
+    public function testParseResponseThrowsRuntimeExceptionForServerError(): void
+    {
+        $method = new \ReflectionMethod(FormSubscriber::class, 'parseResponse');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Remote system failed');
+
+        $method->invoke($this->subscriber, new Response(500, [], 'Remote system failed'), []);
+    }
+
+    public function testParseResponseThrowsValidationExceptionForViolations(): void
+    {
+        $method = new \ReflectionMethod(FormSubscriber::class, 'parseResponse');
+
+        try {
+            $method->invoke(
+                $this->subscriber,
+                new Response(400, [], json_encode(['violations' => ['remote_email' => 'Required value']])),
+                ['remote_email' => 'email']
+            );
+            $this->fail('Expected ValidationException was not thrown.');
+        } catch (ValidationException $exception) {
+            $this->assertSame(['email' => 'Required value'], $exception->getViolations());
+        }
+    }
+
+    public function testParseResponseThrowsRuntimeExceptionForEmptyBodyWithErrorStatus(): void
+    {
+        $method = new \ReflectionMethod(FormSubscriber::class, 'parseResponse');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Repost endpoint returned HTTP 502');
+
+        $method->invoke($this->subscriber, new Response(502, [], ''), []);
     }
 
     public function testOnFormSubmitSendsNothingIfNoEmailsWereSet(): void

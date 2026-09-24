@@ -18,13 +18,13 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ActionDispatcher
+final readonly class ActionDispatcher
 {
     public function __construct(
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly LoggerInterface $logger,
-        private readonly EventScheduler $scheduler,
-        private readonly LegacyEventDispatcher $legacyDispatcher,
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private EventScheduler $scheduler,
+        private LegacyEventDispatcher $legacyDispatcher,
     ) {
     }
 

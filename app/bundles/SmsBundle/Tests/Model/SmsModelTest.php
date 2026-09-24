@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -86,7 +87,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             $this->coreParametersHelper,
             $this->smsRepository, // $smsRepository
             $this->createStub(StatRepository::class), // $statRepository
-            $this->createStub(\Mautic\LeadBundle\Entity\DoNotContactRepository::class), // $doNotContactRepository
+            $this->createStub(DoNotContactRepository::class), // $doNotContactRepository
         );
     }
 
@@ -153,6 +154,8 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $lead2->setMobile('+123456790');
         $lead2->setId(2);
 
+        $smsRepo = $this->createMock(SmsRepository::class);
+
         // Partial mock, mocks just getRepository
         $smsModel = $this->getMockBuilder(SmsModel::class)
             ->setConstructorArgs([
@@ -168,14 +171,12 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $this->userHelper,
                 $this->logger,
                 $this->coreParametersHelper,
-                $this->createStub(SmsRepository::class),
+                $smsRepo,
                 $this->createStub(StatRepository::class),
-                $this->createStub(\Mautic\LeadBundle\Entity\DoNotContactRepository::class),
+                $this->createStub(DoNotContactRepository::class),
             ])
             ->onlyMethods(['getRepository', 'getStatRepository'])
             ->getMock();
-        $smsModel->method('getRepository')
-            ->willReturn($smsRepo = $this->createMock(SmsRepository::class));
 
         $smsModel->method('getStatRepository')
             ->willReturn($this->createStub(StatRepository::class));

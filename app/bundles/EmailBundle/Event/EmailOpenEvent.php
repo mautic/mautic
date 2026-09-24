@@ -7,7 +7,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailOpenEvent extends CommonEvent
+final class EmailOpenEvent extends CommonEvent
 {
     private readonly ?Email $email;
 

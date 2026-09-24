@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Entity\Notification;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class NotificationArrayTransformer implements DataTransformerInterface
+final class NotificationArrayTransformer implements DataTransformerInterface
 {
     public function transform(mixed $value): mixed
     {

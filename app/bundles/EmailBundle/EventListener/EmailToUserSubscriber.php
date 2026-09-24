@@ -8,10 +8,10 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class EmailToUserSubscriber implements EventSubscriberInterface
+final readonly class EmailToUserSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly SendEmailToUser $sendEmailToUser,
+        private SendEmailToUser $sendEmailToUser,
     ) {
     }
 

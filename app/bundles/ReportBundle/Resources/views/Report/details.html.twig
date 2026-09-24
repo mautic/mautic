@@ -99,6 +99,7 @@
           'item': report,
           'templateButtons': {
               'edit': securityHasEntityAccess(permissions['report:reports:editown'], permissions['report:reports:editother'], report.createdBy),
+              'clone': permissions['report:reports:create'],
               'delete': securityHasEntityAccess(permissions['report:reports:deleteown'], permissions['report:reports:deleteother'], report.createdBy),
           },
           'routeBase': 'report',

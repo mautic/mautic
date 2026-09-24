@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Event\CompanyBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<Company>
@@ -24,17 +25,23 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     private ?EventDispatcherInterface $dispatcher = null;
 
+    private LeadFieldRepository $leadFieldRepository;
+
+    #[Required]
+    public function autowireCompanyRepository(
+        LeadFieldRepository $leadFieldRepository,
+        EventDispatcherInterface $eventDispatcher,
+    ): void {
+        $this->leadFieldRepository = $leadFieldRepository;
+        $this->dispatcher = $eventDispatcher;
+    }
+
     /**
      * Used by search functions to search using aliases as commands.
      */
     public function setAvailableSearchFields(array $fields): void
     {
         $this->availableSearchFields = $fields;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher): void
-    {
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -145,7 +152,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     protected function addCatchAllWhereClause($q, $filter): array
     {
-        $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'company');
+        $customFields       = $this->getSearchableFieldAliases($this->leadFieldRepository, 'company');
         $availableForSearch = array_map(fn (string $alias): string => 'comp.'.$alias, $customFields);
 
         $columns = array_merge(
@@ -216,7 +223,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     public function getSearchCommands(): array
     {
         $commands = array_merge(['mautic.project.searchcommand.name'], $this->getStandardSearchCommands());
-        if (!empty($this->availableSearchFields)) {
+        if ([] !== $this->availableSearchFields) {
             $commands = array_merge($commands, $this->availableSearchFields);
         }
 
@@ -461,7 +468,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->where($expr);
         }
 
-        if (!empty($parameters)) {
+        if ([] !== $parameters) {
             $q->setParameters($parameters);
         }
 

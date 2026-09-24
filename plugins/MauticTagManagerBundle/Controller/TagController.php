@@ -10,6 +10,9 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
+use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
+use MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType;
+use MauticPlugin\MauticTagManagerBundle\Helper\TagSearchScopeProvider;
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel as TagManagerModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
@@ -19,8 +22,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class TagController extends FormController
+final class TagController extends FormController
 {
+    private TagRepository $tagRepository;
+
     private TagModel $leadTagModel;
 
     private TagManagerModel $tagManagerModel;
@@ -29,9 +34,11 @@ class TagController extends FormController
     public function autowireTagController(
         TagModel $leadTagModel,
         TagManagerModel $tagManagerModel,
+        TagRepository $tagRepository,
     ): void {
         $this->leadTagModel = $leadTagModel;
         $this->tagManagerModel = $tagManagerModel;
+        $this->tagRepository = $tagRepository;
     }
 
     private const PERMISSION_VIEW   = 'tagManager:tagManager:view';
@@ -47,7 +54,7 @@ class TagController extends FormController
      *
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, TagSearchScopeProvider $tagSearchScopeProvider, $page = 1): Response
     {
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.
@@ -126,18 +133,19 @@ class TagController extends FormController
         $session->set('mautic.tagmanager.page', $page);
 
         $tagIds    = array_map(fn (Tag $tag) => $tag->getId(), iterator_to_array($items->getIterator()));
-        $tagsCount = (!empty($tagIds)) ? $this->tagManagerModel->getRepository()->countByLeads($tagIds) : [];
+        $tagsCount = ([] !== $tagIds) ? $this->tagRepository->countByLeads($tagIds) : [];
 
         $parameters = [
-            'items'       => $items,
-            'tagsCount'   => $tagsCount,
-            'page'        => $page,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'security'    => $this->security,
-            'tmpl'        => $tmpl,
-            'currentUser' => $this->user,
-            'searchValue' => $search,
+            'items'           => $items,
+            'tagsCount'       => $tagsCount,
+            'page'            => $page,
+            'limit'           => $limit,
+            'permissions'     => $permissions,
+            'security'        => $this->security,
+            'tmpl'            => $tmpl,
+            'currentUser'     => $this->user,
+            'searchValue'     => $search,
+            'searchScopes'    => $tagSearchScopeProvider->getScopes(),
         ];
 
         return $this->delegateView([
@@ -171,7 +179,7 @@ class TagController extends FormController
         // get the user form factory
         $form = $this->tagManagerModel->createForm($tag, $this->formFactory, $action);
 
-        $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $this->tagManagerModel, $form, $returnUrl, $page);
+        $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $form, $returnUrl, $page);
         if (null === $response) {
             $response = $this->delegateView([
                 'viewParameters' => [
@@ -190,7 +198,7 @@ class TagController extends FormController
         return $response;
     }
 
-    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, TagManagerModel $model, FormInterface $form, string $returnUrl, int $page): ?Response
+    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, FormInterface $form, string $returnUrl, int $page): ?Response
     {
         if (Request::METHOD_POST !== $request->getMethod()) {
             return null;
@@ -200,19 +208,19 @@ class TagController extends FormController
         if (!$cancelled = $this->isFormCancelled($form)) {
             if ($valid = $this->isFormValid($form)) {
                 // form is valid so process the data
-                $found = $model->getRepository()->countOccurrences($tag->getTag());
-                if (0 !== $found) {
+                $existingTag = $this->tagRepository->getTagByName($tag->getTag());
+                if (null !== $existingTag) {
                     $valid = false;
-                    $this->addFlashMessage('mautic.core.notice.updated', [
-                        '%name%'      => $tag->getTag(),
+                    $this->addFlashMessage('mautic.tagmanager.tag.already.exists', [
+                        '%name%'      => $existingTag->getTag(),
                         '%menu_link%' => 'mautic_tagmanager_index',
                         '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
                             'objectAction' => 'edit',
-                            'objectId'     => $tag->getId(),
+                            'objectId'     => $existingTag->getId(),
                         ]),
                     ]);
                 } else {
-                    $model->saveEntity($tag);
+                    $this->tagManagerModel->saveEntity($tag);
 
                     $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $tag->getTag(),
@@ -385,7 +393,7 @@ class TagController extends FormController
 
     private function isTagUnique(Tag $tag): bool
     {
-        $existingTags = $this->tagManagerModel->getRepository()->getTagsByName([$tag->getTag()]);
+        $existingTags = $this->tagRepository->getTagsByName([$tag->getTag()]);
         foreach ($existingTags as $existingTag) {
             if ($existingTag->getId() != $tag->getId()) {
                 return false;
@@ -449,8 +457,6 @@ class TagController extends FormController
      */
     public function viewAction(Request $request, TagDependencies $tagDependencies, int $objectId): Response
     {
-        $security = $this->security;
-
         $tag = $this->leadTagModel->getEntity($objectId);
 
         // set the page we came from
@@ -484,7 +490,7 @@ class TagController extends FormController
             'returnUrl'      => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $tag->getId()]),
             'viewParameters' => [
                 'tag'        => $tag,
-                'security'   => $security,
+                'security'   => $this->security,
                 'usageStats' => $tagDependencies->getChannelsIds($tag),
             ],
             'contentTemplate' => '@MauticTagManager/Tag/details.html.twig',
@@ -524,7 +530,7 @@ class TagController extends FormController
                 ]);
 
                 $form = $this->formFactory->create(
-                    \MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType::class,
+                    TagMergeType::class,
                     [],
                     [
                         'action'      => $action,
@@ -792,7 +798,7 @@ class TagController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 try {
                     $entities = $this->leadTagModel->deleteEntities($deleteIds);
                 } catch (ForeignKeyConstraintViolationException) {

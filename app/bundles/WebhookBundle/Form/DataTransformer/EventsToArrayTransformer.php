@@ -10,10 +10,10 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<Collection<int, Event>, array<int, string>>
  */
-class EventsToArrayTransformer implements DataTransformerInterface
+final readonly class EventsToArrayTransformer implements DataTransformerInterface
 {
     public function __construct(
-        private readonly Webhook $webhook,
+        private Webhook $webhook,
     ) {
     }
 

@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Command;
 
 use Mautic\IntegrationsBundle\Command\SyncCommand;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -65,7 +66,7 @@ final class SyncCommandTest extends TestCase
             ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO): true {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
                 $this->assertSame(['123', '345'], $inputOptionsDAO->getMauticObjectIds()->getObjectIdsFor(Contact::NAME));
-                $this->assertNotInstanceOf(\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO::class, $inputOptionsDAO->getIntegrationObjectIds());
+                $this->assertNotInstanceOf(ObjectIdsDAO::class, $inputOptionsDAO->getIntegrationObjectIds());
                 $this->assertTrue($inputOptionsDAO->pullIsEnabled());
                 $this->assertFalse($inputOptionsDAO->pushIsEnabled());
 

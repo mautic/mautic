@@ -32,10 +32,10 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         $lead3        = $this->createLead();
         $lead4        = $this->createLead();
         $fieldChanges = $this->generateFieldChanges(4);
-        $fieldChanges[0]->setObjectId((int) $lead3->getId());
-        $fieldChanges[1]->setObjectId((int) $lead4->getId());
-        $fieldChanges[2]->setObjectId((int) $lead1->getId());
-        $fieldChanges[3]->setObjectId((int) $lead2->getId());
+        $fieldChanges[0]->setObjectId($lead3->getId());
+        $fieldChanges[1]->setObjectId($lead4->getId());
+        $fieldChanges[2]->setObjectId($lead1->getId());
+        $fieldChanges[3]->setObjectId($lead2->getId());
 
         foreach ($fieldChanges as $fieldChange) {
             $this->em->persist($fieldChange);
@@ -46,7 +46,7 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         $this->deleteLead($lead2);
 
         $changes = $this->repository->findChangesBefore(
-            static::INTEGRATION,
+            self::INTEGRATION,
             Lead::class,
             $this->getNow()->modify('+30 seconds'),
             null,
@@ -71,9 +71,9 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $this->repository->deleteEntitiesForObject(
-            static::OBJECT_ID,
+            self::OBJECT_ID,
             Lead::class,
-            static::INTEGRATION,
+            self::INTEGRATION,
             $now->modify('+30 seconds')
         );
 
@@ -91,11 +91,11 @@ final class FieldChangeRepositoryTest extends MauticMysqlTestCase
         $now          = $this->getNow();
         for ($i = 1; $i <= $quantity; ++$i) {
             $fieldChange = new FieldChange();
-            $fieldChange->setIntegration(static::INTEGRATION);
-            $fieldChange->setObjectId(static::OBJECT_ID);
+            $fieldChange->setIntegration(self::INTEGRATION);
+            $fieldChange->setObjectId(self::OBJECT_ID);
             $fieldChange->setObjectType(Lead::class);
             $fieldChange->setModifiedAt($now);
-            $fieldChange->setColumnName(static::COLUMN_NAME);
+            $fieldChange->setColumnName(self::COLUMN_NAME);
             $fieldChange->setColumnType('string');
             $fieldChange->setColumnValue((string) $i);
 

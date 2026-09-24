@@ -6,27 +6,32 @@ namespace Mautic\InstallBundle\Install;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\CoreBundle\Release\ThisRelease;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -45,12 +50,14 @@ class InstallService
         private readonly Configurator $configurator,
         private readonly CacheHelper $cacheHelper,
         protected PathsHelper $pathsHelper,
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
         private readonly TranslatorInterface $translator,
         private readonly KernelInterface $kernel,
         private readonly ValidatorInterface $validator,
-        private readonly UserPasswordHasher $hasher,
+        private readonly UserPasswordHasherInterface $hasher,
         private readonly FixturesLoaderInterface $fixturesLoader,
+        private readonly UserRepository $userRepository,
+        private readonly Filesystem $filesystem,
     ) {
     }
 
@@ -74,7 +81,7 @@ class InstallService
         $params = $this->configurator->getParameters();
 
         // Check to ensure the installer is in the right place
-        if ((empty($params)
+        if (([] === $params
                 || !isset($params['db_driver'])
                 || empty($params['db_driver'])) && $index > 1) {
             return $this->configurator->getStep(self::DOCTRINE_STEP)[0];
@@ -133,18 +140,35 @@ class InstallService
 
     /**
      * Translation messages array.
+     *
+     * @param array<int|string, string> $messages
+     *
+     * @return array<int|string, string>
      */
     private function translateMessages(array $messages): array
     {
-        if (empty($messages)) {
+        if ([] === $messages) {
             return $messages;
         }
 
         foreach ($messages as $key => $value) {
-            $messages[$key] = $this->translator->trans($value);
+            $messages[$key] = $this->translator->trans($value, $this->getTranslationParameters($value));
         }
 
         return $messages;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getTranslationParameters(string $messageKey): array
+    {
+        return match ($messageKey) {
+            'mautic.install.memory.limit' => [
+                '%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT,
+            ],
+            default => [],
+        };
     }
 
     /**
@@ -165,6 +189,29 @@ class InstallService
         $messages = $step->checkOptionalSettings();
 
         return $this->translateMessages($messages);
+    }
+
+    /**
+     * Creates the directories the requirements check tests, so a fresh Composer install
+     * does not fail purely because they have not been created yet.
+     *
+     * is_writable() returns false for a path that does not exist, and a project built
+     * from mautic/recommended-project has no var/logs until something writes a log line.
+     *
+     * This lives here rather than in CheckStep::checkRequirements() because that method
+     * also backs the System Info page, and CheckStep's path properties are bound form
+     * fields on the installer's check step.
+     */
+    public function prepareDirectories(): void
+    {
+        try {
+            $this->filesystem->mkdir([
+                $this->pathsHelper->getCachePath(),
+                $this->pathsHelper->getLogsPath(),
+            ]);
+        } catch (IOException) {
+            // Nothing to do here. The requirements check reports the path as unwritable.
+        }
     }
 
     public function saveConfiguration($params, ?StepInterface $step = null, $clearCache = false): array
@@ -244,7 +291,7 @@ class InstallService
     {
         $messages = $this->validateDatabaseParams($dbParams);
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -257,7 +304,7 @@ class InstallService
 
             if ($schemaHelper->createDatabase()) {
                 $messages = $this->saveConfiguration($dbParams, $step, true);
-                if (empty($messages)) {
+                if ([] === $messages) {
                     return $messages;
                 }
             }
@@ -370,8 +417,7 @@ class InstallService
     {
         // ensure the username and email are unique
         try {
-            /** @var User $existingUser */
-            $existingUser = $this->entityManager->getRepository(User::class)->find(1);
+            $existingUser = $this->userRepository->find(1);
         } catch (\Exception) {
             $existingUser = null;
         }
@@ -401,7 +447,7 @@ class InstallService
             }
         }
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -410,7 +456,7 @@ class InstallService
         $emailConstraint          = new Assert\Email();
         $emailConstraint->message = $this->translator->trans('mautic.core.email.required', [], 'validators');
 
-        $passwordConstraint             = new Assert\Length(['min' => 6]);
+        $passwordConstraint             = new Assert\Length(min: 6);
         $passwordConstraint->minMessage = $this->translator->trans('mautic.install.password.minlength', [], 'validators');
 
         $validations[] = $this->validator->validate($data['email'], $emailConstraint);
@@ -423,7 +469,7 @@ class InstallService
             }
         }
 
-        if (!empty($messages)) {
+        if ([] !== $messages) {
             return $messages;
         }
 
@@ -481,13 +527,22 @@ class InstallService
      */
     public function finalMigrationStep(): void
     {
-        // Add database migrations up to this point since this is a fresh install (must be done at this point
-        // after the cache has been rebuilt
-        $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
-        $output = new BufferedOutput();
-
         $application = new Application($this->kernel);
         $application->setAutoExit(false);
-        $application->run($input, $output);
+
+        $commands = [
+            // Create the metadata storage before marking migrations as applied.
+            ['console', 'doctrine:migrations:sync-metadata-storage', '--no-interaction'],
+            ['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction'],
+        ];
+
+        foreach ($commands as $arguments) {
+            $output   = new BufferedOutput();
+            $exitCode = $application->run(new ArgvInput($arguments), $output);
+
+            if (Command::SUCCESS !== $exitCode) {
+                throw new \RuntimeException(sprintf('Command "%s" failed with exit code %d: %s', $arguments[1], $exitCode, trim($output->fetch())));
+            }
+        }
     }
 }

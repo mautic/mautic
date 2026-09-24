@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
 
-class EmailEvent extends CommonEvent
+final class EmailEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

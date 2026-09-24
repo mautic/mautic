@@ -555,8 +555,13 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
                     var elId              = 'mauticform_' + formId;
                     var theForm           = document.getElementById(elId);
-                    var formValid         = Form.customCallbackHandler(formId, 'onValidate');
                     var firstInvalidField = false;
+
+                    if (submitForm && validator.isSubmitting(theForm)) {
+                        return false;
+                    }
+
+                    var formValid = Form.customCallbackHandler(formId, 'onValidate');
 
                     validator.disableSubmitButton();
 
@@ -722,7 +727,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
                             elErrorSpan.style.display = (valid) ? 'none' : '';
                             elErrorSpan.setAttribute('aria-hidden', valid ? 'true' : 'false');
-                            elContainer.className = elContainer.className + " mauticform-has-error";
+                            elContainer.classList.add('mauticform-has-error');
                         }
                     }
                 },
@@ -745,7 +750,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                             if (elErrorSpan) {
                                 elErrorSpan.style.display = 'none';
                                 elErrorSpan.setAttribute('aria-hidden', 'true');
-                                elContainer.className = elContainer.className.replace(" mauticform-has-error", "");
+                                elContainer.classList.remove('mauticform-has-error');
                             }
                         }
                     }
@@ -856,27 +861,81 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                     Form.syncSliderOutputs(formId);
                 },
 
+                getSubmitButtons: function(theForm) {
+                    if (!theForm) {
+                        return [];
+                    }
+
+                    return theForm.querySelectorAll('button.mauticform-button[type="submit"], button.mauticform-button:not([type]), input.mauticform-button[type="submit"], input[type="submit"]');
+                },
+
+                isSubmitting: function(theForm) {
+                    return theForm && theForm.getAttribute('data-mautic-form-submitting') === 'true';
+                },
+
+                setSubmitting: function(theForm, isSubmitting) {
+                    if (!theForm) {
+                        return;
+                    }
+
+                    if (isSubmitting) {
+                        theForm.setAttribute('data-mautic-form-submitting', 'true');
+                        theForm.setAttribute('aria-busy', 'true');
+
+                        return;
+                    }
+
+                    theForm.removeAttribute('data-mautic-form-submitting');
+                    theForm.removeAttribute('aria-busy');
+                },
+
                 disableSubmitButton: function() {
+                    var theForm = document.getElementById('mauticform_' + formId);
+
+                    validator.setSubmitting(theForm, true);
+
                     // If true, then a callback handled it
                     if (!Form.customCallbackHandler(formId, 'onSubmitButtonDisable')) {
-                        var submitButton = document.getElementById('mauticform_' + formId).querySelector('.mauticform-button');
+                        var submitButtons = validator.getSubmitButtons(theForm);
 
-                        if (submitButton) {
-                            MauticLang.submitMessage = submitButton.innerHTML;
-                            submitButton.innerHTML = MauticLang.submittingMessage;
-                            submitButton.disabled = 'disabled';
-                        }
+                        [].forEach.call(submitButtons, function(submitButton) {
+                            if (submitButton.tagName.toLowerCase() === 'input') {
+                                submitButton.setAttribute('data-mautic-form-submit-label', submitButton.value);
+                                submitButton.value = MauticLang.submittingMessage;
+                            } else {
+                                submitButton.setAttribute('data-mautic-form-submit-label', submitButton.innerHTML);
+                                submitButton.innerHTML = MauticLang.submittingMessage;
+                            }
+
+                            submitButton.disabled = true;
+                        });
                     }
                 },
 
                 enableSubmitButton: function() {
+                    var theForm = document.getElementById('mauticform_' + formId);
+
+                    validator.setSubmitting(theForm, false);
+
                     // If true, then a callback handled it
                     if (!Form.customCallbackHandler(formId, 'onSubmitButtonEnable')) {
-                        var submitButton = document.getElementById('mauticform_' + formId).querySelector('.mauticform-button');
-                        if (submitButton) {
-                            submitButton.innerHTML = MauticLang.submitMessage;
-                            submitButton.disabled = '';
-                        }
+                        var submitButtons = validator.getSubmitButtons(theForm);
+
+                        [].forEach.call(submitButtons, function(submitButton) {
+                            var submitLabel = submitButton.getAttribute('data-mautic-form-submit-label');
+
+                            if (submitLabel !== null) {
+                                if (submitButton.tagName.toLowerCase() === 'input') {
+                                    submitButton.value = submitLabel;
+                                } else {
+                                    submitButton.innerHTML = submitLabel;
+                                }
+
+                                submitButton.removeAttribute('data-mautic-form-submit-label');
+                            }
+
+                            submitButton.disabled = false;
+                        });
                     }
                 }
             };
@@ -884,14 +943,65 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
             return validator;
         };
 
+        Form.getAllowedDomains = function() {
+            const allowedDomains = [];
+
+            // Canonical domain list populated by embed snippets.
+            if (Array.isArray(window.MauticDomains)) {
+                window.MauticDomains.forEach(function(domain) {
+                    if (typeof domain === 'string' && allowedDomains.indexOf(domain) === -1) {
+                        allowedDomains.push(domain);
+                    }
+                });
+            }
+
+            // Derive origins directly from loaded forms as a deterministic fallback.
+            const forms = document.querySelectorAll('form[data-mautic-form]');
+            forms.forEach(function(form) {
+                try {
+                    const action = form.getAttribute('action');
+                    if (!action) {
+                        return;
+                    }
+
+                    const origin = (new URL(action, window.location.href)).origin;
+                    if (allowedDomains.indexOf(origin) === -1) {
+                        allowedDomains.push(origin);
+                    }
+                } catch (err) {
+                    if (Core.debug()) console.log(err);
+                }
+            });
+
+            return allowedDomains;
+        };
+
         Form.registerFormMessenger = function() {
             window.addEventListener('message', function(event) {
                 if (Core.debug()) console.log(event);
 
-                if (MauticDomain.indexOf(event.origin) !== 0) return;
+                // Support multiple Mautic instances: check against all registered domains
+                const allowedDomains = Form.getAllowedDomains();
+
+                // Only accept http: and https: origins
+                if (!event.origin || !(event.origin.startsWith('http:') || event.origin.startsWith('https:'))) {
+                    return;
+                }
+
+                // Use exact origin comparison to prevent prefix-based bypass
+                const isAllowed = allowedDomains.some(function(domain) {
+                    if (typeof domain !== 'string') return false;
+                    try {
+                        return new URL(domain).origin === event.origin;
+                    } catch (e) {
+                        return false;
+                    }
+                });
+
+                if (!isAllowed) return;
 
                 try {
-                    var response = JSON.parse(event.data);
+                    const response = JSON.parse(event.data);
 
                     if (response && response.formName) {
                         Core.getValidator(response.formName).parseFormResponse(response);
@@ -1125,14 +1235,39 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
         return Core;
     }
 
+    // Support multiple Mautic instances by allowing domain registration
     if (typeof(MauticSDK) === 'undefined') {
         window.MauticSDK = define_library();
-        var sjs = document.getElementsByTagName('script'), tjs = sjs.length;
-        for (var i = 0; i < sjs.length; i++) {
-            if (!sjs[i].hasAttribute('src') || sjs[i].getAttribute("src").indexOf('mautic-form-src.js') == -1) continue;
-            var sParts = sjs[i].getAttribute("src").split("?");
-            if (sParts[1]) MauticSDK.setConfig(MauticSDK.parseToObject(sParts[1]));
+        if (!Array.isArray(window.MauticDomains)) {
+            window.MauticDomains = [];
+        }
+        const sjs = document.getElementsByTagName('script');
+        for (let i = 0; i < sjs.length; i++) {
+            if (!sjs[i].hasAttribute('src') || (sjs[i].getAttribute("src").indexOf('mautic-form') == -1 || sjs[i].getAttribute("src").indexOf('.js') == -1)) continue;
+            const sParts = sjs[i].getAttribute("src").split("?");
+            if (sParts[1] && sParts[1].indexOf("=") !== -1) MauticSDK.setConfig(MauticSDK.parseToObject(sParts[1]));
             MauticSDK.initialize(sParts[0]);
+            break;
+        }
+    } else {
+        // Subsequent Mautic instance: just register its domain for the message listener
+        const sjs = document.getElementsByTagName('script');
+        for (let i = 0; i < sjs.length; i++) {
+            if (!sjs[i].hasAttribute('src') || (sjs[i].getAttribute("src").indexOf('mautic-form') == -1 || sjs[i].getAttribute("src").indexOf('.js') == -1)) continue;
+            try {
+                const scriptUrl = sjs[i].getAttribute("src");
+                const origin = scriptUrl.split('/').slice(0, 3).join('/');
+                if (!window.MauticDomains) {
+                    window.MauticDomains = [];
+                }
+                if (window.MauticDomains.indexOf(origin) === -1) {
+                    window.MauticDomains.push(origin);
+                }
+            } catch (err) {
+                if (typeof MauticSDK !== 'undefined' && MauticSDK.debug() && window.console && typeof window.console.log === 'function') {
+                    window.console.log('Error registering Mautic domain:', err);
+                }
+            }
             break;
         }
     }

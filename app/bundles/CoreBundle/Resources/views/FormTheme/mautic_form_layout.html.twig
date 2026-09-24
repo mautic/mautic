@@ -202,15 +202,16 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_errors.html.php #}
 {% block form_errors %}
 {% if errors|length > 0 %}
-    <div class="help-block">
+    {% set itemClass = attr.itemClass|default('alert alert-danger') %}
+    <div class="{{ attr.blockClass|default('help-block') }}">
     {% if errors|length > 1 %}
         <ul>
             {% for error in errors %}
-                <li class="alert alert-danger">{{ error.getMessage()|escape }}</li>
+                <li class="{{ itemClass }}">{{ error.getMessage()|escape }}</li>
             {% endfor %}
         </ul>
     {% else %}
-        <div class="alert alert-danger">{{ (errors|first).getMessage()|escape }}</div>
+        <div class="{{ itemClass }}">{{ (errors|first).getMessage()|escape }}</div>
     {% endif %}
     </div>
 {% endif %}
@@ -657,3 +658,19 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
         </div>
     </div>
 {%- endblock alert_widget %}
+
+{% block datespan_widget %}
+    {% set errorAttr = { attr: { blockClass: 'ma-0', itemClass: 'alert alert-danger ma-0' } } %}
+    <div class="row-no-gutters">
+        <div class="col-xs-12 col-lg-8">
+            {{ form_widget(form.interval) }}
+            {{ form_errors(form.interval, errorAttr) }}
+        </div>
+        <div class="col-xs-12 col-lg-4">
+            <div class="choice-wrapper">
+                {{ form_widget(form.unit) }}
+                {{ form_errors(form.unit, errorAttr) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

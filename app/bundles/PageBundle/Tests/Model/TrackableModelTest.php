@@ -36,8 +36,6 @@ final class TrackableModelTest extends TestCase
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([
-                $mockRedirectModel,
-                $mockLeadFieldRepository,
                 $this->createStub(EntityManagerInterface::class),
                 $this->createStub(CorePermissions::class),
                 $this->createStub(EventDispatcherInterface::class),
@@ -46,10 +44,11 @@ final class TrackableModelTest extends TestCase
                 $this->createStub(UserHelper::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(CoreParametersHelper::class),
-                $this->createStub(TrackableRepository::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
+
+        $mockModel->autowireTrackableModel($mockRedirectModel, $mockLeadFieldRepository, $this->createStub(TrackableRepository::class));
 
         $mockModel->expects($this->once())
             ->method('getEntitiesFromUrls')
@@ -88,8 +87,6 @@ final class TrackableModelTest extends TestCase
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([
-                $mockRedirectModel,
-                $mockLeadFieldRepository,
                 $this->createStub(EntityManagerInterface::class),
                 $this->createStub(CorePermissions::class),
                 $this->createStub(EventDispatcherInterface::class),
@@ -98,10 +95,11 @@ final class TrackableModelTest extends TestCase
                 $this->createStub(UserHelper::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(CoreParametersHelper::class),
-                $this->createStub(TrackableRepository::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
+
+        $mockModel->autowireTrackableModel($mockRedirectModel, $mockLeadFieldRepository, $this->createStub(TrackableRepository::class));
 
         $mockModel->expects($this->once())
             ->method('getDoNotTrackList')
@@ -562,11 +560,11 @@ TEXT;
         $this->assertCount(1, $trackables);
 
         // No links so no trackables
-        $this->assertEquals($html, $content[0]);
+        $this->assertSame($html, $content[0]);
         $token = array_key_first($trackables);
         $this->assertNotNull($token);
 
-        $this->assertEquals(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
+        $this->assertSame(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
     }
 
     #[TestDox('Tests that URL based contact fields are found in plain text')]
@@ -597,11 +595,11 @@ TEXT;
         $this->assertCount(1, $trackables);
 
         // No links so no trackables
-        $this->assertEquals($html, $content[0]);
+        $this->assertSame($html, $content[0]);
         $token = array_key_first($trackables);
         $this->assertNotNull($token);
 
-        $this->assertEquals(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
+        $this->assertSame(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
     }
 
     /**
@@ -622,13 +620,8 @@ TEXT;
             ]
         );
 
-        $mockRedirectModel       = $this->createMock(RedirectModel::class);
-        $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
-
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([
-                $mockRedirectModel,
-                $mockLeadFieldRepository,
                 $this->createStub(EntityManagerInterface::class),
                 $this->createStub(CorePermissions::class),
                 $this->createStub(EventDispatcherInterface::class),
@@ -637,10 +630,11 @@ TEXT;
                 $this->createStub(UserHelper::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(CoreParametersHelper::class),
-                $this->createStub(TrackableRepository::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
+
+        $mockModel->autowireTrackableModel($this->createMock(RedirectModel::class), $this->createMock(LeadFieldRepository::class), $this->createStub(TrackableRepository::class));
 
         $mockModel->expects($this->once())
             ->method('getDoNotTrackList')

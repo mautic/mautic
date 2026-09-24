@@ -68,6 +68,8 @@ jobs:
     - name: Build release files
       run: |
         php build/package_release.php -b=${{ steps.get-mautic-version.outputs.version }}
+        unzip -Z1 build/packages/${{ steps.get-mautic-version.outputs.version }}-update.zip | grep -Fxq 'assets/build/manifest.json'
+        unzip -Z1 build/packages/${{ steps.get-mautic-version.outputs.version }}-update.zip | grep -Fxq 'var/sass/app.output.css'
         echo 'MAUTIC_SHA1_CONTENTS<<EOF' >> $GITHUB_ENV
         cat build/packages/build-sha1-all >> $GITHUB_ENV
         echo 'EOF' >> $GITHUB_ENV
@@ -237,6 +239,8 @@ jobs:
       run: |
         php bin/console mautic:update:apply --force --update-package=${{ needs.release.outputs.mautic-version }}-update.zip
         php bin/console mautic:update:apply --finish
+        test -s assets/build/manifest.json
+        test -s var/sass/app.output.css
 
     - name: Store log artifacts
       if: ${{ always() }}

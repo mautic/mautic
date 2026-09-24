@@ -11,6 +11,8 @@ class ImportValidateEvent extends Event
 {
     private bool $skipIfExists = false;
 
+    private bool $createNew = true;
+
     private ?int $ownerId      = null;
 
     private ?int $list    = null;
@@ -55,7 +57,7 @@ class ImportValidateEvent extends Event
      */
     public function importIsForRouteObject(string $routeObject): bool
     {
-        return $this->getRouteObjectName() === $routeObject;
+        return $this->routeObjectName === $routeObject;
     }
 
     public function getRouteObjectName(): string
@@ -81,6 +83,16 @@ class ImportValidateEvent extends Event
     public function setSkipIfExists(bool $skipIfExists): void
     {
         $this->skipIfExists = $skipIfExists;
+    }
+
+    public function getCreateNew(): bool
+    {
+        return $this->createNew;
+    }
+
+    public function setCreateNew(bool $createNew): void
+    {
+        $this->createNew = $createNew;
     }
 
     /**

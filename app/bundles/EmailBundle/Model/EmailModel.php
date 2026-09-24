@@ -54,6 +54,7 @@ use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\FilterTrait;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -140,6 +141,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         private readonly TrackableRepository $trackableRepository,
         private readonly LeadRepository $leadRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
         $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -290,7 +292,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 $event = $this->dispatchEvent('pre_save', $entity, $isNew);
             }
 
-            $this->getRepository()->saveEntity($entity, false);
+            $this->emailRepository->saveEntity($entity, false);
 
             if ($dispatchEvent) {
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
@@ -499,7 +501,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         // Only up counts if associated with both an email and lead
         if ($firstTime && $email && $lead) {
             try {
-                $this->getRepository()->incrementRead($email->getId(), $stat->getId(), $email->isVariant());
+                $this->emailRepository->incrementRead($email->getId(), $stat->getId(), $email->isVariant());
             } catch (\Exception $exception) {
                 error_log($exception);
             }
@@ -542,7 +544,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             if (null !== $hitDateTime && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
-                $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
+                $this->leadRepository->updateLastActive($lead->getId(), $hitDateTime);
             }
         }
     }
@@ -656,10 +658,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $data;
     }
 
-    /**
-     * @return Stat|null
-     */
-    public function getEmailStatus($idHash)
+    public function getEmailStatus(string $idHash): ?Stat
     {
         return $this->getStatRepository()->getEmailStatus($idHash);
     }
@@ -808,7 +807,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         $emailIds      = ($includeVariants) ? $email->getRelatedEntityIds() : [$email->getId()];
         $templateEmail = 'template' === $email->getEmailType();
-        $results       = $this->getStatDeviceRepository()->getDeviceStats($emailIds, $dateFrom, $dateTo);
+        $results       = $this->statDeviceRepository->getDeviceStats($emailIds, $dateFrom, $dateTo);
 
         // Organize by list_id (if a segment email) and/or device
         $stats   = [];
@@ -1009,7 +1008,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
 
-        $total      = $this->getRepository()->getEmailPendingLeads(
+        $total      = $this->emailRepository->getEmailPendingLeads(
             $email->getId(),
             $variantIds,
             $listId,
@@ -1048,7 +1047,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $ids[] = $email->getId();
         }
 
-        $queued = (int) $this->messageQueueModel->getQueuedChannelCount('email', $ids);
+        $queued = $this->messageQueueModel->getQueuedChannelCount('email', $ids);
         $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
 
         return $queued;
@@ -1204,107 +1203,105 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function &getEmailSettings(Email $email, $includeVariants = true)
     {
-        if (empty($this->emailSettings[$email->getId()])) {
-            // store the settings of all the variants in order to properly disperse the emails
-            // set the parent's settings
-            $emailSettings = [
-                $email->getId() => [
-                    'template'     => $email->getTemplate(),
-                    'sentCount'    => $email->getSentCount(),
-                    'variantCount' => $email->getVariantSentCount(),
-                    'isVariant'    => null !== $email->getVariantStartDate(),
-                    'entity'       => $email,
-                    'translations' => $email->getTranslations(true),
-                    'languages'    => ['default' => $email->getId()],
-                ],
-            ];
+        // store the settings of all the variants in order to properly disperse the emails
+        // set the parent's settings
+        $emailSettings = [
+            $email->getId() => [
+                'template'     => $email->getTemplate(),
+                'sentCount'    => $email->getSentCount(),
+                'variantCount' => $email->getVariantSentCount(),
+                'isVariant'    => null !== $email->getVariantStartDate(),
+                'entity'       => $email,
+                'translations' => $email->getTranslations(true),
+                'languages'    => ['default' => $email->getId()],
+            ],
+        ];
 
-            if ($emailSettings[$email->getId()]['translations']) {
-                // Add in the sent counts for translations of this email
-                /** @var Email $translation */
-                foreach ($emailSettings[$email->getId()]['translations'] as $translation) {
-                    if ($translation->isPublished()) {
-                        $emailSettings[$email->getId()]['sentCount'] += $translation->getSentCount();
-                        $emailSettings[$email->getId()]['variantCount'] += $translation->getVariantSentCount();
+        if ($emailSettings[$email->getId()]['translations']) {
+            // Add in the sent counts for translations of this email
+            /** @var Email $translation */
+            foreach ($emailSettings[$email->getId()]['translations'] as $translation) {
+                if ($translation->isPublished()) {
+                    $emailSettings[$email->getId()]['sentCount'] += $translation->getSentCount();
+                    $emailSettings[$email->getId()]['variantCount'] += $translation->getVariantSentCount();
 
-                        // Prevent empty key due to misconfiguration - pretty much ignored
-                        if (!$language = $translation->getLanguage()) {
-                            $language = 'unknown';
-                        }
-                        $core = $this->getTranslationLocaleCore($language);
-                        if (!isset($emailSettings[$email->getId()]['languages'][$core])) {
-                            $emailSettings[$email->getId()]['languages'][$core] = [];
-                        }
-                        $emailSettings[$email->getId()]['languages'][$core][$language] = $translation->getId();
+                    // Prevent empty key due to misconfiguration - pretty much ignored
+                    if (!$language = $translation->getLanguage()) {
+                        $language = 'unknown';
                     }
+                    $core = $this->getTranslationLocaleCore($language);
+                    if (!isset($emailSettings[$email->getId()]['languages'][$core])) {
+                        $emailSettings[$email->getId()]['languages'][$core] = [];
+                    }
+                    $emailSettings[$email->getId()]['languages'][$core][$language] = $translation->getId();
                 }
             }
+        }
 
-            if ($includeVariants && $email->isVariant()) {
-                // get a list of variants for A/B testing
-                $childrenVariant = $email->getVariantChildren();
+        if ($includeVariants && $email->isVariant()) {
+            // get a list of variants for A/B testing
+            $childrenVariant = $email->getVariantChildren();
 
-                if (count($childrenVariant)) {
-                    $totalSent      = $emailSettings[$email->getId()]['variantCount'];
-                    $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
+            if (count($childrenVariant)) {
+                $totalSent      = $emailSettings[$email->getId()]['variantCount'];
+                $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
 
-                    // Normalize weights: AbTestSettingsService returns weights relative to totalWeight
-                    // (e.g. {319: 5, 320: 5} for totalWeight=10), but sendEmail expects weights summing to 1.0
-                    $totalAbWeight = array_sum(array_column($abTestSettings['variants'], 'weight'));
+                // Normalize weights: AbTestSettingsService returns weights relative to totalWeight
+                // (e.g. {319: 5, 320: 5} for totalWeight=10), but sendEmail expects weights summing to 1.0
+                $totalAbWeight = array_sum(array_column($abTestSettings['variants'], 'weight'));
 
-                    foreach ($childrenVariant as $child) {
-                        if ($child->isPublished()) {
-                            $childWeight = $totalAbWeight > 0
-                                ? $abTestSettings['variants'][$child->getId()]['weight'] / $totalAbWeight
-                                : 0;
+                foreach ($childrenVariant as $child) {
+                    if ($child->isPublished()) {
+                        $childWeight = $totalAbWeight > 0
+                            ? $abTestSettings['variants'][$child->getId()]['weight'] / $totalAbWeight
+                            : 0;
 
-                            $emailSettings[$child->getId()] = [
-                                'template'     => $child->getTemplate(),
-                                'sentCount'    => $child->getSentCount(),
-                                'variantCount' => $child->getVariantSentCount(),
-                                'isVariant'    => null !== $email->getVariantStartDate(),
-                                'weight'       => $childWeight,
-                                'entity'       => $child,
-                                'translations' => $child->getTranslations(true),
-                                'languages'    => ['default' => $child->getId()],
-                            ];
+                        $emailSettings[$child->getId()] = [
+                            'template'     => $child->getTemplate(),
+                            'sentCount'    => $child->getSentCount(),
+                            'variantCount' => $child->getVariantSentCount(),
+                            'isVariant'    => null !== $email->getVariantStartDate(),
+                            'weight'       => $childWeight,
+                            'entity'       => $child,
+                            'translations' => $child->getTranslations(true),
+                            'languages'    => ['default' => $child->getId()],
+                        ];
 
-                            if ($emailSettings[$child->getId()]['translations']) {
-                                // Add in the sent counts for translations of this email
-                                /** @var Email $translation */
-                                foreach ($emailSettings[$child->getId()]['translations'] as $translation) {
-                                    if ($translation->isPublished()) {
-                                        $emailSettings[$child->getId()]['sentCount'] += $translation->getSentCount();
-                                        $emailSettings[$child->getId()]['variantCount'] += $translation->getVariantSentCount();
+                        if ($emailSettings[$child->getId()]['translations']) {
+                            // Add in the sent counts for translations of this email
+                            /** @var Email $translation */
+                            foreach ($emailSettings[$child->getId()]['translations'] as $translation) {
+                                if ($translation->isPublished()) {
+                                    $emailSettings[$child->getId()]['sentCount'] += $translation->getSentCount();
+                                    $emailSettings[$child->getId()]['variantCount'] += $translation->getVariantSentCount();
 
-                                        // Prevent empty key due to misconfiguration - pretty much ignored
-                                        if (!$language = $translation->getLanguage()) {
-                                            $language = 'unknown';
-                                        }
-                                        $core = $this->getTranslationLocaleCore($language);
-                                        if (!isset($emailSettings[$child->getId()]['languages'][$core])) {
-                                            $emailSettings[$child->getId()]['languages'][$core] = [];
-                                        }
-                                        $emailSettings[$child->getId()]['languages'][$core][$language] = $translation->getId();
+                                    // Prevent empty key due to misconfiguration - pretty much ignored
+                                    if (!$language = $translation->getLanguage()) {
+                                        $language = 'unknown';
                                     }
+                                    $core = $this->getTranslationLocaleCore($language);
+                                    if (!isset($emailSettings[$child->getId()]['languages'][$core])) {
+                                        $emailSettings[$child->getId()]['languages'][$core] = [];
+                                    }
+                                    $emailSettings[$child->getId()]['languages'][$core][$language] = $translation->getId();
                                 }
                             }
-
-                            $totalSent += $emailSettings[$child->getId()]['variantCount'];
                         }
+
+                        $totalSent += $emailSettings[$child->getId()]['variantCount'];
                     }
-
-                    // set parent weight (normalized)
-                    $emailSettings[$email->getId()]['weight'] = $totalAbWeight > 0
-                        ? $abTestSettings['variants'][$email->getId()]['weight'] / $totalAbWeight
-                        : 1;
-                } else {
-                    $emailSettings[$email->getId()]['weight'] = 1;
                 }
-            }
 
-            $this->emailSettings[$email->getId()] = $emailSettings;
+                // set parent weight (normalized)
+                $emailSettings[$email->getId()]['weight'] = $totalAbWeight > 0
+                    ? $abTestSettings['variants'][$email->getId()]['weight'] / $totalAbWeight
+                    : 1;
+            } else {
+                $emailSettings[$email->getId()]['weight'] = 1;
+            }
         }
+
+        $this->emailSettings[$email->getId()] = $emailSettings;
 
         if ($includeVariants && $email->isVariant()) {
             // now find what percentage of current leads should receive the variants
@@ -1396,13 +1393,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
         }
 
-        $emailRepo = $this->getRepository();
-
         // get email settings such as templates, weights, etc
         $emailSettings = &$this->getEmailSettings($email);
 
         if (!$ignoreDNC) {
-            $dnc = $emailRepo->getDoNotEmailList($leadIds);
+            $dnc = $this->emailRepository->getDoNotEmailList($leadIds);
 
             foreach ($dnc as $removeMeId => $removeMeEmail) {
                 if ($dncAsError) {
@@ -1415,7 +1410,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         // Process frequency rules for email
         if (!$email->getSendToDnc() && count($sendTo)) {
-            $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
+            $campaignEventId = (is_array($channel) && [] !== $channel && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
 
             $this->messageQueueModel->processFrequencyRules(
@@ -1501,6 +1496,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         foreach ($groupedContactsByEmail as $parentId => $translatedEmails) {
             $useSettings = $emailSettings[$parentId];
             foreach ($translatedEmails as $translatedId => $contacts) {
+                /** @var Email $emailEntity */
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
                 $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments)
@@ -1520,11 +1516,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                         $this->sendModel->setContact($contact, $tokens)
                             ->send();
 
-                        // Update $emailSetting so campaign a/b tests are handled correctly
-                        ++$emailSettings[$parentId]['sentCount'];
+                        // Update the counters on the entity so campaign a/b tests are handled correctly
+                        $emailEntity->increaseSentCount();
 
                         if (!empty($emailSettings[$parentId]['isVariant'])) {
-                            ++$emailSettings[$parentId]['variantCount'];
+                            $emailEntity->increaseVariantSentCount();
                         }
                     } catch (FailedToSendToContactException) {
                         // move along to the next contact
@@ -1556,7 +1552,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $strikes = 3;
             while ($strikes >= 0) {
                 try {
-                    $this->getRepository()->upCountSent($emailId, (int) $count, $isVariant);
+                    $this->emailRepository->upCountSent($emailId, (int) $count, $isVariant);
                     break;
                 } catch (\Exception $exception) {
                     error_log($exception);
@@ -1567,7 +1563,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         unset($emailSettings, $options, $sendTo);
 
-        $success = empty($failedContacts);
+        $success = [] === $failedContacts;
         if (!$success && $returnErrorMessages) {
             return $singleEmail ? $errorMessages[$singleEmail] : $errorMessages;
         }
@@ -1609,13 +1605,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $emailSettings = &$this->getEmailSettings($email, false);
 
         // No one to send to so bail
-        if (empty($users) && empty($to)) {
+        if ([] === $users && [] === $to) {
             return false;
         }
 
         $mailer            = $this->mailHelper->getMailer();
         if (!isset($lead['companies'])) {
-            $lead['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($lead['id']);
+            $lead['companies'] = $this->companyRepository->getCompaniesByLeadId($lead['id']);
         }
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
@@ -2042,13 +2038,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     {
         $chart = new PieChart();
 
-        $deviceStats = $this->getStatDeviceRepository()->getDeviceStats(
+        $deviceStats = $this->statDeviceRepository->getDeviceStats(
             null,
             $dateFrom,
             $dateTo
         );
 
-        if (empty($deviceStats)) {
+        if ([] === $deviceStats) {
             $deviceStats[] = [
                 'count'   => 0,
                 'device'  => $this->translator->trans('mautic.report.report.noresults'),
@@ -2148,42 +2144,33 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param string $type
-     * @param string $filter
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $options
+     * @param string|array<int, string> $filter
+     * @param array<string, mixed>      $options
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
-        switch ($type) {
-            case 'email':
-                $emailRepo = $this->getRepository();
-                $emailRepo->setCurrentUser($this->userHelper->getUser());
-                $emails = $emailRepo->getEmailList(
-                    $filter,
-                    $limit,
-                    $start,
-                    $this->security->isGranted('email:emails:viewother'),
-                    $options['top_level'] ?? false,
-                    $options['email_type'] ?? null,
-                    $options['ignore_ids'] ?? [],
-                    $options['variant_parent'] ?? null
-                );
-
-                foreach ($emails as $email) {
-                    if (empty($options['name_is_key'])) {
-                        $results[$email['language']][$email['id']] = sprintf('%s (%s)', $email['name'], $email['id']);
-                    } else {
-                        $results[$email['language']][$email['name']] = $email['id'];
-                    }
+        if ('email' === $type) {
+            $this->emailRepository->setCurrentUser($this->userHelper->getUser());
+            $emails = $this->emailRepository->getEmailList(
+                $filter,
+                $limit,
+                $start,
+                $this->security->isGranted('email:emails:viewother'),
+                $options['top_level'] ?? false,
+                $options['email_type'] ?? null,
+                $options['ignore_ids'] ?? [],
+                $options['variant_parent'] ?? null
+            );
+            foreach ($emails as $email) {
+                if (empty($options['name_is_key'])) {
+                    $results[$email['language']][$email['id']] = sprintf('%s (%s)', $email['name'], $email['id']);
+                } else {
+                    $results[$email['language']][$email['name']] = $email['id'];
                 }
-
-                // sort by language
-                ksort($results);
-
-                break;
+            }
+            // sort by language
+            ksort($results);
         }
 
         return $results;
@@ -2200,8 +2187,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return $contact;
         }
 
-        $companies = $this->companyModel
-            ->getRepository()
+        $companies = $this->companyRepository
             ->getCompaniesForContacts([$contact['id']]);
 
         $contact['companies'] = $companies[$contact['id']] ?? [];
@@ -2248,7 +2234,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $emailSettings = &$this->getEmailSettings($email, false);
 
         // noone to send to so bail
-        if (empty($users)) {
+        if ([] === $users) {
             return false;
         }
 
@@ -2415,7 +2401,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function invalidatePendingCountCacheForList(int $listId): void
     {
-        foreach ($this->getRepository()->getSegmentEmailIdsByListId($listId) as $emailId) {
+        foreach ($this->emailRepository->getSegmentEmailIdsByListId($listId) as $emailId) {
             $this->invalidatePendingCountCache($emailId);
         }
     }
@@ -2516,7 +2502,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getEmailsToSendWinnerVariant(): array
     {
-        $emails = $this->getRepository()->getPublishedEmailsWithVariant();
+        $emails = $this->emailRepository->getPublishedEmailsWithVariant();
 
         $emailsToSend = [];
 
@@ -2570,7 +2556,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             /** @var iterable<Email> $save */
             $save = $this->variantConverterService->getUpdatedVariants();
 
-            $this->getRepository()->saveEntities($save);
+            $this->emailRepository->saveEntities($save);
         } finally {
             $this->inConversion = false;
         }

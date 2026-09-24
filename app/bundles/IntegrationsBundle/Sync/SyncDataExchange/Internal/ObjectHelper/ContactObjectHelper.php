@@ -271,7 +271,7 @@ class ContactObjectHelper implements ObjectHelperInterface
 
     public function findOwnerIds(array $objectIds): array
     {
-        if (empty($objectIds)) {
+        if ([] === $objectIds) {
             return [];
         }
 

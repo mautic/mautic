@@ -311,18 +311,12 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank(
-            ['message' => 'mautic.lead.field.label.notblank']
+            message: 'mautic.lead.field.label.notblank'
         ));
 
-        $metadata->addPropertyConstraint('label', new Assert\Length([
-            'max'        => 191,
-            'maxMessage' => 'mautic.lead.field.label.maxlength',
-        ]));
+        $metadata->addPropertyConstraint('label', new Assert\Length(max: 191, maxMessage: 'mautic.lead.field.label.maxlength'));
 
-        $metadata->addConstraint(new UniqueEntity([
-            'fields'  => ['alias'],
-            'message' => 'mautic.lead.field.alias.unique',
-        ]));
+        $metadata->addConstraint(new UniqueEntity(fields: ['alias'], message: 'mautic.lead.field.alias.unique'));
 
         $metadata->addConstraint(new Assert\Callback(
             function (LeadField $field, ExecutionContextInterface $context): void {
@@ -431,7 +425,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function getName()
     {
-        return $this->getLabel();
+        return $this->label;
     }
 
     /**
@@ -499,7 +493,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function isRequired()
     {
-        return $this->getIsRequired();
+        return $this->isRequired;
     }
 
     /**
@@ -527,7 +521,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function isFixed()
     {
-        return $this->getIsFixed();
+        return $this->isFixed;
     }
 
     /**
@@ -635,7 +629,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function isVisible()
     {
-        return $this->getIsVisible();
+        return $this->isVisible;
     }
 
     public function setIsShortVisible(?bool $isShortVisible): self
@@ -662,7 +656,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function isShortVisible()
     {
-        return $this->getIsShortVisible();
+        return $this->isShortVisible;
     }
 
     /**
@@ -698,7 +692,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function getIsUniqueIdentifier()
     {
-        return $this->getIsUniqueIdentifer();
+        return $this->isUniqueIdentifer;
     }
 
     /**
@@ -756,7 +750,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      */
     public function isListable()
     {
-        return $this->getIsListable();
+        return $this->isListable;
     }
 
     /**
@@ -801,7 +795,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function isNew(): bool
     {
-        return !(bool) $this->getId();
+        return !(bool) $this->id;
     }
 
     public function getColumnIsNotCreated(): bool
@@ -835,12 +829,12 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function disablePublishChange(): bool
     {
-        return 'email' === $this->getAlias() || $this->getColumnIsNotCreated() || $this->getColumnIsNotRemoved();
+        return 'email' === $this->alias || $this->columnIsNotCreated || $this->columnIsNotRemoved;
     }
 
     public function getOriginalIsPublishedValue(): bool
     {
-        return (bool) $this->originalIsPublishedValue;
+        return $this->originalIsPublishedValue;
     }
 
     public function getCacheNamespacesToDelete(): array

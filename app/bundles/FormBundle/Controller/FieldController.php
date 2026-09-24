@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
-class FieldController extends CommonFormController
+final class FieldController extends CommonFormController
 {
     public function __construct(
         private readonly FormModel $formModel,
@@ -383,7 +383,7 @@ class FieldController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
+        $formField = $fields[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $formField) {
             if ($formField['mappedObject'] && $formField['mappedField']) {

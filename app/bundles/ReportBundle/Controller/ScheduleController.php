@@ -22,9 +22,11 @@ final class ScheduleController extends CommonAjaxController
     private ScheduleModel $scheduleModel;
 
     #[Required]
-    public function autowireScheduleController(ReportModel $reportModel, ScheduleModel $scheduleModel): void
-    {
-        $this->reportModel   = $reportModel;
+    public function autowireScheduleController(
+        ReportModel $reportModel,
+        ScheduleModel $scheduleModel
+    ): void {
+        $this->reportModel = $reportModel;
         $this->scheduleModel = $scheduleModel;
     }
 
@@ -56,7 +58,6 @@ final class ScheduleController extends CommonAjaxController
         /** @var Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
-        /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
         $security = $this->security;
 
         if (!$report instanceof Report) {

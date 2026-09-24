@@ -6,8 +6,10 @@ namespace Mautic\CampaignBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -52,8 +54,8 @@ final class EventModelTest extends TestCase
 
         $this->eventModel->autowireEventModel(
             $this->eventRepositoryMock,
-            $this->createStub(\Mautic\CampaignBundle\Entity\CampaignRepository::class),
-            $this->createStub(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)
+            $this->createStub(CampaignRepository::class),
+            $this->createStub(LeadEventLogRepository::class)
         );
     }
 
@@ -158,9 +160,11 @@ final class EventModelTest extends TestCase
             ->onlyMethods(['getRepository', 'deleteEventsByEventIds'])
             ->getMock();
 
-        $mockModel->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->eventRepositoryMock);
+        $mockModel->autowireEventModel(
+            $this->eventRepositoryMock,
+            $this->createStub(CampaignRepository::class),
+            $this->createStub(LeadEventLogRepository::class),
+        );
 
         $campaignEvents = ['1', '2', '3'];
 

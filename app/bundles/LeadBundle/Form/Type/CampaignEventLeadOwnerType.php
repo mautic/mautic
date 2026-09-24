@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\UserBundle\Form\Type\UserListType;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadOwnerType extends AbstractType
+final class CampaignEventLeadOwnerType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

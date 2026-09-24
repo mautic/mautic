@@ -9,13 +9,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     private CategoryModel $categoryModel;
 
     #[Required]
-    public function autowireCategoryAjaxController(CategoryModel $categoryModel): void
-    {
+    public function autowireCategoryAjaxController(
+        CategoryModel $categoryModel,
+    ): void {
         $this->categoryModel = $categoryModel;
     }
 

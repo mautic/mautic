@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'parameters' => [
         'messenger_dsn_email'                  => 'sync://', // sync means no queue

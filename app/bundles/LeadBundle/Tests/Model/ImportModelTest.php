@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
@@ -79,15 +80,6 @@ final class ImportModelTest extends StandardImportTestHelper
 
     public function testCheckParallelImportLimitWhenMore(): void
     {
-        $model  = $this->getMockBuilder(ImportModel::class)
-            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $model->expects($this->once())
-            ->method('getParallelImportLimit')
-            ->willReturn(4);
-
         $repository = $this->getMockBuilder(ImportRepository::class)
             ->onlyMethods(['countImportsWithStatuses'])
             ->disableOriginalConstructor()
@@ -97,10 +89,16 @@ final class ImportModelTest extends StandardImportTestHelper
             ->method('countImportsWithStatuses')
             ->willReturn(5);
 
-        $model->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
+        $model  = $this->getMockBuilder(ImportModel::class)
+            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
+        $model->expects($this->once())
+            ->method('getParallelImportLimit')
+            ->willReturn(4);
+
+        ReflectionHelper::setValue($model, 'importRepository', $repository);
         $result = $model->checkParallelImportLimit();
 
         $this->assertFalse($result);
@@ -109,7 +107,7 @@ final class ImportModelTest extends StandardImportTestHelper
     public function testCheckParallelImportLimitWhenEqual(): void
     {
         $model  = $this->getMockBuilder(ImportModel::class)
-            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
+            ->onlyMethods(['getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -126,9 +124,7 @@ final class ImportModelTest extends StandardImportTestHelper
             ->method('countImportsWithStatuses')
             ->willReturn(4);
 
-        $model->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
+        ReflectionHelper::setValue($model, 'importRepository', $repository);
 
         $result = $model->checkParallelImportLimit();
 
@@ -138,7 +134,7 @@ final class ImportModelTest extends StandardImportTestHelper
     public function testCheckParallelImportLimitWhenLess(): void
     {
         $model  = $this->getMockBuilder(ImportModel::class)
-            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
+            ->onlyMethods(['getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -155,9 +151,7 @@ final class ImportModelTest extends StandardImportTestHelper
             ->method('countImportsWithStatuses')
             ->willReturn(5);
 
-        $model->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
+        ReflectionHelper::setValue($model, 'importRepository', $repository);
 
         $result = $model->checkParallelImportLimit();
 

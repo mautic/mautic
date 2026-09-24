@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PointBundle\Entity\Point;
 
-class PointEvent extends CommonEvent
+final class PointEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

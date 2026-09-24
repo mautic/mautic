@@ -2,41 +2,32 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
+use Mautic\CategoryBundle\Helper\CategorySearchScopeProvider;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class CategoryController extends AbstractFormController
+final class CategoryController extends AbstractFormController
 {
-    public function __construct(
-        private readonly FormFactoryInterface $formFactory,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly CategoryModel $categoryModel,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private FormFactoryInterface $formFactory;
+
+    private CategoryModel $categoryModel;
+
+    #[Required]
+    public function autowireCategoryController(
+        FormFactoryInterface $formFactory,
+        CategoryModel $categoryModel,
+    ): void {
+        $this->formFactory   = $formFactory;
+        $this->categoryModel = $categoryModel;
     }
 
     /**
@@ -47,7 +38,7 @@ class CategoryController extends AbstractFormController
     {
         if (method_exists($this, $objectAction.'Action')) {
             return $this->forward(
-                static::class.'::'.$objectAction.'Action',
+                self::class.'::'.$objectAction.'Action',
                 [
                     'bundle'      => $bundle,
                     'objectId'    => $objectId,
@@ -64,7 +55,7 @@ class CategoryController extends AbstractFormController
      * @param string $bundle
      * @param int    $page
      */
-    public function indexAction(Request $request, $bundle, $page = 1): Response
+    public function indexAction(Request $request, CategorySearchScopeProvider $categorySearchScopeProvider, $bundle, $page = 1): Response
     {
         $session = $request->getSession();
 
@@ -180,10 +171,11 @@ class CategoryController extends AbstractFormController
             [
                 'returnUrl'      => $this->generateUrl('mautic_category_index', $viewParams),
                 'viewParameters' => [
-                    'bundle'         => $bundle,
-                    'permissionBase' => $permissionBase,
-                    'searchValue'    => $search,
-                    'items'          => $entities,
+                    'bundle'          => $bundle,
+                    'permissionBase'  => $permissionBase,
+                    'searchValue'     => $search,
+                    'searchScopes'    => $categorySearchScopeProvider->getScopes(),
+                    'items'           => $entities,
                     'page'           => $page,
                     'limit'          => $limit,
                     'permissions'    => $permissions,
@@ -297,7 +289,7 @@ class CategoryController extends AbstractFormController
     /**
      * Generates edit form and processes post data.
      */
-    public function editAction(Request $request, $bundle, $objectId, $ignorePost = false): JsonResponse|Response
+    public function editAction(Request $request, ?string $bundle, $objectId, $ignorePost = false): JsonResponse|Response
     {
         $session = $request->getSession();
         $entity    = $this->categoryModel->getEntity($objectId);
@@ -434,10 +426,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Deletes the entity.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $bundle, $objectId)
+    public function deleteAction(Request $request, ?string $bundle, $objectId): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);
@@ -503,10 +493,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @param string $bundle
      */
-    public function batchDeleteAction(Request $request, $bundle): Response
+    public function batchDeleteAction(Request $request, ?string $bundle): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);
@@ -557,7 +545,7 @@ class CategoryController extends AbstractFormController
                 }
             }
 
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => 'mautic.category.notice.batch_deleted',
