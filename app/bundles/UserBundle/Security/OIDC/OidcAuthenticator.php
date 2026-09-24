@@ -38,8 +38,8 @@ final class OidcAuthenticator extends AbstractAuthenticator implements Authentic
         // The callback will have code and state parameters from the OIDC provider
         return $this->parameters->isEnabled()
             && 'mautic_oidc_check' === $request->attributes->get('_route')
-            && null !== $request->get('code')
-            && null !== $request->get('state');
+            && null !== $request->query->get('code')
+            && null !== $request->query->get('state');
     }
 
     public function authenticate(Request $request): SelfValidatingPassport
