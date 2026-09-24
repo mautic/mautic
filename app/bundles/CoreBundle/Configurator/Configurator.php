@@ -74,13 +74,11 @@ final class Configurator
     /**
      * Retrieves the specified step.
      *
-     * @param int $index
-     *
      * @return StepInterface[]
      *
      * @throws \InvalidArgumentException
      */
-    public function getStep($index)
+    public function getStep(int $index)
     {
         if (isset($this->steps[$index])) {
             return $this->steps[$index];

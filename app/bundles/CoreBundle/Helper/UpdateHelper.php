@@ -42,11 +42,9 @@ final class UpdateHelper
     /**
      * Fetches a download package from the remote server.
      *
-     * @param string $package
-     *
      * @return array{error: bool, message?: string}
      */
-    public function fetchPackage($package): array
+    public function fetchPackage(string $package): array
     {
         // GET the update data
         try {

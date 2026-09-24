@@ -1936,8 +1936,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get pie chart data of ignored vs opened emails.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      */
     public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {

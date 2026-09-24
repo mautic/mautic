@@ -50,10 +50,8 @@ final class ConfigBuilderEvent extends Event
 
     /**
      * Remove a form to the forms array.
-     *
-     * @param string $formAlias
      */
-    public function removeForm($formAlias): bool
+    public function removeForm(string $formAlias): bool
     {
         if (isset($this->forms[$formAlias])) {
             unset($this->forms[$formAlias]);
@@ -102,7 +100,7 @@ final class ConfigBuilderEvent extends Event
         return [];
     }
 
-    public function addFileFields($fields): static
+    public function addFileFields(array $fields): static
     {
         $this->encodedFields = array_merge($this->encodedFields, (array) $fields);
 

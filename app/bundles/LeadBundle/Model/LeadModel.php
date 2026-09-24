@@ -1905,8 +1905,8 @@ class LeadModel extends FormModel
     /**
      * Get pie chart data of dwell times.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      * @param array  $filters
      */
     public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
@@ -1988,8 +1988,8 @@ class LeadModel extends FormModel
     /**
      * Get a list of top (by leads owned) users.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      * @param array  $filters
      */
     public function getTopOwners(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
@@ -2013,8 +2013,8 @@ class LeadModel extends FormModel
     /**
      * Get a list of top (by leads owned) users.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      * @param array  $filters
      */
     public function getTopCreators(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array

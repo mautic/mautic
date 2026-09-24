@@ -40,7 +40,7 @@ final class IndexSchemaHelper
     /**
      * @throws SchemaException
      */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         if (!$this->sm->tablesExist([$this->prefix.$name])) {
             throw new SchemaException("Table {$name} does not exist!");
@@ -51,7 +51,7 @@ final class IndexSchemaHelper
         return $this;
     }
 
-    public function allowColumn($name): void
+    public function allowColumn(string $name): void
     {
         $this->allowedColumns[] = $name;
     }
