@@ -133,7 +133,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
         $integrationName   = 'Integration A';
         $reportDAO         = new ReportDAO($integrationName);
-        $mappingManualDAO  = new MappingManualDAO($integrationName);
+        $mappingManualDAO  = new MappingManualDAO($integrationName, []);
         $objectMappingDAO  = new ObjectMappingDAO(Contact::NAME, 'Lead');
         $internalObject    = new ReportObjectDAO(Contact::NAME, 123);
         $integrationObject = new ReportObjectDAO('Lead', 'integration-id-1');
@@ -163,13 +163,11 @@ final class ObjectChangeGeneratorTest extends TestCase
 
     private function getMappingManual(string $integration, string $objectName): MappingManualDAO
     {
-        $mappingManual = new MappingManualDAO($integration);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
-        $mappingManual->addObjectMapping($objectMapping);
 
-        return $mappingManual;
+        return new MappingManualDAO($integration, [$objectMapping]);
     }
 
     private function getInternalSyncReport(bool $includeFirstNameField = true): ReportDAO
