@@ -626,10 +626,7 @@ class Hit
         return $this->query;
     }
 
-    /**
-     * @param array $query
-     */
-    public function setQuery($query): static
+    public function setQuery(array $query): static
     {
         $this->query = $query;
 

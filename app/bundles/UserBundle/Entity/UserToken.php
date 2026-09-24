@@ -76,10 +76,7 @@ class UserToken
         return $this->user;
     }
 
-    /**
-     * @param User $user
-     */
-    public function setUser($user): static
+    public function setUser(User $user): static
     {
         $this->user = $user;
 
@@ -94,10 +91,7 @@ class UserToken
         return $this->authorizator;
     }
 
-    /**
-     * @param string $authorizator
-     */
-    public function setAuthorizator($authorizator): static
+    public function setAuthorizator(string $authorizator): static
     {
         $this->authorizator = $authorizator;
 
@@ -132,10 +126,7 @@ class UserToken
         return $this->expiration;
     }
 
-    /**
-     * @param \DateTime|null $expiration
-     */
-    public function setExpiration($expiration = null): static
+    public function setExpiration(?\DateTime $expiration = null): static
     {
         $this->expiration = $expiration;
 
@@ -150,10 +141,7 @@ class UserToken
         return $this->oneTimeOnly;
     }
 
-    /**
-     * @param bool $oneTimeOnly
-     */
-    public function setOneTimeOnly($oneTimeOnly = true): static
+    public function setOneTimeOnly(bool $oneTimeOnly = true): static
     {
         $this->oneTimeOnly = $oneTimeOnly;
 

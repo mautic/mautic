@@ -132,7 +132,7 @@ class NotificationModel extends FormModel
      * @param int  $id    Notification to clear; will clear all if empty
      * @param ?int $limit Maximum number of notifications to clear if $id is empty
      */
-    public function clearNotification($id, $limit = null): void
+    public function clearNotification(int $id, ?int $limit = null): void
     {
         $this->notificationRepository->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id, $limit);
     }

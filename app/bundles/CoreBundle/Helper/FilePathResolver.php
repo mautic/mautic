@@ -58,10 +58,7 @@ final readonly class FilePathResolver
         }
     }
 
-    /**
-     * @param string $path
-     */
-    public function delete($path): void
+    public function delete(string $path): void
     {
         if (!$this->filesystem->exists($path)) {
             return;

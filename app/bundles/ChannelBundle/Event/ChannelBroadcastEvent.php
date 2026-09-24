@@ -96,10 +96,7 @@ final class ChannelBroadcastEvent extends Event
         return $this->output;
     }
 
-    /**
-     * @param int $minContactIdFilter
-     */
-    public function setMinContactIdFilter($minContactIdFilter): void
+    public function setMinContactIdFilter(int $minContactIdFilter): void
     {
         $this->minContactIdFilter = $minContactIdFilter;
     }
@@ -112,10 +109,7 @@ final class ChannelBroadcastEvent extends Event
         return $this->minContactIdFilter;
     }
 
-    /**
-     * @param int $maxContactIdFilter
-     */
-    public function setMaxContactIdFilter($maxContactIdFilter): void
+    public function setMaxContactIdFilter(int $maxContactIdFilter): void
     {
         $this->maxContactIdFilter = $maxContactIdFilter;
     }

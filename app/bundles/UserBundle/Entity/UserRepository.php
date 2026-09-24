@@ -25,7 +25,7 @@ final class UserRepository extends CommonRepository
         return (!empty($result)) ? $result[0] : null;
     }
 
-    public function setLastLogin($user): void
+    public function setLastLogin(User $user): void
     {
         $now      = new DateTimeHelper();
         $datetime = $now->toUtcString();

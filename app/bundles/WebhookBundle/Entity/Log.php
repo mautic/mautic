@@ -133,10 +133,7 @@ class Log
         return $this->runtime;
     }
 
-    /**
-     * @param float $runtime
-     */
-    public function setRuntime($runtime): static
+    public function setRuntime(float $runtime): static
     {
         $this->runtime = round($runtime, 2);
 

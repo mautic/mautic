@@ -110,7 +110,7 @@ class DownloadRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getHttpStatuses($query): array
+    public function getHttpStatuses(\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $query): array
     {
         $query->select('ad.code as status, count(ad.code) as count')
             ->groupBy('ad.code')

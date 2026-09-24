@@ -161,7 +161,7 @@ class ImportModel extends FormModel
      * @throws ImportFailedException
      * @throws ImportDelayedException
      */
-    public function beginImport(Import $import, Progress $progress, $limit = 0, ?float $start = null): void
+    public function beginImport(Import $import, Progress $progress, int $limit = 0, ?float $start = null): void
     {
         $start ??= microtime(true);
 
@@ -531,11 +531,8 @@ class ImportModel extends FormModel
 
     /**
      * Returns a list of failed rows for the import.
-     *
-     * @param int    $importId
-     * @param string $object
      */
-    public function getFailedRows($importId = null, $object = 'lead'): ?array
+    public function getFailedRows(?int $importId = null, string $object = 'lead'): ?array
     {
         if (!$importId) {
             return null;

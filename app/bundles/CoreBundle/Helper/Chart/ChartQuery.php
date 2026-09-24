@@ -80,10 +80,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * Apply where filters to the query.
-     *
-     * @param array $filters
      */
-    public function applyFilters(TrackingQueryBuilder $query, $filters): void
+    public function applyFilters(TrackingQueryBuilder $query, array $filters): void
     {
         if ($filters && is_array($filters)) {
             foreach ($filters as $column => $value) {
@@ -181,7 +179,7 @@ class ChartQuery extends AbstractChart
      *
      * @return string
      */
-    public function translateTimeUnit($unit = null)
+    public function translateTimeUnit(?string $unit = null)
     {
         $unit ??= $this->unit;
 
@@ -521,7 +519,7 @@ class ChartQuery extends AbstractChart
      *
      * @param QueryBuilder $query
      */
-    public function fetchCountDateDiff($query): int
+    public function fetchCountDateDiff(TrackingQueryBuilder $query): int
     {
         $data = $query->executeQuery()->fetchAssociative();
 

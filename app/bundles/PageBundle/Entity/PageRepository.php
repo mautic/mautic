@@ -236,10 +236,7 @@ final class PageRepository extends CommonRepository
             ->executeStatement();
     }
 
-    /**
-     * @param int $increaseBy
-     */
-    public function upHitCount($id, $increaseBy = 1, bool $unique = false, bool $variant = false): void
+    public function upHitCount(int $id, int $increaseBy = 1, bool $unique = false, bool $variant = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

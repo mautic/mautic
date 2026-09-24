@@ -66,7 +66,7 @@ final class FacebookIntegration extends SocialIntegration
         return $values;
     }
 
-    public function getApiUrl($endpoint): string
+    public function getApiUrl(string $endpoint): string
     {
         return "https://graph.facebook.com/{$endpoint}";
     }

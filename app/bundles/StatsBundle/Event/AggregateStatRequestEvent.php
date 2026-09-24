@@ -65,10 +65,7 @@ final class AggregateStatRequestEvent extends Event
         return in_array($this->statName, $contexts, true);
     }
 
-    /**
-     * @param string $prefix
-     */
-    public function checkContextPrefix($prefix): bool
+    public function checkContextPrefix(string $prefix): bool
     {
         return str_starts_with($this->statName, $prefix);
     }

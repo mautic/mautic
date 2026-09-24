@@ -130,10 +130,7 @@ class Trackable
         return $this->hits;
     }
 
-    /**
-     * @param int $hits
-     */
-    public function setHits($hits): static
+    public function setHits(int $hits): static
     {
         $this->hits = $hits;
 
@@ -148,10 +145,7 @@ class Trackable
         return $this->uniqueHits;
     }
 
-    /**
-     * @param int $uniqueHits
-     */
-    public function setUniqueHits($uniqueHits): static
+    public function setUniqueHits(int $uniqueHits): static
     {
         $this->uniqueHits = $uniqueHits;
 

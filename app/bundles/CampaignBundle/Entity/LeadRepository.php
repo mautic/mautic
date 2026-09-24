@@ -84,7 +84,7 @@ class LeadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -250,7 +250,7 @@ class LeadRepository extends CommonRepository
     /**
      * This is approximate because the query that fetches contacts per decision is based on if the grandparent has been executed or not.
      */
-    public function getInactiveContactCount($campaignId, array $decisionIds, ContactLimiter $limiter): int
+    public function getInactiveContactCount(int $campaignId, array $decisionIds, ContactLimiter $limiter): int
     {
         // We have to loop over each decision to get a count or else any contact that has executed any single one of the decision IDs
         // will not be included potentially resulting in not having the inactive path analyzed

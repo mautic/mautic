@@ -86,7 +86,7 @@ final class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function getLeadFields($object = null)
+    public function getLeadFields(?string $object = null)
     {
         if ('company' == $object) {
             $object = 'Account'; // salesforce object name

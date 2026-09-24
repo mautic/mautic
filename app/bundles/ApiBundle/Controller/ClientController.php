@@ -281,11 +281,8 @@ final class ClientController extends AbstractStandardFormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @param int  $objectId
-     * @param bool $ignorePost
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false): Response
+    public function editAction(Request $request, int $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted('api:clients:editother')) {
             $this->throwAccessDenied();

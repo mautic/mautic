@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -163,7 +164,7 @@ final class LeadFieldRepository extends CommonRepository
      *
      * @param string $object name of object using the custom fields
      */
-    public function getFieldAliases($object = 'lead'): array
+    public function getFieldAliases(string $object = 'lead'): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -201,10 +202,9 @@ final class LeadFieldRepository extends CommonRepository
     /**
      * Return property by field alias and join tables.
      *
-     * @param string                                                       $field
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
-    public function getPropertyByField($field, $q): string
+    public function getPropertyByField(string $field, QueryBuilder $q): string
     {
         $columnAlias = 'l.';
         // Join company tables If we're trying search by company fields
@@ -461,7 +461,7 @@ final class LeadFieldRepository extends CommonRepository
     /**
      * @return LeadField[]
      */
-    public function getFieldsByType($type): array
+    public function getFieldsByType(string $type): array
     {
         return $this->findBy(['type' => $type]);
     }

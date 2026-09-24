@@ -225,10 +225,7 @@ class Trigger extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -316,10 +313,7 @@ class Trigger extends FormEntity implements UuidInterface
         return $this->points;
     }
 
-    /**
-     * @param mixed $points
-     */
-    public function setPoints($points): void
+    public function setPoints(int $points): void
     {
         $this->isChanged('points', $points);
         $this->points = $points;
@@ -349,10 +343,7 @@ class Trigger extends FormEntity implements UuidInterface
         return $this->triggerExistingLeads;
     }
 
-    /**
-     * @param mixed $triggerExistingLeads
-     */
-    public function setTriggerExistingLeads($triggerExistingLeads): void
+    public function setTriggerExistingLeads(bool $triggerExistingLeads): void
     {
         $this->triggerExistingLeads = $triggerExistingLeads;
     }

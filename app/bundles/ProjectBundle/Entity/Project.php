@@ -119,7 +119,7 @@ class Project extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setDescription(?string $description): void
+    public function setDescription(string $description): void
     {
         $this->isChanged('description', $description);
 

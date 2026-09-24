@@ -104,7 +104,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Amend mapped lead data before pushing to CRM.
      */
-    public function amendLeadDataBeforePush(&$mappedData): void
+    public function amendLeadDataBeforePush(array &$mappedData): void
     {
     }
 

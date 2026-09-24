@@ -585,7 +585,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
     /**
      * Amend mapped lead data before pushing to CRM.
      */
-    public function amendLeadDataBeforePush(&$mappedData): void
+    public function amendLeadDataBeforePush(array &$mappedData): void
     {
         foreach ($mappedData as &$data) {
             $data = str_replace('|', ';', $data);
