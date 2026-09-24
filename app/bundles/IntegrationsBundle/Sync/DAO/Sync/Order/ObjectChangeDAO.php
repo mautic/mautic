@@ -16,8 +16,6 @@ final class ObjectChangeDAO
 
     private ?ObjectMapping $objectMapping = null;
 
-    private \DateTimeInterface $changeDateTime;
-
     /**
      * @var array<string, FieldDAO[]>
      */
@@ -39,9 +37,8 @@ final class ObjectChangeDAO
         private $objectId,
         private readonly string $mappedObject,
         private $mappedId,
-        ?\DateTimeInterface $changeDateTime = null,
+        private ?\DateTimeInterface $changeDateTime = null,
     ) {
-        $this->changeDateTime = $changeDateTime ?? new \DateTime();
     }
 
     public function getIntegration(): string
@@ -157,7 +154,7 @@ final class ObjectChangeDAO
         return !empty(count($this->fields));
     }
 
-    public function getChangeDateTime(): \DateTimeInterface
+    public function getChangeDateTime(): ?\DateTimeInterface
     {
         return $this->changeDateTime;
     }
