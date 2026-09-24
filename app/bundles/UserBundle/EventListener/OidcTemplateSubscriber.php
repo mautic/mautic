@@ -25,24 +25,8 @@ final readonly class OidcTemplateSubscriber implements EventSubscriberInterface
 
     public function onTemplateRender(CustomTemplateEvent $event): void
     {
-        $template = $event->getTemplate();
-
         // Inject OIDC settings into login template
-        if ('@MauticUser/Security/login.html.twig' === $template) {
-            $vars = $event->getVars();
-            $vars['oidcSettings'] = $this->settings;
-            $event->setVars($vars);
-        }
-
-        // Inject OIDC settings into user form template
-        if ('@MauticUser/User/form.html.twig' === $template) {
-            $vars = $event->getVars();
-            $vars['oidcSettings'] = $this->settings;
-            $event->setVars($vars);
-        }
-
-        // Inject OIDC settings into config widget template
-        if ('@MauticUser/FormTheme/Config/_config_userconfig_widget.html.twig' === $template) {
+        if (in_array($event->getTemplate(), ['@MauticUser/Security/login.html.twig', '@MauticUser/User/form.html.twig', '@MauticUser/FormTheme/Config/_config_userconfig_widget.html.twig'], true)) {
             $vars = $event->getVars();
             $vars['oidcSettings'] = $this->settings;
             $event->setVars($vars);
