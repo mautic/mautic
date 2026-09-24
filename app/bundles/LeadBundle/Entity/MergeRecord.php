@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: MergeRecordRepository::class)]
 #[ORM\Table(name: 'contact_merge_records')]
@@ -32,26 +31,20 @@ class MergeRecord
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'merged_id', type: 'integer')]
     private $mergedId;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addDateAdded()
-            ->addNamedField('mergedId', 'integer', 'merged_id')
-            ->addField('name', 'string');
-    }
 
     /**
      * @return int

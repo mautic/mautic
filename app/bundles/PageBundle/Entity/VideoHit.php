@@ -6,7 +6,6 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -23,6 +22,9 @@ class VideoHit
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -55,15 +57,14 @@ class VideoHit
     #[ORM\Column(type: 'integer', nullable: true)]
     private $duration;
 
-    /**
-     * @var Redirect
-     */
-    private $redirect;
+    private ?Redirect $redirect = null;
 
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private ?Lead $lead = null;
 
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 
     /**
@@ -147,18 +148,8 @@ class VideoHit
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $query = [];
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addIpAddress(true);
-
-        $builder->addNullableField('query', 'array');
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -514,10 +505,7 @@ class VideoHit
         return $this;
     }
 
-    /**
-     * @return Redirect
-     */
-    public function getRedirect()
+    public function getRedirect(): ?Redirect
     {
         return $this->redirect;
     }

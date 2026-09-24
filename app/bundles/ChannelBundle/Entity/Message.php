@@ -57,6 +57,9 @@ class Message extends FormEntity implements UuidInterface
      * @var ?int
      */
     #[Groups(['message:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -64,21 +67,27 @@ class Message extends FormEntity implements UuidInterface
      */
     #[Groups(['message:read', 'message:write', 'channel:read'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var ?string
      */
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $publishUp = null;
 
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $publishDown = null;
 
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     /**
@@ -96,11 +105,6 @@ class Message extends FormEntity implements UuidInterface
     public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIdColumns()
-            ->addPublishDates()
-            ->addCategory();
 
         self::addProjectsField($builder, 'message_projects_xref', 'message_id');
     }
