@@ -7,7 +7,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
@@ -44,12 +43,16 @@ class Download
      * @var int|string
      */
     #[Groups(['download:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'date_download', type: 'datetime')]
     private $dateDownload;
 
     /**
@@ -64,6 +67,8 @@ class Download
      * @var IpAddress|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private $ipAddress;
 
     #[ORM\ManyToOne(targetEntity: Lead::class)]
@@ -75,30 +80,35 @@ class Download
      * @var int
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'integer')]
     private $code;
 
     /**
      * @var string|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $referer;
 
     /**
      * @var string
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191)]
     private $trackingId;
 
     /**
      * @var string|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     #[Groups(['download:read', 'download:write'])]
@@ -106,72 +116,20 @@ class Download
     #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private ?Email $email = null;
 
+    #[ORM\Column(name: 'utm_campaign', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmCampaign = null;
 
+    #[ORM\Column(name: 'utm_content', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmContent = null;
 
+    #[ORM\Column(name: 'utm_medium', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmMedium = null;
 
+    #[ORM\Column(name: 'utm_source', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmSource = null;
 
+    #[ORM\Column(name: 'utm_term', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmTerm = null;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->createField('dateDownload', 'datetime')
-            ->columnName('date_download')
-            ->build();
-
-        $builder->addIpAddress(true);
-
-        $builder->addField('code', 'integer');
-
-        $builder->createField('referer', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmCampaign', Types::STRING)
-            ->columnName('utm_campaign')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmContent', Types::STRING)
-            ->columnName('utm_content')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmMedium', Types::STRING)
-            ->columnName('utm_medium')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmSource', Types::STRING)
-            ->columnName('utm_source')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTerm', Types::STRING)
-            ->columnName('utm_term')
-            ->nullable()
-            ->build();
-    }
 
     public function getId(): int
     {
