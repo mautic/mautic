@@ -155,9 +155,17 @@ final class SecurityController extends CommonController implements EventSubscrib
         ClientFactoryInterface $clientFactory,
         ClientCredentials $clientCredentials,
         LoggerInterface $logger,
+        SessionInterface $session,
     ): RedirectResponse {
         if (!$oidcSettings->isEnabled()) {
             return $this->redirectToRoute('login');
+        }
+
+        // Clear any previous OIDC session state to ensure a clean authentication flow
+        // This is important when user is already authenticated with non-OIDC method
+        $oidcSessionKeys = ['openid_connect_state', 'openid_connect_nonce', 'openid_connect_code_verifier'];
+        foreach ($oidcSessionKeys as $key) {
+            $session->remove($key);
         }
 
         try {
@@ -167,7 +175,7 @@ final class SecurityController extends CommonController implements EventSubscrib
                 return $authenticatedRedirect;
             }
         } catch (\Mautic\UserBundle\Exception\OidcAuthorizationException $e) {
-            $logger->error($e->getMessage(), ['exception' => $e]);
+            $logger->error('OpenID Connect: Login action failed', ['exception' => $e, 'message' => $e->getMessage()]);
         }
 
         throw new Exception\AuthenticationException('OpenID Connect authentication failed.');
@@ -196,12 +204,11 @@ final class SecurityController extends CommonController implements EventSubscrib
             return $this->redirectToRoute('login');
         }
 
-        if ($repository->findOneBy(['user' => $user])) {
-            return $this->redirectToRoute('mautic_oidc_login');
-        }
-
+        // Show the OIDC required page - it will prompt them to click OIDC login button
+        // Whether they already have OIDC linked or not, they need to authenticate via OIDC
         return $this->render('@MauticUser/Security/oidc_required.html.twig', [
             'parameters' => $oidcSettings,
+            'hasOidcLinked' => (bool) $repository->findOneBy(['user' => $user]),
         ]);
     }
 

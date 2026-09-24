@@ -24,14 +24,18 @@ final readonly class UserCredentialsFactory implements UserCredentialsFactoryInt
     public function create(): UserCredentials
     {
         // Create client on-demand to avoid HTTP requests during container compilation
-        $client = $this->clientFactory->create($this->clientCredentials);
-        $claims = ['email', 'preferred_username', 'given_name', 'family_name', $client->getMappingField()];
+        $client   = $this->clientFactory->create($this->clientCredentials);
+        $claims   = ['email', 'preferred_username', 'given_name', 'family_name', $client->getMappingField()];
+        $userInfo = [];
 
         try {
             $userInfo = $client->requestUserInfo($claims);
-            $tokens   = $client->getVerifiedClaims($claims);
         } catch (OidcAuthorizationException $e) {
-            $this->logger->error($e->getMessage(), ['exception' => $e]);
+        }
+
+        try {
+            $tokens = $client->getVerifiedClaims($claims);
+        } catch (OidcAuthorizationException $e) {
             throw new OidcException('mautic.open_id.login.exception.user_info', $e->getCode(), $e);
         }
 
