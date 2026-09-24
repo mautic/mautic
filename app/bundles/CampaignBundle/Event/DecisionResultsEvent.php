@@ -28,7 +28,7 @@ final class DecisionResultsEvent extends Event
     }
 
     /**
-     * @return ArrayCollection<int, LeadEventLog>
+     * @return Collection<int, LeadEventLog>
      */
     public function getLogs(): ArrayCollection
     {

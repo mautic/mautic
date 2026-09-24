@@ -427,7 +427,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     }
 
     /**
-     * @return ArrayCollection<int, Stat>
+     * @return Collection<int, Stat>
      */
     public function getStats(): Collection
     {

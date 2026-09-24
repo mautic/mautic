@@ -274,7 +274,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int, User>
+     * @return Collection<int, User>
      */
     public function getUsers(): Collection
     {

@@ -445,7 +445,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      *
      * @param Collection<int, LeadEventLog> $logs Collection of logs to organize
      *
-     * @return ArrayCollection<int, ArrayCollection<int, LeadEventLog>> Organized logs with event IDs as keys
+     * @return Collection<int, ArrayCollection<int, LeadEventLog>> Organized logs with event IDs as keys
      */
     private function organizeByEvent(Collection $logs): Collection
     {

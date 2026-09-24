@@ -21,7 +21,7 @@ readonly class KickoffContactFinder
     }
 
     /**
-     * @return ArrayCollection<int, Lead>
+     * @return Collection<int, Lead>
      *
      * @throws NoContactsFoundException
      */

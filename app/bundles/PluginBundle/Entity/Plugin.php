@@ -146,7 +146,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return ArrayCollection<int, Integration>
+     * @return Collection<int, Integration>
      */
     public function getIntegrations(): Collection
     {

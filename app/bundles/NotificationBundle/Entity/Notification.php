@@ -539,7 +539,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return ArrayCollection<int, LeadList>
+     * @return Collection<int, LeadList>
      */
     public function getLists(): Collection
     {
@@ -559,7 +559,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return ArrayCollection<int, Stat>
+     * @return Collection<int, Stat>
      */
     public function getStats(): Collection
     {

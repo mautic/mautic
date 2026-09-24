@@ -68,7 +68,7 @@ final class ChannelPreferences
     /**
      * @param int $priority
      *
-     * @return ArrayCollection<int, LeadEventLog>
+     * @return Collection<int, LeadEventLog>
      */
     public function getLogsByPriority($priority)
     {

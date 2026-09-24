@@ -54,7 +54,7 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
     /**
      * Return an array of Lead entities keyed by LeadEventLog ID.
      *
-     * @return ArrayCollection<int, Lead>
+     * @return Collection<int, Lead>
      */
     public function getContacts()
     {

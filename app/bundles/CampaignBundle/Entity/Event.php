@@ -608,7 +608,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int,Event>|Collection<(int|string), mixed>
+     * @return Collection<int,Event>|Collection<(int|string), mixed>
      */
     public function getChildren()
     {
@@ -618,7 +618,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int,Event>
      */
     public function getPositiveChildren()
     {
@@ -628,7 +628,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int,Event>
      */
     public function getNegativeChildren()
     {
@@ -640,7 +640,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @param string $type
      *
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int,Event>
      */
     public function getChildrenByType($type)
     {
@@ -650,7 +650,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int,Event>
      */
     public function getChildrenByEventType(string $type)
     {

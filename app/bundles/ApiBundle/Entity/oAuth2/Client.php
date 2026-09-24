@@ -186,7 +186,7 @@ class Client extends BaseClient
     }
 
     /**
-     * @return ArrayCollection<int, User>
+     * @return Collection<int, User>
      */
     public function getUsers(): Collection
     {

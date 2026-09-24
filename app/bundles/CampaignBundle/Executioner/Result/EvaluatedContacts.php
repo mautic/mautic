@@ -30,7 +30,7 @@ final readonly class EvaluatedContacts
     }
 
     /**
-     * @return ArrayCollection<int, Lead>
+     * @return Collection<int, Lead>
      */
     public function getPassed(): ArrayCollection
     {
@@ -38,7 +38,7 @@ final readonly class EvaluatedContacts
     }
 
     /**
-     * @return ArrayCollection<int, Lead>
+     * @return Collection<int, Lead>
      */
     public function getFailed(): ArrayCollection
     {

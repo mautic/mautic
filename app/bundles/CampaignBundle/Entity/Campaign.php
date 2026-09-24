@@ -403,7 +403,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @param string $type
      *
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int,Event>
      */
     public function getEventsByType($type): ArrayCollection
     {
@@ -414,7 +414,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return ArrayCollection<int, Event>
+     * @return Collection<int, Event>
      */
     public function getEmailSendEvents(): ArrayCollection
     {

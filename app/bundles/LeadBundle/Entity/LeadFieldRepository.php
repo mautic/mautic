@@ -176,7 +176,7 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return ArrayCollection<int,LeadField>
+     * @return Collection<int,LeadField>
      */
     public function getListablePublishedFields(): ArrayCollection
     {

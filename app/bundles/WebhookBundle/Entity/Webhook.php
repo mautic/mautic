@@ -406,7 +406,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * Get log entities.
      *
-     * @return ArrayCollection<int,Log>
+     * @return Collection<int,Log>
      */
     public function getLogs(): Collection
     {
