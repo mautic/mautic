@@ -107,7 +107,10 @@ class InactiveHelper
         return $this->earliestInactiveDate;
     }
 
-    public function getCollectionByDecisionId($decisionId): ArrayCollection
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getCollectionByDecisionId($decisionId): Collection
     {
         $collection = new ArrayCollection();
 

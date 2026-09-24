@@ -270,13 +270,13 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     /**
      * Validates and potentially reschedules events based on execution timing.
      *
-     * @param ArrayCollection $logs             Collection of event logs
+     * @param Collection<int, LeadEventLog> $logs             Collection of event logs
      * @param \DateTime       $now              Current timestamp for comparison
      * @param bool            $scheduleTogether Whether to reschedule all logs together
      *
      * @throws NotSchedulableException
      */
-    private function validateSchedule(ArrayCollection $logs, \DateTime $now, bool $scheduleTogether = false): void
+    private function validateSchedule(Collection $logs, \DateTime $now, bool $scheduleTogether = false): void
     {
         $toBeRescheduled     = new ArrayCollection();
         $toReschedule        = [];
@@ -356,11 +356,11 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * Returns the original event if no redirection occurred, otherwise returns the redirected event.
      *
      * @param Event           $event The event to check for redirection
-     * @param ArrayCollection $logs  Collection of event logs
+     * @param Collection<int, LeadEventLog> $logs  Collection of event logs
      *
      * @return Event The original event or redirected event
      */
-    private function handlePossibleEventRedirection(Event $event, ArrayCollection $logs): Event
+    private function handlePossibleEventRedirection(Event $event, Collection $logs): Event
     {
         $redirectedEvent = $this->eventRedirectionHelper->handleEventRedirection($event, null, null);
 

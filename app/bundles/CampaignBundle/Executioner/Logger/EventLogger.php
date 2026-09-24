@@ -97,9 +97,9 @@ class EventLogger
     /**
      * Persist the queue, clear the entities from memory, and reset the queue.
      *
-     * @return ArrayCollection
+     * @return Collection<int, LeadEventLog>
      */
-    public function persistQueuedLogs()
+    public function persistQueuedLogs(): Collection
     {
         $this->persistPendingAndInsertIntoLogStack();
 
@@ -109,7 +109,10 @@ class EventLogger
         return $logs;
     }
 
-    public function persistCollection(ArrayCollection $collection): self
+    /**
+     * @param Collection<int, LeadEventLog> $collection
+     */
+    public function persistCollection(Collection $collection): self
     {
         if (!$collection->count()) {
             return $this;
@@ -126,18 +129,24 @@ class EventLogger
         return $this;
     }
 
-    public function clearCollection(ArrayCollection $collection): self
+    /**
+     * @param Collection<int, LeadEventLog> $collection
+     */
+    public function clearCollection(Collection $collection): self
     {
         $this->leadEventLogRepository->detachEntities($collection->getValues());
 
         return $this;
     }
 
-    public function extractContactsFromLogs(Collection $logs): ArrayCollection
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     * @return Collection<int, Lead>
+     */
+    public function extractContactsFromLogs(Collection $logs): Collection
     {
         $contacts = new ArrayCollection();
 
-        /** @var LeadEventLog $log */
         foreach ($logs as $log) {
             $contact = $log->getLead();
             $contacts->set($contact->getId(), $contact);
@@ -147,9 +156,9 @@ class EventLogger
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection<int, LeadEventLog>
      */
-    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, bool $isInactiveEntry = false)
+    public function fetchRotationAndGenerateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, bool $isInactiveEntry = false): Collection
     {
         $this->hydrateContactRotationsForNewLogs($contacts->getKeys(), $event->getCampaign()->getId());
 
@@ -157,9 +166,9 @@ class EventLogger
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection<int, LeadEventLog>
      */
-    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, bool $isInactiveEntry)
+    public function generateLogsFromContacts(Event $event, AbstractEventAccessor $config, Collection $contacts, bool $isInactiveEntry): Collection
     {
         $isDecision = Event::TYPE_DECISION === $event->getEventType();
         $campaign   = $event->getCampaign();

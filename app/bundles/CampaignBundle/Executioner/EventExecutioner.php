@@ -101,12 +101,14 @@ class EventExecutioner
     }
 
     /**
+     * @param Collection<int, LeadEventLog> $logs
+     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeLogs(Event $event, ArrayCollection $logs, ?Counter $counter = null): void
+    public function executeLogs(Event $event, Collection $logs, ?Counter $counter = null): void
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId());
 
@@ -262,7 +264,7 @@ class EventExecutioner
         return $events;
     }
 
-    private function persistLogs(ArrayCollection $logs): void
+    private function persistLogs(Collection $logs): void
     {
         if ($this->responses) {
             // Extract responses
@@ -276,7 +278,7 @@ class EventExecutioner
             ->clearCollection($logs);
     }
 
-    private function checkForRemovedContacts(ArrayCollection $logs): void
+    private function checkForRemovedContacts(Collection $logs): void
     {
         /**
          * @var int          $key

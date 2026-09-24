@@ -10,11 +10,21 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final readonly class EvaluatedContacts
 {
-    private ArrayCollection $passed;
+    /**
+     * @var Collection<int, Lead>
+     */
+    private Collection $passed;
 
-    private ArrayCollection $failed;
+    /**
+     * @var Collection<int, Lead>
+     */
+    private Collection $failed;
 
-    public function __construct(?ArrayCollection $passed = null, ?ArrayCollection $failed = null)
+    /**
+     * @param Collection<int, Lead>|null $passed
+     * @param Collection<int, Lead>|null $failed
+     */
+    public function __construct(?Collection $passed = null, ?Collection $failed = null)
     {
         $this->passed = $passed ?? new ArrayCollection();
         $this->failed = $failed ?? new ArrayCollection();
