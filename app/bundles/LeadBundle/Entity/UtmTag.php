@@ -17,11 +17,15 @@ class UtmTag
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
@@ -34,66 +38,59 @@ class UtmTag
     /**
      * @var array
      */
+    #[ORM\Column(type: ArrayType::ARRAY, nullable: true)]
     private $query = [];
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private $referer;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'remote_host', type: Types::STRING, length: 191, nullable: true)]
     private $remoteHost;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private $url;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'user_agent', type: Types::TEXT, nullable: true)]
     private $userAgent;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'utm_campaign', type: Types::STRING, length: 191, nullable: true)]
     private $utmCampaign;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'utm_content', type: Types::STRING, length: 191, nullable: true)]
     private $utmContent;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'utm_medium', type: Types::STRING, length: 191, nullable: true)]
     private $utmMedium;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'utm_source', type: Types::STRING, length: 191, nullable: true)]
     private $utmSource;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'utm_term', type: Types::STRING, length: 191, nullable: true)]
     private $utmTerm;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder->addId();
-        $builder->addDateAdded();
-        $builder->addNullableField('query', ArrayType::ARRAY);
-        $builder->addNullableField('referer', Types::TEXT);
-        $builder->addNullableField('remoteHost', Types::STRING, 'remote_host');
-        $builder->addNullableField('url', Types::TEXT);
-        $builder->addNullableField('userAgent', Types::TEXT, 'user_agent');
-        $builder->addNullableField('utmCampaign', Types::STRING, 'utm_campaign');
-        $builder->addNullableField('utmContent', Types::STRING, 'utm_content');
-        $builder->addNullableField('utmMedium', Types::STRING, 'utm_medium');
-        $builder->addNullableField('utmSource', Types::STRING, 'utm_source');
-        $builder->addNullableField('utmTerm', Types::STRING, 'utm_term');
-    }
 
     /**
      * Prepares the metadata for API usage.

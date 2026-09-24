@@ -3,7 +3,6 @@
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -15,11 +14,15 @@ class DynamicContentLeadData extends CommonEntity
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime', nullable: true)]
     private $dateAdded;
 
     /**
@@ -44,20 +47,8 @@ class DynamicContentLeadData extends CommonEntity
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text')]
     private $slot;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns(false, false);
-
-        $builder->addDateAdded(true);
-
-        $builder->createField('slot', 'text')
-            ->columnName('slot')
-            ->build();
-    }
 
     /**
      * @return int|null

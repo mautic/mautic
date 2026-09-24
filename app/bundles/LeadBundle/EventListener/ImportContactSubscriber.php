@@ -173,7 +173,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
         // ...we must ensure we pass an [] to array_map
         $tags = $tags instanceof ArrayCollection ? $tags->toArray() : [];
 
-        return array_map(fn (Tag $tag) => $tag->getTag(), $tags);
+        return array_map(fn (Tag $tag): ?string => $tag->getTag(), $tags);
     }
 
     /**

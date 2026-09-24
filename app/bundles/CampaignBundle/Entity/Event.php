@@ -15,7 +15,6 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\DateAddedTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -83,18 +82,23 @@ class Event implements ChannelInterface, UuidInterface
      * @var int
      */
     #[Groups(['event:read', 'campaign:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -253,6 +257,7 @@ class Event implements ChannelInterface, UuidInterface
     private array $changes = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $deleted = null;
 
     #[ORM\Column(name: 'failed_count', type: 'integer')]
@@ -297,20 +302,6 @@ class Event implements ChannelInterface, UuidInterface
         $this->channelId         = null;
         $this->redirectEvent     = null;
         $this->redirectingEvents = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addNullableField('deleted', 'datetime');
-
-        $builder->createField('dateAdded', Types::DATETIME_MUTABLE)
-            ->columnName('date_added')
-            ->option('default', '1970-01-01 00:00:00')
-            ->build();
     }
 
     /**

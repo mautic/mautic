@@ -4,7 +4,6 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -21,23 +20,17 @@ class Group extends FormEntity implements UuidInterface
 
     public const string ENTITY_NAME = 'point_group';
 
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id             = null;
 
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private ?string $name        = '';
 
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = '';
-
-    /**
-     * @param ORM\ClassMetadata<Group> $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-
-        $builder->addIdColumns();
-    }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {

@@ -13,9 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -51,19 +49,20 @@ class Tag implements UuidInterface
      * @var int
      */
     #[Groups(['leadfield:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var string
-     */
     #[Groups(['leadfield:read', 'leadfield:write'])]
     #[ORM\Column(type: Types::STRING, length: 191)]
-    private $tag;
+    private ?string $tag;
 
     /**
      * @var string|null
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private $description;
 
     public ?int $deletedId = null;
@@ -71,14 +70,6 @@ class Tag implements UuidInterface
     public function __construct(?string $tag = null, bool $clean = true)
     {
         $this->tag = $clean && $tag ? $this->validateTag($tag) : $tag;
-    }
-
-    public static function loadMetadata(ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-        $builder->addNamedField('description', Types::TEXT, 'description', true);
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
@@ -102,10 +93,7 @@ class Tag implements UuidInterface
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getTag()
+    public function getTag(): ?string
     {
         return $this->tag;
     }

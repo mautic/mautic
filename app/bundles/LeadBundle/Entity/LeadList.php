@@ -68,6 +68,9 @@ class LeadList extends FormEntity implements UuidInterface
      * @var int|null
      */
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -75,6 +78,7 @@ class LeadList extends FormEntity implements UuidInterface
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
@@ -88,12 +92,15 @@ class LeadList extends FormEntity implements UuidInterface
      * @var Category|null
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
      * @var string|null
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -114,6 +121,7 @@ class LeadList extends FormEntity implements UuidInterface
      * @var bool
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'is_global', type: 'boolean')]
     private $isGlobal = true;
 
     /**
@@ -138,6 +146,7 @@ class LeadList extends FormEntity implements UuidInterface
     private ?float $lastBuiltTime = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $deleted = null;
 
     public function __construct()
@@ -150,16 +159,7 @@ class LeadList extends FormEntity implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->addIdColumns();
-
-        $builder->addCategory();
-
-        $builder->createField('isGlobal', 'boolean')
-            ->columnName('is_global')
-            ->build();
-
         self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
-        $builder->addNullableField('deleted', 'datetime');
 
     }
 

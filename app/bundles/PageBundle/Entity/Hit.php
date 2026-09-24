@@ -4,7 +4,6 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -17,6 +16,7 @@ use Mautic\PageBundle\Validator\PageHit;
 #[ORM\Index(name: 'page_hit_code_search', columns: ['code'])]
 #[ORM\Index(name: 'page_hit_source_search', columns: ['source', 'source_id'])]
 #[ORM\Index(name: 'date_hit_left_index', columns: ['date_hit', 'date_left'])]
+#[ORM\Index(name: 'page_hit_url', columns: ['url'], options: ['lengths' => [0 => 128]])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[PageHit]
 class Hit
@@ -26,6 +26,9 @@ class Hit
     /**
      * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -65,6 +68,8 @@ class Hit
     /**
      * @var IpAddress|null
      */
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private $ipAddress;
 
     /**
@@ -160,6 +165,7 @@ class Hit
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $query = [];
 
     /**
@@ -168,20 +174,6 @@ class Hit
     #[ORM\ManyToOne(targetEntity: LeadDevice::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'device_id', onDelete: 'SET NULL')]
     private $device;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIndexWithOptions(['url'], 'page_hit_url', ['lengths' => [0 => 128]]);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->addNullableField('query', 'array');
-    }
 
     /**
      * Prepares the metadata for API usage.

@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Table(name: 'monitoring_leads')]
 #[ORM\Entity(repositoryClass: LeadRepository::class)]
@@ -29,17 +28,8 @@ class Lead
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('monitoring_leads')
-            ->setCustomRepositoryClass(LeadRepository::class);
-
-        $builder->addNamedField('dateAdded', 'datetime', 'date_added');
-    }
 
     /**
      * @return mixed

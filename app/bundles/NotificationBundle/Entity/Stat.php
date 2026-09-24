@@ -6,7 +6,6 @@ namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -25,6 +24,9 @@ class Stat
     /**
      * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -48,123 +50,81 @@ class Stat
     #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
     private $list;
 
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private $dateSent;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_read', type: 'datetime', nullable: true)]
     private $dateRead;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_clicked', type: 'boolean')]
     private $isClicked = false;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_clicked', type: 'datetime', nullable: true)]
     private $dateClicked;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_hash', type: 'string', length: 191, nullable: true)]
     private $trackingHash;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'retry_count', type: 'integer', nullable: true)]
     private $retryCount = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'click_count', type: 'integer', nullable: true)]
     private $clickCount;
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'click_details', type: 'array', nullable: true)]
     private $clickDetails = [];
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'last_clicked', type: 'datetime', nullable: true)]
     private $lastClicked;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('dateRead', 'datetime')
-            ->columnName('date_read')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isClicked', 'boolean')
-            ->columnName('is_clicked')
-            ->build();
-
-        $builder->createField('dateClicked', 'datetime')
-            ->columnName('date_clicked')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingHash', 'string')
-            ->columnName('tracking_hash')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retryCount', 'integer')
-            ->columnName('retry_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('clickCount', 'integer', 'click_count');
-
-        $builder->addNullableField('lastClicked', 'datetime', 'last_clicked');
-
-        $builder->addNullableField('clickDetails', 'array', 'click_details');
-    }
 
     /**
      * Prepares the metadata for API usage.
