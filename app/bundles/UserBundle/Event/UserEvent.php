@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\UserBundle\Entity\User;
 
-final class UserEvent extends CommonEvent
+abstract class UserEvent extends CommonEvent
 {
     public function __construct(User &$user, bool $isNew = false)
     {

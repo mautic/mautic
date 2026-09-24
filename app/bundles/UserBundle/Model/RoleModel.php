@@ -8,9 +8,11 @@ use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\UserRepository;
-use Mautic\UserBundle\Event\RoleEvent;
+use Mautic\UserBundle\Event\PostDeleteRoleEvent;
+use Mautic\UserBundle\Event\PostSaveRoleEvent;
+use Mautic\UserBundle\Event\PreDeleteRoleEvent;
+use Mautic\UserBundle\Event\PreSaveRoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
-use Mautic\UserBundle\UserEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
@@ -157,28 +159,20 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = UserEvents::ROLE_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = UserEvents::ROLE_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = UserEvents::ROLE_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = UserEvents::ROLE_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new PreSaveRoleEvent($entity, $isNew),
+            'post_save'   => new PostSaveRoleEvent($entity, $isNew),
+            'pre_delete'  => new PreDeleteRoleEvent($entity, $isNew),
+            'post_delete' => new PostDeleteRoleEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (!$event instanceof Event) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new RoleEvent($entity, $isNew);
-            }
-            $this->dispatcher->dispatch($event, $name);
+        if ($this->dispatcher->hasListeners($event::class)) {
+            $this->dispatcher->dispatch($event);
 
             return $event;
         }
