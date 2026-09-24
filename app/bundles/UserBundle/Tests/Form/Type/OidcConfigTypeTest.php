@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Form\Extension;
+namespace Mautic\UserBundle\Tests\Form\Extension;
 
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\ConfigType;
 use Mautic\UserBundle\Security\OIDC\ClientCredentials;
 use Mautic\UserBundle\Security\OIDC\ConfigTypeExtension;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Event\PostSubmitEvent;
@@ -18,58 +20,56 @@ use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ConfigTypeExtensionTest extends TestCase
+final class OidcConfigTypeTest extends TestCase
 {
-    public function testGetExtendedTypes(): void
-    {
-        $parameters          = (new ParametersBuilder())->build();
-        $clientCredentials   = new ClientCredentials('https://example.com', 'client_id', 'client_secret', 'sub');
-        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
-        $configTypeExtension = new ConfigTypeExtension($parameters, $clientCredentials, $subjectIdRepository);
+    private OidcSubjectIdRepository&MockObject $subjectIdRepository;
 
-        $this->assertEquals([ConfigType::class], $configTypeExtension::getExtendedTypes());
+    private ConfigType $configType;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
+
+        $this->configType = new ConfigType(
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(TranslatorInterface::class),
+            (new ParametersBuilder())->build(),
+            new ClientCredentials('https://example.com', 'client_id', 'client_secret', 'sub'),
+            $this->subjectIdRepository,
+        );
     }
 
     public function testOnPreSubmitSetsSecretToParamValueIfEmpty(): void
     {
-        $parameters          = (new ParametersBuilder())->build();
-        $clientCredentials   = new ClientCredentials('https://example.com', 'client_id', 'client_secret', 'sub');
-        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
-        $form                = $this->createStub(FormInterface::class);
-        $event               = new PreSubmitEvent($form, ['open_id_client_secret' => '']);
-
-        $configTypeExtension = new ConfigTypeExtension($parameters, $clientCredentials, $subjectIdRepository);
-        $configTypeExtension->onPreSubmit($event);
+        $form  = $this->createStub(FormInterface::class);
+        $event = new PreSubmitEvent($form, ['open_id_client_secret' => '']);
+        $this->configType->onPreSubmit($event);
 
         $this->assertSame('client_secret', $event->getData()['open_id_client_secret']);
     }
 
     public function testOnPreSubmitDoesNotSetSecretToParamValueIfNotEmpty(): void
     {
-        $parameters          = (new ParametersBuilder())->build();
-        $clientCredentials   = new ClientCredentials('https://example.com', 'client_id', 'client_secret', 'sub');
-        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
-        $form                = $this->createStub(FormInterface::class);
-        $event               = new PreSubmitEvent($form, ['open_id_client_secret' => 'notNull']);
-
-        $configTypeExtension = new ConfigTypeExtension($parameters, $clientCredentials, $subjectIdRepository);
-        $configTypeExtension->onPreSubmit($event);
+        $form  = $this->createStub(FormInterface::class);
+        $event = new PreSubmitEvent($form, ['open_id_client_secret' => 'notNull']);
+        $this->configType->onPreSubmit($event);
 
         $this->assertSame('notNull', $event->getData()['open_id_client_secret']);
     }
 
     public function testOnPostEventTruncatesTableWhenMappingFieldIsChanged(): void
     {
-        $parameters          = (new ParametersBuilder())->build();
-        $clientCredentials   = new ClientCredentials('https://example.com', 'client_id', 'client_secret', 'sub');
-        $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
-        $queryBuilder        = $this->createMock(QueryBuilder::class);
-        $query               = $this->createMock(AbstractQuery::class);
-        $form                = $this->createStub(FormInterface::class);
-        $event               = new PostSubmitEvent($form, ['open_id_mapping_field' => 'platform_sub']);
+        $this->subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $query        = $this->createMock(AbstractQuery::class);
+        $form         = $this->createStub(FormInterface::class);
+        $event        = new PostSubmitEvent($form, ['open_id_mapping_field' => 'platform_sub']);
 
-        $subjectIdRepository->expects($this->once())
+        $this->subjectIdRepository->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
@@ -84,8 +84,7 @@ final class ConfigTypeExtensionTest extends TestCase
         $query->expects($this->once())
             ->method('execute');
 
-        $configTypeExtension = new ConfigTypeExtension($parameters, $clientCredentials, $subjectIdRepository);
-        $configTypeExtension->onPostSubmit($event);
+        $this->configType->onPostSubmit($event);
     }
 
     public function testOnPostEventDoesNotTruncatesTableWhenMappingFieldIsUnchanged(): void
