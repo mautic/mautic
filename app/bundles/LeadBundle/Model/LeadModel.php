@@ -673,14 +673,17 @@ class LeadModel extends FormModel
                         $newValue = implode('|', $newValue);
                     }
 
-                    $isEmpty = (null == $newValue || '' == $newValue);
+                    // $newValue is never null here - the `?? ''` above already maps null to ''.
+                    // A boolean field's "no change" option arrives as false via InputHelper::boolean(),
+                    // so false has to keep counting as empty. Numeric zero must not: that is #15030.
+                    $isEmpty = ('' === $newValue || false === $newValue);
                     if ($curValue !== $newValue && (!$isEmpty || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $lead->addUpdatedField($alias, $newValue, $curValue);
                     }
 
                     // if empty, check for social media data to plug the hole
-                    if (empty($newValue) && !empty($socialCache)) {
+                    if ($isEmpty && !empty($socialCache)) {
                         foreach ($socialCache as $service => $details) {
                             // check to see if a field has been assigned
 

@@ -80,11 +80,13 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        if ('testUpdatesContactCampaignActionWithBooleanFields' === $this->name()) {
-            $this->useCleanupRollback = false;
-        } else {
-            $this->useCleanupRollback = true;
-        }
+        // These tests create custom fields, which issues DDL and cannot be rolled back.
+        $createsCustomFields = [
+            'testUpdatesContactCampaignActionWithBooleanFields',
+            'testUpdatesContactCampaignActionWithNumericZero',
+        ];
+
+        $this->useCleanupRollback = !in_array($this->name(), $createsCustomFields, true);
 
         parent::setUp();
 
@@ -408,6 +410,60 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($expectedCityValue, $cityValue);
 
         $this->assertEquals('abcdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $address1Value, 'Shortening too long messages did not work properly');
+    }
+
+    /**
+     * A campaign "Update contact" action must be able to set a number field to 0.
+     * Reported on #15030: "we have set up a campaign that isn't working correctly
+     * because custom fields values are never set to 0".
+     */
+    public function testUpdatesContactCampaignActionWithNumericZero(): void
+    {
+        $this->createField([
+            'alias'      => 'quota',
+            'label'      => 'Quota',
+            'type'       => 'number',
+            'properties' => ['roundmode' => 4, 'scale' => 0],
+        ]);
+
+        $contact   = $this->createContact('test_zero_'.uniqid().'@example.com');
+        $contactId = $contact->getId();
+
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getContainer()->get(LeadModel::class);
+        $leadModel->setFieldValues($contact, ['quota' => 5]);
+        $leadModel->saveEntity($contact);
+        $this->assertEquals(5, $contact->getFieldValue('quota'), 'Precondition: quota starts at 5.');
+
+        $campaign = new Campaign();
+        $campaign->setName('Test Numeric Zero Campaign');
+        $this->em->persist($campaign);
+
+        $this->addContactToCampaign($campaign, $contact);
+
+        $event = new Event();
+        $event->setCampaign($campaign);
+        $event->setName('Update contact quota');
+        $event->setType('lead.updatelead');
+        $event->setEventType('action');
+        $event->setTriggerMode('immediate');
+        $event->setProperties(['quota' => 0]);
+
+        $campaign->addEvent(1, $event);
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $this->em->clear();
+
+        $exitCode = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+        $this->assertSame(0, $exitCode->getStatusCode());
+
+        $updated = $this->contactRepository->getEntity($contactId);
+        $this->assertInstanceOf(Lead::class, $updated);
+
+        $quota = $updated->getFieldValue('quota');
+        $this->assertNotNull($quota, 'Quota must still be set, not blanked.');
+        $this->assertEquals(0, $quota, 'A campaign action must be able to set a number field to 0.');
     }
 
     public function testUpdatesContactCampaignActionWithBooleanFields(): void
