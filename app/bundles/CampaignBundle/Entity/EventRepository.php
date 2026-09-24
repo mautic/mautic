@@ -109,13 +109,11 @@ class EventRepository extends CommonRepository
      */
     public function getEventsByParent(int $parentId, ?string $decisionPath = null, ?string $eventType = null): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
+        $q = $this->createQueryBuilder('e', 'e.id');
 
-        $q->select('e')
-            ->from(Event::class, 'e', 'e.id')
-            ->where(
-                $q->expr()->eq('IDENTITY(e.parent)', $parentId)
-            );
+        $q->where(
+            $q->expr()->eq('IDENTITY(e.parent)', $parentId)
+        );
 
         if (null !== $decisionPath) {
             $q->andWhere(
@@ -141,11 +139,10 @@ class EventRepository extends CommonRepository
      */
     public function getCampaignEmailEvents(int $campaignId): array
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb = $this->createQueryBuilder('e');
 
         return $qb
             ->select('DISTINCT em')
-            ->from(Event::class, 'e')
             ->innerJoin(
                 Email::class,
                 'em',
@@ -172,9 +169,8 @@ class EventRepository extends CommonRepository
      */
     public function getCampaignEvents($campaignId, bool $ignoreDeleted = true): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
+        $q = $this->createQueryBuilder('e', 'e.id');
         $q->select('e, IDENTITY(e.parent)')
-            ->from(Event::class, 'e', 'e.id')
             ->where(
                 $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
             )
@@ -390,9 +386,8 @@ class EventRepository extends CommonRepository
      */
     public function getLeadTriggeredEvents($leadId): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
+        $q = $this->createQueryBuilder('e')
             ->select('e, c, l')
-            ->from(Event::class, 'e')
             ->join('e.campaign', 'c')
             ->join('e.log', 'l');
 

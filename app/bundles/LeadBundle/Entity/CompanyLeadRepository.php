@@ -189,10 +189,8 @@ class CompanyLeadRepository extends CommonRepository
 
     public function getEntitiesByLead(Lead $lead): array
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select('cl')
-            ->from(CompanyLead::class, 'cl')
-            ->where(
+        $qb = $this->createQueryBuilder('cl');
+        $qb->where(
                 $qb->expr()->eq('cl.lead', ':lead')
             )->setParameter('lead', $lead);
 

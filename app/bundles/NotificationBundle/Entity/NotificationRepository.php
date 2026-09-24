@@ -12,10 +12,7 @@ final class NotificationRepository extends CommonRepository
 {
     public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('e')
-            ->from(Notification::class, 'e', 'e.id');
+        $q = $this->createQueryBuilder('e', 'e.id');
         if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
@@ -30,9 +27,8 @@ final class NotificationRepository extends CommonRepository
      */
     public function getSentReadCount(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
-        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
-            ->from(Notification::class, 'e');
+        $q = $this->createQueryBuilder('e');
+        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         $results['sent_count'] ??= 0;
