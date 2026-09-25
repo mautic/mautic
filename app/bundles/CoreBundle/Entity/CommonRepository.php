@@ -42,7 +42,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      */
     public function __construct(ManagerRegistry $registry, ?string $entityFQCN = null)
     {
-        parent::__construct($registry, $entityFQCN ?? str_replace('Repository', '', static::class));
+        parent::__construct($registry, $entityFQCN ?? str_replace('Repository', '', $this::class));
     }
 
     /**
