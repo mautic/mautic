@@ -5,7 +5,7 @@ namespace Mautic\PluginBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
-
+ 
 /**
  * @extends CommonRepository<IntegrationEntity>
  */

@@ -88,6 +88,8 @@ parameters:
         - identifier: symplify.forbiddenNode
         - identifier: symplify.noReference
         - identifier: symplify.forbiddenFuncCall
+        - identifier: symplify.forbiddenExtendOfNonAbstractClass
+        - identifier: symplify.noDynamicName
 
         # parent class is used actively
         -
@@ -99,7 +101,7 @@ parameters:
         # part of deprecation
         -
             identifier: symplify.noConstructorOverride
-            path: *Permission.php
+            path: *Permissions.php
 
         # these services have no class name alias in the container, so only the string name can fetch them
         -
