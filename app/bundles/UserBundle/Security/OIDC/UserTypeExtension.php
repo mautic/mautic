@@ -6,8 +6,6 @@ namespace Mautic\UserBundle\Security\OIDC;
 
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\UserType;
-use Mautic\UserBundle\Security\OIDC\OidcSubjectIdType;
-use Mautic\UserBundle\Security\OIDC\SubjectToUserTransformer;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 

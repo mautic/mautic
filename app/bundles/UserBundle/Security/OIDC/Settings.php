@@ -16,7 +16,7 @@ final readonly class Settings
         #[Autowire(param: 'mautic.open_id_is_user_registration_allowed')]
         private bool $isUserRegistrationAllowed,
         #[Autowire(param: 'mautic.open_id_registered_user_role')]
-        private ?int $registeredUserRoleId = null
+        private ?int $registeredUserRoleId = null,
     ) {
     }
 
