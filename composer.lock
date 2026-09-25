@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2afa75401457c32bb7da5965d1374176",
+    "content-hash": "32a5f9443631eccae05f86865c173d9a",
     "packages": [
         {
             "name": "api-platform/core",
@@ -18228,16 +18228,16 @@
         },
         {
             "name": "symplify/phpstan-rules",
-            "version": "14.17.0",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symplify/phpstan-rules.git",
-                "reference": "c6a60f14fa95d5e615cafd121a8a70f739b6d3e4"
+                "reference": "1ec588220e540dd74985241f08637d6ee1618de3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/c6a60f14fa95d5e615cafd121a8a70f739b6d3e4",
-                "reference": "c6a60f14fa95d5e615cafd121a8a70f739b6d3e4",
+                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/1ec588220e540dd74985241f08637d6ee1618de3",
+                "reference": "1ec588220e540dd74985241f08637d6ee1618de3",
                 "shasum": ""
             },
             "require": {
@@ -18262,6 +18262,7 @@
                 "tomasvotruba/type-coverage": "^2.3",
                 "tomasvotruba/unused-public": "^2.2"
             },
+            "default-branch": true,
             "type": "phpstan-extension",
             "extra": {
                 "phpstan": {
@@ -18296,7 +18297,7 @@
             "description": "Set of Symplify rules, type extensions and error formatter for PHPStan",
             "support": {
                 "issues": "https://github.com/symplify/phpstan-rules/issues",
-                "source": "https://github.com/symplify/phpstan-rules/tree/14.17.0"
+                "source": "https://github.com/symplify/phpstan-rules/tree/main"
             },
             "funding": [
                 {
@@ -18308,7 +18309,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-24T21:33:45+00:00"
+            "time": "2026-09-25T10:30:28+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -18434,7 +18435,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "symplify/phpstan-rules": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {},

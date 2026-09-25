@@ -17,18 +17,10 @@ parameters:
 
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
-<<<<<<< HEAD
         return: 91.6
-        param: 82.9
-        property: 73.7
         constant: 99.9
-=======
-        return: 91.4
         param: 83.4
         property: 73.7
-        constant: 80.4
-        declare: 75.4
->>>>>>> a4ca326670 (wider union)
 
     # rules merged from rector/type-perfect, opt-in since type-coverage 2.3
     type_perfect:
