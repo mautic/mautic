@@ -241,6 +241,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         }
 
         $download->setTrackingId($trackingId);
+        $download->setAsset($asset);
 
         // Skip persisting download record when there is no tracking context
         // (e.g. programmatic/API requests without a browser session).
@@ -251,8 +252,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         }
 
         if (empty($systemEntry)) {
-            $download->setAsset($asset);
-
             $this->assetRepository->upDownloadCount($asset->getId(), 1, $isUnique);
         }
 
