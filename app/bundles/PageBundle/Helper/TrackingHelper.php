@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class TrackingHelper
+final class TrackingHelper
 {
     public function __construct(
         protected ContactTracker $contactTracker,

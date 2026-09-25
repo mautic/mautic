@@ -44,7 +44,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-class MailHelper
+final class MailHelper
 {
     public const QUEUE_RESET_TO           = 'RESET_TO';
 

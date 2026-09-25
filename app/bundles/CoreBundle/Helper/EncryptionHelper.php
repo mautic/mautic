@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\SymmetricCipherInterface;
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
-class EncryptionHelper
+final class EncryptionHelper
 {
     /**
      * @var SymmetricCipherInterface[]

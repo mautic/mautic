@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CsvExporter
+final class CsvExporter
 {
     public function __construct(
         protected FormatterHelper $formatterHelper,

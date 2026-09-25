@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @extends CrmAbstractIntegration<HubspotApi>
  */
-class HubspotIntegration extends CrmAbstractIntegration
+final class HubspotIntegration extends CrmAbstractIntegration
 {
     private StageRepository $stageRepository;
 

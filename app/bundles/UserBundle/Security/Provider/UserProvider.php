@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UserProvider implements UserProviderInterface
+final class UserProvider implements UserProviderInterface
 {
     public function __construct(
         protected UserRepository $userRepository,

@@ -13,7 +13,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Form\Type\ConfigType;
 use Mautic\SmsBundle\Model\SmsModel;
 
-class SmsHelper
+final class SmsHelper
 {
     public function __construct(
         protected LeadRepository $leadRepository,

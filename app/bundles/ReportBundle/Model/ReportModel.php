@@ -47,7 +47,7 @@ use Twig\Environment;
 /**
  * @extends FormModel<Report>
  */
-class ReportModel extends FormModel implements GlobalSearchInterface
+final class ReportModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {

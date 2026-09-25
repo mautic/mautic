@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
-class VariantConverterService
+final class VariantConverterService
 {
     /**
      * @var int

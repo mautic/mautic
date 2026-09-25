@@ -15,7 +15,7 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\LeadBundle\Entity\Lead;
 
-readonly class DecisionExecutioner implements EventInterface
+final readonly class DecisionExecutioner implements EventInterface
 {
     public const TYPE = 'decision';
 

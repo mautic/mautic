@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 
-class ReportGeneratorEvent extends AbstractReportEvent
+final class ReportGeneratorEvent extends AbstractReportEvent
 {
     public const CATEGORY_PREFIX         = 'c';
 

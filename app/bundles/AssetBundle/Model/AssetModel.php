@@ -48,7 +48,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Asset>
  */
-class AssetModel extends FormModel implements GlobalSearchInterface
+final class AssetModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {

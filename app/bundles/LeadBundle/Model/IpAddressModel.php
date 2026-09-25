@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
-class IpAddressModel
+final class IpAddressModel
 {
     private const int DELETE_SIZE = 10000;
 

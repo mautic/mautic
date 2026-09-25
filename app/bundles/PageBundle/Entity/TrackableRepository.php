@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 /**
  * @extends CommonRepository<Trackable>
  */
-class TrackableRepository extends CommonRepository
+final class TrackableRepository extends CommonRepository
 {
     /**
      * Find redirects that are trackable.

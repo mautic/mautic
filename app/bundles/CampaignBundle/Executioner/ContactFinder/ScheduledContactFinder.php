@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 
-readonly class ScheduledContactFinder
+final readonly class ScheduledContactFinder
 {
     public function __construct(
         private LeadRepository $leadRepository,

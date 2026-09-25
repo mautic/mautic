@@ -9,6 +9,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<ContactExportScheduler>
  */
-class ContactExportSchedulerRepository extends CommonRepository
+final class ContactExportSchedulerRepository extends CommonRepository
 {
 }

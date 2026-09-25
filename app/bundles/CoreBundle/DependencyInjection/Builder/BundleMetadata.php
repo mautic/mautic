@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\DependencyInjection\Builder;
 
-class BundleMetadata
+final class BundleMetadata
 {
     /**
      * @var string

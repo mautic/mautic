@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 /**
  * Used to manipulate the schema of an existing table.
  */
-class ColumnSchemaHelper
+final class ColumnSchemaHelper
 {
     /**
      * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>

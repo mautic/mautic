@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
-class MembershipManager
+final class MembershipManager
 {
     public const ACTION_ADDED   = 'added';
 

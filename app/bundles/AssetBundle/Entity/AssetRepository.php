@@ -13,7 +13,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Asset>
  */
-class AssetRepository extends CommonRepository
+final class AssetRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 

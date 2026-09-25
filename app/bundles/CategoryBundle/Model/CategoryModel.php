@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Category>
  */
-class CategoryModel extends FormModel implements AjaxLookupModelInterface
+final class CategoryModel extends FormModel implements AjaxLookupModelInterface
 {
     public static function getName(): string
     {

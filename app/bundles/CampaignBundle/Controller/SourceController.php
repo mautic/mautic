@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class SourceController extends CommonFormController
+final class SourceController extends CommonFormController
 {
     private CampaignModel $campaignModel;
 

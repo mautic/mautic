@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Widget>
  */
-class WidgetRepository extends CommonRepository
+final class WidgetRepository extends CommonRepository
 {
     /**
      * Update widget ordering.

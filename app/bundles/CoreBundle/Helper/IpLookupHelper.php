@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class IpLookupHelper
+final class IpLookupHelper
 {
     /**
      * @var array

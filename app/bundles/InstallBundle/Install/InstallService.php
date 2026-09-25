@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class InstallService
+final class InstallService
 {
     public const CHECK_STEP = 0;
 

@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 
-class IndexSchemaHelper
+final class IndexSchemaHelper
 {
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>

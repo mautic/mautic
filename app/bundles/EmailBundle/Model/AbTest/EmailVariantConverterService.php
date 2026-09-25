@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\EmailBundle\Entity\Email;
 
-readonly class EmailVariantConverterService
+final readonly class EmailVariantConverterService
 {
     public function __construct(
         private VariantConverterService $variantConverterService,

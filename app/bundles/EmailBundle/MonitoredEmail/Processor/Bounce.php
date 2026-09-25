@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class Bounce implements ProcessorInterface
+final class Bounce implements ProcessorInterface
 {
     private const int RETRY_COUNT = 5;
 

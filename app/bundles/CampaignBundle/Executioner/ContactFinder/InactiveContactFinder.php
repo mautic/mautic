@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 
-class InactiveContactFinder
+final class InactiveContactFinder
 {
     /**
      * @var array<string, \DateTimeInterface>|null

@@ -20,7 +20,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonFormModel<Field>
  */
-class FieldModel extends CommonFormModel
+final class FieldModel extends CommonFormModel
 {
     public static function getName(): string
     {

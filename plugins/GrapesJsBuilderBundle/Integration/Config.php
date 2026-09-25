@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
 
-readonly class Config
+final readonly class Config
 {
     public function __construct(
         private IntegrationsHelper $integrationsHelper,

@@ -10,7 +10,7 @@ use Symfony\Component\Process\Exception\RuntimeException;
 /**
  * @note   This class is based on Sensio\Bundle\DistributionBundle\Configurator\Configurator
  */
-class Configurator
+final class Configurator
 {
     /**
      * Configuration filename.

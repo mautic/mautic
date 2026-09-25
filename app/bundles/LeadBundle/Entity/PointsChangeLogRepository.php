@@ -9,7 +9,7 @@ use Mautic\PointBundle\Entity\Group;
 /**
  * @extends CommonRepository<PointsChangeLog>
  */
-class PointsChangeLogRepository extends CommonRepository
+final class PointsChangeLogRepository extends CommonRepository
 {
     use TimelineTrait;
 

@@ -11,7 +11,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<IntegrationEntity>
  */
-class IntegrationEntityModel extends FormModel
+final class IntegrationEntityModel extends FormModel
 {
     public static function getName(): string
     {

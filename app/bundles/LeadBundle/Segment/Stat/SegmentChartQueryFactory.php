@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 
-readonly class SegmentChartQueryFactory
+final readonly class SegmentChartQueryFactory
 {
     public function __construct(
         private LeadListRepository $leadListRepository,

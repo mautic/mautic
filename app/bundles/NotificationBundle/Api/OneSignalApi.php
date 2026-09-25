@@ -8,7 +8,7 @@ use Mautic\NotificationBundle\Exception\MissingApiKeyException;
 use Mautic\NotificationBundle\Exception\MissingAppIDException;
 use Psr\Http\Message\ResponseInterface;
 
-class OneSignalApi extends AbstractNotificationApi
+final class OneSignalApi extends AbstractNotificationApi
 {
     /**
      * @var string

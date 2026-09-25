@@ -5,7 +5,7 @@ namespace Mautic\FormBundle\Helper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Model\FormModel;
 
-class TokenHelper
+final class TokenHelper
 {
     public const REGEX = '/{form=(.*?)}/';
 

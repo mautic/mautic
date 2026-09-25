@@ -16,7 +16,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class OrderExecutioner
+final readonly class OrderExecutioner
 {
     public function __construct(
         private MappingHelper $mappingHelper,

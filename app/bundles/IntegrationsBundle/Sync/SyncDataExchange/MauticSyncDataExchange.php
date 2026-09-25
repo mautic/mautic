@@ -23,7 +23,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderEx
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder;
 
-readonly class MauticSyncDataExchange implements SyncDataExchangeInterface
+final readonly class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
     public const NAME           = 'mautic';
 

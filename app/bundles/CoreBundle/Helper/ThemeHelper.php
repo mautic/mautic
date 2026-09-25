@@ -18,7 +18,7 @@ use Twig\Error\RuntimeError;
 use Twig\Extension\SandboxExtension;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
-class ThemeHelper implements ThemeHelperInterface
+final class ThemeHelper implements ThemeHelperInterface
 {
     public const HIDDEN_THEMES_TXT = 'hidden-themes.txt';
 

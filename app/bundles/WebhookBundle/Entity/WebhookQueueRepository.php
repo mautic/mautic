@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 /**
  * @extends CommonRepository<WebhookQueue>
  */
-class WebhookQueueRepository extends CommonRepository
+final class WebhookQueueRepository extends CommonRepository
 {
     /**
      * Deletes all the webhook queues by ID.

@@ -8,7 +8,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Focus>
  */
-class FocusRepository extends CommonRepository
+final class FocusRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 

@@ -41,7 +41,7 @@ use Twig\Runtime\EscaperRuntime;
 /**
  * @extends FormModel<Focus>
  */
-class FocusModel extends FormModel implements GlobalSearchInterface
+final class FocusModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {

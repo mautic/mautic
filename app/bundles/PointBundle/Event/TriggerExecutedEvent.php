@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\TriggerEvent as TriggerEventEntity;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class TriggerExecutedEvent extends Event
+final class TriggerExecutedEvent extends Event
 {
     private ?bool $result = null;
 

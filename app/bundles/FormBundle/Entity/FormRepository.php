@@ -11,7 +11,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Form>
  */
-class FormRepository extends CommonRepository
+final class FormRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 

@@ -10,7 +10,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExcelExporter
+final class ExcelExporter
 {
     public function __construct(
         protected FormatterHelper $formatterHelper,

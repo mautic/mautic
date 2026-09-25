@@ -11,7 +11,7 @@ use Mautic\EmailBundle\Entity\EmailDraftRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class EmailDraftModel extends AbstractCommonModel
+final class EmailDraftModel extends AbstractCommonModel
 {
     private EmailDraftRepository $emailDraftRepository;
 

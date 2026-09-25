@@ -15,7 +15,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonRepository<Company>
  */
-class CompanyRepository extends CommonRepository implements CustomFieldRepositoryInterface
+final class CompanyRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
     use CustomFieldRepositoryTrait;
     use ProjectRepositoryTrait;

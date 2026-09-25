@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class FieldColumnBackgroundJobDispatcher
+final readonly class FieldColumnBackgroundJobDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,

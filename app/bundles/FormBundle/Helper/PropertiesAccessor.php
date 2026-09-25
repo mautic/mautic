@@ -6,7 +6,7 @@ namespace Mautic\FormBundle\Helper;
 
 use Mautic\FormBundle\Model\FormModel;
 
-readonly class PropertiesAccessor
+final readonly class PropertiesAccessor
 {
     public function __construct(
         private FormModel $formModel,

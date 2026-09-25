@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
-class DateTimeHelper
+final class DateTimeHelper
 {
     public const string FORMAT_DB = 'Y-m-d H:i:s';
 

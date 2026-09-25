@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
-readonly class ContactSegmentFilterOperator
+final readonly class ContactSegmentFilterOperator
 {
     public function __construct(
         private FilterOperatorProviderInterface $filterOperatorProvider,

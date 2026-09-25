@@ -8,7 +8,7 @@ use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 /**
  * @property ConnectwiseIntegration $integration
  */
-class ConnectwiseApi extends CrmApi
+final class ConnectwiseApi extends CrmApi
 {
     /**
      * @param string $endpoint

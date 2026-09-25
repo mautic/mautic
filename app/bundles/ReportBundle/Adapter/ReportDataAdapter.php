@@ -9,7 +9,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportModel;
 
-readonly class ReportDataAdapter
+final readonly class ReportDataAdapter
 {
     public function __construct(
         private ReportModel $reportModel,

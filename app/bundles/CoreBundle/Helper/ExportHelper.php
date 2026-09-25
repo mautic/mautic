@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Provides several functions for export-related tasks,
  * like exporting to CSV or Excel.
  */
-readonly class ExportHelper
+final readonly class ExportHelper
 {
     public const EXPORT_TYPE_EXCEL = 'xlsx';
 

@@ -9,7 +9,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Trigger>
  */
-class TriggerRepository extends CommonRepository
+final class TriggerRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 

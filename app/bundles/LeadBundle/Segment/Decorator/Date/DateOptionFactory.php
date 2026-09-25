@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\RelativeDate;
 
-readonly class DateOptionFactory
+final readonly class DateOptionFactory
 {
     public function __construct(
         private DateDecorator $dateDecorator,

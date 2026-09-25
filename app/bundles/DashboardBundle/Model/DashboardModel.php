@@ -30,7 +30,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @extends FormModel<Widget>
  */
-class DashboardModel extends FormModel
+final class DashboardModel extends FormModel
 {
     public static function getName(): string
     {

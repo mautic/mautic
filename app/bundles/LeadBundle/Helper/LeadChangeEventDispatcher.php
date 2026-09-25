@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LeadChangeEventDispatcher
+final class LeadChangeEventDispatcher
 {
     private ?Lead $lead = null;
 

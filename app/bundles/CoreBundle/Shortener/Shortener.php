@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Shortener;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class Shortener
+final class Shortener
 {
     public const SHORTENER_SERVICE = 'shortener_service';
 

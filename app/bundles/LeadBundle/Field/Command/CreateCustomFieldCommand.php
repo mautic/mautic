@@ -31,7 +31,7 @@ The <info>%command.name%</info> command will create columns in a lead_fields tab
 <info>php %command.full_name%</info>
 TXT
 )]
-class CreateCustomFieldCommand extends ModeratedCommand
+final class CreateCustomFieldCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:custom-field:create-column';
 

@@ -13,7 +13,7 @@ use Mautic\UserBundle\Entity\User;
 /**
  * @extends CommonRepository<AuditLog>
  */
-class AuditLogRepository extends CommonRepository
+final class AuditLogRepository extends CommonRepository
 {
     use TimelineTrait;
 

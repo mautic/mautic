@@ -16,7 +16,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonRepository<LeadList>
  */
-class LeadListRepository extends CommonRepository
+final class LeadListRepository extends CommonRepository
 {
     use ExpressionHelperTrait;
     use RegexTrait;

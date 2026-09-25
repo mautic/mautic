@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SendEmailToContact
+final class SendEmailToContact
 {
     private array $failedContacts = [];
 

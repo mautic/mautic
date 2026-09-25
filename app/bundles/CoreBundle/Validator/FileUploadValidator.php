@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FileUploadValidator
+final class FileUploadValidator
 {
     public function __construct(
         protected TranslatorInterface $translator,

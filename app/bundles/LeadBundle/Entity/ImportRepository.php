@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Import>
  */
-class ImportRepository extends CommonRepository
+final class ImportRepository extends CommonRepository
 {
     /**
      * Count how many imports with the status is there.

@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailValidator
+final class EmailValidator
 {
     public function __construct(
         protected TranslatorInterface $translator,

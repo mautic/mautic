@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-readonly class CacheHelper
+final readonly class CacheHelper
 {
     public function __construct(
         private string $cacheDir,

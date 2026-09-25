@@ -6,7 +6,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WebhookBuilderEvent extends Event
+final class WebhookBuilderEvent extends Event
 {
     private array $events = [];
 

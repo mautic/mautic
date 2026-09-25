@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-readonly class ConditionExecutioner implements EventInterface
+final readonly class ConditionExecutioner implements EventInterface
 {
     public const TYPE = 'condition';
 

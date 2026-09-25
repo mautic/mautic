@@ -4,7 +4,7 @@ namespace Mautic\AssetBundle\Helper;
 
 use Mautic\AssetBundle\Model\AssetModel;
 
-class TokenHelper
+final class TokenHelper
 {
     public const REGEX = '/{assetlink=(.*?)}/';
 

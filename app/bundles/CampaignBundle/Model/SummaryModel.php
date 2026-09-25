@@ -16,7 +16,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends AbstractCommonModel<Summary>
  */
-class SummaryModel extends AbstractCommonModel
+final class SummaryModel extends AbstractCommonModel
 {
     public static function getName(): string
     {

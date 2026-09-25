@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-class ContactSegmentFilterCrate
+final class ContactSegmentFilterCrate
 {
     public const CONTACT_OBJECT   = 'lead';
 

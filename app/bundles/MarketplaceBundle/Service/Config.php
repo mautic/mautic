@@ -6,7 +6,7 @@ namespace Mautic\MarketplaceBundle\Service;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-readonly class Config
+final readonly class Config
 {
     public const MARKETPLACE_ENABLED           = 'marketplace_enabled';
 

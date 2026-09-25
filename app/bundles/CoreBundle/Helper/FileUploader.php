@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileUploader
+final class FileUploader
 {
     /**
      * @var string[]

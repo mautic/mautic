@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-readonly class Widget
+final readonly class Widget
 {
     public const FORMAT_HUMAN = 'M j, Y';
 

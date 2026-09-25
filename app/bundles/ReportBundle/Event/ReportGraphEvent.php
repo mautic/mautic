@@ -5,7 +5,7 @@ namespace Mautic\ReportBundle\Event;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 
-class ReportGraphEvent extends AbstractReportEvent
+final class ReportGraphEvent extends AbstractReportEvent
 {
     /**
      * @param mixed[] $requestedGraphs

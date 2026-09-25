@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Exception\SchemaException;
 /**
  * Used to manipulate creation/removal of tables.
  */
-class TableSchemaHelper
+final class TableSchemaHelper
 {
     /**
      * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>

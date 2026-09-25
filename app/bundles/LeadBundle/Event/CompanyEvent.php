@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Company;
 
-class CompanyEvent extends CommonEvent
+final class CompanyEvent extends CommonEvent
 {
     public function __construct(
         Company $company,

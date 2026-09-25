@@ -26,7 +26,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
-class ObjectChangeGenerator
+final class ObjectChangeGenerator
 {
     /**
      * @var string[]

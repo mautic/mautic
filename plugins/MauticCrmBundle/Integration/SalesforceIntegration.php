@@ -36,7 +36,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CrmAbstractIntegration<SalesforceApi>
  */
-class SalesforceIntegration extends CrmAbstractIntegration
+final class SalesforceIntegration extends CrmAbstractIntegration
 {
     private RoleRepository $roleRepository;
 

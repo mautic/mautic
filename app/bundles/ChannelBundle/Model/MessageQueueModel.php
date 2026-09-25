@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<MessageQueue>
  */
-class MessageQueueModel extends FormModel
+final class MessageQueueModel extends FormModel
 {
     public static function getName(): string
     {

@@ -22,7 +22,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @implements AjaxLookupModelInterface<Message>
  */
-class MessageModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class MessageModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     public static function getName(): string
     {

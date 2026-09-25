@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\EmailBundle\Entity\Email;
 
-class AbTestSettingsService
+final class AbTestSettingsService
 {
     /**
      * @var int

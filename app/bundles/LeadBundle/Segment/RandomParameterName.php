@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Segment;
 
-class RandomParameterName
+final class RandomParameterName
 {
     /**
      * @var int

@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
  * to do. The part shapes are kept identical to DBAL 3's so the rest of the segment
  * code reads them unchanged.
  */
-class QueryBuilder extends BaseQueryBuilder
+final class QueryBuilder extends BaseQueryBuilder
 {
     private ?ExpressionBuilder $_expr = null;
 

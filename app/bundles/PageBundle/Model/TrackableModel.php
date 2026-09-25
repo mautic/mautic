@@ -16,7 +16,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends AbstractCommonModel<Trackable>
  */
-class TrackableModel extends AbstractCommonModel
+final class TrackableModel extends AbstractCommonModel
 {
     public static function getName(): string
     {

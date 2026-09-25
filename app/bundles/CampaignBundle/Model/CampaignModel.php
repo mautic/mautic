@@ -47,7 +47,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @extends CommonFormModel<Campaign>
  */
-class CampaignModel extends CommonFormModel implements GlobalSearchInterface
+final class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {

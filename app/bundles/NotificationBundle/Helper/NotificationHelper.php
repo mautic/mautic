@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class NotificationHelper
+final class NotificationHelper
 {
     public function __construct(
         protected AssetsHelper $assetsHelper,

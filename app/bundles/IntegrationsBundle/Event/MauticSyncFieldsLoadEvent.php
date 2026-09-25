@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MauticSyncFieldsLoadEvent extends Event
+final class MauticSyncFieldsLoadEvent extends Event
 {
     public function __construct(
         private readonly string $objectName,

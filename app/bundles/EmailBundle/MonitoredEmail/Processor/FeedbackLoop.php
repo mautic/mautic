@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FeedbackLoop implements ProcessorInterface
+final class FeedbackLoop implements ProcessorInterface
 {
     private ?Message $message = null;
 

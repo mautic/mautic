@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;
 
-class IntegrationHelper
+final class IntegrationHelper
 {
     /**
      * @var array<string, mixed>

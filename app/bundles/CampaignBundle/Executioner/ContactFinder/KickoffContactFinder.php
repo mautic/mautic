@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 
-readonly class KickoffContactFinder
+final readonly class KickoffContactFinder
 {
     public function __construct(
         private LeadRepository $leadRepository,

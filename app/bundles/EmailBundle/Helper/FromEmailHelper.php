@@ -11,7 +11,7 @@ use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-class FromEmailHelper
+final class FromEmailHelper
 {
     /**
      * @var array<int,mixed[]>

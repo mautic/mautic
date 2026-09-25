@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Field;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-class SchemaDefinition
+final class SchemaDefinition
 {
     /**
      * Max length of VARCHAR fields.

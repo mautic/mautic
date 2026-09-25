@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FormFieldHelper extends AbstractFormFieldHelper
+final class FormFieldHelper extends AbstractFormFieldHelper
 {
     private readonly ValidatorInterface $validator;
 

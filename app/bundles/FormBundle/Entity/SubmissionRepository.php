@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 /**
  * @extends CommonRepository<Submission>
  */
-class SubmissionRepository extends CommonRepository
+final class SubmissionRepository extends CommonRepository
 {
     use TimelineTrait;
 

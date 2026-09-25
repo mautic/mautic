@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 /**
  * @extends CommonRepository<CompanyLead>
  */
-class CompanyLeadRepository extends CommonRepository
+final class CompanyLeadRepository extends CommonRepository
 {
     public const DELETE_BATCH_SIZE = 1000;
 

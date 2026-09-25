@@ -38,7 +38,7 @@ use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 /**
  * @extends FormModel<Webhook>
  */
-class WebhookModel extends FormModel
+final class WebhookModel extends FormModel
 {
     public static function getName(): string
     {

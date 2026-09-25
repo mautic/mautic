@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ContactMerger
+final class ContactMerger
 {
     /**
      * @var Lead

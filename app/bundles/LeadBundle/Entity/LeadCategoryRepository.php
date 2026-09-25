@@ -14,7 +14,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonRepository<LeadCategory>
  */
-class LeadCategoryRepository extends CommonRepository
+final class LeadCategoryRepository extends CommonRepository
 {
     private CategoryRepository $categoryRepository;
 

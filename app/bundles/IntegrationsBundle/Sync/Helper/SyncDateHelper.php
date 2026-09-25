@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Sync\Helper;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
-class SyncDateHelper
+final class SyncDateHelper
 {
     private ?\DateTimeInterface $syncFromDateTime = null;
 

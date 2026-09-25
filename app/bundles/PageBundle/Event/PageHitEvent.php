@@ -9,7 +9,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageHitEvent extends CommonEvent
+final class PageHitEvent extends CommonEvent
 {
     protected ?Page $page = null;
 

@@ -9,7 +9,7 @@ use Mautic\EmailBundle\Entity\Stat;
 /**
  * @extends CommonRepository<FrequencyRule>
  */
-class FrequencyRuleRepository extends CommonRepository
+final class FrequencyRuleRepository extends CommonRepository
 {
     /**
      * @param string      $channel

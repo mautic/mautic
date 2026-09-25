@@ -7,7 +7,7 @@ namespace Mautic\ConfigBundle\Event;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ConfigBuilderEvent extends Event
+final class ConfigBuilderEvent extends Event
 {
     /**
      * @var mixed[]

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Exception\MailboxException;
 use Mautic\EmailBundle\MonitoredEmail\Exception\NotConfiguredException;
 
-class Mailbox
+final class Mailbox
 {
     /**
      * Return all mails matching the rest of the criteria.

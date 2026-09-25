@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * Used to get statistical data from subscribed tables.
  */
-class StatsEvent extends Event
+final class StatsEvent extends Event
 {
     /**
      * Database table containing statistical data available to get the results from.

@@ -9,7 +9,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-readonly class BotRatioHelper
+final readonly class BotRatioHelper
 {
     /**
      * @param string[] $blockedUserAgents

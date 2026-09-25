@@ -13,7 +13,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Redirect>
  */
-class RedirectModel extends FormModel
+final class RedirectModel extends FormModel
 {
     public static function getName(): string
     {

@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 /**
  * @extends CommonRepository<Role>
  */
-class RoleRepository extends CommonRepository
+final class RoleRepository extends CommonRepository
 {
     public function getEntities(array $args = []): iterable
     {

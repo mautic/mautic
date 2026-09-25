@@ -4,7 +4,7 @@ namespace Mautic\PageBundle\Helper;
 
 use Mautic\PageBundle\Model\PageModel;
 
-class TokenHelper
+final class TokenHelper
 {
     private const string REGEX = '/{pagelink=(.*?)}/';
 

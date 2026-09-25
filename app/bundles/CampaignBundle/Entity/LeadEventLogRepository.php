@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 /**
  * @extends CommonRepository<LeadEventLog>
  */
-class LeadEventLogRepository extends CommonRepository
+final class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
     use ContactLimiterTrait;

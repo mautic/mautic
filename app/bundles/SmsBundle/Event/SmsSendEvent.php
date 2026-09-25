@@ -7,7 +7,7 @@ namespace Mautic\SmsBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-class SmsSendEvent extends CommonEvent
+final class SmsSendEvent extends CommonEvent
 {
     /**
      * @var int

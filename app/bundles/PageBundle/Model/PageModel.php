@@ -69,7 +69,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Page>
  */
-class PageModel extends FormModel implements GlobalSearchInterface
+final class PageModel extends FormModel implements GlobalSearchInterface
 {
     use TranslationModelTrait;
     use VariantModelTrait;

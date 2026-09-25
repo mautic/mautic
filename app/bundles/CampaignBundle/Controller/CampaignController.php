@@ -51,7 +51,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class CampaignController extends AbstractStandardFormController
+final class CampaignController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
     use QuickFilterSearchTrait;

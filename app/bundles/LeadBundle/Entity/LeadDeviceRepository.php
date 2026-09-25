@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<LeadDevice>
  */
-class LeadDeviceRepository extends CommonRepository
+final class LeadDeviceRepository extends CommonRepository
 {
     /**
      * {@inhertidoc}.

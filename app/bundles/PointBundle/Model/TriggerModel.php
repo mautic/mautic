@@ -35,7 +35,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends CommonFormModel<Trigger>
  */
-class TriggerModel extends CommonFormModel implements GlobalSearchInterface
+final class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {

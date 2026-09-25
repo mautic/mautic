@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ImportValidateEvent extends Event
+final class ImportValidateEvent extends Event
 {
     private bool $skipIfExists = false;
 

@@ -18,7 +18,7 @@ use Monolog\Logger;
 /**
  * Helper class for fetching update data.
  */
-class UpdateHelper
+final class UpdateHelper
 {
     private readonly string $phpVersion;
 

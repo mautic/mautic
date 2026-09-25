@@ -11,7 +11,7 @@ use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Psr\Log\LoggerInterface;
 
-class InactiveHelper
+final class InactiveHelper
 {
     private ?\DateTimeInterface $earliestInactiveDate = null;
 

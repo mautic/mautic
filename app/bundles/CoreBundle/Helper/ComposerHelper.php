@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Provides several helper functions to interact with Composer (composer require, remove, etc.).
  */
-readonly class ComposerHelper
+final readonly class ComposerHelper
 {
     public function __construct(
         private KernelInterface $kernel,

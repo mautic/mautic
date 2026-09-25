@@ -6,7 +6,7 @@ namespace Mautic\EmailBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EmailValidationEvent extends Event
+final class EmailValidationEvent extends Event
 {
     /**
      * @var bool

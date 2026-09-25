@@ -12,7 +12,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonRepository<LeadField>
  */
-class LeadFieldRepository extends CommonRepository
+final class LeadFieldRepository extends CommonRepository
 {
     /**
      * @var array<int|string, array<string,mixed>>|null

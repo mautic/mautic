@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 
-class EventLogger
+final class EventLogger
 {
     /**
      * @var Collection<int, LeadEventLog>

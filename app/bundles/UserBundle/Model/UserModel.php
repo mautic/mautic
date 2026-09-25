@@ -38,7 +38,7 @@ use Twig\Environment;
 /**
  * @extends FormModel<User>
  */
-class UserModel extends FormModel implements GlobalSearchInterface
+final class UserModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {

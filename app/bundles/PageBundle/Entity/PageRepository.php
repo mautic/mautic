@@ -10,7 +10,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Page>
  */
-class PageRepository extends CommonRepository
+final class PageRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 

@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\ProcessSignal;
 
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 
-class ProcessSignalService
+final class ProcessSignalService
 {
     public const SIGTERM  = 15;
 

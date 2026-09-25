@@ -47,7 +47,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @implements AjaxLookupModelInterface<Sms>
  */
-class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use TranslationModelTrait;
 

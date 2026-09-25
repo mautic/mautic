@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MaintenanceEvent extends Event
+final class MaintenanceEvent extends Event
 {
     protected \DateTimeInterface $date;
 

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<ListLead>
  */
-class ListLeadRepository extends CommonRepository
+final class ListLeadRepository extends CommonRepository
 {
     public const DELETE_BATCH_SIZE = 5000;
 
