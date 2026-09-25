@@ -83,10 +83,7 @@ final class FileUploader
         }
     }
 
-    /**
-     * @param string $path
-     */
-    public function delete($path): void
+    public function delete(string $path): void
     {
         $this->filePathResolver->delete($path);
     }

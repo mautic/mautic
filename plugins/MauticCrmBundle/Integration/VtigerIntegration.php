@@ -210,7 +210,7 @@ final class VtigerIntegration extends CrmAbstractIntegration
 
     public function amendLeadDataBeforePush(array &$mappedData): void
     {
-        if (!empty($mappedData)) {
+        if ($mappedData !== []) {
             // vtiger requires assigned_user_id so default to authenticated user
             $mappedData['assigned_user_id'] = $this->keys['userId'];
         }

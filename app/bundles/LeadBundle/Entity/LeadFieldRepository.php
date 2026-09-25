@@ -193,7 +193,7 @@ final class LeadFieldRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
-    private function addCompanyLeftJoin($q): void
+    private function addCompanyLeftJoin(\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $q): void
     {
         $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
         $q->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'company', 'companies_lead.company_id = company.id');
@@ -397,7 +397,7 @@ final class LeadFieldRepository extends CommonRepository
      * @param string $field alias
      * @param string $value to compare with
      */
-    public function compareDateValue($lead, $field, $value): bool
+    public function compareDateValue($lead, string $field, $value): bool
     {
         $q        = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $property = $this->getPropertyByField($field, $q);
