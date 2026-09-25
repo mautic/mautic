@@ -351,7 +351,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         return $results[0] ?? [];
     }
 
-    public function exists(string $id): bool
+    public function exists(int|string $id): bool
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->select('1')
