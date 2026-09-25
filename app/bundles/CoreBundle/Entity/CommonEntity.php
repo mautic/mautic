@@ -40,7 +40,7 @@ class CommonEntity implements \Stringable
 
     public function __toString(): string
     {
-        $string = static::class;
+        $string = $this::class;
         if (method_exists($this, 'getId')) {
             $string .= ' with ID #'.$this->getId();
         }
