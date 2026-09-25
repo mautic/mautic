@@ -22,6 +22,19 @@ trait LeadDetailsTrait
 
     private AuditLogModel $leadDetailsAuditLogModel;
 
+    #[Required]
+    public function autowireLeadDetailsTrait(
+        RequestStack $requestStack,
+        LeadModel $leadDetailsLeadModel,
+        LeadEventLogRepository $leadEventLogRepository,
+        AuditLogModel $leadDetailsAuditLogModel,
+    ): void {
+        $this->requestStack = $requestStack;
+        $this->leadDetailsLeadModel     = $leadDetailsLeadModel;
+        $this->leadEventLogRepository = $leadEventLogRepository;
+        $this->leadDetailsAuditLogModel = $leadDetailsAuditLogModel;
+    }
+
     protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, int $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
@@ -369,28 +382,5 @@ trait LeadDetailsTrait
                 'eventType' => ['action', 'condition'],
             ]
         );
-    }
-
-    #[Required]
-    public function setRequestStackLeadDetailsTrait(
-        RequestStack $requestStack,
-    ): void {
-        $this->requestStack = $requestStack;
-    }
-
-    #[Required]
-    public function setLeadEventLogRepositoryLeadDetailsTrait(
-        LeadEventLogRepository $leadEventLogRepository,
-    ): void {
-        $this->leadEventLogRepository = $leadEventLogRepository;
-    }
-
-    #[Required]
-    public function autowireLeadDetailsTrait(
-        LeadModel $leadDetailsLeadModel,
-        AuditLogModel $leadDetailsAuditLogModel,
-    ): void {
-        $this->leadDetailsLeadModel     = $leadDetailsLeadModel;
-        $this->leadDetailsAuditLogModel = $leadDetailsAuditLogModel;
     }
 }
