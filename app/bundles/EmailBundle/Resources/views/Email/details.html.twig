@@ -497,7 +497,7 @@
                   <iframe
                       id="content_preview_frame"
                       class="mb-md"
-                      src="{{ previewUrl|e }}"
+                      src="{{ finalPreviewUrl|e('html_attr') }}"
                       sandbox="allow-popups allow-popups-to-escape-sandbox"
                       title="{{ 'mautic.email.preview.iframe_title'|trans }}"
                       style="width: 100%; height: 600px; border: 0; zoom: 0.35; overflow: hidden;">
@@ -526,6 +526,14 @@
                           </div>
                       </div>
                   {% endif %}
+                  {% if previewSettingsForm.company is defined %}
+                      <div class="row">
+                          <div class="form-group col-xs-12 ">
+                              <div class="control-label">{{ 'mautic.email.preview.show.company'|trans }}</div>
+                              {{ form_widget(previewSettingsForm.company) }}
+                          </div>
+                      </div>
+                  {% endif %}
                   <div class="row">
                       <div class="form-group col-xs-12 ">
                           <div class="input-group">
@@ -536,7 +544,7 @@
                                       'query' : 'customToggle=publicPreview'
                                   }) -}}
                               </div>
-                              <input id="content_preview_url" data-route="email/preview" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl|escape }}"/>
+                              <input id="content_preview_url" data-route="email/download/preview" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="{{ previewUrl|e('html_attr') }}"/>
                               <span class="input-group-btn">
                                 {% include '@MauticCore/Helper/button.html.twig' with {
                                     buttons: [
@@ -556,6 +564,7 @@
                           </span>
                               <input type="hidden" id="content_preview_settings_object_id" value="{{ email.id }}">
                               <input type="hidden" id="content_preview_settings_contact_id" value="">
+                              <input type="hidden" id="content_preview_settings_company_id" value="">
                           </div>
                       </div>
                   </div>
@@ -611,11 +620,11 @@
                               'query' : 'customToggle=publicPreview'
                           }) -}}
                       </div>
-                      <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                      <input id="content_draft_preview_url" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                              readonly
-                             value="{{ draftPreviewUrl|escape }}"/>
+                             value="{{ draftPreviewUrl|e('html_attr') }}"/>
                       <span class="input-group-btn">
-                        <button class="btn btn-default btn-nospin" onclick="window.open('{{ draftPreviewUrl }}', '_blank');">
+                        <button id="content_draft_preview_url_button" class="btn btn-default btn-nospin" onclick="window.open('{{ draftPreviewUrl }}', '_blank');">
                             <i class="fa fa-external-link"></i>
                         </button>
                     </span>
@@ -638,6 +647,6 @@
           {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) -}}
       </div>
       <!-- right section -->
-      <input name="entityId" id="entityId" type="hidden" value="{{ email.id|escape }}"/>
+      <input name="entityId" id="entityId" type="hidden" value="{{ email.id|e('html_attr') }}"/>
   </div>
 {% endblock %}

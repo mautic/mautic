@@ -406,11 +406,12 @@ final class EmailController extends FormController
             $draftPreviewUrl = null;
             if ($emailConfig->isDraftEnabled() && $email->hasDraft()) {
                 $draftPreviewUrl = $this->generateUrl(
-                    'mautic_email_preview',
+                    'mautic_email_preview_download',
                     [
                         'objectId'   => $email->getId(),
                         'objectType' => 'draft',
-                    ]
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
                 );
             }
 
@@ -468,8 +469,13 @@ final class EmailController extends FormController
                     'abTestResults'   => $abTestResults,
                     'security'        => $security,
                     'draftPreviewUrl' => $draftPreviewUrl,
-                    'previewUrl'      => $this->generateUrl(
+                    'finalPreviewUrl' => $this->generateUrl(
                         'mautic_email_preview',
+                        ['objectId' => $email->getId()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                    'previewUrl'      => $this->generateUrl(
+                        'mautic_email_preview_download',
                         ['objectId' => $email->getId()],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ),
@@ -891,10 +897,11 @@ final class EmailController extends FormController
         $draftPreviewUrl = '';
         if ($emailConfig->isDraftEnabled() && $entity->hasDraft()) {
             $draftPreviewUrl = $this->generateUrl(
-                'mautic_email_preview',
+                'mautic_email_preview_download',
                 ['objectId'       => $entity->getId(),
                     'objectType'  => 'draft',
-                ]
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL
             );
         }
 
@@ -919,7 +926,7 @@ final class EmailController extends FormController
                     'draftPreviewUrl'    => $draftPreviewUrl,
                     'invalidHtmlError'   => $this->invalidHtmlError,
                     'previewUrl'         => $this->generateUrl(
-                        'mautic_email_preview',
+                        'mautic_email_preview_download',
                         ['objectId' => $entity->getId()],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ),
