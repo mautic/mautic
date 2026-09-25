@@ -28,6 +28,8 @@ use PHPStan\Type\TypeCombinator;
  * constant, e.g. get(PathsHelper::class), which gives a typed service instead of an untyped object.
  *
  * @implements Rule<MethodCall>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoContainerGetRuleTest
  */
 final class NoContainerGetRule implements Rule
 {
