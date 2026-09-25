@@ -39,7 +39,7 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
      * @var string[]
      */
     private const array FIELD_HELPERS = [
-        'addId', 'addBigIntIdField', 'addIdColumns', 'addDateAdded', 'addPublishDates',
+        'addId', 'addUuid', 'addBigIntIdField', 'addIdColumns', 'addDateAdded', 'addPublishDates',
         'addNullableField', 'addNamedField', 'addLead', 'addContact', 'addCategory', 'addIpAddress',
     ];
 
@@ -53,7 +53,7 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
         'setTable', 'setCustomRepositoryClass', 'setMappedSuperClass', 'addIndex', 'addFulltextIndex',
         'addIndexWithOptions', 'addUniqueConstraint',
         'createField', 'addField', 'createManyToOne', 'createOneToMany', 'createOneToOne', 'createManyToMany',
-        'addId', 'addBigIntIdField', 'addIdColumns', 'addDateAdded', 'addPublishDates',
+        'addId', 'addUuid', 'addBigIntIdField', 'addIdColumns', 'addDateAdded', 'addPublishDates',
         'addNullableField', 'addNamedField', 'addLead', 'addContact', 'addCategory', 'addIpAddress',
     ];
 
@@ -76,15 +76,11 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
             return null;
         }
 
-        // In an already attribute-mapped class the leftover field helpers are redundant; leave them
-        // (and the class) alone. Class-level index helpers are still rewritten below.
-        $isHybrid = $this->hasClassLevelOrmAttribute($node);
-
         $newStmts = [];
         $changed  = false;
 
         foreach ($loadMetadata->stmts as $stmt) {
-            if (!$isHybrid && $stmt instanceof Expression && $this->containsFieldHelper($stmt)) {
+            if ($stmt instanceof Expression && $this->containsFieldHelper($stmt)) {
                 foreach ($this->unchainAndDesugar($stmt) as $produced) {
                     $newStmts[] = $produced;
                 }
@@ -175,6 +171,7 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
     {
         return match ($this->methodName($call)) {
             'addId'            => [$this->buildAddId($builder)],
+            'addUuid'          => [$this->buildAddUuid($builder)],
             'addBigIntIdField' => [$this->buildBigIntIdField($builder, $call)],
             'addIdColumns'     => $this->buildAddIdColumns($builder, $call),
             'addDateAdded'     => [$this->buildDateAdded($builder, $call)],
@@ -196,6 +193,15 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
             $this->step('makePrimaryKey', []),
             $this->step('generatedValue', []),
             $this->step('option', [$this->strArg('unsigned'), $this->boolArg(true)]),
+            $this->step('build', []),
+        ]);
+    }
+
+    private function buildAddUuid(Variable $builder): Expression
+    {
+        return $this->chain($builder, [
+            $this->step('createField', [$this->strArg('id'), $this->strArg('guid')]),
+            $this->step('makePrimaryKey', []),
             $this->step('build', []),
         ]);
     }
@@ -365,7 +371,6 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
     {
         return $this->chain($builder, [
             $this->step('createManyToOne', [$this->strArg('category'), $this->classConstArg('Mautic\\CategoryBundle\\Entity\\Category')]),
-            $this->step('cascadeMerge', []),
             $this->step('cascadeDetach', []),
             $this->step('addJoinColumn', [
                 $this->strArg('category_id'),
@@ -385,7 +390,6 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
         return $this->chain($builder, [
             $this->step('createManyToOne', [$this->strArg('ipAddress'), $this->classConstArg('Mautic\\CoreBundle\\Entity\\IpAddress')]),
             $this->step('cascadePersist', []),
-            $this->step('cascadeMerge', []),
             $this->step('cascadeDetach', []),
             $this->step('addJoinColumn', [
                 $this->strArg('ip_id'),
@@ -603,19 +607,5 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
         }
 
         return $default;
-    }
-
-    private function hasClassLevelOrmAttribute(Class_ $class): bool
-    {
-        foreach ($class->attrGroups as $attrGroup) {
-            foreach ($attrGroup->attrs as $attr) {
-                $name = $attr->name->toString();
-                if (str_starts_with($name, 'ORM\\') || str_starts_with($name, 'Doctrine\\ORM\\Mapping\\')) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }

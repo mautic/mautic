@@ -4,8 +4,6 @@ namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: LogRepository::class)]
 #[ORM\Table(name: 'webhook_logs')]
@@ -16,6 +14,9 @@ class Log
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -34,25 +35,17 @@ class Log
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: Types::DATETIME_MUTABLE, nullable: true)]
     private $dateAdded;
 
     /**
      * @var float|null
      */
+    #[ORM\Column(type: Types::FLOAT, nullable: true)]
     private $runtime;
 
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $note = null;
-
-    public static function loadMetadata(ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder
-            ->addId();
-
-        $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
-        $builder->addNullableField('note', Types::STRING);
-        $builder->addNullableField('runtime', Types::FLOAT);
-    }
 
     /**
      * @return int|null

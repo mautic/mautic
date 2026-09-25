@@ -55,6 +55,9 @@ class Trigger extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['trigger:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -62,48 +65,57 @@ class Trigger extends FormEntity implements UuidInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var int
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'integer')]
     private $points = 0;
 
     /**
      * @var string
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'string', length: 7)]
     private $color = 'a0acb8';
 
     /**
      * @var bool
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(name: 'trigger_existing_leads', type: 'boolean')]
     private $triggerExistingLeads = false;
 
     /**
      * @var Category|null
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
@@ -135,22 +147,6 @@ class Trigger extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addPublishDates();
-
-        $builder->addField('points', 'integer');
-
-        $builder->createField('color', 'string')
-            ->length(7)
-            ->build();
-
-        $builder->createField('triggerExistingLeads', 'boolean')
-            ->columnName('trigger_existing_leads')
-            ->build();
-
-        $builder->addCategory();
 
         self::addProjectsField($builder, 'point_trigger_projects_xref', 'point_trigger_id');
     }

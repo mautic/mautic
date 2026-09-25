@@ -11,7 +11,6 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -45,6 +44,9 @@ class LeadCategory
      * @var int
      */
     #[Groups(['leadcategory:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -67,6 +69,7 @@ class LeadCategory
      * @var \DateTimeInterface
      */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
@@ -82,15 +85,6 @@ class LeadCategory
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
     #[ORM\Column(name: 'manually_added', type: 'boolean')]
     private $manuallyAdded = false;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addDateAdded();
-    }
 
     /**
      * @return int|null

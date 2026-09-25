@@ -4,7 +4,6 @@ namespace Mautic\DashboardBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -18,37 +17,46 @@ class Widget extends FormEntity
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: Types::INTEGER)]
     private $width;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: Types::INTEGER)]
     private $height;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private $ordering;
 
     /**
      * @var string
      */
     #[NotBlank(message: 'mautic.core.type.required')]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $type;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: ArrayType::ARRAY, nullable: true)]
     private $params = [];
 
     /**
@@ -74,30 +82,16 @@ class Widget extends FormEntity
     /**
      * @var int|null (minutes)
      */
+    #[ORM\Column(name: 'cache_timeout', type: Types::INTEGER, nullable: true)]
     private $cacheTimeout;
 
-    /**
-     * @var array
-     */
-    private $templateData = [];
+    private array $templateData = [];
 
     public function __clone()
     {
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder->addIdColumns('name', false);
-        $builder->addField('type', Types::STRING);
-        $builder->addField('width', Types::INTEGER);
-        $builder->addField('height', Types::INTEGER);
-        $builder->addNullableField('cacheTimeout', Types::INTEGER, 'cache_timeout');
-        $builder->addNullableField('ordering', Types::INTEGER);
-        $builder->addNullableField('params', ArrayType::ARRAY);
     }
 
     /**
@@ -251,10 +245,7 @@ class Widget extends FormEntity
         return $this->template;
     }
 
-    /**
-     * @return array
-     */
-    public function getTemplateData()
+    public function getTemplateData(): array
     {
         return $this->templateData;
     }

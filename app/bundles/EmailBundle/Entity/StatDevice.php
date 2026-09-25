@@ -6,7 +6,6 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
@@ -21,6 +20,9 @@ class StatDevice
     /**
      * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Stat::class)]
@@ -34,22 +36,12 @@ class StatDevice
     #[ORM\JoinColumn(name: 'device_id', onDelete: 'CASCADE')]
     private $device;
 
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 
+    #[ORM\Column(name: 'date_opened', type: 'datetime')]
     private ?\DateTimeInterface $dateOpened = null;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateOpened', 'datetime')
-            ->columnName('date_opened')
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.

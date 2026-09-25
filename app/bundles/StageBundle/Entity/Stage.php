@@ -55,6 +55,9 @@ class Stage extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['stage:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -62,12 +65,14 @@ class Stage extends FormEntity implements UuidInterface
      */
     #[Groups(['stage:read', 'stage:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -81,12 +86,14 @@ class Stage extends FormEntity implements UuidInterface
      * @var \DateTimeInterface
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
@@ -99,6 +106,8 @@ class Stage extends FormEntity implements UuidInterface
      * @var Category|null
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     public function __clone()
@@ -117,12 +126,6 @@ class Stage extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addPublishDates();
-
-        $builder->addCategory();
 
         self::addProjectsField($builder, 'stage_projects_xref', 'stage_id');
     }

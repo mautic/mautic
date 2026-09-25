@@ -12,7 +12,6 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -55,6 +54,9 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var int
      */
     #[Groups(['report:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -62,12 +64,14 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      */
     #[Groups(['report:read', 'report:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -88,36 +92,42 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: ArrayType::ARRAY, nullable: true)]
     private $columns = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: ArrayType::ARRAY, nullable: true)]
     private $filters = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'table_order', type: ArrayType::ARRAY, nullable: true)]
     private $tableOrder = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: ArrayType::ARRAY, nullable: true)]
     private $graphs = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'group_by', type: ArrayType::ARRAY, nullable: true)]
     private $groupBy = [];
 
     /**
      * @var array
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: ArrayType::ARRAY, nullable: true)]
     private $aggregators = [];
 
     /**
@@ -141,24 +151,28 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      */
     #[Groups(['report:read', 'report:write'])]
     #[EmailAssert\MultipleEmailsValid]
+    #[ORM\Column(name: 'to_address', type: Types::STRING, length: 191, nullable: true)]
     private $toAddress;
 
     /**
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'schedule_unit', type: Types::STRING, length: 191, nullable: true)]
     private $scheduleUnit;
 
     /**
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'schedule_day', type: Types::STRING, length: 191, nullable: true)]
     private $scheduleDay;
 
     /**
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'schedule_month_frequency', type: Types::STRING, length: 191, nullable: true)]
     private $scheduleMonthFrequency;
 
     private bool $hasScheduleChanged = false;
@@ -168,46 +182,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('columns', ArrayType::ARRAY)
-            ->nullable()
-            ->build();
-
-        $builder->createField('filters', ArrayType::ARRAY)
-            ->nullable()
-            ->build();
-
-        $builder->createField('tableOrder', ArrayType::ARRAY)
-            ->columnName('table_order')
-            ->nullable()
-            ->build();
-
-        $builder->createField('graphs', ArrayType::ARRAY)
-            ->nullable()
-            ->build();
-
-        $builder->createField('groupBy', ArrayType::ARRAY)
-            ->columnName('group_by')
-            ->nullable()
-            ->build();
-
-        $builder->createField('aggregators', ArrayType::ARRAY)
-            ->columnName('aggregators')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('scheduleUnit', Types::STRING, 'schedule_unit');
-        $builder->addNullableField('toAddress', Types::STRING, 'to_address');
-        $builder->addNullableField('scheduleDay', Types::STRING, 'schedule_day');
-        $builder->addNullableField('scheduleMonthFrequency', Types::STRING, 'schedule_month_frequency');
-
     }
 
     /**

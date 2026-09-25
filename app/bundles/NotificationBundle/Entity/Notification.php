@@ -58,78 +58,94 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
      * @var int
      */
     #[Groups(['notification:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $url;
 
     /**
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text')]
     private $heading;
 
     /**
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text')]
     private $message;
 
     /**
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $button;
 
     /**
      * @var array
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(name: 'utm_tags', type: 'array', nullable: true)]
     private $utmTags = [];
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var int
      */
     #[Groups(['notification:read'])]
+    #[ORM\Column(name: 'read_count', type: 'integer')]
     private $readCount = 0;
 
     /**
      * @var int
      */
     #[Groups(['notification:read'])]
+    #[ORM\Column(name: 'sent_count', type: 'integer')]
     private $sentCount = 0;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
@@ -152,18 +168,21 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(name: 'notification_type', type: 'text', nullable: true)]
     private $notificationType = 'template';
 
     /**
      * @var bool
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'boolean')]
     private $mobile = false;
 
     /**
      * @var ?array
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'array')]
     private $mobileSettings;
 
     public function __clone()
@@ -191,48 +210,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('url', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('heading', 'text')
-            ->build();
-
-        $builder->createField('message', 'text')
-            ->build();
-
-        $builder->createField('button', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTags', 'array')
-            ->columnName('utm_tags')
-            ->nullable()
-            ->build();
-
-        $builder->createField('notificationType', 'text')
-            ->columnName('notification_type')
-            ->nullable()
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->createField('readCount', 'integer')
-            ->columnName('read_count')
-            ->build();
-
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->build();
-
-        $builder->addCategory();
-
-        $builder->createField('mobile', 'boolean')->build();
-
-        $builder->createField('mobileSettings', 'array')->build();
 
 
         self::addTranslationMetadata($builder, self::class);

@@ -296,7 +296,7 @@ final class LoadMetadataStaticHelperToAttributeRector extends AbstractRector
             $this->namedArg('targetEntity', $target),
             $this->namedArg('cascade', new Array_(array_map(
                 static fn (string $c): ArrayItem => new ArrayItem(new String_($c)),
-                ['merge', 'persist', 'detach'],
+                ['persist', 'detach'],
             ))),
             $this->namedArg('fetch', new String_('LAZY')),
             $this->namedArg('indexBy', new String_($indexBy)),

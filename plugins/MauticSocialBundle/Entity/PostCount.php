@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: PostCountRepository::class)]
 #[ORM\Table(name: 'monitor_post_count')]
@@ -15,6 +14,9 @@ class PostCount
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -27,23 +29,14 @@ class PostCount
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'post_date', type: 'date')]
     private $postDate;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'post_count', type: 'integer')]
     private $postCount;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addNamedField('postDate', 'date', 'post_date');
-
-        $builder->addNamedField('postCount', 'integer', 'post_count');
-    }
 
     /**
      * @return mixed

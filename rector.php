@@ -25,9 +25,9 @@ return RectorConfig::configure()
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
         // to be used next on loadMetadata()
-        // \Utils\Rector\LoadMetadataMauticHelperToAttributeRector::class,
+        \Utils\Rector\LoadMetadataMauticHelperToAttributeRector::class,
         // \Utils\Rector\LoadMetadataStaticHelperToAttributeRector::class,
-        // \Utils\Rector\LoadMetadataColumnToDoctrineAttributeRector::class,
+        \Utils\Rector\LoadMetadataColumnToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataAssociationToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataManyToManyToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataTableToDoctrineAttributeRector::class,

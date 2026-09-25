@@ -35,7 +35,7 @@ final class PluginTest extends \PHPUnit\Framework\TestCase
         $plugin->setDescription($description);
         $this->assertEquals($description, $plugin->getDescription());
         $this->assertEquals('This is the best plugin in the whole galaxy', $plugin->getPrimaryDescription());
-        $this->assertEquals('Learn more about it <a href="#">here</a>', $plugin->getSecondaryDescription());
+        $this->assertSame('Learn more about it <a href="#">here</a>', $plugin->getSecondaryDescription());
         $this->assertTrue($plugin->hasSecondaryDescription());
     }
 
@@ -46,7 +46,7 @@ final class PluginTest extends \PHPUnit\Framework\TestCase
         $plugin->setDescription($description);
         $this->assertEquals($description, $plugin->getDescription());
         $this->assertEquals('This is the best plugin in the whole galaxy', $plugin->getPrimaryDescription());
-        $this->assertEquals('Learn more about it <a href="#">here</a>', $plugin->getSecondaryDescription());
+        $this->assertSame('Learn more about it <a href="#">here</a>', $plugin->getSecondaryDescription());
         $this->assertTrue($plugin->hasSecondaryDescription());
     }
 }

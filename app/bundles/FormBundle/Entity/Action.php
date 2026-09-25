@@ -11,7 +11,6 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -51,18 +50,23 @@ class Action implements UuidInterface
      * @var int
      */
     #[Groups(['action:read', 'form:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -70,18 +74,21 @@ class Action implements UuidInterface
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required', groups: ['action'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var int
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(name: 'action_order', type: 'integer')]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
@@ -92,32 +99,12 @@ class Action implements UuidInterface
     #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private $form;
 
-    /**
-     * @var array
-     */
-    private $changes;
+    private ?array $changes = null;
 
     public function __clone()
     {
         $this->id   = null;
         $this->form = null;
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('action_order')
-            ->build();
-
-        $builder->addField('properties', 'array');
     }
 
     /**
@@ -146,10 +133,7 @@ class Action implements UuidInterface
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getChanges()
+    public function getChanges(): ?array
     {
         return $this->changes;
     }
