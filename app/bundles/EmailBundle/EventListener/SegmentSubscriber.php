@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SegmentSubscriber implements EventSubscriberInterface
@@ -19,8 +19,8 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LEAD_LIST_CHANGE       => ['onListChange', 0],
-            LeadEvents::LEAD_LIST_BATCH_CHANGE => ['onListChange', 0],
+            ListChangeEvent::class       => ['onListChange', 0],
+            ListBatchChangeEvent::class => ['onListChange', 0],
         ];
     }
 

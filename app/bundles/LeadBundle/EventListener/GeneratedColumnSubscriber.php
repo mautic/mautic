@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,7 +26,7 @@ final readonly class GeneratedColumnSubscriber implements EventSubscriberInterfa
     {
         return [
             GeneratedColumnsEvent::class                 => ['onGeneratedColumnsBuild', 0],
-            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => ['onGenerateSegmentFilters', 0],
+            LeadListFiltersChoicesEvent::class => ['onGenerateSegmentFilters', 0],
         ];
     }
 

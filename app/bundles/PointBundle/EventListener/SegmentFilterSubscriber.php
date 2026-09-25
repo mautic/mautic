@@ -6,7 +6,6 @@ namespace Mautic\PointBundle\EventListener;
 
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\PointBundle\Entity\Group;
@@ -26,10 +25,10 @@ final readonly class SegmentFilterSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE   => [
+            LeadListFiltersChoicesEvent::class   => [
                 ['onGenerateSegmentFiltersAddPointGroups', -10],
             ],
-            LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE   => [
+            SegmentDictionaryGenerationEvent::class   => [
                 ['onSegmentDictionaryGenerate', 0],
             ],
         ];

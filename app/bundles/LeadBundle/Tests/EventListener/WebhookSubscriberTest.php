@@ -9,9 +9,10 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
-use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
+use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
-use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\LeadEvents;
@@ -52,8 +53,8 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead = new Lead();
         $lead->setEmail('hello@hello.com');
         $lead->setDateIdentified(new \DateTime());
-        $event = new LeadEvent($lead, true);
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
+        $event = new LeadPostSaveEvent($lead, true);
+        $this->dispatcher->dispatch($event);
     }
 
     public function testUpdateContactEventIsFiredWhenUpdatedButWithoutDateIdentified(): void
@@ -74,8 +75,8 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead->setEmail('hello@hello.com');
         // remove date identified so it'll simulate a simple update
         $lead->resetChanges();
-        $event = new LeadEvent($lead, false);
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
+        $event = new LeadPostSaveEvent($lead, false);
+        $this->dispatcher->dispatch($event);
     }
 
     public function testWebhookIsNotDeliveredIfContactIsAVisitor(): void
@@ -90,8 +91,8 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
         $lead  = new Lead();
-        $event = new LeadEvent($lead, false);
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
+        $event = new LeadPostSaveEvent($lead, false);
+        $this->dispatcher->dispatch($event);
     }
 
     public function testWebhookIsNotDeliveredIfContactIsWithoutChanges(): void
@@ -109,8 +110,8 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead  = new Lead();
         $lead->setEmail('test@test.com');
         $lead->setChanges([]);
-        $event = new LeadEvent($lead, false);
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
+        $event = new LeadPostSaveEvent($lead, false);
+        $this->dispatcher->dispatch($event);
     }
 
     #[TestDox('Test that webhook is queued for channel subscription changes')]
@@ -176,7 +177,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
         $event = new LeadChangeCompanyEvent($lead, $company);
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_COMPANY_CHANGE);
+        $this->dispatcher->dispatch($event);
     }
 
     public function testOnCompanySaveAndDelete(): void
@@ -193,9 +194,8 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $company = new Company();
         $company->setName('company');
-        $event = new CompanyEvent($company);
-        $dispatcher->dispatch($event, LeadEvents::COMPANY_POST_SAVE);
-        $dispatcher->dispatch($event, LeadEvents::COMPANY_POST_DELETE);
+        $dispatcher->dispatch(new CompanyPostSaveEvent($company));
+        $dispatcher->dispatch(new CompanyPostDeleteEvent($company));
     }
 
     public function testOnSegmentChangeWithArrayContact(): void
