@@ -6,9 +6,19 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 trait LeadAccessTrait
 {
+    private LeadModel $leadAccessLeadModel;
+
+    #[Required]
+    public function autowireLeadAccessTrait(
+        LeadModel $leadAccessLeadModel,
+    ): void {
+        $this->leadAccessLeadModel = $leadAccessLeadModel;
+    }
+
     /**
      * Determines if the user has access to the lead the note is for.
      *
@@ -18,8 +28,7 @@ trait LeadAccessTrait
     {
         if (!$leadId instanceof Lead) {
             // make sure the user has view access to this lead
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity((int) $leadId);
+            $lead = $this->leadAccessLeadModel->getEntity((int) $leadId);
         } else {
             $lead   = $leadId;
             $leadId = $lead->getId();
@@ -72,11 +81,8 @@ trait LeadAccessTrait
      */
     protected function checkAllAccess($action, $limit)
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
-
         // make sure the user has view access to leads
-        $repo = $model->getRepository();
+        $repo = $this->leadAccessLeadModel->getRepository();
 
         // order by lastactive, filter
         $leads = $repo->getEntities(
@@ -94,10 +100,6 @@ trait LeadAccessTrait
                 'limit'          => $limit,
                 'hydration_mode' => 'HYDRATE_ARRAY',
             ]);
-
-        if (null === $leads) {
-            return $this->notFound();
-        }
 
         foreach ($leads as $lead) {
             if (!$this->security->hasEntityAccess(

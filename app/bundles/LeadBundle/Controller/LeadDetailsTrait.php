@@ -18,6 +18,23 @@ trait LeadDetailsTrait
 
     private LeadEventLogRepository $leadEventLogRepository;
 
+    private LeadModel $leadDetailsLeadModel;
+
+    private AuditLogModel $leadDetailsAuditLogModel;
+
+    #[Required]
+    public function autowireLeadDetailsTrait(
+        RequestStack $requestStack,
+        LeadModel $leadDetailsLeadModel,
+        LeadEventLogRepository $leadEventLogRepository,
+        AuditLogModel $leadDetailsAuditLogModel,
+    ): void {
+        $this->requestStack = $requestStack;
+        $this->leadDetailsLeadModel     = $leadDetailsLeadModel;
+        $this->leadEventLogRepository = $leadEventLogRepository;
+        $this->leadDetailsAuditLogModel = $leadDetailsAuditLogModel;
+    }
+
     protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, int $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
@@ -61,9 +78,7 @@ trait LeadDetailsTrait
         foreach ($leads as $lead) {
             //  if (!$lead->getEmail()) continue; // discard contacts without email
 
-            /** @var LeadModel $model */
-            $model       = $this->getModel('lead');
-            $engagements = $model->getEngagements($lead, $filters, $orderBy, $page, $limit);
+            $engagements = $this->leadDetailsLeadModel->getEngagements($lead, $filters, $orderBy, $page, $limit);
             $events      = $engagements['events'];
             $types       = $engagements['types'];
 
@@ -170,9 +185,7 @@ trait LeadDetailsTrait
         $lineChart  = new LineChart(null, $fromDate, $toDate);
         $chartQuery = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
 
-        /** @var LeadModel $model */
-        $model       = $this->getModel('lead');
-        $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
+        $engagements = $this->leadDetailsLeadModel->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
         $lineChart->setDataset($this->translator->trans('mautic.lead.graph.line.all_engagements'), $engagements['byUnit']);
 
         $pointStats = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
@@ -212,10 +225,8 @@ trait LeadDetailsTrait
         }
 
         // Audit Log
-        /** @var AuditLogModel $auditlogModel */
-        $auditlogModel = $this->getModel('core.auditlog');
         /** @var AuditLogRepository $repo */
-        $repo     = $auditlogModel->getRepository();
+        $repo     = $this->leadDetailsAuditLogModel->getRepository();
         $logCount = $repo->getAuditLogsCount($lead, $filters);
         $logs     = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
 
@@ -274,10 +285,8 @@ trait LeadDetailsTrait
                 $session->get('mautic.lead.'.$lead->getId().'.timeline.orderbydir'),
             ];
         }
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
 
-        return $model->getEngagements($lead, $filters, $orderBy, $page, $limit);
+        return $this->leadDetailsLeadModel->getEngagements($lead, $filters, $orderBy, $page, $limit);
     }
 
     /**
@@ -295,11 +304,9 @@ trait LeadDetailsTrait
             $toDate = new \DateTime();
         }
 
-        /** @var LeadModel $model */
-        $model       = $this->getModel('lead');
         $chartQuery  = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
 
-        $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
+        $engagements = $this->leadDetailsLeadModel->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
         $pointStats  = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
 
         return [
@@ -320,19 +327,17 @@ trait LeadDetailsTrait
         $engagements = [0, 0, 0, 0, 0, 0];
         $points      = [0, 0, 0, 0, 0, 0];
         foreach ($contacts as $contact) {
-            /** @var LeadModel $model */
-            $model = $this->getModel('lead.lead');
 
             if (!isset($contact['lead_id'])) {
                 continue;
             }
 
-            $lead = $model->getEntity($contact['lead_id']);
+            $lead = $this->leadDetailsLeadModel->getEntity($contact['lead_id']);
 
             if (!$lead instanceof Lead) {
                 continue;
             }
-            $model->getRepository()->refetchEntity($lead);
+            $this->leadDetailsLeadModel->getRepository()->refetchEntity($lead);
             $engagementsData = $this->getStatsCount($lead);
 
             $engagements = array_map(fn ($a, $b): float|int => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
@@ -377,19 +382,5 @@ trait LeadDetailsTrait
                 'eventType' => ['action', 'condition'],
             ]
         );
-    }
-
-    #[Required]
-    public function setRequestStackLeadDetailsTrait(
-        RequestStack $requestStack,
-    ): void {
-        $this->requestStack = $requestStack;
-    }
-
-    #[Required]
-    public function setLeadEventLogRepositoryLeadDetailsTrait(
-        LeadEventLogRepository $leadEventLogRepository,
-    ): void {
-        $this->leadEventLogRepository = $leadEventLogRepository;
     }
 }
