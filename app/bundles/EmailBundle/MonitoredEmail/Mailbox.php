@@ -13,156 +13,156 @@ final class Mailbox
     /**
      * Return all mails matching the rest of the criteria.
      */
-    public const CRITERIA_ALL = 'ALL';
+    public const string CRITERIA_ALL = 'ALL';
 
     /**
      * Match mails with the \\ANSWERED flag set.
      */
-    public const CRITERIA_ANSWERED = 'ANSWERED';
+    public const string CRITERIA_ANSWERED = 'ANSWERED';
 
     /**
      * CRITERIA_BCC "string" - match mails with "string" in the Bcc: field.
      */
-    public const CRITERIA_BCC = 'BCC';
+    public const string CRITERIA_BCC = 'BCC';
 
     /**
      * CRITERIA_BEFORE "date" - match mails with Date: before "date".
      */
-    public const CRITERIA_BEFORE = 'BEFORE';
+    public const string CRITERIA_BEFORE = 'BEFORE';
 
     /**
      * CRITERIA_BODY "string" - match mails with "string" in the body of the mail.
      */
-    public const CRITERIA_BODY = 'BODY';
+    public const string CRITERIA_BODY = 'BODY';
 
     /**
      * CRITERIA_CC "string" - match mails with "string" in the Cc: field.
      */
-    public const CRITERIA_CC = 'CC';
+    public const string CRITERIA_CC = 'CC';
 
     /**
      * Match deleted mails.
      */
-    public const CRITERIA_DELETED = 'DELETED';
+    public const string CRITERIA_DELETED = 'DELETED';
 
     /**
      * Match mails with the \\FLAGGED (sometimes referred to as Important or Urgent) flag set.
      */
-    public const CRITERIA_FLAGGED = 'FLAGGED';
+    public const string CRITERIA_FLAGGED = 'FLAGGED';
 
     /**
      * CRITERIA_FROM "string" - match mails with "string" in the From: field.
      */
-    public const CRITERIA_FROM = 'FROM';
+    public const string CRITERIA_FROM = 'FROM';
 
     /**
      *  CRITERIA_KEYWORD "string" - match mails with "string" as a keyword.
      */
-    public const CRITERIA_KEYWORD = 'KEYWORD';
+    public const string CRITERIA_KEYWORD = 'KEYWORD';
 
     /**
      * Match new mails.
      */
-    public const CRITERIA_NEW = 'NEW';
+    public const string CRITERIA_NEW = 'NEW';
 
     /**
      * Match old mails.
      */
-    public const CRITERIA_OLD = 'OLD';
+    public const string CRITERIA_OLD = 'OLD';
 
     /**
      * CRITERIA_ON "date" - match mails with Date: matching "date".
      */
-    public const CRITERIA_ON = 'ON';
+    public const string CRITERIA_ON = 'ON';
 
     /**
      * Match mails with the \\RECENT flag set.
      */
-    public const CRITERIA_RECENT = 'RECENT';
+    public const string CRITERIA_RECENT = 'RECENT';
 
     /**
      * Match mails that have been read (the \\SEEN flag is set).
      */
-    public const CRITERIA_SEEN = 'SEEN';
+    public const string CRITERIA_SEEN = 'SEEN';
 
     /**
      * CRITERIA_SINCE "date" - match mails with Date: after "date".
      */
-    public const CRITERIA_SINCE = 'SINCE';
+    public const string CRITERIA_SINCE = 'SINCE';
 
     /**
      *  CRITERIA_SUBJECT "string" - match mails with "string" in the Subject:.
      */
-    public const CRITERIA_SUBJECT = 'SUBJECT';
+    public const string CRITERIA_SUBJECT = 'SUBJECT';
 
     /**
      * CRITERIA_TEXT "string" - match mails with text "string".
      */
-    public const CRITERIA_TEXT = 'TEXT';
+    public const string CRITERIA_TEXT = 'TEXT';
 
     /**
      * CRITERIA_TO "string" - match mails with "string" in the To:.
      */
-    public const CRITERIA_TO = 'TO';
+    public const string CRITERIA_TO = 'TO';
 
     /**
      *  Get messages since a specific UID. Eg. UID 2:* will return all messages with UID 2 and above (IMAP includes the given UID).
      */
-    public const CRITERIA_UID = 'UID';
+    public const string CRITERIA_UID = 'UID';
 
     /**
      *  Match mails that have not been answered.
      */
-    public const CRITERIA_UNANSWERED = 'UNANSWERED';
+    public const string CRITERIA_UNANSWERED = 'UNANSWERED';
 
     /**
      * Match mails that are not deleted.
      */
-    public const CRITERIA_UNDELETED = 'UNDELETED';
+    public const string CRITERIA_UNDELETED = 'UNDELETED';
 
     /**
      * Match mails that are not flagged.
      */
-    public const CRITERIA_UNFLAGGED = 'UNFLAGGED';
+    public const string CRITERIA_UNFLAGGED = 'UNFLAGGED';
 
     /**
      * CRITERIA_UNKEYWORD "string" - match mails that do not have the keyword "string".
      */
-    public const CRITERIA_UNKEYWORD = 'UNKEYWORD';
+    public const string CRITERIA_UNKEYWORD = 'UNKEYWORD';
 
     /**
      * Match mails which have not been read yet.
      */
-    public const CRITERIA_UNSEEN = 'UNSEEN';
+    public const string CRITERIA_UNSEEN = 'UNSEEN';
 
     /**
      * Match mails which have not been read yet - alias of CRITERIA_UNSEEN.
      */
-    public const CRITERIA_UNREAD = 'UNSEEN';
+    public const string CRITERIA_UNREAD = 'UNSEEN';
 
-    protected $imapPath;
+    private $imapPath;
 
-    protected $imapFullPath;
+    private $imapFullPath;
 
-    protected $imapStream;
+    private $imapStream;
 
-    protected $imapFolder     = 'INBOX';
+    private $imapFolder     = 'INBOX';
 
-    protected $imapOptions    = 0;
+    private $imapOptions    = 0;
 
-    protected $imapRetriesNum = 0;
+    private $imapRetriesNum = 0;
 
-    protected $imapParams     = [];
+    private ?array $imapParams     = [];
 
-    protected $serverEncoding = 'UTF-8';
+    private string $serverEncoding = 'UTF-8';
 
-    protected $attachmentsDir;
+    private $attachmentsDir;
 
-    protected $settings;
+    private $settings;
 
-    protected $isGmail = false;
+    private bool $isGmail = false;
 
-    protected $mailboxes;
+    private $mailboxes;
 
     /**
      * @var mixed[]
@@ -367,7 +367,7 @@ final class Mailbox
      *
      * @throws MailboxException
      */
-    protected function initImapStream()
+    private function initImapStream()
     {
         imap_timeout(IMAP_OPENTIMEOUT, 15);
         imap_timeout(IMAP_CLOSETIMEOUT, 15);
@@ -392,7 +392,7 @@ final class Mailbox
     /**
      * Check if the stream is connected.
      */
-    protected function isConnected(): bool
+    private function isConnected(): bool
     {
         if (!$this->isConfigured() || !$this->imapStream) {
             return false;
@@ -731,7 +731,7 @@ final class Mailbox
      *
      * @return array|false - FALSE in the case of call failure
      */
-    protected function getQuota(): array|false
+    private function getQuota(): array|false
     {
         return imap_get_quotaroot($this->getImapStream(), 'INBOX');
     }
@@ -847,7 +847,7 @@ final class Mailbox
         return $mail;
     }
 
-    protected function initMailPart(Message $mail, $partStructure, $partNum, bool $markAsSeen = true, bool $isDsn = false, bool $isFbl = false): void
+    private function initMailPart(Message $mail, $partStructure, $partNum, bool $markAsSeen = true, bool $isDsn = false, bool $isFbl = false): void
     {
         $options = FT_UID;
         if (!$markAsSeen) {
@@ -975,7 +975,7 @@ final class Mailbox
         }
     }
 
-    protected function getParameters($partStructure): array
+    private function getParameters($partStructure): array
     {
         $params = [];
         if (!empty($partStructure->parameters)) {
@@ -1000,7 +1000,7 @@ final class Mailbox
     /**
      * @param string $charset
      */
-    protected function decodeMimeStr($string, $charset = 'utf-8'): string
+    private function decodeMimeStr($string, $charset = 'utf-8'): string
     {
         $newString = '';
         $elements  = imap_mime_header_decode($string);
@@ -1015,7 +1015,7 @@ final class Mailbox
         return $newString;
     }
 
-    protected function isUrlEncoded($string): bool
+    private function isUrlEncoded(string $string): bool
     {
         $hasInvalidChars = preg_match('#[^%a-zA-Z0-9\-_\.\+]#', $string);
         $hasEscapedChars = preg_match('#%[a-zA-Z0-9]{2}#', $string);
@@ -1028,7 +1028,7 @@ final class Mailbox
      *
      * @return string
      */
-    protected function decodeRFC2231($string, $charset = 'utf-8')
+    private function decodeRFC2231(string $string, $charset = 'utf-8')
     {
         if (preg_match("/^(.*?)'.*?'(.*?)$/", $string, $matches)) {
             $encoding = $matches[1];
@@ -1050,7 +1050,7 @@ final class Mailbox
      *
      * @return string Converted string if conversion was successful, or the original string if not
      */
-    protected function convertStringEncoding($string, $fromEncoding, $toEncoding)
+    private function convertStringEncoding($string, $fromEncoding, $toEncoding)
     {
         $convertedString = null;
         if ($string && $fromEncoding != $toEncoding) {
@@ -1066,7 +1066,7 @@ final class Mailbox
     /**
      * Close IMAP connection.
      */
-    protected function disconnect(): void
+    private function disconnect(): void
     {
         if ($this->isConnected()) {
             // Prevent these from throwing notices such as "SECURITY PROBLEM: insecure server advertised"

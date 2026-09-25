@@ -10,10 +10,7 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
 final class VariantConverterService
 {
-    /**
-     * @var int
-     */
-    public const DEFAULT_WEIGHT = 100;
+    public const int DEFAULT_WEIGHT = 100;
 
     /**
      * @var array<VariantEntityInterface>

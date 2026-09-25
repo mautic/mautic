@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 final class ListLeadRepository extends CommonRepository
 {
-    public const DELETE_BATCH_SIZE = 5000;
+    public const int DELETE_BATCH_SIZE = 5000;
 
     /**
      * Updates lead ID (e.g. after a lead merge).

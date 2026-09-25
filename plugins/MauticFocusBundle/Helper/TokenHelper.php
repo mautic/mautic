@@ -7,14 +7,14 @@ use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-final class TokenHelper
+final readonly class TokenHelper
 {
-    public const REGEX = '/{focus=(.*?)}/i';
+    public const string REGEX = '/{focus=(.*?)}/i';
 
     public function __construct(
-        protected FocusModel $model,
-        protected RouterInterface $router,
-        protected CorePermissions $security,
+        private FocusModel $model,
+        private RouterInterface $router,
+        private CorePermissions $security,
     ) {
     }
 

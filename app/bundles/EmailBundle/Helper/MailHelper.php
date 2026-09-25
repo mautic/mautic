@@ -46,19 +46,19 @@ use Twig\Environment;
 
 final class MailHelper
 {
-    public const QUEUE_RESET_TO           = 'RESET_TO';
+    public const string QUEUE_RESET_TO           = 'RESET_TO';
 
-    public const QUEUE_FULL_RESET         = 'FULL_RESET';
+    public const string QUEUE_FULL_RESET         = 'FULL_RESET';
 
-    public const QUEUE_DO_NOTHING         = 'DO_NOTHING';
+    public const string QUEUE_DO_NOTHING         = 'DO_NOTHING';
 
-    public const QUEUE_NOTHING_IF_FAILED  = 'IF_FAILED';
+    public const string QUEUE_NOTHING_IF_FAILED  = 'IF_FAILED';
 
-    public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
+    public const string QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
 
-    public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
+    public const string EMAIL_TYPE_TRANSACTIONAL = 'transactional';
 
-    public const EMAIL_TYPE_MARKETING     = 'marketing';
+    public const string EMAIL_TYPE_MARKETING     = 'marketing';
 
     private const array DEFAULT_BODY            = [
         'content'     => '',
@@ -69,91 +69,71 @@ final class MailHelper
     /**
      * @var TransportInterface
      */
-    protected $transport;
+    private $transport;
 
     /**
      * @var bool|MauticMessage
      */
     public $message;
 
-    protected ?AddressDTO $from = null;
+    private ?AddressDTO $from;
 
-    protected ?AddressDTO $systemFrom = null;
+    private ?AddressDTO $systemFrom;
 
-    protected ?string $replyTo = null;
+    private ?string $replyTo;
 
-    protected ?string $systemReplyTo = null;
+    private ?string $systemReplyTo;
 
-    protected int $addressLengthLimit;
+    private int $addressLengthLimit;
 
     /**
      * @var string
      */
-    protected $returnPath;
+    private $returnPath;
 
     /**
      * @var array
      */
-    protected $errors = [];
+    private $errors = [];
 
     /**
      * @var array|Lead
      */
-    protected $lead;
+    private $lead;
 
-    /**
-     * @var bool
-     */
-    protected $internalSend = false;
+    private bool $internalSend = false;
 
-    protected ?string $idHash = null;
+    private ?string $idHash = null;
 
-    /**
-     * @var bool
-     */
-    protected $idHashState = true;
+    private bool $idHashState = true;
 
-    /**
-     * @var bool
-     */
-    protected $appendTrackingPixel = false;
+    private bool $appendTrackingPixel = false;
 
     /**
      * @var array
      */
-    protected $source = [];
+    private $source = [];
 
-    /**
-     * @var Email|null
-     */
-    protected $email;
+    private ?\Mautic\EmailBundle\Entity\Email $email = null;
 
-    /**
-     * @var array
-     */
-    protected $globalTokens = [];
+    private array $globalTokens = [];
 
-    /**
-     * @var array
-     */
-    protected $eventTokens = [];
+    private array $eventTokens = [];
 
     /**
      * Tells the helper that the transport supports tokenized emails (likely HTTP API).
      */
-    protected bool $tokenizationEnabled;
+    private bool $tokenizationEnabled;
 
     /**
      * Use queue mode when sending email through this mailer; this requires a transport that supports tokenization and the use of queue/flushQueue.
-     *
-     * @var bool
      */
-    protected $queueEnabled = false;
+    private bool $queueEnabled = false;
 
     /**
      * @var array
      */
-    protected $queuedRecipients = [];
+    private $queuedRecipients = [];
 
     /**
      * @var array
@@ -163,46 +143,31 @@ final class MailHelper
     /**
      * @var string
      */
-    protected $subject              = '';
+    private $subject              = '';
 
     private ?string $subjectInitial = null;
 
     /**
      * @var string
      */
-    protected $plainText              = '';
+    private $plainText              = '';
 
     private ?string $plainTextInitial = null;
 
-    /**
-     * @var bool
-     */
-    protected $plainTextSet = false;
+    private bool $plainTextSet = false;
+
+    private array $assets = [];
+
+    private array $attachedAssets = [];
+
+    private array $assetStats = [];
 
     /**
      * @var array
      */
-    protected $assets = [];
+    private $headers = [];
 
-    /**
-     * @var array
-     */
-    protected $attachedAssets = [];
-
-    /**
-     * @var array
-     */
-    protected $assetStats = [];
-
-    /**
-     * @var array
-     */
-    protected $headers = [];
-
-    /**
-     * @var array
-     */
-    protected $body = self::DEFAULT_BODY;
+    private array $body = self::DEFAULT_BODY;
 
     /**
      * @var array<?string>
@@ -211,17 +176,12 @@ final class MailHelper
 
     /**
      * Cache for lead owners.
-     *
-     * @var array
      */
-    protected static $leadOwners = [];
+    private static array $leadOwners = [];
 
-    /**
-     * @var bool
-     */
-    protected $fatal = false;
+    private bool $fatal = false;
 
-    protected bool $skip = false;
+    private bool $skip = false;
 
     /**
      * Simply a md5 of the content so that event listeners can easily determine if the content has been changed.
@@ -775,7 +735,7 @@ final class MailHelper
     /**
      * Set plain text for $this->message, replacing if necessary.
      */
-    protected function setMessagePlainText(): void
+    private function setMessagePlainText(): void
     {
         if ($this->tokenizationEnabled && $this->plainTextSet) {
             // No need to find and replace since tokenization happens at the transport level
@@ -1039,12 +999,9 @@ final class MailHelper
     }
 
     /**
-     * @param int    $toBeAdded
-     * @param string $type
-     *
      * @throws BatchQueueMaxException
      */
-    protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to'): void
+    private function checkBatchMaxRecipients(int $toBeAdded = 1, string $type = 'to'): void
     {
         if ($this->queueEnabled && $this->transport instanceof TokenTransportInterface) {
             // Check if max batching has been hit
@@ -1061,10 +1018,8 @@ final class MailHelper
 
     /**
      * Set reply to address(es) for this mailer instance.
-     *
-     * @param string $name
      */
-    public function setReplyTo(?string $addresses, $name = null): void
+    public function setReplyTo(?string $addresses): void
     {
         $this->replyTo = $addresses;
     }
@@ -1473,7 +1428,7 @@ final class MailHelper
     /**
      * Log exception.
      */
-    protected function logError($error, $context = null): void
+    private function logError(string|\Exception $error, $context = null): void
     {
         if ($error instanceof \Exception) {
             $exceptionContext = ['exception' => $error];
@@ -1549,7 +1504,7 @@ final class MailHelper
     /**
      * Creates a download stat for the asset.
      */
-    protected function createAssetDownloadEntries(): void
+    private function createAssetDownloadEntries(): void
     {
         // Nothing was sent out so bail
         if ($this->fatal || [] === $this->assetStats) {
@@ -1586,7 +1541,7 @@ final class MailHelper
     /**
      * Queues the details to note if a lead received an asset if no errors are generated.
      */
-    protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null): void
+    private function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null): void
     {
         if ($this->internalSend || [] === $this->assets) {
             return;
@@ -1794,7 +1749,7 @@ final class MailHelper
     /**
      * Clean the name - if empty, set as null to ensure pretty headers.
      */
-    protected function cleanName(?string $name): ?string
+    private function cleanName(?string $name): ?string
     {
         if (null === $name) {
             return null;

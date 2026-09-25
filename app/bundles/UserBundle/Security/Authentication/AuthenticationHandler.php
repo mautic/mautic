@@ -19,7 +19,7 @@ final readonly class AuthenticationHandler implements AuthenticationSuccessHandl
     ) {
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): \Symfony\Component\HttpFoundation\Response
     {
         // Remove post_logout if set
         $request->getSession()->remove('post_logout');

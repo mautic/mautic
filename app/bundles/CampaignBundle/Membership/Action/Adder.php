@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final readonly class Adder
 {
-    public const NAME = 'added';
+    public const string NAME = 'added';
 
     public function __construct(
         private LeadRepository $leadRepository,

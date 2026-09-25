@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 final readonly class BackgroundSettings
 {
-    public const CREATE_CUSTOM_FIELD_IN_BACKGROUND = 'create_custom_field_in_background';
+    public const string CREATE_CUSTOM_FIELD_IN_BACKGROUND = 'create_custom_field_in_background';
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

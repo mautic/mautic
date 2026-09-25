@@ -64,7 +64,7 @@ final readonly class CacheHelper
     /**
      * Clear cache related session items.
      */
-    protected function clearSessionItems(): void
+    private function clearSessionItems(): void
     {
         // Clear the menu items and icons so they can be rebuilt
         try {

@@ -13,13 +13,11 @@ final class ConnectwiseApi extends CrmApi
     /**
      * @param string $endpoint
      * @param array  $parameters
-     * @param string $method
      *
      * @return mixed|string
-     *
      * @throws ApiErrorException
      */
-    protected function request($endpoint, $parameters = [], $method = 'GET')
+    private function request($endpoint, $parameters = [], string $method = 'GET')
     {
         $apiUrl = $this->integration->getApiUrl();
 

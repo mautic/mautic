@@ -31,7 +31,7 @@ final class CategoryModel extends FormModel implements AjaxLookupModelInterface
      */
     private array $categoriesByBundleCache = [];
 
-    protected RequestStack $requestStack;
+    private RequestStack $requestStack;
 
     private CategoryRepository $categoryRepository;
 

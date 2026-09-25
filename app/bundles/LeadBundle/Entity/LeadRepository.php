@@ -64,7 +64,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         $this->listLeadRepository = $listLeadRepository;
     }
 
-    protected EventDispatcherInterface $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
     private array $availableSocialFields = [];
 
@@ -527,7 +527,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         return ['core', 'social', 'personal', 'professional'];
     }
 
-    public function getEntitiesDbalQueryBuilder(): \Mautic\CoreBundle\Doctrine\Query\QueryBuilder
+    public function getEntitiesDbalQueryBuilder(): \Mautic\LeadBundle\Segment\Query\QueryBuilder
     {
         $alias = $this->getTableAlias();
 

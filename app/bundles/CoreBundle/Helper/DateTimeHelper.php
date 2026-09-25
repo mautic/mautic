@@ -376,7 +376,7 @@ final class DateTimeHelper
         return $this->getLocalDateTime()->format('P');
     }
 
-    protected function setDefaultTimezone(): void
+    private function setDefaultTimezone(): void
     {
         if (null === self::$defaultLocalTimezone) {
             $parameterLoader            = new ParameterLoader();

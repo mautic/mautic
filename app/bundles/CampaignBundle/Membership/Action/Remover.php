@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class Remover
 {
-    public const NAME = 'removed';
+    public const string NAME = 'removed';
 
     private string $unscheduledMessage;
 

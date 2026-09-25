@@ -4,11 +4,11 @@ namespace Mautic\LeadBundle\Segment;
 
 final class ContactSegmentFilterCrate
 {
-    public const CONTACT_OBJECT   = 'lead';
+    public const string CONTACT_OBJECT   = 'lead';
 
-    public const COMPANY_OBJECT   = 'company';
+    public const string COMPANY_OBJECT   = 'company';
 
-    public const BEHAVIORS_OBJECT = 'behaviors';
+    public const string BEHAVIORS_OBJECT = 'behaviors';
 
     /**
      * @var string|null

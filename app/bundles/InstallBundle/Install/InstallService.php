@@ -34,27 +34,27 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class InstallService
+final readonly class InstallService
 {
-    public const CHECK_STEP = 0;
+    public const int CHECK_STEP = 0;
 
-    public const DOCTRINE_STEP = 1;
+    public const int DOCTRINE_STEP = 1;
 
-    public const USER_STEP = 2;
+    public const int USER_STEP = 2;
 
-    public const FINAL_STEP = 3;
+    public const int FINAL_STEP = 3;
 
     public function __construct(
-        private readonly Configurator $configurator,
-        private readonly CacheHelper $cacheHelper,
-        protected PathsHelper $pathsHelper,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly TranslatorInterface $translator,
-        private readonly KernelInterface $kernel,
-        private readonly ValidatorInterface $validator,
-        private readonly UserPasswordHasherInterface $hasher,
-        private readonly FixturesLoaderInterface $fixturesLoader,
-        private readonly UserRepository $userRepository,
+        private Configurator $configurator,
+        private CacheHelper $cacheHelper,
+        private PathsHelper $pathsHelper,
+        private EntityManagerInterface $entityManager,
+        private TranslatorInterface $translator,
+        private KernelInterface $kernel,
+        private ValidatorInterface $validator,
+        private UserPasswordHasherInterface $hasher,
+        private FixturesLoaderInterface $fixturesLoader,
+        private UserRepository $userRepository,
     ) {
     }
 

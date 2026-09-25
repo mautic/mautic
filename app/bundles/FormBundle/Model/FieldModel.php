@@ -27,8 +27,6 @@ final class FieldModel extends CommonFormModel
         return 'form.field';
     }
 
-    protected LeadFieldModel $leadFieldModel;
-
     private RequestStack $requestStack;
 
     private ColumnSchemaHelper $columnSchemaHelper;
@@ -42,7 +40,6 @@ final class FieldModel extends CommonFormModel
         ColumnSchemaHelper $columnSchemaHelper,
         FieldRepository $fieldRepository,
     ): void {
-        $this->leadFieldModel     = $leadFieldModel;
         $this->requestStack       = $requestStack;
         $this->columnSchemaHelper = $columnSchemaHelper;
         $this->fieldRepository    = $fieldRepository;

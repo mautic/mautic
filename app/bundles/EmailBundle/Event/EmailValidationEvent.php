@@ -8,21 +8,15 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class EmailValidationEvent extends Event
 {
-    /**
-     * @var bool
-     */
-    protected $isValid = true;
+    private bool $isValid = true;
 
-    /**
-     * @var string|null
-     */
-    protected $invalidReason;
+    private ?string $invalidReason = null;
 
     /**
      * @param string $address
      */
     public function __construct(
-        protected $address,
+        private $address,
     ) {
     }
 

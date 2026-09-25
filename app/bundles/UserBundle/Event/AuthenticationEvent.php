@@ -16,34 +16,25 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class AuthenticationEvent extends Event
 {
-    /**
-     * @var Response
-     */
-    protected $response;
+    private ?\Symfony\Component\HttpFoundation\Response $response = null;
 
-    /**
-     * @var bool
-     */
-    protected $isAuthenticated = false;
+    private bool $isAuthenticated = false;
 
-    /**
-     * @var bool
-     */
-    protected $forceFailedAuthentication = false;
+    private bool $forceFailedAuthentication = false;
 
     /**
      * @var UserProvider
      */
-    protected UserProviderInterface $userProvider;
+    private readonly UserProviderInterface $userProvider;
 
-    protected bool $isFormLogin;
+    private readonly bool $isFormLogin;
 
     /**
      * Message to display to user if there is a failed authentication.
      *
      * @var string
      */
-    protected $failedAuthMessage;
+    private $failedAuthMessage;
 
     /**
      * @param bool                            $isLoginCheck          Event executed from the mautic_sso_login_check route typically used as the SSO callback
@@ -51,13 +42,13 @@ final class AuthenticationEvent extends Event
      * @param array<AbstractIntegration>|null $integrations
      */
     public function __construct(
-        protected string|User|null $user,
-        protected TokenInterface $token,
+        private string|User|null $user,
+        private TokenInterface $token,
         UserProviderInterface $userProvider,
-        protected Request $request,
-        protected bool $isLoginCheck = false,
-        protected ?string $authenticatingService = null,
-        protected ?array $integrations = null,
+        private readonly Request $request,
+        private readonly bool $isLoginCheck = false,
+        private ?string $authenticatingService = null,
+        private ?array $integrations = null,
     ) {
         $this->isFormLogin           = $token instanceof UsernamePasswordToken;
 

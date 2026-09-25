@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class ConditionExecutioner implements EventInterface
 {
-    public const TYPE = 'condition';
+    public const string TYPE = 'condition';
 
     public function __construct(
         private ConditionDispatcher $dispatcher,

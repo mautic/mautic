@@ -27,10 +27,6 @@ final class IntegrationEntityModel extends FormModel
         $this->integrationEntityRepository = $integrationEntityRepository;
     }
 
-    public function logDataSync(IntegrationObject $integrationObject): void
-    {
-    }
-
     public function getSyncedRecords(IntegrationObject $integrationObject, $integrationName, $recordList, $internalEntityId = null): array
     {
         if (!$formattedRecords = $this->formatListOfContacts($recordList)) {

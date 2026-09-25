@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final readonly class DecisionExecutioner implements EventInterface
 {
-    public const TYPE = 'decision';
+    public const string TYPE = 'decision';
 
     public function __construct(
         private EventLogger $eventLogger,

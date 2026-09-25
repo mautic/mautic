@@ -3,20 +3,18 @@
 namespace Mautic\NotificationBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-final class NotificationHelper
+final readonly class NotificationHelper
 {
     public function __construct(
-        protected AssetsHelper $assetsHelper,
-        protected CoreParametersHelper $coreParametersHelper,
-        protected IntegrationHelper $integrationHelper,
-        protected RouterInterface $router,
-        protected RequestStack $requestStack,
+        private CoreParametersHelper $coreParametersHelper,
+        private IntegrationHelper $integrationHelper,
+        private RouterInterface $router,
+        private RequestStack $requestStack,
     ) {
     }
 

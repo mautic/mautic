@@ -350,7 +350,7 @@ final class ObjectChangeGenerator
             $integrationInformationChangeRequest->getNewValue()->getOriginalValue()
         );
 
-        $deduplicateValue = static::class.'-'.
+        $deduplicateValue = self::class.'-'.
             $integrationInformationChangeRequest->getIntegration().'-'.
             $fieldMappingDAO->getInternalObject().'-'.
             $integrationInformationChangeRequest->getField();

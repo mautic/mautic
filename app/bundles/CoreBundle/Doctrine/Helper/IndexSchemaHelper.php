@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Index\IndexedColumn;
-use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\TextType;
 use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Exception\SchemaException;
@@ -16,41 +15,24 @@ final class IndexSchemaHelper
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
+    private readonly \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
 
-    /**
-     * @var \Doctrine\DBAL\Schema\Schema
-     */
-    protected $schema;
-
-    /**
-     * @var Table
-     */
-    protected $table;
+    private ?\Doctrine\DBAL\Schema\Table $table = null;
 
     /**
      * @var array
      */
-    protected $allowedColumns = [];
+    private $allowedColumns = [];
 
-    /**
-     * @var array
-     */
-    protected $changedIndexes = [];
+    private array $changedIndexes = [];
 
-    /**
-     * @var array
-     */
-    protected $addedIndexes = [];
+    private array $addedIndexes = [];
 
-    /**
-     * @var array
-     */
-    protected $dropIndexes = [];
+    private array $dropIndexes = [];
 
     public function __construct(
-        protected Connection $db,
-        protected ?string $prefix,
+        private readonly Connection $db,
+        private readonly ?string $prefix,
     ) {
         $this->sm = $this->db->createSchemaManager();
     }

@@ -81,7 +81,7 @@ final readonly class DateOptionFactory
         }
     }
 
-    protected function isRelativeFormatsPresent(string $timeframe): bool
+    private function isRelativeFormatsPresent(string $timeframe): bool
     {
         $notations = [
             'first day of ', // first day of January 2021

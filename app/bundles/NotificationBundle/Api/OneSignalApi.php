@@ -10,10 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 
 final class OneSignalApi extends AbstractNotificationApi
 {
-    /**
-     * @var string
-     */
-    protected $apiUrlBase = 'https://onesignal.com/api/v1';
+    private string $apiUrlBase = 'https://onesignal.com/api/v1';
 
     /**
      * @throws MissingAppIDException
@@ -107,7 +104,7 @@ final class OneSignalApi extends AbstractNotificationApi
     /**
      * @param array<string, mixed> $data
      */
-    protected function addMobileData(array &$data, array $mobileConfig): void
+    private function addMobileData(array &$data, array $mobileConfig): void
     {
         foreach ($mobileConfig as $key => $value) {
             switch ($key) {

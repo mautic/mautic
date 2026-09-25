@@ -48,9 +48,9 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
     private array $actions = [];
 
     public function __construct(
-        protected RequestStack $requestStack,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadModel $leadModel,
+        private readonly RequestStack $requestStack,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly LeadModel $leadModel,
         private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,

@@ -20,14 +20,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class UserProvider implements UserProviderInterface
+final readonly class UserProvider implements UserProviderInterface
 {
     public function __construct(
-        protected UserRepository $userRepository,
-        protected PermissionRepository $permissionRepository,
-        protected EventDispatcherInterface $dispatcher,
-        protected UserPasswordHasherInterface $encoder,
-        protected TranslatorInterface $translator,
+        private UserRepository $userRepository,
+        private PermissionRepository $permissionRepository,
+        private EventDispatcherInterface $dispatcher,
+        private UserPasswordHasherInterface $encoder,
+        private TranslatorInterface $translator,
     ) {
     }
 

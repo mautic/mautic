@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class Shortener
 {
-    public const SHORTENER_SERVICE = 'shortener_service';
+    public const string SHORTENER_SERVICE = 'shortener_service';
 
     /**
      * @var ShortenerServiceInterface[]

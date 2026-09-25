@@ -25,7 +25,7 @@ final class ConfigBuilderEvent extends Event
     /**
      * @var string[]
      */
-    protected array $encodedFields = [];
+    private array $encodedFields = [];
 
     public function __construct(
         private readonly BundleHelper $bundleHelper,

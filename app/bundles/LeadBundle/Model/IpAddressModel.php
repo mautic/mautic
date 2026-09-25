@@ -10,14 +10,14 @@ use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
-final class IpAddressModel
+final readonly class IpAddressModel
 {
     private const int DELETE_SIZE = 10000;
 
     public function __construct(
-        protected EntityManagerInterface $entityManager,
-        protected LoggerInterface $logger,
-        private readonly IpAddressRepository $ipAddressRepository,
+        private EntityManagerInterface $entityManager,
+        private LoggerInterface $logger,
+        private IpAddressRepository $ipAddressRepository,
     ) {
     }
 

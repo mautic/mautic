@@ -4,12 +4,12 @@ namespace Mautic\AssetBundle\Helper;
 
 use Mautic\AssetBundle\Model\AssetModel;
 
-final class TokenHelper
+final readonly class TokenHelper
 {
-    public const REGEX = '/{assetlink=(.*?)}/';
+    public const string REGEX = '/{assetlink=(.*?)}/';
 
     public function __construct(
-        protected AssetModel $model,
+        private AssetModel $model,
     ) {
     }
 

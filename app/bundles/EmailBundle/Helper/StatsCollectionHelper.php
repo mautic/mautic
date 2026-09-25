@@ -16,7 +16,7 @@ use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
 final readonly class StatsCollectionHelper
 {
-    public const GENERAL_STAT_PREFIX = 'email';
+    public const string GENERAL_STAT_PREFIX = 'email';
 
     public function __construct(
         private StatHelperContainer $helperContainer,

@@ -10,11 +10,11 @@ use Psr\Log\LoggerInterface;
 final class IpLookupFactory
 {
     public function __construct(
-        protected array $lookupServices,
-        protected LoggerInterface $logger,
-        protected Client $client,
-        protected CoreParametersHelper $coreParametersHelper,
-        protected ?string $cacheDir = null,
+        private array $lookupServices,
+        private readonly LoggerInterface $logger,
+        private readonly Client $client,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly ?string $cacheDir = null,
     ) {
     }
 

@@ -16,9 +16,9 @@ use Symfony\Component\Console\Helper\ProgressBar;
 
 final class MembershipManager
 {
-    public const ACTION_ADDED   = 'added';
+    public const string ACTION_ADDED   = 'added';
 
-    public const ACTION_REMOVED = 'removed';
+    public const string ACTION_REMOVED = 'removed';
 
     private ?ProgressBar $progressBar = null;
 

@@ -92,20 +92,17 @@ final class PageModel extends FormModel implements GlobalSearchInterface
      */
     private const string STRING_ENCODING = 'UTF-8';
 
-    /**
-     * @var bool
-     */
-    protected $catInUrl;
+    private ?bool $catInUrl = null;
 
-    protected DateTimeHelper $dateTimeHelper;
+    private DateTimeHelper $dateTimeHelper;
 
     public function __construct(
-        protected CookieHelper $cookieHelper,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadModel $leadModel,
-        protected FieldModel $leadFieldModel,
-        protected RedirectModel $pageRedirectModel,
-        protected TrackableModel $pageTrackableModel,
+        private CookieHelper $cookieHelper,
+        private IpLookupHelper $ipLookupHelper,
+        private LeadModel $leadModel,
+        private FieldModel $leadFieldModel,
+        private RedirectModel $pageRedirectModel,
+        private TrackableModel $pageTrackableModel,
         private readonly MessageBusInterface $messageBus,
         private readonly CompanyModel $companyModel,
         private readonly IdentifyCompanyHelper $identifyCompanyHelper,

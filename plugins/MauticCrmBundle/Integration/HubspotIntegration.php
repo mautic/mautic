@@ -25,7 +25,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
 {
     private StageRepository $stageRepository;
 
-    protected UserHelper $userHelper;
+    private UserHelper $userHelper;
 
     private EmailValidator $emailValidator;
 
@@ -49,7 +49,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
         return $this->helper;
     }
 
-    public const ACCESS_KEY = 'accessKey';
+    public const string ACCESS_KEY = 'accessKey';
 
     public function getName(): string
     {

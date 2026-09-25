@@ -6,10 +6,7 @@ namespace Mautic\LeadBundle\Segment;
 
 final class RandomParameterName
 {
-    /**
-     * @var int
-     */
-    protected $lastUsedParameterId = 0;
+    private int $lastUsedParameterId = 0;
 
     /**
      * Generate a unique parameter name from int using base conversion.

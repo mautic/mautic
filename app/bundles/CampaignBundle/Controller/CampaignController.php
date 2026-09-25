@@ -59,47 +59,47 @@ final class CampaignController extends AbstractStandardFormController
     /**
      * @var array<string, mixed>
      */
-    protected array $campaignElements = [];
+    private array $campaignElements = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $addedSources = [];
+    private $addedSources = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $campaignEvents = [];
+    private array $campaignEvents = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $campaignSources = [];
+    private array $campaignSources = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $connections = [];
+    private $connections = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $deletedEvents = [];
+    private array $deletedEvents = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $deletedSources = [];
+    private $deletedSources = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $listFilters = [];
+    private array $listFilters = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $modifiedEvents = [];
+    private array $modifiedEvents = [];
 
     protected $sessionId;
 

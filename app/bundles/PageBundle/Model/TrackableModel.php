@@ -28,37 +28,26 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @var array
      */
-    protected $doNotTrack = [];
+    private $doNotTrack = [];
 
     /**
      * Tokens with values that could be used as URLs.
-     *
-     * @var array
      */
-    protected $contentTokens = [];
+    private array $contentTokens = [];
 
     /**
      * Stores content that needs to be replaced when URLs are parsed out of content.
-     *
-     * @var array
      */
-    protected $contentReplacements = [];
+    private array $contentReplacements = [];
 
     /**
      * Indicates whether first-pass replacements were collected while parsing content.
      */
-    protected bool $hasFirstPassReplacements = false;
-
-    /**
-     * Used to rebuild correct URLs when the tokenized URL contains query parameters.
-     *
-     * @var bool
-     */
-    protected $usingClickthrough = true;
+    private bool $hasFirstPassReplacements = false;
 
     private ?array $contactFieldUrlTokens = null;
 
-    protected RedirectModel $redirectModel;
+    private RedirectModel $redirectModel;
 
     private LeadFieldRepository $leadFieldRepository;
 
@@ -78,11 +67,6 @@ final class TrackableModel extends AbstractCommonModel
     public function getRepository(): TrackableRepository
     {
         return $this->trackableRepository;
-    }
-
-    protected function getRedirectModel(): RedirectModel
-    {
-        return $this->redirectModel;
     }
 
     /**
@@ -238,8 +222,6 @@ final class TrackableModel extends AbstractCommonModel
      */
     public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, bool $usingClickthrough = true): array
     {
-        $this->usingClickthrough = $usingClickthrough;
-
         // Set do not track list for validateUrlIsTrackable()
         $this->doNotTrack = $this->getDoNotTrackList($content);
 
@@ -270,7 +252,7 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @return array<string, Redirect|Trackable>
      */
-    protected function createTrackingTokens(array $entities): array
+    private function createTrackingTokens(array $entities): array
     {
         $tokens = [];
         foreach ($entities as $trackable) {
@@ -288,10 +270,9 @@ final class TrackableModel extends AbstractCommonModel
     /**
      * Prepares content for tokenized trackable URLs by replacing them with {trackable=ID} tokens.
      *
-     * @param string $content
      * @param string $type    html|text
      */
-    protected function prepareContentWithTrackableTokens($content, $type): string
+    private function prepareContentWithTrackableTokens(string $content, string $type): string
     {
         if (empty($content)) {
             return '';
@@ -332,7 +313,7 @@ final class TrackableModel extends AbstractCommonModel
     /**
      * @phpstan-impure
      */
-    protected function extractTrackablesFromContent($content): array
+    private function extractTrackablesFromContent(string $content): array
     {
         if (0 !== preg_match('/<[^<]+>/', $content)) {
             // Parse as HTML
@@ -348,7 +329,7 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @param string $html HTML content
      */
-    protected function extractTrackablesFromHtml($html): array
+    private function extractTrackablesFromHtml(string $html): array
     {
         // Find links using DOM to only find <a> tags
         $libxmlPreviousState = libxml_use_internal_errors(true);
@@ -370,7 +351,7 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @param string $text Plain text content
      */
-    protected function extractTrackablesFromText($text): array
+    private function extractTrackablesFromText(string $text): array
     {
         // Remove any HTML tags (such as img) that could contain href or src attributes prior to parsing for links
         $text = strip_tags($text);
@@ -389,7 +370,7 @@ final class TrackableModel extends AbstractCommonModel
         return $trackableUrls;
     }
 
-    protected function createTrackableEntity(string $url, $channel, $channelId): Trackable
+    private function createTrackableEntity(string $url, $channel, $channelId): Trackable
     {
         $redirect = $this->redirectModel->createRedirectEntity($url);
 
@@ -406,7 +387,7 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @return false|array{0: string, 1: string}
      */
-    protected function prepareUrlForTracking(string $url): false|array
+    private function prepareUrlForTracking(string $url): false|array
     {
         // Ensure it's clean
         $url = trim($url);
@@ -480,7 +461,7 @@ final class TrackableModel extends AbstractCommonModel
     /**
      * Determines if a URL/token is in the do not track list.
      */
-    protected function isInDoNotTrack($url): bool
+    private function isInDoNotTrack($url): bool
     {
         // Ensure it's not in the do not track list
         foreach ($this->doNotTrack as $notTrackable) {
@@ -495,7 +476,7 @@ final class TrackableModel extends AbstractCommonModel
     /**
      * Validates that a token is trackable as a URL.
      */
-    protected function validateTokenIsTrackable($token, $tokenizedHost = null): bool
+    private function validateTokenIsTrackable(string $token, $tokenizedHost = null): bool
     {
         // Validate if this token is listed as not to be tracked
         if ($this->isInDoNotTrack($token)) {
@@ -523,7 +504,7 @@ final class TrackableModel extends AbstractCommonModel
         return $this->isValidUrl($tokenValue);
     }
 
-    protected function isValidUrl($url, bool $forceScheme = true): bool
+    private function isValidUrl($url, bool $forceScheme = true): bool
     {
         $urlParts = (!is_array($url)) ? parse_url($url) : $url;
 
@@ -540,70 +521,9 @@ final class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * Find and extract tokens from the URL as this have to be processed outside of tracking tokens.
-     *
-     * @param array<string, mixed> $urlParts from parse_url
-     */
-    protected function extractTokensFromQuery(array &$urlParts): array|false
-    {
-        $tokenizedParams = false;
-
-        // Check for a token with a query appended such as {pagelink=1}&key=value
-        if (isset($urlParts['path']) && preg_match('/([https?|ftps?]?\{.*?\})&(.*?)$/', $urlParts['path'], $match)) {
-            $urlParts['path'] = $match[1];
-            if (isset($urlParts['query'])) {
-                // Likely won't happen but append if this exists
-                $urlParts['query'] .= '&'.$match[2];
-            } else {
-                $urlParts['query'] = $match[2];
-            }
-        }
-
-        // Check for tokens in the query
-        if (!empty($urlParts['query'])) {
-            [$tokenizedParams, $untokenizedParams] = $this->parseTokenizedQuery($urlParts['query']);
-            if ([] !== $tokenizedParams) {
-                // Rebuild the query without the tokenized query params for now
-                $urlParts['query'] = $this->httpBuildQuery($untokenizedParams);
-            }
-        }
-
-        return $tokenizedParams;
-    }
-
-    /**
-     * Group query parameters into those that have tokens and those that do not.
-     *
-     * @return array<array<string, mixed>> [$tokenizedParams[], $untokenizedParams[]]
-     */
-    protected function parseTokenizedQuery($query): array
-    {
-        $tokenizedParams   =
-        $untokenizedParams = [];
-
-        // Test to see if there are tokens in the query and if so, extract and append them to the end of the tracked link
-        if (preg_match('/(\{\S+?\})/', $query)) {
-            // Equal signs in tokens will confuse parse_str so they need to be encoded
-            $query = preg_replace('/\{(\S+?)=(\S+?)\}/', '{$1%3D$2}', $query);
-
-            parse_str($query, $queryParts);
-
-            foreach ($queryParts as $key => $value) {
-                if (preg_match('/(\{\S+?\})/', $key) || preg_match('/(\{\S+?\})/', $value)) {
-                    $tokenizedParams[$key] = $value;
-                } else {
-                    $untokenizedParams[$key] = $value;
-                }
-            }
-        }
-
-        return [$tokenizedParams, $untokenizedParams];
-    }
-
-    /**
      * @return array<string, Trackable|Redirect>
      */
-    protected function getEntitiesFromUrls($trackableUrls, $channel, $channelId): array
+    private function getEntitiesFromUrls(array $trackableUrls, ?string $channel, ?int $channelId): array
     {
         if (!empty($channel) && !empty($channelId)) {
             // Track as channel aware
@@ -620,31 +540,12 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @param array<string, mixed> $parts
      */
-    protected function httpBuildUrl(array $parts): string
+    private function httpBuildUrl(array $parts): string
     {
         $uri = (string) Uri::fromParts($parts);
 
         // Decode curly braces that Guzzle encoded to preserve Mautic tokens like {contactfield=bar}
         return str_replace(['%7B', '%7D'], ['{', '}'], $uri);
-    }
-
-    /**
-     * Build query string while accounting for tokens that include an equal sign.
-     *
-     * @param array<string, mixed> $queryParts
-     */
-    protected function httpBuildQuery(array $queryParts): ?string
-    {
-        $query = http_build_query($queryParts);
-
-        // http_build_query likely encoded tokens so that has to be fixed so they get replaced
-        $query = preg_replace_callback(
-            '/%7B(\S+?)%7D/i',
-            fn ($matches): string => urldecode($matches[0]),
-            $query
-        );
-
-        return $query;
     }
 
     private function isContactFieldToken(string $token): bool
@@ -691,7 +592,7 @@ final class TrackableModel extends AbstractCommonModel
         return $content;
     }
 
-    protected function getContactFieldUrlTokens(): array
+    private function getContactFieldUrlTokens(): array
     {
         if (null !== $this->contactFieldUrlTokens) {
             return $this->contactFieldUrlTokens;

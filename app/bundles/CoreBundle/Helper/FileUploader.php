@@ -14,7 +14,7 @@ final class FileUploader
     /**
      * @var string[]
      */
-    protected array $imageMimes = [
+    private array $imageMimes = [
         'image/gif',
         'image/jpeg',
         'image/pjpeg',
@@ -27,7 +27,7 @@ final class FileUploader
     /**
      * @var string[]
      */
-    protected array $imageExtensions = [
+    private array $imageExtensions = [
         'jpg',
         'jpeg',
         'png',

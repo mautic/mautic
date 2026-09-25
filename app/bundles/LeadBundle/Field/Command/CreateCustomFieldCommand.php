@@ -33,7 +33,7 @@ TXT
 )]
 final class CreateCustomFieldCommand extends ModeratedCommand
 {
-    public const COMMAND_NAME = 'mautic:custom-field:create-column';
+    public const string COMMAND_NAME = 'mautic:custom-field:create-column';
 
     public function __construct(
         private readonly BackgroundService $backgroundService,

@@ -11,21 +11,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class WidgetDetailEvent extends CommonEvent
 {
-    public const DASHBOARD_CACHE_TAG = 'dashboard_widget';
+    public const string DASHBOARD_CACHE_TAG = 'dashboard_widget';
 
-    protected $type;
+    private $type;
 
-    protected $template;
+    private ?string $template = null;
 
-    protected $templateData = [];
+    private array $templateData = [];
 
-    protected $errorMessage;
+    private $errorMessage;
 
-    protected $uniqueId;
+    private ?string $uniqueId = null;
 
-    protected float $startTime;
-
-    protected $loadTime  = 0;
+    private readonly float $startTime;
 
     private string $cacheKeyPath = 'dashboard.widget.';
 
@@ -34,7 +32,7 @@ final class WidgetDetailEvent extends CommonEvent
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly CorePermissions $security,
-        protected Widget $widget,
+        private Widget $widget,
         private readonly CacheProviderTagAwareInterface $cacheProvider,
     ) {
         $this->startTime = microtime(true);

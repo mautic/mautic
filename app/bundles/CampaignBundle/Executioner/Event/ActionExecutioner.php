@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class ActionExecutioner implements EventInterface
 {
-    public const TYPE = 'action';
+    public const string TYPE = 'action';
 
     public function __construct(
         private ActionDispatcher $dispatcher,

@@ -49,11 +49,11 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     public function __construct(
-        protected \Mautic\FormBundle\Model\FormModel $formModel,
-        protected TrackableModel $trackableModel,
-        protected Environment $twig,
-        protected FieldModel $leadFieldModel,
-        protected ContactTracker $contactTracker,
+        private readonly \Mautic\FormBundle\Model\FormModel $formModel,
+        private readonly TrackableModel $trackableModel,
+        private readonly Environment $twig,
+        private readonly FieldModel $leadFieldModel,
+        private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

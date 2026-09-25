@@ -32,7 +32,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
-use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
@@ -55,8 +54,7 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
     }
 
     public function __construct(
-        protected ListModel $leadListModel,
-        protected FormModel $formModel,
+        private readonly ListModel $leadListModel,
         private readonly EventCollector $eventCollector,
         private readonly MembershipBuilder $membershipBuilder,
         private readonly ContactTracker $contactTracker,

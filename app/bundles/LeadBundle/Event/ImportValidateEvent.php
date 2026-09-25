@@ -75,7 +75,7 @@ final class ImportValidateEvent extends Event
         $this->matchedFields = $matchedFields;
     }
 
-    public function getSkipIfExists(): ?bool
+    public function getSkipIfExists(): bool
     {
         return $this->skipIfExists;
     }

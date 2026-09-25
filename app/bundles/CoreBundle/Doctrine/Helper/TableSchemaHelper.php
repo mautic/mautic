@@ -16,27 +16,23 @@ final class TableSchemaHelper
     /**
      * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected AbstractSchemaManager $sm;
+    private readonly AbstractSchemaManager $sm;
 
-    /**
-     * @var Schema
-     */
-    protected $schema;
+    private ?\Doctrine\DBAL\Schema\Schema $schema = null;
 
     /**
      * @var string[]
      */
-    protected array $dropTables = [];
+    private array $dropTables = [];
 
     /**
      * @var string[]
      */
-    protected array $addTables = [];
+    private array $addTables = [];
 
     public function __construct(
-        protected Connection $db,
-        protected ?string $prefix,
-        protected ColumnSchemaHelper $columnHelper,
+        private readonly Connection $db,
+        private readonly ?string $prefix,
     ) {
         $this->sm = $db->createSchemaManager();
     }

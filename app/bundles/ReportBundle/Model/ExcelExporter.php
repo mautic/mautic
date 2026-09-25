@@ -10,11 +10,11 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ExcelExporter
+final readonly class ExcelExporter
 {
     public function __construct(
-        protected FormatterHelper $formatterHelper,
-        private readonly TranslatorInterface $translator,
+        private FormatterHelper $formatterHelper,
+        private TranslatorInterface $translator,
     ) {
     }
 

@@ -8,21 +8,15 @@ use Mautic\LeadBundle\Entity\DoNotContact as DoNotContactEntity;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Form\Type\ConfigType;
-use Mautic\SmsBundle\Model\SmsModel;
 
-final class SmsHelper
+final readonly class SmsHelper
 {
     public function __construct(
-        protected LeadRepository $leadRepository,
-        protected LeadModel $leadModel,
-        protected PhoneNumberHelper $phoneNumberHelper,
-        protected SmsModel $smsModel,
-        protected IntegrationHelper $integrationHelper,
-        private readonly DoNotContact $doNotContact,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private LeadRepository $leadRepository,
+        private PhoneNumberHelper $phoneNumberHelper,
+        private DoNotContact $doNotContact,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

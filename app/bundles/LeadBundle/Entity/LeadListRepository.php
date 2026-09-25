@@ -22,32 +22,24 @@ final class LeadListRepository extends CommonRepository
     use RegexTrait;
     use ProjectRepositoryTrait;
 
-    /**
-     * @var bool
-     */
-    protected $listFiltersInnerJoinCompany = false;
+    private bool $listFiltersInnerJoinCompany = false;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
     /**
      * Flag to check if some segment filter on a company field exists.
-     *
-     * @var bool
      */
-    protected $hasCompanyFilter = false;
+    private bool $hasCompanyFilter = false;
 
     /**
      * @var \Doctrine\DBAL\Schema\Column[]
      */
-    protected $leadTableSchema;
+    private $leadTableSchema;
 
     /**
      * @var \Doctrine\DBAL\Schema\Column[]
      */
-    protected $companyTableSchema;
+    private $companyTableSchema;
 
     private function getSingleEntity(int $id, bool $ignoreDeleted = true): ?LeadList
     {

@@ -1567,7 +1567,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    protected function getSyncKey($email): string
+    private function getSyncKey($email): string
     {
         return mb_strtolower($this->cleanPushData($email));
     }
@@ -1575,14 +1575,14 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param mixed[] $trackedContacts
      */
-    protected function getMauticContactsToUpdate(
+    private function getMauticContactsToUpdate(
         array &$checkEmailsInSF,
         $mauticLeadFieldString,
         &$sfObject,
         array &$trackedContacts,
         $limit,
-        $fromDate,
-        $toDate,
+        ?string $fromDate,
+        ?string $toDate,
         &$totalCount,
     ): bool {
         // Fetch them separately so we can determine if Leads are already Contacts
@@ -1631,13 +1631,13 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-    protected function getMauticContactsToCreate(
-        &$checkEmailsInSF,
+    private function getMauticContactsToCreate(
+        array &$checkEmailsInSF,
         array $fieldMapping,
         $mauticLeadFieldString,
         $limit,
-        $fromDate,
-        $toDate,
+        ?string $fromDate,
+        ?string $toDate,
         &$totalCount,
         $progress = null,
     ) {
@@ -1708,7 +1708,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, mixed> $mauticData
      * @param array<string, mixed> $objectFields
      */
-    protected function buildCompositeBody(
+    private function buildCompositeBody(
         array &$mauticData,
         array $objectFields,
         $object,
@@ -1813,11 +1813,11 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array<int, string|mixed[]>
      */
-    protected function getRequiredFieldString(array $config, array $availableFields, $object): array
+    private function getRequiredFieldString(array $config, array $availableFields, string $object): array
     {
         $requiredFields = $this->getRequiredFields($availableFields[$object]);
 
-        if ('company' != $object) {
+        if ('company' !== $object) {
             $requiredFields = $this->prepareFieldsForSync($config['leadFields'] ?? [], array_keys($requiredFields), $object);
         }
 
@@ -1917,7 +1917,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array<int, int>
      */
-    protected function processCompositeResponse($response, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0): array
+    private function processCompositeResponse($response, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0): array
     {
         if (is_array($response)) {
             foreach ($response as $item) {
@@ -2061,7 +2061,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    protected function getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, $requiredFieldString)
+    private function getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, string $requiredFieldString)
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
@@ -2086,8 +2086,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, mixed> $trackedContacts
      * @param array<string, mixed> $sfEntityRecords
      */
-    protected function prepareMauticContactsToUpdate(
-        &$mauticData,
+    private function prepareMauticContactsToUpdate(
+        array &$mauticData,
         array &$checkEmailsInSF,
         array &$processedLeads,
         array &$trackedContacts,
@@ -2240,7 +2240,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, mixed> $checkEmailsInSF
      * @param array<string, mixed> $processedLeads
      */
-    protected function prepareMauticContactsToCreate(
+    private function prepareMauticContactsToCreate(
         &$mauticData,
         array &$checkEmailsInSF,
         array &$processedLeads,
@@ -2272,12 +2272,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @param int $totalUpdated
-     * @param int $totalCreated
-     * @param int $totalErrored
-     */
-    protected function makeCompositeRequest($mauticData, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0): void
+    private function makeCompositeRequest($mauticData, int &$totalUpdated = 0, int &$totalCreated = 0, int &$totalErrored = 0): void
     {
         if (empty($mauticData)) {
             return;
@@ -2306,7 +2301,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, mixed> $checkEmailsInSF
      * @param array<string, mixed> $lead
      */
-    protected function setContactToSync(array &$checkEmailsInSF, array $lead): false|string
+    private function setContactToSync(array &$checkEmailsInSF, array $lead): false|string
     {
         $key = $this->getSyncKey($lead['email']);
         if (isset($checkEmailsInSF[$key])) {
@@ -2324,12 +2319,12 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return int
      */
-    protected function getSalesforceSyncLimit($currentContactList, $limit): float|int
+    private function getSalesforceSyncLimit(array $currentContactList, $limit): float|int
     {
         return $limit - count($currentContactList);
     }
 
-    protected function checkLeadIsContact(array &$trackedContacts, $email, $contactId, $leadFields): array|bool|null
+    private function checkLeadIsContact(array &$trackedContacts, string $email, $contactId, $leadFields): array|bool|null
     {
         if (empty($trackedContacts[$email])) {
             // Check if there's an existing entry
@@ -2367,7 +2362,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array<string, mixed> $config
      */
-    protected function mapContactDataForPush(Lead $lead, array $config): array
+    private function mapContactDataForPush(Lead $lead, array $config): array
     {
         $fields             = array_keys($config['leadFields'] ?? []);
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config);
@@ -2417,7 +2412,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array<string, mixed> $config
      */
-    protected function mapCompanyDataForPush(Company $company, array $config): array
+    private function mapCompanyDataForPush(Company $company, array $config): array
     {
         $object     = 'company';
         $entity     = [];
@@ -2829,8 +2824,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, array<string, mixed[]>> $objectFields
      * @param array<string, mixed>                  $sfEntityRecords
      */
-    protected function prepareMauticCompaniesToUpdate(
-        &$mauticData,
+    private function prepareMauticCompaniesToUpdate(
+        array &$mauticData,
         array &$checkCompaniesInSF,
         array &$processedCompanies,
         &$companiesToSync,
@@ -2924,7 +2919,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array<string, array<string, mixed[]>> $objectFields
      */
-    protected function prepareMauticCompaniesToCreate(
+    private function prepareMauticCompaniesToCreate(
         &$mauticData,
         array &$checkCompaniesInSF,
         array &$processedCompanies,
@@ -2956,15 +2951,15 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
-    protected function getMauticRecordsToUpdate(
+    private function getMauticRecordsToUpdate(
         array &$checkIdsInSF,
-        $mauticEntityFieldString,
+        string $mauticEntityFieldString,
         &$sfObject,
         $limit,
-        $fromDate,
-        $toDate,
+        ?string $fromDate,
+        ?string $toDate,
         &$totalCount,
-        $internalEntity,
+        string $internalEntity,
     ): bool {
         // Fetch them separately so we can determine if Leads are already Contacts
         $toUpdate = $this->integrationEntityRepository->findLeadsToUpdate(
@@ -2989,12 +2984,12 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return 0 === $toUpdateCount;
     }
 
-    protected function getMauticEntitesToCreate(
+    private function getMauticEntitesToCreate(
         array &$checkIdsInSF,
-        $mauticCompanyFieldString,
+        string $mauticCompanyFieldString,
         $limit,
-        $fromDate,
-        $toDate,
+        ?string $fromDate,
+        ?string $toDate,
         &$totalCount,
         $progress = null,
     ): void {
@@ -3022,7 +3017,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @throws ORMException
      * @throws \Exception
      */
-    protected function getSalesforceAccountsByName(array &$checkIdsInSF, $requiredFieldString): array
+    private function getSalesforceAccountsByName(array &$checkIdsInSF, string $requiredFieldString): array
     {
         $searchForIds   = [];
         $searchForNames = [];

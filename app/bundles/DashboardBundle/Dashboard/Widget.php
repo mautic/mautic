@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final readonly class Widget
 {
-    public const FORMAT_HUMAN = 'M j, Y';
+    public const string FORMAT_HUMAN = 'M j, Y';
 
     public function __construct(
         private DashboardModel $dashboardModel,

@@ -17,28 +17,22 @@ final class ColumnSchemaHelper
     /**
      * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected AbstractSchemaManager $sm;
+    private readonly AbstractSchemaManager $sm;
 
     /**
      * @var string
      */
-    protected $tableName;
+    private $tableName;
 
-    /**
-     * @var Table
-     */
-    protected $fromTable;
+    private ?\Doctrine\DBAL\Schema\Table $fromTable = null;
 
-    /**
-     * @var Table
-     */
-    protected $toTable;
+    private ?\Doctrine\DBAL\Schema\Table $toTable = null;
 
     private $columns;
 
     public function __construct(
-        protected Connection $db,
-        protected ?string $prefix,
+        Connection $db,
+        private readonly ?string $prefix,
     ) {
         $this->sm = $db->createSchemaManager();
     }

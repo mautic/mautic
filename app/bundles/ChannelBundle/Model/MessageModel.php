@@ -29,11 +29,11 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
         return 'channel.message';
     }
 
-    public const CHANNEL_FEATURE = 'marketing_messages';
+    public const string CHANNEL_FEATURE = 'marketing_messages';
 
-    protected static $channels;
+    private static ?array $channels = null;
 
-    protected ChannelListHelper $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
     private LeadEventLogRepository $leadEventLogRepository;
 
