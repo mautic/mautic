@@ -91,28 +91,8 @@ abstract class SocialIntegration extends AbstractIntegration
                         }
                         break;
                     case 'array_object':
-                        if ('urls' == $field || 'url' == $field) {
-                            foreach ($socialProfileUrls as $p => $d) {
-                                $fields["{$p}ProfileHandle"] = (!$label)
-                                    ? $this->translator->transConditional("mautic.integration.common.{$p}ProfileHandle", "mautic.integration.{$s}.{$p}ProfileHandle")
-                                    : $label;
-                            }
-                            foreach ($details['fields'] as $f) {
-                                $fields["{$p}Urls"] = (!$label)
-                                    ? $this->translator->transConditional("mautic.integration.common.{$f}Urls", "mautic.integration.{$s}.{$f}Urls")
-                                    : $label;
-                            }
-                        } elseif (isset($details['fields'])) {
-                            foreach ($details['fields'] as $f) {
-                                $fn          = $this->matchFieldName($field, $f);
-                                $fields[$fn] = (!$label)
-                                    ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
-                                    : $label;
-                            }
-                        } else {
-                            $fields[$fn] = (!$label)
-                                ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
-                                : $label;
+                        foreach ($this->getArrayObjectFields($field, $details, $label, $s, $socialProfileUrls) as $key => $value) {
+                            $fields[$key] = $value;
                         }
                         break;
                 }
@@ -120,6 +100,44 @@ abstract class SocialIntegration extends AbstractIntegration
             if ($this->sortFieldsAlphabetically()) {
                 uasort($fields, strnatcmp(...));
             }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * @param array<string, mixed>  $details
+     * @param array<string, string> $socialProfileUrls
+     *
+     * @return array<string, string>
+     */
+    private function getArrayObjectFields(string $field, array $details, string|false $label, string $s, array $socialProfileUrls): array
+    {
+        $fields = [];
+
+        if ('urls' == $field || 'url' == $field) {
+            foreach ($socialProfileUrls as $p => $d) {
+                $fields["{$p}ProfileHandle"] = (!$label)
+                    ? $this->translator->transConditional("mautic.integration.common.{$p}ProfileHandle", "mautic.integration.{$s}.{$p}ProfileHandle")
+                    : $label;
+            }
+            foreach ($details['fields'] as $f) {
+                $fields["{$p}Urls"] = (!$label)
+                    ? $this->translator->transConditional("mautic.integration.common.{$f}Urls", "mautic.integration.{$s}.{$f}Urls")
+                    : $label;
+            }
+        } elseif (isset($details['fields'])) {
+            foreach ($details['fields'] as $f) {
+                $fn          = $this->matchFieldName($field, $f);
+                $fields[$fn] = (!$label)
+                    ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                    : $label;
+            }
+        } else {
+            $fn          = $this->matchFieldName($field);
+            $fields[$fn] = (!$label)
+                ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                : $label;
         }
 
         return $fields;
