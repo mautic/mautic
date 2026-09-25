@@ -58,13 +58,13 @@ final class WebhookQueueRepository extends CommonRepository
     /**
      * Check if there is webhook to process.
      */
-    public function exists(int $id): bool
+    public function exists(int $webhookId): bool
     {
         $qb     = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $result = $qb->select($this->getTableAlias().'.id')
             ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
-            ->where($this->getTableAlias().'.webhook_id = :id')
-            ->setParameter('id', $id)
+            ->where($this->getTableAlias().'.webhook_id = :webhookId')
+            ->setParameter('webhookId', $webhookId)
             ->setMaxResults(1)
             ->executeQuery()
             ->fetchOne();
