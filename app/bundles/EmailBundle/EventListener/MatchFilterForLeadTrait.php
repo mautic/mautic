@@ -100,7 +100,8 @@ trait MatchFilterForLeadTrait
                     }
                     break;
                 case 'number':
-                    $leadVal   = (float) $leadVal;
+                    // Keep NULL as NULL so it is not conflated with 0, the way SQL treats it for segments.
+                    $leadVal   = (null === $leadVal || '' === $leadVal) ? null : (float) $leadVal;
                     $filterVal = (float) $filterVal;
                     break;
                 case 'region':
@@ -131,36 +132,43 @@ trait MatchFilterForLeadTrait
 
             switch ($data['operator']) {
                 case '=':
-                    if ('boolean' === $data['type']) {
+                    if ('number' === $data['type'] && null === $leadVal) {
+                        // SQL equality never matches NULL, but PHP's null == 0.0 does.
+                        $groups[$groupNum] = false;
+                    } elseif ('boolean' === $data['type']) {
                         $groups[$groupNum] = $leadVal === $filterVal;
                     } else {
                         $groups[$groupNum] = $leadVal == $filterVal;
                     }
                     break;
                 case '!=':
-                    if ('boolean' === $data['type']) {
+                    if ('number' === $data['type'] && null === $leadVal) {
+                        // The segment neq handler ORs in IS NULL, so NULL always matches.
+                        $groups[$groupNum] = true;
+                    } elseif ('boolean' === $data['type']) {
                         $groups[$groupNum] = $leadVal !== $filterVal;
                     } else {
                         $groups[$groupNum] = $leadVal != $filterVal;
                     }
                     break;
                 case 'gt':
-                    $groups[$groupNum] = $leadVal > $filterVal;
+                    // SQL comparisons against NULL never match.
+                    $groups[$groupNum] = null !== $leadVal && $leadVal > $filterVal;
                     break;
                 case 'gte':
-                    $groups[$groupNum] = $leadVal >= $filterVal;
+                    $groups[$groupNum] = null !== $leadVal && $leadVal >= $filterVal;
                     break;
                 case 'lt':
-                    $groups[$groupNum] = $leadVal < $filterVal;
+                    $groups[$groupNum] = null !== $leadVal && $leadVal < $filterVal;
                     break;
                 case 'lte':
-                    $groups[$groupNum] = $leadVal <= $filterVal;
+                    $groups[$groupNum] = null !== $leadVal && $leadVal <= $filterVal;
                     break;
                 case 'empty':
-                    $groups[$groupNum] = empty($leadVal);
+                    $groups[$groupNum] = $this->isLeadValueEmpty($leadVal, $data['type']);
                     break;
                 case '!empty':
-                    $groups[$groupNum] = !empty($leadVal);
+                    $groups[$groupNum] = !$this->isLeadValueEmpty($leadVal, $data['type']);
                     break;
                 case 'like':
                     $filterVal         = str_replace(['.', '*', '%'], ['\.', '\*', '.*'], $filterVal);
@@ -206,6 +214,23 @@ trait MatchFilterForLeadTrait
         }
 
         return in_array(true, $groups);
+    }
+
+    /**
+     * @param mixed $leadVal
+     */
+    private function isLeadValueEmpty($leadVal, ?string $type): bool
+    {
+        if (null === $leadVal || [] === $leadVal) {
+            return true;
+        }
+
+        // 0 is a valid value for a numeric field, not an empty one.
+        if ('number' === $type) {
+            return '' === $leadVal;
+        }
+
+        return empty($leadVal);
     }
 
     /**
