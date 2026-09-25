@@ -6,7 +6,7 @@
 
 ## Removed code
 
-- Constants removed from `Mautic\LeadBundle\LeadEvents`, these events are now dispatched by their own event class (all under `Mautic\LeadBundle\Event`). Subscribe to the event class instead of the constant, e.g. `LeadPostMergeEvent::class => 'onLeadMerge'`. Lifecycle events that used to share one event object now get a dedicated subclass of the former shared class (`LeadEvent`, `CompanyEvent`, `TagEvent`, `LeadNoteEvent`, `LeadDeviceEvent`, `ImportEvent`, `LeadFieldEvent`, `LeadListEvent`, `LeadMergeEvent`, `CompanyMergeEvent`, `TagMergeEvent`, `SaveBatchLeadsEvent`, `ContactExportSchedulerEvent`, `ListChangeEvent`, which are no longer `final`), so listener type hints keep working; pre and post events are now separate objects.
+- Constants removed from `Mautic\LeadBundle\LeadEvents`, these events are now dispatched by their own event class (all under `Mautic\LeadBundle\Event`). Subscribe to the event class instead of the constant, e.g. `LeadPostMergeEvent::class => 'onLeadMerge'`. Lifecycle events that used to share one event object now get a dedicated subclass of the former shared class (`CompanyEvent`, `TagEvent`, `LeadNoteEvent`, `LeadDeviceEvent`, `ImportEvent`, `LeadFieldEvent`, `LeadListEvent`, `LeadMergeEvent`, `CompanyMergeEvent`, `TagMergeEvent`, `SaveBatchLeadsEvent` and `ContactExportSchedulerEvent` are now `abstract`, instantiate one of the subclasses instead; `LeadEvent` and `ListChangeEvent` are no longer `final`), so listener type hints keep working; pre and post events are now separate objects.
 
     | Removed `LeadEvents` constant | New event class |
     |---|---|

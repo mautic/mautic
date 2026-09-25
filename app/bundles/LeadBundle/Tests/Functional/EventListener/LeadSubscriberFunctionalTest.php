@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\EventListener;
 
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 
 final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -38,7 +38,7 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $leadMergeEvent = new LeadMergeEvent($contactB, $contactA);
+        $leadMergeEvent = new LeadPostMergeEvent($contactB, $contactA);
 
         $subscriber = self::getContainer()->get(LeadSubscriber::class);
         $this->assertInstanceOf(LeadSubscriber::class, $subscriber);
