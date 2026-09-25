@@ -33,6 +33,19 @@ trait FrequencyRuleTrait
 
     private EmailModel $frequencyRuleEmailModel;
 
+    #[Required]
+    public function autowireFrequencyRuleTrait(
+        \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
+        RequestStack $requestStack,
+        LeadModel $frequencyRuleLeadModel,
+        EmailModel $frequencyRuleEmailModel,
+    ): void {
+        $this->doNotContactModel = $doNotContactModel;
+        $this->requestStack = $requestStack;
+        $this->frequencyRuleLeadModel = $frequencyRuleLeadModel;
+        $this->frequencyRuleEmailModel = $frequencyRuleEmailModel;
+    }
+
     /**
      * @param array $viewParameters
      *
@@ -168,18 +181,5 @@ trait FrequencyRuleTrait
             }
         }
         $this->frequencyRuleLeadModel->setFrequencyRules($lead, $formData, $this->leadLists);
-    }
-
-    #[Required]
-    public function autowireFrequencyRuleTrait(
-        \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
-        RequestStack $requestStack,
-        LeadModel $frequencyRuleLeadModel,
-        EmailModel $frequencyRuleEmailModel,
-    ): void {
-        $this->doNotContactModel = $doNotContactModel;
-        $this->requestStack = $requestStack;
-        $this->frequencyRuleLeadModel = $frequencyRuleLeadModel;
-        $this->frequencyRuleEmailModel = $frequencyRuleEmailModel;
     }
 }

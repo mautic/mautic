@@ -12,6 +12,13 @@ trait LeadAccessTrait
 {
     private LeadModel $leadAccessLeadModel;
 
+    #[Required]
+    public function autowireLeadAccessTrait(
+        LeadModel $leadAccessLeadModel,
+    ): void {
+        $this->leadAccessLeadModel = $leadAccessLeadModel;
+    }
+
     /**
      * Determines if the user has access to the lead the note is for.
      *
@@ -106,12 +113,5 @@ trait LeadAccessTrait
         }
 
         return $leads;
-    }
-
-    #[Required]
-    public function autowireLeadAccessTrait(
-        LeadModel $leadAccessLeadModel,
-    ): void {
-        $this->leadAccessLeadModel = $leadAccessLeadModel;
     }
 }
