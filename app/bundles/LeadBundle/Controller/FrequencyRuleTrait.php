@@ -29,6 +29,10 @@ trait FrequencyRuleTrait
 
     private RequestStack $requestStack;
 
+    private LeadModel $frequencyRuleLeadModel;
+
+    private EmailModel $frequencyRuleEmailModel;
+
     /**
      * @param array $viewParameters
      *
@@ -36,12 +40,10 @@ trait FrequencyRuleTrait
      */
     protected function getFrequencyRuleForm(Lead $lead, &$viewParameters = [], &$data = null, bool $isPublic = false, $action = null, bool $isPreferenceCenter = false)
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
 
-        $leadChannels = $model->getContactChannels($lead);
-        $allChannels  = $model->getPreferenceChannels();
-        $leadLists    = $model->getLists($lead, true, true, $isPublic, $isPreferenceCenter);
+        $leadChannels = $this->frequencyRuleLeadModel->getContactChannels($lead);
+        $allChannels  = $this->frequencyRuleLeadModel->getPreferenceChannels();
+        $leadLists    = $this->frequencyRuleLeadModel->getLists($lead, true, true, $isPublic, $isPreferenceCenter);
 
         $viewParameters = array_merge(
             $viewParameters,
@@ -55,9 +57,7 @@ trait FrequencyRuleTrait
         // find the email
         $currentChannelId = null;
         if (!empty($viewParameters['idHash'])) {
-            $emailModel = $this->getModel('email');
-            \assert($emailModel instanceof EmailModel);
-            if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
+            if ($stat = $this->frequencyRuleEmailModel->getEmailStatus($viewParameters['idHash'])) {
                 if ($email = $stat->getEmail()) {
                     $currentChannelId = $email->getId();
                 }
@@ -100,13 +100,11 @@ trait FrequencyRuleTrait
     {
         $data = [];
 
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
-        $allChannels ??= $model->getPreferenceChannels();
+        $allChannels ??= $this->frequencyRuleLeadModel->getPreferenceChannels();
 
-        $leadChannels ??= $model->getContactChannels($lead);
+        $leadChannels ??= $this->frequencyRuleLeadModel->getContactChannels($lead);
 
-        $frequencyRules ??= $model->getFrequencyRules($lead);
+        $frequencyRules ??= $this->frequencyRuleLeadModel->getFrequencyRules($lead);
 
         foreach ($allChannels as $channel) {
             if (isset($frequencyRules[$channel])) {
@@ -127,10 +125,10 @@ trait FrequencyRuleTrait
             }
         }
 
-        $data['global_categories'] = $frequencyRules['global_categories'] ?? $model->getSubscribedAndNewCategoryIds(
+        $data['global_categories'] = $frequencyRules['global_categories'] ?? $this->frequencyRuleLeadModel->getSubscribedAndNewCategoryIds(
             $lead, ['global', 'email']);
 
-        $this->leadLists    = $model->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
+        $this->leadLists    = $this->frequencyRuleLeadModel->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
         foreach ($this->leadLists as $leadList) {
             $data['lead_lists'][] = $leadList->getId();
@@ -148,8 +146,6 @@ trait FrequencyRuleTrait
      */
     protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null): void
     {
-        /** @var LeadModel $leadModel */
-        $leadModel = $this->getModel('lead.lead');
 
         $request = $this->requestStack->getCurrentRequest();
         \assert(null !== $request);
@@ -171,15 +167,19 @@ trait FrequencyRuleTrait
                 $this->doNotContactModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
             }
         }
-        $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);
+        $this->frequencyRuleLeadModel->setFrequencyRules($lead, $formData, $this->leadLists);
     }
 
     #[Required]
     public function autowireFrequencyRuleTrait(
         \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
         RequestStack $requestStack,
+        LeadModel $frequencyRuleLeadModel,
+        EmailModel $frequencyRuleEmailModel,
     ): void {
         $this->doNotContactModel = $doNotContactModel;
         $this->requestStack = $requestStack;
+        $this->frequencyRuleLeadModel = $frequencyRuleLeadModel;
+        $this->frequencyRuleEmailModel = $frequencyRuleEmailModel;
     }
 }
