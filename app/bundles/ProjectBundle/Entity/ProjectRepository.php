@@ -14,7 +14,7 @@ final class ProjectRepository extends CommonRepository
     protected function getDefaultOrder(): array
     {
         return [
-            ['p.date_modified', 'ASC'],
+            ['p.dateModified', 'ASC'],
         ];
     }
 
