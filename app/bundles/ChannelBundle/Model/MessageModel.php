@@ -103,10 +103,7 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
         return $this->formFactory->create(MessageType::class, $entity, $options);
     }
 
-    /**
-     * @return array
-     */
-    public function getChannels()
+    public function getChannels(): array
     {
         if (!self::$channels) {
             $channels = $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE);

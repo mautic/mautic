@@ -136,10 +136,8 @@ final class AuthenticationEvent extends Event
 
     /**
      * Check if the user has been authenticated.
-     *
-     * @return bool
      */
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
         return $this->isAuthenticated;
     }
@@ -176,10 +174,8 @@ final class AuthenticationEvent extends Event
 
     /**
      * Returns true if a plugin has forcefully failed authentication.
-     *
-     * @return bool
      */
-    public function isFailed()
+    public function isFailed(): bool
     {
         return $this->forceFailedAuthentication;
     }
@@ -205,10 +201,8 @@ final class AuthenticationEvent extends Event
 
     /**
      * Get the response if set by the listener.
-     *
-     * @return Response|null
      */
-    public function getResponse()
+    public function getResponse(): ?\Symfony\Component\HttpFoundation\Response
     {
         return $this->response;
     }

@@ -237,10 +237,8 @@ final class Mailbox
 
     /**
      * Returns if this is a Gmail connection.
-     *
-     * @return mixed
      */
-    public function isGmail()
+    public function isGmail(): bool
     {
         return $this->isGmail;
     }
@@ -997,10 +995,7 @@ final class Mailbox
         return $params;
     }
 
-    /**
-     * @param string $charset
-     */
-    private function decodeMimeStr($string, $charset = 'utf-8'): string
+    private function decodeMimeStr($string, string $charset = 'utf-8'): string
     {
         $newString = '';
         $elements  = imap_mime_header_decode($string);
@@ -1024,11 +1019,9 @@ final class Mailbox
     }
 
     /**
-     * @param string $charset
-     *
      * @return string
      */
-    private function decodeRFC2231(string $string, $charset = 'utf-8')
+    private function decodeRFC2231(string $string, string $charset = 'utf-8')
     {
         if (preg_match("/^(.*?)'.*?'(.*?)$/", $string, $matches)) {
             $encoding = $matches[1];

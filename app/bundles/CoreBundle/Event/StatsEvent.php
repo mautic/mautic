@@ -102,10 +102,7 @@ final class StatsEvent extends Event
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getSelect()
+    public function getSelect(): ?array
     {
         return $this->select;
     }
@@ -143,10 +140,8 @@ final class StatsEvent extends Event
 
     /**
      * Returns the where.
-     *
-     * @return array
      */
-    public function getWhere()
+    public function getWhere(): array
     {
         return $this->where;
     }
@@ -173,20 +168,16 @@ final class StatsEvent extends Event
 
     /**
      * Returns the results.
-     *
-     * @return array
      */
-    public function getResults()
+    public function getResults(): array
     {
         return $this->results;
     }
 
     /**
      * Returns the subscribed tables untill the match was found.
-     *
-     * @return array
      */
-    public function getTables()
+    public function getTables(): array
     {
         sort($this->tables);
 
@@ -205,10 +196,8 @@ final class StatsEvent extends Event
 
     /**
      * Returns boolean if the results were set or not.
-     *
-     * @return bool
      */
-    public function hasResults()
+    public function hasResults(): bool
     {
         return $this->hasResults;
     }

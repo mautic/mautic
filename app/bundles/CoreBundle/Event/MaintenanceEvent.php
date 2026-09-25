@@ -59,10 +59,7 @@ final class MaintenanceEvent extends Event
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getStats()
+    public function getStats(): array
     {
         ksort($this->stats, SORT_NATURAL);
 

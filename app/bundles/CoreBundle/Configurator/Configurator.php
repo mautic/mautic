@@ -94,7 +94,7 @@ final class Configurator
      *
      * @return StepInterface[]
      */
-    public function getSteps()
+    public function getSteps(): array
     {
         if ([] === $this->sortedSteps) {
             $this->sortedSteps = $this->getSortedSteps();

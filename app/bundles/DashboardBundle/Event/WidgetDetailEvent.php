@@ -145,10 +145,8 @@ final class WidgetDetailEvent extends CommonEvent
 
     /**
      * Get the widget template.
-     *
-     * @return string
      */
-    public function getTemplate()
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
@@ -179,7 +177,7 @@ final class WidgetDetailEvent extends CommonEvent
      *
      * @return array<mixed>
      */
-    public function getTemplateData()
+    public function getTemplateData(): array
     {
         return $this->templateData;
     }
@@ -205,10 +203,8 @@ final class WidgetDetailEvent extends CommonEvent
 
     /**
      * Build a unique ID from type and widget params.
-     *
-     * @return string
      */
-    public function getUniqueWidgetId()
+    public function getUniqueWidgetId(): string
     {
         if ($this->uniqueId) {
             return $this->uniqueId;

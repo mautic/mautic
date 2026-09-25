@@ -1125,10 +1125,8 @@ final class MailHelper
 
     /**
      * Check if this is not being send directly to the lead.
-     *
-     * @return bool
      */
-    public function isInternalSend()
+    public function isInternalSend(): bool
     {
         return $this->internalSend;
     }
@@ -1149,10 +1147,7 @@ final class MailHelper
         $this->source = $source;
     }
 
-    /**
-     * @return Email|null
-     */
-    public function getEmail()
+    public function getEmail(): ?\Mautic\EmailBundle\Entity\Email
     {
         return $this->email;
     }
@@ -1365,10 +1360,7 @@ final class MailHelper
         return $tokens;
     }
 
-    /**
-     * @return array
-     */
-    public function getGlobalTokens()
+    public function getGlobalTokens(): array
     {
         return $this->globalTokens;
     }
@@ -1840,14 +1832,14 @@ final class MailHelper
         return [
             'name'        => $name,
             'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
-            'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
-            'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
+            'emailId'     => ($this->email instanceof \Mautic\EmailBundle\Entity\Email) ? $this->email->getId() : null,
+            'emailName'   => ($this->email instanceof \Mautic\EmailBundle\Entity\Email) ? $this->email->getName() : null,
             'hashId'      => $this->idHash,
             'hashIdState' => $this->idHashState,
             'source'      => $this->source,
             'tokens'      => $tokens,
-            'utmTags'     => (!empty($this->email)) ? $this->email->getUtmTags() : [],
-            'includeDnc'  => !empty($this->email) && $this->email->getSendToDnc(),
+            'utmTags'     => ($this->email instanceof \Mautic\EmailBundle\Entity\Email) ? $this->email->getUtmTags() : [],
+            'includeDnc'  => $this->email instanceof \Mautic\EmailBundle\Entity\Email && $this->email->getSendToDnc(),
         ];
     }
 

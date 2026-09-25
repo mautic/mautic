@@ -36,18 +36,12 @@ final class EmailValidationEvent extends Event
         $this->stopPropagation();
     }
 
-    /**
-     * @return bool
-     */
-    public function isValid()
+    public function isValid(): bool
     {
         return $this->isValid;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getInvalidReason()
+    public function getInvalidReason(): ?string
     {
         return $this->invalidReason;
     }

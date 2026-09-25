@@ -119,7 +119,7 @@ final class ThemeHelper implements ThemeHelperInterface
         $this->finder                    = clone $finder;
     }
 
-    public function getDefaultThemes()
+    public function getDefaultThemes(): array
     {
         return $this->defaultThemes;
     }

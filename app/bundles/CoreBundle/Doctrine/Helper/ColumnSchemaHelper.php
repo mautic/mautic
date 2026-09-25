@@ -66,10 +66,8 @@ final class ColumnSchemaHelper
 
     /**
      * Get table details.
-     *
-     * @return Table
      */
-    public function getTable()
+    public function getTable(): ?\Doctrine\DBAL\Schema\Table
     {
         return $this->toTable;
     }

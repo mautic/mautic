@@ -1911,13 +1911,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param int $totalUpdated
-     * @param int $totalCreated
-     * @param int $totalErrored
-     *
      * @return array<int, int>
      */
-    private function processCompositeResponse($response, &$totalUpdated = 0, &$totalCreated = 0, &$totalErrored = 0): array
+    private function processCompositeResponse($response, int &$totalUpdated = 0, int &$totalCreated = 0, int &$totalErrored = 0): array
     {
         if (is_array($response)) {
             foreach ($response as $item) {
@@ -2061,7 +2057,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    private function getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, string $requiredFieldString)
+    private function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString)
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
@@ -2241,7 +2237,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, mixed> $processedLeads
      */
     private function prepareMauticContactsToCreate(
-        &$mauticData,
+        array &$mauticData,
         array &$checkEmailsInSF,
         array &$processedLeads,
         array $objectFields,
@@ -2920,7 +2916,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, array<string, mixed[]>> $objectFields
      */
     private function prepareMauticCompaniesToCreate(
-        &$mauticData,
+        array &$mauticData,
         array &$checkCompaniesInSF,
         array &$processedCompanies,
         array $objectFields,
