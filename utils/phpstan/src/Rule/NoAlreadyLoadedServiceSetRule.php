@@ -38,6 +38,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * of another directory than the load() call walks.
  *
  * @implements Rule<FileNode>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoAlreadyLoadedServiceSetRuleTest
  */
 final readonly class NoAlreadyLoadedServiceSetRule implements Rule
 {

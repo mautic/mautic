@@ -20,6 +20,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * dependency visible.
  *
  * @implements Rule<MethodCall>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoGetModelWithStringInControllerRuleTest
  */
 final class NoGetModelWithStringInControllerRule implements Rule
 {

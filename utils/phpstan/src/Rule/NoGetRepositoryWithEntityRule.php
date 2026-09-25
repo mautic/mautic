@@ -33,6 +33,8 @@ use PHPStan\Type\ObjectType;
  * Tests are skipped, as fetching an entity by its repository is a legit shortcut there.
  *
  * @implements Rule<MethodCall>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoGetRepositoryWithEntityRuleTest
  */
 final class NoGetRepositoryWithEntityRule implements Rule
 {

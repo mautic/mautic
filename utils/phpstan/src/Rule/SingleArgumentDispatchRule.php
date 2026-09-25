@@ -24,6 +24,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * @see https://symfony.com/blog/new-in-symfony-4-3-simpler-event-dispatching
  *
  * @implements Rule<MethodCall>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\SingleArgumentDispatchRuleTest
  */
 final class SingleArgumentDispatchRule implements Rule
 {
