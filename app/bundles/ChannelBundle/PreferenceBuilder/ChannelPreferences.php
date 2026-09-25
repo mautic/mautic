@@ -26,8 +26,6 @@ final class ChannelPreferences
      */
     public function addPriority($priority): static
     {
-        $priority = (int) $priority;
-
         $this->organizedByPriority[$priority] ??= new ArrayCollection();
 
         return $this;
@@ -38,8 +36,6 @@ final class ChannelPreferences
      */
     public function addLog(LeadEventLog $log, $priority): static
     {
-        $priority = (int) $priority;
-
         $this->addPriority($priority);
 
         // We have to clone the log to not affect the original assocaited with the MM event itself
@@ -73,8 +69,6 @@ final class ChannelPreferences
      */
     public function getLogsByPriority($priority): Collection
     {
-        $priority = (int) $priority;
-
         return $this->organizedByPriority[$priority] ?? new ArrayCollection();
     }
 }

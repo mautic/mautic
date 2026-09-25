@@ -432,15 +432,15 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
         $executed            = 0;
         $integrationEntities = [];
         try {
-            while ($records = ('Contact' == $object)
+            while ($records = ('Contact' === $object)
                 ? $this->getApiHelper()->getContacts($params, $page)
                 : $this->getApiHelper()->getCompanies($params, $page)) {
-                $mauticReferenceObject = ('Contact' == $object) ? 'lead' : 'company';
+                $mauticReferenceObject = ('Contact' === $object) ? 'lead' : 'company';
                 foreach ($records as $record) {
                     if (is_array($record)) {
                         $id            = $record['id'];
                         $formattedData = $this->amendLeadDataBeforeMauticPopulate($record, $object);
-                        $entity        = ('Contact' == $object)
+                        $entity        = ('Contact' === $object)
                             ? $this->getMauticLead($formattedData)
                             : $this->getMauticCompany(
                                 $formattedData,

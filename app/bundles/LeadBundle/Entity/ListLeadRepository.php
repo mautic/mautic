@@ -32,8 +32,8 @@ final class ListLeadRepository extends CommonRepository
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_lists_leads')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId);
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId);
 
         if ([] !== $lists) {
             $q->andWhere(
@@ -45,7 +45,7 @@ final class ListLeadRepository extends CommonRepository
             // Delete remaining leads as the new lead already belongs
             $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads')
-                ->where('lead_id = '.(int) $fromLeadId)
+                ->where('lead_id = '.$fromLeadId)
                 ->executeStatement();
         } else {
             $q->executeStatement();

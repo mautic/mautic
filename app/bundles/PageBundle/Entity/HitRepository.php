@@ -438,7 +438,7 @@ final class HitRepository extends CommonRepository
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
             ->set('date_left', ':datetime')
-            ->where('id = '.(int) $lastHitId)
+            ->where('id = '.$lastHitId)
             ->setParameter('datetime', $dt->toUtcString());
         $q->executeStatement();
     }
@@ -505,8 +505,8 @@ final class HitRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'page_hits')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId)
             ->executeStatement();
     }
 

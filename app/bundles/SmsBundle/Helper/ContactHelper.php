@@ -21,12 +21,10 @@ final readonly class ContactHelper
     }
 
     /**
-     * @param string $number
      * @return Collection<int, Lead>
-     *
      * @throws NumberNotFoundException
      */
-    public function findContactsByNumber($number): Collection
+    public function findContactsByNumber(string $number): Collection
     {
         // Who knows what the number was originally formatted as so let's try a few
         $searchForNumbers = $this->phoneNumberHelper->getFormattedNumberList($number);

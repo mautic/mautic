@@ -8,29 +8,20 @@ final class EmailStatOptions extends FetchOptions
 {
     private array $ids = [];
 
-    /**
-     * @var int|null
-     */
-    private $companyId;
+    private ?int $companyId = null;
 
     /**
      * @var int|null
      */
     private $campaignId;
 
-    /**
-     * @var int|null
-     */
-    private $segmentId;
+    private ?int $segmentId = null;
 
     private array $filters = [];
 
     private bool $canViewOthers = false;
 
-    /**
-     * @var string
-     */
-    private $unit;
+    private ?string $unit = null;
 
     public function setEmailIds(array $ids): static
     {

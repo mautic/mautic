@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "770a96e515d5b6903bc356b8e52e1f1b",
+    "content-hash": "2afa75401457c32bb7da5965d1374176",
     "packages": [
         {
             "name": "api-platform/core",
@@ -18228,16 +18228,16 @@
         },
         {
             "name": "symplify/phpstan-rules",
-            "version": "14.16.0",
+            "version": "14.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symplify/phpstan-rules.git",
-                "reference": "de06599b8ab2a827c7b9f1a2794008bb6d170244"
+                "reference": "c6a60f14fa95d5e615cafd121a8a70f739b6d3e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/de06599b8ab2a827c7b9f1a2794008bb6d170244",
-                "reference": "de06599b8ab2a827c7b9f1a2794008bb6d170244",
+                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/c6a60f14fa95d5e615cafd121a8a70f739b6d3e4",
+                "reference": "c6a60f14fa95d5e615cafd121a8a70f739b6d3e4",
                 "shasum": ""
             },
             "require": {
@@ -18268,6 +18268,13 @@
                     "includes": [
                         "config/services/services.neon",
                         "config/naming-rules.neon",
+                        "config/code-complexity-rules.neon",
+                        "config/configurable-rules.neon",
+                        "config/static-rules.neon",
+                        "config/symfony-rules.neon",
+                        "config/symfony-config-rules.neon",
+                        "config/doctrine-rules.neon",
+                        "config/phpunit-rules.neon",
                         "config/ctor-rules.neon",
                         "config/mock-rules.neon",
                         "config/phpstan-extensions.neon"
@@ -18289,7 +18296,7 @@
             "description": "Set of Symplify rules, type extensions and error formatter for PHPStan",
             "support": {
                 "issues": "https://github.com/symplify/phpstan-rules/issues",
-                "source": "https://github.com/symplify/phpstan-rules/tree/14.16.0"
+                "source": "https://github.com/symplify/phpstan-rules/tree/14.17.0"
             },
             "funding": [
                 {
@@ -18301,7 +18308,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-24T08:39:05+00:00"
+            "time": "2026-09-24T21:33:45+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -18355,16 +18362,16 @@
         },
         {
             "name": "tomasvotruba/type-coverage",
-            "version": "2.3.6",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/type-coverage.git",
-                "reference": "bb2e1d115bfc38b2b29c98ea64762d70607a684f"
+                "reference": "7980db433ce3e88cb892772cc8765c49d410865e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/bb2e1d115bfc38b2b29c98ea64762d70607a684f",
-                "reference": "bb2e1d115bfc38b2b29c98ea64762d70607a684f",
+                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/7980db433ce3e88cb892772cc8765c49d410865e",
+                "reference": "7980db433ce3e88cb892772cc8765c49d410865e",
                 "shasum": ""
             },
             "require": {
@@ -18410,7 +18417,7 @@
             ],
             "support": {
                 "issues": "https://github.com/TomasVotruba/type-coverage/issues",
-                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.3.6"
+                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.4.0"
             },
             "funding": [
                 {
@@ -18422,7 +18429,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-29T08:21:40+00:00"
+            "time": "2026-09-24T19:57:06+00:00"
         }
     ],
     "aliases": [],

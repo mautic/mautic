@@ -15,10 +15,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
     {
         public static $handler;
 
-        /**
-         * @var string
-         */
-        private static $environment;
+        private static ?string $environment = null;
 
         /**
          * @var LoggerInterface

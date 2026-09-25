@@ -65,7 +65,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $this->amendLeadDataBeforePush($mappedData);
 
-        if (empty($mappedData)) {
+        if ($mappedData === []) {
             return false;
         }
 

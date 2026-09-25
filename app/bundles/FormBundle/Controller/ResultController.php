@@ -297,7 +297,6 @@ final class ResultController extends CommonFormController
 
     /**
      * @param int    $objectId
-     * @param string $format
      *
      * @throws \Exception
      */
@@ -307,7 +306,7 @@ final class ResultController extends CommonFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],
     )]
-    public function exportAction(Request $request, $objectId, $format = 'csv'): Response
+    public function exportAction(Request $request, $objectId, string $format = 'csv'): Response
     {
         $form      = $this->formModel->getEntity($objectId);
         $session   = $request->getSession();

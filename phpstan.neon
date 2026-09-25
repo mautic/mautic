@@ -85,12 +85,27 @@ parameters:
             identifier: symplify.noNullableServiceInConstructor
             path: app/bundles/ReportBundle/Generator/ReportGenerator.php
 
+        # too strict
+        - identifier: symplify.forbiddenNode
+        - identifier: symplify.noReference
+        - identifier: symplify.forbiddenFuncCall
+
+        # parent class is used actively
+        -
+            identifier: symplify.forbiddenExtendOfNonAbstractClass
+            paths:
+                - *Controller.php
+                - *Model.php
+
+        # part of deprecation
+        -
+            identifier: symplify.noConstructorOverride
+            path: *Permission.php
+
         # these services have no class name alias in the container, so only the string name can fetch them
         -
             identifier: mautic.noContainerGet
             paths:
-                - app/bundles/ApiBundle/Tests/Functional/OwnershipScopedSecurityMetadataTest.php
-                - app/bundles/CoreBundle/Tests/Functional/DependencyInjection/AbstractContainerSmokeTestCase.php
                 - app/bundles/CoreBundle/Tests/Functional/RouteMapTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php

@@ -26,7 +26,7 @@ final class HourStat
      */
     public function setCount($count): void
     {
-        $this->count = (int) $count;
+        $this->count = $count;
     }
 
     public function getCount(): int
