@@ -7,7 +7,7 @@ namespace MauticPlugin\MauticSocialBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
-final class SocialEvent extends CommonEvent
+abstract class AbstractMonitorEvent extends CommonEvent
 {
     public function __construct(Monitoring $monitoring, bool $isNew = false)
     {
