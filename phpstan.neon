@@ -60,8 +60,6 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     ignoreErrors:
-<<<<<<< HEAD
-<<<<<<< HEAD
         # final classes mocked in tests make the Class&MockObject intersection unresolvable, the mock works via dg/bypass-finals
         -
             identifiers:
@@ -74,13 +72,6 @@ parameters:
             paths:
                 - */Tests/*
                 - */Test/*
-=======
-        # @todo to be removed as risky
-        - identifier: typePerfect.narrowPublicClassMethodParamType
-
->>>>>>> bfbcbb560c ([types] narrow private method param types to passed types)
-=======
->>>>>>> 78919d5bbb (bmp type coverage)
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: symplify.noNullableServiceInConstructor
