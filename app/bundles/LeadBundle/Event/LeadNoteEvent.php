@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 
-class LeadNoteEvent extends CommonEvent
+abstract class LeadNoteEvent extends CommonEvent
 {
     public function __construct(LeadNote $note, bool $isNew = false)
     {
