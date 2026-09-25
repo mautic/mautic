@@ -9,6 +9,7 @@ use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\Scope;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
@@ -27,7 +28,7 @@ final class NoGetModelWithStringInControllerRule implements Rule
 {
     private const string GET_MODEL_METHOD = 'getModel';
 
-    private const string CONTROLLER_SUFFIX = 'Controller.php';
+    private const string CONTROLLER_SUFFIX = 'Controller';
 
     public function getNodeType(): string
     {
@@ -41,13 +42,9 @@ final class NoGetModelWithStringInControllerRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        // inside a trait the scope file is the controller using it, so the very same call would be reported
-        // once per controller, in a file that does not contain it
-        if ($scope->isInTrait()) {
-            return [];
-        }
-
-        if (!str_ends_with($scope->getFile(), self::CONTROLLER_SUFFIX)) {
+        // traits are analysed in context of the using class, so check the class name instead of the file
+        $classReflection = $scope->getClassReflection();
+        if (!$classReflection instanceof ClassReflection || !str_ends_with($classReflection->getName(), self::CONTROLLER_SUFFIX)) {
             return [];
         }
 
