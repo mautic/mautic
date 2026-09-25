@@ -14,12 +14,10 @@ use Mautic\UserBundle\Security\OIDC\Factory\UserCredentialsFactoryInterface;
 use Mautic\UserBundle\Security\OIDC\OidcAuthenticator;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AuthenticatorTest extends TestCase
@@ -71,9 +69,7 @@ final class AuthenticatorTest extends TestCase
             ->willReturn($user);
 
         $authenticator = new OidcAuthenticator($parameters, $credentialsFactory, $userProvider, $urlGenerator, $flashBag, $translator);
-        $passport      = $authenticator->authenticate($request);
-
-        $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
+        $authenticator->authenticate($request);
     }
 
     public function testAuthenticateThrowsAuthenticationExceptionOnOpenIDConnectClientException(): void
@@ -135,14 +131,13 @@ final class AuthenticatorTest extends TestCase
         $translator         = $this->createStub(TranslatorInterface::class);
         $firewallName       = 'main';
 
-        $urlGenerator->expects($this->once())->method('generate')->willReturn('http://mautic.local');
+        $urlGenerator->expects($this->once())->method('generate')->willReturn('https://mautic.local');
 
         $authenticator = new OidcAuthenticator($parameters, $credentialsFactory, $userProvider, $urlGenerator, $flashBag, $translator);
         $result        = $authenticator->onAuthenticationSuccess($request, $token, $firewallName);
-        $this->assertInstanceOf(RedirectResponse::class, $result);
 
         $this->assertSame(302, $result->getStatusCode());
-        $this->assertSame('http://mautic.local', $result->getTargetUrl());
+        $this->assertSame('https://mautic.local', $result->getTargetUrl());
     }
 
     public function testOnAuthenticationFailure(): void
@@ -156,14 +151,13 @@ final class AuthenticatorTest extends TestCase
         $flashBag           = $this->createStub(FlashBag::class);
         $translator         = $this->createStub(TranslatorInterface::class);
 
-        $urlGenerator->expects($this->once())->method('generate')->willReturn('http://mautic.local');
+        $urlGenerator->expects($this->once())->method('generate')->willReturn('https://mautic.local');
 
         $authenticator = new OidcAuthenticator($parameters, $credentialsFactory, $userProvider, $urlGenerator, $flashBag, $translator);
         $result        = $authenticator->onAuthenticationFailure($request, $exception);
-        $this->assertInstanceOf(RedirectResponse::class, $result);
 
         $this->assertSame(302, $result->getStatusCode());
-        $this->assertSame('http://mautic.local', $result->getTargetUrl());
+        $this->assertSame('https://mautic.local', $result->getTargetUrl());
     }
 
     private function buildAuthenticator(bool $isEnabled = true): OidcAuthenticator

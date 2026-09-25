@@ -42,6 +42,7 @@ final readonly class UserProvider implements CredentialsUserProviderInterface
         $openIdConnectId = $credentials->getId();
         $token = $this->tokenStorage->getToken();
         $currentUser = $token?->getUser();
+        \assert(null === $currentUser || $currentUser instanceof User);
 
         if ($linkedUser = $this->linker->findLinkedUser($openIdConnectId, $currentUser)) {
             return $this->userProvider->loadUserByIdentifier($linkedUser->getUsername());

@@ -9,17 +9,18 @@ use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\OIDC\Settings;
 use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use Mautic\UserBundle\Tests\Security\OIDC\Double\Service\Client;
-use Mautic\UserBundle\Tests\Security\OIDC\Functional\WebLoginTrait;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 
 final class SecurityControllerTest extends MauticMysqlTestCase
 {
-    use WebLoginTrait;
-
     private const REQUIRED_LOGIN_PATH = '/s/open_id/required';
     private const LOGIN_CHECK_PATH    = '/s/open_id/login_check';
     private const LOGIN_PATH          = '/s/open_id/login';
@@ -360,5 +361,75 @@ final class SecurityControllerTest extends MauticMysqlTestCase
         $this->client->disableReboot();
 
         return $this->client->request('GET', $path, $requestParameters);
+    }
+
+    /**
+     * Log in with password (form login) on 'main' firewall.
+     *
+     * Note: Mautic uses a shared firewall context 'mautic' for all firewalls.
+     * We pass 'mautic' as context so the session token is stored correctly.
+     * But this means getFirewallName() returns 'mautic', not 'main'.
+     * For OIDC tests that need to distinguish, we manually create tokens.
+     */
+    private function logInWithPassword(string $username = 'linked_admin'): void
+    {
+        $container = $this->client->getContainer();
+        $user      = $container->get(UserRepository::class)->findOneBy(['username' => $username]);
+        \assert($user instanceof User);
+
+        // Create a PostAuthenticationToken with 'main' firewall name
+        $token = new PostAuthenticationToken($user, 'main', $user->getRoles());
+
+        // Get the session and store token under the shared context 'mautic'
+        $session = $container->get(SessionFactoryInterface::class)->createSession();
+        $session->set('_security_mautic', serialize($token));
+        $session->save();
+
+        // Set session cookie so it persists across requests
+        $cookie = new \Symfony\Component\BrowserKit\Cookie($session->getName(), $session->getId());
+        $this->client->getCookieJar()->set($cookie);
+
+        // Also set token storage for immediate use
+        $container->get(TokenStorageInterface::class)->setToken($token);
+    }
+
+    /**
+     * Log in with OpenID on 'open_id' firewall.
+     *
+     * Note: Mautic uses a shared firewall context 'mautic' for all firewalls.
+     * We manually create a PostAuthenticationToken with 'open_id' as firewall name
+     * and store it under _security_mautic so it persists across requests.
+     */
+    private function logInWithOpenID(string $username = 'linked_admin'): void
+    {
+        $container = $this->client->getContainer();
+        $user      = $container->get(UserRepository::class)->findOneBy(['username' => $username]);
+        \assert($user instanceof User);
+
+        // Create a PostAuthenticationToken with 'open_id' firewall name
+        $token = new PostAuthenticationToken($user, 'open_id', $user->getRoles());
+
+        // Get the session and store token under the shared context 'mautic'
+        $session = $container->get(SessionFactoryInterface::class)->createSession();
+        $session->set('_security_mautic', serialize($token));
+        $session->save();
+
+        // Set session cookie so it persists across requests
+        $cookie = new \Symfony\Component\BrowserKit\Cookie($session->getName(), $session->getId());
+        $this->client->getCookieJar()->set($cookie);
+
+        // Also set token storage for immediate use
+        $container->get(TokenStorageInterface::class)->setToken($token);
+    }
+
+    private function logOut(): void
+    {
+        $container = $this->client->getContainer();
+
+        // Clear token storage
+        $container->get(TokenStorageInterface::class)->setToken(null);
+
+        // Clear cookies to ensure fresh session
+        $this->client->getCookieJar()->clear();
     }
 }

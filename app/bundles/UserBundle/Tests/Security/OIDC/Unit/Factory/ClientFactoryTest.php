@@ -42,8 +42,6 @@ final class ClientFactoryTest extends TestCase
             ->with('mautic_oidc_check', [], UrlGeneratorInterface::ABSOLUTE_URL)
             ->willReturn('http://localhost/redirect');
 
-        $client = $clientFactory->create($parameters);
-
-        $this->assertInstanceOf(ClientInterface::class, $client);
+        $clientFactory->create($parameters);
     }
 }

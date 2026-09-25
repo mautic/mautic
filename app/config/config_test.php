@@ -158,6 +158,10 @@ $container->register('test.service_container', Mautic\CoreBundle\Test\Container\
     ->setArgument('$privateServicesLocatorId', 'test.private_services_locator')
     ->setPublic(true);
 
+// Make SessionFactoryInterface public for tests
+$container->setAlias(Symfony\Component\HttpFoundation\Session\SessionFactoryInterface::class, 'session.factory')
+    ->setPublic(true);
+
 // stub oidc client factory - register with class name and alias to interface
 $container->register(Mautic\UserBundle\Tests\Security\OIDC\Double\Factory\ClientFactory::class)
     ->setPublic(true);
