@@ -99,6 +99,57 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
     }
 
+    public function testEmptyValuesArePreservedAsNull(): void
+    {
+        // request config edit page
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        self::assertResponseIsSuccessful();
+
+        // Find save & close button
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+        $form->setValues(
+            [
+                'config[emailconfig][monitored_email][EmailBundle_bounces][override_settings]' => '1',
+                // Do not set address, so the \Mautic\EmailBundle\EventListener\ConfigSubscriber::onConfigBeforeSave will revert config to defaults
+                'config[emailconfig][monitored_email][EmailBundle_bounces][address]' => '',
+                'config[emailconfig][monitored_email][EmailBundle_bounces][port]'    => '789',
+
+                // Some fields are not transferred into request.
+                'config[coreconfig][site_url]'           => 'https://mautic-community.local', // required
+                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
+                'config[companyconfig][company_columns]' => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+            ]
+        );
+
+        $crawler = $this->client->submit($form);
+        self::assertResponseIsSuccessful();
+
+        // Check for a flash error
+        $response = $this->client->getResponse()->getContent();
+        $message  = $crawler->filterXPath("//div[@id='flashes']//span")->count()
+            ?
+            $crawler->filterXPath("//div[@id='flashes']//span")->first()->text()
+            :
+            '';
+        $this->assertStringNotContainsString('Could not save updated configuration:', (string) $response, $message);
+
+        // Check values are escaped properly in the config file
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('monitored_email', $configParameters);
+        $this->assertArrayHasKey('EmailBundle_bounces', $configParameters['monitored_email']);
+        $this->assertSame([
+            'address'           => null,
+            'host'              => null,
+            'port'              => '993',
+            'encryption'        => '/ssl',
+            'user'              => null,
+            'password'          => null,
+            'override_settings' => 0,
+            'folder'            => null,
+        ], $configParameters['monitored_email']['EmailBundle_bounces']);
+    }
+
     private function getConfigPath(): string
     {
         /** @var \AppKernel $kernel */
