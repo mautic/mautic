@@ -17,7 +17,11 @@ final class MappingManualDAO
 
     public function __construct(
         private readonly string $integration,
+        array $objectsMapping
     ) {
+        foreach ($objectsMapping as $objectMapping) {
+            $this->addObjectMapping($objectMapping);
+        }
     }
 
     public function getIntegration(): string
@@ -25,7 +29,7 @@ final class MappingManualDAO
         return $this->integration;
     }
 
-    public function addObjectMapping(ObjectMappingDAO $objectMappingDAO): void
+    private function addObjectMapping(ObjectMappingDAO $objectMappingDAO): void
     {
         $internalObjectName    = $objectMappingDAO->getInternalObjectName();
         $integrationObjectName = $objectMappingDAO->getIntegrationObjectName();

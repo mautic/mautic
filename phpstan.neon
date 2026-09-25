@@ -271,6 +271,7 @@ rules:
     - Utils\PHPStan\Rule\NoRedundantAutowiredServiceArgumentRule
     - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoServiceSetterCallRule
     - Utils\PHPStan\Rule\NoServiceGetterRule
+    - Utils\PHPStan\Rule\NullablePropertyGetterMustReturnNullableRule
     - Symplify\PHPStanRules\Rules\Doctrine\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule

@@ -47,7 +47,7 @@ final class PluginEvents
     /**
      * The mautic.plugin_on_integration_response event is dispatched after a request is made.
      *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationRequestEvent instance.
+     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationResponseEvent instance.
      */
     public const string PLUGIN_ON_INTEGRATION_RESPONSE = 'mautic.plugin_on_integration_response';
 

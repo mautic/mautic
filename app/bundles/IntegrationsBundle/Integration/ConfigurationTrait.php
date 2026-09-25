@@ -12,6 +12,10 @@ trait ConfigurationTrait
 
     public function getIntegrationConfiguration(): Integration
     {
+        if (null === $this->integration) {
+            throw new \LogicException('Integration configuration has not been set. Guard with hasIntegrationConfiguration() first.');
+        }
+
         return $this->integration;
     }
 

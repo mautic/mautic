@@ -82,7 +82,7 @@ class EmailDraft
         return $this->email;
     }
 
-    public function getHtml(): string
+    public function getHtml(): ?string
     {
         return $this->html;
     }
@@ -97,7 +97,7 @@ class EmailDraft
         $this->html = $html;
     }
 
-    public function getTemplate(): string
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
@@ -112,7 +112,7 @@ class EmailDraft
         return $this->publicPreview;
     }
 
-    public function getPublishStatus(): bool
+    public function getPublishStatus(): ?bool
     {
         return $this->publicPreview;
     }
