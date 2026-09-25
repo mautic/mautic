@@ -17,6 +17,21 @@ final class ConfigTrackingPageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
+            'focus_uses_mautic_tracking_consent',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.tracking.script.focus_shared_consent.label',
+                'help'  => 'mautic.page.config.tracking.script.focus_shared_consent.help',
+                'data'  => isset($options['data']['focus_uses_mautic_tracking_consent']) && (bool) $options['data']['focus_uses_mautic_tracking_consent'],
+                'attr'  => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.page.config.tracking.script.focus_shared_consent.tooltip',
+                    'onchange' => 'Mautic.toggleFocusTrackingConsentSnippets(this)',
+                ],
+            ]
+        );
+
+        $builder->add(
             'anonymize_ip',
             YesNoButtonGroupType::class,
             [

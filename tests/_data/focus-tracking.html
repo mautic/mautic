@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Focus tracking</title>
+</head>
+<body>
+<script>
+    var fixtureParams = new URLSearchParams(window.location.search);
+    var fixturePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+
+    if (fixtureParams.get('reset') === '1') {
+        localStorage.clear();
+        sessionStorage.clear();
+        document.cookie.split(';').forEach(function (cookie) {
+            var name = cookie.split('=')[0].trim();
+            document.cookie = name+'=; Max-Age=0; path=/; Secure';
+            document.cookie = name+'=; Max-Age=0; path='+fixturePath+'; Secure';
+        });
+    }
+
+    if (fixtureParams.get('seed') === '1') {
+        localStorage.setItem('mtc_id', 'existing-local-contact');
+        localStorage.setItem('mautic_device_id', 'existing-local-device');
+        sessionStorage.setItem('mtc_id', 'existing-session-contact');
+        sessionStorage.setItem('mautic_device_id', 'existing-session-device');
+        document.cookie = 'mtc_id=existing-cookie-contact; path=/; Secure; SameSite=Lax';
+        document.cookie = 'mautic_device_id=existing-cookie-device; path=/; Secure; SameSite=Lax';
+    }
+
+    window.focusFixture = {
+        cookieWrites: [],
+        errors: [],
+        finished: false,
+        lastNetworkActivity: Date.now(),
+        networkQuietPeriod: 250,
+        pendingRequests: 0,
+        requests: [],
+        storageAccess: []
+    };
+    window.focusScriptErrors = window.focusFixture.errors;
+    window.focusNetworkRequests = window.focusFixture.requests;
+
+    window.focusFixture.recordRequest = function (type, url, method, body) {
+        if (!url) {
+            return null;
+        }
+
+        var normalizedUrl = new URL(url, window.location.href);
+        var request = {
+            body: '',
+            method: method || 'GET',
+            path: normalizedUrl.pathname,
+            type: type,
+            url: normalizedUrl.href
+        };
+        window.focusFixture.requests.push(request);
+        window.focusFixture.lastNetworkActivity = Date.now();
+
+        if (body instanceof URLSearchParams) {
+            request.body = body.toString();
+        } else if (body instanceof FormData) {
+            request.body = Array.from(body.entries()).map(function (entry) {
+                var value = entry[1] instanceof File ? entry[1].name : String(entry[1]);
+
+                return entry[0]+'='+value;
+            }).join('&');
+        } else if (body instanceof Blob) {
+            var finishBody = window.focusFixture.startPendingRequest();
+            body.text().then(function (text) {
+                request.body = text;
+                finishBody();
+            }, finishBody);
+        } else if (body != null) {
+            request.body = String(body);
+        }
+
+        return request;
+    };
+
+    window.focusFixture.startPendingRequest = function () {
+        window.focusFixture.pendingRequests++;
+        window.focusFixture.lastNetworkActivity = Date.now();
+        var finished = false;
+
+        return function () {
+            if (finished) {
+                return;
+            }
+
+            finished = true;
+            window.focusFixture.pendingRequests--;
+            window.focusFixture.lastNetworkActivity = Date.now();
+        };
+    };
+
+    window.focusFixture.countRequests = function (path, type) {
+        return window.focusFixture.requests.filter(function (request) {
+            return request.path === path && (!type || request.type === type);
+        }).length;
+    };
+
+    window.focusFixture.identityValues = function () {
+        return {
+            cookies: document.cookie,
+            localDeviceId: localStorage.getItem('mautic_device_id'),
+            localMtcId: localStorage.getItem('mtc_id'),
+            sessionDeviceId: sessionStorage.getItem('mautic_device_id'),
+            sessionMtcId: sessionStorage.getItem('mtc_id')
+        };
+    };
+
+    window.focusFixture.state = function (focusId) {
+        var item = window.MauticFocusItems && window.MauticFocusItems[focusId];
+        var storageAccess = window.focusFixture.storageAccess.slice();
+        var formFields = [];
+        if (item && item.iframeDoc) {
+            formFields = Array.from(item.iframeDoc.querySelectorAll('input')).map(function (input) {
+                return {name: input.name, value: input.value};
+            });
+        }
+
+        return {
+            cookieWrites: window.focusFixture.cookieWrites.slice(),
+            errors: window.focusFixture.errors.slice(),
+            formFields: formFields,
+            iframeCount: document.querySelectorAll('iframe').length,
+            identity: window.focusFixture.identityValues(),
+            item: item ? {
+                initialized: item.initialized,
+                runtimeReady: item.runtimeReady,
+                trackingEnabled: item.trackingEnabled
+            } : null,
+            pageOrigin: window.location.origin,
+            pendingRequests: window.focusFixture.pendingRequests,
+            queueEntry: Boolean(window.MauticFocusTrackingQueue && window.MauticFocusTrackingQueue[focusId]),
+            requests: window.focusFixture.requests.slice(),
+            storageAccess: storageAccess
+        };
+    };
+
+    window.addEventListener('error', function (event) {
+        window.focusFixture.errors.push(event.message || String(event.error));
+    });
+    window.addEventListener('unhandledrejection', function (event) {
+        window.focusFixture.errors.push(String(event.reason));
+    });
+    document.addEventListener('error', function (event) {
+        if (event.target && event.target.src) {
+            window.focusFixture.errors.push('Failed to load '+event.target.src);
+        }
+    }, true);
+
+    ['getItem', 'setItem', 'removeItem'].forEach(function (method) {
+        var original = Storage.prototype[method];
+        Storage.prototype[method] = function () {
+            window.focusFixture.storageAccess.push({
+                key: String(arguments[0]),
+                method: method,
+                storage: this === localStorage ? 'local' : 'session'
+            });
+
+            return original.apply(this, arguments);
+        };
+    });
+
+    var cookieDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie');
+    if (cookieDescriptor && cookieDescriptor.configurable) {
+        Object.defineProperty(document, 'cookie', {
+            configurable: true,
+            get: function () {
+                return cookieDescriptor.get.call(document);
+            },
+            set: function (value) {
+                window.focusFixture.cookieWrites.push(String(value));
+                cookieDescriptor.set.call(document, value);
+            }
+        });
+    }
+
+    var originalXhrOpen = XMLHttpRequest.prototype.open;
+    var originalXhrSend = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.open = function (method, url) {
+        this.focusFixtureMethod = method;
+        this.focusFixtureUrl = url;
+
+        return originalXhrOpen.apply(this, arguments);
+    };
+    XMLHttpRequest.prototype.send = function (body) {
+        window.focusFixture.recordRequest('xhr', this.focusFixtureUrl, this.focusFixtureMethod, body);
+        var finish = window.focusFixture.startPendingRequest();
+        this.addEventListener('loadend', finish, {once: true});
+
+        return originalXhrSend.apply(this, arguments);
+    };
+
+    var originalFetch = window.fetch;
+    window.fetch = function (input, options) {
+        var finish = window.focusFixture.startPendingRequest();
+        window.focusFixture.recordRequest(
+            'fetch',
+            typeof input === 'string' ? input : input.url,
+            options && options.method,
+            options && options.body
+        );
+
+        return originalFetch.apply(this, arguments).then(function (response) {
+            finish();
+
+            return response;
+        }, function (error) {
+            finish();
+            throw error;
+        });
+    };
+
+    var originalSendBeacon = navigator.sendBeacon;
+    navigator.sendBeacon = function (url, body) {
+        window.focusFixture.recordRequest('beacon', url, 'POST', body);
+
+        return originalSendBeacon.apply(this, arguments);
+    };
+
+    var originalAppendChild = Node.prototype.appendChild;
+    Node.prototype.appendChild = function (node) {
+        if (node && node.tagName && ['SCRIPT', 'LINK'].includes(node.tagName) && (node.src || node.href)) {
+            window.focusFixture.recordRequest(node.tagName.toLowerCase(), node.src || node.href);
+            var finish = window.focusFixture.startPendingRequest();
+            node.addEventListener('load', finish, {once: true});
+            node.addEventListener('error', finish, {once: true});
+        }
+
+        return originalAppendChild.apply(this, arguments);
+    };
+
+    var imageSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+    if (imageSrcDescriptor && imageSrcDescriptor.configurable) {
+        Object.defineProperty(HTMLImageElement.prototype, 'src', {
+            configurable: true,
+            get: imageSrcDescriptor.get,
+            set: function (value) {
+                window.focusFixture.recordRequest('image', value);
+                var finish = window.focusFixture.startPendingRequest();
+                this.addEventListener('load', finish, {once: true});
+                this.addEventListener('error', finish, {once: true});
+                imageSrcDescriptor.set.call(this, value);
+            }
+        });
+    }
+
+    window.focusFixture.loadScript = function (url) {
+        return new Promise(function (resolve, reject) {
+            var script = document.createElement('script');
+            script.async = true;
+            script.src = url;
+            script.onload = resolve;
+            script.onerror = function () {
+                reject(new Error('Failed to load '+script.src));
+            };
+            document.head.appendChild(script);
+        });
+    };
+
+    window.focusFixture.loadScripts = function (urls) {
+        return urls.reduce(function (promise, url) {
+            return promise.then(function () {
+                return window.focusFixture.loadScript(url);
+            });
+        }, Promise.resolve()).then(function () {
+            window.focusFixture.finished = true;
+        }).catch(function (error) {
+            window.focusFixture.errors.push(String(error));
+            window.focusFixture.finished = true;
+        });
+    };
+
+    if (fixtureParams.get('shared') === '1') {
+        window.MauticFocusUseMauticTrackingConsent = true;
+    }
+
+    var queuedFocusId = fixtureParams.get('queued');
+    if (queuedFocusId) {
+        window.MauticFocusTrackingQueue = {};
+        window.MauticFocusTrackingQueue[queuedFocusId] = true;
+    }
+
+    window.focusFixture.cookieWrites = [];
+    window.focusFixture.requests = [];
+    window.focusFixture.storageAccess = [];
+    window.focusNetworkRequests = window.focusFixture.requests;
+    window.focusFixture.loadScripts(fixtureParams.getAll('script'));
+</script>
+</body>
+</html>

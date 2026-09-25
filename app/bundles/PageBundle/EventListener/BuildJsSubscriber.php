@@ -187,6 +187,11 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
           m.sendPageview(e.detail);
       }
     });
+
+    if (!m.trackingActivationDispatched) {
+        m.trackingActivationDispatched = true;
+        m.dispatchEvent('mautic:tracking-enabled');
+    }
 })(window.MauticJS, location, navigator, document);
 JS;
 
