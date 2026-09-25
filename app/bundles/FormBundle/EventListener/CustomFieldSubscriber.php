@@ -6,8 +6,8 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Event\FieldPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CustomFieldSubscriber implements EventSubscriberInterface
@@ -24,7 +24,7 @@ final readonly class CustomFieldSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::FIELD_POST_SAVE => ['regenerateFormCache', 0],
+            FieldPostSaveEvent::class => ['regenerateFormCache', 0],
         ];
     }
 

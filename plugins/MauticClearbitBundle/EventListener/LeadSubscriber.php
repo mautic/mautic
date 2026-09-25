@@ -3,8 +3,9 @@
 namespace MauticPlugin\MauticClearbitBundle\EventListener;
 
 use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -18,8 +19,8 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LEAD_POST_SAVE    => ['leadPostSave', 0],
-            LeadEvents::COMPANY_POST_SAVE => ['companyPostSave', 0],
+            LeadPostSaveEvent::class    => ['leadPostSave', 0],
+            CompanyPostSaveEvent::class => ['companyPostSave', 0],
         ];
     }
 

@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -245,12 +244,12 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcherMock->expects($this->once())
             ->method('hasListeners')
-            ->with(LeadEvents::CURRENT_LEAD_CHANGED)
+            ->with(LeadChangeEvent::class)
             ->willReturn(true);
 
         $this->dispatcherMock->expects($this->once())
             ->method('dispatch')
-            ->with(new LeadChangeEvent($lead, 'def456', $lead2, null), LeadEvents::CURRENT_LEAD_CHANGED)
+            ->with(new LeadChangeEvent($lead, 'def456', $lead2, null))
             ->willReturn(new \stdClass());
 
         $contactTracker->setTrackedContact($lead);

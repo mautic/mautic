@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Import;
 
-final class ImportEvent extends CommonEvent
+abstract class ImportEvent extends CommonEvent
 {
     public function __construct(Import $entity, bool $isNew)
     {

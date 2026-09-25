@@ -4,8 +4,10 @@ namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\CompanyPreDeleteEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
+use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
@@ -24,9 +26,9 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LEAD_PRE_DELETE    => ['onLeadDelete', 0],
-            LeadEvents::LEAD_POST_SAVE     => ['onLeadSave', 0],
-            LeadEvents::COMPANY_PRE_DELETE => ['onCompanyDelete', 0],
+            LeadPreDeleteEvent::class    => ['onLeadDelete', 0],
+            LeadPostSaveEvent::class     => ['onLeadSave', 0],
+            CompanyPreDeleteEvent::class => ['onCompanyDelete', 0],
         ];
     }
 

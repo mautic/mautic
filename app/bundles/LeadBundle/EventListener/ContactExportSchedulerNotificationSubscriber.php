@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\LeadBundle\Event\ContactExportEmailSentEvent;
+use Mautic\LeadBundle\Event\ContactExportScheduledEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Notification\ContactExportAdminNotification;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -24,8 +25,8 @@ final readonly class ContactExportSchedulerNotificationSubscriber implements Eve
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::POST_CONTACT_EXPORT_SCHEDULED  => 'onContactExportScheduled',
-            LeadEvents::POST_CONTACT_EXPORT_SEND_EMAIL => 'onContactExportEmailSent',
+            ContactExportScheduledEvent::class  => 'onContactExportScheduled',
+            ContactExportEmailSentEvent::class => 'onContactExportEmailSent',
         ];
     }
 

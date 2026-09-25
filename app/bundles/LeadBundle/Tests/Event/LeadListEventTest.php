@@ -6,24 +6,24 @@ namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Event\LeadListEvent;
+use Mautic\LeadBundle\Event\ListPostSaveEvent;
 
 final class LeadListEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructGettersSetters(): void
     {
         $segment = new LeadList();
-        $event   = new LeadListEvent($segment);
+        $event   = new ListPostSaveEvent($segment);
 
         $this->assertEquals($segment, $event->getList());
         $this->assertEquals(false, $event->isNew());
 
         $isNew = false;
-        $event = new LeadListEvent($segment, $isNew);
+        $event = new ListPostSaveEvent($segment, $isNew);
         $this->assertEquals($isNew, $event->isNew());
 
         $isNew = true;
-        $event = new LeadListEvent($segment, $isNew);
+        $event = new ListPostSaveEvent($segment, $isNew);
         $this->assertEquals($isNew, $event->isNew());
 
         $segment2 = new LeadList();
@@ -32,7 +32,7 @@ final class LeadListEventTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($segment2, $event->getList());
 
         $isNew = true;
-        $event = new LeadListEvent($segment, $isNew);
+        $event = new ListPostSaveEvent($segment, $isNew);
 
         $category = new Category();
         $category->setTitle('Segment Category 1');

@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Exception\ContactNotFoundException;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
@@ -157,7 +156,7 @@ final class ContactRequestHelper
     private function getContactFromClickthrough(array $clickthrough)
     {
         $event = new ContactIdentificationEvent($clickthrough);
-        $this->eventDispatcher->dispatch($event, LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION);
+        $this->eventDispatcher->dispatch($event);
 
         if ($contact = $event->getIdentifiedContact()) {
             $this->logger->debug("LEAD: Contact ID# {$contact->getId()} tracked through clickthrough query by the ".$event->getIdentifier().' channel');

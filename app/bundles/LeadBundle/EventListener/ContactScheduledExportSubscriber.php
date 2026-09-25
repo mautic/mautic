@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Event\ContactExportEmailSentEvent;
+use Mautic\LeadBundle\Event\ContactExportPrepareFileEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\ContactExportSendEmailEvent;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -19,9 +21,9 @@ final readonly class ContactScheduledExportSubscriber implements EventSubscriber
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::CONTACT_EXPORT_PREPARE_FILE    => 'onContactExportPrepareFile',
-            LeadEvents::CONTACT_EXPORT_SEND_EMAIL      => 'onContactExportSendEmail',
-            LeadEvents::POST_CONTACT_EXPORT_SEND_EMAIL => 'onContactExportEmailSent',
+            ContactExportPrepareFileEvent::class    => 'onContactExportPrepareFile',
+            ContactExportSendEmailEvent::class      => 'onContactExportSendEmail',
+            ContactExportEmailSentEvent::class => 'onContactExportEmailSent',
         ];
     }
 

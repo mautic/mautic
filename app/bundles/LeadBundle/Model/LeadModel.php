@@ -57,15 +57,19 @@ use Mautic\LeadBundle\Event\CategoryChangeEvent;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\LeadPostBatchSaveEvent;
+use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
+use Mautic\LeadBundle\Event\LeadPreBatchSaveEvent;
+use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
+use Mautic\LeadBundle\Event\LeadPreSaveEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\Event\SaveBatchLeadsEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\LeadType;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -293,47 +297,12 @@ class LeadModel extends FormModel
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
-        if (!$entity instanceof Lead) {
-            throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = LeadEvents::LEAD_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = LeadEvents::LEAD_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = LeadEvents::LEAD_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = LeadEvents::LEAD_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new LeadEvent($entity, $isNew);
-            }
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
+        return $this->dispatchLeadEvent($action, $entity, $isNew, false);
     }
 
     protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
-        if (!$event instanceof Event) {
-            $event = new LeadEvent($entity, $isNew);
-            $event->setAlreadyProcessedInBatch(true);
-        }
-
-        return $this->dispatchEvent($action, $entity, $isNew, $event);
+        return $this->dispatchLeadEvent($action, $entity, $isNew, true);
     }
 
     protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
@@ -347,34 +316,52 @@ class LeadModel extends FormModel
             }
         }
 
-        switch ($action) {
-            case 'pre_batch_save':
-                $name = LeadEvents::LEAD_PRE_BATCH_SAVE;
-                break;
-            case 'post_batch_save':
-                $name = LeadEvents::LEAD_POST_BATCH_SAVE;
-                break;
-            default:
-                return null;
+        $eventClass = match ($action) {
+            'pre_batch_save'  => LeadPreBatchSaveEvent::class,
+            'post_batch_save' => LeadPostBatchSaveEvent::class,
+            default           => null,
+        };
+
+        if (null === $eventClass || !$this->dispatcher->hasListeners($eventClass)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            $leadEvents = [];
-            if (!$event instanceof Event) {
-                foreach ($entitiesBatchParams as $entityParam) {
-                    if (!$leadEvent = $entityParam['event']) {
-                        $leadEvent = new LeadEvent($entityParam['entity'], $entityParam['isNew']);
-                    }
-                    $leadEvents[] = $leadEvent;
-                }
-                $event = new SaveBatchLeadsEvent($leadEvents);
-            }
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
+        $leadEvents = [];
+        foreach ($entitiesBatchParams as $entityParam) {
+            $leadEvents[] = $entityParam['event'] ?: new LeadEvent($entityParam['entity'], $entityParam['isNew']);
         }
 
-        return null;
+        $event = new $eventClass($leadEvents);
+        $this->dispatcher->dispatch($event);
+
+        return $event;
+    }
+
+    /**
+     * @throws MethodNotAllowedHttpException
+     */
+    private function dispatchLeadEvent(string $action, object $entity, bool $isNew, bool $alreadyProcessedInBatch): ?LeadEvent
+    {
+        if (!$entity instanceof Lead) {
+            throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
+        }
+
+        $event = match ($action) {
+            'pre_save'    => new LeadPreSaveEvent($entity, $isNew),
+            'post_save'   => new LeadPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new LeadPreDeleteEvent($entity, $isNew),
+            'post_delete' => new LeadPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
+        }
+
+        $event->setAlreadyProcessedInBatch($alreadyProcessedInBatch);
+        $this->dispatcher->dispatch($event);
+
+        return $event;
     }
 
     /**

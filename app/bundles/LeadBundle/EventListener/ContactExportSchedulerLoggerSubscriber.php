@@ -6,8 +6,9 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
+use Mautic\LeadBundle\Event\ContactExportEmailSentEvent;
+use Mautic\LeadBundle\Event\ContactExportScheduledEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -21,8 +22,8 @@ final readonly class ContactExportSchedulerLoggerSubscriber implements EventSubs
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::POST_CONTACT_EXPORT_SCHEDULED  => 'onContactExportScheduled',
-            LeadEvents::POST_CONTACT_EXPORT_SEND_EMAIL => 'onContactExportEmailSent',
+            ContactExportScheduledEvent::class  => 'onContactExportScheduled',
+            ContactExportEmailSentEvent::class => 'onContactExportEmailSent',
         ];
     }
 

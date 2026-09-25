@@ -20,7 +20,11 @@ use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInte
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
+use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
+use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
+use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -38,11 +42,11 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
-            LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
-            LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
-            LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
-            LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 128],
+            LeadPostSaveEvent::class      => ['onLeadPostSave', 0],
+            LeadPostDeleteEvent::class    => ['onLeadPostDelete', 255],
+            CompanyPostSaveEvent::class   => ['onCompanyPostSave', 0],
+            CompanyPostDeleteEvent::class => ['onCompanyPostDelete', 255],
+            LeadChangeCompanyEvent::class => ['onLeadCompanyChange', 128],
         ];
     }
 

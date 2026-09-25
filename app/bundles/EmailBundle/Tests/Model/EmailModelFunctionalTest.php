@@ -19,7 +19,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\ListChangeEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Entity\Hit;
@@ -558,10 +557,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->addContactsToSegment(array_slice($contacts, 2, 3), $segment);
 
-        self::getContainer()->get(EventDispatcherInterface::class)->dispatch(
-            new ListChangeEvent($contacts[2], $segment, true),
-            LeadEvents::LEAD_LIST_CHANGE
-        );
+        self::getContainer()->get(EventDispatcherInterface::class)->dispatch(new ListChangeEvent($contacts[2], $segment, true));
 
         $loadedEmail = $this->emailModel->getEntity($email->getId());
         $this->assertInstanceOf(Email::class, $loadedEmail);

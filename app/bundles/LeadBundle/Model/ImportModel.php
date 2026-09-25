@@ -23,12 +23,15 @@ use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
-use Mautic\LeadBundle\Event\ImportEvent;
+use Mautic\LeadBundle\Event\ImportBatchProcessedEvent;
+use Mautic\LeadBundle\Event\ImportPostDeleteEvent;
+use Mautic\LeadBundle\Event\ImportPostSaveEvent;
+use Mautic\LeadBundle\Event\ImportPreDeleteEvent;
+use Mautic\LeadBundle\Event\ImportPreSaveEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -591,37 +594,22 @@ class ImportModel extends FormModel
             throw new MethodNotAllowedHttpException(['Import']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = LeadEvents::IMPORT_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = LeadEvents::IMPORT_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = LeadEvents::IMPORT_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = LeadEvents::IMPORT_POST_DELETE;
-                break;
-            case 'batch_processed':
-                $name = LeadEvents::IMPORT_BATCH_PROCESSED;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'        => new ImportPreSaveEvent($entity, $isNew),
+            'post_save'       => new ImportPostSaveEvent($entity, $isNew),
+            'pre_delete'      => new ImportPreDeleteEvent($entity, $isNew),
+            'post_delete'     => new ImportPostDeleteEvent($entity, $isNew),
+            'batch_processed' => new ImportBatchProcessedEvent($entity, $isNew),
+            default           => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new ImportEvent($entity, $isNew);
-            }
+        $this->dispatcher->dispatch($event);
 
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     /**

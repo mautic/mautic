@@ -8,8 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class LeadSubscriberTest extends MauticMysqlTestCase
@@ -61,9 +60,9 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
         $contactProxy = $this->em->getReference(Lead::class, $contactReal->getId());
         $contactProxy->__set('email', 'john@doe.email');
         $contactProxy->setPoints(100);
-        $event = new LeadEvent($contactProxy, true);
+        $event = new LeadPostSaveEvent($contactProxy, true);
 
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
+        $this->dispatcher->dispatch($event);
 
         $fieldChanges = $this->fieldChangeRepository->findChangesForObject('unicorn', Lead::class, $contactReal->getId());
         $this->assertCount(2, $fieldChanges, print_r($fieldChanges, true));

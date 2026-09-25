@@ -32,7 +32,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\ContactExportEvent;
-use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
+use Mautic\LeadBundle\Event\ContactExportScheduledEvent;
 use Mautic\LeadBundle\Field\CustomFieldFindReplace;
 use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
 use Mautic\LeadBundle\Form\Type\BatchType;
@@ -43,7 +43,6 @@ use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\Helper\LeadSearchScopeProvider;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
@@ -2292,8 +2291,7 @@ final class LeadController extends FormController
         $details['args']  = $iterator->getArgs();
 
         $this->dispatcher->dispatch(
-            new ContactExportEvent($details, 'ContactExports'),
-            LeadEvents::POST_CONTACT_EXPORT
+            new ContactExportEvent($details, 'ContactExports')
         );
 
         return $response;
@@ -2343,8 +2341,7 @@ final class LeadController extends FormController
         }
 
         $dispatcher->dispatch(
-            new ContactExportEvent($args, 'ContactExport'),
-            LeadEvents::POST_CONTACT_EXPORT
+            new ContactExportEvent($args, 'ContactExport')
         );
 
         return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']), $exportHelper);
@@ -2379,8 +2376,7 @@ final class LeadController extends FormController
         $contactExportScheduler = $this->contactExportSchedulerModel->saveEntity($data);
 
         $this->dispatcher->dispatch(
-            new ContactExportSchedulerEvent($contactExportScheduler),
-            LeadEvents::POST_CONTACT_EXPORT_SCHEDULED
+            new ContactExportScheduledEvent($contactExportScheduler)
         );
 
         $this->addFlashMessage('mautic.lead.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);

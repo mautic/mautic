@@ -21,7 +21,10 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Event\LeadFieldEvent;
+use Mautic\LeadBundle\Event\FieldPostDeleteEvent;
+use Mautic\LeadBundle\Event\FieldPostSaveEvent;
+use Mautic\LeadBundle\Event\FieldPreDeleteEvent;
+use Mautic\LeadBundle\Event\FieldPreSaveEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
@@ -32,7 +35,6 @@ use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
@@ -854,33 +856,26 @@ class FieldModel extends FormModel
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
-        switch ($action) {
-            case 'pre_save':
-                $action = LeadEvents::FIELD_PRE_SAVE;
-                break;
-            case 'post_save':
-                $action = LeadEvents::FIELD_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $action = LeadEvents::FIELD_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $action = LeadEvents::FIELD_POST_DELETE;
-                break;
-        }
-
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
         }
 
-        if (null !== $event && !$event instanceof LeadFieldEvent) {
-            throw new \RuntimeException('Event should be LeadFieldEvent|null.');
+        $event = match ($action) {
+            'pre_save'    => new FieldPreSaveEvent($entity, $isNew),
+            'post_save'   => new FieldPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new FieldPreDeleteEvent($entity, $isNew),
+            'post_delete' => new FieldPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event) {
+            return null;
         }
 
         try {
-            return $this->fieldSaveDispatcher->dispatchEvent($action, $entity, $isNew, $event);
+            return $this->fieldSaveDispatcher->dispatchEvent($event);
         } catch (NoListenerException) {
-            return $event;
+            return null;
         }
     }
 

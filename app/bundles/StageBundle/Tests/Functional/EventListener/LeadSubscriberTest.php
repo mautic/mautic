@@ -7,7 +7,7 @@ namespace Mautic\StageBundle\Tests\Functional\EventListener;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\StageBundle\Entity\LeadStageLog;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\EventListener\LeadSubscriber;
@@ -47,7 +47,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
 
         $this->assertCount(5, $this->getContainer()->get(\Mautic\StageBundle\Entity\LeadStageLogRepository::class)->findAll());
 
-        $leadMergeEvent = new LeadMergeEvent($leadTwo, $leadOne);
+        $leadMergeEvent = new LeadPostMergeEvent($leadTwo, $leadOne);
 
         /** @var LeadSubscriber $subscriber */
         $subscriber = self::getContainer()->get(LeadSubscriber::class);

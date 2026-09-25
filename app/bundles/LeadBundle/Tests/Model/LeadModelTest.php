@@ -33,12 +33,11 @@ use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\Event\SaveBatchLeadsEvent;
+use Mautic\LeadBundle\Event\LeadPostBatchSaveEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\IpAddressModel;
@@ -680,18 +679,18 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $leadEvent2 =  new LeadEvent($leadsParams[1]['entity'], $leadsParams[1]['isNew']);
 
-        $event = new SaveBatchLeadsEvent([
+        $event = new LeadPostBatchSaveEvent([
             $leadEvent1,
             $leadEvent2,
         ]);
 
         $this->dispatcherMock->expects($this->once())
             ->method('hasListeners')
-            ->with(LeadEvents::LEAD_POST_BATCH_SAVE)
+            ->with(LeadPostBatchSaveEvent::class)
             ->willReturn(true);
         $this->dispatcherMock->expects($this->once())
             ->method('dispatch')
-            ->with($event, LeadEvents::LEAD_POST_BATCH_SAVE)
+            ->with($event)
             ->willReturn($event);
 
         $leadModel->dispatchBatchEventForTest($action, $leadsParams);

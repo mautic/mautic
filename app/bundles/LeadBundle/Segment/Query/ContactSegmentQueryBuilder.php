@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\Exception\PluginHandledFilterException;
@@ -223,13 +222,13 @@ final class ContactSegmentQueryBuilder
      */
     private function dispatchPluginFilteringEvent(ContactSegmentFilter $filter, QueryBuilder $queryBuilder): void
     {
-        if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
+        if ($this->dispatcher->hasListeners(LeadListFilteringEvent::class)) {
             //  This has to run for every filter
             $filterCrate = $filter->contactSegmentFilterCrate->getArray();
 
             $alias = $this->generateRandomParameterName();
             $event = new LeadListFilteringEvent($filterCrate, null, $alias, $filterCrate['operator'], $queryBuilder, $this->entityManager);
-            $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_ON_FILTERING);
+            $this->dispatcher->dispatch($event);
             if ($event->isFilteringDone()) {
                 $queryBuilder->addLogic($event->getSubQuery(), $filter->getGlue());
 

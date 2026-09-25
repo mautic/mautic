@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\LeadBundle\Entity\Company;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class CompanyMergeEvent extends Event
+abstract class CompanyMergeEvent extends Event
 {
     public function __construct(
         private readonly Company $victor,

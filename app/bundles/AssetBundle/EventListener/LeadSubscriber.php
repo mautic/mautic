@@ -6,8 +6,8 @@ use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -26,8 +26,8 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     {
         return [
             LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadEvents::CURRENT_LEAD_CHANGED => ['onLeadChange', 0],
-            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+            LeadChangeEvent::class => ['onLeadChange', 0],
+            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
         ];
     }
 
