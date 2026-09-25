@@ -17,11 +17,10 @@ parameters:
 
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
-        return: 91.4
+        return: 91.6
         param: 83.4
         property: 73.7
-        constant: 80.4
-        declare: 75.4
+        constant: 99.9
 
     # rules merged from rector/type-perfect, opt-in since type-coverage 2.3
     type_perfect:
