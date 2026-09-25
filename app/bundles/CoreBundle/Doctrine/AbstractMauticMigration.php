@@ -16,17 +16,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractMauticMigration extends AbstractMigration
 {
-    protected const TABLE_NAME = null;
+    protected const ?string TABLE_NAME = null;
 
-    /**
-     * @var string
-     */
-    public const COLUMN_TYPE_SIGNED = 'SIGNED';
+    public const string COLUMN_TYPE_SIGNED = 'SIGNED';
 
-    /**
-     * @var string
-     */
-    public const COLUMN_TYPE_UNSIGNED = 'UNSIGNED';
+    public const string COLUMN_TYPE_UNSIGNED = 'UNSIGNED';
 
     protected ContainerInterface $container;
 

@@ -49,7 +49,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
 
-    public const CACHE_NAMESPACE = 'Role';
+    public const string CACHE_NAMESPACE = 'Role';
 
     /**
      * @var int

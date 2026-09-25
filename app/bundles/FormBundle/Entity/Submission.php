@@ -18,7 +18,7 @@ use Mautic\PageBundle\Entity\Page;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Submission
 {
-    public const TABLE_NAME = 'form_submissions';
+    public const string TABLE_NAME = 'form_submissions';
 
     /**
      * Set by FormModel::deleteEntity() so post_delete listeners can still read the id.

@@ -14,8 +14,7 @@ parameters:
         return: 91.6
         param: 82.9
         property: 73.7
-        constant: 80.5
-        declare: 75.4
+        constant: 99.9
 
     # rules merged from rector/type-perfect, opt-in since type-coverage 2.3
     type_perfect:

@@ -45,7 +45,7 @@ class Action implements UuidInterface
 {
     use UuidTrait;
 
-    public const ENTITY_NAME = 'form_action';
+    public const string ENTITY_NAME = 'form_action';
 
     /**
      * @var int

@@ -10,7 +10,7 @@ use Mautic\PointBundle\Entity\Group;
 
 final class Version20250805095503 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = Group::TABLE_NAME;
+    protected const string TABLE_NAME = Group::TABLE_NAME;
 
     protected function preUpAssertions(): void
     {

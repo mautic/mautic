@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadTriggerLog
 {
-    public const TABLE_NAME = 'point_lead_event_log';
+    public const string TABLE_NAME = 'point_lead_event_log';
 
     /**
      * @var TriggerEvent

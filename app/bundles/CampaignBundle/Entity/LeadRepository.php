@@ -16,7 +16,7 @@ class LeadRepository extends CommonRepository
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
 
-    public const DELETE_BATCH_SIZE = 5000;
+    public const int DELETE_BATCH_SIZE = 5000;
 
     /**
      * Get the details of leads added to a campaign.

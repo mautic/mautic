@@ -21,7 +21,7 @@ use Mautic\PageBundle\Validator\PageHit;
 #[PageHit]
 class Hit
 {
-    public const TABLE_NAME = 'page_hits';
+    public const string TABLE_NAME = 'page_hits';
 
     /**
      * @var int|string

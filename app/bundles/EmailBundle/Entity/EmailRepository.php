@@ -26,13 +26,13 @@ class EmailRepository extends CommonRepository
     use ProjectRepositoryTrait;
     use QueryBuilderManipulatorTrait;
 
-    public const EMAILS_PREFIX        = 'e';
+    public const string EMAILS_PREFIX        = 'e';
 
-    public const DNC_PREFIX           = 'dnc';
+    public const string DNC_PREFIX           = 'dnc';
 
-    public const TRACKABLE_PREFIX     = 'tr';
+    public const string TRACKABLE_PREFIX     = 'tr';
 
-    public const REDIRECT_PREFIX      = 'pr';
+    public const string REDIRECT_PREFIX      = 'pr';
 
     /**
      * Get an array of do not email.

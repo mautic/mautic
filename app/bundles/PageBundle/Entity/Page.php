@@ -69,9 +69,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     use ProjectTrait;
     use OptimisticLockTrait;
 
-    public const ENTITY_NAME = 'page';
+    public const string ENTITY_NAME = 'page';
 
-    public const TABLE_NAME = 'pages';
+    public const string TABLE_NAME = 'pages';
 
     /**
      * @var int

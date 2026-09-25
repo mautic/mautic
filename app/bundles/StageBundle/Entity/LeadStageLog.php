@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadStageLog
 {
-    public const TABLE_NAME = 'stage_lead_action_log';
+    public const string TABLE_NAME = 'stage_lead_action_log';
 
     /**
      * @var Stage

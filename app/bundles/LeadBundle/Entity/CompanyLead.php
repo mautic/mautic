@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class CompanyLead
 {
-    public const TABLE_NAME = 'companies_leads';
+    public const string TABLE_NAME = 'companies_leads';
 
     /**
      * @var Company

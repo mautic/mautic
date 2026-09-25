@@ -15,9 +15,9 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
-    public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+    public const string DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
 
-    public const CACHE_NAMESPACE             = 'Plugin';
+    public const string CACHE_NAMESPACE             = 'Plugin';
 
     /**
      * @var int

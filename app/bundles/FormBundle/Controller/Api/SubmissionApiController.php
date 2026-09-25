@@ -146,10 +146,8 @@ final class SubmissionApiController extends CommonApiController
      * Returns Form on success
      *
      * @param int $formId
-     *
-     * @return Response|Form
      */
-    protected function getFormOrResponseWithError($formId)
+    protected function getFormOrResponseWithError($formId): \Symfony\Component\HttpFoundation\Response|\Mautic\FormBundle\Entity\Form
     {
         $form = $this->formModel->getEntity($formId);
 

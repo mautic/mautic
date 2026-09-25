@@ -50,7 +50,7 @@ class Project extends FormEntity implements UuidInterface
 {
     use UuidTrait;
 
-    public const TABLE_NAME = 'projects';
+    public const string TABLE_NAME = 'projects';
 
     #[Groups(['project:read'])]
     private ?int $id = null;

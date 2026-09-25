@@ -29,7 +29,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 {
     use OptimisticLockTrait;
 
-    public const TABLE_NAME = 'campaign_lead_event_log';
+    public const string TABLE_NAME = 'campaign_lead_event_log';
 
     /**
      * @var int|string|null

@@ -12,8 +12,8 @@ use Mautic\PageBundle\Entity\Page;
 
 final class Version20260107152512 extends PreUpAssertionMigration
 {
-    private const COLUMN_NAME  = 'version';
-    protected const TABLE_NAME = Page::TABLE_NAME;
+    private const string COLUMN_NAME  = 'version';
+    protected const string TABLE_NAME = Page::TABLE_NAME;
 
     protected function preUpAssertions(): void
     {

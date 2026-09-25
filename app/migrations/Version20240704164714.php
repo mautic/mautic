@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20240704164714 extends AbstractMauticMigration
 {
-    protected const TABLE_NAME = 'lead_fields';
+    protected const string TABLE_NAME = 'lead_fields';
 
     public function up(Schema $schema): void
     {

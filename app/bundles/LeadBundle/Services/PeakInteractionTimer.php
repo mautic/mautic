@@ -13,25 +13,25 @@ use Mautic\PageBundle\Entity\HitRepository;
 
 class PeakInteractionTimer
 {
-    public const DEFAULT_BEST_HOUR_START         = 9;
+    public const int DEFAULT_BEST_HOUR_START         = 9;
 
     // 9 AM
-    public const DEFAULT_BEST_HOUR_END           = 12;
+    public const int DEFAULT_BEST_HOUR_END           = 12;
 
     // 12 PM
-    public const DEFAULT_BEST_DAYS               = [2, 1, 4];
+    public const array DEFAULT_BEST_DAYS               = [2, 1, 4];
 
     // Tuesday, Monday, Thursday
-    public const DEFAULT_FETCH_INTERACTIONS_FROM = '-60 days';
+    public const string DEFAULT_FETCH_INTERACTIONS_FROM = '-60 days';
 
-    public const DEFAULT_FETCH_LIMIT             = 50;
+    public const int DEFAULT_FETCH_LIMIT             = 50;
 
-    public const DEFAULT_CACHE_TIMEOUT           = 43800;
+    public const int DEFAULT_CACHE_TIMEOUT           = 43800;
 
     // in minutes ~ 1 month
-    public const MIN_INTERACTIONS                = 5;
+    public const int MIN_INTERACTIONS                = 5;
 
-    public const DEFAULT_MAX_OPTIMAL_DAYS        = 3;
+    public const int DEFAULT_MAX_OPTIMAL_DAYS        = 3;
 
     private const int MINUTES_START_OF_HOUR   = 0;
 

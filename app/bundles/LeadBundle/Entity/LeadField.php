@@ -55,11 +55,11 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 {
     use UuidTrait;
 
-    public const MAX_VARCHAR_LENGTH      = 191;
+    public const int MAX_VARCHAR_LENGTH      = 191;
 
-    public const CACHE_NAMESPACE         = 'LeadField';
+    public const string CACHE_NAMESPACE         = 'LeadField';
 
-    public const TYPES_SUPPORTING_LENGTH = [
+    public const array TYPES_SUPPORTING_LENGTH = [
         'text',
         'select',
         'phone',
@@ -67,7 +67,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
         'email',
     ];
 
-    public const ENTITY_NAME        = 'lead_field';
+    public const string ENTITY_NAME        = 'lead_field';
 
     /**
      * @var int

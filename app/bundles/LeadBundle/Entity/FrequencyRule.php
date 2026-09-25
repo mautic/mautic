@@ -16,11 +16,11 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FrequencyRule extends CommonEntity
 {
-    public const TIME_DAY   = 'DAY';
+    public const string TIME_DAY   = 'DAY';
 
-    public const TIME_WEEK  = 'WEEK';
+    public const string TIME_WEEK  = 'WEEK';
 
-    public const TIME_MONTH = 'MONTH';
+    public const string TIME_MONTH = 'MONTH';
 
     /**
      * @var int
