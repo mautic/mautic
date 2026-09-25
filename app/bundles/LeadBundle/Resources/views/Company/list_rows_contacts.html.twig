@@ -12,8 +12,19 @@
 {% set baseUrl = path('mautic_company_contacts_list', {'objectId': company_id}) %}
 {% set customButtons = [] %}
 
-{% if permissions['lead:leads:editown'] or permissions['load:leads:editother'] %}
+{% if permissions['lead:leads:editown'] or permissions['lead:leads:editother'] %}
     {% set customButtons = [
+        {
+            'confirm': {
+                'message': 'mautic.company.contacts.confirm_batch_remove'|trans,
+                'confirmText': 'mautic.company.contacts.remove_selected'|trans,
+                'confirmAction': path('mautic_company_action', {'objectAction': 'batchRemoveContacts', 'objectId': company_id}),
+                'iconClass': 'ri-user-unfollow-line',
+                'btnText': 'mautic.company.contacts.remove_selected'|trans,
+                'precheck': 'batchActionPrecheck',
+                'confirmCallback': 'executeBatchAction',
+            },
+        },
         {
             'attr': {
                 'class': 'btn btn-ghost btn-sm btn-nospin',
