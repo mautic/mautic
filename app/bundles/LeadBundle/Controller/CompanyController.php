@@ -403,10 +403,8 @@ final class CompanyController extends FormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @param int $objectId
      */
-    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
+    public function editAction(Request $request, int $objectId, bool $ignorePost = false): Response
     {
         $entity = $this->companyModel->getEntity($objectId);
 

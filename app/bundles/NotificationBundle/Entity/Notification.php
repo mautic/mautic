@@ -343,10 +343,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -420,7 +417,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->button;
     }
 
-    public function setButton($button): void
+    public function setButton(?string $button): void
     {
         $this->isChanged('button', $button);
         $this->button = $button;
@@ -434,10 +431,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->message;
     }
 
-    /**
-     * @param string $message
-     */
-    public function setMessage($message): void
+    public function setMessage(?string $message): void
     {
         $this->isChanged('message', $message);
         $this->message = $message;
@@ -451,10 +445,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->utmTags;
     }
 
-    /**
-     * @param array $utmTags
-     */
-    public function setUtmTags($utmTags): static
+    public function setUtmTags(array $utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;
@@ -574,10 +565,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->notificationType;
     }
 
-    /**
-     * @param string $notificationType
-     */
-    public function setNotificationType($notificationType): void
+    public function setNotificationType(string $notificationType): void
     {
         $this->isChanged('notificationType', $notificationType);
         $this->notificationType = $notificationType;
@@ -591,10 +579,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->mobile;
     }
 
-    /**
-     * @param bool $mobile
-     */
-    public function setMobile($mobile): static
+    public function setMobile(bool $mobile): static
     {
         $this->mobile = $mobile;
 

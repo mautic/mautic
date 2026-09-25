@@ -55,7 +55,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
                 return $this->getEntityFormOptions();
             }
 
-            public function getModel(?string $name): object
+            public function getModel(string $name): object
             {
                 return $this->model;
             }
@@ -96,7 +96,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             ) {
             }
 
-            public function getModel(?string $name): object
+            public function getModel(string $name): object
             {
                 return $this->model;
             }

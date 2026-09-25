@@ -737,7 +737,7 @@ final class LeadController extends FormController
     /**
      * Generates edit form.
      */
-    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, bool $ignorePost = false): Response
+    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, int $objectId, bool $ignorePost = false): Response
     {
         $lead  = $this->leadModel->getEntity($objectId);
 

@@ -11,10 +11,7 @@ final class ContactIdentificationEvent extends Event
 {
     private ?Lead $identifiedContact = null;
 
-    /**
-     * @var string
-     */
-    private $identifiedByChannel;
+    private ?string $identifiedByChannel = null;
 
     public function __construct(
         private readonly array $clickthrough,
@@ -26,10 +23,7 @@ final class ContactIdentificationEvent extends Event
         return $this->clickthrough;
     }
 
-    /**
-     * @param string $channel
-     */
-    public function setIdentifiedContact(Lead $contact, $channel): void
+    public function setIdentifiedContact(Lead $contact, string $channel): void
     {
         $this->identifiedContact   = $contact;
         $this->identifiedByChannel = $channel;
@@ -37,10 +31,7 @@ final class ContactIdentificationEvent extends Event
         $this->stopPropagation();
     }
 
-    /**
-     * @return string
-     */
-    public function getIdentifier()
+    public function getIdentifier(): ?string
     {
         return $this->identifiedByChannel;
     }
