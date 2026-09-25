@@ -321,12 +321,12 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return object
      */
-    public function getNewEntity(array $params)
+    protected function getNewEntity(array $params)
     {
         return $this->model->getEntity();
     }
 
-    public function getCurrentRequest(): Request
+    protected function getCurrentRequest(): Request
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -341,20 +341,16 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      * Alias for notFound method. It's used in the LeadAccessTrait.
      *
      * @param array<mixed> $args
-     *
-     * @return Response
      */
-    public function postActionRedirect(array $args = [])
+    protected function postActionRedirect(array $args = []): Response
     {
         return $this->notFound('mautic.contact.error.notfound');
     }
 
     /**
      * Returns a 403 Access Denied.
-     *
-     * @return Response
      */
-    protected function accessDenied(string $msg = 'mautic.core.error.accessdenied')
+    protected function accessDenied(string $msg = 'mautic.core.error.accessdenied'): Response
     {
         return $this->returnError($msg, Response::HTTP_FORBIDDEN);
     }
@@ -366,10 +362,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * Returns a 400 Bad Request.
-     *
-     * @return Response
      */
-    protected function badRequest(string $msg = 'mautic.core.error.badrequest')
+    protected function badRequest(string $msg = 'mautic.core.error.badrequest'): Response
     {
         return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
     }
@@ -379,10 +373,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @param FormEntity $entity
      * @param string     $action view|create|edit|publish|delete
-     *
-     * @return bool|Response
      */
-    protected function checkEntityAccess($entity, $action = 'view')
+    protected function checkEntityAccess($entity, $action = 'view'): bool|Response
     {
         $ownPerm   = "{$this->permissionBase}:{$action}own";
         $otherPerm = "{$this->permissionBase}:{$action}other";
@@ -525,10 +517,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * Returns a 404 Not Found.
-     *
-     * @return Response
      */
-    protected function notFound(string $msg = 'mautic.core.error.notfound')
+    protected function notFound(string $msg = 'mautic.core.error.notfound'): Response
     {
         return $this->returnError($msg, Response::HTTP_NOT_FOUND);
     }
@@ -584,7 +574,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return Response|array<string, array<mixed>|int|string|null>
      */
-    protected function returnError(string $msg, int $code = Response::HTTP_INTERNAL_SERVER_ERROR, array $details = [])
+    protected function returnError(string $msg, int $code = Response::HTTP_INTERNAL_SERVER_ERROR, array $details = []): Response|array
     {
         if ($this->translator->hasId($msg, 'flashes')) {
             $msg = $this->translator->trans($msg, [], 'flashes');
@@ -699,9 +689,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * @param array<mixed> $parameters
      *
-     * @return array<string, array<mixed>|int|string|null>|bool|Response
+     * @return array<string, array<mixed>|int|string|null>|true|Response
      */
-    protected function validateBatchPayload(array $parameters)
+    protected function validateBatchPayload(array $parameters): \Symfony\Component\HttpFoundation\Response|array|true
     {
         $batchLimit = (int) $this->coreParametersHelper->get('api_batch_max_limit', 200);
         if (count($parameters) > $batchLimit) {

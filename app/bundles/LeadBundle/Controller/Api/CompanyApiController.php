@@ -62,7 +62,7 @@ final class CompanyApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    public function getNewEntity(array $params)
+    protected function getNewEntity(array $params)
     {
         [$company, $companyEntities] = $this->identifyCompanyHelper->findCompany($params);
         if (count($companyEntities)) {
