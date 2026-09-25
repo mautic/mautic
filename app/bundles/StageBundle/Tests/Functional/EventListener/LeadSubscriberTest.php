@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\StageBundle\Tests\Functional\EventListener;
 
-use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\StageBundle\Entity\LeadStageLog;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\EventListener\LeadSubscriber;

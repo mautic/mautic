@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
-use Mautic\LeadBundle\Event\ListPostSaveEvent;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Event\ListPostSaveEvent;
 
 final class LeadListEventTest extends \PHPUnit\Framework\TestCase
 {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
-use Mautic\LeadBundle\Event\CompanyPostMergeEvent;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Event\CompanyPostMergeEvent;
 use PHPUnit\Framework\TestCase;
 
 final class CompanyMergeEventTest extends TestCase
