@@ -18,6 +18,8 @@ trait CustomFieldsApiControllerTrait
 {
     private RequestStack $requestStack;
 
+    private FieldModel $customFieldsFieldModel;
+
     /**
      * @var mixed[]
      */
@@ -44,9 +46,7 @@ trait CustomFieldsApiControllerTrait
             // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter
             // is not defined in the request
 
-            /** @var FieldModel $fieldModel */
-            $fieldModel = $this->getModel('lead.field');
-            $fields     = $fieldModel->getFieldListWithProperties($object);
+            $fields = $this->customFieldsFieldModel->getFieldListWithProperties($object);
 
             foreach ($fields as $alias => $field) {
                 // Set the default value if the parameter is not included in the request, there is no value for the given entity, and a default is defined
@@ -131,10 +131,8 @@ trait CustomFieldsApiControllerTrait
             return $this->fieldCache[$object];
         }
 
-        $model = $this->getModel('lead.field');
-        \assert($model instanceof FieldModel);
 
-        $fields = $model->getEntities(
+        $fields = $this->customFieldsFieldModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -210,5 +208,12 @@ trait CustomFieldsApiControllerTrait
         RequestStack $requestStack,
     ): void {
         $this->requestStack = $requestStack;
+    }
+
+    #[Required]
+    public function autowireCustomFieldsApiControllerTrait(
+        FieldModel $customFieldsFieldModel,
+    ): void {
+        $this->customFieldsFieldModel = $customFieldsFieldModel;
     }
 }

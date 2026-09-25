@@ -37,15 +37,10 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             ->method('getEntities')
             ->willReturn($paginator);
 
-        $controller = new class($modelFake) {
+        $controller = new class {
             use CustomFieldsApiControllerTrait;
 
             private string $entityNameOne = 'lead';
-
-            public function __construct(
-                private readonly object $model,
-            ) {
-            }
 
             /**
              * @return mixed[]
@@ -54,12 +49,8 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             {
                 return $this->getEntityFormOptions();
             }
-
-            public function getModel(?string $name): object
-            {
-                return $this->model;
-            }
         };
+        $controller->autowireCustomFieldsApiControllerTrait($modelFake);
 
         $this->assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling once, should be live
         $this->assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling twice, should be cached
