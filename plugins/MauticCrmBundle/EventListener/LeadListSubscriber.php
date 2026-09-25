@@ -5,7 +5,6 @@ namespace MauticPlugin\MauticCrmBundle\EventListener;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
@@ -24,8 +23,8 @@ final readonly class LeadListSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => ['onFilterChoiceFieldsGenerate', 0],
-            LeadEvents::LIST_PRE_PROCESS_LIST            => ['onLeadListProcessList', 0],
+            LeadListFiltersChoicesEvent::class => ['onFilterChoiceFieldsGenerate', 0],
+            ListPreProcessListEvent::class            => ['onLeadListProcessList', 0],
         ];
     }
 

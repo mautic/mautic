@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Services;
 
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\Exception\FilterNotFoundException;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
@@ -278,9 +277,9 @@ final class ContactSegmentFilterDictionary
      */
     private function fetchFiltersFromSubscribers(): void
     {
-        if ($this->dispatcher->hasListeners(LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE)) {
+        if ($this->dispatcher->hasListeners(SegmentDictionaryGenerationEvent::class)) {
             $event = new SegmentDictionaryGenerationEvent($this->filters);
-            $this->dispatcher->dispatch($event, LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE);
+            $this->dispatcher->dispatch($event);
             $this->filters = $event->getTranslations();
         }
     }

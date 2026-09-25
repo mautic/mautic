@@ -10,8 +10,12 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
+use Mautic\LeadBundle\Event\ListDeleteEvent;
+use Mautic\LeadBundle\Event\ListPostDeleteEvent;
+use Mautic\LeadBundle\Event\ListPostSaveEvent;
+use Mautic\LeadBundle\Event\ListPreDeleteEvent;
+use Mautic\LeadBundle\Event\ListPreUnpublishEvent;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -33,16 +37,16 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LIST_POST_SAVE     => ['onSegmentPostSave', 0],
-            LeadEvents::ON_LIST_DELETE     => ['onSegmentDelete', 0],
-            LeadEvents::LIST_POST_DELETE   => [
+            ListPostSaveEvent::class     => ['onSegmentPostSave', 0],
+            ListDeleteEvent::class     => ['onSegmentDelete', 0],
+            ListPostDeleteEvent::class   => [
                 ['onSegmentPostDelete', 0],
                 ['clearSegmentCountCache', 0],
             ],
-            LeadEvents::LIST_PRE_DELETE   => [
+            ListPreDeleteEvent::class   => [
                 ['onSegmentPreDelete', 0],
             ],
-            LeadEvents::LIST_PRE_UNPUBLISH => [
+            ListPreUnpublishEvent::class => [
                 ['onSegmentPreUnpublish', 0],
             ],
         ];

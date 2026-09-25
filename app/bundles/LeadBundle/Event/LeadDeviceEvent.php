@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
-final class LeadDeviceEvent extends CommonEvent
+class LeadDeviceEvent extends CommonEvent
 {
     public function __construct(LeadDevice &$device, bool $isNew = false)
     {

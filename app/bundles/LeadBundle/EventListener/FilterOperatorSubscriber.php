@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -73,7 +72,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     {
         return [
             LeadListFiltersOperatorsEvent::class => ['onListOperatorsGenerate', 0],
-            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE   => [
+            LeadListFiltersChoicesEvent::class   => [
                 ['onGenerateSegmentFiltersAddStaticFields', 0],
                 ['onGenerateSegmentFiltersAddCustomFields', 0],
                 ['onGenerateSegmentFiltersAddBehaviors', 0],

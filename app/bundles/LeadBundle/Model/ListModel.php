@@ -29,13 +29,18 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
-use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
+use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
+use Mautic\LeadBundle\Event\ListDeleteEvent;
+use Mautic\LeadBundle\Event\ListPostDeleteEvent;
+use Mautic\LeadBundle\Event\ListPostSaveEvent;
+use Mautic\LeadBundle\Event\ListPreDeleteEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
+use Mautic\LeadBundle\Event\ListPreSaveEvent;
+use Mautic\LeadBundle\Event\ListPreUnpublishEvent;
 use Mautic\LeadBundle\Form\Type\ListType;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
@@ -255,39 +260,23 @@ class ListModel extends FormModel implements GlobalSearchInterface
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = LeadEvents::LIST_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = LeadEvents::LIST_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = LeadEvents::LIST_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = LeadEvents::LIST_POST_DELETE;
-                break;
-            case 'pre_unpublish':
-                $name = LeadEvents::LIST_PRE_UNPUBLISH;
-                break;
-            case 'on_list_delete':
-                $name = LeadEvents::ON_LIST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'       => new ListPreSaveEvent($entity, $isNew),
+            'post_save'      => new ListPostSaveEvent($entity, $isNew),
+            'pre_delete'     => new ListPreDeleteEvent($entity, $isNew),
+            'post_delete'    => new ListPostDeleteEvent($entity, $isNew),
+            'pre_unpublish'  => new ListPreUnpublishEvent($entity, $isNew),
+            'on_list_delete' => new ListDeleteEvent($entity, $isNew),
+            default          => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new LeadListEvent($entity, $isNew);
-            }
-            $this->dispatcher->dispatch($event, $name);
+        $this->dispatcher->dispatch($event);
 
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     /**
@@ -314,9 +303,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
             ];
 
         // Add custom choices
-        if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
+        if ($this->dispatcher->hasListeners(LeadListFiltersChoicesEvent::class)) {
             $event = new LeadListFiltersChoicesEvent([], $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest(), $search);
-            $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE);
+            $this->dispatcher->dispatch($event);
             $choices = $event->getChoices();
         }
 
@@ -378,9 +367,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $batchLimiters = ['dateTime' => $dtHelper->toUtcString()];
         $list          = ['id' => $segmentId, 'filters' => $leadList->getFilters()];
 
-        $this->dispatcher->dispatch(
-            new ListPreProcessListEvent($list, false), LeadEvents::LIST_PRE_PROCESS_LIST
-        );
+        $this->dispatcher->dispatch(new ListPreProcessListEvent($list, false));
 
         try {
             // Get a count of leads to add
@@ -458,11 +445,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $start += $limit;
 
                 // Dispatch batch event
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
-                    $this->dispatcher->dispatch(
-                        new ListChangeEvent($newLeadList[$segmentId], $leadList, true),
-                        LeadEvents::LEAD_LIST_BATCH_CHANGE
-                    );
+                if ($this->dispatcher->hasListeners(ListBatchChangeEvent::class)) {
+                    $this->dispatcher->dispatch(new ListBatchChangeEvent($newLeadList[$segmentId], $leadList, true));
                 }
 
                 unset($newLeadList);
@@ -537,11 +521,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 }
 
                 // Dispatch batch event
-                if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
-                    $this->dispatcher->dispatch(
-                        new ListChangeEvent($processedLeads, $leadList, false),
-                        LeadEvents::LEAD_LIST_BATCH_CHANGE
-                    );
+                if (count($processedLeads) && $this->dispatcher->hasListeners(ListBatchChangeEvent::class)) {
+                    $this->dispatcher->dispatch(new ListBatchChangeEvent($processedLeads, $leadList, false));
                 }
 
                 $start += $limit;
@@ -749,10 +730,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
-        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(ListChangeEvent::class)) {
             foreach ($dispatchEvents as $listId) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId]);
-                $this->dispatcher->dispatch($event, LeadEvents::LEAD_LIST_CHANGE);
+                $this->dispatcher->dispatch($event);
 
                 unset($event);
             }
@@ -874,10 +855,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
-        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(ListChangeEvent::class)) {
             foreach ($dispatchEvents as $listId) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId], false);
-                $this->dispatcher->dispatch($event, LeadEvents::LEAD_LIST_CHANGE);
+                $this->dispatcher->dispatch($event);
 
                 unset($event);
             }

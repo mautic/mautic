@@ -9,8 +9,9 @@ use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
-use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\ContactExportEmailSentEvent;
+use Mautic\LeadBundle\Event\ContactExportPrepareFileEvent;
+use Mautic\LeadBundle\Event\ContactExportSendEmailEvent;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -69,10 +70,17 @@ class ContactScheduledExportCommand extends Command
 
         try {
             foreach ($contactExportSchedulers as $contactExportScheduler) {
-                $contactExportSchedulerEvent = new ContactExportSchedulerEvent($contactExportScheduler);
-                $this->eventDispatcher->dispatch($contactExportSchedulerEvent, LeadEvents::CONTACT_EXPORT_PREPARE_FILE);
-                $this->eventDispatcher->dispatch($contactExportSchedulerEvent, LeadEvents::CONTACT_EXPORT_SEND_EMAIL);
-                $this->eventDispatcher->dispatch($contactExportSchedulerEvent, LeadEvents::POST_CONTACT_EXPORT_SEND_EMAIL);
+                $prepareFileEvent = new ContactExportPrepareFileEvent($contactExportScheduler);
+                $this->eventDispatcher->dispatch($prepareFileEvent);
+
+                $sendEmailEvent = new ContactExportSendEmailEvent($contactExportScheduler);
+                $sendEmailEvent->setFilePath($prepareFileEvent->getFilePath());
+                $this->eventDispatcher->dispatch($sendEmailEvent);
+
+                $emailSentEvent = new ContactExportEmailSentEvent($contactExportScheduler);
+                $emailSentEvent->setFilePath($prepareFileEvent->getFilePath());
+                $this->eventDispatcher->dispatch($emailSentEvent);
+
                 ++$count;
             }
 

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\ListBatchChangeEvent;
+use Mautic\LeadBundle\Event\ListChangeEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class SegmentSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -14,7 +15,7 @@ final class SegmentSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
 
-        $this->assertTrue($dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE));
-        $this->assertTrue($dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE));
+        $this->assertTrue($dispatcher->hasListeners(ListChangeEvent::class));
+        $this->assertTrue($dispatcher->hasListeners(ListBatchChangeEvent::class));
     }
 }
