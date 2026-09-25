@@ -144,11 +144,7 @@ class BuilderEvent extends Event
      *
      * @param string|string[]|null $tokenKeys
      */
-<<<<<<< HEAD
-    public function tokensRequested($tokenKeys = null): bool
-=======
     public function tokensRequested(string|array|null $tokenKeys = null): bool
->>>>>>> 499b0ee936 ([types] narrow private method param types to passed types)
     {
         if ($requested = $this->getRequested('tokens')) {
             if (!empty($this->tokenFilter) && 'token' === $this->tokenFilterTarget) {

@@ -29,8 +29,7 @@ parameters:
         no_isset_on_object: true
         no_empty_on_object: true
 
-        # @todo handle next
-        no_mixed_property: false
+        # no_mixed_property: false
         no_mixed_caller: false
 
         null_over_false: true
@@ -91,6 +90,9 @@ parameters:
         - identifier: symplify.forbiddenFuncCall
         - identifier: symplify.forbiddenExtendOfNonAbstractClass
         - identifier: symplify.noDynamicName
+
+        # handled in another PR
+        - identifier: mautic.noGetModelWithStringInController
 
         -
             identifier: symplify.forbiddenStaticClassConstFetch

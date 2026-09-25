@@ -189,10 +189,7 @@ final class LeadFieldRepository extends CommonRepository
         return new ArrayCollection($queryBuilder->getQuery()->execute());
     }
 
-    /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     */
-    private function addCompanyLeftJoin(\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $q): void
+    private function addCompanyLeftJoin(QueryBuilder $q): void
     {
         $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
         $q->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'company', 'companies_lead.company_id = company.id');
@@ -200,14 +197,9 @@ final class LeadFieldRepository extends CommonRepository
 
     /**
      * Return property by field alias and join tables.
-<<<<<<< HEAD
-     *
-     * @param string                                                       $field
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-=======
->>>>>>> 499b0ee936 ([types] narrow private method param types to passed types)
      */
-    public function getPropertyByField($field, $q): string
+    public function getPropertyByField(string $field, $q): string
     {
         $columnAlias = 'l.';
         // Join company tables If we're trying search by company fields

@@ -571,16 +571,11 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
-<<<<<<< HEAD
-     * @param string               $format
-     * @param object               $page
-=======
->>>>>>> 499b0ee936 ([types] narrow private method param types to passed types)
      * @param array<string, mixed> $queryArgs
      *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, array $queryArgs): StreamedResponse|Response
+    public function exportResultsForPage(string $format, object $page, array $queryArgs): StreamedResponse|Response
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];

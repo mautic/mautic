@@ -43,14 +43,7 @@ final class EmailStatOptions extends FetchOptions
         return $this->companyId;
     }
 
-<<<<<<< HEAD
-    /**
-     * @param int|null $companyId
-     */
-    public function setCompanyId($companyId): self
-=======
     public function setCompanyId(int $companyId): self
->>>>>>> 499b0ee936 ([types] narrow private method param types to passed types)
     {
         $this->companyId = $companyId;
 
@@ -83,14 +76,7 @@ final class EmailStatOptions extends FetchOptions
         return $this->segmentId;
     }
 
-<<<<<<< HEAD
-    /**
-     * @param int|null $segmentId
-     */
-    public function setSegmentId($segmentId): self
-=======
     public function setSegmentId(int $segmentId): self
->>>>>>> 499b0ee936 ([types] narrow private method param types to passed types)
     {
         $this->segmentId = $segmentId;
 

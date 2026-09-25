@@ -74,7 +74,6 @@ final class NoGetModelWithStringInControllerRule implements Rule
             $firstArg->value->value
         ))
             ->identifier('mautic.noGetModelWithStringInController')
-            ->nonIgnorable()
             ->build();
 
         return [$ruleError];
