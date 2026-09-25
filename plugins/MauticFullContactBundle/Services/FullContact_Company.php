@@ -21,7 +21,7 @@ final class FullContact_Company extends FullContact_Base
 
     protected $_resourceUri      = '/company/lookup.json';
 
-    public function lookupByDomain($search)
+    public function lookupByDomain(string $search)
     {
         $this->_execute(['domain' => $search, 'method' => 'domain']);
 

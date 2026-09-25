@@ -21,25 +21,15 @@ final class ChannelPreferences
     ) {
     }
 
-    /**
-     * @param int $priority
-     */
-    public function addPriority($priority): static
+    public function addPriority(int $priority): static
     {
-        $priority = (int) $priority;
-
         $this->organizedByPriority[$priority] ??= new ArrayCollection();
 
         return $this;
     }
 
-    /**
-     * @param int $priority
-     */
-    public function addLog(LeadEventLog $log, $priority): static
+    public function addLog(LeadEventLog $log, int $priority): static
     {
-        $priority = (int) $priority;
-
         $this->addPriority($priority);
 
         // We have to clone the log to not affect the original assocaited with the MM event itself
@@ -67,14 +57,10 @@ final class ChannelPreferences
     }
 
     /**
-     * @param int $priority
-     *
      * @return Collection<int, LeadEventLog>
      */
-    public function getLogsByPriority($priority): Collection
+    public function getLogsByPriority(int $priority): Collection
     {
-        $priority = (int) $priority;
-
         return $this->organizedByPriority[$priority] ?? new ArrayCollection();
     }
 }

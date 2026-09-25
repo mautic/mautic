@@ -204,10 +204,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->id;
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -224,10 +221,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->properties;
     }
 
-    /**
-     * @param string $type
-     */
-    public function setType($type): static
+    public function setType(string $type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -267,10 +261,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -365,18 +356,12 @@ class Point extends FormEntity implements UuidInterface
         return $this->delta;
     }
 
-    /**
-     * @param mixed $delta
-     */
-    public function setDelta($delta): void
+    public function setDelta(int $delta): void
     {
-        $this->delta = (int) $delta;
+        $this->delta = $delta;
     }
 
-    /**
-     * @param bool $repeatable
-     */
-    public function setRepeatable($repeatable): static
+    public function setRepeatable(bool $repeatable): static
     {
         $this->isChanged('repeatable', $repeatable);
         $this->repeatable = $repeatable;
@@ -397,7 +382,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->group;
     }
 
-    public function setGroup(?Group $group): void
+    public function setGroup(Group $group): void
     {
         $this->group = $group;
     }

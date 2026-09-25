@@ -25,19 +25,16 @@ final class RedirectRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * @param int $increaseBy
-     */
-    public function upHitCount($id, $increaseBy = 1, bool $unique = false): void
+    public function upHitCount(int $id, int $increaseBy = 1, bool $unique = false): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'page_redirects')
-            ->set('hits', 'hits + '.(int) $increaseBy)
-            ->where('id = '.(int) $id);
+            ->set('hits', 'hits + '.$increaseBy)
+            ->where('id = '.$id);
 
         if ($unique) {
-            $q->set('unique_hits', 'unique_hits + '.(int) $increaseBy);
+            $q->set('unique_hits', 'unique_hits + '.$increaseBy);
         }
 
         $q->executeStatement();

@@ -140,10 +140,7 @@ class PointInsight extends FormEntity
         return $this->description;
     }
 
-    /**
-     * @param string|null $description
-     */
-    public function setDescription($description): static
+    public function setDescription(string $description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -159,10 +156,7 @@ class PointInsight extends FormEntity
         return $this->insightType;
     }
 
-    /**
-     * @param string|null $insightType
-     */
-    public function setInsightType($insightType): static
+    public function setInsightType(string $insightType): static
     {
         $this->isChanged('insightType', $insightType);
         $this->insightType = $insightType;
@@ -178,10 +172,7 @@ class PointInsight extends FormEntity
         return $this->insightAction;
     }
 
-    /**
-     * @param string|null $insightAction
-     */
-    public function setInsightAction($insightAction): static
+    public function setInsightAction(string $insightAction): static
     {
         $this->isChanged('insightAction', $insightAction);
         $this->insightAction = $insightAction;
@@ -197,10 +188,7 @@ class PointInsight extends FormEntity
         return $this->customField;
     }
 
-    /**
-     * @param string|null $customField
-     */
-    public function setCustomField($customField): static
+    public function setCustomField(string $customField): static
     {
         $this->isChanged('customField', $customField);
         $this->customField = $customField;
@@ -219,7 +207,7 @@ class PointInsight extends FormEntity
     /**
      * @param array<int> $pointGroups
      */
-    public function setPointGroups($pointGroups): static
+    public function setPointGroups(array $pointGroups): static
     {
         $this->isChanged('pointGroups', $pointGroups);
         $this->pointGroups = $pointGroups;

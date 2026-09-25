@@ -68,11 +68,9 @@ class EmailRepository extends CommonRepository
     /**
      * Check to see if an email is set as do not contact.
      *
-     * @param string $email
-     *
      * @return false|array{id: numeric-string, unsubscribed: bool, bounced: bool, manual: bool, comments: string}
      */
-    public function checkDoNotEmail($email): false|array
+    public function checkDoNotEmail(string $email): false|array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('dnc.*')
@@ -842,7 +840,7 @@ class EmailRepository extends CommonRepository
      * @param int $minContactId
      * @param int $maxContactId
      */
-    private function setMinMaxIds(QueryBuilder $q, string $column, $minContactId, $maxContactId): QueryBuilder
+    private function setMinMaxIds(TrackingQueryBuilder $q, string $column, $minContactId, $maxContactId): QueryBuilder
     {
         if ($minContactId && is_numeric($minContactId)) {
             $q->andWhere($column.' >= :minContactId');

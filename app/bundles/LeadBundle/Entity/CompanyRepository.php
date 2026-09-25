@@ -392,11 +392,7 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
         return $query->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @param int $limit
-     * @param int $offset
-     */
-    public function getMostCompanies($query, $limit = 10, $offset = 0): array
+    public function getMostCompanies(\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->setMaxResults($limit)
             ->setFirstResult($offset);

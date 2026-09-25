@@ -87,10 +87,7 @@ class Stat
         return $this->focus;
     }
 
-    /**
-     * @param mixed $focus
-     */
-    public function setFocus($focus): static
+    public function setFocus(Focus $focus): static
     {
         $this->focus = $focus;
 
@@ -141,10 +138,7 @@ class Stat
         return $this->dateAdded;
     }
 
-    /**
-     * @param mixed $dateAdded
-     */
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(\DateTimeInterface $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 

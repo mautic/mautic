@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Model\MauticModelInterface;
@@ -18,10 +20,7 @@ final readonly class SubmissionResultLoader implements MauticModelInterface
     ) {
     }
 
-    /**
-     * @param int $id
-     */
-    public function getSubmissionWithResult($id): ?Submission
+    public function getSubmissionWithResult(int $id): ?Submission
     {
         return $this->submissionRepository->getEntity($id);
     }

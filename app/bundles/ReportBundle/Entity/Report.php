@@ -257,10 +257,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $this->id = $id;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -295,10 +292,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->system;
     }
 
-    /**
-     * @param string $source
-     */
-    public function setSource($source): static
+    public function setSource(string $source): static
     {
         $this->isChanged('source', $source);
         $this->source = $source;
@@ -317,7 +311,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @param mixed[] $columns
      */
-    public function setColumns($columns): static
+    public function setColumns(array $columns): static
     {
         $this->isChanged('columns', $columns);
         $this->columns = $columns;
@@ -336,7 +330,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @param mixed[] $filters
      */
-    public function setFilters($filters): static
+    public function setFilters(array $filters): static
     {
         $this->isChanged('filters', $filters);
         $this->filters = $filters;
@@ -355,13 +349,11 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * Get filter value from a specific filter.
      *
-     * @param string $column
-     *
      * @return mixed
      *
      * @throws \UnexpectedValueException
      */
-    public function getFilterValue($column)
+    public function getFilterValue(string $column)
     {
         foreach ($this->filters as $field) {
             if ($column === $field['column']) {
@@ -375,11 +367,9 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * Get filter values from a specific filter.
      *
-     * @param string $column
-     *
      * @throws \UnexpectedValueException
      */
-    public function getFilterValues($column): array
+    public function getFilterValues(string $column): array
     {
         $values = [];
         foreach ($this->filters as $field) {
@@ -403,10 +393,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->description;
     }
 
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description): void
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -514,10 +501,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         return $this->isScheduled;
     }
 
-    /**
-     * @param bool $isScheduled
-     */
-    public function setIsScheduled($isScheduled): void
+    public function setIsScheduled(bool $isScheduled): void
     {
         $this->isChanged('isScheduled', $isScheduled);
 

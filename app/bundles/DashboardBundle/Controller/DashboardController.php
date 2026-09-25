@@ -392,10 +392,8 @@ final class DashboardController extends AbstractFormController
 
     /**
      * Applies dashboard layout.
-     *
-     * @param string|null $file
      */
-    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, RouterInterface $urlGenerator, $file = null): RedirectResponse
+    public function applyDashboardFileAction(Request $request, PathsHelper $pathsHelper, RouterInterface $urlGenerator, ?string $file = null): RedirectResponse
     {
         if (!$file) {
             $file = $request->attributes->all()['file'] ?? $request->query->all()['file'] ?? $request->request->all()['file'] ?? null;

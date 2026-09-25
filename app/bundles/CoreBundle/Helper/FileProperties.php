@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;
@@ -7,11 +9,9 @@ use Mautic\CoreBundle\Exception\FileInvalidException;
 final class FileProperties
 {
     /**
-     * @param string $filename
-     *
      * @throws FileInvalidException
      */
-    public function getFileSize($filename): int|bool
+    public function getFileSize(string $filename): int|bool
     {
         if (!file_exists($filename) || !is_readable($filename)) {
             throw new FileInvalidException();

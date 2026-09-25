@@ -65,7 +65,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $this->amendLeadDataBeforePush($mappedData);
 
-        if (empty($mappedData)) {
+        if ($mappedData === []) {
             return false;
         }
 
@@ -104,7 +104,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Amend mapped lead data before pushing to CRM.
      */
-    public function amendLeadDataBeforePush(&$mappedData): void
+    public function amendLeadDataBeforePush(array &$mappedData): void
     {
     }
 

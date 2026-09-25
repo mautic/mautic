@@ -331,7 +331,7 @@ final class LeadEventLogRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -347,8 +347,8 @@ final class LeadEventLogRepository extends CommonRepository
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId);
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId);
 
         if ([] !== $exists) {
             $q->andWhere(
@@ -360,7 +360,7 @@ final class LeadEventLogRepository extends CommonRepository
             // Delete remaining leads as the new lead already belongs
             $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
-                ->where('lead_id = '.(int) $fromLeadId)
+                ->where('lead_id = '.$fromLeadId)
                 ->executeStatement();
         } else {
             $q->executeStatement();
@@ -586,11 +586,9 @@ final class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param string $message
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function unscheduleEvents(Lead $campaignMember, $message): void
+    public function unscheduleEvents(Lead $campaignMember, string $message): void
     {
         $contactId  = $campaignMember->getLead()->getId();
         $campaignId = $campaignMember->getCampaign()->getId();

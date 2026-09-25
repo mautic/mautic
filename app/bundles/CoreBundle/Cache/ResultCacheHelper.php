@@ -11,7 +11,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\ORM\Query;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 
 final class ResultCacheHelper
@@ -61,7 +60,7 @@ final class ResultCacheHelper
      * clear() drops only that namespace. This is what doctrine/cache's
      * setNamespace()/deleteAll() pair used to provide.
      */
-    public static function getNamespacedCache(CacheItemPoolInterface $cache, string $namespace): AdapterInterface
+    public static function getNamespacedCache(CacheItemPoolInterface $cache, string $namespace): ProxyAdapter
     {
         return new ProxyAdapter($cache, $namespace);
     }

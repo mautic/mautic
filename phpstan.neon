@@ -9,18 +9,33 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
 
+    symplify:
+        naming: false
+        complexity: true
+        configurable: true
+        static: true
+
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
         return: 91.6
-        param: 82.9
-        property: 73.7
         constant: 99.9
+        param: 83.4
+        property: 73.7
 
     # rules merged from rector/type-perfect, opt-in since type-coverage 2.3
     type_perfect:
         no_param_type_removal: true
         no_isset_on_object: true
         no_empty_on_object: true
+
+        # @todo handle next
+        no_mixed_property: false
+        no_mixed_caller: false
+
+        null_over_false: true
+        narrow_param: true
+        narrow_return: true
+
     paths:
         - app/bundles
         - app/config
@@ -60,18 +75,34 @@ parameters:
         -
             identifier: symplify.noNullableServiceInConstructor
             path: app/bundles/ReportBundle/Generator/ReportGenerator.php
-        # the concrete Config Loader and Messenger TransportFactory are the ones wired as services, no interface alias exists
+
+        # too strict
+        - identifier: symplify.forbiddenNode
+        - identifier: symplify.noReference
+        - identifier: symplify.forbiddenFuncCall
+        - identifier: symplify.forbiddenExtendOfNonAbstractClass
+        - identifier: symplify.noDynamicName
+
         -
-            identifier: symplify.preferInterfaceInConstructor
+            identifier: symplify.forbiddenStaticClassConstFetch
+            path: app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
+
+        # parent class is used actively
+        -
+            identifier: symplify.forbiddenExtendOfNonAbstractClass
             paths:
-                - app/bundles/CoreBundle/Event/RouteEvent.php
-                - app/bundles/MessengerBundle/Validator/DsnValidator.php
+                - *Controller.php
+                - *Model.php
+
+        # part of deprecation
+        -
+            identifier: symplify.noConstructorOverride
+            path: *Permissions.php
+
         # these services have no class name alias in the container, so only the string name can fetch them
         -
             identifier: mautic.noContainerGet
             paths:
-                - app/bundles/ApiBundle/Tests/Functional/OwnershipScopedSecurityMetadataTest.php
-                - app/bundles/CoreBundle/Tests/Functional/DependencyInjection/AbstractContainerSmokeTestCase.php
                 - app/bundles/CoreBundle/Tests/Functional/RouteMapTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php
@@ -96,23 +127,14 @@ parameters:
             message: '#Call to an undefined method Mautic(.*?)Integration::getApiUrl\(\)#'
             path: plugins/*/Api/*
         - '#Parameter \$integration of method MauticPlugin\\MauticEmailMarketingBundle\\Api\\EmailMarketingApi::__construct\(\) has typehint with deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration#'
-        # Doctrine expects concrete types but traits use interfaces with generics
+
         -
-            message: '#Property .+::\$translationParent type mapping mismatch: property can contain .+TranslationEntityInterface\|null but database expects#'
-            path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
-            identifier: doctrine.associationType
-        -
-            message: '#Property .+::\$translationChildren type mapping mismatch: property can contain .+but database expects#'
-            path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
-            identifier: doctrine.associationType
-        -
-            message: '#Property .+::\$variantParent type mapping mismatch: property can contain .+VariantEntityInterface\|null but database expects#'
-            path: app/bundles/CoreBundle/Entity/VariantEntityTrait.php
-            identifier: doctrine.associationType
-        # oAuth2 entities redeclare FOS parent properties whose declared types (interfaces, int) differ from the concrete Doctrine mapping
-        -
-            message: '#Property .+::\$(client|user) type mapping mismatch: property can contain .+but database expects#'
-            path: app/bundles/ApiBundle/Entity/oAuth2/*.php
+            paths:
+                # oAuth2 entities redeclare FOS parent properties whose declared types (interfaces, int) differ from the concrete Doctrine mapping
+                - app/bundles/ApiBundle/Entity/oAuth2/*.php
+                - app/bundles/CoreBundle/Entity/VariantEntityTrait.php
+                # Doctrine expects concrete types but traits use interfaces with generics
+                - app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
             identifier: doctrine.associationType
 
         # mocks
@@ -120,11 +142,6 @@ parameters:
         - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
         - '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
 
-        # on purposelater
-        #- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
-
-        # can't figure out what the right type should be for FormBuilderInterface
-        - '#buildForm\(\) expects Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null>, Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null> given#'
         # on purpose type check
         -
             message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'

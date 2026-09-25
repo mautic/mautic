@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use DateTimeInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 final class ReportExportOptions
@@ -10,10 +11,7 @@ final class ReportExportOptions
 
     private int $page = 1;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateFrom;
+    private ?\DateTimeInterface $dateFrom = null;
 
     /**
      * @var \DateTimeInterface
@@ -61,7 +59,7 @@ final class ReportExportOptions
     /**
      * @param \DateTime $dateFrom
      */
-    public function setDateFrom($dateFrom): void
+    public function setDateFrom(DateTimeInterface $dateFrom): void
     {
         $this->dateFrom = $dateFrom;
     }

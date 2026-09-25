@@ -13,7 +13,7 @@ final class LeadTriggerLogRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -30,8 +30,8 @@ final class LeadTriggerLogRepository extends CommonRepository
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'point_lead_event_log')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId);
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId);
 
         if ([] !== $events) {
             $q->andWhere(
@@ -43,7 +43,7 @@ final class LeadTriggerLogRepository extends CommonRepository
             // Delete remaining leads as the new lead already belongs
             $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'point_lead_event_log')
-                ->where('lead_id = '.(int) $fromLeadId)
+                ->where('lead_id = '.$fromLeadId)
                 ->executeStatement();
         } else {
             $q->executeStatement();

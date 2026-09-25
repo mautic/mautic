@@ -144,16 +144,16 @@ class BuilderEvent extends Event
      * Check if tokens have been requested.
      * Pass in string or array of tokens to filter against if filterType == token.
      *
-     * @param string|array|null $tokenKeys
+     * @param string|string[]|null $tokenKeys
      */
-    public function tokensRequested($tokenKeys = null): bool
+    public function tokensRequested(string|array|null $tokenKeys = null): bool
     {
         if ($requested = $this->getRequested('tokens')) {
             if (!empty($this->tokenFilter) && 'token' === $this->tokenFilterTarget) {
                 if (!is_array($tokenKeys)) {
                     $tokenKeys = [$tokenKeys];
                 }
-                $found = array_any($tokenKeys, fn ($token): bool => 0 === stripos($token, $this->tokenFilter));
+                $found = array_any($tokenKeys, fn (?string $token): bool => 0 === stripos($token, $this->tokenFilter));
 
                 if (!$found) {
                     $requested = false;

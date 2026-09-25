@@ -18,6 +18,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * on them.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\RepositoryMethodMustHaveReturnTypeRuleTest
  */
 final readonly class RepositoryMethodMustHaveReturnTypeRule implements Rule
 {

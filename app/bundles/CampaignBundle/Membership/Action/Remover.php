@@ -28,11 +28,9 @@ final readonly class Remover
     }
 
     /**
-     * @param bool $isExit
-     *
      * @throws ContactAlreadyRemovedFromCampaignException
      */
-    public function updateExistingMembership(CampaignMember $campaignMember, $isExit): void
+    public function updateExistingMembership(CampaignMember $campaignMember, bool $isExit): void
     {
         if ($isExit) {
             // Contact was removed by the change campaign action or a segment

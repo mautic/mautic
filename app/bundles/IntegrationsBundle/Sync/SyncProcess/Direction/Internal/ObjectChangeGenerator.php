@@ -335,7 +335,7 @@ final class ObjectChangeGenerator
     }
 
     private function notifyAboutInvalidValue(
-        InvalidValueException $e,
+        RequiredValueException $e,
         FieldMappingDAO $fieldMappingDAO,
         InformationChangeRequestDAO $integrationInformationChangeRequest,
         bool $isNewObject,

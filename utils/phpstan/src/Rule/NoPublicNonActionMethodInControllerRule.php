@@ -18,6 +18,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * listeners are skipped.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoPublicNonActionMethodInControllerRuleTest
  */
 final class NoPublicNonActionMethodInControllerRule implements Rule
 {

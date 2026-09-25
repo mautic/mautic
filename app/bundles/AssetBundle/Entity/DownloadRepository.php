@@ -105,12 +105,10 @@ class DownloadRepository extends CommonRepository
     /**
      * Get pie graph data for http statuses.
      *
-     * @param QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getHttpStatuses($query): array
+    public function getHttpStatuses(\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $query): array
     {
         $query->select('ad.code as status, count(ad.code) as count')
             ->groupBy('ad.code')

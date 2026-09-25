@@ -51,6 +51,7 @@ use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
@@ -468,7 +469,7 @@ final class SubmissionModel extends CommonFormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, $form, array $queryArgs): StreamedResponse|Response
+    public function exportResults(string $format, Form $form, array $queryArgs): StreamedResponse|Response
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -571,13 +572,11 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param string               $format
-     * @param object               $page
      * @param array<string, mixed> $queryArgs
      *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, array $queryArgs): StreamedResponse|Response
+    public function exportResultsForPage(string $format, Page $page, array $queryArgs): StreamedResponse|Response
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
@@ -823,11 +822,10 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of top submission referrers.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      */
-    public function getTopSubmissionReferrers(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmissionReferrers(int $limit = 10, $dateFrom = null, $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -852,11 +850,10 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of the most submisions per lead.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      */
-    public function getTopSubmitters(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmitters(int $limit = 10, $dateFrom = null, $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')

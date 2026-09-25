@@ -113,11 +113,9 @@ final class MenuHelper
     /**
      * Get and reset orphaned menu items.
      *
-     * @param string $type
-     *
      * @return mixed
      */
-    public function resetOrphans($type = 'main')
+    public function resetOrphans(string $type = 'main')
     {
         $orphans              = $this->orphans[$type] ?? [];
         $this->orphans[$type] = [];

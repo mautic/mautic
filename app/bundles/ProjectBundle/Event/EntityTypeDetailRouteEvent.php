@@ -14,7 +14,7 @@ final class EntityTypeDetailRouteEvent extends Event
      */
     private array $routes = [];
 
-    public function addRoute(string $entityType, ?DetailRoute $route): void
+    public function addRoute(string $entityType, DetailRoute $route): void
     {
         $this->routes[$entityType] = $route;
     }

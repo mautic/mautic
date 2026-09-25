@@ -21,12 +21,9 @@ final class HourStat
         return $this->hour;
     }
 
-    /**
-     * @param int $count
-     */
-    public function setCount($count): void
+    public function setCount(int $count): void
     {
-        $this->count = (int) $count;
+        $this->count = $count;
     }
 
     public function getCount(): int

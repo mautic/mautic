@@ -281,10 +281,8 @@ final class TwitterCommandHelper
 
     /**
      * Set the monitor's stat record with the metadata.
-     *
-     * @param array $searchMeta
      */
-    public function setMonitorStats(Monitoring $monitor, $searchMeta): void
+    public function setMonitorStats(Monitoring $monitor, array $searchMeta): void
     {
         $monitor->setStats($searchMeta);
 

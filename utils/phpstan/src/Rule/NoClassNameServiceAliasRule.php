@@ -38,6 +38,8 @@ use Utils\PHPStan\Collector\ServiceDefinitionNameCollector;
  * makes the container builder fail.
  *
  * @implements Rule<CollectedDataNode>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoClassNameServiceAliasRuleTest
  */
 final class NoClassNameServiceAliasRule implements Rule
 {

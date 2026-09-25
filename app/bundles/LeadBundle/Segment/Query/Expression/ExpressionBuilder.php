@@ -124,7 +124,7 @@ final class ExpressionBuilder extends BaseExpressionBuilder
     /**
      * Puts argument into NOT EXISTS mysql function.
      */
-    public function notExists($input): string
+    public function notExists(string $input): string
     {
         return $this->func('NOT EXISTS', $input);
     }

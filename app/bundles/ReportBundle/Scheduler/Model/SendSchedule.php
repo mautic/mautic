@@ -22,7 +22,7 @@ final readonly class SendSchedule
         $this->mailer = $mailer->getMailer();
     }
 
-    public function send(Scheduler $scheduler, $csvFilePath): void
+    public function send(Scheduler $scheduler, string $csvFilePath): void
     {
         $this->mailer->reset(true);
 

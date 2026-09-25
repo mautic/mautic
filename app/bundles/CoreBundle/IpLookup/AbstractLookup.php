@@ -60,7 +60,7 @@ abstract class AbstractLookup
     /**
      * @return $this
      */
-    public function setIpAddress($ip)
+    public function setIpAddress(string $ip)
     {
         $this->ip = $ip;
 

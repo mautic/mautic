@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
+use Knp\Menu\ItemInterface;
 use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Matcher\MatcherInterface;
 use Mautic\CoreBundle\Event\MenuEvent;
@@ -33,22 +34,18 @@ final readonly class MenuBuilder
     /**
      * Used by breadcrumbs to determine active link.
      *
-     * @param \Knp\Menu\ItemInterface $menu
-     * @param string                  $forRouteUri
-     * @param string                  $forRouteName
-     *
      * @return \Knp\Menu\ItemInterface|null
      */
-    public function getCurrentMenuItem($menu, $forRouteUri, $forRouteName)
+    public function getCurrentMenuItem(ItemInterface $menu, string $forRouteUri, string $forRouteName)
     {
         try {
             /** @var \Knp\Menu\ItemInterface $item */
             foreach ($menu as $item) {
-                if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
+                if ('current' === $forRouteUri && $this->matcher->isCurrent($item)) {
                     // current match
                     return $item;
                 }
-                if ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
+                if ('current' !== $forRouteUri && $item->getUri() == $forRouteUri) {
                     // route uri match
                     return $item;
                 }

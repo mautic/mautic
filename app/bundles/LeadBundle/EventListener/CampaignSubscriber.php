@@ -838,7 +838,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
      * device specified in the
      * CampaignExecutionEvent's settings.
      */
-    private function validateContactDevice(CampaignExecutionEvent $campaignExecutionEvent, Lead $contact): bool
+    private function validateContactDevice(ConditionEvent $campaignExecutionEvent, Lead $contact): bool
     {
         $campaignExecutionEventConfig = $campaignExecutionEvent->getConfig();
         $deviceType                   = empty($campaignExecutionEventConfig['device_type']) ? null : $campaignExecutionEventConfig['device_type'];

@@ -78,10 +78,8 @@ final class LineChart extends AbstractChart implements ChartInterface
 
     /**
      * Generate array of labels from the form data.
-     *
-     * @param int $amount
      */
-    public function generateTimeLabels($amount): void
+    public function generateTimeLabels(int $amount): void
     {
         if (!isset($this->labelFormats[$this->unit])) {
             throw new \UnexpectedValueException('Date/Time unit "'.$this->unit.'" is not available for a label.');
@@ -107,11 +105,9 @@ final class LineChart extends AbstractChart implements ChartInterface
     /**
      * Generate unique color for the dataset.
      *
-     * @param int $datasetId
-     *
      * @return array<string, string>
      */
-    public function generateColors($datasetId): array
+    public function generateColors(int $datasetId): array
     {
         $color = $this->configureColorHelper($datasetId);
 

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
+use DateTimeInterface;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
@@ -20,7 +23,7 @@ final class PostCountRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStatsPost($dateFrom, $dateTo, array $options): array
+    public function getLeadStatsPost(DateTimeInterface $dateFrom, DateTimeInterface $dateTo, array $options): array
     {
         $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $dateFrom, $dateTo);
 

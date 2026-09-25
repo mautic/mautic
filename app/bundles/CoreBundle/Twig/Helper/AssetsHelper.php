@@ -302,10 +302,8 @@ final class AssetsHelper
 
     /**
      * Outputs the script files and declarations.
-     *
-     * @param string $location
      */
-    public function outputScripts($location): void
+    public function outputScripts(string $location): void
     {
         if (isset($this->assets[$this->context]['scripts'][$location])) {
             foreach (array_reverse($this->assets[$this->context]['scripts'][$location]) as $s) {
@@ -473,7 +471,7 @@ final class AssetsHelper
      * @param string $onLoadCallback        Mautic namespaced function to call for the script onload
      * @param string $alreadyLoadedCallback Mautic namespaced function to call if the script has already been loaded
      */
-    public function includeScript($assetFilePath, $onLoadCallback = '', $alreadyLoadedCallback = ''): string
+    public function includeScript(string $assetFilePath, string $onLoadCallback = '', string $alreadyLoadedCallback = ''): string
     {
         return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadScript(\''.$this->getUrl($assetFilePath)."', '{$onLoadCallback}', '{$alreadyLoadedCallback}');</script>";
     }
@@ -481,7 +479,7 @@ final class AssetsHelper
     /**
      * @param string $assetFilePath the path to the file location. Can use full path or relative to mautic web root
      */
-    public function includeStylesheet($assetFilePath): string
+    public function includeStylesheet(string $assetFilePath): string
     {
         return '<script async="async" type="text/javascript" data-source="mautic">Mautic.loadStylesheet(\''.$this->getUrl($assetFilePath).'\');</script>';
     }
@@ -492,7 +490,7 @@ final class AssetsHelper
      * @param array<string>         $protocols  http/https, ftp, mail, twitter
      * @param array<string, string> $attributes
      */
-    public function makeLinks(string $text, $protocols = ['http', 'mail'], array $attributes = []): ?string
+    public function makeLinks(string $text, array $protocols = ['http', 'mail'], array $attributes = []): ?string
     {
         // clear tags in text
         $text = InputHelper::url($text, false, $protocols);
@@ -511,7 +509,7 @@ final class AssetsHelper
         }, $text);
 
         // Extract text links for each protocol
-        foreach ((array) $protocols as $protocol) {
+        foreach ($protocols as $protocol) {
             $text = match ($protocol) {
                 'http', 'https' => preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
                     if ($match[1]) {
@@ -563,11 +561,7 @@ final class AssetsHelper
         return $text;
     }
 
-    /**
-     * @param string $country
-     * @param string $class
-     */
-    public function getCountryFlag($country, bool $urlOnly = true, $class = ''): string
+    public function getCountryFlag(string $country, bool $urlOnly = true, string $class = ''): string
     {
         $country  = ucwords(iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(' ', '-', $country)));
         $flagImg  = (string) $this->getOverridableUrl('images/flags/'.$country.'.png');

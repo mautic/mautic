@@ -619,7 +619,7 @@ final class Mailbox
      *
      * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      */
-    public function setFlag(array $mailsIds, $flag): bool
+    public function setFlag(array $mailsIds, string $flag): bool
     {
         return imap_setflag_full($this->getImapStream(), implode(',', $mailsIds), $flag, ST_UID);
     }
@@ -629,7 +629,7 @@ final class Mailbox
      *
      * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      */
-    public function clearFlag(array $mailsIds, $flag): bool
+    public function clearFlag(array $mailsIds, string $flag): bool
     {
         return imap_clearflag_full($this->getImapStream(), implode(',', $mailsIds), $flag, ST_UID);
     }

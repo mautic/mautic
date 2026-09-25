@@ -312,13 +312,10 @@ final class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Get filter value from a specific filter.
      *
-     * @param string $column
-     *
      * @return mixed
-     *
      * @throws \UnexpectedValueException
      */
-    public function getFilterValue($column)
+    public function getFilterValue(string $column)
     {
         return $this->getReport()->getFilterValue($column);
     }
@@ -326,11 +323,9 @@ final class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Get filter values from a specific filter.
      *
-     * @param string $column
-     *
      * @throws \UnexpectedValueException
      */
-    public function getFilterValues($column): array
+    public function getFilterValues(string $column): array
     {
         return $this->getReport()->getFilterValues($column);
     }

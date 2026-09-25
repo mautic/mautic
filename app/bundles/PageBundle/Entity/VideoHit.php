@@ -211,7 +211,7 @@ class VideoHit
     /**
      * @param \DateTime $dateHit
      */
-    public function setDateHit($dateHit): static
+    public function setDateHit(\DateTimeInterface $dateHit): static
     {
         $this->dateHit = $dateHit;
 
@@ -244,10 +244,7 @@ class VideoHit
         return $this;
     }
 
-    /**
-     * @param string $country
-     */
-    public function setCountry($country): static
+    public function setCountry(string $country): static
     {
         $this->country = $country;
 
@@ -262,10 +259,7 @@ class VideoHit
         return $this->country;
     }
 
-    /**
-     * @param string $region
-     */
-    public function setRegion($region): static
+    public function setRegion(string $region): static
     {
         $this->region = $region;
 
@@ -280,10 +274,7 @@ class VideoHit
         return $this->region;
     }
 
-    /**
-     * @param string $city
-     */
-    public function setCity($city): static
+    public function setCity(string $city): static
     {
         $this->city = $city;
 
@@ -298,10 +289,7 @@ class VideoHit
         return $this->city;
     }
 
-    /**
-     * @param string $isp
-     */
-    public function setIsp($isp): static
+    public function setIsp(string $isp): static
     {
         $this->isp = $isp;
 
@@ -316,10 +304,7 @@ class VideoHit
         return $this->isp;
     }
 
-    /**
-     * @param string $organization
-     */
-    public function setOrganization($organization): static
+    public function setOrganization(string $organization): static
     {
         $this->organization = $organization;
 
@@ -549,10 +534,7 @@ class VideoHit
         return $this->query;
     }
 
-    /**
-     * @param array $query
-     */
-    public function setQuery($query): static
+    public function setQuery(array $query): static
     {
         $this->query = $query;
 

@@ -8,29 +8,20 @@ final class EmailStatOptions extends FetchOptions
 {
     private array $ids = [];
 
-    /**
-     * @var int|null
-     */
-    private $companyId;
+    private ?int $companyId = null;
 
     /**
      * @var int|null
      */
     private $campaignId;
 
-    /**
-     * @var int|null
-     */
-    private $segmentId;
+    private ?int $segmentId = null;
 
     private array $filters = [];
 
     private bool $canViewOthers = false;
 
-    /**
-     * @var string
-     */
-    private $unit;
+    private ?string $unit = null;
 
     public function setEmailIds(array $ids): static
     {
@@ -52,10 +43,7 @@ final class EmailStatOptions extends FetchOptions
         return $this->companyId;
     }
 
-    /**
-     * @param int|null $companyId
-     */
-    public function setCompanyId($companyId): self
+    public function setCompanyId(int $companyId): self
     {
         $this->companyId = $companyId;
 
@@ -88,10 +76,7 @@ final class EmailStatOptions extends FetchOptions
         return $this->segmentId;
     }
 
-    /**
-     * @param int|null $segmentId
-     */
-    public function setSegmentId($segmentId): self
+    public function setSegmentId(int $segmentId): self
     {
         $this->segmentId = $segmentId;
 
@@ -130,10 +115,7 @@ final class EmailStatOptions extends FetchOptions
         return $this->unit;
     }
 
-    /**
-     * @param string $unit
-     */
-    public function setUnit($unit): static
+    public function setUnit(string $unit): static
     {
         $this->unit = $unit;
 

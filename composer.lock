@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "692ce8e539b4afbfd5959a271b209af3",
+    "content-hash": "32a5f9443631eccae05f86865c173d9a",
     "packages": [
         {
             "name": "api-platform/core",
@@ -18228,16 +18228,16 @@
         },
         {
             "name": "symplify/phpstan-rules",
-            "version": "14.15.0",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symplify/phpstan-rules.git",
-                "reference": "010d2ba98638618d985644c57a590814f5b18d1e"
+                "reference": "1ec588220e540dd74985241f08637d6ee1618de3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/010d2ba98638618d985644c57a590814f5b18d1e",
-                "reference": "010d2ba98638618d985644c57a590814f5b18d1e",
+                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/1ec588220e540dd74985241f08637d6ee1618de3",
+                "reference": "1ec588220e540dd74985241f08637d6ee1618de3",
                 "shasum": ""
             },
             "require": {
@@ -18262,11 +18262,20 @@
                 "tomasvotruba/type-coverage": "^2.3",
                 "tomasvotruba/unused-public": "^2.2"
             },
+            "default-branch": true,
             "type": "phpstan-extension",
             "extra": {
                 "phpstan": {
                     "includes": [
                         "config/services/services.neon",
+                        "config/naming-rules.neon",
+                        "config/code-complexity-rules.neon",
+                        "config/configurable-rules.neon",
+                        "config/static-rules.neon",
+                        "config/symfony-rules.neon",
+                        "config/symfony-config-rules.neon",
+                        "config/doctrine-rules.neon",
+                        "config/phpunit-rules.neon",
                         "config/ctor-rules.neon",
                         "config/mock-rules.neon",
                         "config/phpstan-extensions.neon"
@@ -18288,7 +18297,7 @@
             "description": "Set of Symplify rules, type extensions and error formatter for PHPStan",
             "support": {
                 "issues": "https://github.com/symplify/phpstan-rules/issues",
-                "source": "https://github.com/symplify/phpstan-rules/tree/14.15.0"
+                "source": "https://github.com/symplify/phpstan-rules/tree/main"
             },
             "funding": [
                 {
@@ -18300,7 +18309,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-21T11:23:08+00:00"
+            "time": "2026-09-25T10:30:28+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -18354,16 +18363,16 @@
         },
         {
             "name": "tomasvotruba/type-coverage",
-            "version": "2.3.6",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/type-coverage.git",
-                "reference": "bb2e1d115bfc38b2b29c98ea64762d70607a684f"
+                "reference": "7980db433ce3e88cb892772cc8765c49d410865e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/bb2e1d115bfc38b2b29c98ea64762d70607a684f",
-                "reference": "bb2e1d115bfc38b2b29c98ea64762d70607a684f",
+                "url": "https://api.github.com/repos/TomasVotruba/type-coverage/zipball/7980db433ce3e88cb892772cc8765c49d410865e",
+                "reference": "7980db433ce3e88cb892772cc8765c49d410865e",
                 "shasum": ""
             },
             "require": {
@@ -18409,7 +18418,7 @@
             ],
             "support": {
                 "issues": "https://github.com/TomasVotruba/type-coverage/issues",
-                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.3.6"
+                "source": "https://github.com/TomasVotruba/type-coverage/tree/2.4.0"
             },
             "funding": [
                 {
@@ -18421,12 +18430,14 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-29T08:21:40+00:00"
+            "time": "2026-09-24T19:57:06+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "symplify/phpstan-rules": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {},

@@ -258,7 +258,7 @@ final class FieldController extends FormController
     /**
      * Generate's edit form and processes post data.
      */
-    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
+    public function editAction(Request $request, int $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             $this->throwAccessDenied();

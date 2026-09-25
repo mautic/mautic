@@ -24,10 +24,8 @@ interface FilterDecoratorInterface
 
     /**
      * Returns a string operator (like, eq, neq, ...).
-     *
-     * @return string
      */
-    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate);
+    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate): string;
 
     /**
      * Returns an argument for QueryBuilder (usually ':arg' in case that $argument is equal to 'arg' string.

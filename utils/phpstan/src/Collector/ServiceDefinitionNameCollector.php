@@ -70,7 +70,7 @@ final class ServiceDefinitionNameCollector implements Collector
         return [$args[0]->value->value, $className, $node->getStartLine(), $node->getEndLine()];
     }
 
-    private function matchClassName(Node $classValue): ?string
+    private function matchClassName(Node\Expr $classValue): ?string
     {
         if (!$classValue instanceof ClassConstFetch || !$classValue->class instanceof Name) {
             return null;

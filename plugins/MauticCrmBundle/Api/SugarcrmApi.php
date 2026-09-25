@@ -75,16 +75,16 @@ final class SugarcrmApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function getLeadFields($object = null)
+    public function getLeadFields(?string $object = null)
     {
         if (!$object) {
             $object = $this->object;
         }
-        if ('company' == $object) {
+        if ('company' === $object) {
             $object = 'Accounts'; // sugarCRM object name
-        } elseif ('lead' == $object || 'Lead' == $object) {
+        } elseif ('lead' === $object || 'Lead' === $object) {
             $object = 'Leads';
-        } elseif ('contact' == $object || 'Contact' == $object) {
+        } elseif ('contact' === $object || 'Contact' === $object) {
             $object = 'Contacts';
         }
 

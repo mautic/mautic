@@ -16,17 +16,13 @@ final class ChannelBroadcastEvent extends Event
 
     /**
      * Min contact ID filter can be used for process parallelization.
-     *
-     * @var int|null
      */
-    private $minContactIdFilter;
+    private ?int $minContactIdFilter = null;
 
     /**
      * Max contact ID filter can be used for process parallelization.
-     *
-     * @var int|null
      */
-    private $maxContactIdFilter;
+    private ?int $maxContactIdFilter = null;
 
     /**
      * How many contacts to load from the database.
@@ -96,10 +92,7 @@ final class ChannelBroadcastEvent extends Event
         return $this->output;
     }
 
-    /**
-     * @param int $minContactIdFilter
-     */
-    public function setMinContactIdFilter($minContactIdFilter): void
+    public function setMinContactIdFilter(int $minContactIdFilter): void
     {
         $this->minContactIdFilter = $minContactIdFilter;
     }
@@ -112,10 +105,7 @@ final class ChannelBroadcastEvent extends Event
         return $this->minContactIdFilter;
     }
 
-    /**
-     * @param int $maxContactIdFilter
-     */
-    public function setMaxContactIdFilter($maxContactIdFilter): void
+    public function setMaxContactIdFilter(int $maxContactIdFilter): void
     {
         $this->maxContactIdFilter = $maxContactIdFilter;
     }

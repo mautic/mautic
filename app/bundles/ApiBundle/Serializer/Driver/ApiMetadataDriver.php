@@ -52,7 +52,7 @@ final class ApiMetadataDriver implements DriverInterface
     /**
      * Set the root (base key).
      */
-    public function setRoot($root): static
+    public function setRoot(string $root): static
     {
         $this->metadata->xmlRootName = $root;
 
@@ -232,11 +232,11 @@ final class ApiMetadataDriver implements DriverInterface
     /**
      * Set max depth for the property if an association.
      */
-    public function setMaxDepth($depth, $property = null): static
+    public function setMaxDepth(int $depth, ?string $property = null): static
     {
         $property ??= $this->getCurrentPropertyName();
 
-        $this->properties[$property]->maxDepth = (int) $depth;
+        $this->properties[$property]->maxDepth = $depth;
 
         return $this;
     }

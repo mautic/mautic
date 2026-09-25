@@ -115,10 +115,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->name;
     }
 
-    /**
-     * @param mixed $name
-     */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
 
@@ -135,10 +132,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->isPublished;
     }
 
-    /**
-     * @param mixed $isPublished
-     */
-    public function setIsPublished($isPublished): static
+    public function setIsPublished(bool $isPublished): static
     {
         $this->isChanged('isPublished', $isPublished);
 

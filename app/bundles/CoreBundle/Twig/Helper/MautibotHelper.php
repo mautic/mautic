@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Twig\Helper;
 
 final class MautibotHelper
@@ -19,7 +21,7 @@ final class MautibotHelper
     /**
      * @param string $image openMouth | smile | wave
      */
-    public function getImage($image): string
+    public function getImage(string $image): string
     {
         return self::get($image);
     }

@@ -746,7 +746,7 @@ final class PublicController extends CommonFormController
         return $this->leadRepository->getLeadByEmail($email);
     }
 
-    private function getUnsubscribeMessage(string $idHash, \Mautic\EmailBundle\Model\EmailModel $model, \Mautic\EmailBundle\Entity\Stat $stat): string
+    private function getUnsubscribeMessage(string $idHash, EmailModel $model, Stat $stat): string
     {
         $model->setDoNotContact($stat, $this->translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 

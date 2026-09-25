@@ -124,10 +124,9 @@ final readonly class FormatterHelper
     }
 
     /**
-     * @param string                $delimeter
      * @param array<string, string> $array
      */
-    public function simpleArrayToHtml(array $array, $delimeter = '<br />'): string
+    public function simpleArrayToHtml(array $array, string $delimeter = '<br />'): string
     {
         $pairs = [];
         foreach ($array as $key => $value) {
