@@ -31,10 +31,7 @@ final class ContactIdentificationEvent extends Event
         $this->stopPropagation();
     }
 
-    /**
-     * @return string
-     */
-    public function getIdentifier()
+    public function getIdentifier(): ?string
     {
         return $this->identifiedByChannel;
     }
