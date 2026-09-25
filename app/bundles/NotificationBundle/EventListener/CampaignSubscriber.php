@@ -152,7 +152,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         foreach ($batches as $batch) {
             $sendNotification = $batch['sendNotification'];
-            $playerIdsChunks  = array_chunk($batch['playerIds'], static::MAX_PLAYER_IDS_PER_REQUEST, true);
+            $playerIdsChunks  = array_chunk($batch['playerIds'], $this::MAX_PLAYER_IDS_PER_REQUEST, true);
 
             foreach ($playerIdsChunks as $playerIdsChunk) {
                 $playerIds = array_keys($playerIdsChunk);
