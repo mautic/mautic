@@ -20,6 +20,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Event\ManualWinnerEvent;
+use Mautic\EmailBundle\Exception\MjmlThemeEmptyCustomHtmlException;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Form\Type\ScheduleSendType;
@@ -559,6 +560,7 @@ final class EmailController extends FormController
 
                     try {
                         // form is valid so process the data
+                        $model->validateMjmlThemeHasCustomHtml($entity);
                         $model->saveEntity($entity);
 
                         $this->addFlashMessage(
@@ -590,6 +592,9 @@ final class EmailController extends FormController
                     } catch (InvalidRenderedHtmlException $e) {
                         $valid                  = false;
                         $this->invalidHtmlError = true;
+                        $this->addFlashMessage($e->getMessage(), [], 'error');
+                    } catch (MjmlThemeEmptyCustomHtmlException $e) {
+                        $valid = false;
                         $this->addFlashMessage($e->getMessage(), [], 'error');
                     }
                 }
@@ -763,6 +768,7 @@ final class EmailController extends FormController
 
                     // form is valid so process the data
                     try {
+                        $model->validateMjmlThemeHasCustomHtml($entity);
                         $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                         if ($emailConfig->isDraftEnabled() && !empty($entity->getId())) {
@@ -794,6 +800,9 @@ final class EmailController extends FormController
                     } catch (InvalidRenderedHtmlException $e) {
                         $valid                  = false;
                         $this->invalidHtmlError = true;
+                        $this->addFlashMessage($e->getMessage(), [], 'error');
+                    } catch (MjmlThemeEmptyCustomHtmlException $e) {
+                        $valid = false;
                         $this->addFlashMessage($e->getMessage(), [], 'error');
                     }
                 }
@@ -1006,6 +1015,7 @@ final class EmailController extends FormController
 
                     try {
                         // form is valid so process the data
+                        $model->validateMjmlThemeHasCustomHtml($entity);
                         $model->saveEntity($entity);
 
                         $this->addFlashMessage(
@@ -1039,6 +1049,9 @@ final class EmailController extends FormController
                     } catch (InvalidRenderedHtmlException $e) {
                         $valid                  = false;
                         $this->invalidHtmlError = true;
+                        $this->addFlashMessage($e->getMessage(), [], 'error');
+                    } catch (MjmlThemeEmptyCustomHtmlException $e) {
+                        $valid = false;
                         $this->addFlashMessage($e->getMessage(), [], 'error');
                     }
                 }

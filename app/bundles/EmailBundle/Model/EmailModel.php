@@ -46,6 +46,7 @@ use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
+use Mautic\EmailBundle\Exception\MjmlThemeEmptyCustomHtmlException;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -79,6 +80,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Error\Error as TwigError;
 
 /**
  * @extends FormModel<Email>
@@ -224,6 +226,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $entity->setEmailType('template');
         }
 
+        // Block the bad state early: a published email with an MJML theme and
+        // empty customHtml has no compiled body. GrapesJS should compile the
+        // theme into customHtml before publishing; sending without it delivers
+        // uncompiled <mjml> or an empty body. Drafts are allowed through so the
+        // user can save and open the builder later.
+        $this->validateMjmlThemeHasCustomHtml($entity);
+
         // Ensure that list emails are published
         if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
@@ -275,6 +284,44 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * Validate that a published email using an MJML theme has compiled customHtml.
+     *
+     * Bundled themes since Mautic 5 use MJML. GrapesJS compiles the MJML into
+     * customHtml client-side. If a published email is saved with an MJML theme
+     * but empty customHtml, it has no usable body — sending would deliver
+     * uncompiled <mjml> markup or an empty email. This method blocks that bad
+     * state at save time so it is caught before send. Unpublished/draft emails
+     * are allowed through so the user can save and open the builder later.
+     *
+     * @throws MjmlThemeEmptyCustomHtmlException
+     */
+    public function validateMjmlThemeHasCustomHtml(Email $email): void
+    {
+        $template = $email->getTemplate();
+        if (empty($template) || !empty($email->getCustomHtml()) || !$email->getIsPublished()) {
+            return;
+        }
+
+        $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+
+        try {
+            $renderedHtml = $this->themeHelper->renderThemeTemplate($logicalName, [
+                'content'  => $email->getContent(),
+                'email'    => $email,
+                'template' => $template,
+            ]);
+        } catch (TwigError) {
+            // If the theme template cannot be rendered, skip validation —
+            // MailHelper::setEmail() will handle the fallback at send time.
+            return;
+        }
+
+        if (str_contains($renderedHtml, '<mjml>')) {
+            throw new MjmlThemeEmptyCustomHtmlException(sprintf('The "%s" theme uses MJML which must be compiled into customHtml before saving. Please open the email in the builder to compile the template.', $template));
+        }
+    }
+
+    /**
      * Save an array of entities.
      */
     public function saveEntities($entities, $unlock = true): void
@@ -284,6 +331,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $i         = 0;
         foreach ($entities as $entity) {
             $isNew = !(bool) $entity->getId();
+
+            if ($entity instanceof Email) {
+                $this->validateMjmlThemeHasCustomHtml($entity);
+            }
 
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
