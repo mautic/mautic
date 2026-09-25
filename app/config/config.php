@@ -153,9 +153,9 @@ $connectionSettings = [
     'dbname'                => '%mautic.db_name%',
     'user'                  => '%mautic.db_user%',
     'password'              => '%mautic.db_password%',
-    'charset'               => 'utf8mb4',
+    'charset'               => '%mautic.db_charset%',
     'default_table_options' => [
-        'charset'    => 'utf8mb4',
+        'charset'    => '%mautic.db_charset%',
         'row_format' => 'DYNAMIC',
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
@@ -166,7 +166,6 @@ $connectionSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
-    'options'        => [PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
@@ -179,7 +178,7 @@ if (!empty($localConfigParameterBag->get('db_host_ro'))) {
             'dbname'                => '%mautic.db_name%',
             'user'                  => '%mautic.db_user%',
             'password'              => '%mautic.db_password%',
-            'charset'               => 'utf8mb4',
+            'charset'               => '%mautic.db_charset%',
         ],
     ];
 }
@@ -195,12 +194,12 @@ $container->loadFromExtension('doctrine', [
             'unbuffered' => array_merge($connectionSettings, [
                 'options' => [
                     $unbufferedQueryConstant    => false,
-                    PDO::ATTR_STRINGIFY_FETCHES => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
                 ],
             ]),
         ],
         'types'    => [
             Types::ARRAY                  => Type\ArrayType::class,
+            Types::BOOLEAN                => Type\BooleanType::class,
             Types::DATETIME_MUTABLE       => Type\UTCDateTimeType::class,
             Types::DATETIME_IMMUTABLE     => Type\UTCDateTimeImmutableType::class,
             Type\GeneratedType::GENERATED => Type\GeneratedType::class,
@@ -213,6 +212,7 @@ $container->loadFromExtension('doctrine', [
         'dql'                         => [
             'string_functions' => [
                 'match' => DoctrineExtensions\Query\Mysql\MatchAgainst::class,
+                'cast'  => DoctrineExtensions\Query\Mysql\Cast::class,
             ],
         ],
         'result_cache_driver' => [

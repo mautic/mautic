@@ -30,6 +30,12 @@ jobs:
             db-types: 'mysql:9.2'
           - php-versions: '8.5'
             db-types: 'mariadb:11.4'
+          - php-versions: '8.6'
+            db-types: 'mysql:26.7' # 'mysql:9.7'
+            experimental: false
+          - php-versions: '8.6'
+            db-types: 'mariadb:13.0-rc' # 'mariadb:12.3'
+            experimental: false
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -63,7 +69,7 @@ jobs:
         env:
           SIMPLESAMLPHP_SP_ENTITY_ID: https://localhost
           SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://localhost/s/saml/login_check
-          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/
+          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/ # NOSONAR
         ports:
           - 8086:8080
 
@@ -91,6 +97,9 @@ jobs:
         coverage: pcov
         ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
 
+    - name: Install mysql client
+      run: sudo apt-get update && sudo apt-get install -y mysql-client
+
     - name: add MySQL config file
       run: |
         mysqldump --version
@@ -107,10 +116,16 @@ jobs:
 
     - name: Install dependencies
       uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
+      with:
+        # Conditionally appends ignore platform rules ONLY for PHP 8.6 dev runs
+        composer-options: ${{ matrix.php-versions == '8.6' && '--ignore-platform-reqs' || '' }}
 
     - name: Run tests - database = ${{ matrix.db-types }}
+      continue-on-error: ${{ matrix.experimental == true }}
       run: |
         rm -rf var/cache
+        export DB_DRIVER="pdo_mysql"
+        export DB_CHARSET="utf8mb4"
         export DB_PORT="${{ job.services.database.ports[3306] }}"
         export SAML_PORT="${{ job.services.saml.ports[8080] }}"
 
@@ -151,6 +166,176 @@ jobs:
       with:
         name: logs-${{ matrix.php-versions }}-${{ env.DB_LOG_NAME }}
         path: ./var/logs/*
+
+  phpunit-postgres:
+    # Same gating as the main phpunit job
+    if: (github.event_name == 'schedule' && (github.repository == 'mautic/mautic' || github.repository == 'mautic/api-library') ) || (github.event_name != 'schedule')
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - php-versions: '8.2'
+            postgres-versions: '16'
+          - php-versions: '8.5'
+            postgres-versions: '18'
+          - php-versions: '8.6'
+            postgres-versions: '19beta3-alpine'
+            experimental: false
+
+    name: PHPUnit ${{ matrix.php-versions }} postgres:${{ matrix.postgres-versions }}
+
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres-versions }}
+        env:
+          POSTGRES_DB: mautictest
+          POSTGRES_USER: mautic
+          POSTGRES_PASSWORD: mautic
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mautic -d mautictest"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      saml:
+        image: kenchan0130/simplesamlphp
+        env:
+          SIMPLESAMLPHP_SP_ENTITY_ID: https://localhost
+          SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://localhost/s/saml/login_check
+          SIMPLESAMLPHP_IDP_BASE_URL: http://localhost:8086/simplesaml/
+        ports:
+          - 8086:8080
+
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: PHPUnit cache
+        if: ${{matrix.php-versions == '8.2'}}
+        uses: actions/cache@v4
+        with:
+          path: ./var/cache/phpunit
+          key: ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}
+            ${{ runner.os }}-phpunit-
+
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql, pgsql, pdo_pgsql, imap, gd
+          coverage: pcov
+          ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
+
+      - name: Install PostgreSQL client
+        run: |
+          # 1. Extract major version number (e.g., '19beta2-alpine' -> '19')
+          VERSION=$(echo "${{ matrix.postgres-versions }}" | sed -E 's/([0-9.]+).*/\1/' | cut -d. -f1)
+
+          sudo apt-get update
+          sudo apt-get install -y curl ca-certificates gnupg lsb-release
+
+          # 2. Pull and dearmor the official PGDG signing key
+          sudo mkdir -p /usr/share/keyrings
+          curl -fSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
+
+          # 3. Add the standard production repo first to test viability
+          echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+
+          # 4. Check if the package exists in the stable 'main' tracking repo
+          if ! apt-cache show "postgresql-client-$VERSION" > /dev/null 2>&1; then
+            echo "Package postgresql-client-$VERSION not found in main. Switching to development snapshots..."
+
+            # Reconfigure for development/pre-release snapshots
+            echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg-snapshot main $VERSION" | sudo tee /etc/apt/sources.list.d/pgdg.list
+
+            # Elevate PGDG priority over Ubuntu default packages to force snapshot usage
+            sudo tee /etc/apt/preferences.d/pgdg.pref <<EOF
+          Package: *
+          Pin: release o=apt.postgresql.org
+          Pin-Priority: 800
+          EOF
+
+            # Final index update for the snapshot repository
+            sudo apt-get update
+          fi
+
+          # 5. Install the package
+          sudo apt-get install -o Dpkg::Options::="--force-overwrite" -y postgresql-client-$VERSION
+
+      - name: Prepare PostgreSQL environment
+        run: |
+          # 1. Extract major version number (e.g., '19beta2-alpine' -> '19')
+          VERSION=$(echo "${{ matrix.postgres-versions }}" | sed -E 's/([0-9.]+).*/\1/' | cut -d. -f1)
+          
+          export PATH="/usr/lib/postgresql/$VERSION/bin:$PATH"
+          echo "PATH=$PATH" >> $GITHUB_ENV
+          pg_dump --version
+          DB_LOG_NAME="$VERSION"
+          echo "DB_LOG_NAME=${DB_LOG_NAME/:/_}" >> $GITHUB_ENV
+
+      - name: Set SYMFONY_ENV to test
+        run: |
+          echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+          echo "MAUTIC_ENV=test" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        # composer install cache - https://github.com/ramsey/composer-install
+        uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
+        with:
+          # Conditionally appends ignore platform rules ONLY for PHP 8.6 dev runs
+          composer-options: ${{ matrix.php-versions == '8.6' && '--ignore-platform-reqs' || '' }}
+
+      - name: Configure env for postgress
+        run: |
+          echo "DB_DRIVER=pdo_pgsql" > .env.test
+          echo "DB_HOST=localhost" >> .env.test
+          echo "DB_PORT=${{ job.services.postgres.ports[5432] }}" >> .env.test
+          echo "DB_NAME=mautictest" >> .env.test
+          echo "DB_USER=mautic" >> .env.test
+          echo "DB_PASSWD=mautic" >> .env.test
+          echo "DB_CHARSET=UTF8" >> .env.test
+          echo "MAUTIC_DB_PREFIX=test_" >> .env.test
+          echo "MAUTIC_TABLE_PREFIX=test_" >> .env.test
+          echo "MAUTIC_ENV=test" >> .env.test
+          echo "MAUTIC_ADMIN_USERNAME=admin" >> .env.test
+          echo "MAUTIC_ADMIN_PASSWORD=mautic" >> .env.test
+          echo "SAML_HOST=localhost" >> .env.test
+          echo "SAML_PORT=${{ job.services.saml.ports[8080] }}" >> .env.test
+
+      - name: Run tests - database = postgres:${{ matrix.postgres-versions }}
+        continue-on-error: ${{ matrix.experimental == true }}
+        env:
+          DB_DRIVER: pdo_pgsql
+          DB_CHARSET: UTF8
+          DB_HOST: localhost
+          DB_PORT: ${{ job.services.postgres.ports[5432] }}
+          DB_USER: mautic
+          DB_PASSWD: mautic
+          DB_NAME: mautictest
+          SYMFONY_ENV: test
+          MAUTIC_ENV: test
+          PGPASSWORD: mautic
+        run: |
+          rm -rf var/cache
+
+          export DB_PORT="${{ job.services.postgres.ports[5432] }}"
+          export SAML_PORT="${{ job.services.saml.ports[8080] }}"
+
+          php -d zend.assertions=1 bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
+
+      - name: Store log artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: logs-postgres-${{ matrix.php-versions }}-postgres_${{ matrix.postgres-versions }}
+          path: ./var/logs/*
 
   e2e-tests:
     runs-on: ubuntu-latest

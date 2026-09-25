@@ -37,13 +37,16 @@ final class InstallSchemaTest extends TestCase
         parent::setUp();
         EnvLoader::load();
 
+        $driver = $_ENV['DB_DRIVER'] ?? 'pdo_mysql';
+
         $this->dbParams = [
-            'driver'        => $_ENV['DB_DRIVER'] ?? 'pdo_mysql',
+            'driver'        => $driver,
             'host'          => $_ENV['DB_HOST'],
             'port'          => $_ENV['DB_PORT'],
             'dbname'        => $_ENV['DB_NAME'], // Doctrine needs 'dbname', not 'name'
             'user'          => $_ENV['DB_USER'],
             'password'      => $_ENV['DB_PASSWD'],
+            'charset'       => 'pdo_pgsql' == $driver ? 'UTF8' : 'utf8mb4',
             'table_prefix'  => MAUTIC_TABLE_PREFIX,
             'backup_prefix' => 'bak_',
         ];
