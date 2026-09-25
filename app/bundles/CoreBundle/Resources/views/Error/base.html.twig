@@ -43,7 +43,7 @@
                     <h1><i class="ri-double-quotes-l"></i> {{ message|trans({'%code%': status_code}) }} <i class="ri-double-quotes-r"></i></h1>
                     <h4 class="mt-5"><strong>{{ status_code }}</strong> {{ status_text }}</h4>
 
-                    <footer class="text-right">Mautibot</footer>
+                    <footer class="text-right">{{ mautibotGetName() }}</footer>
                 </blockquote>
                 <div class="pull-right">
                     <a class="text-secondary" href="http://mau.tc/report-issue" target="_new">{{ 'mautic.core.report_issue' | trans }}</a>
