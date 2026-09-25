@@ -5,9 +5,10 @@ namespace Mautic\PointBundle\EventListener;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Entity\LeadPointLogRepository;
 use Mautic\PointBundle\Entity\LeadTriggerLogRepository;
 use Mautic\PointBundle\Model\TriggerModel;
@@ -28,10 +29,10 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LEAD_POINTS_CHANGE   => ['onLeadPointsChange', 0],
+            PointsChangeEvent::class   => ['onLeadPointsChange', 0],
             LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
-            LeadEvents::LEAD_POST_SAVE       => ['onLeadSave', -1],
+            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
+            LeadPostSaveEvent::class       => ['onLeadSave', -1],
         ];
     }
 

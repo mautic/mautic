@@ -9,9 +9,9 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
-use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadGetCurrentEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
+use Mautic\LeadBundle\Event\LeadPreSaveEvent;
 use Mautic\LeadBundle\Model\DefaultValueTrait;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
@@ -275,13 +275,12 @@ final class ContactTracker
 
         if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
             // Dispatch events for new lead to write create log, ip address change, etc
-            $event = new LeadEvent($lead, true);
-            $this->dispatcher->dispatch($event, LeadEvents::LEAD_PRE_SAVE);
+            $this->dispatcher->dispatch(new LeadPreSaveEvent($lead, true));
             $this->setEntityDefaultValues($lead);
             $this->leadRepository->saveEntity($lead);
             $this->hydrateCustomFieldData($lead);
 
-            $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
+            $this->dispatcher->dispatch(new LeadPostSaveEvent($lead, true));
 
             $this->logger->debug("CONTACT: New lead created with ID# {$lead->getId()}.");
         }
@@ -322,9 +321,9 @@ final class ContactTracker
         );
 
         if (null !== $previouslyTrackedId) {
-            if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
+            if ($this->dispatcher->hasListeners(LeadChangeEvent::class)) {
                 $event = new LeadChangeEvent($previouslyTrackedContact, $previouslyTrackedId, $this->trackedContact, $newTrackingId);
-                $this->dispatcher->dispatch($event, LeadEvents::CURRENT_LEAD_CHANGED);
+                $this->dispatcher->dispatch($event);
             }
         }
     }

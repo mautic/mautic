@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
 use Mautic\CoreBundle\Event\DependencyErrorEventTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 
-final class LeadListEvent extends CommonEvent implements DependencyErrorEventInterface
+class LeadListEvent extends CommonEvent implements DependencyErrorEventInterface
 {
     use DependencyErrorEventTrait;
 

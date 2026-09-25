@@ -27,6 +27,7 @@ use Mautic\EmailBundle\EventListener\TokenSubscriber;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\EventListener\FormValidationSubscriber;
 use Mautic\IntegrationsBundle\EventListener\ControllerSubscriber;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber;
 use Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
@@ -195,7 +196,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\LeadBundle\EventListener\FormSubscriber::class,
             \Mautic\PluginBundle\EventListener\FormSubscriber::class,
         ],
-        'mautic.lead_post_save' => [
+        LeadPostSaveEvent::class => [
             \Mautic\IntegrationsBundle\EventListener\LeadSubscriber::class,
             \Mautic\LeadBundle\EventListener\LeadSubscriber::class,
             \Mautic\LeadBundle\EventListener\WebhookSubscriber::class,

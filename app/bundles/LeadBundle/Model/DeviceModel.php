@@ -5,9 +5,11 @@ namespace Mautic\LeadBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
-use Mautic\LeadBundle\Event\LeadDeviceEvent;
+use Mautic\LeadBundle\Event\DevicePostDeleteEvent;
+use Mautic\LeadBundle\Event\DevicePostSaveEvent;
+use Mautic\LeadBundle\Event\DevicePreDeleteEvent;
+use Mautic\LeadBundle\Event\DevicePreSaveEvent;
 use Mautic\LeadBundle\Form\Type\DeviceType;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -79,33 +81,20 @@ final class DeviceModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadDevice']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = LeadEvents::DEVICE_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = LeadEvents::DEVICE_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = LeadEvents::DEVICE_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = LeadEvents::DEVICE_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new DevicePreSaveEvent($entity, $isNew),
+            'post_save'   => new DevicePostSaveEvent($entity, $isNew),
+            'pre_delete'  => new DevicePreDeleteEvent($entity, $isNew),
+            'post_delete' => new DevicePostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new LeadDeviceEvent($entity, $isNew);
-            }
+        $this->dispatcher->dispatch($event);
 
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 }

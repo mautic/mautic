@@ -8,7 +8,10 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Event as Events;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
+use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
+use Mautic\LeadBundle\Event\CompanyPreSaveEvent;
+use Mautic\LeadBundle\Event\CompanySoftDeleteEvent;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -27,10 +30,10 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::COMPANY_PRE_SAVE    => ['onCompanyPreSave', 0],
-            LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
-            LeadEvents::COMPANY_POST_DELETE => ['onCompanyDelete', 0],
-            LeadEvents::COMPANY_SOFT_DELETE => ['onCompanySoftDelete', 0],
+            CompanyPreSaveEvent::class    => ['onCompanyPreSave', 0],
+            CompanyPostSaveEvent::class   => ['onCompanyPostSave', 0],
+            CompanyPostDeleteEvent::class => ['onCompanyDelete', 0],
+            CompanySoftDeleteEvent::class => ['onCompanySoftDelete', 0],
         ];
     }
 

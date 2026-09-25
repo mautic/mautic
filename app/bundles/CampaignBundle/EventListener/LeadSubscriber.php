@@ -8,8 +8,8 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -31,7 +31,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     {
         return [
             LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
         ];
     }
 

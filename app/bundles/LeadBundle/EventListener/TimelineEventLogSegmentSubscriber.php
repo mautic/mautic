@@ -10,8 +10,8 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
@@ -31,8 +31,8 @@ final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterfac
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LEAD_LIST_CHANGE       => 'onChange',
-            LeadEvents::LEAD_LIST_BATCH_CHANGE => 'onBatchChange',
+            ListChangeEvent::class       => 'onChange',
+            ListBatchChangeEvent::class => 'onBatchChange',
             LeadTimelineEvent::class   => 'onTimelineGenerate',
         ];
     }
