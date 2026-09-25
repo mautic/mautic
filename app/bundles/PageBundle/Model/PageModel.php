@@ -37,7 +37,6 @@ use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -100,9 +99,6 @@ final class PageModel extends FormModel implements GlobalSearchInterface
         private CookieHelper $cookieHelper,
         private IpLookupHelper $ipLookupHelper,
         private LeadModel $leadModel,
-        private FieldModel $leadFieldModel,
-        private RedirectModel $pageRedirectModel,
-        private TrackableModel $pageTrackableModel,
         private readonly MessageBusInterface $messageBus,
         private readonly CompanyModel $companyModel,
         private readonly IdentifyCompanyHelper $identifyCompanyHelper,

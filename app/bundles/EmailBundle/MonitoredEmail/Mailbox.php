@@ -1039,11 +1039,10 @@ final class Mailbox
      *
      * @param string $string
      * @param string $fromEncoding
-     * @param string $toEncoding
      *
      * @return string Converted string if conversion was successful, or the original string if not
      */
-    private function convertStringEncoding($string, $fromEncoding, $toEncoding)
+    private function convertStringEncoding($string, $fromEncoding, string $toEncoding)
     {
         $convertedString = null;
         if ($string && $fromEncoding != $toEncoding) {

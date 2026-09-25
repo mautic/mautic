@@ -196,7 +196,7 @@ final class DateTimeHelper
      *
      * @param string|\DateTime $compare
      *
-     * @return bool|\DateInterval|string
+     * @return \DateInterval|string
      */
     public function getDiff($compare = 'now', $format = null, bool $resetTime = false)
     {

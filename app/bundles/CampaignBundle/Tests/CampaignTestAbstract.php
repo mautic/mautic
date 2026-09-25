@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\FormRepository;
-use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -66,14 +65,8 @@ abstract class CampaignTestAbstract extends TestCase
             ->method('getUserLists')
             ->willReturn([['id' => self::$mockId, 'name' => self::$mockName, 'alias' => self::$mockAlias]]);
 
-        $formModel = $this->getMockBuilder(FormModel::class)
-            ->disableOriginalConstructor()
-            ->setConstructorArgs([12 => $entityManager])
-            ->getMock();
-
         return new CampaignModel(
             $leadListModel,
-            $formModel,
             $this->createStub(EventCollector::class),
             $this->createStub(MembershipBuilder::class),
             $this->createStub(ContactTracker::class),

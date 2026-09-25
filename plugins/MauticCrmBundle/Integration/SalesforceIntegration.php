@@ -1575,7 +1575,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param mixed[] $trackedContacts
      */
-    private function getMauticContactsToUpdate(
+    protected function getMauticContactsToUpdate(
         array &$checkEmailsInSF,
         $mauticLeadFieldString,
         &$sfObject,
@@ -1631,7 +1631,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-    private function getMauticContactsToCreate(
+    protected function getMauticContactsToCreate(
         array &$checkEmailsInSF,
         array $fieldMapping,
         $mauticLeadFieldString,
@@ -2057,7 +2057,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    private function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString)
+    protected function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString)
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
@@ -2236,7 +2236,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, mixed> $checkEmailsInSF
      * @param array<string, mixed> $processedLeads
      */
-    private function prepareMauticContactsToCreate(
+    protected function prepareMauticContactsToCreate(
         array &$mauticData,
         array &$checkEmailsInSF,
         array &$processedLeads,
@@ -2268,9 +2268,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function makeCompositeRequest($mauticData, int &$totalUpdated = 0, int &$totalCreated = 0, int &$totalErrored = 0): void
+    private function makeCompositeRequest(array $mauticData, int &$totalUpdated = 0, int &$totalCreated = 0, int &$totalErrored = 0): void
     {
-        if (empty($mauticData)) {
+        if ($mauticData === []) {
             return;
         }
 
@@ -2315,7 +2315,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return int
      */
-    private function getSalesforceSyncLimit(array $currentContactList, $limit): float|int
+    protected function getSalesforceSyncLimit(array $currentContactList, $limit): float|int
     {
         return $limit - count($currentContactList);
     }

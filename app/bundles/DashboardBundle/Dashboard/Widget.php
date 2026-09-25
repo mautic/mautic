@@ -24,7 +24,7 @@ final readonly class Widget
     /**
      * Get ready widget to populate in template.
      *
-     * @return bool|\Mautic\DashboardBundle\Entity\Widget
+     * @return \Mautic\DashboardBundle\Entity\Widget
      */
     public function get(int $widgetId)
     {

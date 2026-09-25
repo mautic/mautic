@@ -54,14 +54,6 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->transport  = $transport;
     }
 
-    protected function beforeTearDown(): void
-    {
-        // Clear owners cache (to leave a clean environment for future tests):
-        /** @var MailHelper $mailHelper */
-        $mailHelper = self::getContainer()->get(MailHelper::class);
-        ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
-    }
-
     protected function beforeBeginTransaction(): void
     {
         $this->resetAutoincrement(['categories', 'emails']);

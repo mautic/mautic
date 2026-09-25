@@ -22,7 +22,7 @@ final class ExportHandler
     }
 
     /**
-     * @return bool|resource
+     * @return resource
      *
      * @throws FileIOException
      */

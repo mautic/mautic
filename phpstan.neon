@@ -50,6 +50,7 @@ parameters:
         -
             identifiers:
                 - property.unresolvableType
+                - property.unresolvableNativeType
                 - varTag.unresolvableType
                 - return.unresolvableType
                 - argument.unresolvableType
@@ -79,16 +80,10 @@ parameters:
                 - app/bundles/LeadBundle/Tests/Model/FieldModelTest.php
                 - app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
                 - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
-        # createStub() has unresolvable return type in tests
-        -
-            identifier: method.unresolvableReturnType
-            path: */Tests/*
-        # mocks of final classes have unresolvable native type in tests
-        -
-            identifier: property.unresolvableNativeType
-            path: */Tests/*
+
         - identifier: missingType.generics
         # controllers - group missing parameter types to fix later
+
         -
             identifier: missingType.parameter
             path: *Controller.php
@@ -121,6 +116,7 @@ parameters:
             message: '#Property .+::\$(client|user) type mapping mismatch: property can contain .+but database expects#'
             path: app/bundles/ApiBundle/Entity/oAuth2/*.php
             identifier: doctrine.associationType
+
         # mocks
         - '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
         - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'

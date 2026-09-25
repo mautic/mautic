@@ -22,9 +22,6 @@ final class AuthenticationEvent extends Event
 
     private bool $forceFailedAuthentication = false;
 
-    /**
-     * @var UserProvider
-     */
     private readonly UserProviderInterface $userProvider;
 
     private readonly bool $isFormLogin;
@@ -82,7 +79,7 @@ final class AuthenticationEvent extends Event
      */
     public function setUser(User $user, bool $saveUser = true, bool $createIfNotExists = true): void
     {
-        if ($saveUser) {
+        if ($saveUser && $this->userProvider instanceof UserProvider) {
             $user = $this->userProvider->saveUser($user, $createIfNotExists);
         }
 

@@ -25,11 +25,6 @@ final class TableSchemaHelper
      */
     private array $dropTables = [];
 
-    /**
-     * @var string[]
-     */
-    private array $addTables = [];
-
     public function __construct(
         private readonly Connection $db,
         private readonly ?string $prefix,
@@ -63,7 +58,6 @@ final class TableSchemaHelper
 
         // now add the tables
         foreach ($tables as $table) {
-            $this->addTables[] = $table;
             $this->addTable($table, false);
         }
 
@@ -105,8 +99,6 @@ final class TableSchemaHelper
                 $this->deleteTable($table['name']);
             }
         }
-
-        $this->addTables[] = $table;
 
         $options = $table['options'] ?? [];
         $columns = $table['columns'] ?? [];
@@ -169,7 +161,7 @@ final class TableSchemaHelper
 
         // reset schema
         $this->schema     = new Schema([], [], $this->sm->createSchemaConfig());
-        $this->dropTables = $this->addTables = [];
+        $this->dropTables = [];
     }
 
     /**

@@ -76,9 +76,9 @@ final class MailHelper
      */
     public $message;
 
-    private ?AddressDTO $from;
+    private AddressDTO $from;
 
-    private ?AddressDTO $systemFrom;
+    private AddressDTO $systemFrom;
 
     private ?string $replyTo;
 
@@ -173,11 +173,6 @@ final class MailHelper
      * @var array<?string>
      */
     private ?array $bodyInitial = null;
-
-    /**
-     * Cache for lead owners.
-     */
-    private static array $leadOwners = [];
 
     private bool $fatal = false;
 
@@ -414,7 +409,7 @@ final class MailHelper
 
             // Metadata has to be set for each recipient
             foreach ($this->queuedRecipients as $email => $name) {
-                $from        = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
+                $from        = $this->fromEmailHelper->getFromAddressConsideringOwner($this->from, $this->lead, $this->email);
                 $fromAddress = $from->getEmail();
                 // Use composite key (email + name) to ensure contacts with same email but different from names are grouped separately
                 $metadataKey = $fromAddress.'|'.($from->getName() ?? '');
@@ -1865,7 +1860,7 @@ final class MailHelper
         if ($this->lead && $this->email && $this->email->getUseOwnerAsMailer()) {
             $this->lead['owner_id'] ??= 0;
 
-            $from = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
+            $from = $this->fromEmailHelper->getFromAddressConsideringOwner($this->from, $this->lead, $this->email);
             $this->setMessageFrom($from);
 
             return;
@@ -1876,16 +1871,16 @@ final class MailHelper
             $fromName  = $this->email->getFromName();
             if (!empty($fromEmail) || !empty($fromName)) {
                 if (empty($fromName)) {
-                    $fromName = $this->getFrom()->getName();
+                    $fromName = $this->from->getName();
                 } elseif (empty($fromEmail)) {
-                    $fromEmail = $this->getFrom()->getEmail();
+                    $fromEmail = $this->from->getEmail();
                 }
 
                 $this->from = new AddressDTO($fromEmail, $fromName);
             }
         }
 
-        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead, $this->email);
+        $from = $this->fromEmailHelper->getFromAddressDto($this->from, $this->lead, $this->email);
 
         $this->setMessageFrom($from);
     }
@@ -1962,21 +1957,15 @@ final class MailHelper
     private function getSystemReplyTo(): string
     {
         if (!$this->systemReplyTo) {
-            $fromEmailAddress    = $this->from ? $this->from->getEmail() : null;
-            $this->systemReplyTo = $this->coreParametersHelper->get('mailer_reply_to_email') ?? $fromEmailAddress ?? $this->getSystemFrom()->getEmail();
+            $this->systemReplyTo = $this->coreParametersHelper->get('mailer_reply_to_email') ?? $this->from->getEmail();
         }
 
         return $this->systemReplyTo;
     }
 
-    private function getFrom(): AddressDTO
-    {
-        return $this->from ?? $this->getSystemFrom();
-    }
-
     private function getSystemFrom(): AddressDTO
     {
-        if (!$this->systemFrom || $this->systemFrom->isEmpty()) {
+        if ($this->systemFrom->isEmpty()) {
             $this->systemFrom = new AddressDTO($this->coreParametersHelper->get('mailer_from_email'), $this->coreParametersHelper->get('mailer_from_name'));
             $this->fromEmailHelper->setDefaultFrom($this->systemFrom);
         }

@@ -27,7 +27,7 @@ final class DeviceTracker
     }
 
     /**
-     * @return LeadDevice|null
+     * @return LeadDevice
      */
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
     {

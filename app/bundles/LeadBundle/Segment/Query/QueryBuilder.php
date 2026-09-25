@@ -234,7 +234,7 @@ final class QueryBuilder extends BaseQueryBuilder
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getDebugOutput(): string|array
+    public function getDebugOutput(): string
     {
         $params = $this->getParameters();
         $sql    = $this->getSQL();

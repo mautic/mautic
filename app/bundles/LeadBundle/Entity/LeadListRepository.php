@@ -10,8 +10,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<LeadList>
@@ -21,25 +19,6 @@ final class LeadListRepository extends CommonRepository
     use ExpressionHelperTrait;
     use RegexTrait;
     use ProjectRepositoryTrait;
-
-    private bool $listFiltersInnerJoinCompany = false;
-
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    /**
-     * Flag to check if some segment filter on a company field exists.
-     */
-    private bool $hasCompanyFilter = false;
-
-    /**
-     * @var \Doctrine\DBAL\Schema\Column[]
-     */
-    private $leadTableSchema;
-
-    /**
-     * @var \Doctrine\DBAL\Schema\Column[]
-     */
-    private $companyTableSchema;
 
     private function getSingleEntity(int $id, bool $ignoreDeleted = true): ?LeadList
     {
@@ -325,13 +304,6 @@ final class LeadListRepository extends CommonRepository
         }
 
         return $objectFilters;
-    }
-
-    #[Required]
-    public function autowireLeadListRepository(
-        EventDispatcherInterface $dispatcher,
-    ): void {
-        $this->dispatcher = $dispatcher;
     }
 
     /**

@@ -116,7 +116,7 @@ final class PointApiController extends CommonApiController
      *
      * @param int $delta
      */
-    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator): void
+    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, object $lead, $delta, $operator): void
     {
         $ip         = $ipLookupHelper->getIpAddress();
         $eventName  = InputHelper::clean($request->request->get('eventName', $this->translator->trans('mautic.lead.lead.submitaction.operator_'.$operator)));

@@ -87,6 +87,9 @@ return RectorConfig::configure()
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
             __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
             __DIR__.'/app/bundles/EmailBundle/Controller/AjaxController.php',
+            // protected methods are mocked in tests
+            __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
+            __DIR__.'/plugins/MauticCrmBundle/Integration/SalesforceIntegration.php',
         ],
 
         // modified with reflection

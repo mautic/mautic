@@ -13,7 +13,7 @@ final readonly class PrimaryCompanyHelper
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function getProfileFieldsWithPrimaryCompany(Lead $lead)
     {
