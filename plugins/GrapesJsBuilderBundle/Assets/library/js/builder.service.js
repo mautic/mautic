@@ -163,6 +163,10 @@ export default class BuilderService {
     return this.context?.formName === 'page';
   }
 
+  isEmailContext() {
+    return this.context?.formName === 'emailform';
+  }
+
   normalizeSessionId(sessionValue) {
     return sessionValue || null;
   }
@@ -1686,6 +1690,17 @@ export default class BuilderService {
     }
 
     if (inlineHeadingTags.includes(tagName)) {
+      // A standalone <span> text component is inline flow content: wrapping it
+      // in a block gjs-heading-wrapper div splits the surrounding paragraph and
+      // the wrapper persists into custom_mjml/custom_html on every save,
+      // including for emails created by the clone flow (upstream issue #17288).
+      // Emails therefore keep spans unwrapped; spans nested inside a text
+      // component are already protected by hasTextComponentAncestor() above.
+      // Landing pages keep the wrapper so CKEditor heading/paragraph editing
+      // is unchanged.
+      if (this.isEmailContext()) {
+        return;
+      }
       this.wrapHeadingComponentWithDiv(component, tagName);
       return;
     }
