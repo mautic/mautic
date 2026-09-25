@@ -4,15 +4,32 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
 abstract class AbstractFormController extends CommonController
 {
     protected ?string $permissionBase = null;
+
+    protected FormFactoryInterface $formFactory;
+
+    protected FormFieldHelper $fieldHelper;
+
+    #[Required]
+    public function autowireAbstractFormController(
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper
+    ): void
+    {
+        $this->formFactory = $formFactory;
+        $this->fieldHelper = $fieldHelper;
+    }
 
     public function unlockAction(Request $request, $objectId, string $objectModel): RedirectResponse
     {

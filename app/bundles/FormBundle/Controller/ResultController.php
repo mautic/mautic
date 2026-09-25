@@ -2,16 +2,8 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController as CommonFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
@@ -19,47 +11,32 @@ use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class ResultController extends CommonFormController
 {
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly FormModel $formModel,
-        private readonly SubmissionResultLoader $submissionResultLoader,
-        private readonly SubmissionModel $submissionModel,
-    ) {
-        $this->setStandardParameters(
-            'form.submission', // model name
-            'form:forms', // permission base
-            'mautic_form', // route base
-            'mautic.formresult', // session base
-            'mautic.form.result', // lang string base
-            '@MauticForm/Result', // template base
-            'mautic_form', // activeLink
-            'formresult' // mauticContent
-        );
+    private FormModel $formModel;
 
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private SubmissionResultLoader $submissionResultLoader;
+
+    private SubmissionModel $submissionModel;
+
+    #[Required]
+    public function autowireResultController(
+        FormModel $formModel,
+        SubmissionResultLoader $submissionResultLoader,
+        SubmissionModel $submissionModel,
+    ): void {
+        $this->formModel              = $formModel;
+        $this->submissionResultLoader = $submissionResultLoader;
+        $this->submissionModel        = $submissionModel;
     }
 
     #[Route(
@@ -436,6 +413,36 @@ final class ResultController extends CommonFormController
     protected function getActionRoute(): string
     {
         return 'mautic_form_results_action';
+    }
+
+    protected function getPermissionBase(): string
+    {
+        return 'form:forms';
+    }
+
+    protected function getRouteBase(): string
+    {
+        return 'mautic_form';
+    }
+
+    protected function getSessionBase($objectId = null): string
+    {
+        return 'mautic.formresult';
+    }
+
+    protected function getTranslationBase(): string
+    {
+        return 'mautic.form.result';
+    }
+
+    protected function getTemplateBase(): string
+    {
+        return '@MauticForm/Result';
+    }
+
+    protected function getJsLoadMethodPrefix(): string
+    {
+        return 'formresult';
     }
 
     /**

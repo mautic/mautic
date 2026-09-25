@@ -352,6 +352,7 @@ jobs:
             --skip-type "Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer" \
             --skip-type "Mautic\CoreBundle\Factory\PageHelperFactory" \
             --skip-type "Mautic\CoreBundle\Controller\KeepAliveController" \
+            --skip-type "Mautic\CoreBundle\Controller\LockController" \
             --skip-type "Mautic\CoreBundle\Tests\Twig\TwigIntegrationTestTrait" \
             --skip-type "Mautic\IntegrationsBundle\Migrations\Version_0_0_1" \
             --skip-type "Mautic\IntegrationsBundle\Tests\Functional\Auth\Provider\Oauth2ThreeLegged\HttpFactory" \

@@ -3,12 +3,12 @@
 namespace Mautic\ConfigBundle\Controller;
 
 use Mautic\ConfigBundle\Model\SysinfoModel;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class SysinfoController extends FormController
+final class SysinfoController extends AbstractFormController
 {
     private SysinfoModel $sysinfoModel;
 
