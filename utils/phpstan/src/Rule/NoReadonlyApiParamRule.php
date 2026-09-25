@@ -15,6 +15,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * may be swapped in tests via reflection, so it must not be readonly.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoReadonlyApiParamRuleTest
  */
 final readonly class NoReadonlyApiParamRule implements Rule
 {

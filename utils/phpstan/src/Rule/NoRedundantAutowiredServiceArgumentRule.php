@@ -45,6 +45,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * autowiring the interface needs a binding the argument stands in for.
  *
  * @implements Rule<MethodCall>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoRedundantAutowiredServiceArgumentRuleTest
  */
 final readonly class NoRedundantAutowiredServiceArgumentRule implements Rule
 {

@@ -23,6 +23,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * Getter returning a to-many entity association must declare "Collection" return type.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\CollectionGetterMustReturnCollectionRuleTest
  */
 final readonly class CollectionGetterMustReturnCollectionRule implements Rule
 {

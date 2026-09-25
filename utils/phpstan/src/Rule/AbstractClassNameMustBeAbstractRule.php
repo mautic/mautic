@@ -14,6 +14,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * A class whose name contains "Abstract" must be declared abstract.
  *
  * @implements Rule<Class_>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\AbstractClassNameMustBeAbstractRuleTest
  */
 final class AbstractClassNameMustBeAbstractRule implements Rule
 {
