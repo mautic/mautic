@@ -800,6 +800,8 @@ final class ListController extends FormController
                 'list'               => $list,
                 'segmentCount'       => $this->leadListRepository->getLeadCount($list->getId()),
                 'activeSegmentCount' => $listModel->getActiveSegmentContactCount($list->getId()),
+                'manuallyAddedSegmentCount' => $this->leadListRepository->getManuallyAddedLeadCount($list->getId()),
+                'filterAddedSegmentCount'   => $this->leadListRepository->getFilterAddedLeadCount($list->getId()),
                 'permissions'        => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
                 'security'           => $this->security,
                 'dateRangeForm'      => $dateRangeForm->createView(),
