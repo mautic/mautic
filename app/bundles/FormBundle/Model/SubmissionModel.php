@@ -794,14 +794,13 @@ final class SubmissionModel extends CommonFormModel
      *
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
-     * @param array       $filter
      */
     public function getSubmissionsLineChartData(
         ?string $unit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $dateFormat = null,
-        $filter = [],
+        array $filter = [],
         bool $canViewOthers = true,
     ): array {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);

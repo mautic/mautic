@@ -465,7 +465,7 @@ class ChartQuery extends AbstractChart
      * @param array  $filters      will be added to where claues
      * @param array  $options      for special behavior
      */
-    public function count(string $table, string $uniqueColumn, ?string $dateColumn = null, $filters = [], $options = []): int
+    public function count(string $table, string $uniqueColumn, ?string $dateColumn = null, array $filters = [], $options = []): int
     {
         $query = $this->getCountQuery($table, $uniqueColumn, $dateColumn, $filters);
 

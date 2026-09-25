@@ -1907,9 +1907,8 @@ class LeadModel extends FormModel
      *
      * @param \DateTimeInterface $dateFrom
      * @param \DateTimeInterface $dateTo
-     * @param array  $filters
      */
-    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
