@@ -91,6 +91,10 @@ parameters:
         - identifier: symplify.forbiddenExtendOfNonAbstractClass
         - identifier: symplify.noDynamicName
 
+        -
+            identifier: symplify.forbiddenStaticClassConstFetch
+            path: app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
+
         # parent class is used actively
         -
             identifier: symplify.forbiddenExtendOfNonAbstractClass
