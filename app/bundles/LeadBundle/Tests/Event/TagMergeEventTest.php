@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
-use Mautic\LeadBundle\Event\TagPostMergeEvent;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Event\TagPostMergeEvent;
 use PHPUnit\Framework\TestCase;
 
 final class TagMergeEventTest extends TestCase
