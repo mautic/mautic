@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\LeadBundle\Event\ContactExportScheduledEvent;
+use Mautic\LeadBundle\Event\ContactExportEmailSentEvent;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
-use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber;
 use Mautic\LeadBundle\Notification\ContactExportAdminNotification;
 use Mautic\UserBundle\Entity\Role;
@@ -53,7 +54,7 @@ final class ContactExportSchedulerNotificationSubscriberTest extends TestCase
             ->with($contactExportScheduler);
 
         $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $contactExportAdminNotification);
-        $subscriber->onContactExportScheduled(new ContactExportSchedulerEvent($contactExportScheduler));
+        $subscriber->onContactExportScheduled(new ContactExportScheduledEvent($contactExportScheduler));
 
         $this->assertCount(1, $notificationModel->notifications);
         $this->assertSame('Requester notification for requester@example.com', $notificationModel->notifications[0][0]);
@@ -81,7 +82,7 @@ final class ContactExportSchedulerNotificationSubscriberTest extends TestCase
             ->with($contactExportScheduler);
 
         $subscriber = new ContactExportSchedulerNotificationSubscriber($notificationModel, $translator, $contactExportAdminNotification);
-        $subscriber->onContactExportEmailSent(new ContactExportSchedulerEvent($contactExportScheduler));
+        $subscriber->onContactExportEmailSent(new ContactExportEmailSentEvent($contactExportScheduler));
     }
 
     private function createUser(int $id, string $name, string $email): User

@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class SaveBatchLeadsEvent extends Event
+abstract class SaveBatchLeadsEvent extends Event
 {
     public function __construct(
         /**

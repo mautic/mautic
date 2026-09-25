@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ContactExportSchedulerEvent extends Event
+abstract class ContactExportSchedulerEvent extends Event
 {
     private string $filePath;
 

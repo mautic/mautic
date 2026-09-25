@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Tag;
 
-class TagEvent extends CommonEvent
+abstract class TagEvent extends CommonEvent
 {
     public function __construct(Tag $tag, bool $isNew = false)
     {

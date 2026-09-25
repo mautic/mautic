@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Functional\EventListener;
 
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Point;
@@ -47,7 +47,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
 
         $this->assertCount(3, $this->getContainer()->get(\Mautic\PointBundle\Entity\LeadPointLogRepository::class)->findAll());
 
-        $leadMergeEvent = new LeadMergeEvent($contactA, $contactB);
+        $leadMergeEvent = new LeadPostMergeEvent($contactA, $contactB);
 
         /** @var LeadSubscriber $subscriber */
         $subscriber = self::getContainer()->get(LeadSubscriber::class);
@@ -82,7 +82,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
 
         $this->assertCount(3, $this->getContainer()->get(\Mautic\PointBundle\Entity\LeadTriggerLogRepository::class)->findAll());
 
-        $leadMergeEvent = new LeadMergeEvent($contactA, $contactB);
+        $leadMergeEvent = new LeadPostMergeEvent($contactA, $contactB);
 
         /** @var LeadSubscriber $subscriber */
         $subscriber = self::getContainer()->get(LeadSubscriber::class);
