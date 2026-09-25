@@ -375,7 +375,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
     {
         $container = $this->client->getContainer();
         $user      = $container->get(UserRepository::class)->findOneBy(['username' => $username]);
-        \assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         // Create a PostAuthenticationToken with 'main' firewall name
         $token = new PostAuthenticationToken($user, 'main', $user->getRoles());
@@ -404,7 +404,7 @@ final class SecurityControllerTest extends MauticMysqlTestCase
     {
         $container = $this->client->getContainer();
         $user      = $container->get(UserRepository::class)->findOneBy(['username' => $username]);
-        \assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         // Create a PostAuthenticationToken with 'open_id' firewall name
         $token = new PostAuthenticationToken($user, 'open_id', $user->getRoles());

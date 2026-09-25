@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\OIDC\Unit\Factory;
 
-use Mautic\UserBundle\Security\OIDC\Client\ClientInterface;
 use Mautic\UserBundle\Security\OIDC\ClientCredentials;
 use Mautic\UserBundle\Security\OIDC\Factory\ClientFactory;
 use Mautic\UserBundle\Security\OIDC\RegisterScopesEvent;
