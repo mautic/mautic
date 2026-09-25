@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
 
 final class TokenParser
 {
     public const string TOKEN = '{mapped-integration-object=(.*?)}';
 
-    public function findTokens(string $content): ArrayCollection
+    /**
+     * @return Collection<int, Token>
+     */
+    public function findTokens(string $content): Collection
     {
         $tokens = new ArrayCollection();
 

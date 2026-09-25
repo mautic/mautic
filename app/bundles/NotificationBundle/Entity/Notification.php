@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -538,9 +539,9 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return ArrayCollection<int, LeadList>
+     * @return Collection<int, LeadList>
      */
-    public function getLists()
+    public function getLists(): Collection
     {
         return $this->lists;
     }
@@ -558,9 +559,9 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return ArrayCollection<int, Stat>
+     * @return Collection<int, Stat>
      */
-    public function getStats()
+    public function getStats(): Collection
     {
         return $this->stats;
     }

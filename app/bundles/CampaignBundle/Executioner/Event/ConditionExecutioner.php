@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Executioner\Event;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
@@ -30,7 +30,7 @@ readonly class ConditionExecutioner implements EventInterface
     /**
      * @throws CannotProcessEventException
      */
-    public function execute(AbstractEventAccessor $config, ArrayCollection $logs): EvaluatedContacts
+    public function execute(AbstractEventAccessor $config, Collection $logs): EvaluatedContacts
     {
         \assert($config instanceof ConditionAccessor);
         $evaluatedContacts = new EvaluatedContacts();

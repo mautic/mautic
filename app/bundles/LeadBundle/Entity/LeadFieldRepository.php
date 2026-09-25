@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -176,9 +177,9 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return ArrayCollection<int,LeadField>
+     * @return Collection<int,LeadField>
      */
-    public function getListablePublishedFields(): ArrayCollection
+    public function getListablePublishedFields(): Collection
     {
         $queryBuilder = $this->createQueryBuilder($this->getTableAlias(), "{$this->getTableAlias()}.id");
         $queryBuilder->where("{$this->getTableAlias()}.isListable = 1");

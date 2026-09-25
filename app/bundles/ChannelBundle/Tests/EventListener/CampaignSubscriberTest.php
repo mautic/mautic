@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ChannelBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -270,7 +271,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         return $event;
     }
 
-    private function getLogs(): ArrayCollection
+    /**
+     * @return Collection<int, LeadEventLog>
+     */
+    private function getLogs(): Collection
     {
         $lead = $this->createMock(Lead::class);
         $lead->method('getId')
@@ -320,6 +324,9 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $log2->method('getId')
             ->willReturn(2);
 
-        return new ArrayCollection([1 => $log, 2 => $log2]);
+        /** @var Collection<int, LeadEventLog> $logs */
+        $logs = new ArrayCollection([1 => $log, 2 => $log2]);
+
+        return $logs;
     }
 }

@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -66,7 +67,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContact(ArrayCollection $events, Lead $contact, ?Responses $responses = null, ?Counter $counter = null): void
+    public function executeEventsForContact(Collection $events, Lead $contact, ?Responses $responses = null, ?Counter $counter = null): void
     {
         if ($responses) {
             $this->responses = $responses;
@@ -100,12 +101,14 @@ class EventExecutioner
     }
 
     /**
+     * @param Collection<int, LeadEventLog> $logs
+     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeLogs(Event $event, ArrayCollection $logs, ?Counter $counter = null): void
+    public function executeLogs(Event $event, Collection $logs, ?Counter $counter = null): void
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId());
 
@@ -151,7 +154,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function executeEventsForContacts(ArrayCollection $events, ArrayCollection $contacts, ?Counter $childrenCounter = null, bool $isInactive = false): void
+    public function executeEventsForContacts(Collection $events, Collection $contacts, ?Counter $childrenCounter = null, bool $isInactive = false): void
     {
         if (!$contacts->count()) {
             return;
@@ -187,7 +190,7 @@ class EventExecutioner
         }
     }
 
-    public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, bool $isInactiveEvent = false): void
+    public function recordLogsAsExecutedForEvent(Event $event, Collection $contacts, bool $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
         $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
@@ -199,7 +202,7 @@ class EventExecutioner
         }
     }
 
-    public function recordLogsAsFailedForEvent(Event $event, ArrayCollection $contacts, $reason, bool $isInactiveEvent = false): void
+    public function recordLogsAsFailedForEvent(Event $event, Collection $contacts, $reason, bool $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
         $logs   = $this->eventLogger->generateLogsFromContacts($event, $config, $contacts, $isInactiveEvent);
@@ -222,11 +225,11 @@ class EventExecutioner
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection<int, Event>
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function scheduleEvents(ArrayCollection $events, ArrayCollection $contacts, ?Counter $childrenCounter = null, bool $isInactive = false)
+    private function scheduleEvents(Collection $events, Collection $contacts, ?Counter $childrenCounter = null, bool $isInactive = false): Collection
     {
         $events = clone $events;
 
@@ -261,7 +264,7 @@ class EventExecutioner
         return $events;
     }
 
-    private function persistLogs(ArrayCollection $logs): void
+    private function persistLogs(Collection $logs): void
     {
         if ($this->responses) {
             // Extract responses
@@ -275,7 +278,7 @@ class EventExecutioner
             ->clearCollection($logs);
     }
 
-    private function checkForRemovedContacts(ArrayCollection $logs): void
+    private function checkForRemovedContacts(Collection $logs): void
     {
         /**
          * @var int          $key
@@ -303,7 +306,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeActionEventsForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null): void
+    private function executeActionEventsForContacts(Event $event, Collection $contacts, ?Counter $counter = null): void
     {
         $childrenCounter = new Counter();
         $actions         = $event->getChildrenByEventType(Event::TYPE_ACTION);
@@ -325,7 +328,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeConditionEventsForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null): void
+    private function executeConditionEventsForContacts(Event $event, Collection $contacts, ?Counter $counter = null): void
     {
         $childrenCounter = new Counter();
         $conditions      = $event->getChildrenByEventType(Event::TYPE_CONDITION);
@@ -365,7 +368,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executePositivePathEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter): void
+    private function executePositivePathEventsForContacts(Event $event, Collection $contacts, Counter $counter): void
     {
         if (!$contacts->count()) {
             return;
@@ -385,7 +388,7 @@ class EventExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeNegativePathEventsForContacts(Event $event, ArrayCollection $contacts, Counter $counter): void
+    private function executeNegativePathEventsForContacts(Event $event, Collection $contacts, Counter $counter): void
     {
         if (!$contacts->count()) {
             return;

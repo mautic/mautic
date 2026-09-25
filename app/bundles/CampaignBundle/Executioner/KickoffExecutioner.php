@@ -33,7 +33,10 @@ final class KickoffExecutioner implements ExecutionerInterface
 
     private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
-    private ?\Doctrine\Common\Collections\ArrayCollection $rootEvents = null;
+    /**
+     * @var \Doctrine\Common\Collections\Collection<int, Event>|null
+     */
+    private ?\Doctrine\Common\Collections\Collection $rootEvents = null;
 
     private ?Counter $counter = null;
 

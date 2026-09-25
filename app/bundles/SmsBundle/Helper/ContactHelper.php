@@ -3,6 +3,7 @@
 namespace Mautic\SmsBundle\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
@@ -21,10 +22,11 @@ readonly class ContactHelper
 
     /**
      * @param string $number
+     * @return Collection<int, Lead>
      *
      * @throws NumberNotFoundException
      */
-    public function findContactsByNumber($number): ArrayCollection
+    public function findContactsByNumber($number): Collection
     {
         // Who knows what the number was originally formatted as so let's try a few
         $searchForNumbers = $this->phoneNumberHelper->getFormattedNumberList($number);

@@ -374,12 +374,15 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return Collection<int, Event>
      */
-    public function getEvents()
+    public function getEvents(): Collection
     {
         return $this->events;
     }
 
-    public function getRootEvents(): ArrayCollection
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getRootEvents(): Collection
     {
         $criteria = Criteria::create()->where(
             Criteria::expr()->andX(
@@ -392,7 +395,10 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $this->reindexEventsByIdKey($events);
     }
 
-    public function getInactionBasedEvents(): ArrayCollection
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getInactionBasedEvents(): Collection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', Event::PATH_INACTION));
         $events   = $this->events->matching($criteria);
@@ -403,9 +409,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @param string $type
      *
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int, Event>
      */
-    public function getEventsByType($type): ArrayCollection
+    public function getEventsByType($type): Collection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
         $events   = $this->events->matching($criteria);
@@ -414,9 +420,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return ArrayCollection<int, Event>
+     * @return Collection<int, Event>
      */
-    public function getEmailSendEvents(): ArrayCollection
+    public function getEmailSendEvents(): Collection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('type', 'email.send'));
         $events   = $this->events->matching($criteria);
@@ -668,8 +674,10 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * Re-index collection by event ID to work around Doctrine's indexBy mapping issue.
      *
      * @see https://github.com/doctrine/doctrine2/issues/4693
+     *
+     * @return Collection<int, Event>
      */
-    private function reindexEventsByIdKey(Collection $events): ArrayCollection
+    private function reindexEventsByIdKey(Collection $events): Collection
     {
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
         // @see https://github.com/doctrine/doctrine2/issues/4693

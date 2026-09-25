@@ -3,12 +3,14 @@
 namespace Mautic\CampaignBundle\Executioner\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
 class InactiveHelper
@@ -43,13 +45,16 @@ class InactiveHelper
     }
 
     /**
+     * @param Collection<int, Lead> $contacts
+     * @param Collection<int, Event> $negativeChildren
+     *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
     public function removeContactsThatAreNotApplicable(
         \DateTime $now,
-        ArrayCollection $contacts,
+        Collection $contacts,
         ?int $lastActiveEventId,
-        ArrayCollection $negativeChildren,
+        Collection $negativeChildren,
         Event $event,
     ): void {
         $contactIds                 = $contacts->getKeys();
@@ -102,7 +107,10 @@ class InactiveHelper
         return $this->earliestInactiveDate;
     }
 
-    public function getCollectionByDecisionId($decisionId): ArrayCollection
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getCollectionByDecisionId($decisionId): Collection
     {
         $collection = new ArrayCollection();
 
@@ -118,7 +126,7 @@ class InactiveHelper
     /**
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function getEarliestInactiveDate(ArrayCollection $negativeChildren, \DateTimeInterface $lastActiveDate): ?\DateTimeInterface
+    public function getEarliestInactiveDate(Collection $negativeChildren, \DateTimeInterface $lastActiveDate): ?\DateTimeInterface
     {
         $earliestDate = null;
         foreach ($negativeChildren as $event) {

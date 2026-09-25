@@ -249,7 +249,7 @@ class Message extends FormEntity implements UuidInterface
     /**
      * @return Collection<int,Channel>
      */
-    public function getChannels()
+    public function getChannels(): Collection
     {
         return $this->channels;
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\EventListener;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -25,7 +25,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
 {
     private ?Event $pseudoEvent = null;
 
-    private ?ArrayCollection $mmLogs = null;
+    private ?Collection $mmLogs = null;
 
     /**
      * @var mixed[]
@@ -140,13 +140,13 @@ final class CampaignSubscriber implements EventSubscriberInterface
      * @param string               $channel
      * @param array<string, mixed> $messageChannel
      *
-     * @return bool|ArrayCollection
+     * @return bool|Collection<int, LeadEventLog>
      *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    private function sendChannelMessage(ArrayCollection $logs, int|string $channel, array $messageChannel)
+    private function sendChannelMessage(Collection $logs, int|string $channel, array $messageChannel)
     {
         /** @var ActionAccessor $config */
         $config = $this->eventCollector->getEventConfig($this->pseudoEvent);
@@ -181,7 +181,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
         return $success;
     }
 
-    private function passExecutedLogs(PendingEvent $pendingEvent, ArrayCollection $logs, PreferenceBuilder $channelPreferences): void
+    private function passExecutedLogs(PendingEvent $pendingEvent, Collection $logs, PreferenceBuilder $channelPreferences): void
     {
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
@@ -197,9 +197,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ArrayCollection<int,LeadEventLog> $success
+     * @param Collection<int,LeadEventLog> $success
      */
-    private function removePsuedoFailures(ArrayCollection $success): void
+    private function removePsuedoFailures(Collection $success): void
     {
         foreach ($success as $key => $log) {
             if (!empty($log->getMetadata()['failed'])) {

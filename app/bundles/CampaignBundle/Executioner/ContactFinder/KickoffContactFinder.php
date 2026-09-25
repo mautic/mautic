@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -21,11 +20,11 @@ readonly class KickoffContactFinder
     }
 
     /**
-     * @return ArrayCollection<int, Lead>
+     * @return Collection<int, Lead>
      *
      * @throws NoContactsFoundException
      */
-    public function getContacts(?int $campaignId, ContactLimiter $limiter): ArrayCollection
+    public function getContacts(?int $campaignId, ContactLimiter $limiter): Collection
     {
         // Get list of all campaign leads; start is always zero in practice because of $pendingOnly
         $campaignContacts = $this->campaignRepository->getPendingContactIds($campaignId, $limiter);

@@ -542,7 +542,7 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @return Collection<int, Field>
      */
-    public function getFields()
+    public function getFields(): Collection
     {
         return $this->fields;
     }
@@ -666,7 +666,7 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @return Collection<string, Action>
      */
-    public function getActions()
+    public function getActions(): Collection
     {
         return $this->actions;
     }

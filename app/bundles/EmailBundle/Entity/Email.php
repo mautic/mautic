@@ -925,7 +925,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return Collection<int, LeadList>
      */
-    public function getLists()
+    public function getLists(): Collection
     {
         return $this->lists;
     }
@@ -1025,9 +1025,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return ArrayCollection<int, Stat>
+     * @return Collection<int, Stat>
      */
-    public function getStats()
+    public function getStats(): Collection
     {
         return $this->stats;
     }
@@ -1114,10 +1114,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->assetAttachments->removeElement($asset);
     }
 
-    /**
-     * @return Collection
-     */
-    public function getAssetAttachments()
+    public function getAssetAttachments(): Collection
     {
         return $this->assetAttachments;
     }

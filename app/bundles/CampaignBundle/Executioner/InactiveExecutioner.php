@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository;
@@ -36,7 +37,7 @@ class InactiveExecutioner implements ExecutionerInterface
 
     private ?Counter $counter = null;
 
-    private ?ArrayCollection $decisions = null;
+    private ?Collection $decisions = null;
 
     protected ?\DateTime $now = null;
 
@@ -262,7 +263,7 @@ class InactiveExecutioner implements ExecutionerInterface
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    private function executeLogsForInactiveEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter, \DateTimeInterface $earliestLastActiveDateTime): void
+    private function executeLogsForInactiveEvents(Collection $events, Collection $contacts, Counter $childrenCounter, \DateTimeInterface $earliestLastActiveDateTime): void
     {
         $events              = clone $events;
         $eventExecutionDates = $this->scheduler->getSortedExecutionDates($events, $earliestLastActiveDateTime);

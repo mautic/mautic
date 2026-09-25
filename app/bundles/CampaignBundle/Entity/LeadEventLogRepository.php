@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\ParameterType;
@@ -409,8 +410,10 @@ class LeadEventLogRepository extends CommonRepository
      * @param int $eventId
      *
      * @throws \Doctrine\ORM\Query\QueryException
+     *
+     * @return Collection<int, LeadEventLog>
      */
-    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter): ArrayCollection
+    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter): Collection
     {
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             return new ArrayCollection();
@@ -453,8 +456,9 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * @throws \Doctrine\ORM\Query\QueryException
+     * @return Collection<int, LeadEventLog>
      */
-    public function getScheduledByIds(array $ids): ArrayCollection
+    public function getScheduledByIds(array $ids): Collection
     {
         $this->getReplicaConnection();
         $q = $this->createQueryBuilder('o');

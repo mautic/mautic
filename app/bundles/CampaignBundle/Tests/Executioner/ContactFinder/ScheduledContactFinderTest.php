@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
@@ -48,6 +49,7 @@ final class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
         $log2->expects($this->once())
             ->method('setLead');
 
+        /** @var Collection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
             [
                 1 => $log1,
@@ -95,6 +97,7 @@ final class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
         $log2->expects($this->never())
             ->method('setLead');
 
+        /** @var Collection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
             [
                 1 => $log1,

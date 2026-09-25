@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner\Result;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
@@ -60,6 +61,7 @@ final class ResponsesTest extends \PHPUnit\Framework\TestCase
         $conditionLog->method('getMetadata')
             ->willReturn(['something' => 'else']);
 
+        /** @var Collection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$actionLog, $action2Log, $conditionLog]);
 
         $responses = new Responses();
