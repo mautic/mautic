@@ -37,10 +37,15 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             ->method('getEntities')
             ->willReturn($paginator);
 
-        $controller = new class {
+        $controller = new class($modelFake) {
             use CustomFieldsApiControllerTrait;
 
             private string $entityNameOne = 'lead';
+
+            public function __construct(
+                private readonly object $model,
+            ) {
+            }
 
             /**
              * @return mixed[]
