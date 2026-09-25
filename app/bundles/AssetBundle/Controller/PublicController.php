@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends AbstractFormController
@@ -119,7 +120,7 @@ final class PublicController extends AbstractFormController
      * - Resolve the local file path
      * - Track successful or failed download attempts
      * - Set appropriate content-type headers
-     * - Optionally force download via Content-Disposition
+     * - Set Content-Disposition (inline or attachment) with the original file name
      * - Apply robot meta headers when required
      * - Return 404 if the file cannot be read
      */
@@ -150,12 +151,17 @@ final class PublicController extends AbstractFormController
             $this->coreParametersHelper->get('streamed_extensions')
         ));
 
-        if (!$stream) {
-            $response->headers->set(
-                'Content-Disposition',
-                'attachment;filename="'.$entity->getOriginalFileName().'"'
-            );
-        }
+        // Send the original file name also for streamed files, otherwise browsers name the saved file after the URL
+        $filename         = str_replace(['/', '\\'], '_', (string) $entity->getOriginalFileName());
+        $filenameFallback = preg_replace('/[^\x20-\x7e]|%/u', '_', $filename);
+        $response->headers->set(
+            'Content-Disposition',
+            $response->headers->makeDisposition(
+                $stream ? ResponseHeaderBag::DISPOSITION_INLINE : ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                $filename,
+                $filenameFallback
+            )
+        );
 
         return $response;
     }
