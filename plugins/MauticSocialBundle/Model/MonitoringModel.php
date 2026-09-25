@@ -9,7 +9,6 @@ use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
-use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -83,34 +82,21 @@ final class MonitoringModel extends FormModel
             throw new MethodNotAllowedHttpException(['Monitoring']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = SocialEvents::MONITOR_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = SocialEvents::MONITOR_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = SocialEvents::MONITOR_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = SocialEvents::MONITOR_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new Events\MonitorPreSaveEvent($entity, $isNew),
+            'post_save'   => new Events\MonitorPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new Events\MonitorPreDeleteEvent($entity, $isNew),
+            'post_delete' => new Events\MonitorPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new Events\SocialEvent($entity, $isNew);
-            }
+        $this->dispatcher->dispatch($event);
 
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     /**

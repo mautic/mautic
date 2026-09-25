@@ -11,7 +11,6 @@ use MauticPlugin\MauticSocialBundle\Entity\TweetStat;
 use MauticPlugin\MauticSocialBundle\Entity\TweetStatRepository;
 use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetType;
-use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -171,34 +170,21 @@ final class TweetModel extends FormModel implements AjaxLookupModelInterface
             throw new MethodNotAllowedHttpException(['Tweet']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = SocialEvents::TWEET_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = SocialEvents::TWEET_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = SocialEvents::TWEET_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = SocialEvents::TWEET_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new Events\TweetPreSaveEvent($entity, $isNew),
+            'post_save'   => new Events\TweetPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new Events\TweetPreDeleteEvent($entity, $isNew),
+            'post_delete' => new Events\TweetPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new Events\SocialEvent($entity, $isNew);
-            }
+        $this->dispatcher->dispatch($event);
 
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     public function getRepository(): TweetRepository
