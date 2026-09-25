@@ -39,10 +39,7 @@ class BaseDecorator implements FilterDecoratorInterface
         return '';
     }
 
-    /**
-     * @return string
-     */
-    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         $operator = $this->contactSegmentFilterOperator->fixOperator($contactSegmentFilterCrate->getOperator());
 

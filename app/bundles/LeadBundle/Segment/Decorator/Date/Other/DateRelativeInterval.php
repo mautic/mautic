@@ -37,10 +37,7 @@ final class DateRelativeInterval implements FilterDecoratorInterface
         return $this->dateDecorator->getTable($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         if ('=' === $contactSegmentFilterCrate->getOperator()) {
             return 'like';
