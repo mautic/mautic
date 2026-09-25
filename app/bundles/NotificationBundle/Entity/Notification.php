@@ -343,7 +343,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -417,7 +417,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->button;
     }
 
-    public function setButton(string $button): void
+    public function setButton(?string $button): void
     {
         $this->isChanged('button', $button);
         $this->button = $button;
@@ -431,7 +431,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->message;
     }
 
-    public function setMessage(string $message): void
+    public function setMessage(?string $message): void
     {
         $this->isChanged('message', $message);
         $this->message = $message;
