@@ -183,7 +183,7 @@ final class SubmissionModel extends CommonFormModel
                 if ([] !== $captcha) {
                     $props = $f->getProperties();
                     // check for a custom message
-                    $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
+                    $validationErrors[$alias] = (empty($props['errorMessage'])) ? implode('<br />', $captcha) : $props['errorMessage'];
                 }
                 continue;
             }
@@ -979,7 +979,7 @@ final class SubmissionModel extends CommonFormModel
             $companyData = [];
             // force add company contact field to company fields check
             $companyFields = array_merge($companyFields, ['company' => 'company']);
-            foreach ($companyFields as $alias => $properties) {
+            foreach (array_keys($companyFields) as $alias) {
                 if (isset($currentFields[$alias])) {
                     $value               = $currentFields[$alias];
                     $companyData[$alias] = $value;
@@ -1018,10 +1018,10 @@ final class SubmissionModel extends CommonFormModel
 
         // Check for duplicate lead
         /** @var Lead[] $leads */
-        $leads = (!empty($uniqueFieldsWithData)) ? $this->leadRepository->getLeadsByUniqueFields(
+        $leads = (empty($uniqueFieldsWithData)) ? [] : $this->leadRepository->getLeadsByUniqueFields(
             $uniqueFieldsWithData,
             $leadId
-        ) : [];
+        );
 
         $uniqueFieldsCurrent = $getData($currentFields, true);
         if (count($leads)) {
@@ -1232,7 +1232,7 @@ final class SubmissionModel extends CommonFormModel
 
     private function normalizeValue(mixed $value, Field $f): string
     {
-        $value = !is_array($value) ? [$value] : $value;
+        $value = is_array($value) ? $value : [$value];
 
         // select and multiselect normalization
         if ($properties = $f->getProperties()['list'] ?? null) {

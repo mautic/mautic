@@ -241,7 +241,7 @@ class HitRepository extends CommonRepository
             );
         }
         if (isset($options['urls']) && $options['urls']) {
-            $inUrls = (!is_array($options['urls'])) ? [$options['urls']] : $options['urls'];
+            $inUrls = (is_array($options['urls'])) ? $options['urls'] : [$options['urls']];
             foreach ($inUrls as $k => $u) {
                 $sq->andWhere($sq->expr()->like('h.url', ':url_'.$k))
                     ->setParameter('url_'.$k, $u);
@@ -270,7 +270,7 @@ class HitRepository extends CommonRepository
      */
     public function getBounces($pageIds, ?\DateTime $fromDate = null, $isVariantCheck = false): array
     {
-        $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
+        $inOrEq = (is_array($pageIds)) ? 'in' : 'eq';
 
         $hitsColumn = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -322,7 +322,7 @@ class HitRepository extends CommonRepository
             ) : 0;
         }
 
-        return (!is_array($pageIds)) ? $return[$pageIds] : $return;
+        return (is_array($pageIds)) ? $return : $return[$pageIds];
     }
 
     /**

@@ -24,7 +24,7 @@ final class SiteUrlEnvVars implements EnvVarsInterface
         $envVars->set('MAUTIC_REQUEST_CONTEXT_HOST', $parts['host']);
 
         // Scheme
-        $scheme = !empty($parts['scheme']) ? $parts['scheme'] : 'http';
+        $scheme = empty($parts['scheme']) ? 'http' : $parts['scheme'];
         $envVars->set('MAUTIC_REQUEST_CONTEXT_SCHEME', $scheme);
 
         // Path

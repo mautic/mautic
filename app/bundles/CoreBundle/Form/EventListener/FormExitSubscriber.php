@@ -26,7 +26,7 @@ final class FormExitSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
-        $id = !empty($this->options['data']) ? $this->options['data']->getId() : 0;
+        $id = empty($this->options['data']) ? 0 : $this->options['data']->getId();
         if ($id && empty($this->options['ignore_formexit'])) {
             // add a hidden field that is used exclusively to warn a user to use save/cancel to exit a form
             $form = $event->getForm();

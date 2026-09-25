@@ -1187,7 +1187,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         foreach ($emails as $email) {
             // Extact ID
-            preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
+            preg_match('/(Lead|Contact)(\d*)@sftest\.com/', $email, $match);
             $object = $match[1];
 
             if ('Lead' === $object) {

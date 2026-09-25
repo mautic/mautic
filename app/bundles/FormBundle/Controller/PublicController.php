@@ -98,7 +98,7 @@ final class PublicController extends CommonFormController
         if (!empty($return)) {
             // remove mauticError and mauticMessage from the referer so it doesn't get sent back
             $return = InputHelper::url((string) $return, false, null, null, ['mauticError', 'mauticMessage'], true);
-            $query  = (!str_contains($return, '?')) ? '?' : '&';
+            $query  = (str_contains($return, '?')) ? '&' : '?';
         }
 
         return [
@@ -495,8 +495,8 @@ final class PublicController extends CommonFormController
         $session = $request->getSession();
         $message = $session->get('mautic.emailbundle.message', []);
 
-        $msg     = (!empty($message['message'])) ? $message['message'] : '';
-        $msgType = (!empty($message['type'])) ? $message['type'] : 'notice';
+        $msg     = (empty($message['message'])) ? '' : $message['message'];
+        $msgType = (empty($message['type'])) ? 'notice' : $message['type'];
 
         $analytics = $analyticsHelper->getCode();
 
@@ -524,7 +524,7 @@ final class PublicController extends CommonFormController
         $objectId          = (empty($id)) ? (int) $request->get('id') : $id;
         $css               = InputHelper::string((string) $request->get('css'));
         $form              = $this->formModel->getEntity($objectId);
-        $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
+        $customStylesheets = (empty($css)) ? [] : explode(',', $css);
         $template          = null;
 
         if (null === $form || !$form->isPublished()) {

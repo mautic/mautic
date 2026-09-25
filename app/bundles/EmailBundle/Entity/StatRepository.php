@@ -35,7 +35,7 @@ class StatRepository extends CommonRepository
             ->setParameter('hash', $trackingHash);
         $result = $q->getQuery()->getResult();
 
-        return (!empty($result)) ? $result[0] : null;
+        return (empty($result)) ? null : $result[0];
     }
 
     /**
@@ -339,7 +339,7 @@ class StatRepository extends CommonRepository
      */
     public function getOpenedRates($emailIds, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
-        $inIds = (!is_array($emailIds)) ? [$emailIds] : $emailIds;
+        $inIds = (is_array($emailIds)) ? $emailIds : [$emailIds];
 
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('e.email_id, count(e.id) as the_count')
@@ -403,7 +403,7 @@ class StatRepository extends CommonRepository
                 0;
         }
 
-        return (!is_array($emailIds)) ? $return[$emailIds] : $return;
+        return (is_array($emailIds)) ? $return : $return[$emailIds];
     }
 
     /**

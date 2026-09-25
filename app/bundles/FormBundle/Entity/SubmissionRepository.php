@@ -171,11 +171,11 @@ class SubmissionRepository extends CommonRepository
             }
         }
 
-        return (!empty($args['withTotalCount'])) ?
-            [
+        return (empty($args['withTotalCount'])) ?
+            $results : [
                 'count'   => $total,
                 'results' => $results,
-            ] : $results;
+            ];
     }
 
     /**
@@ -468,7 +468,7 @@ class SubmissionRepository extends CommonRepository
         switch ($operatorExpr) {
             case 'like':
             case 'notLike':
-                $value = !str_contains($value, '%') ? '%'.$value.'%' : $value;
+                $value = str_contains($value, '%') ? $value : '%'.$value.'%';
                 break;
             case 'startsWith':
                 $operatorExpr    = 'like';

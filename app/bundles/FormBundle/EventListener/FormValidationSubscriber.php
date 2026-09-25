@@ -152,13 +152,13 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
         $validation = $field->getValidation();
 
         if (!empty($validation['minimum']) && $selectedCnt < (int) $validation['minimum']) {
-            $message = !empty($validation['min_message'])
-                ? $validation['min_message']
-                : $this->translator->trans(
+            $message = empty($validation['min_message'])
+                ? $this->translator->trans(
                     'mautic.form.submission.checkboxgrp.minimum',
                     ['%min%' => (int) $validation['minimum']],
                     'validators'
-                );
+                )
+                : $validation['min_message'];
 
             $event->failedValidation($message);
 
@@ -166,13 +166,13 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
         }
 
         if (!empty($validation['maximum']) && $selectedCnt > (int) $validation['maximum']) {
-            $message = !empty($validation['max_message'])
-                ? $validation['max_message']
-                : $this->translator->trans(
+            $message = empty($validation['max_message'])
+                ? $this->translator->trans(
                     'mautic.form.submission.checkboxgrp.maximum',
                     ['%max%' => (int) $validation['maximum']],
                     'validators'
-                );
+                )
+                : $validation['max_message'];
 
             $event->failedValidation($message);
         }

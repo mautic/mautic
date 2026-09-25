@@ -19,19 +19,29 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class BatchCompanyContactAssignmentModelTest extends TestCase
 {
-    /** @var CompanyModel&MockObject */
+    /**
+     * @var CompanyModel&MockObject
+     */
     private MockObject $companyModel;
 
-    /** @var LeadModel&MockObject */
+    /**
+     * @var LeadModel&MockObject
+     */
     private MockObject $leadModel;
 
-    /** @var CorePermissions&MockObject */
+    /**
+     * @var CorePermissions&MockObject
+     */
     private MockObject $security;
 
-    /** @var LeadRepository&MockObject */
+    /**
+     * @var LeadRepository&MockObject
+     */
     private MockObject $leadRepository;
 
-    /** @var LoggerInterface&MockObject */
+    /**
+     * @var LoggerInterface&MockObject
+     */
     private MockObject $logger;
 
     private BatchCompanyContactAssignmentModel $model;

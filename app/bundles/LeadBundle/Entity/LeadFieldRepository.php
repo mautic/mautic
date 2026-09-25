@@ -304,7 +304,7 @@ class LeadFieldRepository extends CommonRepository
               ->setParameter('lead', (int) $lead)
               ->setParameter('value', $value);
         } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
-            $values   = (!is_array($value)) ? [$value] : $value;
+            $values   = (is_array($value)) ? $value : [$value];
             $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
             $expr     = $q->expr()->and(
                 $q->expr()->eq('l.id', ':lead')

@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Field\IdentifierFields;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Model\FieldGroupModel;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -51,6 +52,7 @@ final class FieldType extends AbstractType
         private readonly Translator $translator,
         private readonly IdentifierFields $identifierFields,
         private readonly IndexHelper $indexHelper,
+        private readonly FieldGroupModel $fieldGroupModel,
         private readonly FormFieldHelper $formFieldHelper,
     ) {
     }
@@ -69,19 +71,18 @@ final class FieldType extends AbstractType
             ]
         );
 
-        $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
+        $disabled = (empty($options['data'])) ? false : $options['data']->isFixed();
+
+        $object       = $options['data'] instanceof LeadField ? $options['data']->getObject() : 'lead';
+        $groupChoices = array_flip($this->fieldGroupModel->getGroups($object));
 
         $builder->add(
             'group',
             ChoiceType::class,
             [
-                'choices' => [
-                    'mautic.lead.field.group.core'         => 'core',
-                    'mautic.lead.field.group.social'       => 'social',
-                    'mautic.lead.field.group.personal'     => 'personal',
-                    'mautic.lead.field.group.professional' => 'professional',
-                ],
-                'attr' => [
+                'choices'                   => $groupChoices,
+                'choice_translation_domain' => false,
+                'attr'                      => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.lead.field.form.group.help',
                     'onchange' => 'Mautic.updateLeadFieldOrderChoiceList();',
@@ -305,13 +306,13 @@ final class FieldType extends AbstractType
                 case 'boolean':
                     if (is_array($data)) {
                         $value    = $data['defaultValue'] ?? false;
-                        $yesLabel = !empty($data['properties']['yes']) ? $data['properties']['yes'] : 'mautic.core.form.yes';
-                        $noLabel  = !empty($data['properties']['no']) ? $data['properties']['no'] : 'mautic.core.form.no';
+                        $yesLabel = empty($data['properties']['yes']) ? 'mautic.core.form.yes' : $data['properties']['yes'];
+                        $noLabel  = empty($data['properties']['no']) ? 'mautic.core.form.no' : $data['properties']['no'];
                     } else {
                         $value    = $data->getDefaultValue();
                         $props    = $data->getProperties();
-                        $yesLabel = !empty($props['yes']) ? $props['yes'] : 'mautic.core.form.yes';
-                        $noLabel  = !empty($props['no']) ? $props['no'] : 'mautic.core.form.no';
+                        $yesLabel = empty($props['yes']) ? 'mautic.core.form.yes' : $props['yes'];
+                        $noLabel  = empty($props['no']) ? 'mautic.core.form.no' : $props['no'];
                     }
 
                     if ('' !== $value && null !== $value) {
@@ -373,7 +374,7 @@ final class FieldType extends AbstractType
                                             $validator  = $context->getValidator();
                                             $violations = $validator->validate(
                                                 $object,
-                                                new Assert\Regex(pattern: '/(2[0-3]|[01][0-9]):([0-5][0-9])/')
+                                                new Assert\Regex(pattern: '/(2[0-3]|[01]\d):([0-5]\d)/')
                                             );
 
                                             if (count($violations) > 0) {

@@ -226,7 +226,7 @@ final class StageController extends AbstractFormController
                     'route'         => $this->generateUrl(
                         'mautic_stage_action',
                         [
-                            'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
+                            'objectAction' => (empty($valid) ? 'new' : 'edit'), // valid means a new form was applied
                             'objectId'     => $entity->getId(),
                         ]
                     ),

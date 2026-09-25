@@ -167,7 +167,7 @@ final class FieldController extends CommonFormController
             $closeModal                = false;
             $viewParams['tmpl']        = 'field';
             $viewParams['form']        = (isset($customParams['formTheme'])) ? $this->setFormTheme($form, $twig, $customParams['formTheme']) : $form->createView();
-            $viewParams['fieldHeader'] = (!empty($customParams)) ? $this->translator->trans($customParams['label']) : $this->translator->transConditional('mautic.core.type.'.$fieldType, 'mautic.form.field.type.'.$fieldType);
+            $viewParams['fieldHeader'] = (empty($customParams)) ? $this->translator->transConditional('mautic.core.type.'.$fieldType, 'mautic.form.field.type.'.$fieldType) : $this->translator->trans($customParams['label']);
         }
 
         $passthroughVars = [
@@ -184,7 +184,7 @@ final class FieldController extends CommonFormController
 
             $passthroughVars['parent']    = $formField['parent'];
             $passthroughVars['fieldId']   = $keyId;
-            $template                     = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
+            $template                     = (empty($customParams)) ? '@MauticForm/Field/'.$fieldType.'.html.twig' : $customParams['template'];
             $passthroughVars['fieldHtml'] = $this->renderView(
                 '@MauticForm/Builder/_field_wrapper.html.twig',
                 [
@@ -308,9 +308,9 @@ final class FieldController extends CommonFormController
                     $twig,
                     $customParams['formTheme']
                 ) : $form->createView();
-                $viewParams['fieldHeader'] = (!empty($customParams))
-                    ? $this->translator->trans($customParams['label'])
-                    : $this->translator->transConditional('mautic.core.type.'.$fieldType, 'mautic.form.field.type.'.$fieldType);
+                $viewParams['fieldHeader'] = (empty($customParams))
+                    ? $this->translator->transConditional('mautic.core.type.'.$fieldType, 'mautic.form.field.type.'.$fieldType)
+                    : $this->translator->trans($customParams['label']);
             }
 
             $passthroughVars = [
@@ -320,7 +320,7 @@ final class FieldController extends CommonFormController
             ];
 
             $passthroughVars['fieldId'] = $objectId;
-            $template                   = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
+            $template                   = (empty($customParams)) ? '@MauticForm/Field/'.$fieldType.'.html.twig' : $customParams['template'];
 
             // prevent undefined errors
             $entity       = new Field();
@@ -422,9 +422,9 @@ final class FieldController extends CommonFormController
         $form = $this->formFieldModel->createForm(
             $formField,
             $this->formFactory,
-            (!empty($formField['id'])) ?
-                $this->generateUrl('mautic_formfield_action', ['objectAction' => 'edit', 'objectId' => $formField['id']])
-                : $this->generateUrl('mautic_formfield_action', ['objectAction' => 'new']),
+            (empty($formField['id'])) ?
+                $this->generateUrl('mautic_formfield_action', ['objectAction' => 'new'])
+                : $this->generateUrl('mautic_formfield_action', ['objectAction' => 'edit', 'objectId' => $formField['id']]),
             ['customParameters' => $customParams]
         );
         $form->get('formId')->setData($formId);

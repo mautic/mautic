@@ -69,12 +69,12 @@ final class MailchimpType extends AbstractType
 
         $builder->add('doubleOptin', YesNoButtonGroupType::class, [
             'label' => 'mautic.mailchimp.double_optin',
-            'data'  => (!isset($options['data']['doubleOptin'])) ? true : $options['data']['doubleOptin'],
+            'data'  => $options['data']['doubleOptin'] ?? true,
         ]);
 
         $builder->add('sendWelcome', YesNoButtonGroupType::class, [
             'label' => 'mautic.emailmarketing.send_welcome',
-            'data'  => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome'],
+            'data'  => $options['data']['sendWelcome'] ?? true,
         ]);
 
         if (!empty($error)) {

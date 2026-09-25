@@ -23,7 +23,7 @@ final class ReportSettingsType extends AbstractType
                 'attr'  => [
                     'class' => 'filter-value',
                 ],
-                'data' => !empty($options['data']['showGraphsAboveTable']) ? $options['data']['showGraphsAboveTable'] : false,
+                'data' => empty($options['data']['showGraphsAboveTable']) ? false : $options['data']['showGraphsAboveTable'],
             ]
         );
 
@@ -35,7 +35,7 @@ final class ReportSettingsType extends AbstractType
                 'attr'  => [
                     'class' => 'filter-value',
                 ],
-                'data' => !empty($options['data']['showDynamicFilters']) ? $options['data']['showDynamicFilters'] : false,
+                'data' => empty($options['data']['showDynamicFilters']) ? false : $options['data']['showDynamicFilters'],
             ]
         );
 
@@ -47,7 +47,7 @@ final class ReportSettingsType extends AbstractType
                 'attr'  => [
                     'class' => 'filter-value',
                 ],
-                'data' => !empty($options['data']['hideDateRangeFilter']) ? $options['data']['hideDateRangeFilter'] : false,
+                'data' => empty($options['data']['hideDateRangeFilter']) ? false : $options['data']['hideDateRangeFilter'],
             ]
         );
     }

@@ -134,7 +134,7 @@ final class ServicePass implements CompilerPassInterface
 
                         // Generate tag and tag arguments
                         if (isset($details['tags'])) {
-                            $tagArguments = (!empty($details['tagArguments'])) ? $details['tagArguments'] : [];
+                            $tagArguments = (empty($details['tagArguments'])) ? [] : $details['tagArguments'];
                             foreach ($details['tags'] as $k => $tag) {
                                 if (!isset($tagArguments[$k])) {
                                     $tagArguments[$k] = [];
@@ -147,8 +147,8 @@ final class ServicePass implements CompilerPassInterface
                                 $definition->addTag($tag, $tagArguments[$k]);
                             }
                         } else {
-                            $tag          = (!empty($details['tag'])) ? $details['tag'] : $defaultTag;
-                            $tagArguments = (!empty($details['tagArguments'])) ? $details['tagArguments'] : [];
+                            $tag          = (empty($details['tag'])) ? $defaultTag : $details['tag'];
+                            $tagArguments = (empty($details['tagArguments'])) ? [] : $details['tagArguments'];
 
                             if (!empty($tag)) {
                                 if (!empty($details['alias'])) {
@@ -240,7 +240,7 @@ final class ServicePass implements CompilerPassInterface
                             }
 
                             // The second parameter of setDecoratedService is optional, check if there is a second key in the array
-                            $secondParam = !empty($details['decoratedService'][1]) ? $details['decoratedService'][1] : null;
+                            $secondParam = empty($details['decoratedService'][1]) ? null : $details['decoratedService'][1];
 
                             $definition->setDecoratedService($details['decoratedService'][0], $secondParam);
                         }

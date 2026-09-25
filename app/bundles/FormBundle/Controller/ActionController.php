@@ -114,8 +114,8 @@ final class ActionController extends CommonFormController
             $blank      = $entity->convertToArray();
             $formAction = array_merge($blank, $formAction);
 
-            $template = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
-                '@MauticForm/Action/base_form_action.html.twig';
+            $template = (empty($formAction['settings']['template'])) ? '@MauticForm/Action/base_form_action.html.twig' :
+                $formAction['settings']['template'];
             $passthroughVars['actionId']   = $keyId;
             $passthroughVars['actionHtml'] = $this->renderView($template, [
                 'inForm' => true,
@@ -244,8 +244,8 @@ final class ActionController extends CommonFormController
                 $entity     = new Action();
                 $blank      = $entity->convertToArray();
                 $formAction = array_merge($blank, $formAction);
-                $template   = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
-                    '@MauticForm/Action/base_form_action.html.twig';
+                $template   = (empty($formAction['settings']['template'])) ? '@MauticForm/Action/base_form_action.html.twig' :
+                    $formAction['settings']['template'];
                 $passthroughVars['actionHtml'] = $this->renderView($template, [
                     'inForm' => true,
                     'action' => $formAction,

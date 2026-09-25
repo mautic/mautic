@@ -163,7 +163,7 @@ final class CampaignEventLeadFieldValueType extends AbstractType
 
                 $transform = function ($value) use ($isMultiple) {
                     if ($isMultiple) {
-                        return !is_array($value) ? (array) $value : $value;
+                        return is_array($value) ? $value : (array) $value;
                     }
 
                     return is_array($value) ? reset($value) : $value;

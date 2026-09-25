@@ -153,9 +153,9 @@ final class EventController extends CommonFormController
 
             $viewParams['form']             = $form->createView();
             $viewParams['eventHeader']      = $this->translator->trans($event['settings']['label']);
-            $viewParams['eventDescription'] = (!empty($event['settings']['description'])) ? $this->translator->trans(
+            $viewParams['eventDescription'] = (empty($event['settings']['description'])) ? '' : $this->translator->trans(
                 $event['settings']['description']
-            ) : '';
+            );
         }
 
         $viewParams['hideTriggerMode'] = isset($event['settings']['hideTriggerMode']) && $event['settings']['hideTriggerMode'];

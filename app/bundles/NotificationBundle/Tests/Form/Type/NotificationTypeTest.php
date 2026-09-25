@@ -27,6 +27,7 @@ final class NotificationTypeTest extends TypeTestCase
     {
         $validatorBuilder = Validation::createValidatorBuilder();
         $validatorBuilder->addMethodMapping('loadValidatorMetadata');
+        $validatorBuilder->enableAttributeMapping();
 
         return [
             new ValidatorExtension($validatorBuilder->getValidator()),
@@ -72,7 +73,7 @@ final class NotificationTypeTest extends TypeTestCase
         $view          = $form->createView();
         $invalidFields = ['name', 'heading', 'message'];
         $errorCount    = 0;
-        foreach ($view->children as $fieldName => $child) {
+        foreach (array_keys($view->children) as $fieldName) {
             $errors = $view->children[$fieldName]->vars['errors'];
             $this->assertInstanceOf(FormErrorIterator::class, $errors);
 
@@ -124,7 +125,7 @@ final class NotificationTypeTest extends TypeTestCase
         $this->assertTrue($form->isValid());
 
         $view = $form->createView();
-        foreach ($view->children as $fieldName => $child) {
+        foreach (array_keys($view->children) as $fieldName) {
             $errors = $view->children[$fieldName]->vars['errors'];
             $this->assertInstanceOf(FormErrorIterator::class, $errors);
             $this->assertCount(0, $errors);

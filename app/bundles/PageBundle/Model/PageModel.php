@@ -352,10 +352,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
         // should the url include the category
         if ($this->catInUrl) {
             $category = $entity->getCategory();
-            $catSlug  = (!empty($category))
-                ? $category->getAlias()
+            $catSlug  = (empty($category))
+                ? $this->translator->trans('mautic.core.url.uncategorized')
                 :
-                $this->translator->trans('mautic.core.url.uncategorized');
+                $category->getAlias();
         }
 
         $parent = $entity->getTranslationParent();
