@@ -41,11 +41,11 @@ final readonly class MenuBuilder
         try {
             /** @var \Knp\Menu\ItemInterface $item */
             foreach ($menu as $item) {
-                if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
+                if ('current' === $forRouteUri && $this->matcher->isCurrent($item)) {
                     // current match
                     return $item;
                 }
-                if ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
+                if ('current' !== $forRouteUri && $item->getUri() == $forRouteUri) {
                     // route uri match
                     return $item;
                 }

@@ -236,7 +236,7 @@ final class ApiMetadataDriver implements DriverInterface
     {
         $property ??= $this->getCurrentPropertyName();
 
-        $this->properties[$property]->maxDepth = (int) $depth;
+        $this->properties[$property]->maxDepth = $depth;
 
         return $this;
     }

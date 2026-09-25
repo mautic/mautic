@@ -358,7 +358,7 @@ class Point extends FormEntity implements UuidInterface
 
     public function setDelta(int $delta): void
     {
-        $this->delta = (int) $delta;
+        $this->delta = $delta;
     }
 
     public function setRepeatable(bool $repeatable): static

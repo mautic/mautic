@@ -86,14 +86,12 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param int $decisionId
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
+    public function validate(int $decisionId, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->limiter = $limiter;
         $this->output  = $output ?: new NullOutput();

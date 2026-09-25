@@ -102,7 +102,7 @@ final class ConfigBuilderEvent extends Event
 
     public function addFileFields(array $fields): static
     {
-        $this->encodedFields = array_merge($this->encodedFields, (array) $fields);
+        $this->encodedFields = array_merge($this->encodedFields, $fields);
 
         return $this;
     }

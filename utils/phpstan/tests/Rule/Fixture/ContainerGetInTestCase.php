@@ -25,9 +25,14 @@ class ContainerGetInTestCase
         $this->container->get(TranslatorInterface::class);
     }
 
-    public function viaInternalTestService(): void
+    public function viaAllowedServiceName(): void
     {
         $this->container->get('test.service_container');
         $this->container->get('test.private_services_locator');
+        $this->container->get('router');
+        $this->container->get('fm_elfinder.configurator');
+        $this->container->get('doctrine.debug_data_holder');
+        $this->container->get('translator.default');
+        $this->container->get('security.untracked_token_storage');
     }
 }

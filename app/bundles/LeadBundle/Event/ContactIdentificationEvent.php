@@ -11,10 +11,7 @@ final class ContactIdentificationEvent extends Event
 {
     private ?Lead $identifiedContact = null;
 
-    /**
-     * @var string
-     */
-    private $identifiedByChannel;
+    private ?string $identifiedByChannel = null;
 
     public function __construct(
         private readonly array $clickthrough,

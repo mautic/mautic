@@ -103,7 +103,7 @@ final class TriggerEventRepository extends CommonRepository
             ->innerJoin('e', MAUTIC_TABLE_PREFIX.'point_triggers', 't', 'e.trigger_id = t.id');
 
         // make sure the published up and down dates are good
-        $q->where($q->expr()->eq('x.lead_id', (string) ((int) $leadId)));
+        $q->where($q->expr()->eq('x.lead_id', (string) ($leadId)));
 
         $results = $q->executeQuery()->fetchAllAssociative();
 

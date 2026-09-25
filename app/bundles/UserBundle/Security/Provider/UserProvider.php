@@ -81,10 +81,7 @@ final readonly class UserProvider implements UserProviderInterface
     /**
      * Create/update user from authentication plugins.
      *
-     * @param bool|true $createIfNotExists
-     *
      * @return User
-     *
      * @throws BadCredentialsException
      */
     public function saveUser(User $user, bool $createIfNotExists = true)

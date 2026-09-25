@@ -46,6 +46,11 @@ final class NoContainerGetRule implements Rule
      */
     private const array ALLOWED_SERVICE_NAMES = [
         'monolog.logger.mautic',
+        'router',
+        'fm_elfinder.configurator',
+        'doctrine.debug_data_holder',
+        'translator.default',
+        'security.untracked_token_storage',
         // internal test services
         'test.private_services_locator',
         'test.service_container',

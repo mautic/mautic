@@ -552,7 +552,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
         );
         $this->amendLeadDataBeforePush($mappedData);
 
-        if (empty($mappedData)) {
+        if ($mappedData === []) {
             return false;
         }
 

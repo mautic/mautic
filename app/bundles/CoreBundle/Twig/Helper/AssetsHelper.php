@@ -509,7 +509,7 @@ final class AssetsHelper
         }, $text);
 
         // Extract text links for each protocol
-        foreach ((array) $protocols as $protocol) {
+        foreach ($protocols as $protocol) {
             $text = match ($protocol) {
                 'http', 'https' => preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
                     if ($match[1]) {

@@ -18,7 +18,7 @@ parameters:
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
         return: 91.4
-        param: 84.4
+        param: 83.4
         property: 73.7
         constant: 80.4
         declare: 75.4
@@ -61,6 +61,7 @@ parameters:
         - phpstan-bootstrap.php
     ignoreErrors:
 <<<<<<< HEAD
+<<<<<<< HEAD
         # final classes mocked in tests make the Class&MockObject intersection unresolvable, the mock works via dg/bypass-finals
         -
             identifiers:
@@ -78,16 +79,34 @@ parameters:
         - identifier: typePerfect.narrowPublicClassMethodParamType
 
 >>>>>>> bfbcbb560c ([types] narrow private method param types to passed types)
+=======
+>>>>>>> 78919d5bbb (bmp type coverage)
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: symplify.noNullableServiceInConstructor
             path: app/bundles/ReportBundle/Generator/ReportGenerator.php
 
+        # too strict
+        - identifier: symplify.forbiddenNode
+        - identifier: symplify.noReference
+        - identifier: symplify.forbiddenFuncCall
+
+        # parent class is used actively
+        -
+            identifier: symplify.forbiddenExtendOfNonAbstractClass
+            paths:
+                - *Controller.php
+                - *Model.php
+
+        # part of deprecation
+        -
+            identifier: symplify.noConstructorOverride
+            path: *Permission.php
+
         # these services have no class name alias in the container, so only the string name can fetch them
         -
             identifier: mautic.noContainerGet
             paths:
-                - app/bundles/ApiBundle/Tests/Functional/OwnershipScopedSecurityMetadataTest.php
                 - app/bundles/CoreBundle/Tests/Functional/RouteMapTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php

@@ -650,8 +650,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     {
         return $this->statRepository->findBy(
             [
-                'email' => (int) $emailId,
-                'lead'  => (int) $leadId,
+                'email' => $emailId,
+                'lead'  => $leadId,
             ],
             ['dateSent' => 'DESC']
         );
@@ -775,10 +775,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getEmailDeviceStats(Email $email, bool $includeVariants = false, ?DateTime $dateFrom = null, ?DateTime $dateTo = null): array
     {
-        if (!$email instanceof Email) {
-            $email = $this->getEntity($email);
-        }
-
         $emailIds      = ($includeVariants) ? $email->getRelatedEntityIds() : [$email->getId()];
         $templateEmail = 'template' === $email->getEmailType();
         $results       = $this->statDeviceRepository->getDeviceStats($emailIds, $dateFrom, $dateTo);
