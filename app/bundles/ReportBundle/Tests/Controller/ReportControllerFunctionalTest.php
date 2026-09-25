@@ -466,6 +466,22 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', (string) $clientResponseContent);
     }
 
+    public function testScheduledReportsSearchCommand(): void
+    {
+        $scheduled = $this->createReport('Automation test scheduled report', 'email', []);
+        $scheduled->setIsScheduled(true);
+        $this->createReport('Automation test unscheduled report', 'email', []);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($scheduled);
+        $this->assertTrue($scheduled->isScheduled());
+
+        $this->client->request('GET', '/s/reports?search=is:scheduled');
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('Automation test scheduled report', $content);
+        $this->assertStringNotContainsString('Automation test unscheduled report', $content);
+    }
+
     public function testXssUrlFromQuery(): void
     {
         $report = new Report();
