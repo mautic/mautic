@@ -15,9 +15,11 @@ trait EntityContactsTrait
     private LeadRepository $entityContactsLeadRepository;
 
     #[Required]
-    public function setDoNotContactRepositoryEntityContactsTrait(
+    public function autowireEntityContactsTrait(
+        LeadRepository $entityContactsLeadRepository,
         DoNotContactRepository $doNotContactRepository,
     ): void {
+        $this->entityContactsLeadRepository = $entityContactsLeadRepository;
         $this->doNotContactRepository = $doNotContactRepository;
     }
 
@@ -199,12 +201,5 @@ trait EntityContactsTrait
                 ],
             ]
         );
-    }
-
-    #[Required]
-    public function autowireEntityContactsTrait(
-        LeadRepository $entityContactsLeadRepository,
-    ): void {
-        $this->entityContactsLeadRepository = $entityContactsLeadRepository;
     }
 }

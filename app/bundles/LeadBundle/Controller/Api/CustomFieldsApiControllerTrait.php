@@ -20,6 +20,15 @@ trait CustomFieldsApiControllerTrait
 
     private FieldModel $customFieldsFieldModel;
 
+    #[Required]
+    public function autowireCustomFieldsApiControllerTrait(
+        FieldModel $customFieldsFieldModel,
+        RequestStack $requestStack,
+    ): void {
+        $this->customFieldsFieldModel = $customFieldsFieldModel;
+        $this->requestStack = $requestStack;
+    }
+
     /**
      * @var mixed[]
      */
@@ -201,19 +210,5 @@ trait CustomFieldsApiControllerTrait
         }
 
         $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
-    }
-
-    #[Required]
-    public function setRequestStack(
-        RequestStack $requestStack,
-    ): void {
-        $this->requestStack = $requestStack;
-    }
-
-    #[Required]
-    public function autowireCustomFieldsApiControllerTrait(
-        FieldModel $customFieldsFieldModel,
-    ): void {
-        $this->customFieldsFieldModel = $customFieldsFieldModel;
     }
 }
