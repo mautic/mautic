@@ -33,10 +33,7 @@ final class ListPreProcessListEvent extends CommonEvent
         $this->list = $list;
     }
 
-    /**
-     * @return bool
-     */
-    public function getResult()
+    public function getResult(): ?bool
     {
         return $this->result;
     }

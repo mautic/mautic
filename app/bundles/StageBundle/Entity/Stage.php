@@ -161,9 +161,9 @@ class Stage extends FormEntity implements UuidInterface
         return $this->id;
     }
 
-    public function setWeight(int $type): self
+    public function setWeight($type): self
     {
-        $this->weight = $type;
+        $this->weight = (int) $type;
 
         return $this;
     }
@@ -181,7 +181,7 @@ class Stage extends FormEntity implements UuidInterface
         return get_object_vars($this);
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -279,7 +279,7 @@ class Stage extends FormEntity implements UuidInterface
         return $this->category;
     }
 
-    public function setCategory(Category $category): void
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }
