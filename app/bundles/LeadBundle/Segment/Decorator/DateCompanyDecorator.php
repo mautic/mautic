@@ -28,10 +28,7 @@ final readonly class DateCompanyDecorator implements FilterDecoratorInterface
         return $this->dateDecorator->getTable($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         return $this->dateDecorator->getOperator($contactSegmentFilterCrate);
     }
