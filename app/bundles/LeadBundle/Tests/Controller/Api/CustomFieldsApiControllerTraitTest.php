@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
 final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
@@ -55,7 +56,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
                 return $this->getEntityFormOptions();
             }
         };
-        $controller->autowireCustomFieldsApiControllerTrait($modelFake);
+        $controller->autowireCustomFieldsApiControllerTrait($modelFake, new RequestStack());
 
         $this->assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling once, should be live
         $this->assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling twice, should be cached
