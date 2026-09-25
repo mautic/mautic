@@ -21,7 +21,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class MappingHelper
+final readonly class MappingHelper
 {
     public function __construct(
         private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,

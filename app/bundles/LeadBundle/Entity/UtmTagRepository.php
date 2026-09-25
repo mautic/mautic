@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<UtmTag>
  */
-class UtmTagRepository extends CommonRepository
+final class UtmTagRepository extends CommonRepository
 {
     use TimelineTrait;
 

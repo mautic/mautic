@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\PrivateAddressChecker;
 use Mautic\WebhookBundle\Exception\PrivateAddressException;
 use Psr\Http\Message\ResponseInterface;
 
-readonly class Client
+final readonly class Client
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

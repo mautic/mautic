@@ -9,7 +9,7 @@ use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 
-readonly class SchedulerPlanner
+final readonly class SchedulerPlanner
 {
     public function __construct(
         private DateBuilder $dateBuilder,

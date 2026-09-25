@@ -35,14 +35,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends CommonFormModel<Trigger>
  */
-class TriggerModel extends CommonFormModel implements GlobalSearchInterface
+final class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
         return 'point.trigger';
     }
 
-    protected $triggers = [];
+    private array $triggers = [];
 
     /**
      * @var array<string, mixed[]>
@@ -50,9 +50,9 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     private array $cachedEvents = [];
 
     public function __construct(
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadModel $leadModel,
-        protected TriggerEventModel $pointTriggerEventModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly LeadModel $leadModel,
+        private readonly TriggerEventModel $pointTriggerEventModel,
         private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,

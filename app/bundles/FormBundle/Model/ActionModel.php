@@ -12,7 +12,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonFormModel<Action>
  */
-class ActionModel extends CommonFormModel
+final class ActionModel extends CommonFormModel
 {
     public static function getName(): string
     {

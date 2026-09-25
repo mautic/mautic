@@ -47,14 +47,14 @@ use Twig\Environment;
 /**
  * @extends FormModel<Report>
  */
-class ReportModel extends FormModel implements GlobalSearchInterface
+final class ReportModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
         return 'report.report';
     }
 
-    public const CHANNEL_FEATURE = 'reporting';
+    public const string CHANNEL_FEATURE = 'reporting';
 
     /**
      * @var array
@@ -64,14 +64,14 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @var mixed
      */
-    protected $defaultPageLimit;
+    private $defaultPageLimit;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        protected Environment $twig,
-        protected ChannelListHelper $channelListHelper,
-        protected FieldModel $fieldModel,
-        protected ReportHelper $reportHelper,
+        private readonly Environment $twig,
+        private readonly ChannelListHelper $channelListHelper,
+        private readonly FieldModel $fieldModel,
+        private readonly ReportHelper $reportHelper,
         private readonly CsvExporter $csvExporter,
         private readonly ExcelExporter $excelExporter,
         EntityManagerInterface $em,

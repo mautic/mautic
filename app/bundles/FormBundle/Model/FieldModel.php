@@ -20,14 +20,12 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonFormModel<Field>
  */
-class FieldModel extends CommonFormModel
+final class FieldModel extends CommonFormModel
 {
     public static function getName(): string
     {
         return 'form.field';
     }
-
-    protected LeadFieldModel $leadFieldModel;
 
     private RequestStack $requestStack;
 
@@ -42,7 +40,6 @@ class FieldModel extends CommonFormModel
         ColumnSchemaHelper $columnSchemaHelper,
         FieldRepository $fieldRepository,
     ): void {
-        $this->leadFieldModel     = $leadFieldModel;
         $this->requestStack       = $requestStack;
         $this->columnSchemaHelper = $columnSchemaHelper;
         $this->fieldRepository    = $fieldRepository;

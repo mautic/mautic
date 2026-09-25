@@ -26,14 +26,6 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $this->setUpMailer();
     }
 
-    protected function beforeTearDown(): void
-    {
-        // Clear owners cache (to leave a clean environment for future tests):
-        /** @var MailHelper $mailHelper */
-        $mailHelper = self::getContainer()->get(MailHelper::class);
-        ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
-    }
-
     public function testEmailSendWithCompanyTokens(): void
     {
         $suffix   = random_int(10, 100);

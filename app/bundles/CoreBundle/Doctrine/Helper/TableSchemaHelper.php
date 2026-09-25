@@ -11,32 +11,23 @@ use Mautic\CoreBundle\Exception\SchemaException;
 /**
  * Used to manipulate creation/removal of tables.
  */
-class TableSchemaHelper
+final class TableSchemaHelper
 {
     /**
      * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected AbstractSchemaManager $sm;
+    private readonly AbstractSchemaManager $sm;
 
-    /**
-     * @var Schema
-     */
-    protected $schema;
+    private ?\Doctrine\DBAL\Schema\Schema $schema = null;
 
     /**
      * @var string[]
      */
-    protected array $dropTables = [];
-
-    /**
-     * @var string[]
-     */
-    protected array $addTables = [];
+    private array $dropTables = [];
 
     public function __construct(
-        protected Connection $db,
-        protected ?string $prefix,
-        protected ColumnSchemaHelper $columnHelper,
+        private readonly Connection $db,
+        private readonly ?string $prefix,
     ) {
         $this->sm = $db->createSchemaManager();
     }
@@ -67,7 +58,6 @@ class TableSchemaHelper
 
         // now add the tables
         foreach ($tables as $table) {
-            $this->addTables[] = $table;
             $this->addTable($table, false);
         }
 
@@ -109,8 +99,6 @@ class TableSchemaHelper
                 $this->deleteTable($table['name']);
             }
         }
-
-        $this->addTables[] = $table;
 
         $options = $table['options'] ?? [];
         $columns = $table['columns'] ?? [];
@@ -173,7 +161,7 @@ class TableSchemaHelper
 
         // reset schema
         $this->schema     = new Schema([], [], $this->sm->createSchemaConfig());
-        $this->dropTables = $this->addTables = [];
+        $this->dropTables = [];
     }
 
     /**

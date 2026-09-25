@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
-class DateTimeHelper
+final class DateTimeHelper
 {
     public const string FORMAT_DB = 'Y-m-d H:i:s';
 
@@ -196,7 +196,7 @@ class DateTimeHelper
      *
      * @param string|\DateTime $compare
      *
-     * @return bool|\DateInterval|string
+     * @return \DateInterval|string
      */
     public function getDiff($compare = 'now', $format = null, bool $resetTime = false)
     {
@@ -376,7 +376,7 @@ class DateTimeHelper
         return $this->getLocalDateTime()->format('P');
     }
 
-    protected function setDefaultTimezone(): void
+    private function setDefaultTimezone(): void
     {
         if (null === self::$defaultLocalTimezone) {
             $parameterLoader            = new ParameterLoader();

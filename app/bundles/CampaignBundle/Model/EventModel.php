@@ -17,7 +17,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Event>
  */
-class EventModel extends FormModel
+final class EventModel extends FormModel
 {
     public static function getName(): string
     {

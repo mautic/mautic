@@ -16,7 +16,6 @@ use Mautic\AssetBundle\Event\AssetPreDeleteEvent;
 use Mautic\AssetBundle\Event\AssetPreSaveEvent;
 use Mautic\AssetBundle\Form\Type\AssetType;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
-use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -48,7 +47,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Asset>
  */
-class AssetModel extends FormModel implements GlobalSearchInterface
+final class AssetModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
@@ -58,13 +57,12 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * @var int
      */
-    protected $maxAssetSize;
+    private $maxAssetSize;
 
     public function __construct(
-        protected LeadModel $leadModel,
-        protected CategoryModel $categoryModel,
+        private readonly LeadModel $leadModel,
         private readonly RequestStack $requestStack,
-        protected IpLookupHelper $ipLookupHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
         private readonly DeviceCreatorServiceInterface $deviceCreatorService,
         private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
         private readonly DeviceTrackingServiceInterface $deviceTrackingService,

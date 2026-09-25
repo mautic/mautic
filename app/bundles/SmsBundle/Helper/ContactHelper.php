@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 
-readonly class ContactHelper
+final readonly class ContactHelper
 {
     public function __construct(
         private LeadRepository $leadRepository,

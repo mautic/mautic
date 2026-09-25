@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Segment\Decorator;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 
-class CompanyDecorator extends BaseDecorator
+final class CompanyDecorator extends BaseDecorator
 {
     public function getRelationJoinTable(): string
     {

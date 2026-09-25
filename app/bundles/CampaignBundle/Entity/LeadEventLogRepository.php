@@ -18,13 +18,13 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 /**
  * @extends CommonRepository<LeadEventLog>
  */
-class LeadEventLogRepository extends CommonRepository
+final class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
 
-    public const LOG_DELETE_BATCH_SIZE = 5000;
+    public const int LOG_DELETE_BATCH_SIZE = 5000;
 
     public function getEntities(array $args = []): iterable
     {

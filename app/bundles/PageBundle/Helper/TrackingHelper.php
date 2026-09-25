@@ -10,13 +10,13 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class TrackingHelper
+final readonly class TrackingHelper
 {
     public function __construct(
-        protected ContactTracker $contactTracker,
-        protected CacheProvider $cache,
-        protected CoreParametersHelper $coreParametersHelper,
-        protected RequestStack $requestStack,
+        private ContactTracker $contactTracker,
+        private CacheProvider $cache,
+        private CoreParametersHelper $coreParametersHelper,
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -110,7 +110,7 @@ class TrackingHelper
         return $this->coreParametersHelper->get('google_analytics_anonymize_ip');
     }
 
-    protected function isLandingPage(): bool
+    private function isLandingPage(): bool
     {
         $server = $this->requestStack->getCurrentRequest()->server;
 

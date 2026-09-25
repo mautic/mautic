@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class CustomFieldValidator
+final readonly class CustomFieldValidator
 {
     public function __construct(
         private FieldModel $fieldModel,

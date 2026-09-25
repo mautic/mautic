@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Helper class for managing Mautic's installed languages.
  */
-class LanguageHelper
+final class LanguageHelper
 {
     private readonly string $cacheFile;
 

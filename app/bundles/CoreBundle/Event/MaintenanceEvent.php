@@ -4,23 +4,20 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MaintenanceEvent extends Event
+final class MaintenanceEvent extends Event
 {
-    protected \DateTimeInterface $date;
+    private readonly \DateTimeInterface $date;
+
+    private array $stats = [];
 
     /**
      * @var array
      */
-    protected $stats = [];
-
-    /**
-     * @var array
-     */
-    protected $debug = [];
+    private $debug = [];
     public function __construct(
-        protected int $daysOld,
-        protected bool $dryRun,
-        protected bool $gdpr,
+        private readonly int $daysOld,
+        private readonly bool $dryRun,
+        private readonly bool $gdpr,
     ) {
         $this->date    = new \DateTime("{$this->daysOld} days ago", new \DateTimeZone('UTC'));
     }
@@ -62,10 +59,7 @@ class MaintenanceEvent extends Event
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getStats()
+    public function getStats(): array
     {
         ksort($this->stats, SORT_NATURAL);
 

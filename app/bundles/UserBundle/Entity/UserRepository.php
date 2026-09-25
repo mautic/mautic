@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 /**
  * @extends CommonRepository<User>
  */
-class UserRepository extends CommonRepository
+final class UserRepository extends CommonRepository
 {
     /**
      * Find user by username or email.

@@ -22,18 +22,18 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @implements AjaxLookupModelInterface<Message>
  */
-class MessageModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class MessageModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     public static function getName(): string
     {
         return 'channel.message';
     }
 
-    public const CHANNEL_FEATURE = 'marketing_messages';
+    public const string CHANNEL_FEATURE = 'marketing_messages';
 
-    protected static $channels;
+    private static ?array $channels = null;
 
-    protected ChannelListHelper $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
     private LeadEventLogRepository $leadEventLogRepository;
 
@@ -103,10 +103,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         return $this->formFactory->create(MessageType::class, $entity, $options);
     }
 
-    /**
-     * @return array
-     */
-    public function getChannels()
+    public function getChannels(): array
     {
         if (!self::$channels) {
             $channels = $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE);

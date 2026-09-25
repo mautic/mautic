@@ -7,7 +7,7 @@ namespace Mautic\ConfigBundle\Event;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ConfigBuilderEvent extends Event
+final class ConfigBuilderEvent extends Event
 {
     /**
      * @var mixed[]
@@ -25,7 +25,7 @@ class ConfigBuilderEvent extends Event
     /**
      * @var string[]
      */
-    protected array $encodedFields = [];
+    private array $encodedFields = [];
 
     public function __construct(
         private readonly BundleHelper $bundleHelper,

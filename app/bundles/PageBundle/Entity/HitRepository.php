@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 /**
  * @extends CommonRepository<Hit>
  */
-class HitRepository extends CommonRepository
+final class HitRepository extends CommonRepository
 {
     use TimelineTrait;
 

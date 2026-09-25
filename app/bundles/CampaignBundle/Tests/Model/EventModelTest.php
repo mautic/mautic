@@ -35,7 +35,7 @@ final class EventModelTest extends TestCase
      */
     private MockObject $dispatcherMock;
 
-    private MockObject|EventModel $eventModel;
+    private EventModel $eventModel;
 
     protected function setUp(): void
     {

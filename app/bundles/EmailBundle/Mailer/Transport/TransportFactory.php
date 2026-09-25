@@ -10,7 +10,7 @@ use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mailer\Transport\Transports;
 
-readonly class TransportFactory
+final readonly class TransportFactory
 {
     public function __construct(
         private SymfonyTransportFactory $transportFactory,

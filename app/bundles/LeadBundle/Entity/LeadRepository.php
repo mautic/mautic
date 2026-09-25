@@ -25,7 +25,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonRepository<Lead>
  */
-class LeadRepository extends CommonRepository implements CustomFieldRepositoryInterface
+final class LeadRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
     use CustomFieldRepositoryTrait {
         prepareDbalFieldsForSave as defaultPrepareDbalFieldsForSave;
@@ -65,7 +65,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $this->listLeadRepository = $listLeadRepository;
     }
 
-    protected EventDispatcherInterface $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
     private array $availableSocialFields = [];
 
@@ -528,7 +528,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return ['core', 'social', 'personal', 'professional'];
     }
 
-    public function getEntitiesDbalQueryBuilder(): \Mautic\CoreBundle\Doctrine\Query\QueryBuilder
+    public function getEntitiesDbalQueryBuilder(): \Mautic\LeadBundle\Segment\Query\QueryBuilder
     {
         $alias = $this->getTableAlias();
 

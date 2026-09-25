@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;
 
-class IntegrationHelper
+final class IntegrationHelper
 {
     /**
      * @var array<string, mixed>
@@ -44,12 +44,12 @@ class IntegrationHelper
 
     public function __construct(
         private readonly ContainerInterface $container,
-        protected EntityManagerInterface $em,
-        protected PathsHelper $pathsHelper,
-        protected BundleHelper $bundleHelper,
-        protected CoreParametersHelper $coreParametersHelper,
-        protected Environment $twig,
-        protected PluginModel $pluginModel,
+        private readonly EntityManagerInterface $em,
+        private readonly PathsHelper $pathsHelper,
+        private readonly BundleHelper $bundleHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Environment $twig,
+        private readonly PluginModel $pluginModel,
         private readonly IntegrationRepository $integrationRepository,
         private readonly LeadRepository $leadRepository,
     ) {

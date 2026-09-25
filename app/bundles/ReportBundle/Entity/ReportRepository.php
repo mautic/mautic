@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Report>
  */
-class ReportRepository extends CommonRepository
+final class ReportRepository extends CommonRepository
 {
     public function getEntities(array $args = []): iterable
     {

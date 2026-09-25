@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonFormModel<Group>
  */
-class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
+final class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {

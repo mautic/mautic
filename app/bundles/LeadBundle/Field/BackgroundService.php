@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
 
-readonly class BackgroundService
+final readonly class BackgroundService
 {
     public function __construct(
         private FieldModel $fieldModel,

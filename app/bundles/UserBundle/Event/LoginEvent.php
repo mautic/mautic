@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\Event;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class LoginEvent extends Event
+final class LoginEvent extends Event
 {
     public function __construct(
         private readonly User $user,

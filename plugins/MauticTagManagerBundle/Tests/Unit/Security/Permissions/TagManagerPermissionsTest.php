@@ -10,10 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class TagManagerPermissionsTest extends TestCase
 {
-    /**
-     * @var TagManagerPermissions
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $tagManagerPermissions;
+    private TagManagerPermissions&\PHPUnit\Framework\MockObject\MockObject $tagManagerPermissions;
 
     protected function setUp(): void
     {

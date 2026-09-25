@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Webhook>
  */
-class WebhookRepository extends CommonRepository
+final class WebhookRepository extends CommonRepository
 {
     /**
      * @return array{0: mixed, 1: array<string, mixed>}

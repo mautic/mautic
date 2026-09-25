@@ -37,7 +37,6 @@ use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -69,7 +68,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Page>
  */
-class PageModel extends FormModel implements GlobalSearchInterface
+final class PageModel extends FormModel implements GlobalSearchInterface
 {
     use TranslationModelTrait;
     use VariantModelTrait;
@@ -92,20 +91,14 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     private const string STRING_ENCODING = 'UTF-8';
 
-    /**
-     * @var bool
-     */
-    protected $catInUrl;
+    private ?bool $catInUrl = null;
 
-    protected DateTimeHelper $dateTimeHelper;
+    private DateTimeHelper $dateTimeHelper;
 
     public function __construct(
-        protected CookieHelper $cookieHelper,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadModel $leadModel,
-        protected FieldModel $leadFieldModel,
-        protected RedirectModel $pageRedirectModel,
-        protected TrackableModel $pageTrackableModel,
+        private CookieHelper $cookieHelper,
+        private IpLookupHelper $ipLookupHelper,
+        private LeadModel $leadModel,
         private readonly MessageBusInterface $messageBus,
         private readonly CompanyModel $companyModel,
         private readonly IdentifyCompanyHelper $identifyCompanyHelper,

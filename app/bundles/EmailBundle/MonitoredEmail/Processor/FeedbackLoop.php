@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FeedbackLoop implements ProcessorInterface
+final class FeedbackLoop implements ProcessorInterface
 {
     private ?Message $message = null;
 
@@ -57,7 +57,7 @@ class FeedbackLoop implements ProcessorInterface
         return true;
     }
 
-    protected function isApplicable(): int|bool
+    private function isApplicable(): int|bool
     {
         return preg_match('/.*feedback-type: abuse.*/is', $this->message->fblReport);
     }

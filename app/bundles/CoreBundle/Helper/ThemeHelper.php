@@ -18,9 +18,9 @@ use Twig\Error\RuntimeError;
 use Twig\Extension\SandboxExtension;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
-class ThemeHelper implements ThemeHelperInterface
+final class ThemeHelper implements ThemeHelperInterface
 {
-    public const HIDDEN_THEMES_TXT = 'hidden-themes.txt';
+    public const string HIDDEN_THEMES_TXT = 'hidden-themes.txt';
 
     /**
      * @var array<string, mixed[]>
@@ -57,7 +57,7 @@ class ThemeHelper implements ThemeHelperInterface
      *
      * @var string[]
      */
-    protected $defaultThemes = [
+    private array $defaultThemes = [
         '_1-2-1-2-column',
         '_1-2-1-column',
         '_1-2-column',
@@ -119,7 +119,7 @@ class ThemeHelper implements ThemeHelperInterface
         $this->finder                    = clone $finder;
     }
 
-    public function getDefaultThemes()
+    public function getDefaultThemes(): array
     {
         return $this->defaultThemes;
     }

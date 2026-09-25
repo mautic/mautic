@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<MessageQueue>
  */
-class MessageQueueModel extends FormModel
+final class MessageQueueModel extends FormModel
 {
     public static function getName(): string
     {
@@ -29,11 +29,7 @@ class MessageQueueModel extends FormModel
     /**
      * @var string A default message reschedule interval
      */
-    public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
-
-    protected LeadModel $leadModel;
-
-    protected CompanyModel $companyModel;
+    public const string DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
     private MessageQueueRepository $messageQueueRepository;
 
@@ -49,8 +45,6 @@ class MessageQueueModel extends FormModel
         FrequencyRuleRepository $frequencyRuleRepository,
         LeadRepository $leadRepository,
     ): void {
-        $this->leadModel               = $leadModel;
-        $this->companyModel            = $companyModel;
         $this->messageQueueRepository  = $messageQueueRepository;
         $this->frequencyRuleRepository = $frequencyRuleRepository;
         $this->leadRepository = $leadRepository;

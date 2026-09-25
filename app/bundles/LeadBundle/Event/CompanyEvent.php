@@ -7,12 +7,12 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Company;
 
-class CompanyEvent extends CommonEvent
+final class CompanyEvent extends CommonEvent
 {
     public function __construct(
         Company $company,
         bool $isNew = false,
-        protected int $score = 0,
+        private int $score = 0,
     ) {
         $this->entity = $company;
         $this->isNew  = $isNew;

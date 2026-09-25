@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Category>
  */
-class CategoryModel extends FormModel implements AjaxLookupModelInterface
+final class CategoryModel extends FormModel implements AjaxLookupModelInterface
 {
     public static function getName(): string
     {
@@ -31,7 +31,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
      */
     private array $categoriesByBundleCache = [];
 
-    protected RequestStack $requestStack;
+    private RequestStack $requestStack;
 
     private CategoryRepository $categoryRepository;
 

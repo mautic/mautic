@@ -14,9 +14,9 @@ use Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper;
 use Mautic\EmailBundle\Stats\StatHelperContainer;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
-readonly class StatsCollectionHelper
+final readonly class StatsCollectionHelper
 {
-    public const GENERAL_STAT_PREFIX = 'email';
+    public const string GENERAL_STAT_PREFIX = 'email';
 
     public function __construct(
         private StatHelperContainer $helperContainer,

@@ -38,7 +38,7 @@ use Twig\Environment;
 /**
  * @extends FormModel<User>
  */
-class UserModel extends FormModel implements GlobalSearchInterface
+final class UserModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
@@ -50,7 +50,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     private const int INVITE_TOKEN_VERIFIER_BYTES = 32;
 
     public function __construct(
-        protected MailHelper $mailHelper,
+        private readonly MailHelper $mailHelper,
         private readonly UserTokenServiceInterface $userTokenService,
         EntityManagerInterface $em,
         CorePermissions $security,

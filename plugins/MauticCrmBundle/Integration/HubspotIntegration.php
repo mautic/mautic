@@ -21,11 +21,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @extends CrmAbstractIntegration<HubspotApi>
  */
-class HubspotIntegration extends CrmAbstractIntegration
+final class HubspotIntegration extends CrmAbstractIntegration
 {
     private StageRepository $stageRepository;
 
-    protected UserHelper $userHelper;
+    private UserHelper $userHelper;
 
     private EmailValidator $emailValidator;
 
@@ -49,7 +49,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $this->helper;
     }
 
-    public const ACCESS_KEY = 'accessKey';
+    public const string ACCESS_KEY = 'accessKey';
 
     public function getName(): string
     {

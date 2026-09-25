@@ -47,7 +47,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @implements AjaxLookupModelInterface<Sms>
  */
-class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use TranslationModelTrait;
 
@@ -57,9 +57,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     }
 
     public function __construct(
-        protected TrackableModel $pageTrackableModel,
-        protected LeadModel $leadModel,
-        protected TransportChain $transport,
+        private TrackableModel $pageTrackableModel,
+        private LeadModel $leadModel,
+        private TransportChain $transport,
         private readonly CacheProviderInterface $cacheProvider,
         EntityManagerInterface $em,
         CorePermissions $security,

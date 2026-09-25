@@ -28,7 +28,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @implements AjaxLookupModelInterface<DynamicContent>
  */
-class DynamicContentModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class DynamicContentModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;

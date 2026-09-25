@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<LeadEventLog>
  */
-class LeadEventLogRepository extends CommonRepository
+final class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
 

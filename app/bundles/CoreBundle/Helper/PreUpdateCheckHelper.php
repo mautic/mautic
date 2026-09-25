@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\AbstractPreUpdateCheck;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class PreUpdateCheckHelper
+final class PreUpdateCheckHelper
 {
     /**
      * @var AbstractPreUpdateCheck[]

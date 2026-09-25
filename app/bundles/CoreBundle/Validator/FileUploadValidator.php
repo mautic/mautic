@@ -7,10 +7,10 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FileUploadValidator
+final readonly class FileUploadValidator
 {
     public function __construct(
-        protected TranslatorInterface $translator,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -174,7 +174,7 @@ class FileUploadValidator
      *
      * @throws FileInvalidException
      */
-    private function throwException(string $messageId, array $parameters): void
+    private function throwException(string $messageId, array $parameters): never
     {
         throw $this->buildException($messageId, $parameters);
     }

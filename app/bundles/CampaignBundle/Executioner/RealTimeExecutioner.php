@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 
-class RealTimeExecutioner
+final class RealTimeExecutioner
 {
     private ?Lead $contact = null;
 

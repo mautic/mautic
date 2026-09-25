@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ConfigEvent extends CommonEvent
+final class ConfigEvent extends CommonEvent
 {
     /**
      * @var mixed[]

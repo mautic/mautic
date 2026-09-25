@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<LeadDevice>
  */
-class LeadDeviceRepository extends CommonRepository
+final class LeadDeviceRepository extends CommonRepository
 {
     /**
      * {@inhertidoc}.
@@ -113,12 +113,9 @@ class LeadDeviceRepository extends CommonRepository
      */
     public function getByTrackingId($trackingId): ?LeadDevice
     {
-        /** @var LeadDevice $leadDevice */
-        $leadDevice = $this->findOneBy([
+        return $this->findOneBy([
             'trackingId' => $trackingId,
         ]);
-
-        return $leadDevice;
     }
 
     /**

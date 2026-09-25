@@ -16,7 +16,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Plugin>
  */
-class PluginModel extends FormModel
+final class PluginModel extends FormModel
 {
     public static function getName(): string
     {

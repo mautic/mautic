@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ObjectProvider
+final class ObjectProvider
 {
     /**
      * Cached internal objects.

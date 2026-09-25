@@ -18,7 +18,7 @@ use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
-class MauticSyncProcess
+final class MauticSyncProcess
 {
     private ?InputOptionsDAO $inputOptionsDAO = null;
 

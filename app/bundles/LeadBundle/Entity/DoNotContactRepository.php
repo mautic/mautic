@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 /**
  * @extends CommonRepository<DoNotContact>
  */
-class DoNotContactRepository extends CommonRepository
+final class DoNotContactRepository extends CommonRepository
 {
     use TimelineTrait;
 

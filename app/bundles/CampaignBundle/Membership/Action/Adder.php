@@ -9,9 +9,9 @@ use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
 
-readonly class Adder
+final readonly class Adder
 {
-    public const NAME = 'added';
+    public const string NAME = 'added';
 
     public function __construct(
         private LeadRepository $leadRepository,

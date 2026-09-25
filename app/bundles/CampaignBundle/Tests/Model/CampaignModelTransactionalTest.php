@@ -20,7 +20,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\FormRepository;
-use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -52,7 +51,6 @@ final class CampaignModelTransactionalTest extends TestCase
         $this->campaignModel = $this->getMockBuilder(CampaignModel::class)
             ->setConstructorArgs([
                 $this->createStub(ListModel::class),
-                $this->createStub(FormModel::class),
                 $this->createStub(EventCollector::class),
                 $this->createStub(MembershipBuilder::class),
                 $this->createStub(ContactTracker::class),

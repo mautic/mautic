@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<StagesChangeLog>
  */
-class StagesChangeLogRepository extends CommonRepository
+final class StagesChangeLogRepository extends CommonRepository
 {
     use TimelineTrait;
 

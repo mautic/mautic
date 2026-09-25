@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class CompanyObjectHelper implements ObjectHelperInterface
+final class CompanyObjectHelper implements ObjectHelperInterface
 {
     /**
      * @var string[]|null

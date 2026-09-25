@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 /**
  * @template M of object
  */
-readonly class ModelFactory
+final readonly class ModelFactory
 {
     public function __construct(
         #[AutowireLocator(

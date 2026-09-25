@@ -6,13 +6,13 @@ namespace Mautic\MarketplaceBundle\Service;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-readonly class Config
+final readonly class Config
 {
-    public const MARKETPLACE_ENABLED           = 'marketplace_enabled';
+    public const string MARKETPLACE_ENABLED           = 'marketplace_enabled';
 
-    public const MARKETPLACE_WEBSITE_URL       = 'marketplace_website_url';
+    public const string MARKETPLACE_WEBSITE_URL       = 'marketplace_website_url';
 
-    public const MARKETPLACE_REGISTRY_URL      = 'marketplace_registry_url';
+    public const string MARKETPLACE_REGISTRY_URL      = 'marketplace_registry_url';
 
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

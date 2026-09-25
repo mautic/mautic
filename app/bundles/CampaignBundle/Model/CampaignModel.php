@@ -32,7 +32,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
-use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
@@ -47,7 +46,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @extends CommonFormModel<Campaign>
  */
-class CampaignModel extends CommonFormModel implements GlobalSearchInterface
+final class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
@@ -55,8 +54,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     public function __construct(
-        protected ListModel $leadListModel,
-        protected FormModel $formModel,
+        private readonly ListModel $leadListModel,
         private readonly EventCollector $eventCollector,
         private readonly MembershipBuilder $membershipBuilder,
         private readonly ContactTracker $contactTracker,

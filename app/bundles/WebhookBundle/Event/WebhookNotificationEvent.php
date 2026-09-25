@@ -7,7 +7,7 @@ namespace Mautic\WebhookBundle\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class WebhookNotificationEvent extends Event
+final class WebhookNotificationEvent extends Event
 {
     private bool $canSend = true;
 

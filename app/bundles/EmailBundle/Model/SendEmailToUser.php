@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Mautic\UserBundle\Hash\UserHash;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class SendEmailToUser
+final readonly class SendEmailToUser
 {
     public function __construct(
         private EmailModel $emailModel,

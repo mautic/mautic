@@ -10,33 +10,33 @@ use Symfony\Component\Process\Exception\RuntimeException;
 /**
  * @note   This class is based on Sensio\Bundle\DistributionBundle\Configurator\Configurator
  */
-class Configurator
+final class Configurator
 {
     /**
      * Configuration filename.
      */
-    protected string $filename;
+    private readonly string $filename;
 
     /**
      * Array containing the steps.
      *
      * @var array<int, StepInterface[]>
      */
-    protected $steps = [];
+    private array $steps = [];
 
     /**
      * Array containing the sorted steps.
      *
      * @var StepInterface[]
      */
-    protected $sortedSteps = [];
+    private array $sortedSteps = [];
 
     /**
      * Configuration parameters.
      *
      * @var array<string, mixed>
      */
-    protected array $parameters;
+    private array $parameters;
 
     public function __construct(PathsHelper $pathsHelper)
     {
@@ -94,7 +94,7 @@ class Configurator
      *
      * @return StepInterface[]
      */
-    public function getSteps()
+    public function getSteps(): array
     {
         if ([] === $this->sortedSteps) {
             $this->sortedSteps = $this->getSortedSteps();
@@ -216,7 +216,7 @@ class Configurator
      * @param array<mixed> $array
      * @param int          $level
      */
-    protected function renderArray($array, $level = 1): string
+    private function renderArray(array $array, int|float $level = 1): string
     {
         $string = "array(\n";
 
@@ -267,7 +267,7 @@ class Configurator
      *
      * @return array<string, mixed>
      */
-    protected function read(): array
+    private function read(): array
     {
         if (!file_exists($this->filename)) {
             return [];

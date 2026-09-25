@@ -15,9 +15,9 @@ use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-readonly class ActionExecutioner implements EventInterface
+final readonly class ActionExecutioner implements EventInterface
 {
-    public const TYPE = 'action';
+    public const string TYPE = 'action';
 
     public function __construct(
         private ActionDispatcher $dispatcher,

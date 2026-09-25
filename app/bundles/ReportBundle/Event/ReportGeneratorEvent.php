@@ -9,17 +9,17 @@ use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 
-class ReportGeneratorEvent extends AbstractReportEvent
+final class ReportGeneratorEvent extends AbstractReportEvent
 {
-    public const CATEGORY_PREFIX         = 'c';
+    public const string CATEGORY_PREFIX         = 'c';
 
-    public const CONTACT_PREFIX          = 'l';
+    public const string CONTACT_PREFIX          = 'l';
 
-    public const COMPANY_PREFIX          = 'comp';
+    public const string COMPANY_PREFIX          = 'comp';
 
-    public const COMPANY_LEAD_PREFIX     = 'companies_lead';
+    public const string COMPANY_LEAD_PREFIX     = 'companies_lead';
 
-    public const IP_ADDRESS_PREFIX       = 'i';
+    public const string IP_ADDRESS_PREFIX       = 'i';
 
     private array $selectColumns = [];
 
@@ -55,7 +55,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    public function getContentTemplate(): ?string
+    public function getContentTemplate(): string
     {
         if ($this->contentTemplate) {
             return $this->contentTemplate;

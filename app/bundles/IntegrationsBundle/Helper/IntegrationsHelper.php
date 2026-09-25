@@ -14,7 +14,7 @@ use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class IntegrationsHelper
+final class IntegrationsHelper
 {
     /**
      * @var IntegrationInterface[]

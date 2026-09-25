@@ -13,7 +13,7 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
-class InactiveHelper
+final class InactiveHelper
 {
     private ?\DateTimeInterface $earliestInactiveDate = null;
 

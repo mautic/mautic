@@ -9,27 +9,27 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class IpLookupHelper
+final class IpLookupHelper
 {
     /**
      * @var array
      */
-    protected $doNotTrackIps;
+    private $doNotTrackIps;
 
     /**
      * @var array
      */
-    protected $doNotTrackBots;
+    private $doNotTrackBots;
 
     /**
      * @var array
      */
-    protected $doNotTrackInternalIps;
+    private $doNotTrackInternalIps;
 
     /**
      * @var array
      */
-    protected $trackPrivateIPRanges;
+    private $trackPrivateIPRanges;
 
     /**
      * @var string
@@ -44,11 +44,11 @@ class IpLookupHelper
     private static array $ipAddresses = [];
 
     public function __construct(
-        protected RequestStack $requestStack,
-        protected IpAddressRepository $ipAddressRepository,
+        private readonly RequestStack $requestStack,
+        private readonly IpAddressRepository $ipAddressRepository,
         CoreParametersHelper $coreParametersHelper,
         private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        protected ?AbstractLookup $ipLookup = null,
+        private readonly ?AbstractLookup $ipLookup = null,
     ) {
         $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');
         $this->doNotTrackBots        = $coreParametersHelper->get('do_not_track_bots');
@@ -227,7 +227,7 @@ class IpLookupHelper
         self::$ipAddresses = [];
     }
 
-    protected function getClientIpFromProxyList($ip)
+    private function getClientIpFromProxyList(string $ip)
     {
         // Proxies are included
         $ips = explode(',', $ip);

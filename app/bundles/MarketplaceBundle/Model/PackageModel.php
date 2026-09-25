@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Model;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\DTO\PackageDetail;
 
-readonly class PackageModel
+final readonly class PackageModel
 {
     public function __construct(
         private Connection $connection,

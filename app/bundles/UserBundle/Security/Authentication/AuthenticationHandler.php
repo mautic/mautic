@@ -12,14 +12,14 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
-readonly class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, AuthenticationFailureHandlerInterface
+final readonly class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, AuthenticationFailureHandlerInterface
 {
     public function __construct(
         private RouterInterface $router,
     ) {
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): \Symfony\Component\HttpFoundation\Response
     {
         // Remove post_logout if set
         $request->getSession()->remove('post_logout');

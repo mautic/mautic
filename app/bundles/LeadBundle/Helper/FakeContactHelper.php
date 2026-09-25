@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Field\FieldList;
 
-readonly class FakeContactHelper
+final readonly class FakeContactHelper
 {
     public function __construct(
         private FieldList $fieldList,

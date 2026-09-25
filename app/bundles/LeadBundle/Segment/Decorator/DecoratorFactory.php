@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class DecoratorFactory
+final readonly class DecoratorFactory
 {
     public function __construct(
         private ContactSegmentFilterDictionary $contactSegmentFilterDictionary,

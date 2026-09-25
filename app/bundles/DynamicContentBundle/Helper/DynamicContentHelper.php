@@ -14,25 +14,19 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DynamicContentHelper
+final class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var string
-     */
-    public const DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
+    public const string DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
 
-    /**
-     * @var string
-     */
-    public const DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
+    public const string DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
 
     public function __construct(
-        protected DynamicContentModel $dynamicContentModel,
-        protected RealTimeExecutioner $realTimeExecutioner,
-        protected EventDispatcherInterface $dispatcher,
-        protected LeadModel $leadModel,
+        private DynamicContentModel $dynamicContentModel,
+        private RealTimeExecutioner $realTimeExecutioner,
+        private EventDispatcherInterface $dispatcher,
+        private LeadModel $leadModel,
     ) {
     }
 

@@ -15,7 +15,6 @@ use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\EmailBundle\Tests\MonitoredEmail\Transport\TestTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -57,15 +56,13 @@ final class BounceTest extends \PHPUnit\Framework\TestCase
         $emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $leadModel = $this->createStub(LeadModel::class);
-
         $translator = $this->createStub(Translator::class);
 
         $logger = $this->createStub(Logger::class);
 
         $doNotContact = $this->createStub(DoNotContact::class);
 
-        $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $leadModel, $translator, $logger, $doNotContact);
+        $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $translator, $logger, $doNotContact);
 
         $message = new Message();
         $this->assertTrue($bouncer->process($message));
@@ -104,15 +101,13 @@ final class BounceTest extends \PHPUnit\Framework\TestCase
         $emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $leadModel = $this->createStub(LeadModel::class);
-
         $translator = $this->createStub(Translator::class);
 
         $logger = $this->createStub(Logger::class);
 
         $doNotContact = $this->createStub(DoNotContact::class);
 
-        $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $leadModel, $translator, $logger, $doNotContact);
+        $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $translator, $logger, $doNotContact);
 
         $message            = new Message();
         $message->to        = ['contact+bounce_123abc@test.com' => null];

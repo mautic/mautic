@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\UserBundle\Entity\User;
 
-readonly class Writer
+final readonly class Writer
 {
     public function __construct(
         private NotificationModel $notificationModel,

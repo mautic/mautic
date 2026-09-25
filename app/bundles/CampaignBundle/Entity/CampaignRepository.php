@@ -15,7 +15,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Campaign>
  */
-class CampaignRepository extends CommonRepository
+final class CampaignRepository extends CommonRepository
 {
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;

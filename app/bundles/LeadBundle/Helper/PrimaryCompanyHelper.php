@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
-readonly class PrimaryCompanyHelper
+final readonly class PrimaryCompanyHelper
 {
     public function __construct(
         private CompanyLeadRepository $companyLeadRepository,
@@ -13,7 +13,7 @@ readonly class PrimaryCompanyHelper
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function getProfileFieldsWithPrimaryCompany(Lead $lead)
     {

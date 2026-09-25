@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class PageDisplayEvent extends Event
+final class PageDisplayEvent extends Event
 {
     /**
      * Preferred lead to be used in listeners.

@@ -16,9 +16,9 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<ConnectwiseApi>
  */
-class ConnectwiseIntegration extends CrmAbstractIntegration
+final class ConnectwiseIntegration extends CrmAbstractIntegration
 {
-    public const PAGESIZE = 200;
+    public const int PAGESIZE = 200;
 
     public function getName(): string
     {

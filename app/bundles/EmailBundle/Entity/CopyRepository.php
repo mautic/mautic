@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Copy>
  */
-class CopyRepository extends CommonRepository
+final class CopyRepository extends CommonRepository
 {
     /**
      * @param string $hash

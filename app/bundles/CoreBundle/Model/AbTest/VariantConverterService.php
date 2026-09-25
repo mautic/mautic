@@ -8,12 +8,9 @@ use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
-class VariantConverterService
+final class VariantConverterService
 {
-    /**
-     * @var int
-     */
-    public const DEFAULT_WEIGHT = 100;
+    public const int DEFAULT_WEIGHT = 100;
 
     /**
      * @var array<VariantEntityInterface>
