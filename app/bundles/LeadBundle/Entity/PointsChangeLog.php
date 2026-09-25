@@ -15,7 +15,7 @@ use Mautic\PointBundle\Entity\Group;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PointsChangeLog
 {
-    public const TABLE_NAME = 'lead_points_change_log';
+    public const string TABLE_NAME = 'lead_points_change_log';
 
     /**
      * @var int|string

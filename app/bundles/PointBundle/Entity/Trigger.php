@@ -49,7 +49,7 @@ class Trigger extends FormEntity implements UuidInterface
     use UuidTrait;
     use ProjectTrait;
 
-    public const ENTITY_NAME = 'point_trigger';
+    public const string ENTITY_NAME = 'point_trigger';
 
     /**
      * @var int

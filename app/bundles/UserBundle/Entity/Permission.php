@@ -46,7 +46,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
 
-    public const CACHE_NAMESPACE = 'Permission';
+    public const string CACHE_NAMESPACE = 'Permission';
 
     /**
      * @var int

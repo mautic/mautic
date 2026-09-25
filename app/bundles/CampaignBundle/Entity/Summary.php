@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Summary
 {
-    public const TABLE_NAME = 'campaign_summary';
+    public const string TABLE_NAME = 'campaign_summary';
 
     /**
      * @var int|null

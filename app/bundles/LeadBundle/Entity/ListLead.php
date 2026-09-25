@@ -14,10 +14,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ListLead
 {
-    /**
-     * @var string
-     */
-    public const TABLE_NAME = 'lead_lists_leads';
+    public const string TABLE_NAME = 'lead_lists_leads';
 
     /**
      * @var LeadList

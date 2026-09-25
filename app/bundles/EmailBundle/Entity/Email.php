@@ -86,11 +86,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     use ProjectTrait;
     use OptimisticLockTrait;
 
-    public const ENTITY_NAME = 'email';
+    public const string ENTITY_NAME = 'email';
 
-    public const MAX_NAME_SUBJECT_LENGTH = 190;
+    public const int MAX_NAME_SUBJECT_LENGTH = 190;
 
-    public const TABLE_NAME = 'emails';
+    public const string TABLE_NAME = 'emails';
 
     private const string SETTINGS_PREFIX = 'settings_';
 

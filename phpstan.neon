@@ -11,12 +11,10 @@ parameters:
 
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
-        return: 88.9
-        param: 76.5
-        property: 72.6
-        # wait for PHP 8.3 before changing
-        constant: 70.7
-        declare: 74.0
+        return: 91.6
+        param: 82.9
+        property: 73.7
+        constant: 99.9
 
     # rules merged from rector/type-perfect, opt-in since type-coverage 2.3
     type_perfect:

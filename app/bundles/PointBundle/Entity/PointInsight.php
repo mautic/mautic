@@ -15,9 +15,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PointInsight extends FormEntity
 {
-    public const INSIGHT_TYPE_COMPARE_POINT_GROUPS = 'compare_point_groups';
+    public const string INSIGHT_TYPE_COMPARE_POINT_GROUPS = 'compare_point_groups';
 
-    public const INSIGHT_ACTION_SET_CUSTOM_FIELD = 'set_custom_field';
+    public const string INSIGHT_ACTION_SET_CUSTOM_FIELD = 'set_custom_field';
 
     private ?int $id = null;
 

@@ -13,7 +13,7 @@ final class NotWeak extends Constraint
 {
     public const string TOO_WEAK = 'f61e730a-284e-11eb-adc1-0242ac120002';
 
-    protected const ERROR_NAMES = [
+    protected const array ERROR_NAMES = [
         self::TOO_WEAK => 'PASSWORD_TOO_WEAK_ERROR',
     ];
 

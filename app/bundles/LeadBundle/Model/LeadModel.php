@@ -99,7 +99,7 @@ class LeadModel extends FormModel
         return 'lead.lead';
     }
 
-    public const CHANNEL_FEATURE = 'contact_preference';
+    public const string CHANNEL_FEATURE = 'contact_preference';
 
     /**
      * @var array

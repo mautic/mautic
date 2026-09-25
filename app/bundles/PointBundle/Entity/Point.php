@@ -53,7 +53,7 @@ class Point extends FormEntity implements UuidInterface
     use UuidTrait;
     use ProjectTrait;
 
-    public const ENTITY_NAME = 'point';
+    public const string ENTITY_NAME = 'point';
 
     /**
      * @var int

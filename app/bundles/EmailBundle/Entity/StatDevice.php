@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class StatDevice
 {
-    public const TABLE_NAME = 'email_stats_devices';
+    public const string TABLE_NAME = 'email_stats_devices';
 
     /**
      * @var int|string

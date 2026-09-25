@@ -11,7 +11,7 @@ use Mautic\ProjectBundle\Entity\Project;
 
 final class Version20250909202247 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = Project::TABLE_NAME;
+    protected const string TABLE_NAME = Project::TABLE_NAME;
 
     protected function preUpAssertions(): void
     {

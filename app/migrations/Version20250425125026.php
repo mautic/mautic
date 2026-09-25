@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250425125026 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'email_projects_xref';
+    protected const string TABLE_NAME = 'email_projects_xref';
 
     protected function preUpAssertions(): void
     {

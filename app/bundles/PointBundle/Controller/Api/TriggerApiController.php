@@ -64,7 +64,7 @@ final class TriggerApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
     {
         $method            = $this->requestStack->getCurrentRequest()->getMethod();
 
@@ -122,6 +122,7 @@ final class TriggerApiController extends CommonApiController
                 }
             }
         }
+        return null;
     }
 
     /**

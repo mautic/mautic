@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class VideoHit
 {
-    public const TABLE_NAME = 'video_hits';
+    public const string TABLE_NAME = 'video_hits';
 
     /**
      * @var int

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class <className> extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'table_name';
+    protected const string TABLE_NAME = 'table_name';
 
     protected function preUpAssertions(): void
     {

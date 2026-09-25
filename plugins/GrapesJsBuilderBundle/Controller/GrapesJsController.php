@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class GrapesJsController extends CommonController
 {
-    public const OBJECT_TYPE = ['email', 'page'];
+    public const array OBJECT_TYPE = ['email', 'page'];
 
     private function isAuthorizedObjectType(string $objectType): bool
     {

@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class WebhookQueue
 {
-    public const TABLE_NAME = 'webhook_queue';
+    public const string TABLE_NAME = 'webhook_queue';
 
     private int|string|null $id = null;
 

@@ -73,7 +73,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     use UuidTrait;
     use ProjectTrait;
 
-    public const ENTITY_NAME = 'dynamic_content';
+    public const string ENTITY_NAME = 'dynamic_content';
 
     /**
      * @var int

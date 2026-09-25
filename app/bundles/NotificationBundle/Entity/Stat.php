@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
-    public const TABLE_NAME = 'push_notification_stats';
+    public const string TABLE_NAME = 'push_notification_stats';
 
     /**
      * @var int|string

@@ -58,7 +58,7 @@ class Asset extends FormEntity implements UuidInterface
 
     use ProjectTrait;
 
-    public const ENTITY_NAME = 'asset';
+    public const string ENTITY_NAME = 'asset';
 
     #[Groups(['asset:read', 'download:read', 'email:read'])]
     private ?int $id = null;

@@ -70,7 +70,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     use TranslationEntityTrait;
     use VariantEntityTrait;
 
-    public const TABLE_NAME = 'sms_messages';
+    public const string TABLE_NAME = 'sms_messages';
 
     /**
      * @var int

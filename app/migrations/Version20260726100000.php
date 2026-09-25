@@ -12,11 +12,11 @@ use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 
 final class Version20260726100000 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'campaign_lead_event_log';
-    protected const INDEX_NAME = 'campaign_leads';
+    protected const string TABLE_NAME = 'campaign_lead_event_log';
+    protected const string INDEX_NAME = 'campaign_leads';
 
-    private const CAMPAIGN_FIRST_COLUMNS = ['campaign_id', 'lead_id', 'rotation'];
-    private const LEAD_FIRST_COLUMNS     = ['lead_id', 'campaign_id', 'rotation'];
+    private const array CAMPAIGN_FIRST_COLUMNS = ['campaign_id', 'lead_id', 'rotation'];
+    private const array LEAD_FIRST_COLUMNS     = ['lead_id', 'campaign_id', 'rotation'];
 
     protected function preUpAssertions(): void
     {

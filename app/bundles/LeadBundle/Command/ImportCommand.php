@@ -32,7 +32,7 @@ TXT
 )]
 class ImportCommand extends Command
 {
-    public const COMMAND_NAME = 'mautic:import';
+    public const string COMMAND_NAME = 'mautic:import';
 
     public function __construct(
         private readonly TranslatorInterface $translator,

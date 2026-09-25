@@ -17,11 +17,11 @@ use Mautic\LeadBundle\Entity\Lead;
 class Stat
 {
     // Used for querying stats
-    public const TYPE_FORM         = 'submission';
+    public const string TYPE_FORM         = 'submission';
 
-    public const TYPE_CLICK        = 'click';
+    public const string TYPE_CLICK        = 'click';
 
-    public const TYPE_NOTIFICATION = 'view';
+    public const string TYPE_NOTIFICATION = 'view';
 
     /**
      * @var int

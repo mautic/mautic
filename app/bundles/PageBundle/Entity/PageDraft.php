@@ -14,15 +14,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PageDraft
 {
-    /**
-     * @var string
-     */
-    public const TABLE_NAME = 'pages_draft';
+    public const string TABLE_NAME = 'pages_draft';
 
-    /**
-     * @var string
-     */
-    public const REGEX_DECODE_AMPERSAND = '/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i';
+    public const string REGEX_DECODE_AMPERSAND = '/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i';
 
     private ?int $id = null;
 

@@ -21,17 +21,17 @@ use Mautic\LeadBundle\Entity\Lead;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class MessageQueue
 {
-    public const STATUS_RESCHEDULED = 'rescheduled';
+    public const string STATUS_RESCHEDULED = 'rescheduled';
 
-    public const STATUS_PENDING     = 'pending';
+    public const string STATUS_PENDING     = 'pending';
 
-    public const STATUS_SENT        = 'sent';
+    public const string STATUS_SENT        = 'sent';
 
-    public const STATUS_CANCELLED   = 'cancelled';
+    public const string STATUS_CANCELLED   = 'cancelled';
 
-    public const PRIORITY_NORMAL = 2;
+    public const int PRIORITY_NORMAL = 2;
 
-    public const PRIORITY_HIGH   = 1;
+    public const int PRIORITY_HIGH   = 1;
 
     /**
      * @var int|string

@@ -49,7 +49,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 )]
 class Webhook extends FormEntity implements SkipModifiedInterface
 {
-    public const LOGS_DISPLAY_LIMIT = 100;
+    public const int LOGS_DISPLAY_LIMIT = 100;
 
     /**
      * @var ?int
