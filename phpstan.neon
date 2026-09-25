@@ -95,7 +95,6 @@ parameters:
             identifier: mautic.noContainerGet
             paths:
                 - app/bundles/ApiBundle/Tests/Functional/OwnershipScopedSecurityMetadataTest.php
-                - app/bundles/CoreBundle/Tests/Functional/DependencyInjection/AbstractContainerSmokeTestCase.php
                 - app/bundles/CoreBundle/Tests/Functional/RouteMapTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php

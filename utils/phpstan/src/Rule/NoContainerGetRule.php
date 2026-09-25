@@ -46,6 +46,9 @@ final class NoContainerGetRule implements Rule
      */
     private const array ALLOWED_SERVICE_NAMES = [
         'monolog.logger.mautic',
+        // internal test services
+        'test.private_services_locator',
+        'test.service_container',
     ];
 
     /**

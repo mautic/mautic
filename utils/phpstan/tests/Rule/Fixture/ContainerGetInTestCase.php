@@ -24,4 +24,10 @@ class ContainerGetInTestCase
     {
         $this->container->get(TranslatorInterface::class);
     }
+
+    public function viaInternalTestService(): void
+    {
+        $this->container->get('test.service_container');
+        $this->container->get('test.private_services_locator');
+    }
 }
