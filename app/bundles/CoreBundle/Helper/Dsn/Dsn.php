@@ -18,7 +18,7 @@ final class Dsn implements \Stringable
      * @param string|null           $user     The DSN user (e.g. root)
      * @param string|null           $password The DSN password (e.g. root)
      * @param int|null              $port     The DSN port (e.g. 3306)
-     * @param string|null           $path     The DSN path (e.g. bucket/name/two)
+     * @param string|null           $path     The DSN path without its leading slash, segments as they appear in the DSN (e.g. bucket/name/two, or %2f/emails for a vhost "/")
      * @param array<string, string> $options  The DSN options (e.g. ['charset' => 'utf8'])
      */
     public function __construct(
@@ -61,7 +61,10 @@ final class Dsn implements \Stringable
         $user     = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
         $password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
         $port     = $parsedDsn['port'] ?? null;
-        $path     = isset($parsedDsn['path']) ? ltrim(urldecode($parsedDsn['path']), '/') : null;
+        // Keep the path segments as they appear in the DSN. A percent-encoded character is data inside a segment,
+        // while a literal "/" separates segments: in amqp://user:pass@localhost/%2f/emails the first segment is the
+        // RabbitMQ vhost "/". Decoding the whole path first would turn it into "//emails" and lose the vhost.
+        $path     = isset($parsedDsn['path']) ? ltrim($parsedDsn['path'], '/') : null;
         parse_str($parsedDsn['query'] ?? '', $query);
 
         return new self($parsedDsn['scheme'], $host, $user, $password, $port, $path, $query);
@@ -90,7 +93,7 @@ final class Dsn implements \Stringable
         }
 
         if ($this->path) {
-            $dsn .= '/'.urlencode($this->path);
+            $dsn .= '/'.self::encodePath($this->path);
         }
 
         $query = http_build_query($this->options);
@@ -100,6 +103,18 @@ final class Dsn implements \Stringable
         }
 
         return $dsn;
+    }
+
+    /**
+     * Percent-encode each path segment on its own, so that "/" keeps separating segments and a segment that is
+     * already encoded (for example "%2f") is kept rather than encoded a second time.
+     */
+    private static function encodePath(string $path): string
+    {
+        return implode('/', array_map(
+            static fn (string $segment): string => rawurlencode(rawurldecode($segment)),
+            explode('/', $path)
+        ));
     }
 
     public function getScheme(): string
