@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
-use PHPStan\Analyser\Scope;
-use PHPStan\Rules\IdentifierRuleError;
-use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleErrorBuilder;
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Return_;
+use PHPStan\Analyser\Scope;
+use PHPStan\Rules\IdentifierRuleError;
+use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * Bundle Config/config.php must not define services, the autowired Config/services.php next to it is the place for them.
