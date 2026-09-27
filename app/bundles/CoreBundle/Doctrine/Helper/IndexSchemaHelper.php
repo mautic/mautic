@@ -19,6 +19,9 @@ final class IndexSchemaHelper
 
     private ?\Doctrine\DBAL\Schema\Table $table = null;
 
+    /**
+     * @var string[]
+     */
     private array $allowedColumns = [];
 
     private array $changedIndexes = [];
@@ -169,11 +172,11 @@ final class IndexSchemaHelper
     }
 
     /**
-     * @param mixed $columns
+     * @param string|string[] $columns
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    private function getTextColumns($columns): array
+    private function getTextColumns(string|array $columns): array
     {
         if (!is_array($columns)) {
             $columns = [$columns];
