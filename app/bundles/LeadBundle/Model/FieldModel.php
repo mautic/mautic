@@ -524,10 +524,7 @@ class FieldModel extends FormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadFields()
+    public function getLeadFields(): array
     {
         return $this->getEntities([
             'filter' => [
@@ -585,10 +582,7 @@ class FieldModel extends FormModel
         return $schemaDetails;
     }
 
-    /**
-     * @return array
-     */
-    public function getCompanyFields()
+    public function getCompanyFields(): array
     {
         return $this->getEntities([
             'filter' => [
@@ -783,10 +777,8 @@ class FieldModel extends FormModel
      * @param string $type
      * @param string $filter
      * @param int    $limit
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults($type, $filter = '', $limit = 10): array
     {
         return $this->leadRepository->getValueList($type, $filter, $limit);
     }
@@ -884,10 +876,7 @@ class FieldModel extends FormModel
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getPublishedFieldArrays(string $object = 'lead')
+    public function getPublishedFieldArrays(string $object = 'lead'): array
     {
         return $this->getEntities(
             [

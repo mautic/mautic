@@ -695,7 +695,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadsByIds(array $ids)
+    public function getLeadsByIds(array $ids): array
     {
         return $this->getEntities([
             'filter' => [
@@ -720,7 +720,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadDetails(Lead|int $lead)
+    public function getLeadDetails(Lead|int $lead): array
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields();
@@ -2185,10 +2185,7 @@ class LeadModel extends FormModel
         return $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE, true);
     }
 
-    /**
-     * @return array
-     */
-    public function getPreferredChannel(Lead $lead)
+    public function getPreferredChannel(Lead $lead): array
     {
         $preferredChannel = $this->frequencyRuleRepository->getPreferredChannel($lead->getId());
         if ([] !== $preferredChannel) {

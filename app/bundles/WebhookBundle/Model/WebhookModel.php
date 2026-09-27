@@ -451,10 +451,8 @@ final class WebhookModel extends FormModel
 
     /**
      * Get the payload from the webhook.
-     *
-     * @return array
      */
-    public function getWebhookPayload(Webhook $webhook, ?WebhookQueue $queue = null)
+    public function getWebhookPayload(Webhook $webhook, ?WebhookQueue $queue = null): array
     {
         if ($payload = $webhook->getPayload()) {
             return $payload;

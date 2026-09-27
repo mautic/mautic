@@ -87,7 +87,7 @@ final class PluginModel extends FormModel
      *
      * @return Plugin[]
      */
-    public function getInstalledPlugins()
+    public function getInstalledPlugins(): array
     {
         return $this->getEntities(
             [

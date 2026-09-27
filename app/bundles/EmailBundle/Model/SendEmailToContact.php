@@ -332,10 +332,7 @@ final class SendEmailToContact
         return [$queued, $queueErrors];
     }
 
-    /**
-     * @return array
-     */
-    private function sendStandardEmail()
+    private function sendStandardEmail(): array
     {
         // Dispatch the event to generate the tokens
         $this->mailer->dispatchSendEvent();

@@ -141,10 +141,8 @@ final class CampaignHelper
 
     /**
      * Gets array of contact values.
-     *
-     * @return array
      */
-    private function getContactValues(Lead $contact)
+    private function getContactValues(Lead $contact): array
     {
         if (empty($this->contactsValues[$contact->getId()])) {
             $this->contactsValues[$contact->getId()]              = $contact->getProfileFields();

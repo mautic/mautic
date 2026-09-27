@@ -199,7 +199,7 @@ final class VtigerIntegration extends CrmAbstractIntegration
     /**
      * @return array<mixed>
      */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('leadfield_match' == $section) {
             return ['mautic.vtiger.form.field_match_notes', 'info'];

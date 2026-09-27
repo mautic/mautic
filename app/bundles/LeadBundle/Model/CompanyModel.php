@@ -698,10 +698,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $mainCompany;
     }
 
-    /**
-     * @return array
-     */
-    public function fetchCompanyFields()
+    public function fetchCompanyFields(): array
     {
         if (empty($this->companyFields)) {
             $this->companyFields = $this->leadFieldModel->getEntities(

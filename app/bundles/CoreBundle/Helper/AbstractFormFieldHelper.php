@@ -86,10 +86,8 @@ abstract class AbstractFormFieldHelper
      * Format a string into an array.
      *
      * @param mixed $list List to parse
-     *
-     * @return array
      */
-    public static function parseList($list)
+    public static function parseList($list): array
     {
         return static::parseChoiceList(
             self::parseListsWithParsers(

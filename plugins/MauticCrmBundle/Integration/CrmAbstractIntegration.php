@@ -463,10 +463,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return array
      */
-    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, $priorityObject = 'mautic'): array
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 1),
@@ -476,10 +474,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return array
      */
-    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, $priorityObject = 'mautic'): array
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 0),
@@ -490,10 +486,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param string               $priorityObject
      * @param array<string, mixed> $config
-     *
-     * @return array
      */
-    protected function getFieldsByPriority(array $config, $priorityObject, $direction)
+    protected function getFieldsByPriority(array $config, $priorityObject, $direction): array
     {
         return isset($config['update_'.$priorityObject]) ? array_keys($config['update_'.$priorityObject], $direction) : array_keys($config['leadFields'] ?? []);
     }
@@ -501,10 +495,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param string[]|string|null $objects
      * @param array<string, mixed> $fieldsToUpdate
-     *
-     * @return array
      */
-    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null): array
     {
         if (!isset($fieldsToUpdate['leadFields'])) {
             return $fieldsToUpdate;
@@ -572,10 +564,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $fields;
     }
 
-    /**
-     * @return array
-     */
-    protected function prepareFieldsForPush($fields)
+    protected function prepareFieldsForPush($fields): array
     {
         $fieldMappings = [];
         $required      = [];
@@ -597,10 +586,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param array<string, mixed> $matchedFields
-     *
-     * @return array
      */
-    private function hydrateCompanyName(array $matchedFields)
+    private function hydrateCompanyName(array $matchedFields): array
     {
         if (!empty($matchedFields['companyname'])) {
             return $matchedFields;

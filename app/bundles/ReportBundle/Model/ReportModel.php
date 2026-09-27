@@ -231,10 +231,8 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
      * Builds the table lookup data for the report forms.
      *
      * @param string $context
-     *
-     * @return array
      */
-    public function getTableData($context = 'all', ?string $reportSource = null)
+    public function getTableData($context = 'all', ?string $reportSource = null): array
     {
         $data = $this->buildAvailableReports($context, $reportSource);
 

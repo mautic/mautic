@@ -553,10 +553,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getOpenDetails()
+    public function getOpenDetails(): array
     {
         return $this->openDetails;
     }

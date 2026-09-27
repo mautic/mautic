@@ -178,7 +178,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return mixed[]
      */
-    public function populateLeadData($lead, $config = [], $object = 'Contacts')
+    public function populateLeadData($lead, $config = [], $object = 'Contacts'): array
     {
         if ('company' === $object) {
             $object = 'accounts';
@@ -190,10 +190,8 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * Get available company fields for choices in the config UI.
-     *
-     * @return array
      */
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('accounts', $settings);
     }
@@ -203,7 +201,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return array|mixed
      */
-    public function getFormLeadFields(array $settings = [])
+    public function getFormLeadFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('contacts', $settings);
     }

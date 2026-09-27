@@ -57,7 +57,7 @@ final class ApiPermissions extends AbstractPermissions
         return !empty($this->params['api_enabled']);
     }
 
-    protected function getSynonym($name, $level)
+    protected function getSynonym($name, $level): array
     {
         if ('access' == $name && 'granted' == $level) {
             return [$name, 'full'];

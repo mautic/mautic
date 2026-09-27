@@ -92,10 +92,8 @@ final class AjaxController extends CommonAjaxController
 
     /**
      * Called by parent::getBuilderTokensAction().
-     *
-     * @return array
      */
-    protected function getBuilderTokens($query)
+    protected function getBuilderTokens($query): array
     {
         return $this->emailModel->getBuilderComponents(null, ['tokens'], (string) $query);
     }

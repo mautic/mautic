@@ -115,10 +115,8 @@ final class CampaignBuilderEvent extends Event
 
     /**
      * Get lead conditions.
-     *
-     * @return array
      */
-    public function getConditions()
+    public function getConditions(): array
     {
         return $this->sort('conditions');
     }
@@ -164,10 +162,7 @@ final class CampaignBuilderEvent extends Event
         $this->actions[$key] = $action;
     }
 
-    /**
-     * @return array
-     */
-    public function getActions()
+    public function getActions(): array
     {
         return $this->sort('actions');
     }
@@ -176,10 +171,8 @@ final class CampaignBuilderEvent extends Event
      * Sort internal actions, decisions and conditions arrays.
      *
      * @param string $property name
-     *
-     * @return array
      */
-    private function sort(string $property)
+    private function sort(string $property): array
     {
         if (empty($this->sortCache[$property])) {
             uasort(

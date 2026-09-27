@@ -202,10 +202,7 @@ class Submission
         return $this->ipAddress;
     }
 
-    /**
-     * @return array
-     */
-    public function getResults()
+    public function getResults(): array
     {
         return $this->results;
     }

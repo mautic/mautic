@@ -11,11 +11,9 @@ final class ZohoApi extends CrmApi
      * @param array<string, string|mixed[]> $parameters
      * @param array<string, mixed>          $settings
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    private function request($operation, array $parameters = [], string $method = 'GET', bool $json = false, array $settings = [])
+    private function request($operation, array $parameters = [], string $method = 'GET', bool $json = false, array $settings = []): array
     {
         $tokenData = $this->integration->getKeys();
 
@@ -41,11 +39,9 @@ final class ZohoApi extends CrmApi
     /**
      * @param string $object
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getLeadFields($object = 'Leads')
+    public function getLeadFields($object = 'Leads'): array
     {
         if ('company' == $object) {
             $object = 'Accounts'; // Zoho object name
@@ -57,11 +53,9 @@ final class ZohoApi extends CrmApi
     /**
      * @param string $object
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function createLead(array $data, $object = 'Leads')
+    public function createLead(array $data, $object = 'Leads'): array
     {
         $parameters         = ['data' => $data];
 
@@ -71,11 +65,9 @@ final class ZohoApi extends CrmApi
     /**
      * @param string $object
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function updateLead(array $data, $object = 'Leads')
+    public function updateLead(array $data, $object = 'Leads'): array
     {
         $parameters         = ['data' => $data];
 
@@ -86,11 +78,9 @@ final class ZohoApi extends CrmApi
      * @param string               $object
      * @param array<string, mixed> $params
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getLeads(array $params, $object, $id = null)
+    public function getLeads(array $params, $object, $id = null): array
     {
         if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';
@@ -120,11 +110,9 @@ final class ZohoApi extends CrmApi
     /**
      * @param array<string, mixed> $params
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function getCompanies(array $params, $id = null)
+    public function getCompanies(array $params, $id = null): array
     {
         $params['selectColumns'] ??= 'All';
 

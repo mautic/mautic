@@ -399,10 +399,8 @@ final class IntegrationHelper
      * @param string $specificIntegration
      * @param bool   $persistLead
      * @param bool   $returnSettings
-     *
-     * @return array
      */
-    public function getUserProfiles(object $lead, $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false)
+    public function getUserProfiles(object $lead, $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false): array
     {
         $socialCache     = $lead->getSocialCache();
         $featureSettings = [];
@@ -472,10 +470,8 @@ final class IntegrationHelper
 
     /**
      * @param bool $integration
-     *
-     * @return array
      */
-    public function clearIntegrationCache(object $lead, $integration = false)
+    public function clearIntegrationCache(object $lead, $integration = false): array
     {
         $socialCache = $lead->getSocialCache();
         if (!empty($integration)) {

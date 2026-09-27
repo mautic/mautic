@@ -290,7 +290,7 @@ class Stat
     /**
      * @return array<array-key, mixed>
      */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
@@ -323,7 +323,7 @@ class Stat
     /**
      * @return array<array-key, mixed>
      */
-    public function getDetails()
+    public function getDetails(): array
     {
         return $this->details;
     }

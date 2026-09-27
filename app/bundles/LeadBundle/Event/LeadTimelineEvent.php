@@ -167,7 +167,7 @@ final class LeadTimelineEvent extends Event
      *
      * @return array Events sorted by timestamp with most recent event first
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         if ([] === $this->events) {
             return [];
@@ -266,7 +266,7 @@ final class LeadTimelineEvent extends Event
      *
      * @return array of wanted filteres. Empty == all
      */
-    public function getEventFilters()
+    public function getEventFilters(): array
     {
         return $this->filters['search'];
     }
@@ -479,10 +479,7 @@ final class LeadTimelineEvent extends Event
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getSerializerGroups()
+    public function getSerializerGroups(): array
     {
         return $this->serializerGroups;
     }

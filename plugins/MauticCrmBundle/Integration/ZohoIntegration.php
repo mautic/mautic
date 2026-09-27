@@ -669,10 +669,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * Get available company fields for choices in the config UI.
-     *
-     * @return array
      */
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('Accounts', $settings);
     }
@@ -1202,10 +1200,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $objects
-     *
-     * @return array
      */
-    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null): array
     {
         $objects ??= ['Leads', 'Contacts'];
 
@@ -1223,10 +1219,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
      * @param array $fields
      * @param array $keys
      * @param mixed $object
-     *
-     * @return array
      */
-    public function prepareFieldsForSync($fields, $keys, $object = null)
+    public function prepareFieldsForSync($fields, $keys, $object = null): array
     {
         $leadFields = [];
         $object ??= 'Leads';

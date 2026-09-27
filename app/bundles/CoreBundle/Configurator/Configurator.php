@@ -80,7 +80,7 @@ final class Configurator
      *
      * @throws \InvalidArgumentException
      */
-    public function getStep($index)
+    public function getStep($index): array
     {
         if (isset($this->steps[$index])) {
             return $this->steps[$index];

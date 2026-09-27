@@ -77,7 +77,7 @@ abstract class AbstractLookup
      *
      * @return array<string, mixed>
      */
-    public function getDetails()
+    public function getDetails(): array
     {
         return [
             'city'         => $this->city,

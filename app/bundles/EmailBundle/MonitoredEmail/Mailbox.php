@@ -447,7 +447,7 @@ final class Mailbox
      *
      * @return array listing the folders
      */
-    public function getListingFolders()
+    public function getListingFolders(): array
     {
         if (!$this->isConfigured()) {
             throw new NotConfiguredException('mautic.email.config.monitored_email.not_configured');

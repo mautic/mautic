@@ -80,10 +80,8 @@ final class DashboardModel extends FormModel
 
     /**
      * Load widgets for the current user from database.
-     *
-     * @return array
      */
-    public function getWidgets(bool $ignorePaginator = false)
+    public function getWidgets(bool $ignorePaginator = false): array
     {
         return $this->getEntities([
             'orderBy' => 'w.ordering',

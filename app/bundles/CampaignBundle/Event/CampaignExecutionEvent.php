@@ -85,10 +85,8 @@ class CampaignExecutionEvent extends Event
 
     /**
      * Returns array with lead fields and owner ID if exist.
-     *
-     * @return array
      */
-    public function getLeadFields()
+    public function getLeadFields(): array
     {
         $lead         = $this->lead;
         $isLeadEntity = $lead instanceof Lead;
@@ -104,20 +102,15 @@ class CampaignExecutionEvent extends Event
         return $leadFields;
     }
 
-    /**
-     * @return array
-     */
-    public function getEvent()
+    public function getEvent(): array
     {
         return ($this->event instanceof CampaignEvent) ? $this->getEventArray($this->event) : $this->event;
     }
 
     /**
      * Used to convert entities to the old array format; tried to minimize the need for this except where needed.
-     *
-     * @return array
      */
-    protected function getEventArray(CampaignEvent $event)
+    protected function getEventArray(CampaignEvent $event): array
     {
         $eventId = $event->getId() ?? '';
         if (isset($this->eventArray[$eventId])) {
@@ -157,10 +150,7 @@ class CampaignExecutionEvent extends Event
         return $this->eventArray[$eventId];
     }
 
-    /**
-     * @return array
-     */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->getEvent()['properties'];
     }

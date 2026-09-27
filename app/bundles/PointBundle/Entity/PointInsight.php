@@ -211,7 +211,7 @@ class PointInsight extends FormEntity
     /**
      * @return array<int>
      */
-    public function getPointGroups()
+    public function getPointGroups(): array
     {
         return $this->pointGroups;
     }

@@ -34,10 +34,8 @@ final class IconEvent extends Event
 
     /**
      * Return the icons.
-     *
-     * @return array
      */
-    public function getIcons()
+    public function getIcons(): array
     {
         return $this->icons;
     }

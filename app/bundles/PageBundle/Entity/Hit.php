@@ -537,7 +537,7 @@ class Hit
     /**
      * @return array<string>
      */
-    public function getBrowserLanguages()
+    public function getBrowserLanguages(): array
     {
         return $this->browserLanguages;
     }
@@ -618,10 +618,7 @@ class Hit
         $this->email = $email;
     }
 
-    /**
-     * @return array
-     */
-    public function getQuery()
+    public function getQuery(): array
     {
         return $this->query;
     }

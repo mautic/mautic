@@ -74,10 +74,7 @@ final class MaintenanceEvent extends Event
         return $this->dryRun;
     }
 
-    /**
-     * @return array
-     */
-    public function getDebug()
+    public function getDebug(): array
     {
         return $this->debug;
     }

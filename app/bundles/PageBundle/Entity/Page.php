@@ -416,7 +416,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @return array<string>
      */
-    public function getContent()
+    public function getContent(): array
     {
         return $this->content;
     }

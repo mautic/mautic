@@ -94,10 +94,8 @@ final class FieldApiController extends CommonApiController
 
     /**
      * Sanitizes and returns an array of where statements from the request.
-     *
-     * @return array
      */
-    protected function getWhereFromRequest(Request $request)
+    protected function getWhereFromRequest(Request $request): array
     {
         $where = parent::getWhereFromRequest($request);
 
