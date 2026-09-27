@@ -52,7 +52,7 @@ final class NoServicesInBundleConfigRule implements Rule
     /**
      * @param Return_ $node
      *
-     * @return list<\PHPStan\Rules\IdentifierRuleError>
+     * @return list<IdentifierRuleError>
      */
     public function processNode(Node $node, Scope $scope): array
     {
@@ -87,7 +87,7 @@ final class NoServicesInBundleConfigRule implements Rule
     /**
      * Every service group is reported on its own, the "menus" one being the only one left alone.
      *
-     * @return list<\PHPStan\Rules\IdentifierRuleError>
+     * @return list<IdentifierRuleError>
      */
     private function createGroupRuleErrors(ArrayItem $servicesArrayItem): array
     {

@@ -15,11 +15,11 @@ use PHPUnit\Framework\TestCase;
 
 final class DBALMocker
 {
-    private ?\PHPUnit\Framework\MockObject\MockObject $mockEm = null;
+    private ?MockObject $mockEm = null;
 
-    private ?\PHPUnit\Framework\MockObject\MockObject $mockConnection = null;
+    private ?MockObject $mockConnection = null;
 
-    private ?\PHPUnit\Framework\MockObject\MockObject $mockQueryBuilder = null;
+    private ?MockObject $mockQueryBuilder = null;
 
     private $queryResponse;
 
@@ -171,7 +171,7 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('select')
                 ->willReturnCallback(
-                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
+                    function () use ($mock): MockObject {
                         $this->queryParts['select'][] = func_get_args();
 
                         return $mock;
@@ -181,7 +181,7 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('from')
                 ->willReturnCallback(
-                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
+                    function () use ($mock): MockObject {
                         $this->queryParts['from'][] = func_get_args();
 
                         return $mock;
@@ -197,7 +197,7 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('where')
                 ->willReturnCallback(
-                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
+                    function () use ($mock): MockObject {
                         $this->queryParts['where'][] = func_get_args();
 
                         return $mock;
@@ -207,7 +207,7 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('andWhere')
                 ->willReturnCallback(
-                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
+                    function () use ($mock): MockObject {
                         $this->queryParts['where'][] = func_get_args();
 
                         return $mock;
@@ -217,7 +217,7 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('setParameter')
                 ->willReturnCallback(
-                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
+                    function () use ($mock): MockObject {
                         $this->queryParts['parameters'][] = func_get_args();
 
                         return $mock;

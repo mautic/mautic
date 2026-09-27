@@ -32,7 +32,7 @@ final class CompanyController extends FormController
 
     private CompanyRepository $companyRepository;
 
-    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+    private UserRepository $userRepository;
 
     private FieldModel $fieldModel;
 
