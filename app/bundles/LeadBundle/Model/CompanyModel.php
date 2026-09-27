@@ -221,7 +221,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         // save the field values
         $fieldValues = $company->getFields();
 
-        if (empty($fieldValues)) {
+        if ($fieldValues === []) {
             // Lead is new or they haven't been populated so let's build the fields now
             if (empty($this->fields)) {
                 $this->fields = $this->leadFieldModel->getEntities(

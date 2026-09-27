@@ -539,7 +539,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        $query = $hit->getQuery() ?: [];
+        $query = $hit->getQuery();
 
         if (!$lead->getTimezone()) {
             if (isset($query['timezone'])) {

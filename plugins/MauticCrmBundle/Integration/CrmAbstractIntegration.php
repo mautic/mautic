@@ -342,7 +342,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data, $config);
 
-        if (empty($matchedFields)) {
+        if ($matchedFields === []) {
             return null;
         }
 
@@ -389,7 +389,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
             // Use only prioirty fields if updating
             $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
-            if (empty($fieldsToUpdateInMautic)) {
+            if ($fieldsToUpdateInMautic === []) {
                 $this->logger->debug('getMauticLead: No fields to update in Mautic', ['config' => $config, 'object' => $object]);
 
                 return null;
