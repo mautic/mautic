@@ -254,7 +254,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             if ([] !== $groupByColumns) {
                 $queryBuilder->addGroupBy(...$groupByColumns);
             }
-        } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
+        } elseif (!empty($options['groupby'])) {
             $queryBuilder->addGroupBy(...array_values((array) $options['groupby']));
         }
 
