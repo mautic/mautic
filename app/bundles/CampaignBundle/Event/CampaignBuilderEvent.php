@@ -66,10 +66,7 @@ final class CampaignBuilderEvent extends Event
         $this->decisions[$key] = $decision;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getDecisions()
+    public function getDecisions(): array
     {
         return $this->sort('decisions');
     }

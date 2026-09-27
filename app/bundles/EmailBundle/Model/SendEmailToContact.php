@@ -23,10 +23,7 @@ final class SendEmailToContact
 
     private array $emailSentCounts = [];
 
-    /**
-     * @var array|null
-     */
-    private $emailEntityErrors;
+    private ?array $emailEntityErrors = null;
 
     /**
      * @var int|null
@@ -214,7 +211,7 @@ final class SendEmailToContact
     {
         if (null === $errorMessages) {
             // Clear the errors so it doesn't stop the next send
-            $errorMessages = implode('; ', (array) $this->mailer->getErrors());
+            $errorMessages = implode('; ', $this->mailer->getErrors());
         } elseif (is_array($errorMessages)) {
             $errorMessages = implode('; ', $errorMessages);
         }

@@ -146,7 +146,7 @@ final class AjaxController extends CommonAjaxController
             try {
                 $mailbox->setMailboxSettings($settings);
                 $folders = $mailbox->getListingFolders();
-                if (!empty($folders)) {
+                if ($folders !== []) {
                     $dataArray['folders'] = '';
                     foreach ($folders as $folder) {
                         $dataArray['folders'] .= "<option value=\"{$folder}\">{$folder}</option>\n";
