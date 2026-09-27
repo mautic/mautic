@@ -120,7 +120,7 @@ final class MailchimpIntegration extends EmailAbstractIntegration
         $config     = $this->mergeConfigToFeatureSettings($config);
         $mappedData = $this->populateLeadData($lead, $config);
 
-        if (empty($mappedData)) {
+        if ($mappedData === []) {
             return false;
         }
         if (empty($mappedData['EMAIL'])) {

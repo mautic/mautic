@@ -535,7 +535,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
 
             // Check to see if this is an update from AJAX
             $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
-            if (!empty($selectedGraphs)) {
+            if ($selectedGraphs !== []) {
                 $availableGraphs = $this->getGraphData($entity->getSource());
 
                 $eventGraphs                     = [];
@@ -573,7 +573,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         $this->dispatcher->dispatch($event);
         $query = $event->getQuery();
 
-        if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
+        if (empty($options['ignoreTableData']) && $selectedColumns !== []) {
             if ($paginate) {
                 // Build the options array to pass into the query
                 if ($session->isStarted()) {

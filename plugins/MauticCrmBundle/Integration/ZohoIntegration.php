@@ -161,7 +161,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
-                        if (!empty($fieldsToUpdateInMautic)) {
+                        if ($fieldsToUpdateInMautic !== []) {
                             $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], $fieldsToUpdateInMautic);
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
@@ -223,7 +223,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
 
-                        if (!empty($fieldsToUpdateInMautic)) {
+                        if ($fieldsToUpdateInMautic !== []) {
                             $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], $fieldsToUpdateInMautic);
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
@@ -296,7 +296,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
-                        if (!empty($fieldsToUpdateInMautic)) {
+                        if ($fieldsToUpdateInMautic !== []) {
                             $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], $fieldsToUpdateInMautic);
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
