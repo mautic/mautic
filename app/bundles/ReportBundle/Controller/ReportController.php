@@ -542,7 +542,6 @@ final class ReportController extends FormController
      * Shows a report.
      *
      * @param int $objectId   Report ID
-     * @param int $reportPage
      */
     #[Route(
         path: '/s/reports/view/{objectId}/{reportPage}',

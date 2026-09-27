@@ -65,9 +65,6 @@ final class MessageController extends AbstractStandardFormController
         return $this->editStandard($request, $objectId, $ignorePost);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/messages/{page}',
         name: 'mautic_message_index',
@@ -236,9 +233,6 @@ final class MessageController extends AbstractStandardFormController
         return 'mautic.channel.message';
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/messages/contacts/{objectId}/{channel}/{page}',
         name: 'mautic_message_contacts',

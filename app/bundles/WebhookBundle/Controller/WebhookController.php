@@ -64,9 +64,6 @@ final class WebhookController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/webhooks/{page}',
         name: 'mautic_webhook_index',

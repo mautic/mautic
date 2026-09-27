@@ -43,8 +43,6 @@ final class FieldController extends FormController
 
     /**
      * Generate's default list view.
-     *
-     * @param int $page
      */
     #[Route(
         path: '/s/contacts/fields/{page}',

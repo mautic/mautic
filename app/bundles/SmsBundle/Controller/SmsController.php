@@ -47,9 +47,6 @@ final class SmsController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/sms/{page}',
         name: 'mautic_sms_index',
@@ -736,9 +733,6 @@ final class SmsController extends FormController
         return new Response('', Response::HTTP_NOT_FOUND);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/sms/view/{objectId}/contact/{page}',
         name: 'mautic_sms_contacts',

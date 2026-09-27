@@ -43,9 +43,6 @@ final class NotificationController extends AbstractFormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/notifications/{page}',
         name: 'mautic_notification_index',
@@ -724,9 +721,6 @@ final class NotificationController extends AbstractFormController
         );
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/notifications/view/{objectId}/contact/{page}',
         name: 'mautic_notification_contacts',

@@ -169,8 +169,6 @@ final class TriggerApiController extends CommonApiController
 
     /**
      * Delete events from a point trigger.
-     *
-     * @param int $triggerId
      */
     #[Route(
         path: '/api/points/triggers/{triggerId}/events/delete',

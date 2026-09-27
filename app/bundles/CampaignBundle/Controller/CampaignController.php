@@ -464,7 +464,6 @@ final class CampaignController extends AbstractStandardFormController
 
     /**
      * @param string|int $objectId
-     * @param int        $page
      * @param int|null   $count
      */
     #[Route(
@@ -613,9 +612,6 @@ final class CampaignController extends AbstractStandardFormController
         return $this->editStandard($request, $objectId, $ignorePost);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/campaigns/{page}',
         name: 'mautic_campaign_index',

@@ -216,7 +216,6 @@ final class CompanyController extends FormController
      * Refresh contacts list in company view with new parameters like order or page.
      *
      * @param int $objectId company id
-     * @param int $page
      */
     #[Route(
         path: '/s/company/{objectId}/contacts/{page}',

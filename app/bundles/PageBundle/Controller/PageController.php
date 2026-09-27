@@ -994,7 +994,6 @@ final class PageController extends FormController
      * Show submissions inside page.
      *
      * @param int $objectId
-     * @param int $page
      */
     #[Route(
         path: '/s/pages/results/{objectId}/{page}',

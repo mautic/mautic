@@ -69,8 +69,6 @@ final class ListController extends FormController
     /**
      * Generate's default list view.
      *
-     * @param int $page
-     *
      * @throws \Exception
      */
     #[Route(
@@ -947,7 +945,6 @@ final class ListController extends FormController
 
     /**
      * @param int $objectId
-     * @param int $page
      */
     #[Route(
         path: '/s/segment/view/{objectId}/contact/{page}',

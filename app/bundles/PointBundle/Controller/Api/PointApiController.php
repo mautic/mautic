@@ -84,7 +84,6 @@ final class PointApiController extends CommonApiController
     /**
      * Subtract points from a lead.
      *
-     * @param int    $leadId
      * @param string $operator
      * @param int    $delta
      */

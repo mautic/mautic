@@ -627,8 +627,6 @@ final class LeadApiController extends CommonApiController
 
     /**
      * Adds a UTM Tagset to the contact.
-     *
-     * @param int $id
      */
     #[Route(
         path: '/api/contacts/{id}/utm/add',
@@ -645,7 +643,6 @@ final class LeadApiController extends CommonApiController
     /**
      * Remove a UTM Tagset for the contact.
      *
-     * @param int $id
      * @param int $utmid
      */
     #[Route(

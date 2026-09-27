@@ -370,7 +370,6 @@ final class NoteController extends FormController
      * Executes an action defined in route.
      *
      * @param int $objectId
-     * @param int $leadId
      */
     #[Route(
         path: '/s/contacts/notes/{leadId}/{objectAction}/{objectId}',

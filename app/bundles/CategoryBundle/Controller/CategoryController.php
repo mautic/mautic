@@ -54,7 +54,6 @@ final class CategoryController extends AbstractFormController
 
     /**
      * @param string $bundle
-     * @param int    $page
      */
     #[Route(
         path: '/s/categories/{bundle}/{page}',

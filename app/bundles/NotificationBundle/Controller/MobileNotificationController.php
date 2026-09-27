@@ -44,9 +44,6 @@ final class MobileNotificationController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/mobile_notifications/{page}',
         name: 'mautic_mobile_notification_index',
@@ -737,9 +734,6 @@ final class MobileNotificationController extends FormController
         );
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/mobile_notifications/view/{objectId}/contact/{page}',
         name: 'mautic_mobile_notification_contacts',

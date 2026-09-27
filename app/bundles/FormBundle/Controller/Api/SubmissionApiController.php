@@ -87,9 +87,6 @@ final class SubmissionApiController extends CommonApiController
 
     /**
      * Obtains a list of entities for specific form and contact.
-     *
-     * @param int $formId
-     * @param int $contactId
      */
     #[Route(
         path: '/api/forms/{formId}/submissions/contact/{contactId}',

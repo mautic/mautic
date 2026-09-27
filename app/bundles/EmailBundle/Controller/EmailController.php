@@ -1828,9 +1828,6 @@ final class EmailController extends FormController
         );
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/emails/view/{objectId}/contact/{page}',
         name: 'mautic_email_contacts',

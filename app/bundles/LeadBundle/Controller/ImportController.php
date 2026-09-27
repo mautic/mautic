@@ -76,9 +76,6 @@ final class ImportController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/{object}/import/{page}',
         name: 'mautic_import_index',

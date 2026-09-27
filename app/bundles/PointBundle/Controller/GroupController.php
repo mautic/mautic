@@ -36,9 +36,6 @@ final class GroupController extends AbstractStandardFormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/points/groups/{page}',
         name: 'mautic_point.group_index',

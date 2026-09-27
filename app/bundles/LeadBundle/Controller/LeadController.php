@@ -159,9 +159,6 @@ final class LeadController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/contacts/{page}',
         name: 'mautic_contact_index',
