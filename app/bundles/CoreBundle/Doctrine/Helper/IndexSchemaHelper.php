@@ -19,9 +19,6 @@ final class IndexSchemaHelper
 
     private ?\Doctrine\DBAL\Schema\Table $table = null;
 
-    /**
-     * @var array
-     */
     private array $allowedColumns = [];
 
     private array $changedIndexes = [];

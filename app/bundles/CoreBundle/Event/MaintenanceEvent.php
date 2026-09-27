@@ -10,9 +10,6 @@ final class MaintenanceEvent extends Event
 
     private array $stats = [];
 
-    /**
-     * @var array
-     */
     private array $debug = [];
     public function __construct(
         private readonly int $daysOld,

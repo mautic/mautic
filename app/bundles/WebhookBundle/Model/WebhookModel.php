@@ -90,8 +90,6 @@ final class WebhookModel extends FormModel
 
     /**
      * The key is queue ID, the value is the WebhookQueue object.
-     *
-     * @var array
      */
     private array $webhookQueueIdList = [];
 
