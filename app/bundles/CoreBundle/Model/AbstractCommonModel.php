@@ -85,7 +85,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      *
      * @return object[]|array<int,mixed>|iterable<object>|Paginator<object>|SimplePaginator<mixed>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         // set the translator
         $repository = $this->getRepository();

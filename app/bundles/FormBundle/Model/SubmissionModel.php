@@ -448,7 +448,7 @@ final class SubmissionModel extends CommonFormModel
     /**
      * @param array<string,mixed> $args
      */
-    public function getEntities(array $args = []): array
+    public function getEntities(array $args = []): iterable
     {
         return $this->submissionRepository->getEntities($args);
     }

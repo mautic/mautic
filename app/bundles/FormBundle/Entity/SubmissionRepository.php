@@ -48,7 +48,7 @@ final class SubmissionRepository extends CommonRepository
     /**
      * @param array<string, mixed> $args
      */
-    public function getEntities(array $args = []): array
+    public function getEntities(array $args = []): iterable
     {
         $form = $args['form'];
 

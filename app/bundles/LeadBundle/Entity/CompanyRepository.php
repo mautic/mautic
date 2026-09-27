@@ -81,7 +81,7 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
     /**
      * Get a list of leads.
      */
-    public function getEntities(array $args = []): array
+    public function getEntities(array $args = []): iterable
     {
         return $this->getEntitiesWithCustomFields('company', $args);
     }

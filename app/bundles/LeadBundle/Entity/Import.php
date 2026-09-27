@@ -629,10 +629,7 @@ class Import extends FormEntity
         return empty($this->properties['fields']) ? [] : $this->properties['fields'];
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -643,7 +640,7 @@ class Import extends FormEntity
     /**
      * @param array<mixed> $properties
      */
-    public function mergeToProperties($properties): static
+    public function mergeToProperties(array $properties): static
     {
         return $this->setProperties(array_merge($this->properties, $properties));
     }

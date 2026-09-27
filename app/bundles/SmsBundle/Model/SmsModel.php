@@ -162,7 +162,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $entities = parent::getEntities($args);
 

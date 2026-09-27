@@ -524,7 +524,7 @@ class FieldModel extends FormModel
         return parent::getEntity($id);
     }
 
-    public function getLeadFields(): array
+    public function getLeadFields(): iterable
     {
         return $this->getEntities([
             'filter' => [
