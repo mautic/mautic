@@ -93,7 +93,7 @@ final class WebhookModel extends FormModel
      *
      * @var array
      */
-    private $webhookQueueIdList = [];
+    private array $webhookQueueIdList = [];
 
     /**
      * How many recent log records should be kept.

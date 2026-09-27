@@ -22,7 +22,7 @@ final class IndexSchemaHelper
     /**
      * @var array
      */
-    private $allowedColumns = [];
+    private array $allowedColumns = [];
 
     private array $changedIndexes = [];
 
