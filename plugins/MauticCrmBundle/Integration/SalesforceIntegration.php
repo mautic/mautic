@@ -1871,8 +1871,6 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return mixed
      */
     protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic'): array
     {
@@ -1883,8 +1881,6 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return mixed
      */
     protected function getPriorityFieldsForIntegration(array $config, $object = null, $priorityObject = 'mautic'): array
     {

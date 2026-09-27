@@ -442,7 +442,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<string, mixed>
      */
     public function getGroupBy(): array
     {

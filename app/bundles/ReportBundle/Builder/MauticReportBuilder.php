@@ -135,7 +135,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * This method configures the ReportBuilder. It has to return a configured Doctrine DBAL QueryBuilder.
      *
-     * @param array<string, mixed> $options Options array
+     * @param array<string, mixed> $options
      */
     private function configureBuilder(array $options): TrackingQueryBuilder
     {

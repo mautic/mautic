@@ -198,8 +198,6 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * @param array<string, mixed> $settings
-     *
-     * @return array|mixed
      */
     public function getFormLeadFields(array $settings = []): array
     {
