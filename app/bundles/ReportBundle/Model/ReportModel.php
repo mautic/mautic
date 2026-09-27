@@ -310,8 +310,6 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param string $context
-     *
      * return \stdClass{filterList: mixed[], definitions: mixed[], operatorChoices: mixed[], operatorHtml: mixed[], filterListHtml: string}
      */
     public function getFilterList(string $context = 'all'): \stdClass
