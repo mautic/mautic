@@ -67,7 +67,7 @@ final class StageApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addContactAction($id, $contactId): Response
+    public function addContactAction(int $id, int $contactId): Response
     {
         $stage = $this->model->getEntity($id);
 
@@ -110,7 +110,7 @@ final class StageApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function removeContactAction($id, $contactId): Response
+    public function removeContactAction(int $id, int $contactId): Response
     {
         $stage = $this->model->getEntity($id);
 

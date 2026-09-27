@@ -1002,7 +1002,7 @@ final class PageController extends FormController
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
     )]
-    public function resultsAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $page = 1): Response
+    public function resultsAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, int $page = 1): Response
     {
         $activePage   = $pageModel->getEntity($objectId);
         $session      = $request->getSession();

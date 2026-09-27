@@ -53,7 +53,7 @@ final class MobileNotificationController extends FormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -750,7 +750,7 @@ final class MobileNotificationController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1,
+        int $page = 1,
     ): Response {
         return $this->generateContactsGrid(
             $request,

@@ -45,6 +45,7 @@ return RectorConfig::configure()
         Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
         Utils\Rector\TestGetRepositoryToContainerGetRector::class,
+        Utils\Rector\RouteRequirementParamTypeRector::class,
     ])
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([

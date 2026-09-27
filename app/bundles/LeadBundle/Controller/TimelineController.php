@@ -22,7 +22,7 @@ final class TimelineController extends CommonController
         requirements: ['leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $leadId, int $page = 1): Response
+    public function indexAction(Request $request, int $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -145,7 +145,7 @@ final class TimelineController extends CommonController
         requirements: ['integration' => Requirement::CATCH_ALL, 'leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function pluginViewAction(Request $request, $integration, $leadId, int $page = 1): Response
+    public function pluginViewAction(Request $request, $integration, int $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
             return $this->notFound();
@@ -212,7 +212,7 @@ final class TimelineController extends CommonController
         name: 'mautic_contact_timeline_export_action',
         requirements: ['leadId' => '\d+'],
     )]
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, int $leadId): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

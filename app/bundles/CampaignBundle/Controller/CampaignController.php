@@ -477,7 +477,7 @@ final class CampaignController extends AbstractStandardFormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1,
+        int $page = 1,
         $count = null,
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
@@ -622,7 +622,7 @@ final class CampaignController extends AbstractStandardFormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, CampaignSearchScopeProvider $campaignSearchScopeProvider, $page = null): Response
+    public function indexAction(Request $request, CampaignSearchScopeProvider $campaignSearchScopeProvider, ?int $page = null): Response
     {
         $this->indexSearchScopes = $campaignSearchScopeProvider->getScopes();
 

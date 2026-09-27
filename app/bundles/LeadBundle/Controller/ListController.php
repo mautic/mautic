@@ -79,7 +79,7 @@ final class ListController extends FormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, SegmentSearchScopeProvider $segmentSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, SegmentSearchScopeProvider $segmentSearchScopeProvider, int $page = 1): Response
     {
         $session = $request->getSession();
 
@@ -955,7 +955,7 @@ final class ListController extends FormController
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
     )]
-    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1): Response
+    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, int $page = 1): Response
     {
         $session = $request->getSession();
         $session->set('mautic.segment.contact.page', $page);

@@ -78,7 +78,7 @@ final class FormApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['DELETE']
     )]
-    public function deleteFieldsAction(Request $request, $formId): Response
+    public function deleteFieldsAction(Request $request, int $formId): Response
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
@@ -113,7 +113,7 @@ final class FormApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['DELETE']
     )]
-    public function deleteActionsAction(Request $request, $formId): Response
+    public function deleteActionsAction(Request $request, int $formId): Response
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();

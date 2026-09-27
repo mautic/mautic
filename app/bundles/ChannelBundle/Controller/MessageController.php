@@ -74,7 +74,7 @@ final class MessageController extends AbstractStandardFormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, MessageSearchScopeProvider $messageSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, MessageSearchScopeProvider $messageSearchScopeProvider, int $page = 1): Response
     {
         $this->indexSearchScopes = $messageSearchScopeProvider->getScopes();
 
@@ -250,7 +250,7 @@ final class MessageController extends AbstractStandardFormController
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $channel,
-        $page = 1,
+        int $page = 1,
     ): Response {
         $filter = [];
         if ('all' !== $channel) {

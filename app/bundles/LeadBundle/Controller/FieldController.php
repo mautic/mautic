@@ -52,7 +52,7 @@ final class FieldController extends FormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, FieldModel $fieldModel, FieldSearchScopeProvider $fieldSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, FieldModel $fieldModel, FieldSearchScopeProvider $fieldSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(['lead:fields:view', 'lead:fields:full'], 'RETURN_ARRAY');

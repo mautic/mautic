@@ -73,7 +73,7 @@ final class WebhookController extends FormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, WebhookSearchScopeProvider $webhookSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, WebhookSearchScopeProvider $webhookSearchScopeProvider, int $page = 1): Response
     {
         $this->indexSearchScopes = $webhookSearchScopeProvider->getScopes();
 

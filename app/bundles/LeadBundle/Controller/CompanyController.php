@@ -224,7 +224,7 @@ final class CompanyController extends FormController
         requirements: ['objectId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0, 'objectId' => 0],
     )]
-    public function contactsListAction(Request $request, $objectId, $page = 1): Response
+    public function contactsListAction(Request $request, int $objectId, int $page = 1): Response
     {
         if (empty($objectId)) {
             $this->throwAccessDenied();
@@ -1229,7 +1229,7 @@ final class CompanyController extends FormController
         name: 'mautic_company_export_action',
         requirements: ['companyId' => '\d+'],
     )]
-    public function companyExportAction(Request $request, ExportHelper $exportHelper, $companyId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function companyExportAction(Request $request, ExportHelper $exportHelper, int $companyId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(

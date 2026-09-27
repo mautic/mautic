@@ -214,7 +214,7 @@ final class LeadApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getNotesAction(Request $request, $id): Response
+    public function getNotesAction(Request $request, int $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -273,7 +273,7 @@ final class LeadApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getDevicesAction(Request $request, $id): Response
+    public function getDevicesAction(Request $request, int $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -332,7 +332,7 @@ final class LeadApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getListsAction($id): Response
+    public function getListsAction(int $id): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -375,7 +375,7 @@ final class LeadApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getCompaniesAction($id): Response
+    public function getCompaniesAction(int $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -410,7 +410,7 @@ final class LeadApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getCampaignsAction($id): Response
+    public function getCampaignsAction(int $id): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -458,7 +458,7 @@ final class LeadApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getActivityAction(Request $request, $id): Response
+    public function getActivityAction(Request $request, int $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -515,7 +515,7 @@ final class LeadApiController extends CommonApiController
         defaults: ['channel' => 'email', '_format' => 'json'],
         methods: ['POST']
     )]
-    public function addDncAction(Request $request, $id, $channel): Response
+    public function addDncAction(Request $request, int $id, $channel): Response
     {
         $entity = $this->model->getEntity((int) $id);
 
@@ -562,7 +562,7 @@ final class LeadApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function removeDncAction($id, $channel): Response
+    public function removeDncAction(int $id, $channel): Response
     {
         $entity = $this->model->getEntity((int) $id);
 
@@ -637,7 +637,7 @@ final class LeadApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addUtmTagsAction(Request $request, $id): Response
+    public function addUtmTagsAction(Request $request, int $id): Response
     {
         return $this->applyUtmTagsAction($id, 'addUTMTags', $request->request->all());
     }
@@ -655,7 +655,7 @@ final class LeadApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function removeUtmTagsAction($id, $utmid): Response
+    public function removeUtmTagsAction(int $id, $utmid): Response
     {
         return $this->applyUtmTagsAction($id, 'removeUtmTags', (int) $utmid);
     }

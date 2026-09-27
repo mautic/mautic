@@ -98,7 +98,7 @@ final class SubmissionApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId): Response
+    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, int $formId, int $contactId): Response
     {
         $filter = [
             'filter' => [

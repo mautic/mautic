@@ -45,7 +45,7 @@ final class GroupController extends AbstractStandardFormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, PointGroupSearchScopeProvider $pointGroupSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, PointGroupSearchScopeProvider $pointGroupSearchScopeProvider, int $page = 1): Response
     {
         $this->indexSearchScopes = $pointGroupSearchScopeProvider->getScopes();
 
