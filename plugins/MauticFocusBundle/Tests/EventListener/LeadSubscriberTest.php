@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -16,11 +15,12 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class LeadSubscriberTest extends CommonMocks
+final class LeadSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&Translator
