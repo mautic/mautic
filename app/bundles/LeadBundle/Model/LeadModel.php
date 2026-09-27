@@ -524,7 +524,7 @@ class LeadModel extends FormModel
         // save the field values
         $fieldValues = $lead->getFields();
 
-        if (empty($fieldValues) || $bindWithForm) {
+        if ($fieldValues === [] || $bindWithForm) {
             // Lead is new or they haven't been populated so let's build the fields now
             if ([] === $this->flattenedFields) {
                 /** @var Paginator<mixed[]> $paginator */
@@ -539,7 +539,7 @@ class LeadModel extends FormModel
                 $this->fieldsByGroup   = $this->organizeFieldsByGroup($this->flattenedFields);
             }
 
-            if (empty($fieldValues)) {
+            if ($fieldValues === []) {
                 $fieldValues = $this->fieldsByGroup;
             }
         }
@@ -724,7 +724,7 @@ class LeadModel extends FormModel
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields();
-            if (!empty($fields)) {
+            if ($fields !== []) {
                 return $fields;
             }
         }

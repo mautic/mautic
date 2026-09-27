@@ -2628,7 +2628,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
         $objectFields            = [];
         $objectFields['company'] = [
-            'update' => !empty($fieldsToUpdateInSf) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
+            'update' => $fieldsToUpdateInSf !== [] ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
             'create' => $fieldsToCreate,
         ];
 
