@@ -252,7 +252,7 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @return array<string, Redirect|Trackable>
      */
-    protected function createTrackingTokens(array $entities): array
+    private function createTrackingTokens(array $entities): array
     {
         $tokens = [];
         foreach ($entities as $trackable) {
@@ -329,7 +329,7 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @param string $html HTML content
      */
-    protected function extractTrackablesFromHtml(string $html): array
+    private function extractTrackablesFromHtml(string $html): array
     {
         // Find links using DOM to only find <a> tags
         $libxmlPreviousState = libxml_use_internal_errors(true);
@@ -351,7 +351,7 @@ final class TrackableModel extends AbstractCommonModel
      *
      * @param string $text Plain text content
      */
-    protected function extractTrackablesFromText(string $text): array
+    private function extractTrackablesFromText(string $text): array
     {
         // Remove any HTML tags (such as img) that could contain href or src attributes prior to parsing for links
         $text = strip_tags($text);
@@ -523,7 +523,7 @@ final class TrackableModel extends AbstractCommonModel
     /**
      * @return array<string, Trackable|Redirect>
      */
-    protected function getEntitiesFromUrls(array $trackableUrls, ?string $channel, ?int $channelId): array
+    private function getEntitiesFromUrls(array $trackableUrls, ?string $channel, ?int $channelId): array
     {
         if (!empty($channel) && !empty($channelId)) {
             // Track as channel aware
@@ -592,7 +592,7 @@ final class TrackableModel extends AbstractCommonModel
         return $content;
     }
 
-    protected function getContactFieldUrlTokens(): array
+    private function getContactFieldUrlTokens(): array
     {
         if (null !== $this->contactFieldUrlTokens) {
             return $this->contactFieldUrlTokens;

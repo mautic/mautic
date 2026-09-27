@@ -366,7 +366,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @return array|mixed
      */
-    protected function generateClickThrough(Hit $hit)
+    private function generateClickThrough(Hit $hit)
     {
         $query = $hit->getQuery();
 

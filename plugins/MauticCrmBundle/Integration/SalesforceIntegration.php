@@ -1575,7 +1575,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param mixed[] $trackedContacts
      */
-    protected function getMauticContactsToUpdate(
+    private function getMauticContactsToUpdate(
         array &$checkEmailsInSF,
         $mauticLeadFieldString,
         &$sfObject,
@@ -1625,8 +1625,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array<string, mixed> $fieldMapping
+     * @api protected to allow mocking
      *
+     * @param array<string, mixed> $fieldMapping
      * @return array
      *
      * @throws ApiErrorException
@@ -2057,7 +2058,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    protected function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString)
+    private function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString)
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
@@ -2236,7 +2237,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, mixed> $checkEmailsInSF
      * @param array<string, mixed> $processedLeads
      */
-    protected function prepareMauticContactsToCreate(
+    private function prepareMauticContactsToCreate(
         array &$mauticData,
         array &$checkEmailsInSF,
         array &$processedLeads,
@@ -2313,7 +2314,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return int
+     * @api protected to allow mocking
      */
     protected function getSalesforceSyncLimit(array $currentContactList, $limit): float|int
     {

@@ -729,7 +729,7 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
      * @param string   $root
      * @param Event[]  $events
      */
-    protected function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', int $order = 1): void
+    private function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', int $order = 1): void
     {
         $count = count($hierarchy);
         if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {
