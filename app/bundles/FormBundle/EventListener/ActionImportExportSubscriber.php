@@ -14,6 +14,7 @@ use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UuidHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\FormBundle\Entity\Form;
@@ -21,7 +22,6 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\ActionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class ActionImportExportSubscriber implements EventSubscriberInterface
 {
@@ -35,7 +35,7 @@ final class ActionImportExportSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private EventDispatcherInterface $dispatcher,
-        private DenormalizerInterface $serializer,
+        private ImportEntityDenormalizer $serializer,
     ) {
     }
 

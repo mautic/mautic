@@ -502,7 +502,7 @@ final class FilterOperatorSubscriberTest extends TestCase
         );
     }
 
-    public function testOnlyCustomFieldsAreLoadedForNonSegmentRoutes(): void
+    public function testFieldsAreLoadedForNonSegmentRoutes(): void
     {
         $request = new Request();
         $request->attributes->set('_route', 'mautic_dynamicContent_action');
