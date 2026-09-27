@@ -189,7 +189,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Build WHERE clause
-        if (!empty($standardFilters)) {
+        if ($standardFilters !== []) {
             if (!$filterExpr = $event->getFilterExpression()) {
                 $this->applyFilters($standardFilters, $queryBuilder, $options['filters']);
             } else {
@@ -287,7 +287,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build SELECT clause
         if (!$event->getSelectColumns()) {
             $fields           = $this->entity->getColumns();
-            $groupByFieldKeys = $groupByOptions ? array_flip($groupByOptions) : [];
+            $groupByFieldKeys = $groupByOptions !== [] ? array_flip($groupByOptions) : [];
 
             foreach ($fields as $field) {
                 // With GROUP BY + aggregators, a column listed only for COUNT/AVG must not

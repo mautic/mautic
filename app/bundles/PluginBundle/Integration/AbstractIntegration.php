@@ -359,7 +359,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * @param bool|false $return Returns the key array rather than setting them
      *
-     * @return void|array
+     * @return null|mixed[]
      */
     public function mergeApiKeys(array $mergeKeys, $withKeys = [], $return = false)
     {
@@ -389,6 +389,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         // reset for events that depend on rebuilding auth objects
         $this->setIntegrationSettings($this->settings);
+        return null;
     }
 
     /**
@@ -1084,7 +1085,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     // Try refresh token
                     $refreshTokenKeys = $this->getRefreshTokenKeys();
 
-                    if (!empty($refreshTokenKeys)) {
+                    if ($refreshTokenKeys !== []) {
                         [$refreshTokenKey, $expiryKey] = $refreshTokenKeys;
 
                         $settings['refresh_token'] = $refreshTokenKey;
@@ -1179,13 +1180,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function isConfigured(): bool
     {
         $requiredTokens = $this->getRequiredKeyFields();
-        foreach ($requiredTokens as $token => $label) {
-            if (empty($this->keys[$token])) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($requiredTokens, fn($label, $token): bool => !empty($this->keys[$token]));
     }
 
     /**
@@ -1206,7 +1201,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 $refreshTokenKeys = $this->getRefreshTokenKeys();
                 if (!isset($this->keys[$authTokenKey])) {
                     $valid = false;
-                } elseif (!empty($refreshTokenKeys)) {
+                } elseif ($refreshTokenKeys !== []) {
                     [$refreshTokenKey, $expiryKey] = $refreshTokenKeys;
                     if (!empty($this->keys[$refreshTokenKey]) && !empty($expiryKey) && isset($this->keys[$expiryKey])
                         && time() > $this->keys[$expiryKey]
@@ -1680,7 +1675,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data);
 
-        if (empty($matchedFields)) {
+        if ($matchedFields === []) {
             return;
         }
 
