@@ -39,7 +39,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Import>
  */
-class ImportModel extends FormModel
+final class ImportModel extends FormModel
 {
     public static function getName(): string
     {
