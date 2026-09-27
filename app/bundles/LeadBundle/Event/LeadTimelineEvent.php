@@ -264,9 +264,9 @@ final class LeadTimelineEvent extends Event
     /**
      * Fetch the filter array for queries.
      *
-     * @return array of wanted filteres. Empty == all
+     * @return array|string of wanted filteres. Empty == all
      */
-    public function getEventFilters(): array
+    public function getEventFilters(): array|string
     {
         return $this->filters['search'];
     }
