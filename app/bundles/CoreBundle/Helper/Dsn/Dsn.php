@@ -93,7 +93,7 @@ final class Dsn implements \Stringable
         }
 
         if ($this->path) {
-            $dsn .= '/'.self::encodePath($this->path);
+            $dsn .= '/'.$this->encodePath($this->path);
         }
 
         $query = http_build_query($this->options);
@@ -109,7 +109,7 @@ final class Dsn implements \Stringable
      * Percent-encode each path segment on its own, so that "/" keeps separating segments and a segment that is
      * already encoded (for example "%2f") is kept rather than encoded a second time.
      */
-    private static function encodePath(string $path): string
+    private function encodePath(string $path): string
     {
         return implode('/', array_map(
             static fn (string $segment): string => rawurlencode(rawurldecode($segment)),
