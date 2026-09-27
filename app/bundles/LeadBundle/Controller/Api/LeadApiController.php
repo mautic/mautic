@@ -517,7 +517,7 @@ final class LeadApiController extends CommonApiController
     )]
     public function addDncAction(Request $request, int $id, $channel): Response
     {
-        $entity = $this->model->getEntity((int) $id);
+        $entity = $this->model->getEntity($id);
 
         if (null === $entity) {
             return $this->notFound();
@@ -564,7 +564,7 @@ final class LeadApiController extends CommonApiController
     )]
     public function removeDncAction(int $id, $channel): Response
     {
-        $entity = $this->model->getEntity((int) $id);
+        $entity = $this->model->getEntity($id);
 
         if (null === $entity) {
             return $this->notFound();

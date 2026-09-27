@@ -103,7 +103,7 @@ final class SubmissionApiController extends CommonApiController
                     [
                         'col'  => 's.lead_id',
                         'expr' => 'eq',
-                        'val'  => (int) $contactId,
+                        'val'  => $contactId,
                     ],
                 ],
             ],

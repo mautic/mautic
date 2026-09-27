@@ -77,7 +77,7 @@ final class SmsApiController extends CommonApiController
             return new JsonResponse(json_encode(['error' => ['message' => 'SMS transport is disabled.', 'code' => Response::HTTP_EXPECTATION_FAILED]]));
         }
 
-        $message = $this->model->getEntity((int) $id);
+        $message = $this->model->getEntity($id);
 
         if (null === $message) {
             return $this->notFound();

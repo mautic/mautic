@@ -1044,8 +1044,6 @@ final class PageController extends FormController
 
         // set limits
         $limit = $session->get('mautic.pageresult.'.$objectId.'.limit', $this->coreParametersHelper->get('default_pagelimit'));
-
-        $page  = $page ?: 0;
         $start = ($page <= 1) ? 0 : (($page - 1) * $limit);
 
         // Set order direction to desc if not set

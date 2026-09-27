@@ -698,13 +698,11 @@ final class CompanyController extends FormController
     /**
      * Get company's contacts for company view.
      *
-     * @param int        $companyId
-     * @param int        $page
      * @param array<int> $leadIds   filter to get only company's contacts
      *
      * @return array<string, mixed>
      */
-    private function getCompanyContacts(Request $request, $companyId, $page = 0, array $leadIds = []): array
+    private function getCompanyContacts(Request $request, int $companyId, int $page = 0, array $leadIds = []): array
     {
         $this->setListFilters();
         $session = $request->getSession();
