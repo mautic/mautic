@@ -181,8 +181,8 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
             'addPublishDates'  => $this->buildPublishDates($builder),
             'addNullableField' => [$this->buildNullableField($builder, $call)],
             'addNamedField'    => [$this->buildNamedField($builder, $call)],
-            'addLead'          => [$this->buildContactHelper($builder, $call, 'lead', 'lead_id', 'Mautic\\LeadBundle\\Entity\\Lead')],
-            'addContact'       => [$this->buildContactHelper($builder, $call, 'contact', 'contact_id', 'Mautic\\LeadBundle\\Entity\\Lead')],
+            'addLead'          => [$this->buildContactHelper($builder, $call, 'lead', 'lead_id', \Mautic\LeadBundle\Entity\Lead::class)],
+            'addContact'       => [$this->buildContactHelper($builder, $call, 'contact', 'contact_id', \Mautic\LeadBundle\Entity\Lead::class)],
             'addCategory'      => [$this->buildCategory($builder)],
             'addIpAddress'     => [$this->buildIpAddress($builder, $call)],
             default            => [new Expression($call)],
@@ -364,7 +364,7 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
     private function buildCategory(Variable $builder): Expression
     {
         return $this->chain($builder, [
-            $this->step('createManyToOne', [$this->strArg('category'), $this->classConstArg('Mautic\\CategoryBundle\\Entity\\Category')]),
+            $this->step('createManyToOne', [$this->strArg('category'), $this->classConstArg(\Mautic\CategoryBundle\Entity\Category::class)]),
             $this->step('cascadeMerge', []),
             $this->step('cascadeDetach', []),
             $this->step('addJoinColumn', [
@@ -383,7 +383,7 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
         $nullable = $this->boolArgValue($call, 0, false);
 
         return $this->chain($builder, [
-            $this->step('createManyToOne', [$this->strArg('ipAddress'), $this->classConstArg('Mautic\\CoreBundle\\Entity\\IpAddress')]),
+            $this->step('createManyToOne', [$this->strArg('ipAddress'), $this->classConstArg(\Mautic\CoreBundle\Entity\IpAddress::class)]),
             $this->step('cascadePersist', []),
             $this->step('cascadeMerge', []),
             $this->step('cascadeDetach', []),

@@ -258,7 +258,7 @@ final class LoadMetadataStaticHelperToAttributeRector extends AbstractRector
             return null;
         }
 
-        $target = new ClassConstFetch(new FullyQualified('Mautic\\ProjectBundle\\Entity\\Project'), new Identifier('class'));
+        $target = new ClassConstFetch(new FullyQualified(\Mautic\ProjectBundle\Entity\Project::class), new Identifier('class'));
 
         $attributeGroups = $this->manyToManyAttributes(
             $target,
