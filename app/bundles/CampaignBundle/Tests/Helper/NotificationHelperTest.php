@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Router;
 
 final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
@@ -231,7 +232,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @param \PHPUnit\Framework\MockObject\MockObject&User $user
      */
-    private function prepareCommonMocks(Event $event, \PHPUnit\Framework\MockObject\MockObject $user): void
+    private function prepareCommonMocks(Event $event, MockObject $user): void
     {
         $campaign = new Campaign();
         $event->setCampaign($campaign);

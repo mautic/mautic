@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
+use PHPStan\Analyser\Scope;
+use PHPStan\Rules\IdentifierRuleError;
+use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleErrorBuilder;
 use PhpParser\Node;
 use PhpParser\Node\ArrayItem;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Return_;
-use PHPStan\Analyser\Scope;
-use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * Bundle Config/config.php must not define services, the autowired Config/services.php next to it is the place for them.
@@ -112,7 +113,7 @@ final class NoServicesInBundleConfigRule implements Rule
         return $ruleErrors;
     }
 
-    private function createRuleError(string $groupName, int $line): \PHPStan\Rules\IdentifierRuleError
+    private function createRuleError(string $groupName, int $line): IdentifierRuleError
     {
         return RuleErrorBuilder::message(sprintf(
             'Config file must not define services. Register the "%s" group in the autowired Config/services.php instead.',
