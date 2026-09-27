@@ -251,8 +251,9 @@ final class TrackableModel extends AbstractCommonModel
      * @param array<string, Trackable|Redirect> $entities
      *
      * @return array<string, Redirect|Trackable>
+     * @api protected to allow mocking
      */
-    private function createTrackingTokens(array $entities): array
+    protected function createTrackingTokens(array $entities): array
     {
         $tokens = [];
         foreach ($entities as $trackable) {
@@ -326,10 +327,11 @@ final class TrackableModel extends AbstractCommonModel
 
     /**
      * Find URLs in HTML and parse into trackables.
+     * @api stays protected to allow mocking
      *
      * @param string $html HTML content
      */
-    private function extractTrackablesFromHtml(string $html): array
+    protected function extractTrackablesFromHtml(string $html): array
     {
         // Find links using DOM to only find <a> tags
         $libxmlPreviousState = libxml_use_internal_errors(true);
@@ -350,8 +352,9 @@ final class TrackableModel extends AbstractCommonModel
      * Find URLs in plain text and parse into trackables.
      *
      * @param string $text Plain text content
+     * @api stays protected to allow mocking
      */
-    private function extractTrackablesFromText(string $text): array
+    protected function extractTrackablesFromText(string $text): array
     {
         // Remove any HTML tags (such as img) that could contain href or src attributes prior to parsing for links
         $text = strip_tags($text);
@@ -523,7 +526,7 @@ final class TrackableModel extends AbstractCommonModel
     /**
      * @return array<string, Trackable|Redirect>
      */
-    private function getEntitiesFromUrls(array $trackableUrls, ?string $channel, ?int $channelId): array
+    protected function getEntitiesFromUrls(array $trackableUrls, ?string $channel, ?int $channelId): array
     {
         if (!empty($channel) && !empty($channelId)) {
             // Track as channel aware
@@ -592,7 +595,10 @@ final class TrackableModel extends AbstractCommonModel
         return $content;
     }
 
-    private function getContactFieldUrlTokens(): array
+    /**
+     * @api must be protected to stay mocked
+     */
+    protected function getContactFieldUrlTokens(): array
     {
         if (null !== $this->contactFieldUrlTokens) {
             return $this->contactFieldUrlTokens;

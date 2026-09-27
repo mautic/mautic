@@ -39,7 +39,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Import>
  */
-final class ImportModel extends FormModel
+class ImportModel extends FormModel
 {
     public static function getName(): string
     {
@@ -626,10 +626,8 @@ final class ImportModel extends FormModel
 
     /**
      * Logs a debug message if in dev environment.
-     *
-     * @param string $msg
      */
-    protected function logDebug($msg, ?Import $import = null): void
+    private function logDebug(string $msg, ?Import $import = null): void
     {
         if (MAUTIC_ENV === 'dev') {
             $importId = $import ? '('.$import->getId().')' : '';

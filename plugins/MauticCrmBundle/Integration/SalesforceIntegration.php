@@ -1573,9 +1573,11 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @api protected to allow mocking
+     *
      * @param mixed[] $trackedContacts
      */
-    private function getMauticContactsToUpdate(
+    protected function getMauticContactsToUpdate(
         array &$checkEmailsInSF,
         $mauticLeadFieldString,
         &$sfObject,
@@ -2058,7 +2060,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    private function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString)
+    protected function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString)
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
@@ -2234,10 +2236,12 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @api must be protected to allow mocking
+     *
      * @param array<string, mixed> $checkEmailsInSF
      * @param array<string, mixed> $processedLeads
      */
-    private function prepareMauticContactsToCreate(
+    protected function prepareMauticContactsToCreate(
         array &$mauticData,
         array &$checkEmailsInSF,
         array &$processedLeads,
@@ -2340,7 +2344,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $objects
      *
-     * @return array
+     * @api must be protected to allow mocking
      */
     protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
     {
