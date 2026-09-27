@@ -45,7 +45,7 @@ final class AuthenticationEvent extends Event
         private readonly Request $request,
         private readonly bool $isLoginCheck = false,
         private ?string $authenticatingService = null,
-        private ?array $integrations = null,
+        private readonly ?array $integrations = null,
     ) {
         $this->isFormLogin           = $token instanceof UsernamePasswordToken;
 

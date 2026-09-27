@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class DynamicContentHelper
+final readonly class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 

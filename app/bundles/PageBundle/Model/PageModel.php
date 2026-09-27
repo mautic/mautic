@@ -93,12 +93,12 @@ final class PageModel extends FormModel implements GlobalSearchInterface
 
     private ?bool $catInUrl = null;
 
-    private DateTimeHelper $dateTimeHelper;
+    private readonly DateTimeHelper $dateTimeHelper;
 
     public function __construct(
-        private CookieHelper $cookieHelper,
-        private IpLookupHelper $ipLookupHelper,
-        private LeadModel $leadModel,
+        private readonly CookieHelper $cookieHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly LeadModel $leadModel,
         private readonly MessageBusInterface $messageBus,
         private readonly CompanyModel $companyModel,
         private readonly IdentifyCompanyHelper $identifyCompanyHelper,
