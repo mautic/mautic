@@ -11,8 +11,8 @@ parameters:
 
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
-        return: 91.6
-        param: 82.9
+        return: 92.6
+        param: 82.4
         property: 73.7
         constant: 99.9
 
