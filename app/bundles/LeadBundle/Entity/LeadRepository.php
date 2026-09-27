@@ -445,7 +445,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
     /**
      * Get a list of leads.
      */
-    public function getEntities(array $args = []): array
+    public function getEntities(array $args = []): iterable
     {
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',

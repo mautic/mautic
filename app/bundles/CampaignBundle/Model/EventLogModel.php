@@ -54,7 +54,7 @@ final class EventLogModel extends AbstractCommonModel
         return 'campaign:campaigns';
     }
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         /** @var LeadEventLog[] $logs */
         $logs = parent::getEntities($args);
