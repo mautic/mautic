@@ -189,10 +189,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * Get available company fields for choices in the config UI.
-     *
-     * @return array
      */
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('company', $settings);
     }
@@ -317,10 +315,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return $salesFields;
     }
 
-    /**
-     * @return array
-     */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('authorization' == $section) {
             return ['mautic.salesforce.form.oauth_requirements', 'warning'];
@@ -625,10 +620,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array $fields
      * @param array $keys
      * @param mixed $object
-     *
-     * @return array
      */
-    public function prepareFieldsForSync($fields, $keys, $object = null)
+    public function prepareFieldsForSync($fields, $keys, $object = null): array
     {
         $leadFields = [];
         $object ??= 'Lead';
@@ -1272,10 +1265,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return [$totalUpdated, $totalCreated, $totalErrors, $totalIgnored];
     }
 
-    /**
-     * @return array
-     */
-    public function getSalesforceLeadId($lead)
+    public function getSalesforceLeadId($lead): array
     {
         $config                = $this->mergeConfigToFeatureSettings([]);
 
@@ -1294,11 +1284,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     *
      * @throws \Exception
      */
-    public function getCampaigns()
+    public function getCampaigns(): array
     {
         $campaigns = [];
         try {
@@ -1452,11 +1440,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     *
      * @throws \Exception
      */
-    public function getCampaignMemberStatus($campaignId)
+    public function getCampaignMemberStatus($campaignId): array
     {
         $campaignMemberStatus = [];
         try {
@@ -1630,7 +1616,6 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @api protected to allow mocking
      *
      * @param array<string, mixed> $fieldMapping
-     * @return array
      *
      * @throws ApiErrorException
      */
@@ -1643,7 +1628,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         ?string $toDate,
         &$totalCount,
         $progress = null,
-    ) {
+    ): array {
         $leadsToCreate = $this->integrationEntityRepository->findLeadsToCreate(
             'Salesforce',
             $mauticLeadFieldString,
@@ -1890,10 +1875,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return mixed
      */
-    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic'): array
     {
         $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
 
@@ -1902,10 +1885,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return mixed
      */
-    protected function getPriorityFieldsForIntegration(array $config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForIntegration(array $config, $object = null, $priorityObject = 'mautic'): array
     {
         $fields = parent::getPriorityFieldsForIntegration($config, $object, $priorityObject);
         unset($fields['Contact']['Id'], $fields['Lead']['Id']);
@@ -2057,10 +2038,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return [$totalUpdated, $totalCreated];
     }
 
-    /**
-     * @return array
-     */
-    protected function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString)
+    protected function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString): array|string
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
@@ -2658,7 +2636,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
         $objectFields            = [];
         $objectFields['company'] = [
-            'update' => !empty($fieldsToUpdateInSf) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
+            'update' => $fieldsToUpdateInSf !== [] ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
             'create' => $fieldsToCreate,
         ];
 

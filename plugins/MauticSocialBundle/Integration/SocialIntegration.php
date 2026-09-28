@@ -50,10 +50,8 @@ abstract class SocialIntegration extends AbstractIntegration
 
     /**
      * @param array<string, mixed> $settings
-     *
-     * @return array
      */
-    public function getFormLeadFields(array $settings = [])
+    public function getFormLeadFields(array $settings = []): array
     {
         static $fields = [];
 
@@ -125,7 +123,7 @@ abstract class SocialIntegration extends AbstractIntegration
         return $fields;
     }
 
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         $settings['feature_settings']['objects'] = ['Company'];
 
@@ -137,7 +135,7 @@ abstract class SocialIntegration extends AbstractIntegration
         return 'oauth2';
     }
 
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return [
             'client_id'     => 'mautic.integration.keyfield.clientid',
@@ -185,7 +183,7 @@ abstract class SocialIntegration extends AbstractIntegration
      *
      * @return array<mixed>
      */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         return ['', 'info'];
     }
