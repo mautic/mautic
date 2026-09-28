@@ -178,7 +178,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return mixed[]
      */
-    public function populateLeadData($lead, $config = [], $object = 'Contacts')
+    public function populateLeadData($lead, $config = [], $object = 'Contacts'): array
     {
         if ('company' === $object) {
             $object = 'accounts';
@@ -190,20 +190,16 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * Get available company fields for choices in the config UI.
-     *
-     * @return array
      */
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('accounts', $settings);
     }
 
     /**
      * @param array<string, mixed> $settings
-     *
-     * @return array|mixed
      */
-    public function getFormLeadFields(array $settings = [])
+    public function getFormLeadFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('contacts', $settings);
     }
@@ -523,7 +519,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
-                        if (!empty($fieldsToUpdateInMautic)) {
+                        if ($fieldsToUpdateInMautic !== []) {
                             $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
@@ -573,7 +569,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
-                        if (!empty($fieldsToUpdateInMautic)) {
+                        if ($fieldsToUpdateInMautic !== []) {
                             $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'] ?? [], array_flip($fieldsToUpdateInMautic));
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
