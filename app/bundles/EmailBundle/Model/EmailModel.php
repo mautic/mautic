@@ -288,17 +288,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * Bundled themes since Mautic 5 use MJML. GrapesJS compiles the MJML into
      * customHtml client-side. If a published email is saved with an MJML theme
-     * but empty customHtml, it has no usable body — sending would deliver
+     * but empty customHtml, it has no usable HTML body — sending would deliver
      * uncompiled <mjml> markup or an empty email. This method blocks that bad
      * state at save time so it is caught before send. Unpublished/draft emails
-     * are allowed through so the user can save and open the builder later.
+     * are allowed through so the user can save and open the builder later, and
+     * emails with a plain text body are allowed through because MailHelper can
+     * send those as a text/plain message even when the theme fallback is
+     * skipped (the send path only hard-fails when plain text is empty too).
      *
      * @throws MjmlThemeEmptyCustomHtmlException
      */
     public function validateMjmlThemeHasCustomHtml(Email $email): void
     {
         $template = $email->getTemplate();
-        if (empty($template) || !empty($email->getCustomHtml()) || !$email->getIsPublished()) {
+        if (empty($template) || !empty($email->getCustomHtml()) || !empty($email->getPlainText()) || !$email->getIsPublished()) {
             return;
         }
 
