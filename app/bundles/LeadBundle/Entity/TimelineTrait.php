@@ -47,7 +47,7 @@ trait TimelineTrait
 
         if (!empty($options['fromDate']) && !empty($options['toDate'])) {
             $query->andWhere($timestampColumn.' BETWEEN :dateFrom AND :dateTo')
-                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'))
+                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s.u'))
                 ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
         } elseif (!empty($options['fromDate'])) {
             $query->andWhere($query->expr()->gte($timestampColumn, ':dateFrom'))
