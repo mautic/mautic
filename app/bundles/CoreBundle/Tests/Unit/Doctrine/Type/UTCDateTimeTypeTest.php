@@ -22,7 +22,7 @@ final class UTCDateTimeTypeTest extends TestCase
 
     /**
      * @param class-string<AbstractPlatform> $platformClass
-     * @param array<string, int>             $column
+     * @param array<string, int|null>        $column
      */
     #[DataProvider('sqlDeclarationProvider')]
     public function testGetSQLDeclaration(string $platformClass, array $column, string $expectedSql, bool $expectFallback): void
@@ -42,13 +42,21 @@ final class UTCDateTimeTypeTest extends TestCase
     /**
      * @return iterable<string, array{
      *     0: class-string<AbstractPlatform>,
-     *     1: array<string, int>|array<empty>,
+     *     1: array<string, int|null>,
      *     2: string,
      *     3: bool
      * }>
      */
     public static function sqlDeclarationProvider(): iterable
     {
+        yield 'MySQL introspected precision' => [MySQLPlatform::class, ['precision' => null, 'length' => 3], 'DATETIME(3)', false];
+        yield 'MySQL DBAL default precision' => [MySQLPlatform::class, ['precision' => 10, 'length' => 3], 'DATETIME(3)', false];
+        yield 'MySQL DBAL default without fractional seconds' => [MySQLPlatform::class, ['precision' => 10, 'length' => null], 'DATETIME', true];
+        yield 'MySQL explicit precision takes precedence' => [MySQLPlatform::class, ['precision' => 6, 'length' => 3], 'DATETIME(6)', false];
+        yield 'MySQL explicit zero takes precedence' => [MySQLPlatform::class, ['precision' => 0, 'length' => 3], 'DATETIME', true];
+        yield 'MySQL invalid introspected precision' => [MySQLPlatform::class, ['length' => 7], 'DATETIME', true];
+        yield 'PostgreSQL ignores length' => [PostgreSQLPlatform::class, ['length' => 3], 'TIMESTAMP WITHOUT TIME ZONE', true];
+
         yield 'MySQL with valid precision' => [
             MySQLPlatform::class,
             ['precision' => 3],

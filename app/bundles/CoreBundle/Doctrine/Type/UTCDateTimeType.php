@@ -50,6 +50,11 @@ final class UTCDateTimeType extends DateTimeType
     {
         $precision = $column['precision'] ?? null;
 
+        // DBAL 3 introspects fractional seconds as length and defaults missing precision to 10.
+        if ((null === $precision || 10 === $precision) && $platform instanceof MySQLPlatform) {
+            $precision = $column['length'] ?? null;
+        }
+
         // Only handle explicit fractional precision (1–6)
         $supportsPrecision = is_int($precision) && $precision >= 1 && $precision <= 6;
 
