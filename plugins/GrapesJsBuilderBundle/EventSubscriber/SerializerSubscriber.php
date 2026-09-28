@@ -17,7 +17,7 @@ final readonly class SerializerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private Config $config,
-        private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
+        private GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
     }
 

@@ -108,7 +108,7 @@ class LeadDeviceRepository extends CommonRepository
         // get totals
         $device = $selectQuery->executeQuery()->fetchAllAssociative();
 
-        return (!empty($device)) ? $device[0] : [];
+        return $device[0] ?? [];
     }
 
     /**

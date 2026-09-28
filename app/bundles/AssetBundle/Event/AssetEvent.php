@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Event;
 
 use Mautic\AssetBundle\Entity\Asset;

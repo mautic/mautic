@@ -33,7 +33,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         private AuthorizationCheckerInterface $securityContext,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
-        private readonly UserRepository $userRepository,
+        private UserRepository $userRepository,
     ) {
     }
 

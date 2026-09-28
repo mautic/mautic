@@ -80,7 +80,9 @@
                     'tooltip': 'mautic.page.searchcommand.isprefcenter.description',
                     'icon': 'ri-settings-4-line'
                 }
-            ]
+            ],
+            'searchScopes': searchScopes|default([]),
+            'searchScopeHint': searchScopeHint|default(''),
         }) }}
         <div class="page-list">
   {% endif %}

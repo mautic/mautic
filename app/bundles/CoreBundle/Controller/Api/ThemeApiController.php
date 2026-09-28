@@ -28,10 +28,8 @@ final class ThemeApiController extends CommonApiController
 
     /**
      * Accepts the zip file and installs the theme from it.
-     *
-     * @return Response
      */
-    public function newAction(Request $request, PathsHelper $pathsHelper)
+    public function newAction(Request $request, PathsHelper $pathsHelper): Response
     {
         if (!$this->security->isGranted('core:themes:create')) {
             return $this->accessDenied();
@@ -74,10 +72,8 @@ final class ThemeApiController extends CommonApiController
      * Get zip file of a theme.
      *
      * @param string $theme dir name
-     *
-     * @return Response
      */
-    public function getAction($theme)
+    public function getAction($theme): Response
     {
         if (!$this->security->isGranted('core:themes:view')) {
             return $this->accessDenied();
@@ -106,10 +102,8 @@ final class ThemeApiController extends CommonApiController
 
     /**
      * List the folders (themes) in the /themes directory.
-     *
-     * @return Response
      */
-    public function listAction()
+    public function listAction(): Response
     {
         if (!$this->security->isGranted('core:themes:view')) {
             return $this->accessDenied();
@@ -130,10 +124,8 @@ final class ThemeApiController extends CommonApiController
      * Delete a theme.
      *
      * @param string $theme
-     *
-     * @return Response
      */
-    public function deleteAction($theme)
+    public function deleteAction($theme): Response
     {
         if (!$this->security->isGranted('core:themes:delete')) {
             return $this->accessDenied();

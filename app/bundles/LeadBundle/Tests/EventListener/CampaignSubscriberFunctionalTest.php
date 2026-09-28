@@ -531,12 +531,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function createContacts(): array
     {
-        $contacts   = [];
-        $contacts[] = $this->createContact('contact1@email.com', 'Isaac', 'Asimov');
-        $contacts[] = $this->createContact('contact2@email.com', 'Robert A.', 'Heinlein');
-        $contacts[] = $this->createContact('contact3@email.com', 'Arthur C.', 'Clarke', 1);
-
-        return $contacts;
+        return [$this->createContact('contact1@email.com', 'Isaac', 'Asimov'), $this->createContact('contact2@email.com', 'Robert A.', 'Heinlein'), $this->createContact('contact3@email.com', 'Arthur C.', 'Clarke', 1)];
     }
 
     /**

@@ -26,7 +26,6 @@ final class DayStatTest extends TestCase
 
     public function testGetHour(): void
     {
-        $this->assertInstanceOf(HourStat::class, $this->hourStat);
         $this->assertSame("{$this->day} {$this->hour}", $this->hourStat->getHour());
         $this->assertSame(0, $this->hourStat->getCount());
 

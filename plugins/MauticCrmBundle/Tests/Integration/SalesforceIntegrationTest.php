@@ -741,7 +741,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 function () use ($spy): array {
                     // WARNING: this is using a PHPUnit undocumented workaround:
                     // https://github.com/sebastianbergmann/phpunit/issues/3888
-                    $spyParentProperties = self::getParentPrivateProperties($spy);
+                    $spyParentProperties = $this->getParentPrivateProperties($spy);
                     $invocations         = $spyParentProperties['invocations'];
 
                     if (count($invocations) > $this->getMaxInvocations('getIntegrationsEntityId')) {
@@ -1405,7 +1405,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @return array<string, mixed>
      */
-    private static function getParentPrivateProperties(mixed $instance): array
+    private function getParentPrivateProperties(mixed $instance): array
     {
         $reflectionClass       = new \ReflectionClass($instance::class);
         $parentReflectionClass = $reflectionClass->getParentClass();

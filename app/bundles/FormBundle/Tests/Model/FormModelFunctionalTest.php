@@ -19,6 +19,13 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        $this->configParams['form_field_autofill'] = true;
+
+        parent::setUp();
+    }
+
     public function testConditionalFieldsPreserveOrderAfterDatabaseSave(): void
     {
         /** @var FormModel $formModel */

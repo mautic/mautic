@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'name'        => 'FullContact',
     'description' => 'Enables integration with FullContact for contact and company lookup',

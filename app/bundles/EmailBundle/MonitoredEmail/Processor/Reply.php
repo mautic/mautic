@@ -27,7 +27,7 @@ final readonly class Reply implements ProcessorInterface
         private LoggerInterface $logger,
         private ContactTracker $contactTracker,
         private EmailAddressHelper $addressHelper,
-        private readonly LeadRepository $leadRepository,
+        private LeadRepository $leadRepository,
     ) {
     }
 

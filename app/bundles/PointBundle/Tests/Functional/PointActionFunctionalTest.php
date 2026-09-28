@@ -57,7 +57,6 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
         $groupScore  = $lead->getGroupScores()->first();
 
         $this->assertEquals($pointAction->getDelta(), $groupScore->getScore());
-        $this->assertInstanceOf(Lead::class, $lead);
         // group point action shouldn't update main contact points
         $this->assertEquals(0, $lead->getPoints());
     }
@@ -82,7 +81,6 @@ final class PointActionFunctionalTest extends MauticMysqlTestCase
 
         // Points should remain unchanged as no point actions are available
         $this->assertEquals($initialPoints, $lead->getPoints());
-        $this->assertInstanceOf(Lead::class, $lead);
         $this->assertEquals(0, $lead->getPoints());
     }
 

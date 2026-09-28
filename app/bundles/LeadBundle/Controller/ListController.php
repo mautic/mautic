@@ -15,13 +15,12 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Helper\SegmentSearchScopeProvider;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -62,7 +61,7 @@ final class ListController extends FormController
      *
      * @throws \Exception
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, SegmentSearchScopeProvider $segmentSearchScopeProvider, $page = 1): Response
     {
         $session = $request->getSession();
 
@@ -161,6 +160,7 @@ final class ListController extends FormController
             'tmpl'                           => $tmpl,
             'currentUser'                    => $this->user,
             'searchValue'                    => $search,
+            'searchScopes'                   => $segmentSearchScopeProvider->getScopes(),
             'segmentRebuildWarningThreshold' => $this->coreParametersHelper->get('segment_rebuild_time_warning'),
             'segmentBuildWarningThreshold'   => $this->coreParametersHelper->get('segment_build_time_warning'),
         ];
@@ -490,10 +490,8 @@ final class ListController extends FormController
 
     /**
      * Delete a list.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.segment.page', 1);
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
@@ -932,10 +930,8 @@ final class ListController extends FormController
     /**
      * @param int $objectId
      * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1)
+    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1): Response
     {
         $session = $request->getSession();
         $session->set('mautic.segment.contact.page', $page);

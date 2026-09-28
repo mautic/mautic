@@ -23,7 +23,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         private DynamicContentModel $dynamicContentModel,
         private CacheProvider $cache,
         private EventDispatcherInterface $dispatcher,
-        private readonly DynamicContentRepository $dynamicContentRepository,
+        private DynamicContentRepository $dynamicContentRepository,
     ) {
     }
 

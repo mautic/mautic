@@ -2,13 +2,12 @@
 
 namespace Mautic\ApiBundle\Controller;
 
+use Mautic\ApiBundle\Helper\ClientSearchScopeProvider;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -28,7 +27,7 @@ final class ClientController extends AbstractStandardFormController
     /**
      * Generate's default client list.
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, ClientSearchScopeProvider $clientSearchScopeProvider, int $page = 1): Response
     {
         if (!$this->security->isGranted('api:clients:view')) {
             $this->throwAccessDenied();
@@ -91,17 +90,18 @@ final class ClientController extends AbstractStandardFormController
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'items'       => $clients,
-                    'page'        => $page,
-                    'limit'       => $limit,
-                    'permissions' => [
+                    'items'           => $clients,
+                    'page'            => $page,
+                    'limit'           => $limit,
+                    'permissions'     => [
                         'create' => $this->security->isGranted('api:clients:create'),
                         'edit'   => $this->security->isGranted('api:clients:editother'),
                         'delete' => $this->security->isGranted('api:clients:deleteother'),
                     ],
-                    'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                    'searchValue' => $filter,
-                    'filters'     => $filters,
+                    'tmpl'            => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'searchValue'     => $filter,
+                    'searchScopes'    => $clientSearchScopeProvider->getScopes(),
+                    'filters'         => $filters,
                 ],
                 'contentTemplate' => '@MauticApi/Client/list.html.twig',
                 'passthroughVars' => [
@@ -266,10 +266,8 @@ final class ClientController extends AbstractStandardFormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted('api:clients:editother')) {
             $this->throwAccessDenied();
@@ -371,10 +369,8 @@ final class ClientController extends AbstractStandardFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('api:clients:delete')) {
             $this->throwAccessDenied();

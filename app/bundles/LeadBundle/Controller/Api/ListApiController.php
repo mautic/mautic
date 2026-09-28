@@ -179,11 +179,9 @@ final class ListApiController extends CommonApiController
      *
      * @param int $id segement ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadsAction(Request $request, $id)
+    public function addLeadsAction(Request $request, $id): Response
     {
         $contactIds = $request->request->all()['ids'] ?? null;
         if (null === $contactIds) {

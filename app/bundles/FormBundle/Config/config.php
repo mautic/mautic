@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Mautic\FormBundle\Helper\BlockedFreeEmailProvidersHelper;
 
 return [
@@ -144,5 +146,6 @@ return [
         'blocked_free_email_providers' => BlockedFreeEmailProvidersHelper::load(),
         'form_results_data_sources'    => false,
         'successful_submit_action'     => 'top',
+        'form_field_autofill'          => false,
     ],
 ];

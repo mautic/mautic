@@ -29,7 +29,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         private AssetsHelper $assetsHelper,
         private ThemeHelperInterface $themeHelper,
         private CoreParametersHelper $coreParametersHelper,
-        private readonly AssetRepository $assetRepository,
+        private AssetRepository $assetRepository,
     ) {
     }
 
