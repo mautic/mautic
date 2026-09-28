@@ -624,18 +624,12 @@ class Import extends FormEntity
         return $this->properties['line'] ?? 0;
     }
 
-    /**
-     * @return array
-     */
-    public function getMatchedFields()
+    public function getMatchedFields(): array
     {
         return empty($this->properties['fields']) ? [] : $this->properties['fields'];
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -646,17 +640,15 @@ class Import extends FormEntity
     /**
      * @param array<mixed> $properties
      */
-    public function mergeToProperties($properties): static
+    public function mergeToProperties(array $properties): static
     {
         return $this->setProperties(array_merge($this->properties, $properties));
     }
 
     /**
      * Get array of default values.
-     *
-     * @return array
      */
-    public function getDefaults()
+    public function getDefaults(): array
     {
         return $this->properties['defaults'] ?? [];
     }
@@ -695,10 +687,7 @@ class Import extends FormEntity
         return $this->setProperties($properties);
     }
 
-    /**
-     * @return array
-     */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return empty($this->properties['headers']) ? [] : $this->properties['headers'];
     }
@@ -714,10 +703,7 @@ class Import extends FormEntity
         return $this->setProperties($properties);
     }
 
-    /**
-     * @return array
-     */
-    public function getParserConfig()
+    public function getParserConfig(): array
     {
         return empty($this->properties['parser']) ? [] : $this->properties['parser'];
     }

@@ -138,7 +138,7 @@ class LeadDevice
     /**
      * @return array<mixed>
      */
-    public function getClientInfo()
+    public function getClientInfo(): array
     {
         return $this->clientInfo;
     }
