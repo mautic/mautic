@@ -193,7 +193,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getFeatureSettings()
+    public function getFeatureSettings(): array
     {
         return $this->featureSettings;
     }

@@ -496,7 +496,7 @@ final class LeadController extends FormController
         }
 
         $fields            = $lead->getFields();
-        $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
+        $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
         $companies     = $this->companyRepository->getCompaniesByLeadId($objectId);
