@@ -116,6 +116,7 @@ class Download
 
         $builder->createField('dateDownload', 'datetime')
             ->columnName('date_download')
+            ->precision(3)
             ->build();
 
         $builder->createManyToOne('asset', 'Asset')

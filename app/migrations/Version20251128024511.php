@@ -12,7 +12,10 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 final class Version20251128024511 extends AbstractMauticMigration
 {
     private const TABLES_AND_COLUMNS = [
+        'asset_downloads'         => ['date_download'],
+        'audit_log'               => ['date_added'],
         'campaign_lead_event_log' => ['date_triggered'],
+        'dynamic_content_stats'   => ['date_sent'],
         'lead_donotcontact'       => ['date_added'],
         'lead_event_log'          => ['date_added'],
         'lead_points_change_log'  => ['date_added'],
