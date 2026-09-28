@@ -1242,6 +1242,32 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('MJML', (string) $content['errors'][0]['message']);
     }
 
+    public function testSaveAllowsPublishedPlainTextOnlyEmail(): void
+    {
+        $payload = [
+            'name'        => 'MJML plain text only test',
+            'subject'     => 'Test subject',
+            'template'    => 'blank',
+            'customHtml'  => '',
+            'plainText'   => 'Plain text body from the plain text field.',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        // MailHelper::setEmail() treats an email with empty customHtml and a
+        // plain text body as sendable (the MJML theme fallback is skipped, and
+        // the message goes out as text/plain). The save path must not be
+        // stricter than the send path, otherwise the email can never be
+        // published — and segment sends only pick up published emails.
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $content = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('email', $content);
+        $this->assertSame($payload['plainText'], $content['email']['plainText']);
+    }
+
     public function testSegmentEmailSendWithoutContinueSending(): void
     {
         $segment = $this->createSegment('Segment A', 'segment-a');
