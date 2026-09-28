@@ -891,3 +891,11 @@
     | `StageBundle\Entity\Stage` | `setCategory()` | `?Category` |
 
     `ContactIdentificationEvent::getIdentifier()` now returns `?string` and `ListPreProcessListEvent::getResult()` returns `?bool`.
+
+- Methods in `Mautic\PluginBundle\Integration\AbstractIntegration`, `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` and `MauticPlugin\MauticSocialBundle\Integration\SocialIntegration` that documented `@return array` now declare a native `array` return type. Most third-party integrations extend one of these classes, so if yours overrides one of the methods below, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with AbstractIntegration::method(): array":
+
+    | Class | Methods |
+    | --- | --- |
+    | `AbstractIntegration` | `encryptApiKeys()`, `decryptApiKeys()`, `getSecretKeys()`, `getRefreshTokenKeys()`, `getRequiredKeyFields()`, `prepareRequest()`, `cleanUpFields()`, `getRequiredFields()`, `populateLeadData()`, `populateCompanyData()`, `populateMauticLeadData()`, `matchUpData()`, `getFormNotes()`, `getFormDisplaySettings()`, `getFormLeadFields()`, `getFormCompanyFields()`, `dispatchIntegrationKeyEvent()`, `formatMatchedFields()` |
+    | `CrmAbstractIntegration` | `getFormFieldsByObject()`, `getPriorityFieldsForMautic()`, `getPriorityFieldsForIntegration()`, `getFieldsByPriority()`, `cleanPriorityFields()`, `prepareFieldsForPush()` |
+    | `SocialIntegration` | `getFormLeadFields()`, `getFormCompanyFields()`, `getRequiredKeyFields()`, `getFormNotes()` |
