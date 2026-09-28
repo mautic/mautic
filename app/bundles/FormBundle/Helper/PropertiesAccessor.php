@@ -18,7 +18,7 @@ final readonly class PropertiesAccessor
      *
      * @return mixed[]
      */
-    public function getProperties(array $field)
+    public function getProperties(array $field): array
     {
         $hasContactFieldMapped = !empty($field['mappedField']) && !empty($field['mappedObject']) && 'contact' === $field['mappedObject'];
         if ('country' === $field['type'] || ($hasContactFieldMapped && !empty($field['properties']['syncList']))) {
@@ -83,7 +83,7 @@ final readonly class PropertiesAccessor
      *
      * @return mixed[]
      */
-    private function getOptionsListFromProperties(array $properties)
+    private function getOptionsListFromProperties(array $properties): array
     {
         if (!empty($properties['list']['list'])) {
             return $properties['list']['list'];

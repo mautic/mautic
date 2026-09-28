@@ -84,7 +84,7 @@ final class ReportDAO
     /**
      * @return ObjectDAO[]
      */
-    public function getObjects(?string $objectName)
+    public function getObjects(?string $objectName): array
     {
         $returnedObjects = [];
         if (null === $objectName) {

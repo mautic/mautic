@@ -49,10 +49,8 @@ final class MappedIntegrationObjectTokenEvent extends CommonEvent
      * Get only the tokens provided by a particular integration.
      *
      * @param string $integrationName
-     *
-     * @return array
      */
-    public function getTokensByIntegration($integrationName)
+    public function getTokensByIntegration($integrationName): array
     {
         return $this->tokens[$integrationName] ?? [];
     }
