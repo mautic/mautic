@@ -106,11 +106,9 @@ final class SugarcrmApi extends CrmApi
     /**
      * @param array<string, mixed> $fields
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function createLead(array $fields, $lead)
+    public function createLead(array $fields, $lead): array
     {
         $tokenData       = $this->integration->getKeys();
         $createdLeadData = [];
