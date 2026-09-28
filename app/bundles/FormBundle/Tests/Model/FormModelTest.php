@@ -624,6 +624,9 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn([]);
+
         $this->contactTracker->method('getContact')
             ->willReturn($contact);
 
