@@ -2034,7 +2034,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return [$totalUpdated, $totalCreated];
     }
 
-    protected function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString): array
+    protected function getSalesforceObjectsByEmails($sfObject, array $checkEmailsInSF, string $requiredFieldString): array|string
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
