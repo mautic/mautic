@@ -619,7 +619,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    public function getContent(): array
+    public function getContent(): array|string
     {
         return $this->content;
     }
