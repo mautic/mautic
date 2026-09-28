@@ -28,11 +28,9 @@ abstract class AbstractHelper implements StatHelperInterface
     }
 
     /**
-     * @return array
-     *
      * @throws \Exception
      */
-    public function fetchStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
+    public function fetchStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options): array
     {
         $statCollection = $this->collector->fetchStats($this->getName(), $fromDateTime, $toDateTime, $options);
         $calculator     = $statCollection->getCalculator($fromDateTime, $toDateTime);

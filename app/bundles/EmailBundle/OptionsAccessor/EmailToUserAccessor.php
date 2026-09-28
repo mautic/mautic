@@ -51,30 +51,21 @@ final readonly class EmailToUserAccessor
         return $users;
     }
 
-    /**
-     * @return array
-     */
-    public function getToFormatted()
+    public function getToFormatted(): array
     {
         $property = 'to';
 
         return empty($this->config[$property]) ? [] : $this->transformer->reverseTransform($this->config[$property]);
     }
 
-    /**
-     * @return array
-     */
-    public function getCcFormatted()
+    public function getCcFormatted(): array
     {
         $property = 'cc';
 
         return empty($this->config[$property]) ? [] : $this->transformer->reverseTransform($this->config[$property]);
     }
 
-    /**
-     * @return array
-     */
-    public function getBccFormatted()
+    public function getBccFormatted(): array
     {
         $property = 'bcc';
 

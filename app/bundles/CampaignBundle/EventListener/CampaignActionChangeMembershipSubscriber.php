@@ -107,10 +107,7 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
         );
     }
 
-    /**
-     * @return array
-     */
-    private function getCampaigns(array $campaigns, Campaign $executingCampaign)
+    private function getCampaigns(array $campaigns, Campaign $executingCampaign): array
     {
         // Check for the keyword "this"
         $includeExecutingCampaign = false;

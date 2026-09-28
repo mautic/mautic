@@ -74,18 +74,12 @@ final class ScheduledEvent extends Event
         return $this->lead;
     }
 
-    /**
-     * @return array
-     */
-    public function getEvent()
+    public function getEvent(): array
     {
         return ($this->event instanceof CampaignEvent) ? $this->getEventArray($this->event) : $this->event;
     }
 
-    /**
-     * @return array
-     */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->getEvent()['properties'];
     }

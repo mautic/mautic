@@ -104,7 +104,7 @@ final class InsightModel extends CommonFormModel
         $pointGroupIds = $insight->getPointGroups();
         $customField   = $insight->getCustomField();
 
-        if (empty($pointGroupIds) || empty($customField)) {
+        if ($pointGroupIds === [] || empty($customField)) {
             return false;
         }
 
