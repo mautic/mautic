@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Tests\CommonMocks;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -19,11 +22,12 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-abstract class StandardImportTestHelper extends CommonMocks
+abstract class StandardImportTestHelper extends TestCase
 {
     protected $eventEntities = [];
 
@@ -139,10 +143,10 @@ abstract class StandardImportTestHelper extends CommonMocks
      */
     protected function initImportModel(bool $entityManagerOpen = true)
     {
-        $translator           = $this->getTranslatorMock();
-        $pathsHelper          = $this->getPathsHelperMock();
-        $this->entityManager  = $this->getEntityManagerMock();
-        $coreParametersHelper = $this->getCoreParametersHelperMock();
+        $translator           = $this->createStub(Translator::class);
+        $pathsHelper          = $this->createStub(PathsHelper::class);
+        $this->entityManager  = $this->createMock(EntityManager::class);
+        $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
 
         /** @var MockObject&LeadEventLogRepository $logRepository */
         $logRepository = $this->createMock(LeadEventLogRepository::class);
