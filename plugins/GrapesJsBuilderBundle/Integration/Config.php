@@ -34,7 +34,7 @@ final readonly class Config
         try {
             $integration = $this->getIntegrationEntity();
 
-            return $integration->getFeatureSettings() ?: [];
+            return $integration->getFeatureSettings();
         } catch (IntegrationNotFoundException) {
             return [];
         }
