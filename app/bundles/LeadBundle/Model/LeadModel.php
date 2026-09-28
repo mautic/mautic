@@ -257,9 +257,9 @@ class LeadModel extends FormModel
     /**
      * @param array<mixed> $args
      *
-     * @return array|Paginator|mixed
+     * @return array|Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $entities   = parent::getEntities($args);
         $contactIds = $this->getContactIdsFromArgs($args);
@@ -524,7 +524,7 @@ class LeadModel extends FormModel
         // save the field values
         $fieldValues = $lead->getFields();
 
-        if (empty($fieldValues) || $bindWithForm) {
+        if ($fieldValues === [] || $bindWithForm) {
             // Lead is new or they haven't been populated so let's build the fields now
             if ([] === $this->flattenedFields) {
                 /** @var Paginator<mixed[]> $paginator */
@@ -539,7 +539,7 @@ class LeadModel extends FormModel
                 $this->fieldsByGroup   = $this->organizeFieldsByGroup($this->flattenedFields);
             }
 
-            if (empty($fieldValues)) {
+            if ($fieldValues === []) {
                 $fieldValues = $this->fieldsByGroup;
             }
         }
@@ -695,7 +695,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadsByIds(array $ids)
+    public function getLeadsByIds(array $ids): array
     {
         return $this->getEntities([
             'filter' => [
@@ -720,11 +720,11 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadDetails(Lead|int $lead)
+    public function getLeadDetails(Lead|int $lead): array
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields();
-            if (!empty($fields)) {
+            if ($fields !== []) {
                 return $fields;
             }
         }
@@ -2185,10 +2185,7 @@ class LeadModel extends FormModel
         return $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE, true);
     }
 
-    /**
-     * @return array
-     */
-    public function getPreferredChannel(Lead $lead)
+    public function getPreferredChannel(Lead $lead): array
     {
         $preferredChannel = $this->frequencyRuleRepository->getPreferredChannel($lead->getId());
         if ([] !== $preferredChannel) {

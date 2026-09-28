@@ -33,10 +33,8 @@ abstract class AbstractPermissions
 
     /**
      * Returns bundle's permissions array.
-     *
-     * @return array
      */
-    public function getPermissions()
+    public function getPermissions(): array
     {
         return $this->permissions;
     }
@@ -146,7 +144,7 @@ abstract class AbstractPermissions
      *
      * @return array<int, string>
      */
-    protected function getSynonym($name, $level)
+    protected function getSynonym($name, $level): array
     {
         if (in_array($level, ['viewown', 'viewother'])) {
             if (isset($this->permissions[$name]['view'])) {
@@ -264,7 +262,7 @@ abstract class AbstractPermissions
      *
      * @return array<int, int>
      */
-    public function getPermissionRatio(array $data)
+    public function getPermissionRatio(array $data): array
     {
         $totalAvailable = $totalGranted = 0;
 

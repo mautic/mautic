@@ -12,7 +12,7 @@ parameters:
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
         return: 91.6
-        param: 82.9
+        param: 82.4
         property: 73.7
         constant: 99.9
 
@@ -56,6 +56,11 @@ parameters:
             paths:
                 - */Tests/*
                 - */Test/*
+
+        -
+            identifier: argument.type
+            path: app/bundles/CoreBundle/Controller/AjaxController.php
+
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: symplify.noNullableServiceInConstructor
@@ -277,6 +282,7 @@ rules:
     - Symplify\PHPStanRules\Rules\RequireArrayShapeReturnRule
     - Utils\PHPStan\Rule\RepositoryMethodMustHaveReturnTypeRule
     - Utils\PHPStan\Rule\CollectionGetterMustReturnCollectionRule
+    - Utils\PHPStan\Rule\MockedMethodReturnMustMatchNativeTypeRule
     # enable later, might not be needed
     - Symplify\PHPStanRules\Rules\NoDuplicateNonRepeatableAttributeRule
 

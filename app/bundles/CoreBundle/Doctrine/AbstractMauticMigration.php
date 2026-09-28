@@ -167,7 +167,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
      *
      * @return array<int, string> [idx, fk]
      */
-    protected function generateKeys($table, array $columnNames)
+    protected function generateKeys($table, array $columnNames): array
     {
         return [
             $this->generatePropertyName($table, 'idx', $columnNames),

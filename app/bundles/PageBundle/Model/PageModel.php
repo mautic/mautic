@@ -539,7 +539,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        $query = $hit->getQuery() ?: [];
+        $query = $hit->getQuery();
 
         if (!$lead->getTimezone()) {
             if (isset($query['timezone'])) {
@@ -748,10 +748,8 @@ final class PageModel extends FormModel implements GlobalSearchInterface
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     *
-     * @return array
      */
-    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = ''): array
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);

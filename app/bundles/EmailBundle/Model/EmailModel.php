@@ -353,7 +353,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return Paginator|array<string, int|object>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $entities = parent::getEntities($args);
 
@@ -542,10 +542,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     *
-     * @return array
      */
-    public function getBuilderComponents(?Email $email = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Email $email = null, $requestedComponents = 'all', string $tokenFilter = ''): array
     {
         $event = new EmailOnBuildEvent($this->translator, $email, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event);
@@ -1159,10 +1157,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Gets template, stats, weights, etc for an email in preparation to be sent.
-     *
-     * @return array
      */
-    public function &getEmailSettings(Email $email, bool $includeVariants = true)
+    public function &getEmailSettings(Email $email, bool $includeVariants = true): array
     {
         if (empty($this->emailSettings[$email->getId()])) {
             // store the settings of all the variants in order to properly disperse the emails

@@ -135,7 +135,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * This method configures the ReportBuilder. It has to return a configured Doctrine DBAL QueryBuilder.
      *
-     * @param array<string, mixed> $options Options array
+     * @param array<string, mixed> $options
      */
     private function configureBuilder(array $options): TrackingQueryBuilder
     {
@@ -189,7 +189,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Build WHERE clause
-        if (!empty($standardFilters)) {
+        if ($standardFilters !== []) {
             if (!$filterExpr = $event->getFilterExpression()) {
                 $this->applyFilters($standardFilters, $queryBuilder, $options['filters']);
             } else {
@@ -254,7 +254,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             if ([] !== $groupByColumns) {
                 $queryBuilder->addGroupBy(...$groupByColumns);
             }
-        } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
+        } elseif (!empty($options['groupby'])) {
             $queryBuilder->addGroupBy(...array_values((array) $options['groupby']));
         }
 
@@ -287,7 +287,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build SELECT clause
         if (!$event->getSelectColumns()) {
             $fields           = $this->entity->getColumns();
-            $groupByFieldKeys = $groupByOptions ? array_flip($groupByOptions) : [];
+            $groupByFieldKeys = $groupByOptions !== [] ? array_flip($groupByOptions) : [];
 
             foreach ($fields as $field) {
                 // With GROUP BY + aggregators, a column listed only for COUNT/AVG must not

@@ -12,10 +12,8 @@ trait BuilderModelTrait
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     *
-     * @return array
      */
-    public function getCommonBuilderComponents($requestedComponents, BuilderEvent $event)
+    public function getCommonBuilderComponents($requestedComponents, BuilderEvent $event): array
     {
         $singleComponent = (!is_array($requestedComponents) && 'all' != $requestedComponents);
         $components      = [];

@@ -35,7 +35,7 @@ final readonly class ExcelExporter
             $reportData       = $reportDataResult->getData();
             $rowCount         = 1;
 
-            if (empty($reportData)) {
+            if ($reportData === []) {
                 throw new \Exception('No report data to be exported');
             }
 

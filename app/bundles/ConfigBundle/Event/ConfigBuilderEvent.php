@@ -84,10 +84,8 @@ final class ConfigBuilderEvent extends Event
 
     /**
      * Get default parameters from config defined in bundles.
-     *
-     * @return array
      */
-    public function getParametersFromConfig(string $bundle)
+    public function getParametersFromConfig(string $bundle): array
     {
         static $allBundles;
 

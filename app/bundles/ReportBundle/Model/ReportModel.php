@@ -231,10 +231,8 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
      * Builds the table lookup data for the report forms.
      *
      * @param string $context
-     *
-     * @return array
      */
-    public function getTableData($context = 'all', ?string $reportSource = null)
+    public function getTableData($context = 'all', ?string $reportSource = null): array
     {
         $data = $this->buildAvailableReports($context, $reportSource);
 
@@ -537,7 +535,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
 
             // Check to see if this is an update from AJAX
             $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
-            if (!empty($selectedGraphs)) {
+            if ($selectedGraphs !== []) {
                 $availableGraphs = $this->getGraphData($entity->getSource());
 
                 $eventGraphs                     = [];
@@ -575,7 +573,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         $this->dispatcher->dispatch($event);
         $query = $event->getQuery();
 
-        if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
+        if (empty($options['ignoreTableData']) && $selectedColumns !== []) {
             if ($paginate) {
                 // Build the options array to pass into the query
                 if ($session->isStarted()) {

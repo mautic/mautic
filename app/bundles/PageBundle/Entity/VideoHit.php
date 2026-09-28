@@ -470,7 +470,7 @@ class VideoHit
     /**
      * @return array<string>
      */
-    public function getBrowserLanguages()
+    public function getBrowserLanguages(): array
     {
         return $this->browserLanguages;
     }
@@ -541,10 +541,7 @@ class VideoHit
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getQuery()
+    public function getQuery(): array
     {
         return $this->query;
     }

@@ -41,17 +41,15 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      *
      * @return mixed[]
      */
-    public function getSupportedSearchCommands()
+    public function getSupportedSearchCommands(): array
     {
         return [];
     }
 
     /**
      * Retrieve the search command list for a repository.
-     *
-     * @return array
      */
-    public function getCommandList()
+    public function getCommandList(): array
     {
         $repo = $this->getRepository();
 
@@ -87,7 +85,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      *
      * @return object[]|array<int,mixed>|iterable<object>|Paginator<object>|SimplePaginator<mixed>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         // set the translator
         $repository = $this->getRepository();

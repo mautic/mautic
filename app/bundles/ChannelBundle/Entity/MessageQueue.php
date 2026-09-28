@@ -444,7 +444,7 @@ class MessageQueue
     /**
      * @return array<array-key, mixed>
      */
-    public function getMetadata()
+    public function getMetadata(): array
     {
         return $this->options['metadata'] ?? [];
     }
