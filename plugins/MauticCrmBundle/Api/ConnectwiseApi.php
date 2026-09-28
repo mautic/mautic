@@ -167,11 +167,9 @@ final class ConnectwiseApi extends CrmApi
     /**
      * @param array $params
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function postActivity($params = [])
+    public function postActivity($params = []): array
     {
         return $this->request('sales/activities', $params, 'POST');
     }

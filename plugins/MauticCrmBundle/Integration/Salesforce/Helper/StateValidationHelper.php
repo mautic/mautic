@@ -26,10 +26,8 @@ final class StateValidationHelper
      * only send state if it is supported out of the box by SF.
      *
      * @param array<string, mixed> $mappedData
-     *
-     * @return array
      */
-    public static function validate(array $mappedData)
+    public static function validate(array $mappedData): array
     {
         if (!isset($mappedData['State'])) {
             return $mappedData;
