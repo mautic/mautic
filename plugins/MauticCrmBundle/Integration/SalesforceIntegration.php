@@ -2472,10 +2472,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param string $object
-     *
-     * @return array
      */
-    public function getFieldsForQuery($object)
+    public function getFieldsForQuery($object): array
     {
         $fields = $this->getIntegrationSettings()->getFeatureSettings();
         switch ($object) {
