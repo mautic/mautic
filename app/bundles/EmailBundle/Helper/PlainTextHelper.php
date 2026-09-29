@@ -257,7 +257,7 @@ final class PlainTextHelper
         $text = html_entity_decode($text, ENT_QUOTES, self::ENCODING);
 
         // Remove unknown/unhandled entities (this cannot be done in search-and-replace block)
-        $text = preg_replace('/&([a-zA-Z0-9]{2,6}|#[0-9]{2,4});/', '', $text);
+        $text = preg_replace('/&([a-zA-Z0-9]{2,6}|#\d{2,4});/', '', $text);
 
         // Convert "|+|amp|+|" into "&", need to be done after handling of unknown entities
         // This properly handles situation of "&amp;quot;" in input string

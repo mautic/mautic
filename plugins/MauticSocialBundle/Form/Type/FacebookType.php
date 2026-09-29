@@ -46,12 +46,12 @@ final class FacebookType extends AbstractType
 
         $builder->add('showFaces', YesNoButtonGroupType::class, [
             'label' => 'mautic.integration.Facebook.share.showfaces',
-            'data'  => (!isset($options['data']['showFaces'])) ? 1 : $options['data']['showFaces'],
+            'data'  => $options['data']['showFaces'] ?? 1,
         ]);
 
         $builder->add('showShare', YesNoButtonGroupType::class, [
             'label' => 'mautic.integration.Facebook.share.showshare',
-            'data'  => (!isset($options['data']['showShare'])) ? 1 : $options['data']['showShare'],
+            'data'  => $options['data']['showShare'] ?? 1,
         ]);
     }
 

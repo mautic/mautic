@@ -345,7 +345,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
                 );
             }
 
-            foreach ($stats as $contactId => $sentCount) {
+            foreach (array_keys($stats) as $contactId) {
                 /** @var LeadEventLog $log */
                 $log = $event->findLogByContactId($contactId);
                 // Pass with a note to the UI because no use retrying

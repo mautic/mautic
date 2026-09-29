@@ -72,7 +72,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
     {
         $featureSettings = $this->getKeys();
 
-        return !empty($featureSettings['datacenter']) ? $featureSettings['datacenter'] : 'zoho.com';
+        return empty($featureSettings['datacenter']) ? 'zoho.com' : $featureSettings['datacenter'];
     }
 
     public function getApiUrl(): string
@@ -1233,7 +1233,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
             $object = 'Leads';
         }
 
-        $objects = (!is_array($object)) ? [$object] : $object;
+        $objects = (is_array($object)) ? $object : [$object];
         if (is_string($object) && 'Accounts' === $object) {
             return $fields['companyFields'] ?? $fields;
         }

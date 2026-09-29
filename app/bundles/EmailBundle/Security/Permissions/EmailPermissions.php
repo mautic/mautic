@@ -67,7 +67,7 @@ final class EmailPermissions extends AbstractPermissions
                 'choices'           => $choices,
                 'choices_as_values' => true,
                 'label'             => $this->getLabel($bundle, $level),
-                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+                'data'              => (empty($data[$level]) ? [] : $data[$level]),
                 'bundle'            => $bundle,
                 'level'             => $level,
             ]

@@ -17,7 +17,7 @@ final class ModelPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $modelServices = [];
-        foreach ($container->findTaggedServiceIds(self::TAG) as $id => $tags) {
+        foreach (array_keys($container->findTaggedServiceIds(self::TAG)) as $id) {
             $modelServices[$id] = new Reference($id);
 
             // because aliases are not tagged we need to inject them too.

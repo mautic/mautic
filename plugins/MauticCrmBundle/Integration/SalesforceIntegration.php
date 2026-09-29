@@ -645,7 +645,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $object = 'Lead';
         }
 
-        $objects = (!is_array($object)) ? [$object] : $object;
+        $objects = (is_array($object)) ? $object : [$object];
         if (is_string($object) && 'Account' === $object) {
             return $fields['companyFields'] ?? $fields;
         }
@@ -1466,7 +1466,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $mixedFields = array_filter($fields['leadFields'] ?? []);
         $fields      = [];
-        foreach ($mixedFields as $sfField => $mField) {
+        foreach (array_keys($mixedFields) as $sfField) {
             if (str_contains($sfField, '__'.$object)) {
                 $fields[] = str_replace('__'.$object, '', $sfField);
             }
@@ -1549,9 +1549,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $referenceId       = $integrationEntity->getId();
                         $internalLeadId    = $integrationEntity->getInternalEntityId();
                     }
-                    $id              = !empty($lead->getId()) ? $lead->getId() : '';
+                    $id              = empty($lead->getId()) ? '' : $lead->getId();
                     $id .= '-CampaignMember'.$campaignMembers[$memberId];
-                    $id .= !empty($referenceId) ? '-'.$referenceId : '';
+                    $id .= empty($referenceId) ? '' : '-'.$referenceId;
                     $id .= $campaignMappingId;
                     $patchurl        = $url.'/'.$campaignMembers[$memberId];
                     $mauticData[$id] = [
@@ -1564,7 +1564,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         ],
                     ];
                 } else {
-                    $id              = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMemberNew-null'.$campaignMappingId;
+                    $id              = (empty($lead->getId()) ? '' : $lead->getId()).'-CampaignMemberNew-null'.$campaignMappingId;
                     $mauticData[$id] = [
                         'method'      => 'POST',
                         'url'         => $url,
@@ -1808,7 +1808,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if ($objectId) {
                     $url .= '/'.$objectId;
                 }
-                $id              = $entity['internal_entity_id'].'-'.$object.(!empty($entity['id']) ? '-'.$entity['id'] : '');
+                $id              = $entity['internal_entity_id'].'-'.$object.(empty($entity['id']) ? '' : '-'.$entity['id']);
                 $method          = ($objectId) ? 'PATCH' : 'POST';
                 $mauticData[$id] = [
                     'method'      => $method,
@@ -2154,7 +2154,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $checkEmailsInSF[$key]            = $contactEntity;
                     $trackedContacts['Contact'][$key] = $contactEntity['id'];
                 } else {
-                    $id = (!empty($sfEntityRecord['ConvertedContactId'])) ? $sfEntityRecord['ConvertedContactId'] : $sfEntityRecord['Id'];
+                    $id = (empty($sfEntityRecord['ConvertedContactId'])) ? $sfEntityRecord['Id'] : $sfEntityRecord['ConvertedContactId'];
                     // This contact does not have a Contact record
                     $integrationEntity = $this->createIntegrationEntity(
                         'Contact',
@@ -2190,8 +2190,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 // Keep track of Mautic ID to Salesforce ID for the integration table
-                $this->salesforceIdMapping[$contactId] = (!empty($sfEntityRecord['ConvertedContactId'])) ? $sfEntityRecord['ConvertedContactId']
-                    : $sfEntityRecord['Id'];
+                $this->salesforceIdMapping[$contactId] = (empty($sfEntityRecord['ConvertedContactId'])) ? $sfEntityRecord['Id']
+                    : $sfEntityRecord['ConvertedContactId'];
 
                 $leadEntity = $this->em->getReference(Lead::class, $leadData['internal_entity_id']);
                 if ($updateLead = $this->buildCompositeBody(
@@ -2427,7 +2427,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config, 'Account', 'mautic_company');
 
             $fieldMapping[$object]    = [
-                'update' => !empty($fieldsToUpdateInSf) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
+                'update' => empty($fieldsToUpdateInSf) ? [] : array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf),
                 'create' => $fieldsToCreate,
             ];
             $entity['primaryCompany'] = $company->getProfileFields();
@@ -2485,7 +2485,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             default:
                 $mixedFields = array_filter($fields['leadFields'] ?? []);
                 $fields      = [];
-                foreach ($mixedFields as $sfField => $mField) {
+                foreach (array_keys($mixedFields) as $sfField) {
                     if (str_contains($sfField, '__'.$object)) {
                         $fields[] = str_replace('__'.$object, '', $sfField);
                     }
@@ -2655,7 +2655,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config, $sfObject, 'mautic_company');
 
         $objectFields['company'] = [
-            'update' => !empty($fieldsToUpdateInSf) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
+            'update' => empty($fieldsToUpdateInSf) ? [] : array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf),
             'create' => $fieldsToCreate,
         ];
 

@@ -68,7 +68,7 @@ final class LeadPermissions extends AbstractPermissions
                     'mautic.core.permissions.view'   => 'view',
                 ],
                 'label'             => 'mautic.lead.permissions.fields',
-                'data'              => (!empty($data['fields']) ? $data['fields'] : []),
+                'data'              => (empty($data['fields']) ? [] : $data['fields']),
                 'bundle'            => 'lead',
                 'level'             => 'fields',
             ]

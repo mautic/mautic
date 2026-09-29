@@ -38,7 +38,7 @@ final class ApiPermissions extends AbstractPermissions
                     'mautic.api.permissions.granted' => 'full',
                 ],
                 'label'             => 'mautic.api.permissions.apiaccess',
-                'data'              => (!empty($data['access']) ? $data['access'] : []),
+                'data'              => (empty($data['access']) ? [] : $data['access']),
                 'bundle'            => 'api',
                 'level'             => 'access',
             ]

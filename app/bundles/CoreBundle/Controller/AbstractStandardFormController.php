@@ -539,7 +539,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 if (is_object($objectId)) {
                     $entity   = $objectId;
                     $isClone  = true;
-                    $objectId = (!empty($this->sessionId)) ? $this->sessionId : 'mautic_'.sha1(uniqid(mt_rand(), true));
+                    $objectId = (empty($this->sessionId)) ? 'mautic_'.sha1(uniqid(mt_rand(), true)) : $this->sessionId;
                 } elseif (str_contains($objectId, 'mautic_')) {
                     $isClone = true;
                     $entity  = $model->getEntity();
@@ -1024,7 +1024,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'route'         => $this->generateUrl(
                     $this->getActionRoute(),
                     [
-                        'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
+                        'objectAction' => (empty($valid) ? 'new' : 'edit'), // valid means a new form was applied
                         'objectId'     => ($entity) ? $entity->getId() : 0,
                     ]
                 ),

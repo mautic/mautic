@@ -604,7 +604,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             'lte' => 'mautic.lead.list.form.operator.lessthanequals.date',
         ];
 
-        foreach ($operators as $operator => $string) {
+        foreach (array_keys($operators) as $operator) {
             if (isset($translationKeys[$operator])) {
                 $operators[$operator] = $this->translator->trans($translationKeys[$operator]);
             }

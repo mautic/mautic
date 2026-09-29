@@ -177,7 +177,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getLeadData(?\DateTime $startDate = null, ?\DateTime $endDate = null, $leadId = [])
     {
-        $leadIds      = (!is_array($leadId)) ? [$leadId] : $leadId;
+        $leadIds      = (is_array($leadId)) ? $leadId : [$leadId];
         $leadActivity = [];
 
         $config = $this->mergeConfigToFeatureSettings();

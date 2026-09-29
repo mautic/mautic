@@ -89,7 +89,7 @@ final class LineChart extends AbstractChart implements ChartInterface
         /** @var \DateTime $date */
         $date    = clone $this->dateFrom;
         $oneUnit = $this->getUnitInterval();
-        $format  = !empty($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$this->unit];
+        $format  = empty($this->dateFormat) ? $this->labelFormats[$this->unit] : $this->dateFormat;
 
         for ($i = 0; $i < $amount; ++$i) {
             $this->labels[] = $date->format($format);

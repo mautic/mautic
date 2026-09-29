@@ -202,7 +202,7 @@ final class FieldType extends AbstractType
             'label',
             TextType::class,
             [
-                'label'       => !empty($labelText) ? $labelText : 'mautic.form.field.form.label',
+                'label'       => empty($labelText) ? 'mautic.form.field.form.label' : $labelText,
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
                 'constraints' => [
@@ -231,12 +231,12 @@ final class FieldType extends AbstractType
         }
 
         if ($addShowLabel) {
-            $default = (!isset($options['data']['showLabel'])) ? true : (bool) $options['data']['showLabel'];
+            $default = (isset($options['data']['showLabel'])) ? (bool) $options['data']['showLabel'] : true;
             $builder->add(
                 'showLabel',
                 YesNoButtonGroupType::class,
                 [
-                    'label' => (!empty($showLabelText)) ? $showLabelText : 'mautic.form.field.form.showlabel',
+                    'label' => (empty($showLabelText)) ? 'mautic.form.field.form.showlabel' : $showLabelText,
                     'data'  => $default,
                 ]
             );
@@ -272,7 +272,7 @@ final class FieldType extends AbstractType
         }
 
         if ($addIsRequired) {
-            $default = (!isset($options['data']['isRequired'])) ? false : (bool) $options['data']['isRequired'];
+            $default = isset($options['data']['isRequired']) && (bool) $options['data']['isRequired'];
             $builder->add(
                 'isRequired',
                 YesNoButtonGroupType::class,
@@ -375,8 +375,8 @@ final class FieldType extends AbstractType
         }
 
         if ($addSaveResult) {
-            $default = !isset($options['data']['saveResult']) ? true
-                : (bool) $options['data']['saveResult'];
+            $default = isset($options['data']['saveResult']) ? (bool) $options['data']['saveResult']
+                : true;
             $builder->add(
                 'saveResult',
                 YesNoButtonGroupType::class,
@@ -405,8 +405,8 @@ final class FieldType extends AbstractType
                 ]
             );
 
-            $default = !isset($options['data']['showWhenValueExists']) ? true
-                : (bool) $options['data']['showWhenValueExists'];
+            $default = isset($options['data']['showWhenValueExists']) ? (bool) $options['data']['showWhenValueExists']
+                : true;
             $builder->add(
                 'showWhenValueExists',
                 YesNoButtonGroupType::class,
@@ -436,7 +436,7 @@ final class FieldType extends AbstractType
             );
 
             if ($isAutoFillFeatureEnabled) {
-                $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? false : (bool) $options['data']['isAutoFill'];
+                $isAutoFillValue = isset($options['data']['isAutoFill']) && (bool) $options['data']['isAutoFill'];
                 $builder->add(
                     'isAutoFill',
                     YesNoButtonGroupType::class,

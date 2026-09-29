@@ -175,7 +175,7 @@ final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     private function createCategories(): array
     {
         $categories = [];
-        foreach ($this->categoryFlags as $suffix => $name) {
+        foreach (array_keys($this->categoryFlags) as $suffix) {
             $categories[$suffix] = $this->createCategory('Category '.$suffix, 'category '.$suffix);
         }
 

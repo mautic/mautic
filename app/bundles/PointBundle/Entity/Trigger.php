@@ -20,7 +20,6 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -58,6 +57,7 @@ class Trigger extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -161,11 +161,6 @@ class Trigger extends FormEntity implements UuidInterface
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'point_trigger_projects_xref', 'point_trigger_id');
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
     }
 
     /**

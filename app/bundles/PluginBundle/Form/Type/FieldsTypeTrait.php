@@ -120,7 +120,7 @@ trait FieldsTypeTrait
                     $fieldData[$fieldsName] = $options['integration_object']->formatMatchedFields($fieldData[$fieldsName]);
                 }
 
-                foreach ($paginatedFields as $field => $details) {
+                foreach (array_keys($paginatedFields) as $field) {
                     $matched  = isset($fieldData[$fieldsName][$field]);
                     $required = (int) (!empty($integrationFields[$field]['required']) || 'Email' == $choices[$field]);
                     ++$index;

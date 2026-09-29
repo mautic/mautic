@@ -327,9 +327,9 @@ class CommonController extends AbstractController implements MauticController
             foreach ($flashes as $flash) {
                 $this->addFlashMessage(
                     $flash['msg'],
-                    !empty($flash['msgVars']) ? $flash['msgVars'] : [],
-                    !empty($flash['type']) ? $flash['type'] : 'notice',
-                    !empty($flash['domain']) ? $flash['domain'] : 'flashes'
+                    empty($flash['msgVars']) ? [] : $flash['msgVars'],
+                    empty($flash['type']) ? 'notice' : $flash['type'],
+                    empty($flash['domain']) ? 'flashes' : $flash['domain']
                 );
             }
         }
@@ -691,7 +691,7 @@ class CommonController extends AbstractController implements MauticController
                 'notifications' => $notifications,
                 'updateMessage' => $updateMessage,
             ]) : '',
-            'lastId'              => (!empty($lastNotification)) ? $lastNotification['id'] : $afterId,
+            'lastId'              => (empty($lastNotification)) ? $afterId : $lastNotification['id'],
             'hasNewNotifications' => $showNewIndicator,
             'updateAvailable'     => (!empty($updateMessage)),
         ];

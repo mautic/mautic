@@ -34,7 +34,7 @@ final class UserStepType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
                 'required'    => true,
-                'data'        => (!empty($storedData->firstname)) ? $storedData->firstname : '',
+                'data'        => (empty($storedData->firstname)) ? '' : $storedData->firstname,
                 'constraints' => [
                     new Assert\NotBlank(
                         message: 'mautic.core.value.required'
@@ -51,7 +51,7 @@ final class UserStepType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
                 'required'    => true,
-                'data'        => (!empty($storedData->lastname)) ? $storedData->lastname : '',
+                'data'        => (empty($storedData->lastname)) ? '' : $storedData->lastname,
                 'constraints' => [
                     new Assert\NotBlank(
                         message: 'mautic.core.value.required'
@@ -71,7 +71,7 @@ final class UserStepType extends AbstractType
                     'preaddon' => 'ri-mail-line',
                 ],
                 'required'    => true,
-                'data'        => (!empty($storedData->email)) ? $storedData->email : '',
+                'data'        => (empty($storedData->email)) ? '' : $storedData->email,
                 'constraints' => [
                     new Assert\NotBlank(
                         message: 'mautic.core.value.required'
@@ -93,7 +93,7 @@ final class UserStepType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'required'    => true,
-                'data'        => (!empty($storedData->username)) ? $storedData->username : '',
+                'data'        => (empty($storedData->username)) ? '' : $storedData->username,
                 'constraints' => [
                     new Assert\NotBlank(
                         message: 'mautic.core.value.required'

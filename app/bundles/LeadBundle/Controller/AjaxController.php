@@ -724,7 +724,7 @@ final class AjaxController extends CommonAjaxController
                         }
                         break;
                     default:
-                        $options = (!empty($properties)) ? $properties : [];
+                        $options = (empty($properties)) ? [] : $properties;
                 }
             }
 

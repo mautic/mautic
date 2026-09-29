@@ -149,14 +149,14 @@ trait EntityFieldsBuildFormTrait
                             $opts['format']              = 'yyyy-MM-dd HH:mm:ss';
                             $opts['with_seconds']        = true;
 
-                            $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
+                            $opts['data'] = (empty($value)) ? null : $dtHelper->toLocalString('Y-m-d H:i:s');
                         } elseif (DateType::class === $type) {
                             $opts['attr']['data-toggle'] = 'date';
-                            $opts['data']                = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
+                            $opts['data']                = (empty($value)) ? null : $dtHelper->toLocalString('Y-m-d');
                         } else {
                             $opts['attr']['data-toggle'] = 'time';
                             // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
-                            $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
+                            $opts['data']          = (empty($value)) ? null : $dtHelper->toLocalString('H:i:s');
                         }
 
                         $builder->addEventListener(

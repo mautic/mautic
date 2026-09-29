@@ -218,7 +218,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         }
 
         if (!$sms->isPublished()) {
-            foreach ($contacts as $contactId => $contact) {
+            foreach (array_keys($contacts) as $contactId) {
                 $results[$contactId] = [
                     'sent'   => false,
                     'status' => 'mautic.sms.campaign.failed.unpublished',
@@ -556,7 +556,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                 );
 
                 foreach ($entities as $entity) {
-                    $mms                                         = !empty($entity['media']) ? '['.$this->translator->trans('mautic.sms.form.mms').'] ' : '';
+                    $mms                                         = empty($entity['media']) ? '' : '['.$this->translator->trans('mautic.sms.form.mms').'] ';
                     $results[$entity['language']][$entity['id']] = $mms.$entity['name'];
                 }
 

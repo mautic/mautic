@@ -249,7 +249,7 @@ final class SalesforceApi extends CrmApi
     public function createLeadActivity(array $activity, $object): array
     {
         $config              = $this->integration->getIntegrationSettings()->getFeatureSettings();
-        $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
+        $namespace           = (empty($config['namespace'])) ? '' : $config['namespace'].'__';
         $mActivityObjectName = $namespace.'mautic_timeline__c';
         $activityData        = [];
 

@@ -237,7 +237,7 @@ final class ClearbitController extends FormController
         }
         if ('POST' === $request->getMethod()) {
             $notify = array_key_exists('notify', $data);
-            foreach ($lookupEmails as $id => $lookupEmail) {
+            foreach (array_keys($lookupEmails) as $id) {
                 if ($lead = $this->leadModel->getEntity($id)) {
                     try {
                         $lookupHelper->lookupContact($lead, $notify);
@@ -479,7 +479,7 @@ final class ClearbitController extends FormController
         }
         if ('POST' === $request->getMethod()) {
             $notify = array_key_exists('notify', $data);
-            foreach ($lookupWebsites as $id => $lookupWebsite) {
+            foreach (array_keys($lookupWebsites) as $id) {
                 if ($company = $this->companyModel->getEntity($id)) {
                     try {
                         $lookupHelper->lookupCompany($company, $notify);

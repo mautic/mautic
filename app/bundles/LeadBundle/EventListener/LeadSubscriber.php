@@ -528,7 +528,7 @@ final class LeadSubscriber implements EventSubscriberInterface
                         'event'      => $eventTypeKey,
                         'eventType'  => $eventTypeName,
                         'eventId'    => $eventTypeKey.$utmTag['id'],
-                        'eventLabel' => !empty($utmTag['utm_campaign']) ? $this->translator->trans('mautic.lead.timeline.event.utmcampaign').': '.$utmTag['utm_campaign'] : $eventTypeName,
+                        'eventLabel' => empty($utmTag['utm_campaign']) ? $eventTypeName : $this->translator->trans('mautic.lead.timeline.event.utmcampaign').': '.$utmTag['utm_campaign'],
                         'timestamp'  => $utmTag['date_added'],
                         'icon'       => $icon,
                         'extra'      => [
@@ -637,7 +637,7 @@ final class LeadSubscriber implements EventSubscriberInterface
                         'event'      => $eventTypeKey,
                         'eventId'    => $eventTypeKey.$import['id'],
                         'eventType'  => $eventTypeName,
-                        'eventLabel' => !empty($import['object_id']) ? [
+                        'eventLabel' => empty($import['object_id']) ? $eventLabel : [
                             'label' => $eventLabel,
                             'href'  => $this->router->generate(
                                 'mautic_import_action',
@@ -647,7 +647,7 @@ final class LeadSubscriber implements EventSubscriberInterface
                                     'objectId'     => $import['object_id'],
                                 ]
                             ),
-                        ] : $eventLabel,
+                        ],
                         'timestamp'       => $import['date_added'],
                         'icon'            => 'ri-download-line',
                         'extra'           => $import,

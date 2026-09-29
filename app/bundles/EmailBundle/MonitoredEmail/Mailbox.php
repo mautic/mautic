@@ -220,10 +220,10 @@ class Mailbox
      */
     public function switchMailbox($bundle, $mailbox = ''): void
     {
-        $key = $bundle.(!empty($mailbox) ? '_'.$mailbox : '');
+        $key = $bundle.(empty($mailbox) ? '' : '_'.$mailbox);
 
         if (isset($this->mailboxes[$key])) {
-            $this->settings           = (!empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes[$key] : $this->mailboxes['general'];
+            $this->settings           = (empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes['general'] : $this->mailboxes[$key];
             $this->imapFolder         = $this->mailboxes[$key]['folder'];
             $this->settings['folder'] = $this->mailboxes[$key]['folder'];
             // Disconnect so that new mailbox settings are used
@@ -261,7 +261,7 @@ class Mailbox
     public function getImapPath(array $settings): array
     {
         if (!isset($settings['encryption'])) {
-            $settings['encryption'] = (!empty($settings['ssl'])) ? '/ssl' : '';
+            $settings['encryption'] = (empty($settings['ssl'])) ? '' : '/ssl';
         }
         $path     = "{{$settings['host']}:{$settings['port']}/imap{$settings['encryption']}}";
         $fullPath = $path;
@@ -300,10 +300,10 @@ class Mailbox
             return $this->settings;
         }
 
-        $key = $bundle.(!empty($mailbox) ? '_'.$mailbox : '');
+        $key = $bundle.(empty($mailbox) ? '' : '_'.$mailbox);
 
         if (isset($this->mailboxes[$key])) {
-            $settings = (!empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes[$key] : $this->mailboxes['general'];
+            $settings = (empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes['general'] : $this->mailboxes[$key];
 
             $settings['folder'] = $this->mailboxes[$key]['folder'];
             $this->setImapPath($settings);
@@ -893,7 +893,7 @@ class Mailbox
                 if (empty($params['filename']) && empty($params['name'])) {
                     $fileName = $attachmentId.'.'.strtolower($partStructure->subtype);
                 } else {
-                    $fileName = !empty($params['filename']) ? $params['filename'] : $params['name'];
+                    $fileName = empty($params['filename']) ? $params['name'] : $params['filename'];
                     $fileName = $this->decodeMimeStr($fileName, $this->serverEncoding);
                     $fileName = $this->decodeRFC2231($fileName, $this->serverEncoding);
                 }
@@ -923,9 +923,9 @@ class Mailbox
             }
 
             if (!empty($data)) {
-                $subtype = !empty($partStructure->ifsubtype)
-                    ? strtolower($partStructure->subtype)
-                    : '';
+                $subtype = empty($partStructure->ifsubtype)
+                    ? ''
+                    : strtolower($partStructure->subtype);
                 switch ($partStructure->type) {
                     case TYPETEXT:
                         match ($subtype) {

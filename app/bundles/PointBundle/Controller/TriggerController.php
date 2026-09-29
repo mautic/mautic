@@ -282,7 +282,7 @@ final class TriggerController extends FormController
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
                 'route'         => $this->generateUrl('mautic_pointtrigger_action', [
-                    'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
+                    'objectAction' => (empty($valid) ? 'new' : 'edit'), // valid means a new form was applied
                     'objectId'     => $entity->getId(), ]
                 ),
             ],

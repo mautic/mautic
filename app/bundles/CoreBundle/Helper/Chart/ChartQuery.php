@@ -402,7 +402,7 @@ class ChartQuery extends AbstractChart
         }
 
         if ($countAverage) {
-            foreach ($data as $key => $value) {
+            foreach (array_keys($data) as $key) {
                 if (!empty($averageCounts[$key])) {
                     $data[$key] = round($data[$key] / $averageCounts[$key], 2);
                 }

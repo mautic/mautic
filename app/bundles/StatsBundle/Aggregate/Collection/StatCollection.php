@@ -63,7 +63,7 @@ final class StatCollection
      */
     public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count): static
     {
-        if (preg_match('/([0-9]{4})\\s([0-9]{2})/', $dateTimeInUTC, $matches)) {    //  Is this a week?
+        if (preg_match('/(\d{4})\s(\d{2})/', $dateTimeInUTC, $matches)) {    //  Is this a week?
             $dateTimeString = CalculatorHelper::getWeekDateString($matches[1].'-'.$matches[2]);
             $dateTime       = new \DateTime($dateTimeString, new \DateTimeZone('UTC'));
         } elseif (4 === strlen($dateTimeInUTC) && is_numeric($dateTimeInUTC)) {

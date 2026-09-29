@@ -31,7 +31,7 @@ final class StatRepository extends CommonRepository
 
         $result = $q->getQuery()->getResult();
 
-        return (!empty($result)) ? $result[0] : null;
+        return (empty($result)) ? null : $result[0];
     }
 
     /**

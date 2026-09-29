@@ -75,9 +75,9 @@ final class BatchTransport extends AbstractTransport implements TokenTransportIn
             }
         }
 
-        $this->fromAddresses[]    = !empty($message->getFrom()) ? $message->getFrom()[0]->getAddress() : null;
-        $this->fromNames[]        = !empty($message->getFrom()) ? $message->getFrom()[0]->getName() : null;
-        $this->replyToAddresses[] = !empty($message->getReplyTo()) ? $message->getReplyTo()[0]->getAddress() : null;
+        $this->fromAddresses[]    = empty($message->getFrom()) ? null : $message->getFrom()[0]->getAddress();
+        $this->fromNames[]        = empty($message->getFrom()) ? null : $message->getFrom()[0]->getName();
+        $this->replyToAddresses[] = empty($message->getReplyTo()) ? null : $message->getReplyTo()[0]->getAddress();
         $this->message            = $message;
     }
 

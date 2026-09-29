@@ -180,7 +180,7 @@ class LeadModel extends FormModel
             // set the point trigger model in order to get the color code for the lead
             $fields = $this->leadFieldModel->getFieldList(true, false);
 
-            $socialFields = (!empty($fields['social'])) ? array_keys($fields['social']) : [];
+            $socialFields = (empty($fields['social'])) ? [] : array_keys($fields['social']);
             $this->leadRepository->setAvailableSocialFields($socialFields);
 
             $searchFields = [];
@@ -899,7 +899,7 @@ class LeadModel extends FormModel
         $this->setFieldValues($lead, $values, false, false);
         $cleanFields = $lead->getFields();
 
-        foreach ($inQuery as $k => $v) {
+        foreach (array_keys($inQuery) as $k) {
             if (empty($queryFields[$k])) {
                 unset($inQuery[$k]);
             }
@@ -1128,8 +1128,8 @@ class LeadModel extends FormModel
                 $frequencyRule->setFrequencyTime(null);
             }
 
-            $frequencyRule->setPauseFromDate(!empty($data['lead_channels']['contact_pause_start_date_'.$ch]) ? $data['lead_channels']['contact_pause_start_date_'.$ch] : null);
-            $frequencyRule->setPauseToDate(!empty($data['lead_channels']['contact_pause_end_date_'.$ch]) ? $data['lead_channels']['contact_pause_end_date_'.$ch] : null);
+            $frequencyRule->setPauseFromDate(empty($data['lead_channels']['contact_pause_start_date_'.$ch]) ? null : $data['lead_channels']['contact_pause_start_date_'.$ch]);
+            $frequencyRule->setPauseToDate(empty($data['lead_channels']['contact_pause_end_date_'.$ch]) ? null : $data['lead_channels']['contact_pause_end_date_'.$ch]);
 
             $frequencyRule->setLead($lead);
             $frequencyRule->setPreferredChannel($data['lead_channels']['preferred_channel'] === $ch);

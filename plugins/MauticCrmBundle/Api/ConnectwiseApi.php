@@ -36,7 +36,7 @@ class ConnectwiseApi extends CrmApi
         $code   = 0;
 
         if (is_array($response)) {
-            foreach ($response as $key => $r) {
+            foreach (array_keys($response) as $key) {
                 $key = preg_replace('/[\r\n]+/', '', $key);
                 switch ($key) {
                     case '<!DOCTYPE_html_PUBLIC_"-//W3C//DTD_XHTML_1_0_Strict//EN"_"http://www_w3_org/TR/xhtml1/DTD/xhtml1-strict_dtd"><html_xmlns':
