@@ -124,7 +124,7 @@ class TransportChain
     /**
      * @param string $content
      *
-     * @return mixed
+     * @return bool|string
      *
      * @throws \Exception
      */

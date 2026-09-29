@@ -68,6 +68,7 @@ Mautic.smsOnLoad = function (container, response) {
     }
 
     Mautic.initSmsAtWho();
+    Mautic.updateSmsScheduleOptions();
 };
 
 Mautic.setSmsCharactersCount = function (smsMessage) {
@@ -101,11 +102,19 @@ Mautic.selectSmsType = function(smsType) {
     }
 
     mQuery('#sms_smsType').val(smsType);
+    Mautic.updateSmsScheduleOptions();
 
     mQuery('body').removeClass('noscroll');
 
     mQuery('.sms-type-modal').remove();
     mQuery('.sms-type-modal-backdrop').remove();
+};
+
+Mautic.updateSmsScheduleOptions = function() {
+    const isSegmentSms = mQuery('#sms_smsType').val() === 'list';
+
+    mQuery('#smsScheduleDates').toggleClass('hide', isSegmentSms);
+    mQuery('#smsScheduleOptionsNotice').toggleClass('hide', !isSegmentSms);
 };
 
 Mautic.standardSmsUrl = function(options) {
