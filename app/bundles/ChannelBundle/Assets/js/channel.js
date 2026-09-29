@@ -3,6 +3,28 @@ Mautic.messagesOnLoad = function(container) {
       // Move modals outside of the wrapper
       mQuery(this).closest('.panel').append(mQuery(this));
     });
+
+    const emailChannelSelect = mQuery(container + ' .message_channel_properties_email select[id$="_channelId"]');
+    if (emailChannelSelect.length) {
+        emailChannelSelect.on('change', function() {
+            Mautic.setMarketingMessageEmailChannelSendToDncStatus(mQuery(this).val());
+        });
+        if (emailChannelSelect.val()) {
+            Mautic.setMarketingMessageEmailChannelSendToDncStatus(emailChannelSelect.val());
+        }
+    }
+};
+
+Mautic.messageSendOnLoad = function(container) {
+    const marketingMessageSelect = mQuery(container + ' #campaignevent_properties_marketingMessage');
+    if (marketingMessageSelect.length) {
+        marketingMessageSelect.on('change', function() {
+            Mautic.setMarketingMessageSendToDncStatus(mQuery(this).val());
+        });
+        if (marketingMessageSelect.val()) {
+            Mautic.setMarketingMessageSendToDncStatus(marketingMessageSelect.val());
+        }
+    }
 };
 
 Mautic.toggleChannelFormDisplay = function (el, channel) {
@@ -27,3 +49,38 @@ Mautic.cancelQueuedMessageEvent = function (channelId) {
         }, false
     );
 };
+
+Mautic.setMarketingMessageSendToDncStatus = function (messageId) {
+    Mautic.setSendToDncStatus(
+        messageId,
+        'marketing_message_send_to_dnc_status',
+        'channel:getMarketingMessageSendToDncStatus'
+    )
+};
+
+Mautic.setMarketingMessageEmailChannelSendToDncStatus = function (emailId) {
+    Mautic.setSendToDncStatus(
+        emailId,
+        'marketing_message_email_channel_send_to_dnc_status',
+        'email:getEmailSendToDncStatus'
+    )
+};
+
+Mautic.setSendToDncStatus = function (id, selector, action) {
+    const statusElement = mQuery('#'+selector);
+    if (id && statusElement.length > 0) {
+        Mautic.ajaxActionRequest(action, {id: id}, function(response) {
+            if (typeof response.sendToDncStatus != "undefined") {
+                statusElement.removeClass('hide')
+                statusElement.find('span.dnc-status-text')
+                    .removeClass('label-danger label-primary')
+                    .addClass(response.sendToDncStatus ? 'label-danger' : 'label-primary')
+                    .text(response.sendToDncText);
+            } else {
+                statusElement.addClass('hide');
+            }
+        }, false, false, "GET");
+    } else {
+        statusElement.addClass('hide');
+    }
+}
