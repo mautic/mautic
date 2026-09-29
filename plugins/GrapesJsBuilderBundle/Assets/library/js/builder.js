@@ -18,7 +18,7 @@ function launchBuilderGrapesjs(formName) {
   // builder cannot save against its temporary session id, so persist the clone
   // first and let the normal inBuilder response reopen the builder with the
   // newly assigned entity id.
-  if (formName === 'emailform' && typeof sessionId === 'string' && sessionId.startsWith('new_')) {
+  if (formName === 'emailform' && typeof sessionId === 'string' && sessionId && window.location.pathname.includes('/emails/clone/')) {
     const saveButton = form.find('button.btn-save').first();
 
     if (!saveButton.length) {
