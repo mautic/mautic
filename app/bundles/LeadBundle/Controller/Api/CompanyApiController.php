@@ -120,8 +120,8 @@ final class CompanyApiController extends CommonApiController
     /**
      * Removes given contact from a company.
      *
-     * @param int $companyId List ID
-     * @param int $contactId Lead ID
+     * @param int        $companyId List ID
+     * @param int|string $contactId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -132,7 +132,7 @@ final class CompanyApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function removeContactAction(int $companyId, int $contactId): Response
+    public function removeContactAction(int $companyId, int|string $contactId): Response
     {
         $company = $this->model->getEntity($companyId);
         $view    = $this->view(['success' => 1], Response::HTTP_OK);

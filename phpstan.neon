@@ -283,6 +283,7 @@ rules:
     - Utils\PHPStan\Rule\RepositoryMethodMustHaveReturnTypeRule
     - Utils\PHPStan\Rule\CollectionGetterMustReturnCollectionRule
     - Utils\PHPStan\Rule\MockedMethodReturnMustMatchNativeTypeRule
+    - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     # enable later, might not be needed
     - Symplify\PHPStanRules\Rules\NoDuplicateNonRepeatableAttributeRule
 

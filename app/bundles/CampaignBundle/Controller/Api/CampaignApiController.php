@@ -116,8 +116,8 @@ final class CampaignApiController extends CommonApiController
     /**
      * Adds a lead to a campaign.
      *
-     * @param int $id     Campaign ID
-     * @param int $leadId Lead ID
+     * @param int        $id     Campaign ID
+     * @param int|string $leadId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -128,7 +128,7 @@ final class CampaignApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addLeadAction(int $id, int $leadId): Response
+    public function addLeadAction(int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {

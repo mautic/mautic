@@ -2301,7 +2301,7 @@ final class LeadController extends FormController
         name: 'mautic_contact_export_action',
         requirements: ['contactId' => '\d+'],
     )]
-    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, int $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, int|string $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -2397,7 +2397,7 @@ final class LeadController extends FormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
-    public function contactStatsAction(int $objectId): Response
+    public function contactStatsAction(int|string $objectId): Response
     {
         /** @var Lead $lead */
         $lead = $this->leadModel->getEntity($objectId);
