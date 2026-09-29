@@ -231,11 +231,11 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
             'attribution'      => null,
             'website'          => null,
             'facebook'         => null,
-            'foursquare'       => null,
             'instagram'        => null,
             'linkedin'         => null,
-            'skype'            => null,
+            'tiktok'           => null,
             'twitter'          => null,
+            'youtube'          => null,
         ];
     }
 }

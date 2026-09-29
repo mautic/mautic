@@ -123,9 +123,13 @@ final class PublicController extends FormController
             if (array_key_exists('socialProfiles', $result)) {
                 $socialProfiles = $result['socialProfiles'];
             }
-            foreach (['facebook', 'foursquare', 'instagram', 'linkedin', 'twitter'] as $p) {
+            foreach (['facebook', 'instagram', 'linkedin', 'tiktok', 'twitter', 'youtube'] as $p) {
                 foreach ($socialProfiles as $socialProfile) {
-                    if (array_key_exists('type', $socialProfile) && $socialProfile['type'] === $p && empty($currFields[$p]['value'])) {
+                    if (array_key_exists($p, $currFields)
+                        && array_key_exists('type', $socialProfile)
+                        && $socialProfile['type'] === $p
+                        && empty($currFields[$p]['value'])
+                    ) {
                         $data[$p] = array_key_exists('url', $socialProfile) ? $socialProfile['url'] : '';
                         break;
                     }
@@ -158,16 +162,6 @@ final class PublicController extends FormController
                     && empty($currFields['website']['value'])
                 ) {
                     $data['website'] = $result['contactInfo']['websites'][0]['url'];
-                }
-
-                if ((array_key_exists('chats', $result['contactInfo'])
-                        && array_key_exists(
-                            'skype',
-                            $result['contactInfo']['chats']
-                        ))
-                    && empty($currFields['skype']['value'])
-                ) {
-                    $data['skype'] = $result['contactInfo']['chats']['skype']['handle'];
                 }
             }
 
