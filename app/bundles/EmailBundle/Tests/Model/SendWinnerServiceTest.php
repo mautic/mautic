@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
@@ -113,7 +114,7 @@ final class SendWinnerServiceTest extends TestCase
         $this->sendWinnerService->processWinnerEmails($emailId);
 
         $variantSettings = $variant->getVariantSettings();
-        $this->assertNotInstanceOf(\Mautic\CoreBundle\Entity\VariantEntityInterface::class, $variant->getVariantParent());
+        $this->assertNotInstanceOf(VariantEntityInterface::class, $variant->getVariantParent());
         $this->assertTrue($variant->isPublished());
         $this->assertFalse($email->isPublished());
         $this->assertSame($variant, $email->getVariantParent());
@@ -188,7 +189,7 @@ final class SendWinnerServiceTest extends TestCase
         $this->sendWinnerService->processWinnerEmails();
 
         $variantSettings = $variant->getVariantSettings();
-        $this->assertNotInstanceOf(\Mautic\CoreBundle\Entity\VariantEntityInterface::class, $variant->getVariantParent());
+        $this->assertNotInstanceOf(VariantEntityInterface::class, $variant->getVariantParent());
         $this->assertTrue($variant->isPublished());
         $this->assertFalse($email->isPublished());
         $this->assertSame($variant, $email->getVariantParent());
