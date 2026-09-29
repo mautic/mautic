@@ -7,6 +7,7 @@ namespace Mautic\DynamicContentBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Mautic\LeadBundle\Entity\Lead;
 
 class Stat
@@ -80,7 +81,7 @@ class Stat
 
         $builder->addLead(true, 'SET NULL');
 
-        $builder->createField('dateSent', 'datetime')
+        $builder->createField('dateSent', UTCDateTimeMicrosecondType::NAME)
             ->columnName('date_sent')
             ->precision(3)
             ->build();

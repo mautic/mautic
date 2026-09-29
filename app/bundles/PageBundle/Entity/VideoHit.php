@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -140,12 +141,12 @@ class VideoHit
 
         $builder->addId();
 
-        $builder->createField('dateHit', 'datetime')
+        $builder->createField('dateHit', UTCDateTimeMicrosecondType::NAME)
             ->columnName('date_hit')
             ->precision(3)
             ->build();
 
-        $builder->createField('dateLeft', 'datetime')
+        $builder->createField('dateLeft', UTCDateTimeMicrosecondType::NAME)
             ->columnName('date_left')
             ->precision(3)
             ->nullable()

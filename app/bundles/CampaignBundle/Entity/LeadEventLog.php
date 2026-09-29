@@ -6,6 +6,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
@@ -141,7 +142,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
         $builder->addIpAddress(true);
 
-        $builder->createField('dateTriggered', 'datetime')
+        $builder->createField('dateTriggered', UTCDateTimeMicrosecondType::NAME)
             ->columnName('date_triggered')
             ->precision(3)
             ->nullable()

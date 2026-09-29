@@ -9,8 +9,10 @@ use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-final class UTCDateTimeType extends DateTimeType
+class UTCDateTimeType extends DateTimeType
 {
+    protected const FORMAT_SUFFIX = '';
+
     private static ?\DateTimeZone $utc = null;
 
     /**
@@ -40,7 +42,7 @@ final class UTCDateTimeType extends DateTimeType
         if ($value instanceof \DateTimeInterface) {
             $dateTimeFormat = $platform->getDateTimeFormatString();
 
-            return $value->format("{$dateTimeFormat}.u");
+            return $value->format($dateTimeFormat.static::FORMAT_SUFFIX);
         }
 
         return parent::convertToDatabaseValue($value, $platform);

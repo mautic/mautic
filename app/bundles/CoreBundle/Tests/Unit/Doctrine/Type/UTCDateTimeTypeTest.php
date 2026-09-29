@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +19,30 @@ final class UTCDateTimeTypeTest extends TestCase
     protected function setUp(): void
     {
         $this->type = new UTCDateTimeType();
+    }
+
+    public function testLegacyDatesDoNotSendFractionalSecondsToTheDatabase(): void
+    {
+        $date = new \DateTime('2026-09-29 10:28:18.999999', new \DateTimeZone('Asia/Kolkata'));
+        $original = clone $date;
+        $platform = new MySQLPlatform();
+
+        $this->assertSame('2026-09-29 04:58:18', $this->type->convertToDatabaseValue($date, $platform));
+        $this->assertEquals($original, $date);
+        $this->assertNull($this->type->convertToDatabaseValue(null, $platform));
+    }
+
+    public function testTimelineDatesRetainFractionalSeconds(): void
+    {
+        $date = new \DateTime('2026-09-29 10:28:18.600123', new \DateTimeZone('Asia/Kolkata'));
+        $original = clone $date;
+        $type = new UTCDateTimeMicrosecondType();
+        $platform = new MySQLPlatform();
+
+        $this->assertSame('2026-09-29 04:58:18.600123', $type->convertToDatabaseValue($date, $platform));
+        $this->assertEquals($original, $date);
+        $this->assertNull($type->convertToDatabaseValue(null, $platform));
+        $this->assertTrue($type->requiresSQLCommentHint($platform));
     }
 
     /**

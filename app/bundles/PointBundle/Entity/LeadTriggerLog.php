@@ -6,6 +6,7 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Mautic\CoreBundle\Entity\IpAddress;
 
 class LeadTriggerLog
@@ -49,7 +50,7 @@ class LeadTriggerLog
 
         $builder->addIpAddress(true);
 
-        $builder->createField('dateFired', 'datetime')
+        $builder->createField('dateFired', UTCDateTimeMicrosecondType::NAME)
             ->columnName('date_fired')
             ->precision(3)
             ->build();

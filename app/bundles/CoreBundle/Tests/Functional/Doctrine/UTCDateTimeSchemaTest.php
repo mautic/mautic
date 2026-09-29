@@ -5,13 +5,28 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Doctrine;
 
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Types\Types;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\WebhookBundle\Entity\Webhook;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UTCDateTimeSchemaTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    public function testWebhookCreationDateDoesNotRoundUpWhenReloaded(): void
+    {
+        $webhook = new Webhook();
+        $webhook->setName('Timestamp precision regression');
+        $webhook->setSecret('test-secret');
+        $webhook->setWebhookUrl('https://example.com/webhook');
+        $webhook->setDateAdded(new \DateTime('2026-09-29 04:58:18.600000', new \DateTimeZone('UTC')));
+        $this->em->persist($webhook);
+        $this->em->flush();
+        $this->em->refresh($webhook);
+
+        $this->assertSame('2026-09-29 04:58:18', $webhook->getDateAdded()->format('Y-m-d H:i:s'));
+    }
 
     #[DataProvider('provideColumns')]
     public function testSchemaComparisonPreservesFractionalPrecision(int $storedPrecision, bool $nullable): void
@@ -19,13 +34,14 @@ final class UTCDateTimeSchemaTest extends MauticMysqlTestCase
         $connection = $this->em->getConnection();
         $tableName  = MAUTIC_TABLE_PREFIX.'datetime_precision_check';
         $nullSql    = $nullable ? 'DEFAULT NULL' : 'NOT NULL';
-        $connection->executeStatement("CREATE TABLE $tableName (occurred_at DATETIME($storedPrecision) $nullSql)");
+        $comment    = 3 === $storedPrecision ? '(DC2Type:datetime_microsecond)' : '';
+        $connection->executeStatement("CREATE TABLE $tableName (occurred_at DATETIME($storedPrecision) $nullSql COMMENT '$comment')");
 
         try {
             $manager  = $connection->createSchemaManager();
             $platform = $connection->getDatabasePlatform();
             $expected = new Table($tableName);
-            $expected->addColumn('occurred_at', Types::DATETIME_MUTABLE, ['precision' => 3, 'notnull' => !$nullable]);
+            $expected->addColumn('occurred_at', UTCDateTimeMicrosecondType::NAME, ['precision' => 3, 'notnull' => !$nullable]);
             $actual = $manager->introspectTable($tableName);
             $diff   = $manager->createComparator()->compareTables($actual, $expected);
 

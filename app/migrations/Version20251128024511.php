@@ -70,11 +70,12 @@ final class Version20251128024511 extends AbstractMauticMigration
                         : 'NOT NULL';
 
                     $this->addSql(sprintf(
-                        'ALTER TABLE %s MODIFY %s %s %s',
+                        "ALTER TABLE %s MODIFY %s %s %s COMMENT '%s'",
                         $tableName,
                         $column,
                         $type,
-                        $nullDef
+                        $nullDef,
+                        $withMilliseconds ? '(DC2Type:datetime_microsecond)' : ''
                     ));
                 } else {
                     $this->addSql(sprintf(
@@ -82,6 +83,12 @@ final class Version20251128024511 extends AbstractMauticMigration
                         $tableName,
                         $column,
                         $type
+                    ));
+                    $this->addSql(sprintf(
+                        'COMMENT ON COLUMN %s.%s IS %s',
+                        $tableName,
+                        $column,
+                        $withMilliseconds ? "'(DC2Type:datetime_microsecond)'" : 'NULL'
                     ));
                 }
             }
