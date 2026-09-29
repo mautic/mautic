@@ -524,10 +524,7 @@ class FieldModel extends FormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadFields()
+    public function getLeadFields(): iterable
     {
         return $this->getEntities([
             'filter' => [
@@ -783,10 +780,8 @@ class FieldModel extends FormModel
      * @param string $type
      * @param string $filter
      * @param int    $limit
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults($type, $filter = '', $limit = 10): array
     {
         return $this->leadRepository->getValueList($type, $filter, $limit);
     }
