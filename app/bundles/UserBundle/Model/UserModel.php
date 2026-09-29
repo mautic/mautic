@@ -201,10 +201,8 @@ final class UserModel extends FormModel implements GlobalSearchInterface
      *
      * @param string $type
      * @param int    $limit
-     *
-     * @return array
      */
-    public function getLookupResults($type, ?string $filter = '', int|string|null $limit = 10)
+    public function getLookupResults($type, ?string $filter = '', int|string|null $limit = 10): array
     {
         $results = [];
 
