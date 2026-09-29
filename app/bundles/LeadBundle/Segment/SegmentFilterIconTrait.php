@@ -103,6 +103,7 @@ trait SegmentFilterIconTrait
             'source_id'               => 'ri-external-link-line',
             'url_title'               => 'ri-external-link-line',
             'lead_email_sent'         => 'ri-mail-send-line',
+            'lead_form_submission'    => 'ri-survey-line',
             default                   => 'ri-shapes-line',
         };
     }
