@@ -95,9 +95,9 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
     }
 
     #[DataProvider('nonNumericTextProvider')]
-    public function testSetFieldValuesDoesNotOverwriteStoredNumberWithNonNumericText(string $value): void
+    public function testSetFieldValuesDoesNotOverwriteStoredNumberWithNonNumericText(string $value, string $slug): void
     {
-        $contactId = $this->createContact('non-numeric-'.md5($value).'@example.com', [self::NUMBER_FIELD => 5]);
+        $contactId = $this->createContact('non-numeric-'.$slug.'@example.com', [self::NUMBER_FIELD => 5]);
         $this->em->clear();
 
         $leadModel = self::getContainer()->get(LeadModel::class);
@@ -113,9 +113,9 @@ final class LeadApiZeroValueFunctionalTest extends MauticMysqlTestCase
 
     public static function nonNumericTextProvider(): \Generator
     {
-        yield 'whitespace' => [' '];
-        yield 'text' => ['abc'];
-        yield 'placeholder' => ['n/a'];
+        yield 'whitespace' => [' ', 'whitespace'];
+        yield 'text' => ['abc', 'text'];
+        yield 'placeholder' => ['n/a', 'placeholder'];
     }
 
     public function testPatchPersistsZeroNumberField(): void
