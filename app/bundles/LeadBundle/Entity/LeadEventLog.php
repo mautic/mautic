@@ -92,7 +92,7 @@ class LeadEventLog
             ->addNullableField('object', Types::STRING)
             ->addNullableField('action', Types::STRING)
             ->addNullableField('objectId', Types::INTEGER, 'object_id')
-            ->addNamedField('dateAdded', Types::DATETIME_MUTABLE, 'date_added')
+            ->addDateAdded(false, 3)
             ->addNullableField('properties', Types::JSON);
 
         $builder->createManyToOne('lead', Lead::class)

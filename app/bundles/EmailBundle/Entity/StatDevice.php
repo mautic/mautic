@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
@@ -53,8 +54,9 @@ class StatDevice
 
         $builder->addIpAddress(true);
 
-        $builder->createField('dateOpened', 'datetime')
+        $builder->createField('dateOpened', UTCDateTimeMicrosecondType::NAME)
             ->columnName('date_opened')
+            ->precision(3)
             ->build();
     }
 
