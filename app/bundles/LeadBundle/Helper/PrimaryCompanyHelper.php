@@ -12,10 +12,7 @@ final readonly class PrimaryCompanyHelper
     ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getProfileFieldsWithPrimaryCompany(Lead $lead)
+    public function getProfileFieldsWithPrimaryCompany(Lead $lead): array
     {
         return $this->mergeInPrimaryCompany(
             $this->companyLeadRepository->getCompaniesByLeadId($lead->getId()),
@@ -23,10 +20,7 @@ final readonly class PrimaryCompanyHelper
         );
     }
 
-    /**
-     * @return array
-     */
-    public function mergePrimaryCompanyWithProfileFields($contactId, array $profileFields)
+    public function mergePrimaryCompanyWithProfileFields($contactId, array $profileFields): array
     {
         return $this->mergeInPrimaryCompany(
             $this->companyLeadRepository->getCompaniesByLeadId($contactId),
@@ -34,10 +28,7 @@ final readonly class PrimaryCompanyHelper
         );
     }
 
-    /**
-     * @return array
-     */
-    private function mergeInPrimaryCompany(array $companies, array $profileFields)
+    private function mergeInPrimaryCompany(array $companies, array $profileFields): array
     {
         foreach ($companies as $company) {
             if (empty($company['is_primary'])) {
