@@ -490,10 +490,7 @@ class Field implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -509,10 +506,7 @@ class Field implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getValidation()
+    public function getValidation(): array
     {
         return $this->validation;
     }
@@ -698,10 +692,7 @@ class Field implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getCustomParameters()
+    public function getCustomParameters(): array
     {
         return $this->customParameters;
     }
@@ -927,7 +918,7 @@ class Field implements UuidInterface
     /**
      * @return array<string, mixed>
      */
-    public function getConditions()
+    public function getConditions(): array
     {
         return $this->conditions;
     }
