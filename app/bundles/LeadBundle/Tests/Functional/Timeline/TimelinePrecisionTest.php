@@ -108,7 +108,7 @@ final class TimelinePrecisionTest extends MauticMysqlTestCase
         $contactId = $contact->getId();
         $this->em->clear();
 
-        $events = static::getContainer()->get(LeadModel::class)->getEngagements(
+        $events = self::getContainer()->get(LeadModel::class)->getEngagements(
             $this->em->find(Lead::class, $contactId),
             ['search' => '', 'includeEvents' => ['asset.download', 'dynamic.content.sent', 'lead.ipadded'], 'excludeEvents' => []],
             ['timestamp', $direction]
@@ -124,7 +124,7 @@ final class TimelinePrecisionTest extends MauticMysqlTestCase
         }
         $this->assertSame($expectedTimes, $times);
 
-        $expectedDisplayTime = static::getContainer()->get(DateHelper::class)->toTime(
+        $expectedDisplayTime = self::getContainer()->get(DateHelper::class)->toTime(
             new \DateTime('2025-11-28 12:00:00', new \DateTimeZone('UTC'))
         );
         $crawler = $this->client->request('POST', '/s/contacts/timeline/'.$contactId, [

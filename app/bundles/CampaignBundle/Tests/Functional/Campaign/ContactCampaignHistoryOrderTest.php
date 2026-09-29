@@ -59,7 +59,7 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
         $this->em->clear();
         $contact = $this->em->find(Lead::class, $contactId);
 
-        $engagements = static::getContainer()->get(LeadModel::class)->getEngagements(
+        $engagements = self::getContainer()->get(LeadModel::class)->getEngagements(
             $contact,
             ['search' => '', 'includeEvents' => ['campaign.event'], 'excludeEvents' => []],
             ['timestamp', $direction]
@@ -117,7 +117,7 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var LeadModel $contactModal */
-        $contactModal = static::getContainer()->get(LeadModel::class);
+        $contactModal = self::getContainer()->get(LeadModel::class);
 
         $filters = [
             'search'        => '',
@@ -215,7 +215,7 @@ final class ContactCampaignHistoryOrderTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var ListModel $listModel */
-        $listModel = static::getContainer()->get(ListModel::class);
+        $listModel = self::getContainer()->get(ListModel::class);
         $listModel->addLead($contact, $segment);
         $this->em->flush();
 
