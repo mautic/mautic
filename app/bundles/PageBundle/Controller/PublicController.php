@@ -333,7 +333,7 @@ final class PublicController extends AbstractFormController
             $this->throwAccessDenied();
         }
 
-        if (empty($content) && !empty($BCcontent)) {
+        if (empty($content) && $BCcontent !== []) {
             $template = $page->getTemplate();
             // all the checks pass so display the content
             $content = $page->getContent();

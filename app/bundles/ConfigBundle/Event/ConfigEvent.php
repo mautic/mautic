@@ -46,10 +46,8 @@ final class ConfigEvent extends CommonEvent
 
     /**
      * Returns the config array.
-     *
-     * @return array
      */
-    public function getConfig(?string $key = null)
+    public function getConfig(?string $key = null): array
     {
         if ($key) {
             return $this->config[$key] ?? [];
@@ -164,10 +162,7 @@ final class ConfigEvent extends CommonEvent
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getNormData()
+    public function getNormData(): array
     {
         return $this->normData;
     }

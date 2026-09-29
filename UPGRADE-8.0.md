@@ -771,3 +771,38 @@
 - `Mautic\CoreBundle\Entity\CommonRepository` and `Mautic\CoreBundle\Event\CommonEvent` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
 - All class and interface constants now declare a native type (PHP 8.3 typed class constants), e.g. `public const string NAME = ...`. If a plugin class overrides one of them, add a compatible type to the overriding constant, otherwise PHP fails with "Type of X::NAME must be compatible with Y::NAME". `AbstractMauticMigration::TABLE_NAME` is `?string`, so migrations declare `protected const string TABLE_NAME`.
 - `Mautic\DashboardBundle\Entity\Widget::getParams()` and `::getTemplateData()` now declare a native `array` return type instead of a `@return array` docblock. If a plugin class extends `Widget` and overrides either method, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::getParams() must be compatible with Widget::getParams(): array".
+- Methods in Core and shared base classes, interfaces and traits that documented `@return array` now declare a native return type. If a plugin class implements one of these interfaces or overrides one of these methods, add a compatible return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with Y::method(): array". The return type is `array` unless noted:
+
+    | Class | Methods |
+    | --- | --- |
+    | `CoreBundle\Configurator\Step\StepInterface` | `checkRequirements()`, `checkOptionalSettings()`, `update()` |
+    | `CoreBundle\Helper\ThemeHelperInterface` | `getDefaultThemes()`, `getOptionalSettings()` |
+    | `CoreBundle\IpLookup\IpLookupFormInterface` | `getConfigFormThemes()` |
+    | `CoreBundle\Model\SearchCommandListInterface` | `getCommandList()` |
+    | `StatsBundle\Aggregate\Collection\Stats\StatInterface` | `getStats()` |
+    | `CoreBundle\Model\AbstractCommonModel` | `getSupportedSearchCommands()`, `getCommandList()`, `getEntities()` (`iterable`) |
+    | `CoreBundle\Controller\AbstractFormController` | `refererPostActionVars()` |
+    | `CoreBundle\Controller\AbstractStandardFormController` | `afterEntityClone()`, `getEntityFormOptions()`, `getUpdateSelectParams()`, `getViewDateRange()` |
+    | `CoreBundle\Doctrine\AbstractMauticMigration` | `generateKeys()` |
+    | `CoreBundle\Security\Permissions\AbstractPermissions` | `getPermissions()`, `getSynonym()`, `getPermissionRatio()` |
+    | `CoreBundle\Helper\AbstractFormFieldHelper` | `parseList()` |
+    | `CoreBundle\IpLookup\AbstractLookup` | `getDetails()` |
+    | `CoreBundle\IpLookup\AbstractLocalDataLookup` | `getConfigFormThemes()` |
+    | `CoreBundle\IpLookup\AbstractMaxmindLookup` | `getHeaders()` |
+    | `CoreBundle\IpLookup\AbstractRemoteDataLookup` | `getHeaders()`, `getParameters()` |
+    | `CoreBundle\Entity\CommonEntity` | `getChanges()` |
+    | `CoreBundle\Entity\DynamicContentEntityTrait` | `getDynamicContent()`, `getDefaultDynamicContent()` |
+    | `CoreBundle\Entity\FiltersEntityTrait` | `getFilters()` |
+    | `CoreBundle\Model\BuilderModelTrait` | `getCommonBuilderComponents()` |
+    | `CoreBundle\Event\BuilderEvent` | `getTokens()`, `filterTokens()` |
+    | `CoreBundle\Event\TokenReplacementEvent` | `getTokens()` |
+    | `ApiBundle\Controller\FetchCommonApiController` | `getWhereFromRequest()` |
+    | `EmailBundle\Model\EmailModel` | `getEntities()` (`iterable`), `getBuilderComponents()`, `getEmailSettings()` |
+    | `LeadBundle\Model\LeadModel` | `getEntities()` (`iterable`), `getLeadsByIds()`, `getLeadDetails()`, `getPreferredChannel()` |
+    | `PageBundle\Entity\Page` | `getContent()` (`?array`) |
+    | `PageBundle\Entity\Hit`, `PageBundle\Entity\VideoHit` | `getBrowserLanguages()`, `getQuery()` |
+    | `ReportBundle\Entity\Report` | `getColumns()`, `getFilters()`, `getTableOrder()`, `getGraphs()`, `getGroupBy()`, `getAggregators()` |
+    | `CampaignBundle\Entity\Campaign` | `getChanges()` |
+    | `ChannelBundle\Entity\Channel` | `getProperties()` |
+    | `ChannelBundle\Entity\MessageQueue` | `getMetadata()` |
+    | `CoreBundle\Entity\AuditLog` | `getDetails()` |

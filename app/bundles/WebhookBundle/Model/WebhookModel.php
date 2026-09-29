@@ -285,7 +285,7 @@ final class WebhookModel extends FormModel
         $payload = $this->getWebhookPayload($webhook, $queue);
 
         // if there wasn't a payload we can stop here.
-        if (empty($payload)) {
+        if ($payload === []) {
             return false;
         }
 
@@ -451,10 +451,8 @@ final class WebhookModel extends FormModel
 
     /**
      * Get the payload from the webhook.
-     *
-     * @return array
      */
-    public function getWebhookPayload(Webhook $webhook, ?WebhookQueue $queue = null)
+    public function getWebhookPayload(Webhook $webhook, ?WebhookQueue $queue = null): array
     {
         if ($payload = $webhook->getPayload()) {
             return $payload;

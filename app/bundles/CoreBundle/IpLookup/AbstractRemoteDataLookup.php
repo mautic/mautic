@@ -29,7 +29,7 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
     /**
      * @return array<string, mixed>
      */
-    protected function getHeaders()
+    protected function getHeaders(): array
     {
         return [];
     }
@@ -37,7 +37,7 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
     /**
      * @return array{}
      */
-    protected function getParameters()
+    protected function getParameters(): array
     {
         return [];
     }

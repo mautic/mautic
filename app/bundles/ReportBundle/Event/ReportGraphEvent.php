@@ -41,10 +41,8 @@ final class ReportGraphEvent extends AbstractReportEvent
 
     /**
      * Fetch the options array for the graph.
-     *
-     * @return array
      */
-    public function getOptions($graph)
+    public function getOptions($graph): array
     {
         return $this->requestedGraphs[$graph]['options'] ?? [];
     }

@@ -74,10 +74,8 @@ final class ColumnSchemaHelper
 
     /**
      * Get array of Doctrine\DBAL\Schema\Column instances for the table.
-     *
-     * @return array
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         if (empty($this->columns)) {
             // DBAL 4 hands the columns back as a list, and they are looked up by name here

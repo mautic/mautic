@@ -32,10 +32,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
         return IpLookupDownloadDataStoreButtonType::class;
     }
 
-    /**
-     * @return array
-     */
-    public function getConfigFormThemes()
+    public function getConfigFormThemes(): array
     {
         return [];
     }

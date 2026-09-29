@@ -16,7 +16,7 @@ interface ThemeHelperInterface
      *
      * @return string[]
      */
-    public function getDefaultThemes();
+    public function getDefaultThemes(): array;
 
     /**
      * @param string $defaultTheme
@@ -71,7 +71,7 @@ interface ThemeHelperInterface
      *
      * @return mixed[]
      */
-    public function getOptionalSettings();
+    public function getOptionalSettings(): array;
 
     /**
      * @param string $template

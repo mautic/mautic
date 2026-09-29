@@ -121,10 +121,8 @@ class BuilderEvent extends Event
 
     /**
      * Get token array.
-     *
-     * @return array
      */
-    public function getTokens(bool $withBC = true)
+    public function getTokens(bool $withBC = true): array
     {
         if (false === $withBC) {
             $tokens = [];
@@ -181,10 +179,8 @@ class BuilderEvent extends Event
      * Simple token filtering.
      *
      * @param array $tokens array('token' => 'label')
-     *
-     * @return array
      */
-    public function filterTokens($tokens)
+    public function filterTokens($tokens): array
     {
         $filter = $this->tokenFilter;
 

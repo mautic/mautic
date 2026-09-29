@@ -42,7 +42,7 @@ final class VariantType extends AbstractType
 
         $abTestWinnerCriteria = $this->pageModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
-        if (!empty($abTestWinnerCriteria)) {
+        if ($abTestWinnerCriteria !== []) {
             $criteria = $abTestWinnerCriteria['criteria'];
             $choices  = $abTestWinnerCriteria['choices'];
 

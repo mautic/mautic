@@ -13,8 +13,6 @@ interface IpLookupFormInterface
 
     /**
      * Return array of themes to include in form rendering.
-     *
-     * @return array
      */
-    public function getConfigFormThemes();
+    public function getConfigFormThemes(): array;
 }

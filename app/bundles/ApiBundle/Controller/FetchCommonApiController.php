@@ -232,7 +232,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return array<mixed>
      */
-    protected function getWhereFromRequest(Request $request)
+    protected function getWhereFromRequest(Request $request): array
     {
         $where = $request->query->all()['where'] ?? [];
 

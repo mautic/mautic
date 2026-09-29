@@ -80,7 +80,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array<int, mixed> of arguments for editAction
      */
-    protected function afterEntityClone($newEntity, $entity)
+    protected function afterEntityClone($newEntity, $entity): array
     {
         return [$newEntity, true];
     }
@@ -738,7 +738,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array<string, mixed>
      */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         return [];
     }
@@ -750,10 +750,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * @param object $entity
      * @param string $nameMethod   name of the entity method holding the name
      * @param string $groupMethod  name of the entity method holding the select group
-     *
-     * @return array
      */
-    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage')
+    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage'): array
     {
         $options = [
             'updateSelect' => $updateSelect,
@@ -773,7 +771,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return \DateTime[]
      */
-    protected function getViewDateRange(Request $request, $objectId, $returnUrl, $timezone = 'local', &$dateRangeForm = null)
+    protected function getViewDateRange(Request $request, $objectId, $returnUrl, $timezone = 'local', &$dateRangeForm = null): array
     {
         $name            = $this->getSessionBase($objectId).'.view.daterange';
         $method          = ('POST' === $request->getMethod()) ? 'request' : 'query';

@@ -96,10 +96,7 @@ class TokenReplacementEvent extends CommonEvent
         $this->tokens[$token] = $value;
     }
 
-    /**
-     * @return array
-     */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
