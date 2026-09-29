@@ -112,7 +112,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $savedWinnerStage = $savedWinner->getStage();
         $this->assertInstanceOf(Stage::class, $savedWinnerStage);
         $this->assertSame($stageId, $savedWinnerStage->getId());
-        $this->assertNull($this->em->find(Lead::class, $loserId));
+        $this->assertNotInstanceOf(Lead::class, $this->em->find(Lead::class, $loserId));
     }
 
     public function testMergedContactsPointsAreAccurate(): void
