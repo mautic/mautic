@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
 
 final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 {
@@ -73,6 +74,45 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(Lead::class, $bob);
         $jane = $model->getEntity($janeId);
         $this->assertNotInstanceOf(Lead::class, $jane);
+    }
+
+    public function testMergedContactInheritsLoserStage(): void
+    {
+        /** @var LeadModel $model */
+        $model = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $model);
+
+        /** @var ContactMerger $merger */
+        $merger = self::getContainer()->get(ContactMerger::class);
+        $this->assertInstanceOf(ContactMerger::class, $merger);
+
+        $stage = new Stage();
+        $stage->setName('Inherited stage');
+        $this->em->persist($stage);
+        $this->em->flush();
+
+        $winner = new Lead();
+        $winner->setEmail('stage-merge-winner@example.com');
+        $model->saveEntity($winner);
+
+        $loser = new Lead();
+        $loser->setEmail('stage-merge-loser@example.com');
+        $loser->setStage($stage);
+        $model->saveEntity($loser);
+
+        $stageId  = $stage->getId();
+        $winnerId = $winner->getId();
+        $loserId  = $loser->getId();
+
+        $merger->merge($winner, $loser);
+        $this->em->clear();
+
+        $savedWinner = $this->em->find(Lead::class, $winnerId);
+        $this->assertInstanceOf(Lead::class, $savedWinner);
+        $savedWinnerStage = $savedWinner->getStage();
+        $this->assertInstanceOf(Stage::class, $savedWinnerStage);
+        $this->assertSame($stageId, $savedWinnerStage->getId());
+        $this->assertNull($this->em->find(Lead::class, $loserId));
     }
 
     public function testMergedContactsPointsAreAccurate(): void
