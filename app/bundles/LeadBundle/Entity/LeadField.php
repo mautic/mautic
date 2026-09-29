@@ -531,7 +531,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * @return mixed[]
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }

@@ -994,7 +994,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @return array<mixed>
      */
-    public function getInternal()
+    public function getInternal(): array
     {
         return $this->internal;
     }
@@ -1007,7 +1007,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return array<mixed>
      */
-    public function getSocialCache()
+    public function getSocialCache(): array
     {
         return $this->socialCache;
     }
@@ -1619,7 +1619,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @return array<mixed>
      */
-    public function getChannelRules()
+    public function getChannelRules(): array
     {
         if (null === $this->channelRules) {
             $frequencyRules = $this->frequencyRules->toArray();
