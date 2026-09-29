@@ -11,10 +11,8 @@ interface CustomFieldRepositoryInterface
 {
     /**
      * Return an array of groups supported by the custom fields for this entity.
-     *
-     * @return array
      */
-    public function getFieldGroups();
+    public function getFieldGroups(): array;
 
     /**
      * Get the base DBAL query builder for entities.
