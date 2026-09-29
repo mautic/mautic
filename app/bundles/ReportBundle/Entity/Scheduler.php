@@ -72,7 +72,7 @@ class Scheduler
     /**
      * @param array<mixed> $data
      */
-    public function setData(array $data): Scheduler
+    public function setData(array $data): self
     {
         $this->data = $data;
 

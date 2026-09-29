@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;

@@ -42,7 +42,7 @@ final readonly class ReportExporter
         $report                  = $scheduler->getReport();
         $scheduledData           = $scheduler->getData();
         $scheduleNextDownloadJob = true;
-        if (!empty($scheduledData)) {
+        if ([] !== $scheduledData) {
             $scheduleNextDownloadJob = false;
             $this->reportExportOptions->setData($scheduledData);
             $this->reportExportOptions->setDateFrom(new \DateTime($scheduledData['dateFrom']));
