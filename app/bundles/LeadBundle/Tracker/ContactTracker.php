@@ -100,7 +100,7 @@ final class ContactTracker
 
         // Hydrate custom field data
         $fields = $trackedContact->getFields();
-        if (empty($fields)) {
+        if ($fields === []) {
             $this->hydrateCustomFieldData($trackedContact);
         }
 
@@ -132,7 +132,7 @@ final class ContactTracker
             $this->logger->debug("LEAD: {$lead->getId()} set as system lead.");
 
             $fields = $lead->getFields();
-            if (empty($fields)) {
+            if ($fields === []) {
                 $this->hydrateCustomFieldData($lead);
             }
         }
