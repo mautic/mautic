@@ -2346,7 +2346,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @api must be protected to allow mocking
      */
-    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null): array
     {
         $objects ??= ['Lead', 'Contact'];
 
