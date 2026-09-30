@@ -46,7 +46,7 @@ final class ContactSegmentFilterDictionary
      *
      * @throws FilterNotFoundException
      */
-    public function getFilter($filterKey)
+    public function getFilter($filterKey): array
     {
         if (array_key_exists($filterKey, $this->getFilters())) {
             return $this->filters[$filterKey];
