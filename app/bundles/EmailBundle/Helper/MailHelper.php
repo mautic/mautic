@@ -1256,7 +1256,7 @@ class MailHelper
         $template   = $email->getTemplate();
         $customHtml = $email->getCustomHtml();
         // Process emails created by Mautic v1
-        if (empty($customHtml) && $template) {
+        if (empty($customHtml) && $template && !empty($email->getContent())) {
             $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $customHtml = $this->themeHelper->renderThemeTemplate($logicalName, [

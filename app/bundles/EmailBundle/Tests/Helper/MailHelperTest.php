@@ -279,6 +279,43 @@ final class MailHelperTest extends TestCase
         $this->assertArrayNotHasKey('failures', $errors, var_export($errors, true));
     }
 
+    public function testEmptyCustomHtmlDoesNotRenderLegacyTemplateWithoutContent(): void
+    {
+        $this->themeHelper->expects($this->never())->method('renderThemeTemplate');
+
+        $email = new Email();
+        $email->setTemplate('legacy-theme');
+        $email->setCustomHtml('');
+        $email->setSubject('Plain text email');
+
+        $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
+        $mailer->setEmail($email);
+
+        $this->assertSame('', $mailer->message->getHtmlBody());
+    }
+
+    public function testEmptyCustomHtmlStillRendersLegacyTemplateWithContent(): void
+    {
+        $this->themeHelper->expects($this->once())
+            ->method('checkForTwigTemplate')
+            ->with('@themes/legacy-theme/html/email.html.twig')
+            ->willReturn('@themes/legacy-theme/html/email.html.twig');
+        $this->themeHelper->expects($this->once())
+            ->method('renderThemeTemplate')
+            ->willReturn('<p>Legacy content</p>');
+
+        $email = new Email();
+        $email->setTemplate('legacy-theme');
+        $email->setContent(['body' => 'Legacy content']);
+        $email->setCustomHtml('');
+        $email->setSubject('Legacy email');
+
+        $mailer = $this->createMailHelperWithTransport(new SmtpTransport());
+        $mailer->setEmail($email);
+
+        $this->assertSame('<p>Legacy content</p>', $mailer->message->getHtmlBody());
+    }
+
     public function testQueuedOwnerAsMailer(): void
     {
         $this->coreParametersHelper->method('get')->willReturnMap($this->defaultParams);
