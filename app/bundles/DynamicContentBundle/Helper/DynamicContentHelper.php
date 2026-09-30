@@ -177,7 +177,7 @@ final readonly class DynamicContentHelper
      *
      * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getDwcsBySlotName($slotName, $publishedOnly = false)
+    public function getDwcsBySlotName($slotName, $publishedOnly = false): iterable
     {
         $filter = [
             'where' => [
