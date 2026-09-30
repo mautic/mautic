@@ -118,7 +118,6 @@ abstract class AbstractMauticMigration extends AbstractMigration
     protected function getIndexes(string $tableName): array
     {
         return $this->sm->listTableIndexes($tableName);
-        // return DatabasePlatform::listTableIndexes($this->connection, $tableName);
     }
 
     protected function dropIndex(string $tableName, string $indexName, bool $ifExists = true): void

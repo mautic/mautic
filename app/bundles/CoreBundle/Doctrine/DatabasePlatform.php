@@ -1490,18 +1490,6 @@ final class DatabasePlatform
     }
 
     /**
-     * Removes platform-specific quoting from a column identifier (for normalization/comparison).
-     */
-    public static function unquoteIdentifier(?AbstractPlatform $platform, string $fullColumnName): string
-    {
-        $quoteChar = self::isPostgreSQL($platform) ? '"' : '`';
-
-        return preg_match('/^['.$quoteChar.'a-zA-Z0-9_\.\$]+$/', $fullColumnName)
-            ? str_replace($quoteChar, '', $fullColumnName)
-            : $fullColumnName;
-    }
-
-    /**
      * Returns aggregator expression with platform-specific precision handling.
      *
      * MySQL:      AVG(column)
