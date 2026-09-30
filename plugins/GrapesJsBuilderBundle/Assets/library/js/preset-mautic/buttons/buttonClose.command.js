@@ -48,7 +48,7 @@ export default class ButtonCloseCommands {
     const mjmlCode = MjmlService.getEditorMjmlContent(editor); // Update textarea for save
 
     if (!htmlCode || !mjmlCode) {
-      throw new Error('Could not generate html from MJML');
+      return;
     }
 
     if (mauticEditorFonts) {
