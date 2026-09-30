@@ -197,6 +197,7 @@ return [
         'show_contact_preferred_channels'                                   => false,
         'show_contact_categories'                                           => false,
         'show_contact_segments'                                             => false,
+        'email_columns'                                                     => Mautic\EmailBundle\Enum\EmailListColumn::defaultValues(),
         'validate_unsubscribe_emails'                                       => true,
         'disable_trackable_urls'                                            => false,
         'email_draft_enabled'                                               => false,

@@ -20,6 +20,7 @@ return function (ContainerConfigurator $configurator): void {
         'Stat/Reference.php',
         'Helper/DTO',
         'Model/AbTest/EmailStatus.php',
+        'Enum',
     ];
 
     $services->load('Mautic\\EmailBundle\\', '../')

@@ -1,0 +1,140 @@
+{% if 'name' == column %}
+    <td>
+        <div>
+            {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                'item': item,
+                'model': 'email',
+                'status': item.getSendingStatus(),
+            }) -}}
+            <a href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': item.getId()}) }}"
+               data-toggle="ajax">
+                {{ item.getName() }}
+                {% if hasChildrenVariants > 0 %}
+                    <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.ab_test.has.children'|trans }}"><i class="ri-fw ri-organization-chart fs-14"></i></span>
+                {% endif %}
+                {% if hasVariants %}
+                  <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.ab_test.has.parent'|trans }}"><i class="ri-fw ri-a-b fs-14"></i></span>
+                {% endif %}
+                {% if hasChildrenTranslations > 0 %}
+                    <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.has.children.translation'|trans }}"><i class="ri-fw ri-translate fs-14"></i></span>
+                {% endif %}
+                {% if hasTranslations %}
+                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.has.parent.translation'|trans }}"><i class="ri-fw ri-translate-2 fs-14"></i></span>
+                {% endif %}
+                {% if 'list' == type %}
+                  <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="ri-pie-chart-line fs-14"></i></span>
+                {% endif %}
+                {% if isDraftEnabled and hasDraft %}
+                <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.has_draft'|trans }}">
+                    <i class="fa fa-fw fa-file"></i>
+                </span>
+                {% endif %}
+                {{ customContent('email.name', mauticTemplateVars) }}
+            </a>
+            {{ include('@MauticProject/Modules/projects.html.twig') }}
+        </div>
+        {% if item.getDescription() is not empty %}
+            <div class="text-secondary mt-4">
+                <small>{{ item.getDescription()|purify }}</small>
+            </div>
+        {% endif %}
+    </td>
+{% elseif 'subject' == column %}
+    <td class="visible-md visible-lg">{{ item.getSubject()|escape }}</td>
+{% elseif 'description' == column %}
+    <td class="visible-lg">{{ item.getDescription()|default('')|purify }}</td>
+{% elseif 'emailType' == column %}
+    <td class="visible-md visible-lg">
+        {% if 'list' == item.getEmailType() %}
+            {{ 'mautic.email.type.list'|trans }}
+        {% elseif 'template' == item.getEmailType() %}
+            {{ 'mautic.email.type.template'|trans }}
+        {% else %}
+            {{ item.getEmailType()|escape }}
+        {% endif %}
+    </td>
+{% elseif 'language' == column %}
+    <td class="visible-md visible-lg">
+        {% if item.getLanguage() %}
+            {{ item.getLanguage()|language_name }}
+        {% else %}
+            <span class="text-muted">-</span>
+        {% endif %}
+    </td>
+{% elseif 'category' == column %}
+    <td class="visible-md visible-lg">
+        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
+    </td>
+{% elseif 'template' == column %}
+    <td class="visible-md visible-lg">
+        {% if item.getTemplate() %}
+            {{ getThemeName(item.getTemplate()) }}
+        {% else %}
+            <span class="text-muted">{{ 'mautic.core.form.default'|trans }}</span>
+        {% endif %}
+    </td>
+{% elseif 'isPublished' == column %}
+    <td class="visible-md visible-lg">
+        {% if item.isPublished() %}
+            <span class="label label-success">{{ 'mautic.core.form.available'|trans }}</span>
+        {% else %}
+            <span class="label label-danger">{{ 'mautic.core.form.unavailable'|trans }}</span>
+        {% endif %}
+    </td>
+{% elseif 'stats' == column %}
+    <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
+        {{ customContent('email.stats.above', mauticTemplateVars) }}
+        <span class="mt-xs label label-warm-gray{{ (item.getPendingCount() > 0 and 'list' == item.getEmailType()) ? '' : ' hide' }}"
+              id="pending-{{ item.getId() }}"
+              data-toggle="tooltip"
+              title="{{ 'mautic.email.stat.leadcount.tooltip'|trans }}">
+          <i class="ri-more-fill"></i><a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.email_pending'|trans ~ ':' ~ item.getId()}) }}">
+              {{ 'mautic.email.stat.leadcount'|trans ({'%count%': item.getPendingCount()}) }}
+          </a>
+        </span>
+        <span class="mt-xs label label-magenta{{ item.getQueuedCount() > 0 ? '' : ' hide' }}"
+              id="queued-{{ item.getId() }}"
+              data-toggle="tooltip"
+              title="{{ 'mautic.email.stat.queued.tooltip'|trans }}">
+          <i class="ri-mail-send-line"></i><a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.email_queued'|trans ~ ':' ~ item.getId()}) }}">
+              {{ 'mautic.email.stat.queuedcount'|trans ({'%count%': item.getQueuedCount()}) }}
+          </a>
+        </span>
+        <span class="mt-xs label label-blue" id="sent-count-{{ item.getId() }}">
+            <i class="ri-mail-unread-line"></i><a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.email_sent'|trans ~ ':' ~ item.getId()}) }}"
+             data-toggle="tooltip"
+             title="{{ 'mautic.email.stat.tooltip'|trans }}">{{ 'mautic.email.stat.sentcount'|trans ({'%count%': item.getSentCount(true)}) }}</a>
+        </span>
+        <span class="mt-xs label label-teal" id="read-count-{{ item.getId() }}">
+            <i class="ri-mail-open-line"></i><a href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.email_read'|trans ~ ':' ~ item.getId()}) }}"
+             data-toggle="tooltip"
+             title="{{ 'mautic.email.stat.tooltip'|trans }}">{{ 'mautic.email.stat.readcount'|trans ({'%count%': item.getReadCount(true)}) }}</a>
+             <span id="read-percent-{{ item.getId() }}">
+                ({{ item.getReadPercentage(true) }}%)
+            </span>
+        </span>
+
+        {{ customContent('email.stats', mauticTemplateVars) }}
+        {{ customContent('email.stats.below', mauticTemplateVars) }}
+    </td>
+{% elseif 'dateAdded' == column %}
+    <td class="visible-lg" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
+        {{ item.getDateAdded() ? dateToDate(item.getDateAdded()) : '' }}
+    </td>
+{% elseif 'dateModified' == column %}
+    <td class="visible-lg" title="{{ item.getDateModified() ? dateToFullConcat(item.getDateModified()) : '' }}">
+        {{ item.getDateModified() ? dateToDate(item.getDateModified()) : '' }}
+    </td>
+{% elseif 'publishUp' == column %}
+    <td class="visible-lg" title="{{ item.getPublishUp() ? dateToFullConcat(item.getPublishUp()) : '' }}">
+        {{ item.getPublishUp() ? dateToDate(item.getPublishUp()) : '' }}
+    </td>
+{% elseif 'publishDown' == column %}
+    <td class="visible-lg" title="{{ item.getPublishDown() ? dateToFullConcat(item.getPublishDown()) : '' }}">
+        {{ item.getPublishDown() ? dateToDate(item.getPublishDown()) : '' }}
+    </td>
+{% elseif 'createdByUser' == column %}
+    <td class="visible-lg">{{ item.getCreatedByUser()|escape }}</td>
+{% elseif 'id' == column %}
+    <td class="visible-md visible-lg">{{ item.getId() }}</td>
+{% endif %}
