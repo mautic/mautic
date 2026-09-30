@@ -403,10 +403,6 @@ final class FieldModelTest extends MauticMysqlTestCase
 
         $sm      = $this->connection->createSchemaManager();
         $indexes = $sm->listTableIndexes($fullTable);
-        // $indexes = DatabasePlatform::listTableIndexes(
-        //    $this->connection,
-        //    $fullTable
-        // );
 
         foreach ($indexes as $index) {
             if (strtolower($index->getName()) === strtolower($indexName)) {
