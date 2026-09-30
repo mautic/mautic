@@ -101,6 +101,10 @@ trait LeadAccessTrait
                 'hydration_mode' => 'HYDRATE_ARRAY',
             ]);
 
+        if (count($leads) === 0) {
+            return $this->notFound();
+        }
+
         foreach ($leads as $lead) {
             if (!$this->security->hasEntityAccess(
                 'lead:leads:'.$action.'own',
