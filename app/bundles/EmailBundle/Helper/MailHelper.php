@@ -84,7 +84,7 @@ final class MailHelper
 
     private ?string $systemReplyTo;
 
-    private int $addressLengthLimit;
+    private readonly int $addressLengthLimit;
 
     /**
      * @var string
@@ -123,7 +123,7 @@ final class MailHelper
     /**
      * Tells the helper that the transport supports tokenized emails (likely HTTP API).
      */
-    private bool $tokenizationEnabled;
+    private readonly bool $tokenizationEnabled;
 
     /**
      * Use queue mode when sending email through this mailer; this requires a transport that supports tokenization and the use of queue/flushQueue.

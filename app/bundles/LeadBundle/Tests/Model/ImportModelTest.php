@@ -165,7 +165,7 @@ final class ImportModelTest extends StandardImportTestHelper
 
     public function testBeginImportWhenParallelLimitHit(): void
     {
-        $model = $this->getMockBuilder(\Mautic\LeadBundle\Tests\Fixtures\Model\ImportModel::class)
+        $model = $this->getMockBuilder(\Mautic\LeadBundle\Tests\Fixtures\Model\ImportModelMock::class)
             ->onlyMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -201,7 +201,7 @@ final class ImportModelTest extends StandardImportTestHelper
 
     public function testBeginImportWhenDatabaseException(): void
     {
-        $model = $this->getMockBuilder(\Mautic\LeadBundle\Tests\Fixtures\Model\ImportModel::class)
+        $model = $this->getMockBuilder(\Mautic\LeadBundle\Tests\Fixtures\Model\ImportModelMock::class)
             ->onlyMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
             ->disableOriginalConstructor()
             ->getMock();

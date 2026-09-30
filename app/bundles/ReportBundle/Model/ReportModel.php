@@ -99,7 +99,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         return 'report:reports';
     }
 
-    protected function getSession(): SessionInterface
+    private function getSession(): SessionInterface
     {
         try {
             return $this->requestStack->getSession();
@@ -310,8 +310,6 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param string $context
-     *
      * return \stdClass{filterList: mixed[], definitions: mixed[], operatorChoices: mixed[], operatorHtml: mixed[], filterListHtml: string}
      */
     public function getFilterList(string $context = 'all'): \stdClass
@@ -896,7 +894,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         return $connection;
     }
 
-    protected function isDebugMode(): bool
+    private function isDebugMode(): bool
     {
         return MAUTIC_ENV == 'dev' || $this->coreParametersHelper->get('debug');
     }

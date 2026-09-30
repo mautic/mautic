@@ -230,7 +230,7 @@ final class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * @return UserToken
      */
-    protected function getResetToken(User $user)
+    private function getResetToken(User $user)
     {
         $userToken = new UserToken();
         $userToken->setUser($user)

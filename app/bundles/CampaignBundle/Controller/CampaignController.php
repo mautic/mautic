@@ -89,7 +89,7 @@ final class CampaignController extends AbstractStandardFormController
     /**
      * @var array<string, mixed>
      */
-    private $deletedSources = [];
+    private array $deletedSources = [];
 
     /**
      * @var array<string, mixed>

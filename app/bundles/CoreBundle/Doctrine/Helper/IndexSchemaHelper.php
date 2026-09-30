@@ -20,9 +20,9 @@ final class IndexSchemaHelper
     private ?\Doctrine\DBAL\Schema\Table $table = null;
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $allowedColumns = [];
+    private array $allowedColumns = [];
 
     private array $changedIndexes = [];
 
@@ -62,7 +62,7 @@ final class IndexSchemaHelper
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function addIndex($columns, $name, $options = []): static
+    public function addIndex(string|array $columns, $name, $options = []): static
     {
         $textColumns = $this->getTextColumns($columns);
 
@@ -84,13 +84,11 @@ final class IndexSchemaHelper
     }
 
     /**
-     * @param mixed  $columns
      * @param string $name
      * @param array  $options
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function dropIndex($columns, $name, $options = []): static
+    public function dropIndex(string|array $columns, $name, $options = []): static
     {
         $textColumns = $this->getTextColumns($columns);
 
@@ -172,11 +170,11 @@ final class IndexSchemaHelper
     }
 
     /**
-     * @param mixed $columns
+     * @param string|string[] $columns
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    private function getTextColumns($columns): array
+    private function getTextColumns(string|array $columns): array
     {
         if (!is_array($columns)) {
             $columns = [$columns];

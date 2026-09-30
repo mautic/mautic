@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class DynamicContentHelper
+final readonly class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
@@ -177,7 +177,7 @@ final class DynamicContentHelper
      *
      * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getDwcsBySlotName($slotName, $publishedOnly = false)
+    public function getDwcsBySlotName($slotName, $publishedOnly = false): iterable
     {
         $filter = [
             'where' => [

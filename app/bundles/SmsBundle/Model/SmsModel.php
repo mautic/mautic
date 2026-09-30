@@ -57,9 +57,9 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
     }
 
     public function __construct(
-        private TrackableModel $pageTrackableModel,
-        private LeadModel $leadModel,
-        private TransportChain $transport,
+        private readonly TrackableModel $pageTrackableModel,
+        private readonly LeadModel $leadModel,
+        private readonly TransportChain $transport,
         private readonly CacheProviderInterface $cacheProvider,
         EntityManagerInterface $em,
         CorePermissions $security,

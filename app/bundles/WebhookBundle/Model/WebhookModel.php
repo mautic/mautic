@@ -90,10 +90,8 @@ final class WebhookModel extends FormModel
 
     /**
      * The key is queue ID, the value is the WebhookQueue object.
-     *
-     * @var array
      */
-    private $webhookQueueIdList = [];
+    private array $webhookQueueIdList = [];
 
     /**
      * How many recent log records should be kept.
@@ -352,7 +350,7 @@ final class WebhookModel extends FormModel
 
         // Run this on command as well as immediate send because if switched from queue to immediate
         // it can have some rows in the queue which will be send in every webhook forever
-        if (!empty($this->webhookQueueIdList)) {
+        if ($this->webhookQueueIdList !== []) {
             // delete all the queued items we just processed
             $this->webhookQueueRepository->deleteQueuesById(array_keys($this->webhookQueueIdList));
             $nextWebhookExists = $this->webhookQueueRepository->exists($webhook->getId());

@@ -1573,6 +1573,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @api protected to allow mocking
+     *
      * @param mixed[] $trackedContacts
      */
     protected function getMauticContactsToUpdate(
@@ -1625,8 +1627,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array<string, mixed> $fieldMapping
+     * @api protected to allow mocking
      *
+     * @param array<string, mixed> $fieldMapping
      * @return array
      *
      * @throws ApiErrorException
@@ -2233,6 +2236,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @api must be protected to allow mocking
+     *
      * @param array<string, mixed> $checkEmailsInSF
      * @param array<string, mixed> $processedLeads
      */
@@ -2313,7 +2318,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return int
+     * @api protected to allow mocking
      */
     protected function getSalesforceSyncLimit(array $currentContactList, $limit): float|int
     {
@@ -2339,9 +2344,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $objects
      *
-     * @return array
+     * @api must be protected to allow mocking
      */
-    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null): array
     {
         $objects ??= ['Lead', 'Contact'];
 
@@ -2467,10 +2472,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param string $object
-     *
-     * @return array
      */
-    public function getFieldsForQuery($object)
+    public function getFieldsForQuery($object): array
     {
         $fields = $this->getIntegrationSettings()->getFeatureSettings();
         switch ($object) {

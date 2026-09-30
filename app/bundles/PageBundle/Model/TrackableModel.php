@@ -251,6 +251,7 @@ final class TrackableModel extends AbstractCommonModel
      * @param array<string, Trackable|Redirect> $entities
      *
      * @return array<string, Redirect|Trackable>
+     * @api protected to allow mocking
      */
     protected function createTrackingTokens(array $entities): array
     {
@@ -326,6 +327,7 @@ final class TrackableModel extends AbstractCommonModel
 
     /**
      * Find URLs in HTML and parse into trackables.
+     * @api stays protected to allow mocking
      *
      * @param string $html HTML content
      */
@@ -350,6 +352,7 @@ final class TrackableModel extends AbstractCommonModel
      * Find URLs in plain text and parse into trackables.
      *
      * @param string $text Plain text content
+     * @api stays protected to allow mocking
      */
     protected function extractTrackablesFromText(string $text): array
     {
@@ -592,6 +595,9 @@ final class TrackableModel extends AbstractCommonModel
         return $content;
     }
 
+    /**
+     * @api must be protected to stay mocked
+     */
     protected function getContactFieldUrlTokens(): array
     {
         if (null !== $this->contactFieldUrlTokens) {
