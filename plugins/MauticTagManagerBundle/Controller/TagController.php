@@ -259,7 +259,7 @@ final class TagController extends FormController
     /**
      * Generate's edit form and processes post data.
      */
-    public function editAction(Request $request, TagDependencies $tagDependencies, int $objectId, bool $ignorePost = false): Response
+    public function editAction(Request $request, TagDependencies $tagDependencies, int|string $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_EDIT)) {
             $this->throwAccessDenied();
@@ -419,7 +419,7 @@ final class TagController extends FormController
     /**
      * @return array<string, mixed>
      */
-    private function getPostActionVars(Request $request, ?int $objectId = null): array
+    private function getPostActionVars(Request $request, int|string|null $objectId = null): array
     {
         // set the return URL
         if ($objectId) {
@@ -448,7 +448,7 @@ final class TagController extends FormController
     /**
      * Loads a specific form into the detailed panel.
      */
-    public function viewAction(Request $request, TagDependencies $tagDependencies, int $objectId): Response
+    public function viewAction(Request $request, TagDependencies $tagDependencies, int|string $objectId): Response
     {
         $tag = $this->leadTagModel->getEntity($objectId);
 
@@ -497,7 +497,7 @@ final class TagController extends FormController
     /**
      * Merge two tags together.
      */
-    public function mergeAction(Request $request, int $objectId): Response
+    public function mergeAction(Request $request, int|string $objectId): Response
     {
         $permissions = $this->security->isGranted(
             [
@@ -540,7 +540,7 @@ final class TagController extends FormController
         return $response;
     }
 
-    private function handleTagNotFound(int $objectId): Response
+    private function handleTagNotFound(int|string $objectId): Response
     {
         $postActionVars = $this->getMergePostActionVars($this->getCurrentRequest());
 

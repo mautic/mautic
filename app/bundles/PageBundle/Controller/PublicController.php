@@ -292,7 +292,7 @@ final class PublicController extends AbstractFormController
         name: 'mautic_page_preview',
         defaults: ['objectType' => null],
     )]
-    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, PageModel $model, LeadModel $leadModel, int $id, ?string $objectType = null): Response
+    public function previewAction(Request $request, PageConfig $pageConfig, CorePermissions $security, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, PageModel $model, LeadModel $leadModel, int|string $id, ?string $objectType = null): Response
     {
         $page = $model->getEntity($id);
 

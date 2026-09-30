@@ -25,7 +25,7 @@ final class ABTestController extends AbstractFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
-    public function generateABTestAction(Request $request, EmailModel $emailModel, int $objectId): Response
+    public function generateABTestAction(Request $request, EmailModel $emailModel, int|string $objectId): Response
     {
         if (!$parent = $emailModel->getEntity($objectId)) {
             return $this->notFound();

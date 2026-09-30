@@ -1102,7 +1102,7 @@ final class EmailController extends FormController
     /**
      * Clone an email and its translation/variant family.
      */
-    public function cloneWithTranslationsAction(Request $request, EmailModel $model, int $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function cloneWithTranslationsAction(Request $request, EmailModel $model, int|string $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         $page = $request->getSession()->get('mautic.email.page', 1);
 
@@ -1310,7 +1310,7 @@ final class EmailController extends FormController
         ));
     }
 
-    public function abTestAction(Request $request, AssetModel $assetModel, CorePermissions $corePermissions, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, int $objectId): Response
+    public function abTestAction(Request $request, AssetModel $assetModel, CorePermissions $corePermissions, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, int|string $objectId): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -1627,7 +1627,7 @@ final class EmailController extends FormController
         );
     }
 
-    public function scheduleSendAction(CorePermissions $security, EmailModel $model, Request $request, int $objectId): JsonResponse|Response
+    public function scheduleSendAction(CorePermissions $security, EmailModel $model, Request $request, int|string $objectId): JsonResponse|Response
     {
         $entity = $model->getEntity($objectId);
 

@@ -499,7 +499,7 @@ final class PageController extends FormController
         PageConfig $pageConfig,
         PageModel $model,
         ThemeHelper $themeHelper,
-        int $objectId,
+        int|string $objectId,
         bool $ignorePost = false,
     ): Response {
         $entity     = $model->getEntity($objectId);

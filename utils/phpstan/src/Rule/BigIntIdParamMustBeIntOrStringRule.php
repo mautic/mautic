@@ -16,13 +16,18 @@ use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * Repository "$id" param must be "int|string" when its entity id is an unsigned bigint via "addBigIntIdField()",
- * as Doctrine hydrates bigint as string.
+ * as Doctrine hydrates bigint as string. Controller action "$id"/"$objectId" params must be "int|string" too.
  *
  * @implements Rule<ClassMethod>
  */
 final readonly class BigIntIdParamMustBeIntOrStringRule implements Rule
 {
     private const string ID_PARAM_NAME = 'id';
+
+    /**
+     * @var string[]
+     */
+    private const array CONTROLLER_ID_PARAM_NAMES = ['id', 'objectId'];
 
     public function __construct(
         private ReflectionProvider $reflectionProvider,
@@ -45,10 +50,19 @@ final readonly class BigIntIdParamMustBeIntOrStringRule implements Rule
             return [];
         }
 
+        $isController = $this->isController($scope);
+
         $ruleErrors = [];
 
         foreach ($node->params as $param) {
-            if (!$param->var instanceof Node\Expr\Variable || self::ID_PARAM_NAME !== $param->var->name) {
+            if (!$param->var instanceof Node\Expr\Variable || !is_string($param->var->name)) {
+                continue;
+            }
+
+            $paramName = $param->var->name;
+
+            $isControllerIdParam = $isController && in_array($paramName, self::CONTROLLER_ID_PARAM_NAMES, true);
+            if (!$isControllerIdParam && self::ID_PARAM_NAME !== $paramName) {
                 continue;
             }
 
@@ -57,12 +71,14 @@ final readonly class BigIntIdParamMustBeIntOrStringRule implements Rule
                 continue;
             }
 
-            if (!$this->isBigIntIdEntityRepository($scope)) {
+            // controllers flag any id/objectId param; repositories require a bigint id entity
+            if (!$isControllerIdParam && !$this->isBigIntIdEntityRepository($scope)) {
                 return [];
             }
 
             $ruleErrors[] = RuleErrorBuilder::message(sprintf(
-                'Param "$id" of "%s()" must be "int|string", as the entity id is unsigned bigint hydrated as string.',
+                'Param "$%s" of "%s()" must be "int|string", as entity ids are unsigned bigint hydrated as string.',
+                $paramName,
                 $node->name->toString()
             ))
                 ->identifier('mautic.bigIntIdParamMustBeIntOrString')
@@ -71,6 +87,11 @@ final readonly class BigIntIdParamMustBeIntOrStringRule implements Rule
         }
 
         return $ruleErrors;
+    }
+
+    private function isController(Scope $scope): bool
+    {
+        return str_ends_with($scope->getClassReflection()->getName(), 'Controller');
     }
 
     private function isIntOrString(Node $type): bool

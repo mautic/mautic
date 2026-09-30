@@ -236,7 +236,7 @@ final class RoleController extends FormController
     /**
      * Clone an existing role and present it as a new form.
      */
-    public function cloneAction(Request $request, int $objectId, RoleModel $model): Response
+    public function cloneAction(Request $request, int|string $objectId, RoleModel $model): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_CREATE) || !$this->security->isGranted(self::PERMISSION_VIEW)) {
             $this->throwAccessDenied();
@@ -274,7 +274,7 @@ final class RoleController extends FormController
     /**
      * @param array<string, mixed> $postActionVars
      */
-    private function getRoleNotFoundResponse(array $postActionVars, int $objectId): Response
+    private function getRoleNotFoundResponse(array $postActionVars, int|string $objectId): Response
     {
         return $this->postActionRedirect(
             array_merge($postActionVars, [
@@ -292,7 +292,7 @@ final class RoleController extends FormController
     /**
      * @param array<string, mixed> $postActionVars
      */
-    private function handleRoleClone(Request $request, int $objectId, Entity\Role $source, RoleModel $model, array $postActionVars): Response
+    private function handleRoleClone(Request $request, int|string $objectId, Entity\Role $source, RoleModel $model, array $postActionVars): Response
     {
         $entity            = $model->cloneEntity($source);
         $permissionsConfig = $this->getPermissionsConfig($source);

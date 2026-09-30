@@ -490,7 +490,7 @@ final class PublicController extends CommonFormController
         EmailModel $model,
         Request $request,
         FakeContactHelper $fakeLeadHelper,
-        string $objectId,
+        int|string $objectId,
         ?string $objectType = null,
     ): Response {
         $contactId   = (int) $request->query->get('contactId');

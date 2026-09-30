@@ -201,7 +201,7 @@ final class CampaignController extends AbstractStandardFormController
         return $exportHelper->downloadAsZip($filePath, $exportFileName);
     }
 
-    public function exportAction(ExportHelper $exportHelper, CampaignModel $campaignModel, int $objectId): JsonResponse|BinaryFileResponse|Response
+    public function exportAction(ExportHelper $exportHelper, CampaignModel $campaignModel, int|string $objectId): JsonResponse|BinaryFileResponse|Response
     {
         if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
             $this->logger->error('Access denied for campaign export', ['user' => $this->user->getId()]);
@@ -233,7 +233,7 @@ final class CampaignController extends AbstractStandardFormController
         return $this->handleExportDownload($exportHelper, $jsonOutput, $assetList, $exportFileName);
     }
 
-    public function shareAction(Request $request, CampaignModel $campaignModel, CampaignShareService $shareService, ExportHelper $exportHelper, int $objectId): RedirectResponse|BinaryFileResponse|Response
+    public function shareAction(Request $request, CampaignModel $campaignModel, CampaignShareService $shareService, ExportHelper $exportHelper, int|string $objectId): RedirectResponse|BinaryFileResponse|Response
     {
         if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
             $this->throwAccessDenied();
@@ -335,7 +335,7 @@ final class CampaignController extends AbstractStandardFormController
         return $stashed;
     }
 
-    private function handleShareSubmission(FormInterface $form, Campaign $campaign, CampaignShareService $shareService, ExportHelper $exportHelper, int $objectId): RedirectResponse|BinaryFileResponse|Response
+    private function handleShareSubmission(FormInterface $form, Campaign $campaign, CampaignShareService $shareService, ExportHelper $exportHelper, int|string $objectId): RedirectResponse|BinaryFileResponse|Response
     {
         $formData = $form->getData();
 
@@ -520,7 +520,7 @@ final class CampaignController extends AbstractStandardFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
-    public function eventStatsAction(int $objectId, string $dateFromValue, string $dateToValue): JsonResponse
+    public function eventStatsAction(int|string $objectId, string $dateFromValue, string $dateToValue): JsonResponse
     {
         $response        = [];
         // CRITICAL: Always include deleted events in individual tabs by setting ignoreDeleted=false
@@ -577,7 +577,7 @@ final class CampaignController extends AbstractStandardFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
-    public function graphAction(Request $request, int $objectId, string $dateFrom, string $dateTo): Response
+    public function graphAction(Request $request, int|string $objectId, string $dateFrom, string $dateTo): Response
     {
         $dateRangeValues = ['date_from' => $dateFrom, 'date_to' => $dateTo];
         $action          = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
@@ -1342,7 +1342,7 @@ final class CampaignController extends AbstractStandardFormController
      *
      * @throws CacheException
      */
-    private function processCampaignLogCounts(int $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateTo): array
+    private function processCampaignLogCounts(int|string $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateTo): array
     {
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
             $campaignLogCounts          = $this->summaryRepository->getCampaignLogCounts($id, $dateFrom, $dateTo);

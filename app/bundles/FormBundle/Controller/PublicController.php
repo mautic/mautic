@@ -531,7 +531,7 @@ final class PublicController extends CommonFormController
         name: 'mautic_form_preview',
         defaults: ['id' => '0'],
     )]
-    public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int $id = 0): Response
+    public function previewAction(Request $request, AnalyticsHelper $analyticsHelper, AssetsHelper $assetsHelper, ThemeHelper $themeHelper, int|string $id = 0): Response
     {
         $objectId          = (empty($id)) ? (int) ($request->attributes->all()['id'] ?? $request->query->all()['id'] ?? $request->request->all()['id'] ?? null) : $id;
         $css               = InputHelper::string((string) ($request->attributes->all()['css'] ?? $request->query->all()['css'] ?? $request->request->all()['css'] ?? null));

@@ -105,7 +105,7 @@ class GrapesJsController extends CommonController
         LoggerInterface $mauticLogger,
         ThemeHelper $themeHelper,
         string $objectType,
-        string $objectId,
+        int|string $objectId,
     ): Response {
         if (!$this->isAuthorizedObjectType($objectType)) {
             throw new ConflictHttpException('Object not authorized to load custom builder');
@@ -190,7 +190,7 @@ class GrapesJsController extends CommonController
 
     public function editorStateAction(
         string $objectType,
-        string $objectId,
+        int|string $objectId,
     ): Response {
         if (!$this->isAuthorizedObjectType($objectType)) {
             throw new ConflictHttpException('Object not authorized to load custom builder');

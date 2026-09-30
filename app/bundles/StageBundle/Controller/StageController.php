@@ -422,7 +422,7 @@ final class StageController extends AbstractFormController
         return $this->newAction($request, $entity);
     }
 
-    public function mergeAction(Request $request, StageModel $model, int $objectId): Response
+    public function mergeAction(Request $request, StageModel $model, int|string $objectId): Response
     {
         $secondaryStage = $model->getEntity($objectId);
         $page           = $request->getSession()->get('mautic.stage.page', 1);

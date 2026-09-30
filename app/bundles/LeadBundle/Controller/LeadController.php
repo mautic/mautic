@@ -2400,7 +2400,7 @@ final class LeadController extends FormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
-    public function contactStatsAction(int $objectId): Response
+    public function contactStatsAction(int|string $objectId): Response
     {
         /** @var Lead $lead */
         $lead = $this->leadModel->getEntity($objectId);
@@ -2429,7 +2429,7 @@ final class LeadController extends FormController
         LeadModel $model,
         PointGroupModel $pointGroupModel,
         IpLookupHelper $ipLookupHelper,
-        int $objectId): Response
+        int|string $objectId): Response
     {
         $lead  = $model->getEntity($objectId);
         if (null === $lead

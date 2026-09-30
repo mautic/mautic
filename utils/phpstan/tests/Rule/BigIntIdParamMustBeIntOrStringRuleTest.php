@@ -22,11 +22,11 @@ final class BigIntIdParamMustBeIntOrStringRuleTest extends RuleTestCase
     {
         $this->analyse([__DIR__.'/Fixture/BigIntIdParam/BigIntIdEntityRepository.php'], [
             [
-                'Param "$id" of "exists()" must be "int|string", as the entity id is unsigned bigint hydrated as string.',
+                'Param "$id" of "exists()" must be "int|string", as entity ids are unsigned bigint hydrated as string.',
                 14,
             ],
             [
-                'Param "$id" of "findByStringId()" must be "int|string", as the entity id is unsigned bigint hydrated as string.',
+                'Param "$id" of "findByStringId()" must be "int|string", as entity ids are unsigned bigint hydrated as string.',
                 19,
             ],
         ]);
@@ -35,5 +35,19 @@ final class BigIntIdParamMustBeIntOrStringRuleTest extends RuleTestCase
     public function testSkipNonBigIntIdEntity(): void
     {
         $this->analyse([__DIR__.'/Fixture/BigIntIdParam/IntIdEntityRepository.php'], []);
+    }
+
+    public function testController(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/BigIntIdParam/SomeController.php'], [
+            [
+                'Param "$id" of "editAction()" must be "int|string", as entity ids are unsigned bigint hydrated as string.',
+                9,
+            ],
+            [
+                'Param "$objectId" of "viewAction()" must be "int|string", as entity ids are unsigned bigint hydrated as string.',
+                13,
+            ],
+        ]);
     }
 }

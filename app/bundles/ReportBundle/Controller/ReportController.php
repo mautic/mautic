@@ -175,7 +175,7 @@ final class ReportController extends FormController
         return $this->newAction($request, $entity);
     }
 
-    public function deleteAction(Request $request, int $objectId): bool|Response
+    public function deleteAction(Request $request, int|string $objectId): bool|Response
     {
         $page      = $request->getSession()->get('mautic.report.page', 1);
         $returnUrl = $this->generateUrl('mautic_report_index', ['page' => $page]);
@@ -305,7 +305,7 @@ final class ReportController extends FormController
      * @param int  $objectId   Item ID
      * @param bool $ignorePost Flag to ignore POST data
      */
-    public function editAction(Request $request, int $objectId, $ignorePost = false): false|Response
+    public function editAction(Request $request, int|string $objectId, $ignorePost = false): false|Response
     {
         $entity  = $this->reportModel->getEntity($objectId);
         $session = $request->getSession();
@@ -747,7 +747,7 @@ final class ReportController extends FormController
      * @param array<mixed> $postActionVars
      * @param array<mixed> $permissions
      */
-    private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, string $modelName): bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
+    private function checkEntityAccess(array $postActionVars, ?Report $entity, int|string $objectId, array $permissions, string $modelName): bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
     {
         if (null === $entity) {
             return $this->postActionRedirect(

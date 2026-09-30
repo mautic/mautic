@@ -79,7 +79,7 @@ final class ResultController extends CommonFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+', 'page' => '\d+'],
         defaults: ['objectId' => 0, 'page' => 0],
     )]
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int|string $objectId, int $page = 1): Response
     {
         $form           = $this->formModel->getEntity($objectId);
         $session        = $request->getSession();
@@ -492,7 +492,7 @@ final class ResultController extends CommonFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
-    public function addToSegmentAction(Request $request, int $objectId, FormModel $formModel, SubmissionModel $model, ListModel $segmentModel): Response
+    public function addToSegmentAction(Request $request, int|string $objectId, FormModel $formModel, SubmissionModel $model, ListModel $segmentModel): Response
     {
         $form      = $formModel->getEntity($objectId);
         $session   = $request->getSession();

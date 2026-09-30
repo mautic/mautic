@@ -100,7 +100,7 @@ final class ReportApiController extends CommonApiController
         );
     }
 
-    public function getReportAction(Request $request, int $id): Response
+    public function getReportAction(Request $request, int|string $id): Response
     {
         return $this->getEntityAction($request, $id);
     }

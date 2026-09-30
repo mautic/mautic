@@ -390,7 +390,7 @@ final class ProjectController extends AbstractFormController
         ]);
     }
 
-    public function deleteAction(string $objectId, Request $request, ProjectModel $projectModel, CorePermissions $corePermissions): Response
+    public function deleteAction(int|string $objectId, Request $request, ProjectModel $projectModel, CorePermissions $corePermissions): Response
     {
         $page      = $request->getSession()->get('mautic.project.page', 1);
         $returnUrl = $this->generateUrl(self::ROUTE_INDEX, ['page' => $page]);

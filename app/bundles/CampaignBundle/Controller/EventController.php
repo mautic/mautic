@@ -208,7 +208,7 @@ final class EventController extends CommonFormController
     /**
      * Generates edit form and processes post data.
      */
-    public function editAction(Request $request, string $objectId): JsonResponse|Response
+    public function editAction(Request $request, int|string $objectId): JsonResponse|Response
     {
         $valid         = $cancelled = false;
         $method        = $request->getMethod();
@@ -480,7 +480,7 @@ final class EventController extends CommonFormController
         return new JsonResponse($dataArray);
     }
 
-    public function cloneAction(Request $request, string $objectId): JsonResponse
+    public function cloneAction(Request $request, int|string $objectId): JsonResponse
     {
         $campaignId     = $request->query->get('campaignId');
         $session        = $request->getSession();

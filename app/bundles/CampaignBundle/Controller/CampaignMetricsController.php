@@ -35,7 +35,7 @@ final class CampaignMetricsController extends AbstractController
     public function emailWeekdaysAction(
         EmailPeriodMetrics $emailPeriodMetrics,
         CampaignModel $model,
-        int $objectId,
+        int|string $objectId,
         string $dateFrom = '',
         string $dateTo = '',
     ): Response {
@@ -81,7 +81,7 @@ final class CampaignMetricsController extends AbstractController
     public function emailHoursAction(
         EmailPeriodMetrics $emailPeriodMetrics,
         CampaignModel $model,
-        int $objectId,
+        int|string $objectId,
         string $dateFrom = '',
         string $dateTo = '',
     ): Response {
@@ -131,7 +131,7 @@ final class CampaignMetricsController extends AbstractController
     public function eventDetailsAction(
         EventDispatcherInterface $eventDispatcher,
         EventModel $eventModel,
-        int $objectId,
+        int|string $objectId,
     ): JsonResponse {
         $event    = $eventModel->getEntity($objectId);
 

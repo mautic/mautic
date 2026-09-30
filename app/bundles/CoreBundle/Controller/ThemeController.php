@@ -137,7 +137,7 @@ final class ThemeController extends FormController
     /**
      * Download a theme.
      */
-    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId): Response
+    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, int|string $objectId): Response
     {
         $flashes = [];
         $error   = false;
@@ -200,7 +200,7 @@ final class ThemeController extends FormController
     /**
      * Deletes the theme.
      */
-    public function deleteAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId): Response
+    public function deleteAction(Request $request, ThemeHelperInterface $themeHelper, int|string $objectId): Response
     {
         $flashes = [];
 
@@ -326,7 +326,7 @@ final class ThemeController extends FormController
     /**
      * Change default theme's visibility.
      */
-    public function visibilityAction(string $objectId, Request $request, CorePermissions $corePermissions, ThemeHelperInterface $themeHelper): Response
+    public function visibilityAction(int|string $objectId, Request $request, CorePermissions $corePermissions, ThemeHelperInterface $themeHelper): Response
     {
         if (!$corePermissions->isGranted('core:themes:view')) {
             $this->throwAccessDenied();

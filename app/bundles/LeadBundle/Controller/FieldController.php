@@ -539,12 +539,12 @@ final class FieldController extends FormController
      * Check if the entity can be deleted and add it to the deleteIds array if it can.
      * Return an array of flash messages if the entity cannot be deleted.
      *
-     * @param array<int>                                  $deleteIds
+     * @param array<int|string>                           $deleteIds
      * @param array<string, array<string, string>|string> $postActionVars
      *
      * @return array<int, array<string, mixed>>
      */
-    private function checkEntityForDeletion(int $objectId, array &$deleteIds, array $postActionVars): array
+    private function checkEntityForDeletion(int|string $objectId, array &$deleteIds, array $postActionVars): array
     {
         $entity    = $this->fieldModel->getEntity($objectId);
         $flashes   = [];

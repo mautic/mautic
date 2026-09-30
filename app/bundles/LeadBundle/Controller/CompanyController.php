@@ -678,7 +678,7 @@ final class CompanyController extends FormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
-    public function graphAction(CompanyLeadRepository $companiesRepo, int $objectId): Response
+    public function graphAction(CompanyLeadRepository $companiesRepo, int|string $objectId): Response
     {
         $contacts       = $companiesRepo->getCompanyLeads($objectId);
         $engagementData = is_array($contacts) ? $this->getCompanyEngagementsForGraph($contacts) : [];

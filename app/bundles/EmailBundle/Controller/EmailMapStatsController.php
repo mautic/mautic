@@ -90,7 +90,7 @@ final class EmailMapStatsController extends AbstractController
     )]
     public function viewAction(
         CorePermissions $security,
-        int $objectId,
+        int|string $objectId,
         string $dateFrom = '',
         string $dateTo = '',
     ): Response {
