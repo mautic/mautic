@@ -6,30 +6,55 @@ namespace Mautic\SmsBundle\Broadcast;
 
 final class BroadcastResult
 {
-    private int $sentCount = 0;
+    private const SCHEDULED_STATUS = 'mautic.sms.timeline.status.scheduled';
+
+    private const UNKNOWN_FAILURE_STATUS = 'mautic.sms.timeline.event.failed';
+
+    private int $processedCount = 0;
+
+    private int $submittedCount = 0;
+
+    private int $scheduledCount = 0;
 
     private int $failedCount = 0;
+
+    private int $executionFailureCount = 0;
+
+    private int $remainingCount = 0;
 
     /**
      * @var array<int, string>
      */
     private array $failedContacts = [];
 
-    public function process(array $results): void
+    public function process(array $results, ?int $processedCount = null): void
     {
-        foreach ($results as $lead_id => $result) {
+        $processedCount ??= count($results);
+        $this->processedCount += max($processedCount, count($results));
+        $this->failedCount += max(0, $processedCount - count($results));
+
+        foreach ($results as $leadId => $result) {
             if (isset($result['sent']) && true === $result['sent']) {
                 $this->sent();
+            } elseif (self::SCHEDULED_STATUS === ($result['status'] ?? null)) {
+                $this->scheduled();
             } else {
                 $this->failed();
-                $this->failedContacts[$lead_id] = $result['status'];
+                $this->failedContacts[(int) $leadId] = is_string($result['status'] ?? null)
+                    ? $result['status']
+                    : self::UNKNOWN_FAILURE_STATUS;
             }
         }
     }
 
     public function sent(): void
     {
-        ++$this->sentCount;
+        ++$this->submittedCount;
+    }
+
+    public function scheduled(): void
+    {
+        ++$this->scheduledCount;
     }
 
     public function failed(): void
@@ -37,14 +62,65 @@ final class BroadcastResult
         ++$this->failedCount;
     }
 
+    public function executionFailed(): void
+    {
+        ++$this->executionFailureCount;
+    }
+
+    public function merge(self $result): void
+    {
+        $this->processedCount += $result->processedCount;
+        $this->submittedCount += $result->submittedCount;
+        $this->scheduledCount += $result->scheduledCount;
+        $this->failedCount += $result->failedCount;
+        $this->executionFailureCount += $result->executionFailureCount;
+        $this->remainingCount         = $result->remainingCount;
+        $this->failedContacts         = array_replace($this->failedContacts, $result->failedContacts);
+    }
+
+    public function setRemainingCount(int $remainingCount): void
+    {
+        $this->remainingCount = max(0, $remainingCount);
+    }
+
+    public function getProcessedCount(): int
+    {
+        return $this->processedCount;
+    }
+
+    public function getSubmittedCount(): int
+    {
+        return $this->submittedCount;
+    }
+
+    public function getScheduledCount(): int
+    {
+        return $this->scheduledCount;
+    }
+
+    public function getSuccessfulCount(): int
+    {
+        return $this->submittedCount + $this->scheduledCount;
+    }
+
     public function getSentCount(): int
     {
-        return $this->sentCount;
+        return $this->submittedCount;
     }
 
     public function getFailedCount(): int
     {
-        return $this->failedCount;
+        return $this->failedCount + $this->executionFailureCount;
+    }
+
+    public function getExecutionFailureCount(): int
+    {
+        return $this->executionFailureCount;
+    }
+
+    public function getRemainingCount(): int
+    {
+        return $this->remainingCount;
     }
 
     /**
