@@ -302,6 +302,8 @@ abstract class AbstractCampaignCommand extends MauticMysqlTestCase
                     $event['trigger_date']      = $conditionTimestamp->format(self::DATE_TIME_FORMAT);
                     $fieldTypes['trigger_date'] = Types::DATETIME_MUTABLE;
                     break;
+                default:
+                    break;
             }
             $connection->insert($table2, $event, $fieldTypes);
         }

@@ -234,7 +234,7 @@ jobs:
 
       - name: Install PostgreSQL client
         run: |
-          # 1. Extract major version number (e.g., '19beta2-alpine' -> '19')
+          # 1. Extract major version number (e.g., '19beta4' -> '19')
           VERSION=$(echo "${{ matrix.postgres-versions }}" | sed -E 's/([0-9.]+).*/\1/' | cut -d. -f1)
 
           sudo apt-get update
@@ -242,7 +242,7 @@ jobs:
 
           # 2. Pull and dearmor the official PGDG signing key
           sudo mkdir -p /usr/share/keyrings
-          curl -fSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
+          curl -fS https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
 
           # 3. Add the standard production repo first to test viability
           echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
@@ -271,7 +271,7 @@ jobs:
 
       - name: Prepare PostgreSQL environment
         run: |
-          # 1. Extract major version number (e.g., '19beta2-alpine' -> '19')
+          # 1. Extract major version number (e.g., '19beta4' -> '19')
           VERSION=$(echo "${{ matrix.postgres-versions }}" | sed -E 's/([0-9.]+).*/\1/' | cut -d. -f1)
           
           export PATH="/usr/lib/postgresql/$VERSION/bin:$PATH"
