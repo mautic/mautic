@@ -1,0 +1,22 @@
+diff --git a/vendor/doctrine/doctrine-bundle/Repository/ContainerRepositoryFactory.php b/vendor/doctrine/doctrine-bundle/Repository/ContainerRepositoryFactory.php
+index 9d007c8efc..5a8f22bc2f 100644
+--- a/vendor/doctrine/doctrine-bundle/Repository/ContainerRepositoryFactory.php
++++ b/vendor/doctrine/doctrine-bundle/Repository/ContainerRepositoryFactory.php
+@@ -14,7 +14,7 @@ use RuntimeException;
+ use function class_exists;
+ use function get_debug_type;
+ use function is_a;
+-use function spl_object_hash;
++use function spl_object_id;
+ use function sprintf;
+ use function trigger_deprecation;
+
+@@ -97,7 +97,7 @@ final class ContainerRepositoryFactory implements RepositoryFactory
+         EntityManagerInterface $entityManager,
+         ClassMetadata $metadata
+     ): ObjectRepository {
+-        $repositoryHash = $metadata->getName() . spl_object_hash($entityManager);
++        $repositoryHash = $metadata->getName() . spl_object_id($entityManager);
+         if (isset($this->managedRepositories[$repositoryHash])) {
+             /** @psalm-var ObjectRepository<TEntity> */
+             return $this->managedRepositories[$repositoryHash];

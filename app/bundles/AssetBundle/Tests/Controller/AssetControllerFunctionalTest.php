@@ -14,7 +14,6 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -243,6 +242,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     {
         $userCreator = $this->getUser($userCreatorUN);
         $userEditor  = $this->getUser(self::SALES_USER);
+        $this->assertInstanceOf(User::class, $userCreator);
+        $this->assertInstanceOf(User::class, $userEditor);
         $this->setPermission($userEditor, ['asset:assets' => $permission]);
 
         $asset = new Asset();
@@ -387,13 +388,6 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         if (file_exists($tempFile)) {
             unlink($tempFile);
         }
-    }
-
-    private function getUser(string $username): User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
     }
 
     /**

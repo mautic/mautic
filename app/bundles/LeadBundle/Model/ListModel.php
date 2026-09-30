@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
@@ -412,7 +413,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         // Ensure the same list is used each batch <- would love to know how
-        $batchLimiters['maxId'] = (int) $newLeadsCount[$segmentId]['maxId'];
+        $batchLimiters['maxId'] = isset($newLeadsCount[$segmentId]['maxId']) ? (int) $newLeadsCount[$segmentId]['maxId'] : 0;
 
         // Number of total leads to process
         $leadCount = (int) $newLeadsCount[$segmentId]['count'];
@@ -1222,7 +1223,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     public function getFieldSegments(LeadField $field)
     {
-        $alias       = $field->getAlias();
+        $platform    = $this->em->getConnection()->getDatabasePlatform();
+        $alias       = DatabasePlatform::normalizeSearchValue($platform, $field->getAlias());
         $aliasLength = mb_strlen($alias);
         $likeContent = "%;s:5:\"field\";s:{$aliasLength}:\"{$alias}\";%";
         $filter      = [
@@ -1460,7 +1462,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             } else {
                 $count               = $this->getRepository()->getLeadCount($listId);
                 $leadCounts[$listId] = $count;
-                $this->segmentCountCacheHelper->setSegmentContactCount($listId, (int) $count);
+                $this->segmentCountCacheHelper->setSegmentContactCount($listId, $count);
             }
         }
 

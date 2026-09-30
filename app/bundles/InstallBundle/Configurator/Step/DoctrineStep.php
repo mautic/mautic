@@ -57,6 +57,13 @@ final class DoctrineStep implements StepInterface
     public $password;
 
     /**
+     * Database charset.
+     *
+     * @var string
+     */
+    public $charset = 'utf8mb4';
+
+    /**
      * Backup tables if they exist; otherwise drop them.
      * Required in step.
      *
@@ -149,6 +156,7 @@ final class DoctrineStep implements StepInterface
     {
         $mauticSupported = [
             'pdo_mysql' => 'MySQL PDO (Recommended)',
+            'pdo_pgsql' => 'PostgreSQL PDO (Experimental)',
         ];
 
         $supported = [];

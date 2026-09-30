@@ -4,6 +4,11 @@ on:
   pull_request:
     types: [labeled]
 
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
 jobs:
   coverage:
     # Only the "check-coverage" and "ready-to-commit" labels trigger this workflow

@@ -5,32 +5,54 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
-use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
 final class Version20211020092759 extends PreUpAssertionMigration
 {
-    private const TABLE = 'leads';
+    protected const TABLE_NAME = 'leads';
+    protected const INDEX_NAME = 'lead_date_modified';
 
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            function (Schema $schema) {
-                $table = $schema->getTable($this->getPrefixedTableName(self::TABLE));
+            function () {
+                $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+                $indexName = $this->getPrefixedIndexName(self::INDEX_NAME);
+                $platform  = $this->connection->getDatabasePlatform();
 
-                return count($table->getIndexes()) >= IndexHelper::MAX_COUNT_ALLOWED || $table->hasIndex($this->getIndexName());
+                // Check index limit
+                $indexes = $this->getIndexes($tableName);
+
+                if (count($indexes) >= DatabasePlatform::getMaxIndexAllowed($platform)) {
+                    return true;
+                }
+
+                // Check if the specific index already exists (reliable way)
+                return $this->indexExists($tableName, $indexName);
             },
-            "Index {$this->getIndexName()} cannot be created because the {$this->getPrefixedTableName(self::TABLE)} has hit the table index limit or the index already exists"
+            sprintf(
+                'Index %s cannot be created because the %s table has hit the table index limit or the index already exists',
+                $this->getPrefixedIndexName(self::INDEX_NAME),
+                $this->getPrefixedTableName(self::TABLE_NAME)
+            )
         );
     }
 
     public function up(Schema $schema): void
     {
-        $this->addSql("CREATE INDEX {$this->getIndexName()} ON {$this->getPrefixedTableName(self::TABLE)} (date_modified)");
+        $this->createIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedIndexName(self::INDEX_NAME),
+            ['date_modified']
+        );
     }
 
-    private function getIndexName(): string
+    public function down(Schema $schema): void
     {
-        return $this->prefix.'lead_date_modified';
+        $this->dropIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedIndexName(self::INDEX_NAME)
+        );
     }
 }

@@ -45,6 +45,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
                     ['label' => 'label2', 'value' => 'value2'],
                 ],
             ],
+            'order' => $this->getOrder(),
         ];
 
         $typeSafePayload = $this->generateTypeSafePayload($payload);
@@ -123,6 +124,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'label'               => 'Request a meeting',
             'alias'               => 'meeting',
             'type'                => 'boolean',
+            'order'               => $this->getOrder(),
             'isPubliclyUpdatable' => true,
             'isUniqueIdentifier'  => false,
         ];
@@ -398,7 +400,9 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Test creating a new field
 
-        $typeSafePayload = $this->generateTypeSafePayload($payload);
+        $typeSafePayload          = $this->generateTypeSafePayload($payload);
+        $typeSafePayload['order'] = $this->getOrder(); // Order must be defined to prevent race-condition on PostgreSQL
+
         $this->client->request('POST', '/api/fields/contact/new', $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
@@ -536,6 +540,14 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'charLengthLimit'     => 50,
             'properties'          => [],
         ];
+    }
+
+    private function getOrder(string $group = 'core', string $object = 'lead'): ?int
+    {
+        $orderField = $this->em->getRepository(LeadField::class)
+            ->findOneBy(['group' => $group, 'object' => $object, 'isFixed' => false], ['order' => 'DESC']);
+
+        return $orderField ? $orderField->getId() : null;
     }
 
     private function assertDeleteEntityActionFieldUsedInSegment(bool $isBackground): void

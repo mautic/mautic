@@ -10,25 +10,33 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20221014061125 extends AbstractMauticMigration
 {
+    protected const TABLE_NAME = 'webhook_logs';
+    protected const INDEX_NAME = 'webhook_id_date_added';
+
     public function preUp(Schema $schema): void
     {
-        if ($schema->getTable($this->getTableName())->hasIndex($this->getIndexName())) {
-            throw new SkipMigration(sprintf('Index %s already exists', $this->getIndexName()));
+        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+        $indexName = $this->getPrefixedIndexName(self::INDEX_NAME);
+
+        if ($this->indexExists($tableName, $indexName)) {
+            throw new SkipMigration(sprintf('Index %s already exists', self::INDEX_NAME));
         }
     }
 
     public function up(Schema $schema): void
     {
-        $this->addSql(sprintf('CREATE INDEX %s ON %s (webhook_id, date_added)', $this->getIndexName(), $this->getTableName()));
+        $this->createIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedIndexName(self::INDEX_NAME),
+            ['webhook_id', 'date_added']
+        );
     }
 
-    private function getTableName(): string
+    public function down(Schema $schema): void
     {
-        return "{$this->prefix}webhook_logs";
-    }
-
-    private function getIndexName(): string
-    {
-        return "{$this->prefix}webhook_id_date_added";
+        $this->dropIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedIndexName(self::INDEX_NAME)
+        );
     }
 }

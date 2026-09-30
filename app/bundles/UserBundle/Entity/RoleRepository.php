@@ -150,7 +150,8 @@ class RoleRepository extends CommonRepository
             $q->expr()->in('u.role_id', ':ids')
         )
             ->setParameter('ids', $roleIds, ArrayParameterType::INTEGER)
-            ->groupBy('u.role_id');
+            ->groupBy('u.role_id')
+            ->orderBy('u.role_id'); // make sure order is same in PostgreSQL
 
         $result = $q->executeQuery()->fetchAllAssociative();
 

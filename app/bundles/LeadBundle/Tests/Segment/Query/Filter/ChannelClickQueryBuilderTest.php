@@ -44,7 +44,8 @@ final class ChannelClickQueryBuilderTest extends TestCase
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ChannelClickQueryBuilder(
             $this->randomParameterMock,
-            $this->createStub(EventDispatcherInterface::class)
+            $this->createStub(EventDispatcherInterface::class),
+            $this->connectionMock
         );
 
         $this->connectionMock->method('quote')

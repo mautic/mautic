@@ -11,21 +11,50 @@ final class Version20250415142826 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME = 'campaign_lead_event_log';
 
+    private function getTableName(): string
+    {
+        return $this->prefix.self::TABLE_NAME;
+    }
+
+    private function getIndexName(): string
+    {
+        return "{$this->prefix}idx_scheduled_events";
+    }
+
     protected function preUpAssertions(): void
     {
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->hasIndex("{$this->prefix}idx_scheduled_events"),
+            fn (Schema $schema) => $this->indexExists($tableName, $indexName),
             'Index idx_scheduled_events already exists'
         );
     }
 
     public function up(Schema $schema): void
     {
-        $this->addSql("CREATE INDEX {$this->prefix}idx_scheduled_events ON {$this->getPrefixedTableName(self::TABLE_NAME)} (is_scheduled, event_id, trigger_date);");
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+
+        if (!$schema->hasTable($tableName) || $this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        $table = $schema->getTable($tableName);
+        $table->addIndex(['is_scheduled', 'event_id', 'trigger_date'], $indexName);
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("DROP INDEX {$this->prefix}idx_scheduled_events ON {$this->getPrefixedTableName(self::TABLE_NAME)};");
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+
+        if (!$schema->hasTable($tableName) || !$this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        $table = $schema->getTable($tableName);
+        $table->dropIndex($indexName);
     }
 }

@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ImportCommandTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     protected $useCleanupRollback = false;
 
     /**
@@ -74,14 +76,15 @@ final class ImportCommandTest extends MauticMysqlTestCase
 
     private function createCsvContactImport(int $status = Import::QUEUED): Import
     {
-        $csvFile = $this->generateSmallCSV();
+        $csvFile     = $this->generateSmallCSV();
+        $userCreator = $this->getUser(self::ADMIN_USER);
 
         $now    = new \DateTime();
         $import = new Import();
         $import->setIsPublished(true);
         $import->setDateAdded($now->modify('-4 hours'));
         $import->setDateModified($now->modify('-3 hours'));
-        $import->setCreatedBy(1);
+        $import->setCreatedBy($userCreator->getId());
         $import->setDir('/tmp');
         $import->setFile(basename($csvFile));
         $import->setOriginalFile(basename($csvFile));

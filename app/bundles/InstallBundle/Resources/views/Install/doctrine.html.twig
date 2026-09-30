@@ -74,6 +74,7 @@
             {{- include('@MauticInstall/Install/navbar.html.twig', {'step' : index, 'count' : count, 'completedSteps' : completedSteps}) -}}
         </div>
         <div class="col-sm-3">
+            {{ form_row(form.charset) }}
             {{ form_row(form.buttons) }}
         </div>
     </div>

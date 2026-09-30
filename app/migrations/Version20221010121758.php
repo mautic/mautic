@@ -11,6 +11,20 @@ final class Version20221010121758 extends AbstractMauticMigration
 {
     public function up(Schema $schema): void
     {
-        $this->addSql("UPDATE `{$this->prefix}leads` SET `state` = 'Uttarakhand' WHERE `state` = 'Uttaranchal'");
+        $leadsTable = $this->getPrefixedTableName('leads');
+
+        $oldState = $this->connection->quote('Uttaranchal');
+        $newState = $this->connection->quote('Uttarakhand');
+
+        $sql = sprintf(
+            'UPDATE %s SET %s = %s WHERE %s = %s',
+            $leadsTable,
+            $this->connection->quoteIdentifier('state'),
+            $newState,
+            $this->connection->quoteIdentifier('state'),
+            $oldState
+        );
+
+        $this->addSql($sql);
     }
 }

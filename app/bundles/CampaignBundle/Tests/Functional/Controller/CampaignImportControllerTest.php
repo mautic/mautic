@@ -17,7 +17,10 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        $this->useCleanupRollback = false;
+        // we keep it on if non PSQL
+        if ('pdo_pgsql' != $this->configParams['db_driver']) {
+            $this->useCleanupRollback = false;
+        }
         parent::setUp();
     }
 
