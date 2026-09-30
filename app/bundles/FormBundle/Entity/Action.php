@@ -146,10 +146,7 @@ class Action implements UuidInterface
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changes;
     }
