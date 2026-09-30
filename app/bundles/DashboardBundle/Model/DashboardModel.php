@@ -83,7 +83,7 @@ final class DashboardModel extends FormModel
      *
      * @return array
      */
-    public function getWidgets(bool $ignorePaginator = false)
+    public function getWidgets(bool $ignorePaginator = false): iterable
     {
         return $this->getEntities([
             'orderBy' => 'w.ordering',

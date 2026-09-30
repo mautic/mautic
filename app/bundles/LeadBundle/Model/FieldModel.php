@@ -527,7 +527,7 @@ class FieldModel extends FormModel
     /**
      * @return array
      */
-    public function getLeadFields()
+    public function getLeadFields(): iterable
     {
         return $this->getEntities([
             'filter' => [
@@ -588,7 +588,7 @@ class FieldModel extends FormModel
     /**
      * @return array
      */
-    public function getCompanyFields()
+    public function getCompanyFields(): iterable
     {
         return $this->getEntities([
             'filter' => [
@@ -719,7 +719,7 @@ class FieldModel extends FormModel
      *
      * @return Paginator
      */
-    public function getFieldSegments(LeadField $field)
+    public function getFieldSegments(LeadField $field): iterable
     {
         return $this->leadListModel->getFieldSegments($field);
     }
@@ -783,10 +783,8 @@ class FieldModel extends FormModel
      * @param string $type
      * @param string $filter
      * @param int    $limit
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults($type, $filter = '', $limit = 10): array
     {
         return $this->leadRepository->getValueList($type, $filter, $limit);
     }
@@ -887,7 +885,7 @@ class FieldModel extends FormModel
     /**
      * @return array
      */
-    public function getPublishedFieldArrays(string $object = 'lead')
+    public function getPublishedFieldArrays(string $object = 'lead'): iterable
     {
         return $this->getEntities(
             [

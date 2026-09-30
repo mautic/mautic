@@ -117,7 +117,6 @@ final class CampaignApiController extends CommonApiController
      * Adds a lead to a campaign.
      *
      * @param int        $id     Campaign ID
-     * @param int|string $leadId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -155,7 +154,6 @@ final class CampaignApiController extends CommonApiController
      * Removes given lead from a campaign.
      *
      * @param int $id     Campaign ID
-     * @param int $leadId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */

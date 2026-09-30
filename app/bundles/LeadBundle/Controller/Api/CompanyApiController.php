@@ -86,9 +86,6 @@ final class CompanyApiController extends CommonApiController
     /**
      * Adds a contact to a company.
      *
-     * @param int $companyId Company ID
-     * @param int $contactId Contact ID
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     #[Route(

@@ -47,7 +47,6 @@ final class CheckStep implements StepInterface
     /**
      * @param Configurator $configurator Configurator service
      * @param string       $projectDir   Kernel root path
-     * @param RequestStack $requestStack Request stack
      */
     public function __construct(
         Configurator $configurator,

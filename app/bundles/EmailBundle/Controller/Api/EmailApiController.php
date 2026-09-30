@@ -146,7 +146,6 @@ final class EmailApiController extends CommonApiController
      * Sends the email to a specific lead.
      *
      * @param int $id     Email ID
-     * @param int $leadId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */

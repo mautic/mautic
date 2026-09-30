@@ -151,7 +151,6 @@ final class ListApiController extends CommonApiController
      * Adds a lead to a list.
      *
      * @param int $id     List ID
-     * @param int $leadId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -241,7 +240,6 @@ final class ListApiController extends CommonApiController
      * Removes given contact from a list.
      *
      * @param int $id     List ID
-     * @param int $leadId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */

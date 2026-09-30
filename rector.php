@@ -66,6 +66,12 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
         ],
 
+        // getEntities() is declared iterable, but callers rely on the countable Paginator it returns
+        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
+            __DIR__.'/app/bundles/DynamicContentBundle/Tests/Unit/Helper/DynamicContentHelperTest.php',
+        ],
+
         // test fixtures
         __DIR__.'/plugins/*/node_modules/*',
         __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Helper/resource/',

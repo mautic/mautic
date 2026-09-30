@@ -193,7 +193,7 @@ final readonly class FieldsBuilder
     /**
      * @param LeadField[] $fields
      */
-    private function getFieldColumns($fields, string $prefix): array
+    private function getFieldColumns(iterable $fields, string $prefix): array
     {
         $prefix = $this->sanitizePrefix($prefix);
 
