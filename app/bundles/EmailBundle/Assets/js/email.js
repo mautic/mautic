@@ -112,6 +112,42 @@ Mautic.emailOnUnload = function(id) {
     }
 };
 
+Mautic.launchEmailBuilder = function(formName) {
+    if (mQuery('#emailform_emailType').val() === 'list') {
+        const lists = mQuery('#emailform_lists').val() || [];
+        const excludedLists = mQuery('#emailform_excludedLists').val() || [];
+        const conflicting = lists.some(function(listId) {
+            return excludedLists.indexOf(listId) !== -1;
+        });
+
+        const excludedListsField = mQuery('#emailform_excludedLists');
+        const group = excludedListsField.closest('.form-group');
+        const existingError = group.find('.email-builder-segment-conflict');
+
+        if (existingError.length) {
+            existingError.remove();
+
+            if (!group.find('.help-block').length) {
+                group.removeClass('has-error');
+            }
+        }
+
+        if (conflicting) {
+            group.addClass('has-error');
+
+            mQuery('<span class="help-block text-danger email-builder-segment-conflict"></span>')
+                .text(Mautic.translate('mautic.email.builder.segment_conflict'))
+                .insertAfter(excludedListsField);
+
+            return false;
+        }
+    }
+
+    Mautic.launchBuilder(formName, 'email');
+
+    return false;
+};
+
 Mautic.insertEmailBuilderToken = function(editorId, token) {
     var editor = Mautic.getEmailBuilderEditorInstances();
     editor[instance].insertText(token);
