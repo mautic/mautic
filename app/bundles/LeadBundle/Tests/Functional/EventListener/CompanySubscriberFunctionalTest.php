@@ -36,7 +36,7 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $companyModel = self::getContainer()->get(CompanyModel::class);
         $companyModel->saveEntity($company);
 
-        $auditLogRepository = $this->em->getRepository(AuditLog::class);
+        $auditLogRepository = $this->getContainer()->get(\Mautic\CoreBundle\Entity\AuditLogRepository::class);
         $auditLogs          = $auditLogRepository->findOneBy(['bundle' => 'lead', 'object' => 'company', 'action' => 'create', 'objectId' => $company->getId()]);
         $this->assertInstanceOf(AuditLog::class, $auditLogs);
         $auditLogDetail = $auditLogs->getDetails();
@@ -60,7 +60,7 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $companyModel->addLeadToCompany($company, $lead);
         $leadModel->saveEntity($lead);
 
-        $leadRepository = $this->em->getRepository(Lead::class);
+        $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
         $lead           = $leadRepository->findOneBy(['firstname' => 'Test name']);
         $this->assertInstanceOf(Lead::class, $lead);
         $this->assertSame('Test Delete Company', $lead->getCompany());

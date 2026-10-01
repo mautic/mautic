@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<VtigerApi>
  */
-class VtigerIntegration extends CrmAbstractIntegration
+final class VtigerIntegration extends CrmAbstractIntegration
 {
     private string $authorzationError = '';
 

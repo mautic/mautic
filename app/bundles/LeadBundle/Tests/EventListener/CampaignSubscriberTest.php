@@ -245,7 +245,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $leadEventLog->method('getLead')->willReturn($lead);
         $leadEventLog->method('getId')->willReturn(1);
 
-        $pendingEvent = new PendingEvent($this->createStub(ActionAccessor::class), $campaignEvent, new ArrayCollection([$leadEventLog]));
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
+        $logs = new ArrayCollection([$leadEventLog]);
+
+        $pendingEvent = new PendingEvent($this->createStub(ActionAccessor::class), $campaignEvent, $logs);
         $this->subscriber->onCampaignTriggerActionUpdateCompany($pendingEvent);
 
         $this->assertCount(1, $pendingEvent->getSuccessful());
@@ -492,6 +495,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with(false)
             ->willReturn($leadEventLog);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
 
         $this->mockLeadModel->expects($this->exactly(2))

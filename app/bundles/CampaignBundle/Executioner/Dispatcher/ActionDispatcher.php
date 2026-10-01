@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
@@ -30,7 +30,7 @@ final readonly class ActionDispatcher
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    public function dispatchEvent(ActionAccessor $config, Event $event, ArrayCollection $logs, ?PendingEvent $pendingEvent = null): PendingEvent
+    public function dispatchEvent(ActionAccessor $config, Event $event, Collection $logs, ?PendingEvent $pendingEvent = null): PendingEvent
     {
         if (!$pendingEvent) {
             $pendingEvent = new PendingEvent($config, $event, $logs);
@@ -56,7 +56,10 @@ final readonly class ActionDispatcher
         return $pendingEvent;
     }
 
-    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs): void
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
+    private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, Collection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -73,7 +76,10 @@ final readonly class ActionDispatcher
         );
     }
 
-    private function dispatchFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs): void
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
+    private function dispatchFailedEvent(AbstractEventAccessor $config, Collection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -94,10 +100,14 @@ final readonly class ActionDispatcher
     }
 
     /**
+     * @param Collection<int, LeadEventLog> $pending
+     * @param Collection<int, LeadEventLog> $success
+     * @param Collection<int, LeadEventLog> $failed
+     *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */
-    private function validateProcessedLogs(ArrayCollection $pending, ArrayCollection $success, ArrayCollection $failed): void
+    private function validateProcessedLogs(Collection $pending, Collection $success, Collection $failed): void
     {
         foreach ($pending as $log) {
             if (!$success->contains($log) && !$failed->contains($log)) {

@@ -13,7 +13,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Redirect>
  */
-class RedirectModel extends FormModel
+final class RedirectModel extends FormModel
 {
     public static function getName(): string
     {
@@ -90,7 +90,7 @@ class RedirectModel extends FormModel
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
      *
-     * @return Redirect|null
+     * @return Redirect
      */
     public function getRedirectByUrl(string $url)
     {

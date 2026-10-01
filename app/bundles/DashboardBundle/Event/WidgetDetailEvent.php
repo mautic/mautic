@@ -9,23 +9,21 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Exception\CouldNotFormatDateTimeException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WidgetDetailEvent extends CommonEvent
+final class WidgetDetailEvent extends CommonEvent
 {
-    public const DASHBOARD_CACHE_TAG = 'dashboard_widget';
+    public const string DASHBOARD_CACHE_TAG = 'dashboard_widget';
 
-    protected $type;
+    private $type;
 
-    protected $template;
+    private ?string $template = null;
 
-    protected $templateData = [];
+    private array $templateData = [];
 
-    protected $errorMessage;
+    private $errorMessage;
 
-    protected $uniqueId;
+    private ?string $uniqueId = null;
 
-    protected float $startTime;
-
-    protected $loadTime  = 0;
+    private readonly float $startTime;
 
     private string $cacheKeyPath = 'dashboard.widget.';
 
@@ -34,7 +32,7 @@ class WidgetDetailEvent extends CommonEvent
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly CorePermissions $security,
-        protected Widget $widget,
+        private Widget $widget,
         private readonly CacheProviderTagAwareInterface $cacheProvider,
     ) {
         $this->startTime = microtime(true);
@@ -147,10 +145,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Get the widget template.
-     *
-     * @return string
      */
-    public function getTemplate()
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
@@ -181,7 +177,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @return array<mixed>
      */
-    public function getTemplateData()
+    public function getTemplateData(): array
     {
         return $this->templateData;
     }
@@ -207,10 +203,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Build a unique ID from type and widget params.
-     *
-     * @return string
      */
-    public function getUniqueWidgetId()
+    public function getUniqueWidgetId(): string
     {
         if ($this->uniqueId) {
             return $this->uniqueId;

@@ -319,7 +319,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 
@@ -769,7 +769,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         // get the contact (lead) and primary company field values
         $leadArray = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
-        if (!is_array($leadArray) || count($leadArray) <= 0) {
+        if (count($leadArray) <= 0) {
             return;
         }
 

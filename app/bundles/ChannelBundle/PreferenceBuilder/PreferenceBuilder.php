@@ -2,7 +2,7 @@
 
 namespace Mautic\ChannelBundle\PreferenceBuilder;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -16,7 +16,7 @@ final class PreferenceBuilder
     private array $channels = [];
 
     public function __construct(
-        ArrayCollection $logs,
+        Collection $logs,
         private readonly Event $event,
         array $channels,
         private readonly LoggerInterface $logger,
@@ -79,7 +79,7 @@ final class PreferenceBuilder
         return $this->channels[$channel];
     }
 
-    private function buildRules(ArrayCollection $logs, array $channels): void
+    private function buildRules(Collection $logs, array $channels): void
     {
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {

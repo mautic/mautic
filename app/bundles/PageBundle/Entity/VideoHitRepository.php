@@ -18,10 +18,8 @@ final class VideoHitRepository extends CommonRepository
      *
      * @param int|null             $leadId
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getTimelineStats($leadId = null, array $options = [])
+    public function getTimelineStats($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

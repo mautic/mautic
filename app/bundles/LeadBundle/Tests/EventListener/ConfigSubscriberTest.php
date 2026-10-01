@@ -20,10 +20,7 @@ final class ConfigSubscriberTest extends TestCase
 {
     private ConfigSubscriber $configSubscriber;
 
-    /**
-     * @var MockObject&ConfigBuilderEvent
-     */
-    private MockObject $configBuilderEvent;
+    private ConfigBuilderEvent&MockObject $configBuilderEvent;
 
     protected function setUp(): void
     {

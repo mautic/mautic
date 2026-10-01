@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 
-class UpdatedObjectMappingDAO
+final class UpdatedObjectMappingDAO
 {
     private readonly \DateTimeInterface $objectModifiedDate;
 

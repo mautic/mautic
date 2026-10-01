@@ -63,6 +63,8 @@ final class ThemeHelperTest extends TestCase
 
     private ThemeHelper $themeHelper;
 
+    private Finder $finder;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -84,7 +86,7 @@ final class ThemeHelperTest extends TestCase
             $this->translator,
             $this->coreParameterHelper,
             new Filesystem(),
-            new Finder(),
+            $this->finder = new Finder(),
             $this->builderIntegrationsHelper
         );
     }
@@ -167,6 +169,8 @@ final class ThemeHelperTest extends TestCase
 
     public function testThemeFallbackToDefaultIfTemplateIsMissing(): void
     {
+        $themesDirectory = __DIR__.'/../../../../../../themes';
+
         $this->twig->expects($this->exactly(2))
             ->method('getLoader')
             ->willReturn($this->loader);
@@ -178,12 +182,24 @@ final class ThemeHelperTest extends TestCase
                 true, // default themes twig exists
             );
 
-        $this->pathsHelper->expects($this->exactly(46))->method('getSystemPath')
+        $themesCount = $this->finder->files()
+            ->in($themesDirectory.'/*/')
+            ->depth('0')
+            ->name('config.json')
+            ->count();
+
+        // Create theme helper: call with "themes" and "themes_root". (2)
+        // Load themes call with "themes". (1)
+        // Check all theme directories. ($themesCount)
+        // Load from getTheme (2)
+        $count = $themesCount + 5;
+
+        $this->pathsHelper->expects($this->exactly($count))->method('getSystemPath')
             ->willReturnCallback(
-                function ($path, bool $absolute) {
+                function (string $path, bool $absolute) use ($themesDirectory) {
                     switch ($path) {
                         case 'themes':
-                            return ($absolute) ? __DIR__.'/../../../../../../themes' : 'themes';
+                            return ($absolute) ? $themesDirectory : 'themes';
                         case 'themes_root':
                             return __DIR__.'/../../../../../..';
                     }
@@ -198,6 +214,7 @@ final class ThemeHelperTest extends TestCase
 
     public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes(): void
     {
+        $themesDirectory = __DIR__.'/../../../../../../themes';
         $this->twig->expects($this->exactly(3))
             ->method('getLoader')
             ->willReturn($this->loader);
@@ -213,12 +230,24 @@ final class ThemeHelperTest extends TestCase
                 true
             );
 
-        $this->pathsHelper->expects($this->exactly(46))->method('getSystemPath')
+        $themesCount = $this->finder->files()
+            ->in($themesDirectory.'/*/')
+            ->depth('0')
+            ->name('config.json')
+            ->count();
+
+        // Create theme helper: call with "themes" and "themes_root". (2)
+        // Load themes call with "themes". (1)
+        // Check all theme directories. ($themesCount)
+        // Load from getTheme (2)
+        $count = $themesCount + 5;
+
+        $this->pathsHelper->expects($this->exactly($count))->method('getSystemPath')
             ->willReturnCallback(
-                function ($path, bool $absolute) {
+                function (string $path, bool $absolute) use ($themesDirectory) {
                     switch ($path) {
                         case 'themes':
-                            return ($absolute) ? __DIR__.'/../../../../../../themes' : 'themes';
+                            return ($absolute) ? $themesDirectory : 'themes';
                         case 'themes_root':
                             return __DIR__.'/../../../../../..';
                     }

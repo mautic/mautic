@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20260814141635 extends AbstractMauticMigration
 {
-    protected const TABLE_NAME = 'forms';
+    protected const string TABLE_NAME = 'forms';
     private string $columnName  = 'form_type';
 
     public function preUp(Schema $schema): void

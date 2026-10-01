@@ -15,10 +15,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 #[AllowMockObjectsWithoutExpectations]
 final class SlotNameTypeValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var DynamicContentModel|MockObject
-     */
-    private ?MockObject $dynamicContentModel = null;
+    private DynamicContentModel&MockObject $dynamicContentModel;
 
     protected function createValidator(): SlotNameTypeValidator
     {

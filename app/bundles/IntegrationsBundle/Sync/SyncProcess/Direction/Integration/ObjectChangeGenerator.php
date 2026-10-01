@@ -17,7 +17,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
-readonly class ObjectChangeGenerator
+final readonly class ObjectChangeGenerator
 {
     public function __construct(
         private ValueHelper $valueHelper,

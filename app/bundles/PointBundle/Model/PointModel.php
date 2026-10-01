@@ -35,7 +35,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @extends CommonFormModel<Point>
  */
-class PointModel extends CommonFormModel implements GlobalSearchInterface, ResetInterface
+final class PointModel extends CommonFormModel implements GlobalSearchInterface, ResetInterface
 {
     public static function getName(): string
     {
@@ -48,9 +48,9 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
     private array $actions = [];
 
     public function __construct(
-        protected RequestStack $requestStack,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadModel $leadModel,
+        private readonly RequestStack $requestStack,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly LeadModel $leadModel,
         private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,

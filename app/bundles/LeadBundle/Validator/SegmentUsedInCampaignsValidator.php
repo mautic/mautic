@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentUsedInCampaignsValidator
+final class SegmentUsedInCampaignsValidator
 {
     private string $errorMessage = '';
 

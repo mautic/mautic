@@ -29,9 +29,9 @@ class Stat
     /**
      * @var int Limit number of stored 'openDetails'
      */
-    public const MAX_OPEN_DETAILS = 1000;
+    public const int MAX_OPEN_DETAILS = 1000;
 
-    public const TABLE_NAME = 'email_stats';
+    public const string TABLE_NAME = 'email_stats';
 
     private int|string|null $id = null;
 
@@ -586,7 +586,7 @@ class Stat
     /**
      * @return Collection<int, EmailReply>
      */
-    public function getReplies()
+    public function getReplies(): Collection
     {
         return $this->replies;
     }

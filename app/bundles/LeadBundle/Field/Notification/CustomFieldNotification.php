@@ -11,7 +11,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class CustomFieldNotification
+final readonly class CustomFieldNotification
 {
     public function __construct(
         private NotificationModel $notificationModel,

@@ -21,11 +21,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @extends CrmAbstractIntegration<HubspotApi>
  */
-class HubspotIntegration extends CrmAbstractIntegration
+final class HubspotIntegration extends CrmAbstractIntegration
 {
     private StageRepository $stageRepository;
 
-    protected UserHelper $userHelper;
+    private UserHelper $userHelper;
 
     private EmailValidator $emailValidator;
 
@@ -49,7 +49,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $this->helper;
     }
 
-    public const ACCESS_KEY = 'accessKey';
+    public const string ACCESS_KEY = 'accessKey';
 
     public function getName(): string
     {
@@ -201,10 +201,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $objects
-     *
-     * @return array
      */
-    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null): array
     {
         $objects ??= ['Leads', 'Contacts'];
 
@@ -467,7 +465,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                 if (null === $stage) {
                     $stage = new Stage();
                     $stage->setName($stageName);
-                    $stages[$stageName] = $stage;
+                    $stages             = [$stageName => $stage];
                 }
                 if (!$lead->getStage() && $lead->getStage() != $stage) {
                     $lead->setStage($stage);

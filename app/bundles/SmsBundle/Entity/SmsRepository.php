@@ -3,28 +3,19 @@
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Sms>
  */
-class SmsRepository extends CommonRepository
+final class SmsRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    /**
-     * Get a list of entities.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select($this->getTableAlias())
-            ->from(Sms::class, $this->getTableAlias(), $this->getTableAlias().'.id');
+        $q = $this->createQueryBuilder($this->getTableAlias(), $this->getTableAlias().'.id');
 
         if (empty($args['iterable_mode'])) {
             $q->leftJoin($this->getTableAlias().'.category', 'c');
@@ -62,10 +53,7 @@ class SmsRepository extends CommonRepository
         return $qb->getQuery();
     }
 
-    /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function getSegmentsContactsQuery(int $smsId)
+    public function getSegmentsContactsQuery(int $smsId): \Doctrine\DBAL\Query\QueryBuilder
     {
         // Main query
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -87,14 +75,11 @@ class SmsRepository extends CommonRepository
 
     /**
      * Get amounts of sent and read emails.
-     *
-     * @return array
      */
-    public function getSentCount()
+    public function getSentCount(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
-        $q->select('SUM(e.sentCount) as sent_count')
-            ->from(Sms::class, 'e');
+        $q = $this->createQueryBuilder('e');
+        $q->select('SUM(e.sentCount) as sent_count');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         $results['sent_count'] ??= 0;

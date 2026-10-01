@@ -44,7 +44,7 @@ final class DetailController extends CommonController
     }
 
     #[Route(
-        '/s/marketplace/detail/{vendor}/{package}',
+        path: '/s/marketplace/detail/{vendor}/{package}',
         name: 'mautic_marketplace_detail',
         methods: ['GET'],
     )]

@@ -7,16 +7,16 @@ namespace Mautic\SmsBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-class SmsSendEvent extends CommonEvent
+final class SmsSendEvent extends CommonEvent
 {
     /**
      * @var int
      */
-    protected $smsId;
+    private $smsId;
 
     public function __construct(
-        protected string $content,
-        protected Lead $lead,
+        private string $content,
+        private Lead $lead,
     ) {
     }
 

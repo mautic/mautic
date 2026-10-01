@@ -32,16 +32,16 @@ final class RemoveAnonymousContactsCommandFunctionalTest extends MauticMysqlTest
 
         $this->em->flush();
 
-        $this->assertCount(1, $this->em->getRepository(ListLead::class)->findBy(['list' => $segment]));
-        $this->assertCount(1, $this->em->getRepository(CampaignLead::class)->findBy(['campaign' => $campaign]));
-        $this->assertCount(1, $this->em->getRepository(LeadEventLog::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']));
+        $this->assertCount(1, $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findBy(['list' => $segment]));
+        $this->assertCount(1, $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findBy(['campaign' => $campaign]));
+        $this->assertCount(1, $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']));
 
         $this->testSymfonyCommand(RemoveAnonymousContactsCommand::COMMAND_NAME);
 
-        $this->assertCount(1, $this->em->getRepository(Lead::class)->findAll());
-        $this->assertCount(0, $this->em->getRepository(ListLead::class)->findBy(['list' => $segment]));
-        $this->assertCount(0, $this->em->getRepository(CampaignLead::class)->findBy(['campaign' => $campaign]));
-        $this->assertCount(0, $this->em->getRepository(LeadEventLog::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']));
+        $this->assertCount(1, $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findAll());
+        $this->assertCount(0, $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findBy(['list' => $segment]));
+        $this->assertCount(0, $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findBy(['campaign' => $campaign]));
+        $this->assertCount(0, $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']));
     }
 
     private function createAnonymousLead(): Lead

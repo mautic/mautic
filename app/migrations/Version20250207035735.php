@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 
 final class Version20250207035735 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'lead_fields';
+    protected const string TABLE_NAME = 'lead_fields';
 
     protected function preUpAssertions(): void
     {

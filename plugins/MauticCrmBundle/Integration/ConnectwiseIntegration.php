@@ -16,9 +16,9 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<ConnectwiseApi>
  */
-class ConnectwiseIntegration extends CrmAbstractIntegration
+final class ConnectwiseIntegration extends CrmAbstractIntegration
 {
-    public const PAGESIZE = 200;
+    public const int PAGESIZE = 200;
 
     public function getName(): string
     {
@@ -186,7 +186,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         if (isset($settings['feature_settings']['objects'])) {
             $cwObjects = $settings['feature_settings']['objects'];
         } else {
-            $cwObjects['Contact'] = 'Contact';
+            $cwObjects            = ['Contact' => 'Contact'];
         }
         if (!$this->isAuthorized()) {
             return [];
@@ -575,7 +575,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             $personFound = true;
         }
 
-        $personData = [];
+        $personData          = [];
+        $integrationEntities = [];
 
         try {
             if ($personFound) {
@@ -757,10 +758,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $objects
-     *
-     * @return array
      */
-    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null): array
     {
         $objects ??= ['Leads', 'Contacts'];
         if (isset($fieldsToUpdate['leadFields']) && is_array($objects)) {

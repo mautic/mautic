@@ -186,10 +186,7 @@ class AuditLog
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getDetails()
+    public function getDetails(): array
     {
         return $this->details;
     }

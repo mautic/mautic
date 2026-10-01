@@ -10,7 +10,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
-class ReportDAO
+final class ReportDAO
 {
     private array $objects = [];
 
@@ -84,7 +84,7 @@ class ReportDAO
     /**
      * @return ObjectDAO[]
      */
-    public function getObjects(?string $objectName)
+    public function getObjects(?string $objectName): array
     {
         $returnedObjects = [];
         if (null === $objectName) {

@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Psr\Log\LoggerInterface;
 
-readonly class CustomFieldIndex
+final readonly class CustomFieldIndex
 {
     public function __construct(
         private IndexSchemaHelper $indexSchemaHelper,

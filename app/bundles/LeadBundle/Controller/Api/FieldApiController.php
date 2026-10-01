@@ -94,10 +94,8 @@ final class FieldApiController extends CommonApiController
 
     /**
      * Sanitizes and returns an array of where statements from the request.
-     *
-     * @return array
      */
-    protected function getWhereFromRequest(Request $request)
+    protected function getWhereFromRequest(Request $request): array
     {
         $where = parent::getWhereFromRequest($request);
 
@@ -130,7 +128,7 @@ final class FieldApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
     {
         if (isset($parameters['properties'])) {
             $result = $this->model->setFieldProperties($entity, $parameters['properties']);
@@ -139,5 +137,6 @@ final class FieldApiController extends CommonApiController
                 return $this->returnError($this->translator->trans($result, [], 'validators'), Response::HTTP_BAD_REQUEST);
             }
         }
+        return null;
     }
 }

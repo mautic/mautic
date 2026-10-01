@@ -99,7 +99,7 @@ class LeadModel extends FormModel
         return 'lead.lead';
     }
 
-    public const CHANNEL_FEATURE = 'contact_preference';
+    public const string CHANNEL_FEATURE = 'contact_preference';
 
     /**
      * @var array
@@ -181,8 +181,6 @@ class LeadModel extends FormModel
 
     public function getRepository(): LeadRepository
     {
-        $this->leadRepository->setDispatcher($this->dispatcher);
-
         if (!$this->repoSetup) {
             $this->repoSetup = true;
 
@@ -259,9 +257,9 @@ class LeadModel extends FormModel
     /**
      * @param array<mixed> $args
      *
-     * @return array|Paginator|mixed
+     * @return array|Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $entities   = parent::getEntities($args);
         $contactIds = $this->getContactIdsFromArgs($args);
@@ -382,7 +380,7 @@ class LeadModel extends FormModel
     /**
      * @param Lead $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
@@ -526,7 +524,7 @@ class LeadModel extends FormModel
         // save the field values
         $fieldValues = $lead->getFields();
 
-        if (empty($fieldValues) || $bindWithForm) {
+        if ($fieldValues === [] || $bindWithForm) {
             // Lead is new or they haven't been populated so let's build the fields now
             if ([] === $this->flattenedFields) {
                 /** @var Paginator<mixed[]> $paginator */
@@ -541,7 +539,7 @@ class LeadModel extends FormModel
                 $this->fieldsByGroup   = $this->organizeFieldsByGroup($this->flattenedFields);
             }
 
-            if (empty($fieldValues)) {
+            if ($fieldValues === []) {
                 $fieldValues = $this->fieldsByGroup;
             }
         }
@@ -687,7 +685,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadsByIp(string $ip)
+    public function getLeadsByIp(string $ip): array
     {
         return $this->getRepository()->getLeadsByIp($ip);
     }
@@ -697,7 +695,7 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadsByIds(array $ids)
+    public function getLeadsByIds(array $ids): array
     {
         return $this->getEntities([
             'filter' => [
@@ -722,11 +720,11 @@ class LeadModel extends FormModel
      *
      * @return array<mixed>
      */
-    public function getLeadDetails(Lead|int $lead)
+    public function getLeadDetails(Lead|int $lead): array
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields();
-            if (!empty($fields)) {
+            if ($fields !== []) {
                 return $fields;
             }
         }
@@ -780,10 +778,8 @@ class LeadModel extends FormModel
 
     /**
      * Returns flat array for single lead.
-     *
-     * @return array
      */
-    public function getLead(int $leadId)
+    public function getLead(int $leadId): array
     {
         return $this->getRepository()->getLead($leadId);
     }
@@ -836,7 +832,7 @@ class LeadModel extends FormModel
         if (count($uniqueFieldData)) {
             $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData);
 
-            if (!empty($existingLeads)) {
+            if ($existingLeads !== []) {
                 $this->logger->debug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
                 $lead = $existingLeads[0];
             }
@@ -847,10 +843,8 @@ class LeadModel extends FormModel
 
     /**
      * Get a list of segments this lead belongs to.
-     *
-     * @return mixed
      */
-    public function getLists(Lead $lead, bool $forLists = false, bool $arrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false)
+    public function getLists(Lead $lead, bool $forLists = false, bool $arrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {
         return $this->leadListRepository->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
@@ -1550,7 +1544,6 @@ class LeadModel extends FormModel
      */
     public function setTags(Lead $lead, array $tags, bool $removeOrphans = false): void
     {
-        /** @var Tag[] $currentTags */
         $currentTags  = $lead->getTags();
         $leadModified = $tagsDeleted = false;
 
@@ -2190,10 +2183,7 @@ class LeadModel extends FormModel
         return $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE, true);
     }
 
-    /**
-     * @return array
-     */
-    public function getPreferredChannel(Lead $lead)
+    public function getPreferredChannel(Lead $lead): array
     {
         $preferredChannel = $this->frequencyRuleRepository->getPreferredChannel($lead->getId());
         if ([] !== $preferredChannel) {
@@ -2236,7 +2226,7 @@ class LeadModel extends FormModel
 
         if (!$newPrimaryCompany) {
             $latestCompany = $this->companyLeadRepository->getLatestCompanyForLead($leadId);
-            if (!empty($latestCompany)) {
+            if ($latestCompany !== []) {
                 $lead->addUpdatedField('company', $latestCompany['companyname'])
                     ->setDateModified(new \DateTime());
             }

@@ -14,10 +14,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ListLead
 {
-    /**
-     * @var string
-     */
-    public const TABLE_NAME = 'lead_lists_leads';
+    public const string TABLE_NAME = 'lead_lists_leads';
 
     /**
      * @var LeadList
@@ -43,11 +40,13 @@ class ListLead
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'manually_removed', type: 'boolean')]
     private $manuallyRemoved = false;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'manually_added', type: 'boolean')]
     private $manuallyAdded = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -55,14 +54,6 @@ class ListLead
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addDateAdded();
-
-        $builder->createField('manuallyRemoved', 'boolean')
-            ->columnName('manually_removed')
-            ->build();
-
-        $builder->createField('manuallyAdded', 'boolean')
-            ->columnName('manually_added')
-            ->build();
     }
 
     /**

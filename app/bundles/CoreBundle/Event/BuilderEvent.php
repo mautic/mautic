@@ -19,10 +19,13 @@ class BuilderEvent extends Event
 
     protected string $tokenFilterTarget;
 
+    /**
+     * @param string|string[] $requested
+     */
     public function __construct(
         protected TranslatorInterface $translator,
         protected $entity = null,
-        protected $requested = 'all',
+        protected string|array $requested = 'all',
         protected string $tokenFilter = '',
     ) {
         $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
@@ -118,10 +121,8 @@ class BuilderEvent extends Event
 
     /**
      * Get token array.
-     *
-     * @return array
      */
-    public function getTokens(bool $withBC = true)
+    public function getTokens(bool $withBC = true): array
     {
         if (false === $withBC) {
             $tokens = [];
@@ -178,10 +179,8 @@ class BuilderEvent extends Event
      * Simple token filtering.
      *
      * @param array $tokens array('token' => 'label')
-     *
-     * @return array
      */
-    public function filterTokens($tokens)
+    public function filterTokens($tokens): array
     {
         $filter = $this->tokenFilter;
 
@@ -213,12 +212,12 @@ class BuilderEvent extends Event
         return $this->getRequested('abTestWinnerCriteria');
     }
 
-    protected function getRequested($type): bool
+    protected function getRequested(string $type): bool
     {
         if (is_array($this->requested)) {
             return in_array($type, $this->requested);
         }
 
-        return $this->requested == $type || 'all' == $this->requested;
+        return $this->requested === $type || 'all' === $this->requested;
     }
 }

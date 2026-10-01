@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class FieldSaveDispatcher
+final readonly class FieldSaveDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,

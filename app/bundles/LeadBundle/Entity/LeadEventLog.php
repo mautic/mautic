@@ -23,10 +23,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog
 {
-    /**
-     * @var string
-     */
-    public const INDEX_SEARCH = 'IDX_SEARCH';
+    public const string INDEX_SEARCH = 'IDX_SEARCH';
 
     /**
      * @var int|string

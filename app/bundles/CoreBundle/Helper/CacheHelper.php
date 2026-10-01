@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-readonly class CacheHelper
+final readonly class CacheHelper
 {
     public function __construct(
         private string $cacheDir,
@@ -64,7 +64,7 @@ readonly class CacheHelper
     /**
      * Clear cache related session items.
      */
-    protected function clearSessionItems(): void
+    private function clearSessionItems(): void
     {
         // Clear the menu items and icons so they can be rebuilt
         try {

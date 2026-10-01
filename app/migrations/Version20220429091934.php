@@ -10,9 +10,9 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20220429091934 extends PreUpAssertionMigration
 {
-    private const SIGNED   = 'SIGNED';
+    private const string SIGNED   = 'SIGNED';
 
-    private const UNSIGNED = 'UNSIGNED';
+    private const string UNSIGNED = 'UNSIGNED';
 
     protected function preUpAssertions(): void
     {

@@ -72,7 +72,7 @@ final class MauticSocialMonitoringCommand extends Command
     /**
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    private function getMonitors($id = null)
+    private function getMonitors($id = null): iterable
     {
         $filter = [
             'start' => 0,

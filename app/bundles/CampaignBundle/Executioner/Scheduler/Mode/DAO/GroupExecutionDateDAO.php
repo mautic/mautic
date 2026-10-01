@@ -5,16 +5,20 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode\DAO;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\LeadBundle\Entity\Lead;
 
 final readonly class GroupExecutionDateDAO
 {
-    private ArrayCollection $contacts;
+    /**
+     * @var Collection<int, Lead>
+     */
+    private Collection $contacts;
 
     public function __construct(
         private \DateTimeInterface $executionDate,
     ) {
-        $this->contacts      = new ArrayCollection();
+        $this->contacts = new ArrayCollection();
     }
 
     public function addContact(Lead $contact): void
@@ -27,7 +31,10 @@ final readonly class GroupExecutionDateDAO
         return $this->executionDate;
     }
 
-    public function getContacts(): ArrayCollection
+    /**
+     * @return Collection<int, Lead>
+     */
+    public function getContacts(): Collection
     {
         return $this->contacts;
     }

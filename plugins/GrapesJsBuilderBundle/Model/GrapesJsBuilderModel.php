@@ -18,7 +18,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends AbstractCommonModel<GrapesJsBuilder>
  */
-class GrapesJsBuilderModel extends AbstractCommonModel
+final class GrapesJsBuilderModel extends AbstractCommonModel
 {
     private RequestStack $requestStack;
 

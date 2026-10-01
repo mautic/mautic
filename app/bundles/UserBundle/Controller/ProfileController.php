@@ -32,7 +32,7 @@ final class ProfileController extends FormController
      * Generate's account profile.
      */
     #[Route(
-        '/s/account',
+        path: '/s/account',
         name: 'mautic_user_account',
     )]
     public function indexAction(Request $request, LanguageHelper $languageHelper,

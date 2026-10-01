@@ -9,16 +9,14 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Trigger>
  */
-class TriggerRepository extends CommonRepository
+final class TriggerRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
+        $q = $this->createQueryBuilder($this->getTableAlias())
             ->select($this->getTableAlias().', cat')
-            ->from(Trigger::class, $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat')
             ->leftJoin($this->getTableAlias().'.group', 'pl');
 
@@ -32,9 +30,8 @@ class TriggerRepository extends CommonRepository
      */
     public function getTriggerColors(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->select('partial t.{id, color, points}')
-            ->from(Trigger::class, 't', 't.id');
+        $q = $this->createQueryBuilder('t', 't.id')
+            ->select('partial t.{id, color, points}');
 
         $q->where($this->getPublishedByDateOrmExpression($q));
         $q->orderBy('t.points', Order::Ascending->value);

@@ -28,6 +28,7 @@ class Log
     /**
      * @var string
      */
+    #[ORM\Column(name: 'status_code', type: Types::STRING, length: 50)]
     private $statusCode;
 
     /**
@@ -47,11 +48,6 @@ class Log
         $builder = new ClassMetadataBuilder($metadata);
         $builder
             ->addId();
-
-        $builder->createField('statusCode', Types::STRING)
-            ->columnName('status_code')
-            ->length(50)
-            ->build();
 
         $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
         $builder->addNullableField('note', Types::STRING);

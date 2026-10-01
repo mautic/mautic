@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
@@ -14,9 +15,9 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
-    public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+    public const string DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
 
-    public const CACHE_NAMESPACE             = 'Plugin';
+    public const string CACHE_NAMESPACE             = 'Plugin';
 
     /**
      * @var int
@@ -145,9 +146,9 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return ArrayCollection<int, Integration>
+     * @return Collection<int, Integration>
      */
-    public function getIntegrations()
+    public function getIntegrations(): Collection
     {
         return $this->integrations;
     }

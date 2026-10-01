@@ -7,14 +7,14 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Psr\Log\LoggerInterface;
 
-class IpLookupFactory
+final readonly class IpLookupFactory
 {
     public function __construct(
-        protected array $lookupServices,
-        protected LoggerInterface $logger,
-        protected Client $client,
-        protected CoreParametersHelper $coreParametersHelper,
-        protected ?string $cacheDir = null,
+        private array $lookupServices,
+        private LoggerInterface $logger,
+        private Client $client,
+        private CoreParametersHelper $coreParametersHelper,
+        private ?string $cacheDir = null,
     ) {
     }
 

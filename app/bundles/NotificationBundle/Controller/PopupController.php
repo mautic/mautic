@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class PopupController extends CommonController
 {
     #[Route(
-        '/notification',
+        path: '/notification',
         name: 'mautic_notification_popup',
     )]
     public function indexAction(AssetsHelper $assetsHelper): Response

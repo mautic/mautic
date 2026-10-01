@@ -76,7 +76,7 @@ class EmailSendEvent extends CommonEvent
         $this->skip        = $args['skip'] ?? false;
 
         if (!$this->subject && $this->email instanceof Email) {
-            $this->subject = (string) $args['email']->getSubject();
+            $this->subject = (string) $this->email->getSubject();
         }
 
         if (isset($args['internalSend'])) {

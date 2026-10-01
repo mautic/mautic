@@ -14,7 +14,7 @@ use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class IntegrationsHelper
+final class IntegrationsHelper
 {
     /**
      * @var IntegrationInterface[]
@@ -30,7 +30,7 @@ class IntegrationsHelper
         private readonly IntegrationRepository $integrationRepository,
         private readonly EncryptionService $encryptionService,
         private readonly EventDispatcherInterface $eventDispatcher,
-        #[AutowireIterator('mautic.basic_integration')]
+        #[AutowireIterator(tag: 'mautic.basic_integration')]
         iterable $integrations = [],
     ) {
         foreach ($integrations as $integration) {

@@ -63,7 +63,7 @@ final class UserApiController extends CommonApiController
      * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/users/self',
+        path: '/api/users/self',
         name: 'mautic_api_getself',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -178,7 +178,7 @@ final class UserApiController extends CommonApiController
      * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/users/{id}/permissioncheck',
+        path: '/api/users/{id}/permissioncheck',
         name: 'mautic_api_checkpermission',
         requirements: ['id' => '\\d+'],
         defaults: ['_format' => 'json'],
@@ -210,7 +210,7 @@ final class UserApiController extends CommonApiController
      * Obtains a list of roles for user edits.
      */
     #[Route(
-        '/api/users/list/roles',
+        path: '/api/users/list/roles',
         name: 'mautic_api_getuserroles',
         defaults: ['_format' => 'json'],
         methods: ['GET']

@@ -624,6 +624,9 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn([]);
+
         $this->contactTracker->method('getContact')
             ->willReturn($contact);
 
@@ -765,6 +768,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
     {
         $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
         $fieldSession2         = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fields                = [];
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,

@@ -28,7 +28,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @implements AjaxLookupModelInterface<DynamicContent>
  */
-class DynamicContentModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class DynamicContentModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
@@ -66,10 +66,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return $this->dynamicContentRepository;
     }
 
-    /**
-     * @param object $entity
-     */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 

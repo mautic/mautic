@@ -61,7 +61,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('flashes', $response);
 
         $this->em->clear();
-        $updatedCompany = $this->em->getRepository(Company::class)->find($company->getId());
+        $updatedCompany = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class)->find($company->getId());
         $this->assertInstanceOf(Company::class, $updatedCompany);
         $this->assertSame($owner->getId(), $updatedCompany->getOwner()->getId());
     }

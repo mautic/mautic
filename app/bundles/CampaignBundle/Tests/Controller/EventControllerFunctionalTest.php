@@ -484,7 +484,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $userTimezone = 'Europe/Berlin';
         $wallClock    = '2026-12-15 19:00';
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $user->setTimezone($userTimezone);
         $this->em->persist($user);

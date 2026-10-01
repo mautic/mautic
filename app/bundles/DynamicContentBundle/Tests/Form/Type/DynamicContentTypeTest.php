@@ -61,7 +61,7 @@ final class DynamicContentTypeTest extends TestCase
         );
 
         $formBuilderInterfaceMock = $this->createMock(FormBuilderInterface::class);
-        $options['data']          = new DynamicContent();
+        $options                  = ['data' => new DynamicContent()];
 
         $tagChoices = [];
 

@@ -127,7 +127,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/delete/%d', $contact->getId(), $noteId));
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
-        $this->assertNotInstanceOf(LeadNote::class, $this->em->getRepository(LeadNote::class)->find($noteId));
+        $this->assertNotInstanceOf(LeadNote::class, $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadNoteRepository::class)->find($noteId));
     }
 
     public function testDeleteActionIsDeniedWithoutNotesDeletePermission(): void

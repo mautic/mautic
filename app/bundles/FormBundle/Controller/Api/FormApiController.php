@@ -72,7 +72,7 @@ final class FormApiController extends CommonApiController
      * Delete fields from a form.
      */
     #[Route(
-        '/api/forms/{formId}/fields/delete',
+        path: '/api/forms/{formId}/fields/delete',
         name: 'mautic_api_formdeletefields',
         requirements: ['formId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -107,7 +107,7 @@ final class FormApiController extends CommonApiController
      * Delete fields from a form.
      */
     #[Route(
-        '/api/forms/{formId}/actions/delete',
+        path: '/api/forms/{formId}/actions/delete',
         name: 'mautic_api_formdeleteactions',
         requirements: ['formId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -144,7 +144,7 @@ final class FormApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
     {
         $method = $this->getCurrentRequest()->getMethod();
         $isNew  = false;
@@ -300,6 +300,7 @@ final class FormApiController extends CommonApiController
                 $this->model->deleteActions($entity, $actionsToDelete);
             }
         }
+        return null;
     }
 
     /**

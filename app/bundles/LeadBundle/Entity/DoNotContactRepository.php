@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 /**
  * @extends CommonRepository<DoNotContact>
  */
-class DoNotContactRepository extends CommonRepository
+final class DoNotContactRepository extends CommonRepository
 {
     use TimelineTrait;
 
@@ -111,10 +111,8 @@ class DoNotContactRepository extends CommonRepository
 
     /**
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getTimelineStats($leadId = null, array $options = [])
+    public function getTimelineStats($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

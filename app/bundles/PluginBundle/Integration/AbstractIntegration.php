@@ -59,15 +59,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
-    public const FIELD_TYPE_STRING   = 'string';
+    public const string FIELD_TYPE_STRING   = 'string';
 
-    public const FIELD_TYPE_BOOL     = 'boolean';
+    public const string FIELD_TYPE_BOOL     = 'boolean';
 
-    public const FIELD_TYPE_NUMBER   = 'number';
+    public const string FIELD_TYPE_NUMBER   = 'number';
 
-    public const FIELD_TYPE_DATETIME = 'datetime';
+    public const string FIELD_TYPE_DATETIME = 'datetime';
 
-    public const FIELD_TYPE_DATE     = 'date';
+    public const string FIELD_TYPE_DATE     = 'date';
 
     protected bool $coreIntegration = false;
 
@@ -1717,7 +1717,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (count($uniqueLeadFieldData)) {
             $existingLeads = $this->leadRepository->getLeadsByUniqueFields($uniqueLeadFieldData);
 
-            if (!empty($existingLeads)) {
+            if ($existingLeads !== []) {
                 $lead = array_shift($existingLeads);
             }
         }

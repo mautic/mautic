@@ -37,7 +37,7 @@ final class PluginController extends FormController
     }
 
     #[Route(
-        '/s/plugins',
+        path: '/s/plugins',
         name: 'mautic_plugin_index',
     )]
     public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
@@ -141,7 +141,7 @@ final class PluginController extends FormController
      * @param string $name
      */
     #[Route(
-        '/s/plugins/config/{name}/{page}',
+        path: '/s/plugins/config/{name}/{page}',
         name: 'mautic_plugin_config',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -376,7 +376,7 @@ final class PluginController extends FormController
     }
 
     #[Route(
-        '/s/plugins/info/{name}',
+        path: '/s/plugins/info/{name}',
         name: 'mautic_plugin_info',
     )]
     public function infoAction(IntegrationHelper $integrationHelper, $name): Response
@@ -418,7 +418,7 @@ final class PluginController extends FormController
      * Scans the addon bundles directly and loads bundles which are not registered to the database.
      */
     #[Route(
-        '/s/plugins/reload',
+        path: '/s/plugins/reload',
         name: 'mautic_plugin_reload',
     )]
     public function reloadAction(Request $request, ReloadFacade $reloadFacade): Response

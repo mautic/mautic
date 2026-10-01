@@ -61,7 +61,7 @@ final class StageApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     #[Route(
-        '/api/stages/{id}/contact/{contactId}/add',
+        path: '/api/stages/{id}/contact/{contactId}/add',
         name: 'mautic_api_stageddcontact',
         requirements: ['id' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -104,7 +104,7 @@ final class StageApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     #[Route(
-        '/api/stages/{id}/contact/{contactId}/remove',
+        path: '/api/stages/{id}/contact/{contactId}/remove',
         name: 'mautic_api_stageremovecontact',
         requirements: ['id' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],

@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 /**
  * @extends CommonRepository<Stat>
  */
-class StatRepository extends CommonRepository
+final class StatRepository extends CommonRepository
 {
     use TimelineTrait;
 

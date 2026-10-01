@@ -24,7 +24,7 @@ final class ActionController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/action/{objectAction}/{objectId}',
+        path: '/s/forms/action/{objectAction}/{objectId}',
         name: 'mautic_formaction_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

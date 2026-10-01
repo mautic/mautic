@@ -27,6 +27,7 @@ final class LeadFieldData extends Fixture implements OrderedFixtureInterface, Fi
      */
     public function load(ObjectManager $manager): void
     {
+        $fieldGroups            = [];
         $fieldGroups['lead']    = FieldModel::$coreFields;
         $fieldGroups['company'] = FieldModel::$coreCompanyFields;
 

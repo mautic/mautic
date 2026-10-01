@@ -110,7 +110,7 @@ final class ContactDeduper
     /**
      * @return Lead[]
      */
-    public function checkForDuplicateContacts(array $queryFields, bool $mergeNewerIntoOlder = false)
+    public function checkForDuplicateContacts(array $queryFields, bool $mergeNewerIntoOlder = false): array
     {
         $duplicates = [];
         $uniqueData = $this->getUniqueData($queryFields);

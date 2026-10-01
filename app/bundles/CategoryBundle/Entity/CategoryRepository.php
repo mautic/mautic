@@ -8,14 +8,14 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Category>
  */
-class CategoryRepository extends CommonRepository
+final class CategoryRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('c')
@@ -137,10 +137,8 @@ class CategoryRepository extends CommonRepository
      * @param string $bundle
      * @param string $alias
      * @param object $entity
-     *
-     * @return mixed
      */
-    public function checkUniqueCategoryAlias($bundle, $alias, $entity = null)
+    public function checkUniqueCategoryAlias($bundle, $alias, $entity = null): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as aliascount')

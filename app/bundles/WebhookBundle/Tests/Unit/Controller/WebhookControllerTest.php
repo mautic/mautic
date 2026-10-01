@@ -224,12 +224,11 @@ final class WebhookControllerTest extends TestCase
             ->willReturn(false);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->expects($this->exactly(10))->method('get')
+        $coreParametersHelper->expects($this->exactly(9))->method('get')
             ->willReturnMap([
                 ['webhook_limit', 10, 5],
                 ['webhook_time_limit', 600, 500],
                 ['webhook_disable_limit', 100, $disableLimit],
-                ['webhook_timeout', 15, 25],
                 ['webhook_log_max', WebhookModel::WEBHOOK_LOG_MAX, 50],
                 ['queue_mode', null, WebhookModel::IMMEDIATE_PROCESS],
                 ['events_orderby_dir', Order::Ascending, Order::Ascending],

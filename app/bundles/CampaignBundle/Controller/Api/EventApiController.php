@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -57,7 +58,7 @@ final class EventApiController extends CommonApiController
     /**
      * @param Event|FormEntity $entity
      */
-    protected function checkEntityAccess($entity, $action = 'view')
+    protected function checkEntityAccess($entity, $action = 'view'): bool|Response
     {
         // Use the campaign for permission checks
         return parent::checkEntityAccess($entity->getCampaign(), $action);

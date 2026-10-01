@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;
 
-class FileProperties
+final class FileProperties
 {
     /**
      * @param string $filename

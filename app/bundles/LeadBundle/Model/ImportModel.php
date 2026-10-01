@@ -534,10 +534,8 @@ class ImportModel extends FormModel
      *
      * @param int    $importId
      * @param string $object
-     *
-     * @return array|null
      */
-    public function getFailedRows($importId = null, $object = 'lead')
+    public function getFailedRows($importId = null, $object = 'lead'): ?array
     {
         if (!$importId) {
             return null;
@@ -628,10 +626,8 @@ class ImportModel extends FormModel
 
     /**
      * Logs a debug message if in dev environment.
-     *
-     * @param string $msg
      */
-    protected function logDebug($msg, ?Import $import = null): void
+    private function logDebug(string $msg, ?Import $import = null): void
     {
         if (MAUTIC_ENV === 'dev') {
             $importId = $import ? '('.$import->getId().')' : '';

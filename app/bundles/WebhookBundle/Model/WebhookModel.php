@@ -38,7 +38,7 @@ use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 /**
  * @extends FormModel<Webhook>
  */
-class WebhookModel extends FormModel
+final class WebhookModel extends FormModel
 {
     public static function getName(): string
     {
@@ -48,37 +48,35 @@ class WebhookModel extends FormModel
     /**
      *  2 possible types of the processing of the webhooks.
      */
-    public const COMMAND_PROCESS   = 'command_process';
+    public const string COMMAND_PROCESS   = 'command_process';
 
-    public const IMMEDIATE_PROCESS = 'immediate_process';
+    public const string IMMEDIATE_PROCESS = 'immediate_process';
 
     private const int DELETE_BATCH_LIMIT = 5000;
 
-    public const WEBHOOK_LOG_MAX = 1000;
+    public const int WEBHOOK_LOG_MAX = 1000;
 
     /**
      * Whet queue mode is turned on.
      *
      * @var string
      */
-    protected $queueMode;
+    private $queueMode;
 
     /**
      * How many entities to add into one queued webhook.
-     *
-     * @var int
      */
-    protected $webhookLimit;
+    private int $webhookLimit;
 
     /**
      * Sets min webhook queue ID to get/process.
      */
-    protected ?int $minQueueId = null;
+    private ?int $minQueueId = null;
 
     /**
      * Sets max webhook queue ID to get/process.
      */
-    protected ?int $maxQueueId = null;
+    private ?int $maxQueueId = null;
 
     /**
      * How long the webhook processing can run in seconds.
@@ -87,31 +85,18 @@ class WebhookModel extends FormModel
 
     /**
      * How many responses in 1 row can fail until the webhook disables itself.
-     *
-     * @var int
      */
-    protected $disableLimit;
-
-    /**
-     * How many seconds will we wait for the response.
-     *
-     * @var int in seconds
-     */
-    protected $webhookTimeout;
+    private int $disableLimit;
 
     /**
      * The key is queue ID, the value is the WebhookQueue object.
-     *
-     * @var array
      */
-    protected $webhookQueueIdList = [];
+    private array $webhookQueueIdList = [];
 
     /**
      * How many recent log records should be kept.
-     *
-     * @var int
      */
-    protected $logMax;
+    private int $logMax;
 
     /**
      * Queued events default order by dir
@@ -119,7 +104,7 @@ class WebhookModel extends FormModel
      *
      * @var string
      */
-    protected $eventsOrderByDir;
+    private $eventsOrderByDir;
 
     /**
      * Timestamp when the webhook processing starts.
@@ -132,7 +117,7 @@ class WebhookModel extends FormModel
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        protected SerializerInterface $serializer,
+        private readonly SerializerInterface $serializer,
         private readonly Client $httpClient,
         EntityManagerInterface $em,
         CorePermissions $security,
@@ -154,7 +139,7 @@ class WebhookModel extends FormModel
     /**
      * @param Webhook $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         if (null === $entity->getSecret()) {
             $entity->setSecret(EncryptionHelper::generateKey());
@@ -298,7 +283,7 @@ class WebhookModel extends FormModel
         $payload = $this->getWebhookPayload($webhook, $queue);
 
         // if there wasn't a payload we can stop here.
-        if (empty($payload)) {
+        if ($payload === []) {
             return false;
         }
 
@@ -365,7 +350,7 @@ class WebhookModel extends FormModel
 
         // Run this on command as well as immediate send because if switched from queue to immediate
         // it can have some rows in the queue which will be send in every webhook forever
-        if (!empty($this->webhookQueueIdList)) {
+        if ($this->webhookQueueIdList !== []) {
             // delete all the queued items we just processed
             $this->webhookQueueRepository->deleteQueuesById(array_keys($this->webhookQueueIdList));
             $nextWebhookExists = $this->webhookQueueRepository->exists($webhook->getId());
@@ -464,10 +449,8 @@ class WebhookModel extends FormModel
 
     /**
      * Get the payload from the webhook.
-     *
-     * @return array
      */
-    public function getWebhookPayload(Webhook $webhook, ?WebhookQueue $queue = null)
+    public function getWebhookPayload(Webhook $webhook, ?WebhookQueue $queue = null): array
     {
         if ($payload = $webhook->getPayload()) {
             return $payload;
@@ -514,7 +497,7 @@ class WebhookModel extends FormModel
      *
      * @return iterable<object>
      */
-    public function getWebhookQueues(Webhook $webhook)
+    public function getWebhookQueues(Webhook $webhook): iterable
     {
         $webhookRetryTime = new \DateTimeImmutable()
             ->modify(sprintf('-%d seconds', $this->webhookRetryDelay))
@@ -708,7 +691,6 @@ class WebhookModel extends FormModel
         $this->webhookLimit            = (int) $coreParametersHelper->get('webhook_limit', 10);
         $this->webhookTimeLimit        = (int) $coreParametersHelper->get('webhook_time_limit', 600);
         $this->disableLimit            = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
-        $this->webhookTimeout          = (int) $coreParametersHelper->get('webhook_timeout', 15);
         $this->logMax                  = (int) $coreParametersHelper->get('webhook_log_max', self::WEBHOOK_LOG_MAX);
         $this->queueMode               = $coreParametersHelper->get('queue_mode');
         $this->eventsOrderByDir        = $coreParametersHelper->get('events_orderby_dir', Order::Ascending);

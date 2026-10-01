@@ -38,10 +38,8 @@ final class StatRepository extends CommonRepository
 
     /**
      * @param int|array $dynamicContentIds
-     *
-     * @return int
      */
-    public function getSentCount($dynamicContentIds = null)
+    public function getSentCount($dynamicContentIds = null): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -105,12 +103,10 @@ final class StatRepository extends CommonRepository
      * @param int|null             $leadId
      * @param array<string, mixed> $options
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($leadId = null, array $options = [])
+    public function getLeadStats($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

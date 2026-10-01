@@ -16,14 +16,14 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
 {
     public function testPublicSegmentsInContactPreferences(): void
     {
-        $user           = $this->em->getRepository(User::class)->findBy([], [], 1)[0];
+        $user           = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findBy([], [], 1)[0];
         $firstLeadList  = $this->createLeadList($user, 'First', true);
         $secondLeadList = $this->createLeadList($user, 'Second', false);
         $thirdLeadList  = $this->createLeadList($user, 'Third', true);
         $this->em->flush();
 
         /** @var LeadListRepository $repo */
-        $repo  = $this->em->getRepository(LeadList::class);
+        $repo  = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
         $lists = $repo->getGlobalLists();
 
         $this->assertCount(2, $lists);
@@ -38,7 +38,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
         $segmentModel = self::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->em->getRepository(Lead::class);
+        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
 
         $segment = new LeadList();
         $segment->setName('Segment A');
@@ -93,7 +93,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
         $segmentModel = self::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->em->getRepository(Lead::class);
+        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
 
         $segment = new LeadList();
         $segment->setName('Segment A');

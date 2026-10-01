@@ -91,14 +91,14 @@ final class EventLogApiController extends FetchCommonApiController
      * Get a list of events.
      */
     #[Route(
-        '/api/campaigns/events/contact/{contactId}',
+        path: '/api/campaigns/events/contact/{contactId}',
         name: 'mautic_api_campaigns_events_contact',
         requirements: ['contactId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
     #[Route(
-        '/api/campaigns/{campaignId}/events/contact/{contactId}',
+        path: '/api/campaigns/{campaignId}/events/contact/{contactId}',
         name: 'mautic_api_campaign_contact_events',
         requirements: ['campaignId' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -152,7 +152,7 @@ final class EventLogApiController extends FetchCommonApiController
     }
 
     #[Route(
-        '/api/campaigns/events/{eventId}/contact/{contactId}/edit',
+        path: '/api/campaigns/events/{eventId}/contact/{contactId}/edit',
         name: 'mautic_api_campaigns_edit_contact_event',
         requirements: ['eventId' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -201,7 +201,7 @@ final class EventLogApiController extends FetchCommonApiController
     }
 
     #[Route(
-        '/api/campaigns/events/batch/edit',
+        path: '/api/campaigns/events/batch/edit',
         name: 'mautic_api_campaigns_batchedit_events',
         defaults: ['_format' => 'json'],
         methods: ['PUT']

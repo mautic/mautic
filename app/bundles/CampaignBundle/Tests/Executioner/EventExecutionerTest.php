@@ -215,6 +215,7 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $log->method('getId')
             ->willReturn(1);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
             [
                 1 => $log,

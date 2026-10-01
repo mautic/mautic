@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 /**
  * @extends CommonRepository<Scheduler>
  */
-class SchedulerRepository extends CommonRepository
+final class SchedulerRepository extends CommonRepository
 {
     /**
      * @return Scheduler|null

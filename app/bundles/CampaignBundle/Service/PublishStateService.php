@@ -13,7 +13,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 
-class PublishStateService
+final class PublishStateService
 {
     /**
      * @var array<int, PublishStateDateRange[]>

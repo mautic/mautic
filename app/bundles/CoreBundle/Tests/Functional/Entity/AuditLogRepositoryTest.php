@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Entity;
 
-use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -41,7 +40,7 @@ final class AuditLogRepositoryTest extends MauticMysqlTestCase
         $contact->addDoNotContactEntry($doNotContact);
 
         /** @var AuditLogRepository $alRepo */
-        $alRepo = $this->em->getRepository(AuditLog::class);
+        $alRepo = $this->getContainer()->get(\Mautic\CoreBundle\Entity\AuditLogRepository::class);
 
         $this->assertCount($expectedCount, $alRepo->getAuditLogsForLeads([$contact->getId()], $filters));
     }

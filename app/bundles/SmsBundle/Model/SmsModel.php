@@ -47,7 +47,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @implements AjaxLookupModelInterface<Sms>
  */
-class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use TranslationModelTrait;
 
@@ -57,9 +57,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     }
 
     public function __construct(
-        protected TrackableModel $pageTrackableModel,
-        protected LeadModel $leadModel,
-        protected TransportChain $transport,
+        private readonly TrackableModel $pageTrackableModel,
+        private readonly LeadModel $leadModel,
+        private readonly TransportChain $transport,
         private readonly CacheProviderInterface $cacheProvider,
         EntityManagerInterface $em,
         CorePermissions $security,
@@ -86,7 +86,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         return 'sms:smses';
     }
 
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 
@@ -162,7 +162,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $entities = parent::getEntities($args);
 
@@ -490,10 +490,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         return $chart->render();
     }
 
-    /**
-     * @return Stat
-     */
-    public function getSmsStatus(string $idHash)
+    public function getSmsStatus(string $idHash): ?\Mautic\SmsBundle\Entity\Stat
     {
         return $this->statRepository->getSmsStatus($idHash);
     }

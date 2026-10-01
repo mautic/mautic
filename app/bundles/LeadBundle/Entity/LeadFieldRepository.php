@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -12,7 +13,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonRepository<LeadField>
  */
-class LeadFieldRepository extends CommonRepository
+final class LeadFieldRepository extends CommonRepository
 {
     /**
      * @var array<int|string, array<string,mixed>>|null
@@ -99,9 +100,7 @@ class LeadFieldRepository extends CommonRepository
      */
     public function getFieldsForObject(string $object): array
     {
-        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
-        $queryBuilder->select($this->getTableAlias());
-        $queryBuilder->from($this->getEntityName(), $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder = $this->createQueryBuilder($this->getTableAlias(), "{$this->getTableAlias()}.id");
         $queryBuilder->where("{$this->getTableAlias()}.object = :object");
         $queryBuilder->andWhere("{$this->getTableAlias()}.isPublished = 1");
         $queryBuilder->orderBy("{$this->getTableAlias()}.label");
@@ -178,13 +177,11 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return ArrayCollection<int,LeadField>
+     * @return Collection<int,LeadField>
      */
-    public function getListablePublishedFields(): ArrayCollection
+    public function getListablePublishedFields(): Collection
     {
-        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
-        $queryBuilder->select($this->getTableAlias());
-        $queryBuilder->from($this->getEntityName(), $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder = $this->createQueryBuilder($this->getTableAlias(), "{$this->getTableAlias()}.id");
         $queryBuilder->where("{$this->getTableAlias()}.isListable = 1");
         $queryBuilder->andWhere("{$this->getTableAlias()}.isPublished = 1");
         $queryBuilder->orderBy("{$this->getTableAlias()}.object");
@@ -229,10 +226,8 @@ class LeadFieldRepository extends CommonRepository
      * @param string $field        alias
      * @param mixed  $value        to compare with
      * @param string $operatorExpr for WHERE clause
-     *
-     * @return bool
      */
-    public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType = null)
+    public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType = null): bool
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id')
@@ -494,9 +489,8 @@ class LeadFieldRepository extends CommonRepository
      */
     public function getFieldSchemaData(string $object): array
     {
-        return $this->getEntityManager()->createQueryBuilder()
+        return $this->createQueryBuilder('f', 'f.alias')
             ->select('f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit')
-            ->from($this->getEntityName(), 'f', 'f.alias')
             ->where('f.object = :object')
             ->setParameter('object', $object)
             ->getQuery()

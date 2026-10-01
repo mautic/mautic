@@ -161,10 +161,7 @@ class Monitoring extends FormEntity implements UuidInterface
         return $this->id;
     }
 
-    /**
-     * @return array
-     */
-    public function getLists()
+    public function getLists(): array
     {
         return $this->lists;
     }
@@ -187,10 +184,8 @@ class Monitoring extends FormEntity implements UuidInterface
 
     /**
      * Get statistics.
-     *
-     * @return array
      */
-    public function getStats()
+    public function getStats(): array
     {
         return $this->stats;
     }
@@ -203,10 +198,7 @@ class Monitoring extends FormEntity implements UuidInterface
         return $this->title;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }

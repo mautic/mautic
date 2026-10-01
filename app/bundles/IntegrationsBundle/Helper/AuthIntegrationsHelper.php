@@ -21,7 +21,7 @@ final class AuthIntegrationsHelper
      */
     public function __construct(
         private readonly IntegrationsHelper $integrationsHelper,
-        #[AutowireIterator('mautic.authentication_integration')]
+        #[AutowireIterator(tag: 'mautic.authentication_integration')]
         iterable $integrations = [],
     ) {
         foreach ($integrations as $integration) {

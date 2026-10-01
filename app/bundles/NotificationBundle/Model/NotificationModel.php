@@ -127,7 +127,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         return parent::getEntity($id);
     }
 
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 
@@ -232,10 +232,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         return $chart->render();
     }
 
-    /**
-     * @return Stat
-     */
-    public function getNotificationStatus(string $idHash)
+    public function getNotificationStatus(string $idHash): ?\Mautic\NotificationBundle\Entity\Stat
     {
         return $this->statRepository->getNotificationStatus($idHash);
     }

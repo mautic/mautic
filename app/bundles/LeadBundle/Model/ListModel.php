@@ -113,7 +113,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 
@@ -1042,6 +1042,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
+        $data           = [];
         $data['values'] = [];
         $data['labels'] = [];
 
@@ -1086,6 +1087,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         ];
 
         $chart      = new BarChart($data['labels']);
+        $datasets   = [];
         $datasets[] = array_merge($baseData, $chart->generateColors(3));
 
         return [
@@ -1104,6 +1106,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
+        $data           = [];
         $data['values'] = [];
         $data['labels'] = [];
 
@@ -1150,6 +1153,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         ];
 
         $chart      = new BarChart($data['labels']);
+        $datasets   = [];
         $datasets[] = array_merge($baseData, $chart->generateColors(2));
 
         return [
@@ -1177,7 +1181,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         // added line everytime
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $this->segmentChartQueryFactory->getContactsAdded($query));
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->segmentChartQueryFactory->getContactsRemoved($query));
-        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentChartQueryFactory->getContactsTotal($query, $this));
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentChartQueryFactory->getContactsTotal($query));
 
         return $chart->render();
     }

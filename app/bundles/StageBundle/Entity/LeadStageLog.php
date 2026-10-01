@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadStageLog
 {
-    public const TABLE_NAME = 'stage_lead_action_log';
+    public const string TABLE_NAME = 'stage_lead_action_log';
 
     /**
      * @var Stage
@@ -40,6 +40,7 @@ class LeadStageLog
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_fired', type: 'datetime')]
     private $dateFired;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -47,10 +48,6 @@ class LeadStageLog
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addIpAddress(true);
-
-        $builder->createField('dateFired', 'datetime')
-            ->columnName('date_fired')
-            ->build();
     }
 
     /**

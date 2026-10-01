@@ -3,14 +3,13 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * @extends CommonRepository<User>
  */
-class UserRepository extends CommonRepository
+final class UserRepository extends CommonRepository
 {
     /**
      * Find user by username or email.
@@ -66,12 +65,7 @@ class UserRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * Get a list of users.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('u')
@@ -91,10 +85,9 @@ class UserRepository extends CommonRepository
      */
     public function getUserList(?string $search = '', int|string|null $limit = 10, int $start = 0, array $permissionLimiter = []): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
+        $q = $this->createQueryBuilder('u');
 
         $q->select('DISTINCT partial u.{id, firstName, lastName, email}')
-            ->from(User::class, 'u')
             ->leftJoin('u.role', 'r')
             ->leftJoin('r.permissions', 'p');
 
@@ -175,10 +168,9 @@ class UserRepository extends CommonRepository
      */
     public function getPositionList(?string $search = '', int $limit = 10, int $start = 0): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
+        $q = $this->createQueryBuilder('u')
             ->select('u.position')
             ->distinct()
-            ->from(User::class, 'u')
             ->where("u.position != ''")
             ->andWhere('u.position IS NOT NULL');
         if (!empty($search)) {

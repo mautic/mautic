@@ -31,7 +31,7 @@ final class ThemeApiController extends CommonApiController
      * Accepts the zip file and installs the theme from it.
      */
     #[Route(
-        '/api/themes/new',
+        path: '/api/themes/new',
         name: 'mautic_core_api_theme_create',
         defaults: ['_format' => 'json'],
         methods: ['POST']
@@ -81,7 +81,7 @@ final class ThemeApiController extends CommonApiController
      * @param string $theme dir name
      */
     #[Route(
-        '/api/themes/{theme}',
+        path: '/api/themes/{theme}',
         name: 'mautic_core_api_theme_get',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -117,7 +117,7 @@ final class ThemeApiController extends CommonApiController
      * List the folders (themes) in the /themes directory.
      */
     #[Route(
-        '/api/themes',
+        path: '/api/themes',
         name: 'mautic_core_api_theme_list',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -145,7 +145,7 @@ final class ThemeApiController extends CommonApiController
      * @param string $theme
      */
     #[Route(
-        '/api/themes/{theme}/delete',
+        path: '/api/themes/{theme}/delete',
         name: 'mautic_core_api_theme_delete',
         defaults: ['_format' => 'json'],
         methods: ['DELETE']

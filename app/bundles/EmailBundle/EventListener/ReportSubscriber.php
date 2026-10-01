@@ -818,6 +818,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
      */
     private function countVsRead(int $value, string $label, array $emailCounts): array
     {
+        $result = [];
         if (($emailCounts['read_count'] - $value) > 0) {
             $result['vsRead']    = $emailCounts['read_count'] - $value;
             $result['vsNotRead'] = $emailCounts['not_read'];

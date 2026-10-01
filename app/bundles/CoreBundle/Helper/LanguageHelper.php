@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Helper class for managing Mautic's installed languages.
  */
-class LanguageHelper
+final class LanguageHelper
 {
     private readonly string $cacheFile;
 
@@ -119,10 +119,8 @@ class LanguageHelper
 
     /**
      * Fetches the list of available languages.
-     *
-     * @return array
      */
-    public function fetchLanguages(bool $overrideCache = false, bool $returnError = true)
+    public function fetchLanguages(bool $overrideCache = false, bool $returnError = true): array
     {
         $overrideFile = $this->coreParametersHelper->get('language_list_file');
         if (!empty($overrideFile) && is_readable($overrideFile)) {

@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 /**
  * @extends CommonRepository<FieldChange>
  */
-class FieldChangeRepository extends CommonRepository
+final class FieldChangeRepository extends CommonRepository
 {
     /**
      * Takes an object id & type and deletes all entities

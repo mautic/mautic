@@ -27,7 +27,7 @@ final class CampaignMetricsController extends AbstractController
     }
 
     #[Route(
-        '/s/campaign/metrics/email-weekdays/{objectId}/{dateFrom}/{dateTo}',
+        path: '/s/campaign/metrics/email-weekdays/{objectId}/{dateFrom}/{dateTo}',
         name: 'mautic_campaign_metrics_email_weekdays',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -73,7 +73,7 @@ final class CampaignMetricsController extends AbstractController
     }
 
     #[Route(
-        '/s/campaign/metrics/email-hours/{objectId}/{dateFrom}/{dateTo}',
+        path: '/s/campaign/metrics/email-hours/{objectId}/{dateFrom}/{dateTo}',
         name: 'mautic_campaign_metrics_email_hours',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -123,7 +123,7 @@ final class CampaignMetricsController extends AbstractController
     }
 
     #[Route(
-        '/s/campaign/metrics/event-details/{objectId}',
+        path: '/s/campaign/metrics/event-details/{objectId}',
         name: 'mautic_campaign_metrics_event_details',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

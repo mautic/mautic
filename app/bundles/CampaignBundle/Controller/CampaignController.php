@@ -51,7 +51,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class CampaignController extends AbstractStandardFormController
+final class CampaignController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
@@ -59,47 +59,47 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @var array<string, mixed>
      */
-    protected array $campaignElements = [];
+    private array $campaignElements = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $addedSources = [];
+    private $addedSources = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $campaignEvents = [];
+    private array $campaignEvents = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $campaignSources = [];
+    private array $campaignSources = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $connections = [];
+    private $connections = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $deletedEvents = [];
+    private array $deletedEvents = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $deletedSources = [];
+    private array $deletedSources = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $listFilters = [];
+    private array $listFilters = [];
 
     /**
      * @var array<string, mixed>
      */
-    protected $modifiedEvents = [];
+    private array $modifiedEvents = [];
 
     protected $sessionId;
 
@@ -158,7 +158,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/campaigns/{objectAction}/{objectId}',
+        path: '/s/campaigns/{objectAction}/{objectId}',
         name: 'mautic_campaign_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -468,7 +468,7 @@ class CampaignController extends AbstractStandardFormController
      * @param int|null   $count
      */
     #[Route(
-        '/s/campaigns/view/{objectId}/contact/{page}',
+        path: '/s/campaigns/view/{objectId}/contact/{page}',
         name: 'mautic_campaign_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
@@ -515,7 +515,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/campaigns/event/stats/{objectId}/{dateFromValue}/{dateToValue}',
+        path: '/s/campaigns/event/stats/{objectId}/{dateFromValue}/{dateToValue}',
         name: 'mautic_campaign_event_stats',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -572,7 +572,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/campaigns/graph/{objectId}/{dateFrom}/{dateTo}',
+        path: '/s/campaigns/graph/{objectId}/{dateFrom}/{dateTo}',
         name: 'mautic_campaign_graph',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -617,7 +617,7 @@ class CampaignController extends AbstractStandardFormController
      * @param int $page
      */
     #[Route(
-        '/s/campaigns/{page}',
+        path: '/s/campaigns/{page}',
         name: 'mautic_campaign_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

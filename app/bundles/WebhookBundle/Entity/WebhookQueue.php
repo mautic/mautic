@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class WebhookQueue
 {
-    public const TABLE_NAME = 'webhook_queue';
+    public const string TABLE_NAME = 'webhook_queue';
 
     private int|string|null $id = null;
 
@@ -35,6 +35,7 @@ class WebhookQueue
     #[ORM\JoinColumn(name: 'event_id', nullable: false, onDelete: 'CASCADE')]
     private ?Event $event = null;
 
+    #[ORM\Column(type: Types::SMALLINT, options: ['unsigned' => true, 'default' => 0])]
     private int $retries = 0;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -47,11 +48,6 @@ class WebhookQueue
             ->columnName('payload_compressed')
             ->nullable()
             ->length(MySQLPlatform::LENGTH_LIMIT_MEDIUMBLOB)
-            ->build();
-        $builder->createField('retries', Types::SMALLINT)
-            ->columnName('retries')
-            ->option('unsigned', true)
-            ->option('default', 0)
             ->build();
     }
 

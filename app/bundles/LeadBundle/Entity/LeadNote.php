@@ -31,16 +31,19 @@ class LeadNote extends FormEntity
      * @var string
      */
     #[NotBlank(message: 'mautic.lead.note.text.notblank')]
+    #[ORM\Column(type: 'text')]
     private $text;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $type = 'general';
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_time', type: 'datetime', nullable: true)]
     private $dateTime;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -48,18 +51,6 @@ class LeadNote extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->addField('text', 'text');
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateTime', 'datetime')
-            ->columnName('date_time')
-            ->nullable()
-            ->build();
     }
 
     /**

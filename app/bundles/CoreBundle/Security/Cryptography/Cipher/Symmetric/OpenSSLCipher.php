@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric;
 
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
-class OpenSSLCipher implements SymmetricCipherInterface
+final class OpenSSLCipher implements SymmetricCipherInterface
 {
     private string $cipher = 'AES-256-CBC';
 

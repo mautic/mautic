@@ -47,14 +47,14 @@ use Twig\Environment;
 /**
  * @extends FormModel<Report>
  */
-class ReportModel extends FormModel implements GlobalSearchInterface
+final class ReportModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
         return 'report.report';
     }
 
-    public const CHANNEL_FEATURE = 'reporting';
+    public const string CHANNEL_FEATURE = 'reporting';
 
     /**
      * @var array
@@ -64,14 +64,14 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @var mixed
      */
-    protected $defaultPageLimit;
+    private $defaultPageLimit;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        protected Environment $twig,
-        protected ChannelListHelper $channelListHelper,
-        protected FieldModel $fieldModel,
-        protected ReportHelper $reportHelper,
+        private readonly Environment $twig,
+        private readonly ChannelListHelper $channelListHelper,
+        private readonly FieldModel $fieldModel,
+        private readonly ReportHelper $reportHelper,
         private readonly CsvExporter $csvExporter,
         private readonly ExcelExporter $excelExporter,
         EntityManagerInterface $em,
@@ -99,7 +99,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         return 'report:reports';
     }
 
-    protected function getSession(): SessionInterface
+    private function getSession(): SessionInterface
     {
         try {
             return $this->requestStack->getSession();
@@ -231,10 +231,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      * Builds the table lookup data for the report forms.
      *
      * @param string $context
-     *
-     * @return array
      */
-    public function getTableData($context = 'all', ?string $reportSource = null)
+    public function getTableData($context = 'all', ?string $reportSource = null): array
     {
         $data = $this->buildAvailableReports($context, $reportSource);
 
@@ -312,8 +310,6 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param string $context
-     *
      * return \stdClass{filterList: mixed[], definitions: mixed[], operatorChoices: mixed[], operatorHtml: mixed[], filterListHtml: string}
      */
     public function getFilterList(string $context = 'all'): \stdClass
@@ -537,7 +533,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
             // Check to see if this is an update from AJAX
             $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
-            if (!empty($selectedGraphs)) {
+            if ($selectedGraphs !== []) {
                 $availableGraphs = $this->getGraphData($entity->getSource());
 
                 $eventGraphs                     = [];
@@ -575,7 +571,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         $this->dispatcher->dispatch($event);
         $query = $event->getQuery();
 
-        if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
+        if (empty($options['ignoreTableData']) && $selectedColumns !== []) {
             if ($paginate) {
                 // Build the options array to pass into the query
                 if ($session->isStarted()) {
@@ -898,7 +894,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         return $connection;
     }
 
-    protected function isDebugMode(): bool
+    private function isDebugMode(): bool
     {
         return MAUTIC_ENV == 'dev' || $this->coreParametersHelper->get('debug');
     }

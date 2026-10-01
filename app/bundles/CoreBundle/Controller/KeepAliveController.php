@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class KeepAliveController
 {
     #[Route(
-        '/s/keep-alive',
+        path: '/s/keep-alive',
         name: 'mautic_core_keep_alive',
     )]
     public function keepAliveAction(): Response

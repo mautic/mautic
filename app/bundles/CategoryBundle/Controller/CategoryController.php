@@ -30,7 +30,7 @@ final class CategoryController extends AbstractFormController
      * @param string $objectModel
      */
     #[Route(
-        '/s/categories/{bundle}/{objectAction}/{objectId}',
+        path: '/s/categories/{bundle}/{objectAction}/{objectId}',
         name: 'mautic_category_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['bundle' => 'category', 'objectId' => 0],
@@ -57,7 +57,7 @@ final class CategoryController extends AbstractFormController
      * @param int    $page
      */
     #[Route(
-        '/s/categories/{bundle}/{page}',
+        path: '/s/categories/{bundle}/{page}',
         name: 'mautic_category_index',
         requirements: ['page' => '\d+'],
         defaults: ['bundle' => 'category', 'page' => 0],

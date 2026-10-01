@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250415142826 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'campaign_lead_event_log';
+    protected const string TABLE_NAME = 'campaign_lead_event_log';
 
     protected function preUpAssertions(): void
     {

@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\RelativeDate;
 
-readonly class DateOptionFactory
+final readonly class DateOptionFactory
 {
     public function __construct(
         private DateDecorator $dateDecorator,
@@ -81,7 +81,7 @@ readonly class DateOptionFactory
         }
     }
 
-    protected function isRelativeFormatsPresent(string $timeframe): bool
+    private function isRelativeFormatsPresent(string $timeframe): bool
     {
         $notations = [
             'first day of ', // first day of January 2021

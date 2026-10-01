@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-class AppVersion
+final class AppVersion
 {
     /**
      * @return string

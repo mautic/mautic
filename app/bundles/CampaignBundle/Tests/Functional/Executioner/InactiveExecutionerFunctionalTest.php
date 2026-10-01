@@ -80,7 +80,7 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
 
         $this->inactiveExecutioner->validate($originalDecision->getId(), $limiter, $output);
 
-        $targetActionLogsAfter = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $targetActionLogsAfter = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $targetAction,
             'lead'  => $contact,
         ], ['rotation' => 'ASC']);
@@ -146,7 +146,7 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->inactiveExecutioner->validate($originalDecision->getId(), $limiter, $output);
 
         // Verify redirection worked by checking if redirect action was executed
-        $redirectActionLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $redirectActionLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $redirectAction,
             'lead'  => $contact,
         ]);
@@ -200,13 +200,13 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         $counter = $this->inactiveExecutioner->validate($originalDecision->getId(), $limiter, $output);
 
         // Verify that the redirect condition was executed
-        $redirectConditionLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $redirectConditionLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $redirectCondition,
             'lead'  => $contact,
         ]);
 
         // Verify that the original decision's negative action was NOT executed
-        $originalNegativeActionLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $originalNegativeActionLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $originalNegativeAction,
             'lead'  => $contact,
         ]);
@@ -290,12 +290,12 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->inactiveExecutioner->validate($secondDecision->getId(), $limiter, $output);
 
         // Verify both redirections worked
-        $firstRedirectLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $firstRedirectLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $firstRedirectAction,
             'lead'  => $contact,
         ]);
 
-        $secondRedirectLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $secondRedirectLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $secondRedirectAction,
             'lead'  => $contact,
         ]);
@@ -304,12 +304,12 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->assertGreaterThan(0, count($secondRedirectLogs), 'Expected logs for second redirect action');
 
         // Verify original negative actions were NOT executed
-        $firstNegativeLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $firstNegativeLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $firstNegativeAction,
             'lead'  => $contact,
         ]);
 
-        $secondNegativeLogs = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $secondNegativeLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $secondNegativeAction,
             'lead'  => $contact,
         ]);
@@ -361,14 +361,14 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->inactiveExecutioner->validate($deletedDecision->getId(), $limiter, new BufferedOutput());
         $this->em->clear();
 
-        $logsAfterFirstRun = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $logsAfterFirstRun = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $redirectEmailAction,
             'lead'  => $contact,
         ], ['rotation' => 'ASC']);
 
         $this->assertCount(1, $logsAfterFirstRun, 'Redirect target should execute once on first inactive run');
 
-        $decisionLogsAfterFirstRun = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $decisionLogsAfterFirstRun = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $deletedDecision,
             'lead'  => $contact,
         ]);
@@ -377,7 +377,7 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->inactiveExecutioner->validate($deletedDecision->getId(), new ContactLimiter(100, 0, 0, 0, [$contact->getId()]), new BufferedOutput());
         $this->em->clear();
 
-        $logsAfterSecondRun = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $logsAfterSecondRun = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $redirectEmailAction,
             'lead'  => $contact,
         ], ['rotation' => 'ASC']);
@@ -388,13 +388,13 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
             'Redirect target must not be re-executed on subsequent inactive runs'
         );
 
-        $decisionLogsAfterSecondRun = $this->em->getRepository(LeadEventLog::class)->findBy([
+        $decisionLogsAfterSecondRun = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy([
             'event' => $deletedDecision,
             'lead'  => $contact,
         ]);
         $this->assertCount(1, $decisionLogsAfterSecondRun, 'Deleted decision should be recorded as executed once');
 
-        $campaignLeadAfter = $this->em->getRepository(CampaignLead::class)->findOneBy([
+        $campaignLeadAfter = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findOneBy([
             'campaign' => $campaign,
             'lead'     => $contact,
         ]);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -35,6 +36,7 @@ class Event
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_type', type: 'string', length: 50)]
     private $eventType;
 
     public function __construct()
@@ -47,11 +49,6 @@ class Event
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-
-        $builder->createField('eventType', 'string')
-            ->columnName('event_type')
-            ->length(50)
-            ->build();
     }
 
     /**
@@ -119,7 +116,7 @@ class Event
     /**
      * @return ArrayCollection
      */
-    public function getQueues()
+    public function getQueues(): Collection
     {
         return $this->queues;
     }

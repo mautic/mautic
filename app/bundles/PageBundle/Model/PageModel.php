@@ -37,7 +37,6 @@ use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -69,7 +68,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Page>
  */
-class PageModel extends FormModel implements GlobalSearchInterface
+final class PageModel extends FormModel implements GlobalSearchInterface
 {
     use TranslationModelTrait;
     use VariantModelTrait;
@@ -92,20 +91,14 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     private const string STRING_ENCODING = 'UTF-8';
 
-    /**
-     * @var bool
-     */
-    protected $catInUrl;
+    private ?bool $catInUrl = null;
 
-    protected DateTimeHelper $dateTimeHelper;
+    private readonly DateTimeHelper $dateTimeHelper;
 
     public function __construct(
-        protected CookieHelper $cookieHelper,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadModel $leadModel,
-        protected FieldModel $leadFieldModel,
-        protected RedirectModel $pageRedirectModel,
-        protected TrackableModel $pageTrackableModel,
+        private readonly CookieHelper $cookieHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly LeadModel $leadModel,
         private readonly MessageBusInterface $messageBus,
         private readonly CompanyModel $companyModel,
         private readonly IdentifyCompanyHelper $identifyCompanyHelper,
@@ -163,7 +156,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Page $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $pageIds = $entity->getRelatedEntityIds();
 
@@ -373,7 +366,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @return array|mixed
      */
-    protected function generateClickThrough(Hit $hit)
+    private function generateClickThrough(Hit $hit)
     {
         $query = $hit->getQuery();
 
@@ -546,7 +539,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        $query = $hit->getQuery() ?: [];
+        $query = $hit->getQuery();
 
         if (!$lead->getTimezone()) {
             if (isset($query['timezone'])) {
@@ -755,10 +748,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     *
-     * @return array
      */
-    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = ''): array
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);

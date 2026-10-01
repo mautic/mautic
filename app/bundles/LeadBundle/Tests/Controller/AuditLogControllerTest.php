@@ -38,7 +38,7 @@ final class AuditLogControllerTest extends MauticMysqlTestCase
         $this->em->persist($contact);
         $this->em->flush();
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => self::SALES_USER]);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => self::SALES_USER]);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $this->client->request(Request::METHOD_GET, '/s/contacts/auditlog/batchExport/'.$contact->getId());

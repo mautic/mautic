@@ -11,7 +11,7 @@ use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
-readonly class ScheduleModel
+final readonly class ScheduleModel
 {
     public function __construct(
         private EntityManagerInterface $entityManager,

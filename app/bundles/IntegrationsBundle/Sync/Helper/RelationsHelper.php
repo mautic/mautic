@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\InternalIdNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
-class RelationsHelper
+final class RelationsHelper
 {
     /**
      * @var ObjectDAO[]

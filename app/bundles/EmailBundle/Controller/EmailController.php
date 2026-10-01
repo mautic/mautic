@@ -68,7 +68,7 @@ final class EmailController extends FormController
     private bool $invalidHtmlError = false;
 
     #[Route(
-        '/s/emails/{objectAction}/{objectId}',
+        path: '/s/emails/{objectAction}/{objectId}',
         name: 'mautic_email_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -79,7 +79,7 @@ final class EmailController extends FormController
     }
 
     #[Route(
-        '/s/emails/{page}',
+        path: '/s/emails/{page}',
         name: 'mautic_email_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -1832,7 +1832,7 @@ final class EmailController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/emails/view/{objectId}/contact/{page}',
+        path: '/s/emails/view/{objectId}/contact/{page}',
         name: 'mautic_email_contacts',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+', 'page' => '\d+'],
         defaults: ['objectId' => 0, 'page' => 0],

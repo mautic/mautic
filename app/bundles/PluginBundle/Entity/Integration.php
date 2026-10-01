@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Integration extends CommonEntity implements CacheInvalidateInterface
 {
-    public const CACHE_NAMESPACE = 'IntegrationSettings';
+    public const string CACHE_NAMESPACE = 'IntegrationSettings';
 
     /**
      * @var int
@@ -193,7 +193,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getFeatureSettings()
+    public function getFeatureSettings(): array
     {
         return $this->featureSettings;
     }

@@ -22,7 +22,7 @@ final class ScheduleController extends CommonAjaxController
     }
 
     #[Route(
-        '/s/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}',
+        path: '/s/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}',
         name: 'mautic_report_schedule_preview',
         defaults: ['isScheduled' => 0, 'scheduleUnit' => '', 'scheduleDay' => '', 'scheduleMonthFrequency' => ''],
     )]
@@ -50,7 +50,7 @@ final class ScheduleController extends CommonAjaxController
      * @param int $reportId
      */
     #[Route(
-        '/s/reports/schedule/{reportId}/now',
+        path: '/s/reports/schedule/{reportId}/now',
         name: 'mautic_report_schedule',
     )]
     public function nowAction($reportId): JsonResponse

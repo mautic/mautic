@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20201019100000 extends AbstractMauticMigration
 {
-    protected const TABLE_NAME = 'emails_draft';
+    protected const string TABLE_NAME = 'emails_draft';
 
     /**
      * @throws SkipMigration

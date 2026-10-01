@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Message;
 /**
  * Signs message with S/MIME certificate.
  */
-class SMimeHelper
+final class SMimeHelper
 {
     /**
      * Caching the certificate paths to avoid reading/decrypting them on every message.

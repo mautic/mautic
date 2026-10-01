@@ -46,12 +46,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[Assert\GroupSequence(['User', 'SecondPass', 'CheckPassword'])]
+#[Assert\GroupSequence(groups: ['User', 'SecondPass', 'CheckPassword'])]
 #[UniqueEntity(fields: ['username'], message: 'mautic.user.user.username.unique', repositoryMethod: 'checkUniqueUsernameEmail')]
 #[UniqueEntity(fields: ['email'], message: 'mautic.user.user.email.unique', repositoryMethod: 'checkUniqueUsernameEmail', groups: ['User', 'SecondPass'])]
 class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface, CacheInvalidateInterface
 {
-    public const CACHE_NAMESPACE = 'User';
+    public const string CACHE_NAMESPACE = 'User';
 
     /**
      * @var ?int

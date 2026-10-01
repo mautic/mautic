@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Redirect>
  */
-class RedirectRepository extends CommonRepository
+final class RedirectRepository extends CommonRepository
 {
     public function findByUrls(array $urls): array
     {

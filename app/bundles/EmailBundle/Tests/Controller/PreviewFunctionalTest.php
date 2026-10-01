@@ -292,7 +292,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 

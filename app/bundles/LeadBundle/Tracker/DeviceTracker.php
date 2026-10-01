@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceI
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Psr\Log\LoggerInterface;
 
-class DeviceTracker
+final class DeviceTracker
 {
     private bool $deviceWasChanged = false;
 
@@ -27,7 +27,7 @@ class DeviceTracker
     }
 
     /**
-     * @return LeadDevice|null
+     * @return LeadDevice
      */
     public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
     {

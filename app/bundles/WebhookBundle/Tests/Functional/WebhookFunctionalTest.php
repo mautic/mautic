@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
-use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
@@ -54,7 +53,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->webhookQueueRepository       = self::getContainer()->get(WebhookQueueRepository::class);
         $this->notificationRepository       = self::getContainer()->get(NotificationRepository::class);
-        $this->webhhokRepository            = $this->em->getRepository(Webhook::class);
+        $this->webhhokRepository            = $this->getContainer()->get(\Mautic\WebhookBundle\Entity\WebhookRepository::class);
     }
 
     /**
@@ -67,7 +66,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
     public function testWebhookWorkflowWithCommandProcess(): void
     {
-        $webhookQueueRepository = $this->em->getRepository(WebhookQueue::class);
+        $webhookQueueRepository = $this->getContainer()->get(\Mautic\WebhookBundle\Entity\WebhookQueueRepository::class);
         $this->assertInstanceOf(WebhookQueueRepository::class, $webhookQueueRepository);
         $this->mockSuccessfulWebhookResponse(2);
         $webhook = $this->createWebhook();

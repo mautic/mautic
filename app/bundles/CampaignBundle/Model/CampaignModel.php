@@ -32,7 +32,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
-use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
@@ -47,7 +46,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * @extends CommonFormModel<Campaign>
  */
-class CampaignModel extends CommonFormModel implements GlobalSearchInterface
+final class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
@@ -55,8 +54,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     public function __construct(
-        protected ListModel $leadListModel,
-        protected FormModel $formModel,
+        private readonly ListModel $leadListModel,
         private readonly EventCollector $eventCollector,
         private readonly MembershipBuilder $membershipBuilder,
         private readonly ContactTracker $contactTracker,
@@ -543,7 +541,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     {
         $formId = ($form instanceof Form) ? $form->getId() : $form;
 
-        return $this->getRepository()->findByFormId($formId);
+        return $this->campaignRepository->findByFormId($formId);
     }
 
     /**
@@ -731,7 +729,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param string   $root
      * @param Event[]  $events
      */
-    protected function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', int $order = 1): void
+    private function buildOrder(array $hierarchy, array &$events, $entity, int|string $root = 'null', int $order = 1): void
     {
         $count = count($hierarchy);
         if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {
@@ -835,7 +833,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getCountryStats(Campaign $entity, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo): array
     {
-        $results['contacts'] =  $this->getCampaignMembersGroupByCountry($entity, $dateFrom, $dateTo);
+        $results             = ['contacts' => $this->getCampaignMembersGroupByCountry($entity, $dateFrom, $dateTo)];
 
         if ($entity->isEmailCampaign()) {
             $eventsEmailsSend     = $entity->getEmailSendEvents();

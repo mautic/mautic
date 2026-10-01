@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -13,17 +13,15 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 /**
  * @extends CommonRepository<Stat>
  */
-class StatRepository extends CommonRepository
+final class StatRepository extends CommonRepository
 {
     use TimelineTrait;
 
     /**
-     * @return mixed
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getEmailStatus($trackingHash)
+    public function getEmailStatus(string $trackingHash): ?Stat
     {
         $q = $this->createQueryBuilder('s');
         $q->select('s')
@@ -41,10 +39,8 @@ class StatRepository extends CommonRepository
     /**
      * @param int $contactId
      * @param int $emailId
-     *
-     * @return array
      */
-    public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId)
+    public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('distinct ph.url, ph.date_hit')
@@ -212,10 +208,8 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     *
-     * @return array|int
      */
-    public function getSentCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
+    public function getSentCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         return $this->getStatusCount('is_sent', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -223,10 +217,8 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null $emailIds
      * @param array<int,int|string>|int|null $listId
-     *
-     * @return array|int
      */
-    public function getReadCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
+    public function getReadCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         return $this->getStatusCount('is_read', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -234,10 +226,8 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     *
-     * @return array|int
      */
-    public function getFailedCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
+    public function getFailedCount($emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         return $this->getStatusCount('is_failed', $emailIds, $listId, $chartQuery, $combined);
     }
@@ -246,10 +236,8 @@ class StatRepository extends CommonRepository
      * @param string                              $column
      * @param array<int,int|string>|int|null      $emailIds
      * @param array<int,int|string>|int|true|null $listId
-     *
-     * @return array|int
      */
-    public function getStatusCount($column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false)
+    public function getStatusCount($column, $emailIds = null, $listId = null, ?ChartQuery $chartQuery = null, bool $combined = false): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -438,12 +426,10 @@ class StatRepository extends CommonRepository
      * @param int                  $leadId
      * @param array<string, mixed> $options
      *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($leadId, array $options = [])
+    public function getLeadStats($leadId, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
@@ -523,14 +509,10 @@ class StatRepository extends CommonRepository
     /**
      * Get counts for Sent, Read and Failed emails.
      *
-     * @param QueryBuilder $query
-     *
-     * @return array
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getIgnoredReadFailed($query = null)
+    public function getIgnoredReadFailed(QueryBuilder $query): array
     {
         $query->select('count(es.id) as sent, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read", count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed');
 
@@ -610,12 +592,12 @@ class StatRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int|string $fromLeadId, int|string $toLeadId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'email_stats')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId)
             ->executeStatement();
     }
 

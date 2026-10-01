@@ -35,7 +35,7 @@ final class ReportController extends FormController
     }
 
     #[Route(
-        '/s/reports/{objectAction}/{objectId}',
+        path: '/s/reports/{objectAction}/{objectId}',
         name: 'mautic_report_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -46,7 +46,7 @@ final class ReportController extends FormController
     }
 
     #[Route(
-        '/s/reports/{page}',
+        path: '/s/reports/{page}',
         name: 'mautic_report_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -349,6 +349,7 @@ final class ReportController extends FormController
                 $entity->setColumns([]);
                 $oldSchedule = $entity->isScheduled() ? $entity->getSchedule() : null;
 
+                $newSchedule                             = [];
                 $newSchedule['schedule_unit']            = $request->request->all()['report']['scheduleUnit'];
                 $newSchedule['schedule_day']             = $request->request->all()['report']['scheduleDay'];
                 $newSchedule['schedule_month_frequency'] = $request->request->all()['report']['scheduleMonthFrequency'];
@@ -544,7 +545,7 @@ final class ReportController extends FormController
      * @param int $reportPage
      */
     #[Route(
-        '/s/reports/view/{objectId}/{reportPage}',
+        path: '/s/reports/view/{objectId}/{reportPage}',
         name: 'mautic_report_view',
         requirements: ['reportPage' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['reportPage' => 1, 'objectId' => 0],
@@ -781,7 +782,7 @@ final class ReportController extends FormController
      * @throws \Exception
      */
     #[Route(
-        '/s/reports/view/{objectId}/export/{format}',
+        path: '/s/reports/view/{objectId}/export/{format}',
         name: 'mautic_report_export',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],
@@ -886,7 +887,7 @@ final class ReportController extends FormController
      * @throws \Exception
      */
     #[Route(
-        '/s/reports/download/{reportId}/{format}',
+        path: '/s/reports/download/{reportId}/{format}',
         name: 'mautic_report_download',
         defaults: ['format' => 'csv'],
     )]

@@ -29,7 +29,7 @@ final class DefaultController extends CommonController
     }
 
     #[Route(
-        '/',
+        path: '/',
         name: 'mautic_base_index',
     )]
     public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|Response

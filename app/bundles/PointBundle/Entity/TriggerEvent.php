@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -42,7 +43,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[OwnershipParent('trigger')]
+#[OwnershipParent(association: 'trigger')]
 class TriggerEvent implements UuidInterface
 {
     use UuidTrait;
@@ -288,10 +289,7 @@ class TriggerEvent implements UuidInterface
         $this->log->removeElement($log);
     }
 
-    /**
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getLog()
+    public function getLog(): Collection
     {
         return $this->log;
     }

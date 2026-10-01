@@ -114,8 +114,8 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $matchingSegment    = $this->em->getRepository(LeadList::class)->find($matchingSegment->getId());
-        $nonMatchingSegment = $this->em->getRepository(LeadList::class)->find($nonMatchingSegment->getId());
+        $matchingSegment    = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class)->find($matchingSegment->getId());
+        $nonMatchingSegment = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class)->find($nonMatchingSegment->getId());
 
         $this->assertSame('os', $matchingSegment?->getCategory()?->getAlias());
         $this->assertSame('hardware', $nonMatchingSegment?->getCategory()?->getAlias());
@@ -707,7 +707,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     private function loginOtherUser(string $name): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => $name]);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => $name]);
         $this->assertInstanceOf(User::class, $user);
 
         $this->loginUser($user);

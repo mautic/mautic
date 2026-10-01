@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Twig\Environment;
 
-readonly class GlobalSearch
+final readonly class GlobalSearch
 {
     public function __construct(
         private Environment $twig,

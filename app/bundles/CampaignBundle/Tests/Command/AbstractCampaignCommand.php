@@ -19,9 +19,9 @@ use Mautic\LeadBundle\Entity\ListLead;
 
 abstract class AbstractCampaignCommand extends MauticMysqlTestCase
 {
-    public const SEND_EMAIL_SECONDS = 3;
+    public const int SEND_EMAIL_SECONDS = 3;
 
-    public const CONDITION_SECONDS  = 6;
+    public const int CONDITION_SECONDS  = 6;
 
     /**
      * @var array
@@ -80,7 +80,7 @@ abstract class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->em->getConnection()->executeStatement($sql);
     }
 
-    public function beforeTearDown(): void
+    protected function beforeTearDown(): void
     {
         $this->clientServer = $this->defaultClientServer;
     }

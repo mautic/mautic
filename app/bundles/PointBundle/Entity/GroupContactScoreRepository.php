@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<GroupContactScore>
  */
-class GroupContactScoreRepository extends CommonRepository
+final class GroupContactScoreRepository extends CommonRepository
 {
     public function compareScore(int $leadId, int $groupId, int $score, string $operatorExpr): bool
     {

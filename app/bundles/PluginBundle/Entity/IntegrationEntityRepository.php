@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<IntegrationEntity>
  */
-class IntegrationEntityRepository extends CommonRepository
+final class IntegrationEntityRepository extends CommonRepository
 {
     /**
      * @param array<int>|int|null               $internalEntityIds

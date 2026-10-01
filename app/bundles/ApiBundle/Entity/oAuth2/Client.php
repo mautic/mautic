@@ -3,6 +3,7 @@
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\Client as BaseClient;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -185,9 +186,9 @@ class Client extends BaseClient
     }
 
     /**
-     * @return ArrayCollection<int, User>
+     * @return Collection<int, User>
      */
-    public function getUsers()
+    public function getUsers(): Collection
     {
         return $this->users;
     }

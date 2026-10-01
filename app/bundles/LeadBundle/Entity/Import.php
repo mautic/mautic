@@ -23,46 +23,46 @@ class Import extends FormEntity
     /**
      * When the import entity is created for background processing.
      */
-    public const QUEUED = 1;
+    public const int QUEUED = 1;
 
     /**
      * When the background process started the import.
      */
-    public const IN_PROGRESS = 2;
+    public const int IN_PROGRESS = 2;
 
     /**
      * When the import is finished.
      */
-    public const IMPORTED = 3;
+    public const int IMPORTED = 3;
 
     /**
      * When the import process failed.
      */
-    public const FAILED = 4;
+    public const int FAILED = 4;
 
     /**
      * When the import has been stopped by a user.
      */
-    public const STOPPED = 5;
+    public const int STOPPED = 5;
 
     /**
      * When the import happens in the browser.
      */
-    public const MANUAL = 6;
+    public const int MANUAL = 6;
 
     /**
      * When the import is scheduled for later processing.
      */
-    public const DELAYED = 7;
+    public const int DELAYED = 7;
 
     /**
      * ===== Priorities: =====.
      */
-    public const LOW    = 512;
+    public const int LOW    = 512;
 
-    public const NORMAL = 64;
+    public const int NORMAL = 64;
 
-    public const HIGH   = 1;
+    public const int HIGH   = 1;
 
     /**
      * @var int
@@ -624,18 +624,12 @@ class Import extends FormEntity
         return $this->properties['line'] ?? 0;
     }
 
-    /**
-     * @return array
-     */
-    public function getMatchedFields()
+    public function getMatchedFields(): array
     {
         return empty($this->properties['fields']) ? [] : $this->properties['fields'];
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -646,17 +640,15 @@ class Import extends FormEntity
     /**
      * @param array<mixed> $properties
      */
-    public function mergeToProperties($properties): static
+    public function mergeToProperties(array $properties): static
     {
         return $this->setProperties(array_merge($this->properties, $properties));
     }
 
     /**
      * Get array of default values.
-     *
-     * @return array
      */
-    public function getDefaults()
+    public function getDefaults(): array
     {
         return $this->properties['defaults'] ?? [];
     }
@@ -695,10 +687,7 @@ class Import extends FormEntity
         return $this->setProperties($properties);
     }
 
-    /**
-     * @return array
-     */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return empty($this->properties['headers']) ? [] : $this->properties['headers'];
     }
@@ -714,10 +703,7 @@ class Import extends FormEntity
         return $this->setProperties($properties);
     }
 
-    /**
-     * @return array
-     */
-    public function getParserConfig()
+    public function getParserConfig(): array
     {
         return empty($this->properties['parser']) ? [] : $this->properties['parser'];
     }

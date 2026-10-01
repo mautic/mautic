@@ -8,7 +8,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ServerBag;
 
-class SubmissionEvent extends CommonEvent
+final class SubmissionEvent extends CommonEvent
 {
     /**
      * Cleaned post results.

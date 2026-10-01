@@ -6,6 +6,8 @@
 
 ## Removed code
 
+- Constants `USER_PRE_SAVE`, `USER_POST_SAVE`, `USER_PRE_DELETE`, `USER_POST_DELETE`, `ROLE_PRE_SAVE`, `ROLE_POST_SAVE`, `ROLE_PRE_DELETE` and `ROLE_POST_DELETE` removed from `Mautic\UserBundle\UserEvents`. These lifecycle events are now dispatched as dedicated event classes: `PreSaveUserEvent`, `PostSaveUserEvent`, `PreDeleteUserEvent`, `PostDeleteUserEvent`, `PreSaveRoleEvent`, `PostSaveRoleEvent`, `PreDeleteRoleEvent` and `PostDeleteRoleEvent` (all under `Mautic\UserBundle\Event`, extending `UserEvent` / `RoleEvent`, which are now `abstract`). Subscribe to the event class instead of the constant, e.g. `PostSaveUserEvent::class => 'onUserPostSave'`.
+- Classes `Mautic\UserBundle\Event\UserEvent` and `Mautic\UserBundle\Event\RoleEvent` are now `abstract` and can no longer be instantiated directly. Dispatch one of the concrete `Pre*/Post*` subclasses listed above instead.
 - Method `setEntityManager()` and the `protected $em` property removed from `Mautic\CoreBundle\Event\CommonEvent`. The entity manager was set on the event by every model but never read. `Mautic\LeadBundle\Event\LeadListFilteringEvent` was the only reader; it now holds its own `$em` property (unchanged constructor and `getEntityManager()`). Remove any `$event->setEntityManager(...)` calls.
 - Legacy `services` config group removed from bundle `Config/config.php` handling. `Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata` no longer reads a `services` array from `Config/config.php`. Register services as Symfony services in each bundle's `Config/services.php` instead.
 - Deprecated method `addLead()` removed from `Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder`. The 28 entities that used it now map their `lead` association with native `#[ORM\ManyToOne]` / `#[ORM\JoinColumn]` attributes (column `lead_id`, unchanged). Any custom entity calling `$builder->addLead(...)` in `loadMetadata()` must declare the mapping with Doctrine attributes instead.
@@ -629,6 +631,10 @@
     +    public function isLocked(object $entity): bool
     -    public function isNewEntity($entity): bool
     +    public function isNewEntity(object $entity): bool
+    -    public function saveEntity($entity, bool $unlock = true): void
+    +    public function saveEntity(object $entity, bool $unlock = true): void
+    -    public function saveAndDetachEntity($entity, bool $unlock = true): void
+    +    public function saveAndDetachEntity(object $entity, bool $unlock = true): void
     -    public function togglePublishStatus($entity): bool
     +    public function togglePublishStatus(object $entity): bool
     -    public function deleteEntity($entity): void
@@ -636,6 +642,8 @@
     -    public function deleteEntities($ids): array
     +    public function deleteEntities(array $ids): array
     ```
+
+    The `saveEntity()` overrides in `AssetModel`, `CategoryModel`, `MessageModel`, `DashboardModel`, `DynamicContentModel`, `EmailModel`, `Form\FormModel`, `CompanyModel`, `Lead\FieldModel`, `LeadModel`, `ListModel`, `NotificationModel`, `PageModel`, `TriggerModel`, `SmsModel`, `RoleModel`, `UserModel`, `WebhookModel`, `FocusModel` and `MonitoringModel` use the `object` type too.
 
     The `deleteEntity()` / `deleteEntities()` overrides in `CampaignModel`, `EmailModel`, `Form\FormModel`, `SubmissionModel`, `CompanyModel`, `Lead\FieldModel`, `LeadModel`, `ListModel`, `PageModel` and `RoleModel` use the same `object` / `array` types (the concrete entity stays in the `@param` docblock). Other typed methods per model:
 
@@ -656,7 +664,7 @@
     | `FormBundle\Model\ActionModel` | `getFormsIdsWithDependenciesOnSegment()` | `int` |
     | `FormBundle\Model\FieldModel` | `getSessionFields()` | `int\|string` |
     | `FormBundle\Model\FormModel` | `getFilterExpressionFunctions()` | `?string` |
-    | `LeadBundle\Model\CompanyModel` | `companyMerge()` (second parameter) | `object` |
+    | `LeadBundle\Model\CompanyModel` | `companyMerge()` (both parameters, now also returns `Company`) | `Company` |
     | `LeadBundle\Model\FieldModel` | `reorderFieldsByEntity()` | `LeadField` |
     | `LeadBundle\Model\FieldModel` | `getPublishedFieldArrays()` | `string` |
     | `LeadBundle\Model\FieldModel` | `getFieldListWithProperties()` | `string\|bool` |
@@ -761,3 +769,41 @@
 - `Mautic\CoreBundle\Cache\ResultCacheHelper::getCache()` returns a PSR-6 `CacheItemPoolInterface` instead of a `Doctrine\Common\Cache\CacheProvider`, which doctrine-bundle 3 no longer accepts.
 - `Mautic\LeadBundle\Field\SchemaDefinition::getSchemaDefinition()` now returns an explicit `length` for a unique identifier field, where it previously left the length to DBAL. DBAL 4 refuses a VARCHAR without one. The value is the 255 DBAL 3 applied implicitly, so the column is unchanged.
 - `Mautic\CoreBundle\Model\FormModel::cleanAlias()` and `Mautic\FormBundle\Entity\SubmissionRepository` check a generated alias against `Mautic\CoreBundle\Doctrine\ReservedWords` instead of the platform's keyword list, which DBAL 4 deprecated with no replacement. The list is the union of the newest MySQL and MariaDB reserved words, so a handful of aliases that were left alone before are now prefixed.
+- `Mautic\CoreBundle\Entity\CommonRepository` and `Mautic\CoreBundle\Event\CommonEvent` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
+- All class and interface constants now declare a native type (PHP 8.3 typed class constants), e.g. `public const string NAME = ...`. If a plugin class overrides one of them, add a compatible type to the overriding constant, otherwise PHP fails with "Type of X::NAME must be compatible with Y::NAME". `AbstractMauticMigration::TABLE_NAME` is `?string`, so migrations declare `protected const string TABLE_NAME`.
+- `Mautic\DashboardBundle\Entity\Widget::getParams()` and `::getTemplateData()` now declare a native `array` return type instead of a `@return array` docblock. If a plugin class extends `Widget` and overrides either method, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::getParams() must be compatible with Widget::getParams(): array".
+- Methods in Core and shared base classes, interfaces and traits that documented `@return array` now declare a native return type. If a plugin class implements one of these interfaces or overrides one of these methods, add a compatible return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with Y::method(): array". The return type is `array` unless noted:
+
+    | Class | Methods |
+    | --- | --- |
+    | `CoreBundle\Configurator\Step\StepInterface` | `checkRequirements()`, `checkOptionalSettings()`, `update()` |
+    | `CoreBundle\Helper\ThemeHelperInterface` | `getDefaultThemes()`, `getOptionalSettings()` |
+    | `CoreBundle\IpLookup\IpLookupFormInterface` | `getConfigFormThemes()` |
+    | `CoreBundle\Model\SearchCommandListInterface` | `getCommandList()` |
+    | `StatsBundle\Aggregate\Collection\Stats\StatInterface` | `getStats()` |
+    | `CoreBundle\Model\AbstractCommonModel` | `getSupportedSearchCommands()`, `getCommandList()`, `getEntities()` (`iterable`) |
+    | `CoreBundle\Controller\AbstractFormController` | `refererPostActionVars()` |
+    | `CoreBundle\Controller\AbstractStandardFormController` | `afterEntityClone()`, `getEntityFormOptions()`, `getUpdateSelectParams()`, `getViewDateRange()` |
+    | `CoreBundle\Doctrine\AbstractMauticMigration` | `generateKeys()` |
+    | `CoreBundle\Security\Permissions\AbstractPermissions` | `getPermissions()`, `getSynonym()`, `getPermissionRatio()` |
+    | `CoreBundle\Helper\AbstractFormFieldHelper` | `parseList()` |
+    | `CoreBundle\IpLookup\AbstractLookup` | `getDetails()` |
+    | `CoreBundle\IpLookup\AbstractLocalDataLookup` | `getConfigFormThemes()` |
+    | `CoreBundle\IpLookup\AbstractMaxmindLookup` | `getHeaders()` |
+    | `CoreBundle\IpLookup\AbstractRemoteDataLookup` | `getHeaders()`, `getParameters()` |
+    | `CoreBundle\Entity\CommonEntity` | `getChanges()` |
+    | `CoreBundle\Entity\DynamicContentEntityTrait` | `getDynamicContent()`, `getDefaultDynamicContent()` |
+    | `CoreBundle\Entity\FiltersEntityTrait` | `getFilters()` |
+    | `CoreBundle\Model\BuilderModelTrait` | `getCommonBuilderComponents()` |
+    | `CoreBundle\Event\BuilderEvent` | `getTokens()`, `filterTokens()` |
+    | `CoreBundle\Event\TokenReplacementEvent` | `getTokens()` |
+    | `ApiBundle\Controller\FetchCommonApiController` | `getWhereFromRequest()` |
+    | `EmailBundle\Model\EmailModel` | `getEntities()` (`iterable`), `getBuilderComponents()`, `getEmailSettings()` |
+    | `LeadBundle\Model\LeadModel` | `getEntities()` (`iterable`), `getLeadsByIds()`, `getLeadDetails()`, `getPreferredChannel()` |
+    | `PageBundle\Entity\Page` | `getContent()` (`?array`) |
+    | `PageBundle\Entity\Hit`, `PageBundle\Entity\VideoHit` | `getBrowserLanguages()`, `getQuery()` |
+    | `ReportBundle\Entity\Report` | `getColumns()`, `getFilters()`, `getTableOrder()`, `getGraphs()`, `getGroupBy()`, `getAggregators()` |
+    | `CampaignBundle\Entity\Campaign` | `getChanges()` |
+    | `ChannelBundle\Entity\Channel` | `getProperties()` |
+    | `ChannelBundle\Entity\MessageQueue` | `getMetadata()` |
+    | `CoreBundle\Entity\AuditLog` | `getDetails()` |

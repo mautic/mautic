@@ -29,7 +29,7 @@ final class NoteController extends FormController
      * Generate's default list view.
      */
     #[Route(
-        '/s/contacts/notes/{leadId}/{page}',
+        path: '/s/contacts/notes/{leadId}/{page}',
         name: 'mautic_contactnote_index',
         requirements: ['leadId' => '\d+', 'page' => '\d+'],
         defaults: ['leadId' => 0, 'page' => 0],
@@ -373,7 +373,7 @@ final class NoteController extends FormController
      * @param int $leadId
      */
     #[Route(
-        '/s/contacts/notes/{leadId}/{objectAction}/{objectId}',
+        path: '/s/contacts/notes/{leadId}/{objectAction}/{objectId}',
         name: 'mautic_contactnote_action',
         requirements: ['leadId' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

@@ -16,7 +16,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Plugin>
  */
-class PluginModel extends FormModel
+final class PluginModel extends FormModel
 {
     public static function getName(): string
     {
@@ -87,7 +87,7 @@ class PluginModel extends FormModel
      *
      * @return Plugin[]
      */
-    public function getInstalledPlugins()
+    public function getInstalledPlugins(): array
     {
         return $this->getEntities(
             [

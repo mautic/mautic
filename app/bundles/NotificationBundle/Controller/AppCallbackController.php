@@ -32,7 +32,7 @@ final class AppCallbackController extends CommonController
     }
 
     #[Route(
-        '/notification/appcallback',
+        path: '/notification/appcallback',
         name: 'mautic_app_notification',
     )]
     public function indexAction(Request $request): JsonResponse

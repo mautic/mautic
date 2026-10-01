@@ -10,44 +10,15 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<LeadList>
  */
-class LeadListRepository extends CommonRepository
+final class LeadListRepository extends CommonRepository
 {
     use ExpressionHelperTrait;
     use RegexTrait;
     use ProjectRepositoryTrait;
-
-    /**
-     * @var bool
-     */
-    protected $listFiltersInnerJoinCompany = false;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * Flag to check if some segment filter on a company field exists.
-     *
-     * @var bool
-     */
-    protected $hasCompanyFilter = false;
-
-    /**
-     * @var \Doctrine\DBAL\Schema\Column[]
-     */
-    protected $leadTableSchema;
-
-    /**
-     * @var \Doctrine\DBAL\Schema\Column[]
-     */
-    protected $companyTableSchema;
 
     private function getSingleEntity(int $id, bool $ignoreDeleted = true): ?LeadList
     {
@@ -87,8 +58,7 @@ class LeadListRepository extends CommonRepository
      */
     public function getLists(?User $user = null, string $alias = '', string|int|null $id = '', bool $justPublished = true): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(LeadList::class, 'l', 'l.id');
+        $q = $this->createQueryBuilder('l', 'l.id');
 
         $q->select('partial l.{id, name, alias}');
 
@@ -125,14 +95,11 @@ class LeadListRepository extends CommonRepository
      * Get lists for a specific lead.
      *
      * @param int|Lead[] $lead Lead ID or array of Leads
-     *
-     * @return mixed
      */
-    public function getLeadLists($lead, bool $forList = false, bool $singleArrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false)
+    public function getLeadLists($lead, bool $forList = false, bool $singleArrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {
         if (is_array($lead)) {
-            $q = $this->getEntityManager()->createQueryBuilder()
-                ->from(LeadList::class, 'l', 'l.id');
+            $q = $this->createQueryBuilder('l', 'l.id');
 
             if ($forList) {
                 $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
@@ -170,8 +137,7 @@ class LeadListRepository extends CommonRepository
 
             return $return;
         }
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(LeadList::class, 'l', 'l.id');
+        $q = $this->createQueryBuilder('l', 'l.id');
 
         if ($forList) {
             $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
@@ -229,8 +195,7 @@ class LeadListRepository extends CommonRepository
      */
     public function getGlobalLists(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(LeadList::class, 'l', 'l.id');
+        $q = $this->createQueryBuilder('l', 'l.id');
 
         $q->select('partial l.{id, name, alias}')
             ->where($q->expr()->eq('l.isPublished', 'true'))
@@ -253,8 +218,7 @@ class LeadListRepository extends CommonRepository
      */
     public function getPreferenceCenterList(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(LeadList::class, 'l', 'l.id');
+        $q = $this->createQueryBuilder('l', 'l.id');
 
         $q->select('l.id, l.name, l.publicName, l.alias')
             ->where($q->expr()->eq('l.isPublished', ':published'))
@@ -340,13 +304,6 @@ class LeadListRepository extends CommonRepository
         }
 
         return $objectFilters;
-    }
-
-    #[Required]
-    public function autowireLeadListRepository(
-        EventDispatcherInterface $dispatcher,
-    ): void {
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -868,9 +825,8 @@ SQL;
      */
     public function getLeadSegmentIds(int $leadId): array
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb = $this->createQueryBuilder('ll');
         $qb->select('ll.id')
-            ->from(LeadList::class, 'll')
             ->innerJoin('ll.leads', 'l')
             ->where(
                 $qb->expr()->eq('l.lead', ':leadId')

@@ -206,10 +206,8 @@ trait CustomFieldRepositoryTrait
      * @param string $search
      * @param int    $limit
      * @param int    $start
-     *
-     * @return array
      */
-    public function getValueList($field, $search = '', $limit = 10, $start = 0)
+    public function getValueList($field, $search = '', $limit = 10, $start = 0): array
     {
         // Includes prefix
         $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
@@ -368,7 +366,7 @@ trait CustomFieldRepositoryTrait
      *
      * @return array [$fields, $fixedFields]
      */
-    public function getCustomFieldList($object)
+    public function getCustomFieldList($object): array
     {
         if (empty($this->customFieldList)) {
             // Get the list of custom fields

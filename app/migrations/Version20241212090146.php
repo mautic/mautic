@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20241212090146 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'sync_object_mapping';
+    protected const string TABLE_NAME = 'sync_object_mapping';
 
     private string $indexName = MAUTIC_TABLE_PREFIX.'internal_object_id_idx';
 

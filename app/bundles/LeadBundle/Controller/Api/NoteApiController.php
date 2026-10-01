@@ -61,7 +61,7 @@ final class NoteApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
     {
         if (!empty($parameters['lead'])) {
             $leadAction = 'new' === $action ? 'view' : $action;
@@ -76,5 +76,6 @@ final class NoteApiController extends CommonApiController
         } elseif ('new' === $action) {
             return $this->returnError('lead ID is mandatory', Response::HTTP_BAD_REQUEST);
         }
+        return null;
     }
 }

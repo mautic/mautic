@@ -27,7 +27,7 @@ trait TwigIntegrationTestTrait
      * Get the fixtures directory for the test
      * Uses the directory of the class that uses this trait.
      */
-    public static function getFixturesDirectory(): string
+    protected static function getFixturesDirectory(): string
     {
         // Get the directory of the class that uses this trait
         $reflection = new \ReflectionClass(static::class);

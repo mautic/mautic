@@ -10,7 +10,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -118,7 +117,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $leadModel->addToCompany($contact, $company2);
 
         /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
+        $companyLeadRepo  = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyLeadRepository::class);
 
         return $companyLeadRepo->getCompaniesByLeadId($contact->getId());
     }

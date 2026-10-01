@@ -15,17 +15,16 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Campaign>
  */
-class CampaignRepository extends CommonRepository
+final class CampaignRepository extends CommonRepository
 {
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
+        $q = $this->createQueryBuilder($this->getTableAlias(), $this->getTableAlias().'.id');
         $q->select($this->getTableAlias().', cat')
-            ->from(Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
         if (!empty($args['joinLists'])) {
@@ -66,8 +65,7 @@ class CampaignRepository extends CommonRepository
      */
     public function getPublishedCampaigns(?int $specificId = null, ?int $leadId = null, bool $forList = false, bool $viewOther = false): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(Campaign::class, 'c', 'c.id');
+        $q = $this->createQueryBuilder('c', 'c.id');
 
         if ($forList && $leadId) {
             $q->select('partial c.{id, name}, partial l.{campaign, lead, dateAdded, manuallyAdded, manuallyRemoved}, partial ll.{id}');
@@ -510,11 +508,9 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignIdsWithDependenciesOnEmail(int $emailId): array
     {
-        $query = $this->getEntityManager()
-            ->createQueryBuilder()
+        $query = $this->createQueryBuilder($this->getTableAlias(), $this->getTableAlias().'.id')
             ->select($this->getTableAlias().'.id')
             ->distinct()
-            ->from(Campaign::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->leftJoin(
                 $this->getTableAlias().'.events',
                 'e',

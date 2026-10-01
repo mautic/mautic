@@ -15,17 +15,13 @@ interface StepInterface
 
     /**
      * Checks for requirements.
-     *
-     * @return array
      */
-    public function checkRequirements();
+    public function checkRequirements(): array;
 
     /**
      * Checks for optional settings.
-     *
-     * @return array
      */
-    public function checkOptionalSettings();
+    public function checkOptionalSettings(): array;
 
     /**
      * Returns the template to be rendered for this step.
@@ -36,8 +32,6 @@ interface StepInterface
 
     /**
      * Updates form data parameters.
-     *
-     * @return array
      */
-    public function update(self $data);
+    public function update(self $data): array;
 }

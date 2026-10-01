@@ -10,7 +10,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 
-readonly class FormUploader
+final readonly class FormUploader
 {
     public function __construct(
         private FileUploader $fileUploader,

@@ -5,7 +5,7 @@ namespace Mautic\ReportBundle\Event;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 
-class ReportGraphEvent extends AbstractReportEvent
+final class ReportGraphEvent extends AbstractReportEvent
 {
     /**
      * @param mixed[] $requestedGraphs
@@ -41,10 +41,8 @@ class ReportGraphEvent extends AbstractReportEvent
 
     /**
      * Fetch the options array for the graph.
-     *
-     * @return array
      */
-    public function getOptions($graph)
+    public function getOptions($graph): array
     {
         return $this->requestedGraphs[$graph]['options'] ?? [];
     }

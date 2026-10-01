@@ -8,7 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 
-class ConnectionWrapper extends Connection
+final class ConnectionWrapper extends Connection
 {
     /**
      * @param array<string, mixed> $dbParams

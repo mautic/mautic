@@ -31,7 +31,7 @@ final class FieldController extends FormController
     }
 
     #[Route(
-        '/s/contacts/fields/{objectAction}/{objectId}',
+        path: '/s/contacts/fields/{objectAction}/{objectId}',
         name: 'mautic_contactfield_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -47,7 +47,7 @@ final class FieldController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/contacts/fields/{page}',
+        path: '/s/contacts/fields/{page}',
         name: 'mautic_contactfield_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

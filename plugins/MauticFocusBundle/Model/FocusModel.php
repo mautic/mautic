@@ -41,7 +41,7 @@ use Twig\Runtime\EscaperRuntime;
 /**
  * @extends FormModel<Focus>
  */
-class FocusModel extends FormModel implements GlobalSearchInterface
+final class FocusModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
@@ -49,11 +49,11 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     public function __construct(
-        protected \Mautic\FormBundle\Model\FormModel $formModel,
-        protected TrackableModel $trackableModel,
-        protected Environment $twig,
-        protected FieldModel $leadFieldModel,
-        protected ContactTracker $contactTracker,
+        private readonly \Mautic\FormBundle\Model\FormModel $formModel,
+        private readonly TrackableModel $trackableModel,
+        private readonly Environment $twig,
+        private readonly FieldModel $leadFieldModel,
+        private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -120,7 +120,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Focus $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
         $this->generateTrackableUrl($entity);

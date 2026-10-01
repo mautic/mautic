@@ -13,7 +13,7 @@ use Mautic\UserBundle\Entity\User;
 /**
  * @extends CommonRepository<AuditLog>
  */
-class AuditLogRepository extends CommonRepository
+final class AuditLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
@@ -178,10 +178,7 @@ class AuditLogRepository extends CommonRepository
         return $query->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadIpLogs(?Lead $lead = null, array $options = [])
+    public function getLeadIpLogs(?Lead $lead = null, array $options = []): array
     {
         $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sqb = $this->getEntityManager()->getConnection()->createQueryBuilder();

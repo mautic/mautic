@@ -208,7 +208,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @param Email $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $type = $entity->getEmailType();
         if (empty($type)) {
@@ -353,7 +353,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return Paginator|array<string, int|object>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $entities = parent::getEntities($args);
 
@@ -517,7 +517,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $emailOpenStat = new StatDevice();
             $emailOpenStat->setIpAddress($ipAddress);
             $emailOpenStat->setDevice($trackedDevice);
-            $emailOpenStat->setDateOpened($readDateTime->toUtcString());
+            $emailOpenStat->setDateOpened($readDateTime->getDateTime());
             $emailOpenStat->setStat($stat);
 
             $this->em->persist($emailOpenStat);
@@ -542,10 +542,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     *
-     * @return array
      */
-    public function getBuilderComponents(?Email $email = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Email $email = null, $requestedComponents = 'all', string $tokenFilter = ''): array
     {
         $event = new EmailOnBuildEvent($this->translator, $email, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch($event);
@@ -637,10 +635,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $data;
     }
 
-    /**
-     * @return Stat|null
-     */
-    public function getEmailStatus(string $idHash)
+    public function getEmailStatus(string $idHash): ?\Mautic\EmailBundle\Entity\Stat
     {
         return $this->statRepository->getEmailStatus($idHash);
     }
@@ -669,6 +664,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $emailIds = ($includeVariants && ($entity->isVariant() || $entity->isTranslation())) ? $entity->getRelatedEntityIds() : [$entity->getId()];
 
         $emailStats            = $this->statRepository->getStatsSummaryByCountry($dateFrom, $dateTo, $emailIds);
+        $results               = [];
         $results['read_count'] = $results['clicked_through_count'] = [];
 
         foreach ($emailStats as $e) {
@@ -962,8 +958,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param int   $maxContactId    Filter by max contact ID
      * @param bool  $countWithMaxMin Add min_id and max_id info to the count result
      * @param bool  $storeToCache    Whether to store the result to the cache
-     *
-     * @return int|array
      */
     public function getPendingLeads(
         Email $email,
@@ -977,7 +971,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         bool $storeToCache = true,
         ?int $maxThreads = null,
         ?int $threadId = null,
-    ) {
+    ): int|array {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
 
         $total      = $this->emailRepository->getEmailPendingLeads(
@@ -1163,10 +1157,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Gets template, stats, weights, etc for an email in preparation to be sent.
-     *
-     * @return array
      */
-    public function &getEmailSettings(Email $email, bool $includeVariants = true)
+    public function &getEmailSettings(Email $email, bool $includeVariants = true): array
     {
         if (empty($this->emailSettings[$email->getId()])) {
             // store the settings of all the variants in order to properly disperse the emails

@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ConfigEvent extends CommonEvent
+final class ConfigEvent extends CommonEvent
 {
     /**
      * @var mixed[]
@@ -46,10 +46,8 @@ class ConfigEvent extends CommonEvent
 
     /**
      * Returns the config array.
-     *
-     * @return array
      */
-    public function getConfig(?string $key = null)
+    public function getConfig(?string $key = null): array
     {
         if ($key) {
             return $this->config[$key] ?? [];
@@ -164,10 +162,7 @@ class ConfigEvent extends CommonEvent
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getNormData()
+    public function getNormData(): array
     {
         return $this->normData;
     }

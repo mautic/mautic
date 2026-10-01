@@ -16,16 +16,14 @@ class LeadRepository extends CommonRepository
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
 
-    public const DELETE_BATCH_SIZE = 5000;
+    public const int DELETE_BATCH_SIZE = 5000;
 
     /**
      * Get the details of leads added to a campaign.
      */
     public function getLeadDetails($campaignId, $leads = null): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(Lead::class, 'lc')
-            ->select('lc')
+        $q = $this->createQueryBuilder('lc')
             ->leftJoin('lc.campaign', 'c')
             ->leftJoin('lc.lead', 'l');
         $q->where(
@@ -53,8 +51,7 @@ class LeadRepository extends CommonRepository
      */
     public function getLeads($campaignId, $eventId = null): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(Lead::class, 'lc')
+        $q = $this->createQueryBuilder('lc')
             ->select('lc, l')
             ->leftJoin('lc.campaign', 'c')
             ->leftJoin('lc.lead', 'l');

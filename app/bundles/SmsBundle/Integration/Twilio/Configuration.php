@@ -7,7 +7,7 @@ namespace Mautic\SmsBundle\Integration\Twilio;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Twilio\Exceptions\ConfigurationException;
 
-class Configuration
+final class Configuration
 {
     /**
      * @var string

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Log>
  */
-class LogRepository extends CommonRepository
+final class LogRepository extends CommonRepository
 {
     private const int LOG_DELETE_BATCH_SIZE = 5000;
 

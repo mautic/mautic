@@ -7,7 +7,6 @@ namespace Mautic\FormBundle\Tests\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
-use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Tests\FormTestHelperTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -25,10 +24,10 @@ final class DeleteFormResultsTableCommandTest extends MauticMysqlTestCase
         $this->deleteAllFormResultsTable();
 
         /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->em->getRepository(Submission::class);
+        $submissionRepository = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class);
 
         /** @var FormRepository $formRepository */
-        $formRepository = $this->em->getRepository(Form::class);
+        $formRepository = $this->getContainer()->get(\Mautic\FormBundle\Entity\FormRepository::class);
 
         $deletedForms = 20;
 

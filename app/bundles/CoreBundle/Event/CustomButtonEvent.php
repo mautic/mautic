@@ -56,11 +56,10 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Add a single button.
      *
-     * @param string|null          $location
      * @param string|null          $route
      * @param array<string, mixed> $button
      */
-    public function addButton(array $button, $location = null, $route = null): static
+    public function addButton(array $button, ?string $location = null, array|string|null $route = null): static
     {
         if (!$this->checkLocationContext($location) || !$this->checkRouteContext($route)) {
             return $this;

@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<TriggerEvent>
  */
-class TriggerEventRepository extends CommonRepository
+final class TriggerEventRepository extends CommonRepository
 {
     /**
      * Get array of published triggers based on point total.

@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20211110070503 extends PreUpAssertionMigration
 {
-    public function preUpAssertions(): void
+    protected function preUpAssertions(): void
     {
         $this->skipAssertion(fn (Schema $schema) => $schema->getTable("{$this->prefix}campaigns")->getColumn('allow_restart')->getType() instanceof BooleanType, 'Column already in BOOLEAN type');
     }

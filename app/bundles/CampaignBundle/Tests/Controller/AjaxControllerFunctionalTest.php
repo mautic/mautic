@@ -47,7 +47,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($campaign);
 
         /** @var LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
+        $leadEventLogRepository = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class);
 
         /** @var LeadEventLog $log */
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);

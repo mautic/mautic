@@ -8,7 +8,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Focus>
  */
-class FocusRepository extends CommonRepository
+final class FocusRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
@@ -21,14 +21,11 @@ class FocusRepository extends CommonRepository
         );
     }
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $alias = $this->getTableAlias();
 
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select($alias)
-            ->from(Focus::class, $alias, $alias.'.id');
+        $q = $this->createQueryBuilder($alias, $alias.'.id');
 
         if (empty($args['iterable_mode'])) {
             $q->leftJoin($alias.'.category', 'c');

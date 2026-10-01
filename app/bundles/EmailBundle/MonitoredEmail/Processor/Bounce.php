@@ -13,33 +13,23 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class Bounce implements ProcessorInterface
+final class Bounce implements ProcessorInterface
 {
     private const int RETRY_COUNT = 5;
 
-    /**
-     * @var string
-     */
-    protected $bouncerAddress;
-
-    /**
-     * @var Message
-     */
-    protected $message;
+    private ?\Mautic\EmailBundle\MonitoredEmail\Message $message = null;
 
     public function __construct(
-        protected TransportInterface $transport,
-        protected ContactFinder $contactFinder,
-        protected EmailStatModel $emailStatModel,
-        protected LeadModel $leadModel,
-        protected TranslatorInterface $translator,
-        protected LoggerInterface $logger,
-        protected DoNotContact $doNotContact,
+        private readonly TransportInterface $transport,
+        private readonly ContactFinder $contactFinder,
+        private readonly EmailStatModel $emailStatModel,
+        private readonly TranslatorInterface $translator,
+        private readonly LoggerInterface $logger,
+        private readonly DoNotContact $doNotContact,
     ) {
     }
 
@@ -93,7 +83,7 @@ class Bounce implements ProcessorInterface
         return true;
     }
 
-    protected function updateStat(Stat $stat, BouncedEmail $bouncedEmail): void
+    private function updateStat(Stat $stat, BouncedEmail $bouncedEmail): void
     {
         $dtHelper    = new DateTimeHelper();
         $openDetails = $stat->getOpenDetails();

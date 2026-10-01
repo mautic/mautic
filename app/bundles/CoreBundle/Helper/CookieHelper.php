@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class CookieHelper implements EventSubscriberInterface
+final class CookieHelper implements EventSubscriberInterface
 {
     private ?Request $request = null;
 

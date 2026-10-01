@@ -130,7 +130,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var LeadRepository $repo */
-        $repo     = $this->em->getRepository(Lead::class);
+        $repo     = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
         $contacts = $repo->getContacts($contactIds);
 
         $this->assertCount($expectedCount, $contacts);
@@ -232,7 +232,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testIfLeadExists(): void
     {
         /** @var LeadRepository $repo */
-        $repo = $this->em->getRepository(Lead::class);
+        $repo = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
 
         $this->assertFalse($repo->exists('654'));
 

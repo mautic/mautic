@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class CustomFieldColumn
+final readonly class CustomFieldColumn
 {
     public function __construct(
         private ColumnSchemaHelper $columnSchemaHelper,

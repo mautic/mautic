@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class JsController extends CommonController
 {
     #[Route(
-        '/mtc.js',
+        path: '/mtc.js',
         name: 'mautic_js',
     )]
     public function indexAction(
@@ -22,7 +22,7 @@ final class JsController extends CommonController
     }
 
     #[Route(
-        '/mautic-essential.js',
+        path: '/mautic-essential.js',
         name: 'mautic_essential_js',
     )]
     public function essentialAction(
@@ -33,7 +33,7 @@ final class JsController extends CommonController
     }
 
     #[Route(
-        '/mautic-tracking.js',
+        path: '/mautic-tracking.js',
         name: 'mautic_tracking_js',
     )]
     public function trackingAction(

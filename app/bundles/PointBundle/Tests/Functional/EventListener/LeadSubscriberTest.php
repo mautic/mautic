@@ -29,7 +29,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
 
     public function testLeadPointLogUpdateLead(): void
     {
-        $this->assertEmpty($this->em->getRepository(LeadPointLog::class)->findAll());
+        $this->assertEmpty($this->getContainer()->get(\Mautic\PointBundle\Entity\LeadPointLogRepository::class)->findAll());
 
         $contactA = $this->createLead('one@example.com');
         $contactB = $this->createLead('two@example.com');
@@ -45,7 +45,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
         $this->createLeadPointLog($pointRead, $contactB, $ipAddress);
         $this->createLeadPointLog($pointOpen, $contactA, $ipAddress);
 
-        $this->assertCount(3, $this->em->getRepository(LeadPointLog::class)->findAll());
+        $this->assertCount(3, $this->getContainer()->get(\Mautic\PointBundle\Entity\LeadPointLogRepository::class)->findAll());
 
         $leadMergeEvent = new LeadMergeEvent($contactA, $contactB);
 
@@ -54,12 +54,12 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
 
         $subscriber->onLeadMerge($leadMergeEvent);
 
-        $this->assertCount(2, $this->em->getRepository(LeadPointLog::class)->findAll());
+        $this->assertCount(2, $this->getContainer()->get(\Mautic\PointBundle\Entity\LeadPointLogRepository::class)->findAll());
     }
 
     public function testLeadTriggerLogUpdateLead(): void
     {
-        $this->assertEmpty($this->em->getRepository(LeadTriggerLog::class)->findAll());
+        $this->assertEmpty($this->getContainer()->get(\Mautic\PointBundle\Entity\LeadTriggerLogRepository::class)->findAll());
 
         $contactA = $this->createLead('one@example.com');
         $contactB = $this->createLead('two@example.com');
@@ -80,7 +80,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
         $this->createLeadTriggerLog($triggerEventOne, $contactB, $ipAddress);
         $this->createLeadTriggerLog($triggerEventTwo, $contactA, $ipAddress);
 
-        $this->assertCount(3, $this->em->getRepository(LeadTriggerLog::class)->findAll());
+        $this->assertCount(3, $this->getContainer()->get(\Mautic\PointBundle\Entity\LeadTriggerLogRepository::class)->findAll());
 
         $leadMergeEvent = new LeadMergeEvent($contactA, $contactB);
 
@@ -89,7 +89,7 @@ final class LeadSubscriberTest extends MauticMysqlTestCase
 
         $subscriber->onLeadMerge($leadMergeEvent);
 
-        $this->assertCount(2, $this->em->getRepository(LeadTriggerLog::class)->findAll());
+        $this->assertCount(2, $this->getContainer()->get(\Mautic\PointBundle\Entity\LeadTriggerLogRepository::class)->findAll());
     }
 
     private function createLead(string $email): Lead

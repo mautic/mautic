@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Segment;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
 
-class TableSchemaColumnsCache
+final class TableSchemaColumnsCache
 {
     private array $cache = [];
 

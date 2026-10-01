@@ -8,7 +8,7 @@ use DateTimeInterface;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 
-class InputOptionsDAO
+final class InputOptionsDAO
 {
     /**
      * @var string

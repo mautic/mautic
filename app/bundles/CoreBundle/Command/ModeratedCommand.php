@@ -15,11 +15,11 @@ use Symfony\Component\Lock\Store\RedisStore;
 
 abstract class ModeratedCommand extends Command
 {
-    public const MODE_PID   = 'pid';
+    public const string MODE_PID   = 'pid';
 
-    public const MODE_FLOCK = 'flock';
+    public const string MODE_FLOCK = 'flock';
 
-    public const MODE_REDIS = 'redis';
+    public const string MODE_REDIS = 'redis';
 
     protected $moderationKey;
 

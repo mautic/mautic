@@ -27,7 +27,7 @@ final class NotificationRepositoryTest extends MauticMysqlTestCase
     private function assertDuplicate(bool $expectedIsDuplicate, int $userId, string $deduplicate, \DateTime $from): void
     {
         /** @var NotificationRepository $notificationRepository */
-        $notificationRepository = $this->em->getRepository(Notification::class);
+        $notificationRepository = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class);
         $isDuplicate            = $notificationRepository->isDuplicate($userId, md5($deduplicate), $from);
 
         $this->assertSame($expectedIsDuplicate, $isDuplicate);

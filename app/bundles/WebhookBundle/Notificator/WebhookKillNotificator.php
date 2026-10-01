@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class WebhookKillNotificator
+final readonly class WebhookKillNotificator
 {
     public function __construct(
         private WebhookNotificationSender $sender,

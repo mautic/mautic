@@ -88,7 +88,7 @@ final class ContactTrackerFunctionalLastActiveTest extends MauticMysqlTestCase
 
     private function isLastActiveDateSet(int $id): bool
     {
-        return (bool) $this->em->getRepository(Lead::class)->createQueryBuilder('l')
+        return (bool) $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->createQueryBuilder('l')
             ->select('l.lastActive')
             ->where('l.id = :id')
             ->setParameter('id', $id)

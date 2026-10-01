@@ -9,12 +9,12 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileUploader
+final class FileUploader
 {
     /**
      * @var string[]
      */
-    protected array $imageMimes = [
+    private array $imageMimes = [
         'image/gif',
         'image/jpeg',
         'image/pjpeg',
@@ -27,7 +27,7 @@ class FileUploader
     /**
      * @var string[]
      */
-    protected array $imageExtensions = [
+    private array $imageExtensions = [
         'jpg',
         'jpeg',
         'png',

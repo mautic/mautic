@@ -19,7 +19,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 {
     public function testPreviewPageWithContact(): void
     {
-        $user           = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user           = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         $lead           = $this->createLead();
         $dynamicContent = $this->createDynamicContent($lead);
         $defaultContent = 'Default web content';
@@ -194,7 +194,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $pageId = $page->getId();
 
         // Check public preview with login.
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/'.$pageId);

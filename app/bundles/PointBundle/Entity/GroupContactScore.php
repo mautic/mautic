@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class GroupContactScore extends CommonEntity
 {
-    public const TABLE_NAME = 'point_group_contact_score';
+    public const string TABLE_NAME = 'point_group_contact_score';
 
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'groupScores')]

@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
  * This helper centralizes logic for finding and following chains of redirected events.
  * It also provides methods to handle the replacement of deleted events with their redirects.
  */
-readonly class EventRedirectionHelper
+final readonly class EventRedirectionHelper
 {
     private const int MAX_DEPTH = 20;
 

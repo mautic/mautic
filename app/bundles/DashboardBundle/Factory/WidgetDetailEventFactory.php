@@ -10,7 +10,7 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class WidgetDetailEventFactory
+final readonly class WidgetDetailEventFactory
 {
     public function __construct(
         private TranslatorInterface $translator,

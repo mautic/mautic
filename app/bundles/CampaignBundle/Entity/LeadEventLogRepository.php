@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\ParameterType;
@@ -17,15 +18,15 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 /**
  * @extends CommonRepository<LeadEventLog>
  */
-class LeadEventLogRepository extends CommonRepository
+final class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
 
-    public const LOG_DELETE_BATCH_SIZE = 5000;
+    public const int LOG_DELETE_BATCH_SIZE = 5000;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $alias = $this->getTableAlias();
         $q     = $this
@@ -62,10 +63,8 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @param int|null             $leadId
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getLeadLogs($leadId = null, array $options = [])
+    public function getLeadLogs($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         // add() carries the MySQL index hint, which only Mautic's builder accepts
@@ -411,8 +410,10 @@ class LeadEventLogRepository extends CommonRepository
      * @param int $eventId
      *
      * @throws \Doctrine\ORM\Query\QueryException
+     *
+     * @return Collection<int, LeadEventLog>
      */
-    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter): ArrayCollection
+    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter): Collection
     {
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             return new ArrayCollection();
@@ -455,8 +456,9 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * @throws \Doctrine\ORM\Query\QueryException
+     * @return Collection<int, LeadEventLog>
      */
-    public function getScheduledByIds(array $ids): ArrayCollection
+    public function getScheduledByIds(array $ids): Collection
     {
         $this->getReplicaConnection();
         $q = $this->createQueryBuilder('o');

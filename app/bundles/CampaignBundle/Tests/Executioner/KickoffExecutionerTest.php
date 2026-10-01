@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -89,14 +90,14 @@ final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $event2   = new Event();
         $campaign = new class() extends Campaign {
             /**
-             * @var ArrayCollection<int,Event>
+             * @var Collection<int,Event>
              */
-            public ArrayCollection $rootEvents;
+            public Collection $rootEvents;
 
             /**
-             * @return ArrayCollection<int,Event>
+             * @return Collection<int,Event>
              */
-            public function getRootEvents(): ArrayCollection
+            public function getRootEvents(): Collection
             {
                 return $this->rootEvents;
             }

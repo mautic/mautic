@@ -216,10 +216,7 @@ class Widget extends FormEntity
         return $this->ordering;
     }
 
-    /**
-     * @return array
-     */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -251,10 +248,7 @@ class Widget extends FormEntity
         return $this->template;
     }
 
-    /**
-     * @return array
-     */
-    public function getTemplateData()
+    public function getTemplateData(): array
     {
         return $this->templateData;
     }

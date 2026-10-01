@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
@@ -170,7 +169,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey('score', $responseData);
 
             // Verify the company was actually created in the database
-            $companyRepository = $this->em->getRepository(Company::class);
+            $companyRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
             $company           = $companyRepository->find($responseData['id']);
 
             $this->assertInstanceOf(Company::class, $company);
@@ -421,7 +420,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     protected function markCompanyEmailAsUnique(): void
     {
-        $fieldRepository   = $this->em->getRepository(LeadField::class);
+        $fieldRepository   = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadFieldRepository::class);
         $companyEmailField = $fieldRepository->findOneBy(['alias' => 'companyemail']);
         $this->assertInstanceOf(LeadField::class, $companyEmailField);
         $companyEmailField->setIsUniqueIdentifer(true);
@@ -432,12 +431,12 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
     private function getCompanyRepository(): CompanyRepository
     {
         /** @var CompanyRepository */
-        return $this->em->getRepository(Company::class);
+        return $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
     }
 
     private function getContactRepository(): LeadRepository
     {
         /** @var LeadRepository */
-        return $this->em->getRepository(Lead::class);
+        return $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
     }
 }

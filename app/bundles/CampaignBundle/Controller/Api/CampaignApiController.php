@@ -123,7 +123,7 @@ final class CampaignApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     #[Route(
-        '/api/campaigns/{id}/contact/{leadId}/add',
+        path: '/api/campaigns/{id}/contact/{leadId}/add',
         name: 'mautic_api_campaignaddcontact',
         requirements: ['id' => '\d+', 'leadId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -161,7 +161,7 @@ final class CampaignApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     #[Route(
-        '/api/campaigns/{id}/contact/{leadId}/remove',
+        path: '/api/campaigns/{id}/contact/{leadId}/remove',
         name: 'mautic_api_campaignremovecontact',
         requirements: ['id' => '\d+', 'leadId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -319,7 +319,7 @@ final class CampaignApiController extends CommonApiController
      *
      * @param array $events
      */
-    public function modifyCampaignEventArray($events): array
+    private function modifyCampaignEventArray($events): array
     {
         $updatedEvents = [];
 
@@ -338,7 +338,7 @@ final class CampaignApiController extends CommonApiController
      * Obtains a list of campaign contacts.
      */
     #[Route(
-        '/api/campaigns/{id}/contacts',
+        path: '/api/campaigns/{id}/contacts',
         name: 'mautic_api_campaigngetcontacts',
         requirements: ['id' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -387,7 +387,7 @@ final class CampaignApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/campaigns/clone/{campaignId}',
+        path: '/api/campaigns/clone/{campaignId}',
         name: 'mautic_api_contact_clone_campaign',
         requirements: ['campaignId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -432,7 +432,7 @@ final class CampaignApiController extends CommonApiController
      * Get a list of events.
      */
     #[Route(
-        '/api/campaigns/export/{campaignId}',
+        path: '/api/campaigns/export/{campaignId}',
         name: 'mautic_api_export_campaign',
         requirements: ['campaignId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -464,7 +464,7 @@ final class CampaignApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/campaigns/import',
+        path: '/api/campaigns/import',
         name: 'mautic_api_import_campaign',
         defaults: ['_format' => 'json'],
         methods: ['POST']

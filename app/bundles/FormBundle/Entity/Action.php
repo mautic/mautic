@@ -40,12 +40,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[OwnershipParent('form')]
+#[OwnershipParent(association: 'form')]
 class Action implements UuidInterface
 {
     use UuidTrait;
 
-    public const ENTITY_NAME = 'form_action';
+    public const string ENTITY_NAME = 'form_action';
 
     /**
      * @var int
@@ -194,10 +194,7 @@ class Action implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }

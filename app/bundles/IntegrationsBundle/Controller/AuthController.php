@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AuthController extends CommonController
 {
     #[Route(
-        '/integration/{integration}/callback',
+        path: '/integration/{integration}/callback',
         name: 'mautic_integration_public_callback',
     )]
     public function callbackAction(AuthIntegrationsHelper $authIntegrationsHelper, string $integration, Request $request): Response

@@ -7,12 +7,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<MergeRecord>
  */
-class MergeRecordRepository extends CommonRepository
+final class MergeRecordRepository extends CommonRepository
 {
-    /**
-     * @return Lead|null
-     */
-    public function findMergedContact($id)
+    public function findMergedContact($id): ?Lead
     {
         $record = $this->findOneBy(['mergedId' => (int) $id], ['dateAdded' => 'desc']);
         if ($record instanceof MergeRecord) {

@@ -12,33 +12,27 @@ use Mautic\LeadBundle\Entity\LeadField;
 /**
  * Used to manipulate the schema of an existing table.
  */
-class ColumnSchemaHelper
+final class ColumnSchemaHelper
 {
     /**
      * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected AbstractSchemaManager $sm;
+    private readonly AbstractSchemaManager $sm;
 
     /**
      * @var string
      */
-    protected $tableName;
+    private $tableName;
 
-    /**
-     * @var Table
-     */
-    protected $fromTable;
+    private ?\Doctrine\DBAL\Schema\Table $fromTable = null;
 
-    /**
-     * @var Table
-     */
-    protected $toTable;
+    private ?\Doctrine\DBAL\Schema\Table $toTable = null;
 
     private $columns;
 
     public function __construct(
-        protected Connection $db,
-        protected ?string $prefix,
+        Connection $db,
+        private readonly ?string $prefix,
     ) {
         $this->sm = $db->createSchemaManager();
     }
@@ -72,20 +66,16 @@ class ColumnSchemaHelper
 
     /**
      * Get table details.
-     *
-     * @return Table
      */
-    public function getTable()
+    public function getTable(): ?\Doctrine\DBAL\Schema\Table
     {
         return $this->toTable;
     }
 
     /**
      * Get array of Doctrine\DBAL\Schema\Column instances for the table.
-     *
-     * @return array
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         if (empty($this->columns)) {
             // DBAL 4 hands the columns back as a list, and they are looked up by name here

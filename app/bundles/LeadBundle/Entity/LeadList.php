@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -59,9 +60,9 @@ class LeadList extends FormEntity implements UuidInterface
 
     use ProjectTrait;
 
-    public const TABLE_NAME  = 'lead_lists';
+    public const string TABLE_NAME  = 'lead_lists';
 
-    public const ENTITY_NAME = 'lists';
+    public const string ENTITY_NAME = 'lists';
 
     /**
      * @var int|null
@@ -80,6 +81,7 @@ class LeadList extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'public_name', type: 'string', length: 191)]
     private $publicName;
 
     /**
@@ -98,12 +100,14 @@ class LeadList extends FormEntity implements UuidInterface
      * @var string
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $alias;
 
     /**
      * @var array
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'array')]
     private $filters = [];
 
     /**
@@ -116,6 +120,7 @@ class LeadList extends FormEntity implements UuidInterface
      * @var bool
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'is_preference_center', type: 'boolean')]
     private $isPreferenceCenter = false;
 
     /**
@@ -125,9 +130,11 @@ class LeadList extends FormEntity implements UuidInterface
     private $leads;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'last_built_date', type: 'datetime', nullable: true)]
     private \DateTime|\DateTimeInterface|null $lastBuiltDate = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'last_built_time', type: 'float', nullable: true)]
     private ?float $lastBuiltTime = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
@@ -145,32 +152,10 @@ class LeadList extends FormEntity implements UuidInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('alias', 'string');
-
-        $builder->createField('publicName', 'string')
-            ->columnName('public_name')
-            ->build();
-
         $builder->addCategory();
-
-        $builder->addField('filters', 'array');
 
         $builder->createField('isGlobal', 'boolean')
             ->columnName('is_global')
-            ->build();
-
-        $builder->createField('isPreferenceCenter', 'boolean')
-            ->columnName('is_preference_center')
-            ->build();
-
-        $builder->createField('lastBuiltDate', 'datetime')
-            ->columnName('last_built_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastBuiltTime', 'float')
-            ->columnName('last_built_time')
-            ->nullable()
             ->build();
 
         self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
@@ -383,10 +368,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->alias;
     }
 
-    /**
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getLeads()
+    public function getLeads(): Collection
     {
         return $this->leads;
     }

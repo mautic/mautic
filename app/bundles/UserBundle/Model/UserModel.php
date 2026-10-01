@@ -19,11 +19,13 @@ use Mautic\UserBundle\Entity\UserInviteRepository;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
-use Mautic\UserBundle\Event\UserEvent;
+use Mautic\UserBundle\Event\PostDeleteUserEvent;
+use Mautic\UserBundle\Event\PostSaveUserEvent;
+use Mautic\UserBundle\Event\PreDeleteUserEvent;
+use Mautic\UserBundle\Event\PreSaveUserEvent;
 use Mautic\UserBundle\Exception\PasswordResetTokenCreationFailedException;
 use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
-use Mautic\UserBundle\UserEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
@@ -36,7 +38,7 @@ use Twig\Environment;
 /**
  * @extends FormModel<User>
  */
-class UserModel extends FormModel implements GlobalSearchInterface
+final class UserModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
@@ -48,7 +50,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     private const int INVITE_TOKEN_VERIFIER_BYTES = 32;
 
     public function __construct(
-        protected MailHelper $mailHelper,
+        private readonly MailHelper $mailHelper,
         private readonly UserTokenServiceInterface $userTokenService,
         EntityManagerInterface $em,
         CorePermissions $security,
@@ -81,7 +83,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
@@ -173,28 +175,20 @@ class UserModel extends FormModel implements GlobalSearchInterface
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = UserEvents::USER_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = UserEvents::USER_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = UserEvents::USER_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = UserEvents::USER_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new PreSaveUserEvent($entity, $isNew),
+            'post_save'   => new PostSaveUserEvent($entity, $isNew),
+            'pre_delete'  => new PreDeleteUserEvent($entity, $isNew),
+            'post_delete' => new PostDeleteUserEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (!$event instanceof Event) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new UserEvent($entity, $isNew);
-            }
-            $this->dispatcher->dispatch($event, $name);
+        if ($this->dispatcher->hasListeners($event::class)) {
+            $this->dispatcher->dispatch($event);
 
             return $event;
         }
@@ -207,10 +201,8 @@ class UserModel extends FormModel implements GlobalSearchInterface
      *
      * @param string $type
      * @param int    $limit
-     *
-     * @return array
      */
-    public function getLookupResults($type, ?string $filter = '', int|string|null $limit = 10)
+    public function getLookupResults($type, ?string $filter = '', int|string|null $limit = 10): array
     {
         $results = [];
 
@@ -238,7 +230,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * @return UserToken
      */
-    protected function getResetToken(User $user)
+    private function getResetToken(User $user)
     {
         $userToken = new UserToken();
         $userToken->setUser($user)

@@ -41,7 +41,6 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigSave(ConfigEvent $event): void
     {
-        /** @var array $values */
         $values = $event->getConfig();
 
         // Manipulate the values

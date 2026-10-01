@@ -4,7 +4,7 @@ namespace Mautic\ReportBundle\Event;
 
 use Mautic\ReportBundle\Entity\Report;
 
-class ReportDataEvent extends AbstractReportEvent
+final class ReportDataEvent extends AbstractReportEvent
 {
     private readonly int $totalResults;
 

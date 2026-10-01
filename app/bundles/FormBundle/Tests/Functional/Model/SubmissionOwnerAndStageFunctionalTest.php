@@ -41,8 +41,8 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
         ?string $expectedOwnerUsername = null,
         ?string $expectedStageName = null,
     ): void {
-        $salesUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
-        $adminUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $salesUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'sales']);
+        $adminUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
 
         $stage = new Stage();
         $stage->setName(self::STAGE_NAME);
@@ -59,13 +59,13 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
 
         $expectedOwnerId = null;
         if ($expectedOwnerUsername) {
-            $expectedOwner   = $this->em->getRepository(User::class)->findOneBy(['username' => $expectedOwnerUsername]);
+            $expectedOwner   = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => $expectedOwnerUsername]);
             $expectedOwnerId = $expectedOwner->getId();
         }
 
         $expectedStageId = null;
         if ($expectedStageName) {
-            $expectedStage   = $this->em->getRepository(Stage::class)->findOneBy(['name' => $expectedStageName]);
+            $expectedStage   = $this->getContainer()->get(\Mautic\StageBundle\Entity\StageRepository::class)->findOneBy(['name' => $expectedStageName]);
             $expectedStageId = $expectedStage->getId();
         }
 
@@ -94,7 +94,7 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form, $formValues);
 
-        $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
+        $submissions = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findBy(['form' => $formId]);
         $this->assertCount(1, $submissions, "Submission was not created for test: {$testName}");
 
         /** @var Submission $submission */

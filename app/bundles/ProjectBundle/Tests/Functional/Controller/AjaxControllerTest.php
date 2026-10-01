@@ -71,7 +71,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertCount(
             0,
-            $this->em->getRepository(Project::class)->findAll(),
+            $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findAll(),
             'There should be no projects at the beginning of the test.'
         );
 
@@ -81,7 +81,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertCount(
             1,
-            $this->em->getRepository(Project::class)->findAll(),
+            $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findAll(),
             'There should be 1 project after creating the first one.'
         );
 
@@ -96,7 +96,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertCount(
             1,
-            $this->em->getRepository(Project::class)->findAll(),
+            $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findAll(),
             'There should be still 1 project after an attempt to create a duplicate project.'
         );
 
@@ -111,7 +111,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertCount(
             2,
-            $this->em->getRepository(Project::class)->findAll(),
+            $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findAll(),
             'There should be 2 projects after an attempt to create a unique project.'
         );
     }

@@ -11,8 +11,8 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\Submission;
 
-#[AsDoctrineListener(Events::postPersist)]
-#[AsDoctrineListener(Events::postRemove)]
+#[AsDoctrineListener(event: Events::postPersist)]
+#[AsDoctrineListener(event: Events::postRemove)]
 final readonly class SubmissionSubscriber
 {
     public function __construct(

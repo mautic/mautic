@@ -61,7 +61,7 @@ class FormController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/{objectAction}/{objectId}',
+        path: '/s/forms/{objectAction}/{objectId}',
         name: 'mautic_form_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -72,7 +72,7 @@ class FormController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/{page}',
+        path: '/s/forms/{page}',
         name: 'mautic_form_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -1113,7 +1113,7 @@ class FormController extends CommonFormController
     /**
      * Clear field and actions from the session.
      */
-    public function clearSessionComponents(Request $request, $sessionId): void
+    protected function clearSessionComponents(Request $request, $sessionId): void
     {
         $session = $request->getSession();
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');
@@ -1187,7 +1187,7 @@ class FormController extends CommonFormController
         );
     }
 
-    public function getModelName(): string
+    protected function getModelName(): string
     {
         return 'form';
     }

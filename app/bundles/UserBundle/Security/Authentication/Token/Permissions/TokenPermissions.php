@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-readonly class TokenPermissions
+final readonly class TokenPermissions
 {
     public function __construct(
         private TokenStorageInterface $tokenStorage,

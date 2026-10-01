@@ -7,7 +7,7 @@ namespace Mautic\ConfigBundle\Form\DataTransformer;
 use Mautic\ConfigBundle\Form\Type\EscapeTransformer;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-readonly class DsnTransformerFactory
+final readonly class DsnTransformerFactory
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

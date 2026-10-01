@@ -36,7 +36,7 @@ final class PublicController extends FormController
      * Generates a new password for the user and emails it to them.
      */
     #[Route(
-        '/passwordreset',
+        path: '/passwordreset',
         name: 'mautic_user_passwordreset',
     )]
     public function passwordResetAction(Request $request, LoggerInterface $logger): RedirectResponse|Response
@@ -92,7 +92,7 @@ final class PublicController extends FormController
     }
 
     #[Route(
-        '/passwordresetconfirm',
+        path: '/passwordresetconfirm',
         name: 'mautic_user_passwordresetconfirm',
     )]
     public function passwordResetConfirmAction(Request $request): RedirectResponse|Response
@@ -161,7 +161,7 @@ final class PublicController extends FormController
     }
 
     #[Route(
-        '/invite/{token}',
+        path: '/invite/{token}',
         name: 'mautic_user_invite_register',
     )]
     public function inviteAction(Request $request, UserModel $model, LoggerInterface $logger): RedirectResponse|Response

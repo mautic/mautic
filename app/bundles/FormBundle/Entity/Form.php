@@ -53,9 +53,9 @@ class Form extends FormEntity implements UuidInterface
 
     use ProjectTrait;
 
-    public const ENTITY_NAME = 'forms';
+    public const string ENTITY_NAME = 'forms';
 
-    public const TABLE_NAME  = 'forms';
+    public const string TABLE_NAME  = 'forms';
 
     /**
      * @var int
@@ -136,7 +136,7 @@ class Form extends FormEntity implements UuidInterface
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     #[ORM\OneToMany(targetEntity: Field::class, mappedBy: 'form', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC', 'id' => 'ASC'])]
+    #[ORM\OrderBy(value: ['order' => 'ASC', 'id' => 'ASC'])]
     private $fields;
 
     /**
@@ -144,7 +144,7 @@ class Form extends FormEntity implements UuidInterface
      */
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     #[ORM\OneToMany(targetEntity: Action::class, mappedBy: 'form', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC'])]
+    #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $actions;
 
     /**
@@ -170,7 +170,7 @@ class Form extends FormEntity implements UuidInterface
      */
     #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     #[ORM\OneToMany(targetEntity: Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateSubmitted' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateSubmitted' => 'DESC'])]
     private Collection $submissions;
 
     #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
@@ -542,7 +542,7 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @return Collection<int, Field>
      */
-    public function getFields()
+    public function getFields(): Collection
     {
         return $this->fields;
     }
@@ -666,7 +666,7 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @return Collection<string, Action>
      */
-    public function getActions()
+    public function getActions(): Collection
     {
         return $this->actions;
     }

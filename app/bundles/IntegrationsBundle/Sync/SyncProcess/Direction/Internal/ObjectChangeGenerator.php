@@ -26,7 +26,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
-class ObjectChangeGenerator
+final class ObjectChangeGenerator
 {
     /**
      * @var string[]
@@ -350,7 +350,7 @@ class ObjectChangeGenerator
             $integrationInformationChangeRequest->getNewValue()->getOriginalValue()
         );
 
-        $deduplicateValue = static::class.'-'.
+        $deduplicateValue = self::class.'-'.
             $integrationInformationChangeRequest->getIntegration().'-'.
             $fieldMappingDAO->getInternalObject().'-'.
             $integrationInformationChangeRequest->getField();

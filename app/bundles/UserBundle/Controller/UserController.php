@@ -55,7 +55,7 @@ final class UserController extends FormController
     }
 
     #[Route(
-        '/s/users/{objectAction}/{objectId}',
+        path: '/s/users/{objectAction}/{objectId}',
         name: 'mautic_user_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -69,7 +69,7 @@ final class UserController extends FormController
      * Generate's default user list.
      */
     #[Route(
-        '/s/users/{page}',
+        path: '/s/users/{page}',
         name: 'mautic_user_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

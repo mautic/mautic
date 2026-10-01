@@ -39,7 +39,7 @@ final class PublicController extends AbstractFormController
      * @throws ORMException
      */
     #[Route(
-        '/asset/{slug}',
+        path: '/asset/{slug}',
         name: 'mautic_asset_download',
         defaults: ['slug' => ''],
     )]

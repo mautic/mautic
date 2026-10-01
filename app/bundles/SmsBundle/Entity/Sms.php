@@ -70,7 +70,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     use TranslationEntityTrait;
     use VariantEntityTrait;
 
-    public const TABLE_NAME = 'sms_messages';
+    public const string TABLE_NAME = 'sms_messages';
 
     /**
      * @var int
@@ -409,7 +409,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     /**
      * @return Collection<int, LeadList>
      */
-    public function getLists()
+    public function getLists(): Collection
     {
         return $this->lists;
     }
@@ -427,9 +427,9 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     }
 
     /**
-     * @return ArrayCollection<int, Stat>
+     * @return Collection<int, Stat>
      */
-    public function getStats()
+    public function getStats(): Collection
     {
         return $this->stats;
     }

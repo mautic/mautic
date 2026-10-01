@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -48,7 +49,7 @@ class Trigger extends FormEntity implements UuidInterface
     use UuidTrait;
     use ProjectTrait;
 
-    public const ENTITY_NAME = 'point_trigger';
+    public const string ENTITY_NAME = 'point_trigger';
 
     /**
      * @var int
@@ -110,7 +111,7 @@ class Trigger extends FormEntity implements UuidInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
     #[ORM\OneToMany(targetEntity: TriggerEvent::class, mappedBy: 'trigger', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC'])]
+    #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $events;
 
     #[Groups(['trigger:read', 'trigger:write'])]
@@ -264,10 +265,7 @@ class Trigger extends FormEntity implements UuidInterface
         $this->events->removeElement($event);
     }
 
-    /**
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getEvents()
+    public function getEvents(): Collection
     {
         return $this->events;
     }

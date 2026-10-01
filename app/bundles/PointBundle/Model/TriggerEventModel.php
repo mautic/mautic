@@ -13,7 +13,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonFormModel<TriggerEvent>
  */
-class TriggerEventModel extends CommonFormModel
+final class TriggerEventModel extends CommonFormModel
 {
     public static function getName(): string
     {

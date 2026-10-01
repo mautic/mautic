@@ -51,7 +51,7 @@ final class AssetDownloadFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var DownloadRepository $downloadRepo */
-        $downloadRepo = $this->em->getRepository(Download::class);
+        $downloadRepo = $this->getContainer()->get(\Mautic\AssetBundle\Entity\DownloadRepository::class);
 
         $countByPages = $downloadRepo->getDownloadCountsByPage([$pageA->getId(), $pageB->getId()]);
 
@@ -80,7 +80,7 @@ final class AssetDownloadFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var DownloadRepository $downloadRepo */
-        $downloadRepo = $this->em->getRepository(Download::class);
+        $downloadRepo = $this->getContainer()->get(\Mautic\AssetBundle\Entity\DownloadRepository::class);
 
         $countByPages = $downloadRepo->getDownloadCountsByEmail([$emailA->getId(), $emailB->getId()]);
 

@@ -133,7 +133,7 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         // Verify in database that only one project exists with the updated data
         $this->em->clear();
-        $projects = $this->em->getRepository(Project::class)->findAll();
+        $projects = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findAll();
         $this->assertCount(1, $projects, 'Should only have one project in database after PUT');
         $this->assertSame($originalId, $projects[0]->getId());
         $this->assertSame('Updated Project', $projects[0]->getName());
@@ -195,7 +195,7 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         // Verify project was created in database
         $this->em->clear();
-        $project = $this->em->getRepository(Project::class)->find($response['id']);
+        $project = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->find($response['id']);
         $this->assertInstanceOf(Project::class, $project);
         $this->assertSame('New Project', $project->getName());
     }
@@ -249,7 +249,7 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         // Verify in database that the description was actually cleared
         $this->em->clear();
-        $updatedProject = $this->em->getRepository(Project::class)->find($originalId);
+        $updatedProject = $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->find($originalId);
         $this->assertInstanceOf(Project::class, $updatedProject);
         $this->assertSame('Updated Project Name Only', $updatedProject->getName());
         $this->assertNull($updatedProject->getDescription(), 'Description should be cleared in database');

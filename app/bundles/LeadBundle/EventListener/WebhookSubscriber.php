@@ -137,7 +137,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
 
         $changes = $lead->getChanges(true);
 
-        if (empty($changes)) {
+        if ($changes === []) {
             return;
         }
 

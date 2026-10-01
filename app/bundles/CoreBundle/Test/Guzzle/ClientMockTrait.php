@@ -10,9 +10,6 @@ trait ClientMockTrait
 {
     private function getClientMockHandler(): MockHandler
     {
-        $clientMockHandler = static::getContainer()->get(MockHandler::class);
-        \assert($clientMockHandler instanceof MockHandler);
-
-        return $clientMockHandler;
+        return static::getContainer()->get(MockHandler::class);
     }
 }

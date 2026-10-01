@@ -74,12 +74,14 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var bool
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: '`system`', type: Types::BOOLEAN)]
     private $system = false;
 
     /**
      * @var string
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $source;
 
     /**
@@ -122,6 +124,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var array|null
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private $settings = [];
 
     /**
@@ -130,6 +133,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @ApiProperty(readable=true)
      */
     #[Groups(['report:read', 'report:write'])]
+    #[ORM\Column(name: 'is_scheduled', type: Types::BOOLEAN)]
     private $isScheduled = false;
 
     /**
@@ -172,10 +176,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('system', Types::BOOLEAN, ['columnName'=>'`system`']);
-
-        $builder->addField('source', Types::STRING);
-
         $builder->createField('columns', ArrayType::ARRAY)
             ->nullable()
             ->build();
@@ -201,15 +201,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $builder->createField('aggregators', ArrayType::ARRAY)
             ->columnName('aggregators')
             ->nullable()
-            ->build();
-
-        $builder->createField('settings', Types::JSON)
-            ->columnName('settings')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isScheduled', Types::BOOLEAN)
-            ->columnName('is_scheduled')
             ->build();
 
         $builder->addNullableField('scheduleUnit', Types::STRING, 'schedule_unit');
@@ -337,7 +328,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }
@@ -356,7 +347,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return $this->filters;
     }
@@ -423,7 +414,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getTableOrder()
+    public function getTableOrder(): array
     {
         return $this->tableOrder;
     }
@@ -438,7 +429,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getGraphs()
+    public function getGraphs(): array
     {
         return $this->graphs;
     }
@@ -451,9 +442,9 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array<array-key, mixed>
+     * @return array<string, mixed>
      */
-    public function getGroupBy()
+    public function getGroupBy(): array
     {
         return $this->groupBy;
     }
@@ -468,7 +459,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getAggregators()
+    public function getAggregators(): array
     {
         return $this->aggregators;
     }

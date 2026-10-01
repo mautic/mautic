@@ -7,7 +7,7 @@ use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Exception\FileIOException;
 
-readonly class ReportFileWriter
+final readonly class ReportFileWriter
 {
     public function __construct(
         private CsvExporter $csvExporter,

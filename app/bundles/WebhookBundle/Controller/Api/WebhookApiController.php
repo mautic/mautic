@@ -89,7 +89,7 @@ final class WebhookApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/hooks/triggers',
+        path: '/api/hooks/triggers',
         name: 'mautic_api_webhookevents',
         defaults: ['_format' => 'json'],
         methods: ['GET']

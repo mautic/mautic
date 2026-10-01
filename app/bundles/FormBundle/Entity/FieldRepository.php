@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 /**
  * @extends CommonRepository<Field>
  */
-class FieldRepository extends CommonRepository
+final class FieldRepository extends CommonRepository
 {
     public function fieldExistsByFormAndType(int $formId, string $type): bool
     {

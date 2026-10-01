@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Integration>
  */
-class IntegrationRepository extends CommonRepository
+final class IntegrationRepository extends CommonRepository
 {
     /**
      * @return mixed[]

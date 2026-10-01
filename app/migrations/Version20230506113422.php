@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20230506113422 extends PreUpAssertionMigration
 {
-    public function preUpAssertions(): void
+    protected function preUpAssertions(): void
     {
         $this->skipAssertion(fn (Schema $schema) => $schema->getTable($this->getTableName())->hasIndex($this->getIndexName()), sprintf('The index "%s" has already been added to the table "%s".', $this->getIndexName(), $this->getTableName()));
     }

@@ -15,7 +15,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonRepository<Company>
  */
-class CompanyRepository extends CommonRepository implements CustomFieldRepositoryInterface
+final class CompanyRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
     use CustomFieldRepositoryTrait;
     use ProjectRepositoryTrait;
@@ -80,10 +80,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get a list of leads.
-     *
-     * @return array
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         return $this->getEntitiesWithCustomFields('company', $args);
     }
@@ -98,14 +96,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * @param mixed[] $args
-     *
-     * @return QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order, array $args=[])
+    public function getEntitiesOrmQueryBuilder($order, array $args=[]): QueryBuilder
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
+        $q = $this->createQueryBuilder($this->getTableAlias(), $this->getTableAlias().'.id');
         $q->select($this->getTableAlias().','.$order)
-            ->from(Company::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->andWhere($q->expr()->isNull($this->getTableAlias().'.deleted'));
 
         return $q;
@@ -228,10 +223,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * @param string $id
-     *
-     * @return array|mixed
      */
-    public function getCompanies(bool $user = false, $id = '')
+    public function getCompanies(bool $user = false, $id = ''): array
     {
         $q                = $this->getEntityManager()->getConnection()->createQueryBuilder();
         static $companies = [];
@@ -275,7 +268,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @return array
      */
-    public function getLeadCount($companyIds)
+    public function getLeadCount($companyIds): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -310,10 +303,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get a list of lists.
-     *
-     * @return array
      */
-    public function identifyCompany($companyName, $city = null, $country = null, $state = null)
+    public function identifyCompany($companyName, $city = null, $country = null, $state = null): ?array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if (empty($companyName)) {
@@ -404,10 +395,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @param int $limit
      * @param int $offset
-     *
-     * @return mixed
      */
-    public function getMostCompanies($query, $limit = 10, $offset = 0)
+    public function getMostCompanies($query, $limit = 10, $offset = 0): array
     {
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -541,9 +530,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $companies[(int) $r['id']] = $r;
         }
 
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->select('c')
-            ->from(Company::class, 'c');
+        $q = $this->createQueryBuilder('c');
 
         $q->where(
             $q->expr()->in('c.id', ':ids')

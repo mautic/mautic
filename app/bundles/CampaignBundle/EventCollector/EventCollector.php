@@ -10,7 +10,7 @@ use Mautic\CampaignBundle\EventCollector\Builder\ConnectionBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EventCollector
+final class EventCollector
 {
     private array $eventsArray = [];
 

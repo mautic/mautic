@@ -3,7 +3,6 @@
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -11,17 +10,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 final class NotificationRepository extends CommonRepository
 {
-    /**
-     * Get a list of entities.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('e')
-            ->from(Notification::class, 'e', 'e.id');
+        $q = $this->createQueryBuilder('e', 'e.id');
         if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
@@ -33,14 +24,11 @@ final class NotificationRepository extends CommonRepository
 
     /**
      * Get amounts of sent and read notifications.
-     *
-     * @return array
      */
-    public function getSentReadCount()
+    public function getSentReadCount(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
-        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
-            ->from(Notification::class, 'e');
+        $q = $this->createQueryBuilder('e');
+        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         $results['sent_count'] ??= 0;

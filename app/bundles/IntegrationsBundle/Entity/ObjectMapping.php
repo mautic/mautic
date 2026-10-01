@@ -254,10 +254,7 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getInternalStorage()
+    public function getInternalStorage(): array
     {
         return $this->internalStorage;
     }

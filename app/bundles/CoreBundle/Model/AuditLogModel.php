@@ -10,7 +10,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends AbstractCommonModel<AuditLog>
  */
-class AuditLogModel extends AbstractCommonModel
+final class AuditLogModel extends AbstractCommonModel
 {
     public static function getName(): string
     {

@@ -24,7 +24,7 @@ final class TriggerEventController extends CommonFormController
     }
 
     #[Route(
-        '/s/points/triggers/events/{objectAction}/{objectId}',
+        path: '/s/points/triggers/events/{objectAction}/{objectId}',
         name: 'mautic_pointtriggerevent_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

@@ -86,11 +86,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     use ProjectTrait;
     use OptimisticLockTrait;
 
-    public const ENTITY_NAME = 'email';
+    public const string ENTITY_NAME = 'email';
 
-    public const MAX_NAME_SUBJECT_LENGTH = 190;
+    public const int MAX_NAME_SUBJECT_LENGTH = 190;
 
-    public const TABLE_NAME = 'emails';
+    public const string TABLE_NAME = 'emails';
 
     private const string SETTINGS_PREFIX = 'settings_';
 
@@ -925,7 +925,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return Collection<int, LeadList>
      */
-    public function getLists()
+    public function getLists(): Collection
     {
         return $this->lists;
     }
@@ -1025,9 +1025,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return ArrayCollection<int, Stat>
+     * @return Collection<int, Stat>
      */
-    public function getStats()
+    public function getStats(): Collection
     {
         return $this->stats;
     }
@@ -1114,10 +1114,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->assetAttachments->removeElement($asset);
     }
 
-    /**
-     * @return Collection
-     */
-    public function getAssetAttachments()
+    public function getAssetAttachments(): Collection
     {
         return $this->assetAttachments;
     }

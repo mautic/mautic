@@ -184,6 +184,7 @@ final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
     #[TestDox('The string is parsed correctly into a choice array')]
     public function testLabelValuePairsAreFlattenedWithOptGroup(): void
     {
+        $array              = [];
         $array['optGroup1'] = [
             [
                 'label' => 'label1',

@@ -23,7 +23,7 @@ use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class ContactObjectHelper implements ObjectHelperInterface
+final class ContactObjectHelper implements ObjectHelperInterface
 {
     private ?array $availableFields = null;
 

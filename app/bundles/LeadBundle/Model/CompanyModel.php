@@ -90,7 +90,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @param Company $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         // Update leads primary company name
         $this->setEntityDefaultValues($entity, 'company');
@@ -164,10 +164,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return parent::getEntity($id);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getUserCompanies()
+    public function getUserCompanies(): array
     {
         $user = (!$this->security->isGranted('lead:leads:viewother')) ?
             $this->userHelper->getUser() : false;
@@ -263,7 +260,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array|Company $companies
+     * @param array|int|Company $companies
      * @param array|Lead    $lead
      *
      * @throws \Doctrine\ORM\Exception\ORMException
@@ -646,10 +643,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Company Merge function, will merge $mainCompany with $secCompany -  empty records from main company will be
      * filled with secondary then secondary will be deleted.
-     *
-     * @return mixed
      */
-    public function companyMerge($mainCompany, object $secCompany)
+    public function companyMerge(Company $mainCompany, Company $secCompany): Company
     {
         $this->logger->debug('COMPANY: Merging companies');
 

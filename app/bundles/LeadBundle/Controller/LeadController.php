@@ -149,7 +149,7 @@ final class LeadController extends FormController
     }
 
     #[Route(
-        '/s/contacts/{objectAction}/{objectId}',
+        path: '/s/contacts/{objectAction}/{objectId}',
         name: 'mautic_contact_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -163,7 +163,7 @@ final class LeadController extends FormController
      * @param int $page
      */
     #[Route(
-        '/s/contacts/{page}',
+        path: '/s/contacts/{page}',
         name: 'mautic_contact_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -496,7 +496,7 @@ final class LeadController extends FormController
         }
 
         $fields            = $lead->getFields();
-        $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
+        $socialProfiles    = $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
         $companies     = $this->companyRepository->getCompaniesByLeadId($objectId);
@@ -2269,6 +2269,7 @@ final class LeadController extends FormController
                 '%total%' => number_format($totalContacts),
             ];
             $this->addFlashMessage('mautic.lead.export.limit.exceeded', $messageVars, FlashBag::LEVEL_ERROR);
+            $response            = [];
             $response['message'] = $this->translator->trans('mautic.lead.export.limit.exceeded', $messageVars, 'flashes');
             $response['flashes'] = $this->getFlashContent();
 
@@ -2286,6 +2287,7 @@ final class LeadController extends FormController
         );
         $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 
+        $details          = [];
         $details['total'] = $iterator->getTotal();
         $details['args']  = $iterator->getArgs();
 
@@ -2298,7 +2300,7 @@ final class LeadController extends FormController
     }
 
     #[Route(
-        '/s/contacts/contact/export/{contactId}',
+        path: '/s/contacts/contact/export/{contactId}',
         name: 'mautic_contact_export_action',
         requirements: ['contactId' => '\d+'],
     )]
@@ -2326,6 +2328,7 @@ final class LeadController extends FormController
         }
 
         $contactFields = $lead->getProfileFields();
+        $args          = [];
         $args[]        = [
             'lead'          => $contactId,
             'dataType'      => $dataType,
@@ -2348,7 +2351,7 @@ final class LeadController extends FormController
     }
 
     #[Route(
-        '/s/contacts/export/download/{fileName}',
+        path: '/s/contacts/export/download/{fileName}',
         name: 'mautic_contact_export_download',
     )]
     public function downloadExportAction(string $fileName = ''): Response
@@ -2381,6 +2384,7 @@ final class LeadController extends FormController
         );
 
         $this->addFlashMessage('mautic.lead.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
+        $response            = [];
         $response['message'] = 'Contact export scheduled for CSV file type.';
         $response['flashes'] = $this->getFlashContent();
 
@@ -2391,7 +2395,7 @@ final class LeadController extends FormController
      * Loads a specific lead statistic info.
      */
     #[Route(
-        '/s/contacts/view/{objectId}/stats',
+        path: '/s/contacts/view/{objectId}/stats',
         name: 'mautic_contact_stats',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

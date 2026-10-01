@@ -18,25 +18,15 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ContactMerger
+final readonly class ContactMerger
 {
-    /**
-     * @var Lead
-     */
-    protected $winner;
-
-    /**
-     * @var Lead
-     */
-    protected $loser;
-
     public function __construct(
-        protected LeadModel $leadModel,
-        protected MergeRecordRepository $repo,
-        protected EventDispatcherInterface $dispatcher,
-        protected LoggerInterface $logger,
-        protected CompanyLeadRepository $companyLeadRepository,
-        private readonly LeadRepository $leadRepository,
+        private LeadModel $leadModel,
+        private MergeRecordRepository $repo,
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private CompanyLeadRepository $companyLeadRepository,
+        private LeadRepository $leadRepository,
     ) {
     }
 

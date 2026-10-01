@@ -86,7 +86,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
         $this->assertSame($this->expectedPngContent, $content);
 
-        $downloadRepo = $this->em->getRepository(Download::class);
+        $downloadRepo = $this->getContainer()->get(\Mautic\AssetBundle\Entity\DownloadRepository::class);
 
         $download = $downloadRepo->findOneBy(['asset' => $this->asset]);
         $this->assertInstanceOf(Download::class, $download);

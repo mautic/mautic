@@ -7,14 +7,14 @@ use Doctrine\Common\Collections\Order;
 /**
  * @extends CommonRepository<Notification>
  */
-class NotificationRepository extends CommonRepository
+final class NotificationRepository extends CommonRepository
 {
     public function getTableAlias(): string
     {
         return 'n';
     }
 
-    public function getDefaultOrder(): array
+    protected function getDefaultOrder(): array
     {
         return [
             ['n.dateAdded', 'DESC'],
@@ -64,10 +64,7 @@ class NotificationRepository extends CommonRepository
         }
     }
 
-    /**
-     * @return mixed|null
-     */
-    public function getUpstreamLastDate()
+    public function getUpstreamLastDate(): ?\DateTimeInterface
     {
         $qb = $this->createQueryBuilder('n')
             ->select('partial n.{id, dateAdded}')

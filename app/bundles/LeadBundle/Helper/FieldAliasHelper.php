@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 
-readonly class FieldAliasHelper
+final readonly class FieldAliasHelper
 {
     public function __construct(
         private FieldModel $fieldModel,

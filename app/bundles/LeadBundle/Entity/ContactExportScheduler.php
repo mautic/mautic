@@ -24,6 +24,7 @@ class ContactExportScheduler
     private ?User $user = null; // Created by
 
     #[Assert\NotBlank()]
+    #[ORM\Column(name: 'scheduled_datetime', type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $scheduledDateTime;
 
     /**
@@ -45,9 +46,6 @@ class ContactExportScheduler
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->addId();
-        $builder->createField('scheduledDateTime', Types::DATETIME_IMMUTABLE)
-            ->columnName('scheduled_datetime')
-            ->build();
         $builder->addNullableField('data', ArrayType::ARRAY);
     }
 

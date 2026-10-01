@@ -137,7 +137,7 @@ final class AjaxController extends CommonAjaxController
      * Ajax submit for forms.
      */
     #[Route(
-        '/form/submit/ajax',
+        path: '/form/submit/ajax',
         name: 'mautic_form_postresults_ajax',
     )]
     public function submitAction(Request $request): JsonResponse

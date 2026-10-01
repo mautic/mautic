@@ -81,7 +81,7 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($permission);
         $this->em->flush();
 
-        $rolesBefore = $this->em->getRepository(Role::class)->count([]);
+        $rolesBefore = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->count([]);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/roles/clone/'.$role->getId());
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
@@ -97,10 +97,10 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($newName, (string) $this->client->getResponse()->getContent());
         $this->assertStringContainsString('Original Description', (string) $this->client->getResponse()->getContent());
 
-        $rolesAfterCount = $this->em->getRepository(Role::class)->count([]);
+        $rolesAfterCount = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->count([]);
         $this->assertSame($rolesBefore + 1, $rolesAfterCount);
 
-        $clonedRole = $this->em->getRepository(Role::class)->findOneBy(['name' => $newName]);
+        $clonedRole = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->findOneBy(['name' => $newName]);
         $this->assertInstanceOf(Role::class, $clonedRole);
         $this->assertSame(['view', 'edit'], $clonedRole->getRawPermissions()['user:roles']);
     }
@@ -112,7 +112,7 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $rolesBefore = $this->em->getRepository(Role::class)->count([]);
+        $rolesBefore = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->count([]);
         $crawler     = $this->client->request(Request::METHOD_GET, '/s/roles/clone/'.$role->getId());
         $form        = $crawler->selectButton('role[buttons][apply]')->form();
         $form[self::ROLE_NAME_FIELD]->setValue('');
@@ -120,7 +120,7 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertSame($rolesBefore, $this->em->getRepository(Role::class)->count([]));
+        $this->assertSame($rolesBefore, $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->count([]));
         $this->assertGreaterThan(0, $this->client->getCrawler()->selectButton('role[buttons][apply]')->count());
     }
 
@@ -131,14 +131,14 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($role);
         $this->em->flush();
 
-        $rolesBefore = $this->em->getRepository(Role::class)->count([]);
+        $rolesBefore = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->count([]);
         $crawler     = $this->client->request(Request::METHOD_GET, '/s/roles/clone/'.$role->getId());
         $cancelButton = $crawler->selectButton('role[buttons][cancel]');
 
         $this->client->submit($cancelButton->form());
 
         $this->assertResponseIsSuccessful();
-        $this->assertSame($rolesBefore, $this->em->getRepository(Role::class)->count([]));
+        $this->assertSame($rolesBefore, $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->count([]));
     }
 
     public function testCloneRoleActionReportsMissingRole(): void
@@ -186,7 +186,7 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->assertResponseIsSuccessful();
-        $this->assertInstanceOf(Role::class, $this->em->getRepository(Role::class)->find($targetRole->getId()));
+        $this->assertInstanceOf(Role::class, $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->find($targetRole->getId()));
     }
 
     public function testIndexActionCanSortByUserCount(): void

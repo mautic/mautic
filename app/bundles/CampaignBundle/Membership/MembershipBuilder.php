@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MembershipBuilder
+final class MembershipBuilder
 {
     private ?Campaign $campaign = null;
 

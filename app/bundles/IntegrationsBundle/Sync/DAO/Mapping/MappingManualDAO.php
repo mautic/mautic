@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
-class MappingManualDAO
+final class MappingManualDAO
 {
     private array $objectsMapping = [];
 

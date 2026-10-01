@@ -25,20 +25,17 @@ final class IconEvent extends Event
     }
 
     /**
-     * @param string $type
      * @param string $icon
      */
-    public function addIcon($type, $icon): void
+    public function addIcon(string $type, $icon): void
     {
         $this->icons[$type] = $icon;
     }
 
     /**
      * Return the icons.
-     *
-     * @return array
      */
-    public function getIcons()
+    public function getIcons(): array
     {
         return $this->icons;
     }

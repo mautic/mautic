@@ -5,52 +5,34 @@ namespace Mautic\CoreBundle\Doctrine\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Index\IndexedColumn;
-use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\TextType;
 use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 
-class IndexSchemaHelper
+final class IndexSchemaHelper
 {
     /**
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    protected \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
+    private readonly \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
+
+    private ?\Doctrine\DBAL\Schema\Table $table = null;
 
     /**
-     * @var \Doctrine\DBAL\Schema\Schema
+     * @var string[]
      */
-    protected $schema;
+    private array $allowedColumns = [];
 
-    /**
-     * @var Table
-     */
-    protected $table;
+    private array $changedIndexes = [];
 
-    /**
-     * @var array
-     */
-    protected $allowedColumns = [];
+    private array $addedIndexes = [];
 
-    /**
-     * @var array
-     */
-    protected $changedIndexes = [];
-
-    /**
-     * @var array
-     */
-    protected $addedIndexes = [];
-
-    /**
-     * @var array
-     */
-    protected $dropIndexes = [];
+    private array $dropIndexes = [];
 
     public function __construct(
-        protected Connection $db,
-        protected ?string $prefix,
+        private readonly Connection $db,
+        private readonly ?string $prefix,
     ) {
         $this->sm = $this->db->createSchemaManager();
     }
@@ -80,7 +62,7 @@ class IndexSchemaHelper
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function addIndex($columns, $name, $options = []): static
+    public function addIndex(string|array $columns, $name, $options = []): static
     {
         $textColumns = $this->getTextColumns($columns);
 
@@ -102,13 +84,11 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param mixed  $columns
      * @param string $name
      * @param array  $options
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function dropIndex($columns, $name, $options = []): static
+    public function dropIndex(string|array $columns, $name, $options = []): static
     {
         $textColumns = $this->getTextColumns($columns);
 
@@ -190,11 +170,11 @@ class IndexSchemaHelper
     }
 
     /**
-     * @param mixed $columns
+     * @param string|string[] $columns
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    private function getTextColumns($columns): array
+    private function getTextColumns(string|array $columns): array
     {
         if (!is_array($columns)) {
             $columns = [$columns];

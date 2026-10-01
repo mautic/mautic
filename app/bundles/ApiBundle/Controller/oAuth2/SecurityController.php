@@ -12,7 +12,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 final class SecurityController extends CommonController
 {
     #[Route(
-        '/oauth/v2/authorize_login',
+        path: '/oauth/v2/authorize_login',
         name: 'mautic_oauth2_server_auth_login',
         methods: ['GET', 'POST'],
     )]
@@ -52,7 +52,7 @@ final class SecurityController extends CommonController
     }
 
     #[Route(
-        '/oauth/v2/authorize_login_check',
+        path: '/oauth/v2/authorize_login_check',
         name: 'mautic_oauth2_server_auth_login_check',
         methods: ['GET', 'POST'],
     )]

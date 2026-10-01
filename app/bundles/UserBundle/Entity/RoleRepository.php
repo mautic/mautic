@@ -10,14 +10,9 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 /**
  * @extends CommonRepository<Role>
  */
-class RoleRepository extends CommonRepository
+final class RoleRepository extends CommonRepository
 {
-    /**
-     * Get a list of roles.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->createQueryBuilder('r');
         $q->select('r');
@@ -58,10 +53,9 @@ class RoleRepository extends CommonRepository
      */
     public function getRoleList(?string $search = '', int $limit = 10, int $start = 0): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
+        $q = $this->createQueryBuilder('r');
 
-        $q->select('partial r.{id, name}')
-            ->from(Role::class, 'r');
+        $q->select('partial r.{id, name}');
 
         if (!empty($search)) {
             $q->where('r.name LIKE :search')
@@ -124,12 +118,7 @@ class RoleRepository extends CommonRepository
         ];
     }
 
-    /**
-     * Get a count of users that belong to the role.
-     *
-     * @return array
-     */
-    public function getUserCount($roleIds)
+    public function getUserCount($roleIds): mixed
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

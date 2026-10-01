@@ -20,22 +20,22 @@ class DoNotContact
     /**
      * Lead is contactable.
      */
-    public const IS_CONTACTABLE = 0;
+    public const int IS_CONTACTABLE = 0;
 
     /**
      * Lead unsubscribed themselves.
      */
-    public const UNSUBSCRIBED = 1;
+    public const int UNSUBSCRIBED = 1;
 
     /**
      * Lead was unsubscribed due to an unsuccessful send.
      */
-    public const BOUNCED = 2;
+    public const int BOUNCED = 2;
 
     /**
      * Lead was manually unsubscribed by user.
      */
-    public const MANUAL = 3;
+    public const int MANUAL = 3;
 
     /**
      * @var int
@@ -57,16 +57,19 @@ class DoNotContact
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $reason = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $comments;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
     private $channelId;
@@ -79,17 +82,7 @@ class DoNotContact
 
         $builder->addDateAdded();
 
-        $builder->createField('reason', 'smallint')
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->build();
-
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
-
-        $builder->createField('comments', 'text')
-            ->nullable()
-            ->build();
     }
 
     /**

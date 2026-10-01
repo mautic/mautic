@@ -49,7 +49,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 )]
 class Webhook extends FormEntity implements SkipModifiedInterface
 {
-    public const LOGS_DISPLAY_LIMIT = 100;
+    public const int LOGS_DISPLAY_LIMIT = 100;
 
     /**
      * @var ?int
@@ -82,6 +82,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ?string
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $secret;
 
     /**
@@ -101,7 +102,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ArrayCollection<int, Log>
      */
     #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'webhook', cascade: ['persist', 'detach'], fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateAdded' => Order::Descending->value])]
+    #[ORM\OrderBy(value: ['dateAdded' => Order::Descending->value])]
     private $logs;
 
     /**
@@ -159,7 +160,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         $builder->addCategory();
 
         $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
-        $builder->addField('secret', Types::STRING);
         $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
         $builder->addNullableField('markedUnhealthyAt', Types::DATETIME_IMMUTABLE, 'marked_unhealthy_at');
         $builder->addNullableField('unHealthySince', Types::DATETIME_IMMUTABLE, 'unhealthy_since');
@@ -290,7 +290,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @return Collection<int, Event>
      */
-    public function getEvents()
+    public function getEvents(): Collection
     {
         return $this->events;
     }
@@ -406,9 +406,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * Get log entities.
      *
-     * @return ArrayCollection<int,Log>
+     * @return Collection<int,Log>
      */
-    public function getLogs()
+    public function getLogs(): Collection
     {
         return $this->logs;
     }

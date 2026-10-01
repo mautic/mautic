@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;
 
-class IntegrationHelper
+final class IntegrationHelper
 {
     /**
      * @var array<string, mixed>
@@ -44,12 +44,12 @@ class IntegrationHelper
 
     public function __construct(
         private readonly ContainerInterface $container,
-        protected EntityManagerInterface $em,
-        protected PathsHelper $pathsHelper,
-        protected BundleHelper $bundleHelper,
-        protected CoreParametersHelper $coreParametersHelper,
-        protected Environment $twig,
-        protected PluginModel $pluginModel,
+        private readonly EntityManagerInterface $em,
+        private readonly PathsHelper $pathsHelper,
+        private readonly BundleHelper $bundleHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Environment $twig,
+        private readonly PluginModel $pluginModel,
         private readonly IntegrationRepository $integrationRepository,
         private readonly LeadRepository $leadRepository,
     ) {
@@ -399,10 +399,8 @@ class IntegrationHelper
      * @param string $specificIntegration
      * @param bool   $persistLead
      * @param bool   $returnSettings
-     *
-     * @return array
      */
-    public function getUserProfiles(object $lead, $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false)
+    public function getUserProfiles(object $lead, $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false): array
     {
         $socialCache     = $lead->getSocialCache();
         $featureSettings = [];
@@ -472,10 +470,8 @@ class IntegrationHelper
 
     /**
      * @param bool $integration
-     *
-     * @return array
      */
-    public function clearIntegrationCache(object $lead, $integration = false)
+    public function clearIntegrationCache(object $lead, $integration = false): array
     {
         $socialCache = $lead->getSocialCache();
         if (!empty($integration)) {

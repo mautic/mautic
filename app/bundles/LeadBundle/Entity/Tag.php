@@ -57,6 +57,7 @@ class Tag implements UuidInterface
      * @var string
      */
     #[Groups(['leadfield:read', 'leadfield:write'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $tag;
 
     /**
@@ -77,7 +78,6 @@ class Tag implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addId();
-        $builder->addField('tag', Types::STRING);
         $builder->addNamedField('description', Types::TEXT, 'description', true);
     }
 

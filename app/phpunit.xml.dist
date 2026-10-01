@@ -2,7 +2,7 @@
 <!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     colors="true"
-    bootstrap="../vendor/autoload.php"
+    bootstrap="tests/bootstrap.php"
     xsi:noNamespaceSchemaLocation="../vendor/phpunit/phpunit/phpunit.xsd"
     failOnRisky="true"
     failOnWarning="true"

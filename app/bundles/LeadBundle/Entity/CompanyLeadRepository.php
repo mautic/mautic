@@ -10,11 +10,11 @@ use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 /**
  * @extends CommonRepository<CompanyLead>
  */
-class CompanyLeadRepository extends CommonRepository
+final class CompanyLeadRepository extends CommonRepository
 {
-    public const DELETE_BATCH_SIZE = 1000;
+    public const int DELETE_BATCH_SIZE = 1000;
 
-    public const BATCH_SIZE        = 5000;
+    public const int BATCH_SIZE        = 5000;
 
     /**
      * @param CompanyLead[] $entities
@@ -151,10 +151,7 @@ class CompanyLeadRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return array
-     */
-    public function getLatestCompanyForLead($leadId)
+    public function getLatestCompanyForLead($leadId): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -192,10 +189,8 @@ class CompanyLeadRepository extends CommonRepository
 
     public function getEntitiesByLead(Lead $lead): array
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select('cl')
-            ->from(CompanyLead::class, 'cl')
-            ->where(
+        $qb = $this->createQueryBuilder('cl');
+        $qb->where(
                 $qb->expr()->eq('cl.lead', ':lead')
             )->setParameter('lead', $lead);
 

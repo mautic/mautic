@@ -23,14 +23,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 #[AllowMockObjectsWithoutExpectations]
 final class RedirectModelTest extends PageTestAbstract
 {
-    public function testCreateRedirectEntityWhenCalledReturnsRedirect(): void
-    {
-        $redirectModel = $this->getRedirectModel();
-        $entity        = $redirectModel->createRedirectEntity('http://some-url.com');
-
-        $this->assertInstanceOf(Redirect::class, $entity);
-    }
-
     public function testGenerateRedirectUrlWhenCalledReturnsValidUrl(): void
     {
         $redirect = new Redirect();

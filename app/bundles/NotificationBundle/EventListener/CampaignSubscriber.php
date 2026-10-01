@@ -25,22 +25,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    public const EVENT_ACTION_SEND_MOBILE_NOTIFICATION = 'notification.send_mobile_notification';
+    public const string EVENT_ACTION_SEND_MOBILE_NOTIFICATION = 'notification.send_mobile_notification';
 
-    /**
-     * @var string
-     */
-    public const EVENT_ACTION_SEND_NOTIFICATION = 'notification.send_notification';
+    public const string EVENT_ACTION_SEND_NOTIFICATION = 'notification.send_notification';
 
     /**
      * The maximum number of `include_player_ids` that can be sent within a single request.
-     *
-     * @var int
      */
-    protected const MAX_PLAYER_IDS_PER_REQUEST = 2000;
+    protected const int MAX_PLAYER_IDS_PER_REQUEST = 2000;
 
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,

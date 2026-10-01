@@ -22,7 +22,7 @@ final class NotifierTest extends MauticMysqlTestCase
     {
         $this->installDatabaseFixtures([LoadLeadData::class]);
 
-        $leadRepository = $this->em->getRepository(Lead::class);
+        $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
         /** @var Lead[] $leads */
         $leads = $leadRepository->findBy([], [], 2);
 

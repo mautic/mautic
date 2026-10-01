@@ -86,5 +86,5 @@ trait AjaxLookupControllerTrait
      *
      * @return Response
      */
-    abstract public function renderException(\Exception $e);
+    abstract protected function renderException(\Exception $e);
 }

@@ -398,7 +398,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertMatchesRegularExpression('/\/s\/companies\/view\/'.$this->company1Id.'/', $this->client->getRequest()->getUri());
 
         /** @var LeadRepository $leadRepo */
-        $leadRepo = $this->em->getRepository(Lead::class);
+        $leadRepo = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
         $this->assertSame($updatedName, $leadRepo->getValue($leadA->getId(), 'company'));
         $this->assertSame($updatedName, $leadRepo->getValue($leadB->getId(), 'company'));
     }

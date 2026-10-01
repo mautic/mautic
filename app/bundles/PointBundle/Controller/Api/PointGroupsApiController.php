@@ -60,7 +60,7 @@ final class PointGroupsApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/contacts/{contactId}/points/groups',
+        path: '/api/contacts/{contactId}/points/groups',
         name: 'mautic_api_getcontactpointgroups',
         requirements: ['contactId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -94,7 +94,7 @@ final class PointGroupsApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/contacts/{contactId}/points/groups/{groupId}',
+        path: '/api/contacts/{contactId}/points/groups/{groupId}',
         name: 'mautic_api_getcontactpointgroup',
         requirements: ['contactId' => '\d+', 'groupId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -132,7 +132,7 @@ final class PointGroupsApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/contacts/{contactId}/points/groups/{groupId}/{operator}/{value}',
+        path: '/api/contacts/{contactId}/points/groups/{groupId}/{operator}/{value}',
         name: 'mautic_api_adjustcontactgrouppoints',
         requirements: ['contactId' => '\d+', 'groupId' => '\d+'],
         defaults: ['_format' => 'json'],

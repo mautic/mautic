@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
-    public const TABLE_NAME = 'sms_message_stats';
+    public const string TABLE_NAME = 'sms_message_stats';
 
     /**
      * @var int|string

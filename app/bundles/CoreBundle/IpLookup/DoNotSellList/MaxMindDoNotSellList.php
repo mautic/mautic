@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class MaxMindDoNotSellList implements DoNotSellListInterface
+final class MaxMindDoNotSellList implements DoNotSellListInterface
 {
     private int $position = 0;
 

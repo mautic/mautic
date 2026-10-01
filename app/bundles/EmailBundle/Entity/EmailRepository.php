@@ -26,13 +26,13 @@ class EmailRepository extends CommonRepository
     use ProjectRepositoryTrait;
     use QueryBuilderManipulatorTrait;
 
-    public const EMAILS_PREFIX        = 'e';
+    public const string EMAILS_PREFIX        = 'e';
 
-    public const DNC_PREFIX           = 'dnc';
+    public const string DNC_PREFIX           = 'dnc';
 
-    public const TRACKABLE_PREFIX     = 'tr';
+    public const string TRACKABLE_PREFIX     = 'tr';
 
-    public const REDIRECT_PREFIX      = 'pr';
+    public const string REDIRECT_PREFIX      = 'pr';
 
     /**
      * Get an array of do not email.
@@ -116,12 +116,9 @@ class EmailRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('e')
-            ->from(Email::class, 'e', 'e.id');
+        $q = $this->createQueryBuilder('e', 'e.id');
         if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
 
@@ -137,15 +134,12 @@ class EmailRepository extends CommonRepository
 
     /**
      * Get amounts of sent and read emails.
-     *
-     * @return array
      */
-    public function getSentReadCount()
+    public function getSentReadCount(): array
     {
         // Get entities
-        $q = $this->getEntityManager()->createQueryBuilder();
-        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
-            ->from(Email::class, 'e');
+        $q = $this->createQueryBuilder('e');
+        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         $results['sent_count'] ??= 0;
@@ -334,8 +328,6 @@ class EmailRepository extends CommonRepository
      * @param int|null   $limit
      * @param int|null   $minContactId
      * @param int|null   $maxContactId
-     *
-     * @return array|int
      */
     public function getEmailPendingLeads(
         $emailId,
@@ -349,7 +341,7 @@ class EmailRepository extends CommonRepository
         ?int $maxThreads = null,
         ?int $threadId = null,
         ?\DateTimeInterface $sendStopDate = null,
-    ) {
+    ): array|int {
         $q = $this->getEmailPendingQuery(
             $emailId,
             $variantIds,
@@ -941,12 +933,10 @@ class EmailRepository extends CommonRepository
      */
     public function getPublishedEmailsWithVariant(): array
     {
-        $qb   = $this->getEntityManager()->createQueryBuilder();
+        $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateOrmExpression($qb, $this->getTableAlias());
 
-        $qb->select($this->getTableAlias())
-            ->from(Email::class, $this->getTableAlias())
-            ->innerJoin(Email::class, 'v', Expr\Join::WITH, $qb->expr()->andX(
+        $qb->innerJoin(Email::class, 'v', Expr\Join::WITH, $qb->expr()->andX(
                 $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
                 $qb->expr()->eq('v.isPublished', true)
             ))

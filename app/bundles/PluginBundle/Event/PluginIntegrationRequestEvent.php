@@ -5,7 +5,7 @@ namespace Mautic\PluginBundle\Event;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
+final class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
     private ?ResponseInterface $response = null;
 

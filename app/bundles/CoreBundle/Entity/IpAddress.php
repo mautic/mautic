@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class IpAddress
 {
-    public const TABLE_NAME = 'ip_addresses';
+    public const string TABLE_NAME = 'ip_addresses';
 
     /**
      * Set by factory of configured IPs to not track.

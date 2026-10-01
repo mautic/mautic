@@ -16,7 +16,7 @@ final class GroupRepository extends CommonRepository
         return 'pl';
     }
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         // Without qb it returns entities indexed by id instead of array indexes
         $args['qb'] = $this->createQueryBuilder($this->getTableAlias());

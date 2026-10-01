@@ -47,7 +47,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[OwnershipParent('message')]
+#[OwnershipParent(association: 'message')]
 class Channel extends CommonEntity implements UuidInterface
 {
     use UuidTrait;
@@ -215,10 +215,7 @@ class Channel extends CommonEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }

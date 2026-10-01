@@ -18,24 +18,17 @@ final class CustomContentEvent extends Event
      */
     private array $templates = [];
 
-    /**
-     * @param string      $viewName
-     * @param string|null $context
-     */
     public function __construct(
-        private $viewName,
-        private $context = null,
+        private readonly ?string $viewName,
+        private readonly ?string $context = null,
         private readonly array $vars = [],
     ) {
     }
 
     /**
      * Check if the context is applicable.
-     *
-     * @param string      $viewName
-     * @param string|null $context
      */
-    public function checkContext($viewName, $context): bool
+    public function checkContext(string $viewName, string $context): bool
     {
         return $viewName === $this->viewName && $context === $this->context;
     }
@@ -47,11 +40,7 @@ final class CustomContentEvent extends Event
     {
         $this->content[] = $content;
     }
-
-    /**
-     * @param string $template
-     */
-    public function addTemplate($template, array $vars = []): void
+    public function addTemplate(string $template, array $vars = []): void
     {
         $this->templates[] = [
             'template' => $template,
@@ -59,18 +48,12 @@ final class CustomContentEvent extends Event
         ];
     }
 
-    /**
-     * @return mixed
-     */
-    public function getViewName()
+    public function getViewName(): string
     {
         return $this->viewName;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getContext()
+    public function getContext(): ?string
     {
         return $this->context;
     }

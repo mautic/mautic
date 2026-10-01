@@ -4,12 +4,12 @@ namespace Mautic\PageBundle\Helper;
 
 use Mautic\PageBundle\Model\PageModel;
 
-class TokenHelper
+final readonly class TokenHelper
 {
     private const string REGEX = '/{pagelink=(.*?)}/';
 
     public function __construct(
-        protected PageModel $model,
+        private PageModel $model,
     ) {
     }
 

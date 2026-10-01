@@ -61,6 +61,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(6);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
 
         $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
@@ -89,6 +90,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with(false)
             ->willReturn($leadEventLog);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
 
         $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
@@ -118,6 +120,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadata')
             ->willReturn([]);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
 
         $this->sendEmailToUser->expects($this->once())
@@ -158,6 +161,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(6);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
 
         $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);

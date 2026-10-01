@@ -64,7 +64,7 @@ final class TriggerApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
     {
         $method            = $this->requestStack->getCurrentRequest()->getMethod();
 
@@ -122,6 +122,7 @@ final class TriggerApiController extends CommonApiController
                 }
             }
         }
+        return null;
     }
 
     /**
@@ -143,7 +144,7 @@ final class TriggerApiController extends CommonApiController
      * Return array of available point trigger event types.
      */
     #[Route(
-        '/api/points/triggers/events/types',
+        path: '/api/points/triggers/events/types',
         name: 'mautic_api_getpointtriggereventtypes',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -172,7 +173,7 @@ final class TriggerApiController extends CommonApiController
      * @param int $triggerId
      */
     #[Route(
-        '/api/points/triggers/{triggerId}/events/delete',
+        path: '/api/points/triggers/{triggerId}/events/delete',
         name: 'mautic_api_pointtriggerdeleteevents',
         requirements: ['triggerId' => '\d+'],
         defaults: ['_format' => 'json'],

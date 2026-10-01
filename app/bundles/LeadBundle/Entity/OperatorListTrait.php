@@ -139,7 +139,7 @@ trait OperatorListTrait
      *
      * @return mixed[]
      */
-    public function getOperatorsForFieldType($type = null, $overrideHiddenTypes = [])
+    public function getOperatorsForFieldType($type = null, $overrideHiddenTypes = []): array
     {
         static $processedTypes = [];
 

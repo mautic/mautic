@@ -125,7 +125,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return Response A Response instance
      */
-    public function forwardWithPost($controller, array $request = [], array $path = [], array $query = []): Response
+    protected function forwardWithPost($controller, array $request = [], array $path = [], array $query = []): Response
     {
         $path['_controller'] = $controller;
         $subRequest          = $this->requestStack->getCurrentRequest()->duplicate($query, $request, $path);
@@ -136,7 +136,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @param array<string, string> $parameters
      */
-    public function eventAwareRenderView(string &$contentTemplate, array &$parameters, ?Request $request = null): string
+    protected function eventAwareRenderView(string &$contentTemplate, array &$parameters, ?Request $request = null): string
     {
         if ($this->dispatcher->hasListeners(CustomTemplateEvent::class)) {
             $event = $this->dispatcher->dispatch(new CustomTemplateEvent($request, $contentTemplate, $parameters));
@@ -154,7 +154,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @param array $args
      */
-    public function delegateView($args): Response
+    protected function delegateView($args): Response
     {
         $request = $this->getCurrentRequest();
         $bundle  = $request->query->get('bundle');
@@ -217,7 +217,7 @@ class CommonController extends AbstractController implements MauticController
      * Determines if a redirect response should be returned or a Json response directing the ajax call to force a page
      * refresh.
      */
-    public function delegateRedirect(string $url): JsonResponse|RedirectResponse
+    protected function delegateRedirect(string $url): JsonResponse|RedirectResponse
     {
         $request = $this->getCurrentRequest();
 
@@ -249,7 +249,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @param array<string, mixed> $args [returnUrl, viewParameters, contentTemplate, passthroughVars, flashes, forwardController]
      */
-    public function postActionRedirect(array $args = []): RedirectResponse|Response
+    protected function postActionRedirect(array $args = []): RedirectResponse|Response
     {
         $request = $this->getCurrentRequest();
 
@@ -408,7 +408,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Get's the content of error page.
      */
-    public function renderException(\Exception $e): Response
+    protected function renderException(\Exception $e): Response
     {
         $request = $this->getCurrentRequest();
 
@@ -453,7 +453,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @throws AccessDeniedHttpException
      */
-    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): never
+    protected function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): never
     {
         throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $this->getCurrentRequest()->getRequestUri()]));
     }
@@ -461,7 +461,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @return array{type: string, msg: string}
      */
-    public function getAccessDeniedFlash(): array
+    protected function getAccessDeniedFlash(): array
     {
         return [
             'type' => 'error',
@@ -474,7 +474,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return Response
      */
-    public function notFound(string $msg = 'mautic.core.url.error.404')
+    protected function notFound(string $msg = 'mautic.core.url.error.404')
     {
         $request = $this->getCurrentRequest();
         $page404 = $this->coreParametersHelper->get('404_page');
@@ -508,7 +508,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Returns a json encoded access denied error for modal windows.
      */
-    public function modalAccessDenied(string $msg = 'mautic.core.error.accessdenied'): JsonResponse
+    protected function modalAccessDenied(string $msg = 'mautic.core.error.accessdenied'): JsonResponse
     {
         return new JsonResponse([
             'error' => $this->translator->trans($msg, [], 'flashes'),
@@ -610,7 +610,7 @@ class CommonController extends AbstractController implements MauticController
      * @param string|null  $level
      * @param string|null  $domain
      */
-    public function addFlashMessage($message, array $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', ?bool $addNotification = false): void
+    protected function addFlashMessage($message, array $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', ?bool $addNotification = false): void
     {
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
@@ -618,7 +618,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @param array|\Iterator $toExport
      */
-    public function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
+    protected function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
     {
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));

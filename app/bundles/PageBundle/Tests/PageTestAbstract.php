@@ -24,7 +24,6 @@ use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -37,7 +36,6 @@ use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
-use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -80,8 +78,6 @@ abstract class PageTestAbstract extends TestCase
 
         $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
-
-        $redirectModel = $this->getRedirectModel();
 
         $this->companyModel = $this->createMock(CompanyModel::class);
 
@@ -134,9 +130,6 @@ abstract class PageTestAbstract extends TestCase
             $this->createStub(CookieHelper::class),
             $this->ipLookupHelper,
             $this->createStub(LeadModel::class),
-            $this->createStub(FieldModel::class),
-            $redirectModel,
-            $this->createStub(TrackableModel::class),
             $this->createStub(MessageBus::class),
             $this->companyModel,
             new IdentifyCompanyHelper($this->companyModel, $this->createStub(CompanyLeadRepository::class)),
@@ -166,10 +159,7 @@ abstract class PageTestAbstract extends TestCase
         );
     }
 
-    /**
-     * @return RedirectModel
-     */
-    protected function getRedirectModel(): MockObject
+    protected function getRedirectModel(): RedirectModel
     {
         $mockRedirectModel = $this->getMockBuilder(RedirectModel::class)
             ->setConstructorArgs([

@@ -197,7 +197,7 @@ final class OwnerSubscriberTest extends TestCase
         $this->assertEquals('', $tokens['{ownerfield=lastname}']);
     }
 
-    protected function getMockLeadRepository(): LeadRepository&MockObject
+    protected function getMockLeadRepository(): LeadRepository
     {
         $mockLeadRepository = $this->createMock(LeadRepository::class);
 

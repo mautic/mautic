@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Exception\UnexpectedValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 
-class OrderDAO
+final class OrderDAO
 {
     /**
      * @var ObjectChangeDAO[][]

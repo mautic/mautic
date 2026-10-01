@@ -713,7 +713,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $sf = $this->getSalesforceIntegration();
         $sf->amendLeadDataBeforePush($input);
 
-        $this->assertSame($input, $output);
+        $this->assertSame($input, $output); // @phpstan-ignore method.impossibleType (mock of final class resolves to plain MockObject)
         $this->assertSame('string', gettype($output[0]));
         $this->assertSame('boolean', gettype($output[1]));
         $this->assertSame('string', gettype($output[2]));

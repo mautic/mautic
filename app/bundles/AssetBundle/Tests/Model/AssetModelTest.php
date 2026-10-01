@@ -13,7 +13,6 @@ use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
-use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -46,8 +45,6 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
     private LeadModel&\PHPUnit\Framework\MockObject\Stub $leadModel;
-
-    private CategoryModel&\PHPUnit\Framework\MockObject\Stub $categoryModel;
 
     private RequestStack&MockObject $requestStack;
 
@@ -88,7 +85,6 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn('2MB');
         $cacheProvider               = new CacheProvider($this->coreParametersHelper, $this->createStub(ContainerInterface::class));
         $this->leadModel             = $this->createStub(LeadModel::class);
-        $this->categoryModel         = $this->createStub(CategoryModel::class);
         $this->requestStack          = $this->createMock(RequestStack::class);
         $this->ipLookupHelper        = $this->createMock(IpLookupHelper::class);
         $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);
@@ -106,7 +102,6 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assetModel = new AssetModel(
             $this->leadModel,
-            $this->categoryModel,
             $this->requestStack,
             $this->ipLookupHelper,
             $this->deviceCreatorService,
@@ -270,7 +265,6 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         $model = $this->getMockBuilder(AssetModel::class)
             ->setConstructorArgs([
                 $this->leadModel,
-                $this->categoryModel,
                 $this->requestStack,
                 $this->ipLookupHelper,
                 $this->deviceCreatorService,

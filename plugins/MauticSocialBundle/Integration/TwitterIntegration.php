@@ -233,7 +233,7 @@ final class TwitterIntegration extends SocialIntegration
         ];
     }
 
-    public function cleanIdentifier($identifier): string
+    protected function cleanIdentifier($identifier): string
     {
         if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
             // extract the handle

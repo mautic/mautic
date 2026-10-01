@@ -10,7 +10,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
 use Symfony\Component\HttpFoundation\Request;
 
-readonly class Tracking404Model
+final readonly class Tracking404Model
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

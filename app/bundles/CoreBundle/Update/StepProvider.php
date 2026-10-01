@@ -21,7 +21,7 @@ final class StepProvider
      * @param iterable<StepInterface> $steps
      */
     public function __construct(
-        #[AutowireIterator('mautic.update_step')]
+        #[AutowireIterator(tag: 'mautic.update_step')]
         iterable $steps = [],
     ) {
         foreach ($steps as $step) {

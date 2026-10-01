@@ -64,7 +64,10 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $event->setCampaign($campaign);
         $event->setType('sms.send_text_sms');
 
-        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, new ArrayCollection([$leadLog->getId() => $leadLog]));
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
+        $logs = new ArrayCollection([$leadLog->getId() => $leadLog]);
+
+        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, $logs);
 
         $this->subscriber->onCampaignTriggerBatchAction($pendingEvent);
         $this->assertCount(0, $pendingEvent->getFailures());
@@ -101,7 +104,10 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->smsModel->expects($this->once())->method('getEntity')->willReturn($sms);
         $this->translator->method('trans')->willReturn('mautic.sms.campaign.failed.unpublished');
 
-        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, new ArrayCollection([$leadLog->getId() => $leadLog]));
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
+        $logs = new ArrayCollection([$leadLog->getId() => $leadLog]);
+
+        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, $logs);
 
         $this->subscriber->onCampaignTriggerBatchAction($pendingEvent);
 
@@ -160,7 +166,10 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $event->setProperties(['sms' => 1]);
         $event->setCampaign($campaign);
 
-        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, new ArrayCollection([$leadLog->getId() => $leadLog]));
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
+        $logs = new ArrayCollection([$leadLog->getId() => $leadLog]);
+
+        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, $logs);
 
         $this->assertCount(1, $pendingEvent->getContacts());
         $subscriber->onCampaignTriggerBatchAction($pendingEvent);

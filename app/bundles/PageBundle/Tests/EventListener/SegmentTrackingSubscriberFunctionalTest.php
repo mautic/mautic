@@ -121,7 +121,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $segments   = $this->getContactSegments($lead);
         $segmentIds = array_keys($segments);
 
-        $listLead = $this->em->getRepository(ListLead::class)->findOneBy([
+        $listLead = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findOneBy([
             'lead' => $lead,
             'list' => $segmentIds[0],
         ]);
@@ -191,7 +191,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $segments = $this->getContactSegments($lead);
 
         $firstSegmentId = array_key_first($segments);
-        $segment        = $this->em->getRepository(LeadList::class)->find($firstSegmentId);
+        $segment        = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class)->find($firstSegmentId);
         $this->assertInstanceOf(LeadList::class, $segment);
         $segment->setIsPublished(false);
         $this->em->persist($segment);
@@ -249,7 +249,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertContains((string) $newSegment->getId(), $segmentIds2, 'New segment ID should be included');
 
         $firstSegmentId = array_key_first($initialSegments);
-        $listLead       = $this->em->getRepository(ListLead::class)->findOneBy([
+        $listLead       = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findOneBy([
             'lead' => $lead->getId(),
             'list' => $firstSegmentId,
         ]);
@@ -314,7 +314,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        return $this->em->getRepository(Lead::class)->find($lead->getId());
+        return $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($lead->getId());
     }
 
     /**
@@ -325,7 +325,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
     private function getContactSegments(Lead $lead): array
     {
         /** @var \Mautic\LeadBundle\Entity\LeadListRepository $repository */
-        $repository = $this->em->getRepository(LeadList::class);
+        $repository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
 
         return $repository->getLeadLists($lead->getId(), false, true);
     }

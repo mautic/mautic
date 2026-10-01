@@ -58,7 +58,7 @@ final class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
     {
         // Add 5 contacts
         /** @var LeadRepository $contactRepo */
-        $contactRepo = $this->em->getRepository(Lead::class);
+        $contactRepo = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
         $contacts    = [];
 
         for ($i = 1; $i <= 5; ++$i) {
@@ -76,7 +76,7 @@ final class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
     {
         // Add 1 segment
         /** @var LeadListRepository $segmentRepo */
-        $segmentRepo = $this->em->getRepository(LeadList::class);
+        $segmentRepo = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
         $segment     = new LeadList();
         $filters     = [
             [

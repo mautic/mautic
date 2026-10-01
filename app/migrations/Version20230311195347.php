@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20230311195347 extends AbstractMauticMigration
 {
-    public const BATCH_SIZE = 1000;
+    public const int BATCH_SIZE = 1000;
 
     public function up(Schema $schema): void
     {

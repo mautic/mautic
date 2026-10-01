@@ -58,7 +58,7 @@ final class NotificationApiController extends CommonApiController
      * Receive Web Push subscription request.
      */
     #[Route(
-        '/notification/subscribe',
+        path: '/notification/subscribe',
         name: 'mautic_subscribe_notification',
     )]
     public function subscribeAction(Request $request): JsonResponse

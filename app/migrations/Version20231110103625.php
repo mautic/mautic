@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20231110103625 extends AbstractMauticMigration
 {
-    protected const TABLE_NAME = 'roles';
+    protected const string TABLE_NAME = 'roles';
 
     public function up(Schema $schema): void
     {

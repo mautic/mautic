@@ -15,7 +15,7 @@ final class MonitoringRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getPublishedEntities(array $args = [])
+    public function getPublishedEntities(array $args = []): iterable
     {
         $q    = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($q);
@@ -31,7 +31,7 @@ final class MonitoringRepository extends CommonRepository
         $q    = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($q);
         $q->where($expr);
-        $args['qb'] = $q;
+        $args       = ['qb' => $q];
 
         return count(parent::getEntities($args));
     }

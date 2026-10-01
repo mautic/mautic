@@ -33,7 +33,7 @@ final class RemoveController extends CommonController
     }
 
     #[Route(
-        '/s/marketplace/remove/{vendor}/{package}',
+        path: '/s/marketplace/remove/{vendor}/{package}',
         name: 'mautic_marketplace_remove',
         methods: ['GET', 'POST'],
     )]

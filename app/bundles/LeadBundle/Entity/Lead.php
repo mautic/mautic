@@ -62,19 +62,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 {
     use CustomFieldEntityTrait;
 
-    public const FIELD_ALIAS     = '';
+    public const string FIELD_ALIAS     = '';
 
-    public const POINTS_ADD      = 'plus';
+    public const string POINTS_ADD      = 'plus';
 
-    public const POINTS_SUBTRACT = 'minus';
+    public const string POINTS_SUBTRACT = 'minus';
 
-    public const POINTS_MULTIPLY = 'times';
+    public const string POINTS_MULTIPLY = 'times';
 
-    public const POINTS_DIVIDE   = 'divide';
+    public const string POINTS_DIVIDE   = 'divide';
 
-    public const POINTS_SET      = 'set';
+    public const string POINTS_SET      = 'set';
 
-    public const DEFAULT_ALIAS   = 'l';
+    public const string DEFAULT_ALIAS   = 'l';
 
     /**
      * Used to determine social identity.
@@ -149,6 +149,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var int
      */
     #[Groups(['contact:read', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'integer')]
     private $points = 0;
 
     private array $pointChanges = [];
@@ -162,7 +163,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<int, PointsChangeLog>
      */
     #[ORM\OneToMany(targetEntity: PointsChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateAdded' => 'DESC'])]
     private $pointsChangeLog;
 
     private ?int $actualPoints = null;
@@ -171,7 +172,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<int, CompanyChangeLog>
      */
     #[ORM\OneToMany(targetEntity: CompanyChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateAdded' => 'DESC'])]
     private $companyChangeLog;
 
     /**
@@ -205,16 +206,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var \DateTimeInterface
      */
     #[Groups(['contact:read'])]
+    #[ORM\Column(name: 'last_active', type: 'datetime', nullable: true)]
     private $lastActive;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $internal = [];
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'social_cache', type: 'array', nullable: true)]
     private $socialCache = [];
 
     /**
@@ -238,18 +242,20 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var \DateTimeInterface
      */
     #[Groups(['contact:read'])]
+    #[ORM\Column(name: 'date_identified', type: 'datetime', nullable: true)]
     private $dateIdentified;
 
     /**
      * @var Collection<int, LeadNote>
      */
     #[ORM\OneToMany(targetEntity: LeadNote::class, mappedBy: 'lead', cascade: ['detach'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateAdded' => 'DESC'])]
     private $notes;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'preferred_profile_image', type: 'string', length: 191, nullable: true)]
     private $preferredProfileImage = 'gravatar';
 
     /**
@@ -265,7 +271,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     #[ORM\JoinTable(name: 'lead_tags_xref')]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'tag_id', nullable: false)]
-    #[ORM\OrderBy(['tag' => 'ASC'])]
+    #[ORM\OrderBy(value: ['tag' => 'ASC'])]
     private $tags;
 
     /**
@@ -280,7 +286,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<int, StagesChangeLog>
      */
     #[ORM\OneToMany(targetEntity: StagesChangeLog::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true)]
-    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateAdded' => 'DESC'])]
     private $stageChangeLog;
 
     /**
@@ -293,7 +299,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var Collection<int, FrequencyRule>
      */
     #[ORM\OneToMany(targetEntity: FrequencyRule::class, mappedBy: 'lead', cascade: ['all'], fetch: 'EXTRA_LAZY', orphanRemoval: true, indexBy: 'channel')]
-    #[ORM\OrderBy(['dateAdded' => 'DESC'])]
+    #[ORM\OrderBy(value: ['dateAdded' => 'DESC'])]
     private $frequencyRules;
 
     /**
@@ -325,6 +331,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->frequencyRules   = new ArrayCollection();
         $this->companyChangeLog = new ArrayCollection();
         $this->groupScores      = new ArrayCollection();
+        $this->notes            = new ArrayCollection();
+        $this->utmtags          = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -332,33 +340,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->addBigIntIdField();
-
-        $builder->createField('points', 'integer')
-            ->build();
-
-        $builder->createField('lastActive', 'datetime')
-            ->columnName('last_active')
-            ->nullable()
-            ->build();
-
-        $builder->createField('internal', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->createField('socialCache', 'array')
-            ->columnName('social_cache')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateIdentified', 'datetime')
-            ->columnName('date_identified')
-            ->nullable()
-            ->build();
-
-        $builder->createField('preferredProfileImage', 'string')
-            ->columnName('preferred_profile_image')
-            ->nullable()
-            ->build();
 
         self::loadFixedFieldMetadata(
             $builder,
@@ -588,10 +569,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->ipAddresses->removeElement($ipAddress);
     }
 
-    /**
-     * @return Collection
-     */
-    public function getIpAddresses()
+    public function getIpAddresses(): Collection
     {
         return $this->ipAddresses;
     }
@@ -851,7 +829,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int, StagesChangeLog>
      */
-    public function getStageChangeLog()
+    public function getStageChangeLog(): Collection
     {
         return $this->stageChangeLog;
     }
@@ -861,10 +839,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->pointsChangeLog->removeElement($pointsChangeLog);
     }
 
-    /**
-     * @return Collection
-     */
-    public function getPointsChangeLog()
+    public function getPointsChangeLog(): Collection
     {
         return $this->pointsChangeLog;
     }
@@ -899,7 +874,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int,CompanyChangeLog>
      */
-    public function getCompanyChangeLog()
+    public function getCompanyChangeLog(): Collection
     {
         return $this->companyChangeLog;
     }
@@ -946,7 +921,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int, PushID>
      */
-    public function getPushIDs()
+    public function getPushIDs(): Collection
     {
         return $this->pushIds;
     }
@@ -1019,7 +994,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @return array<mixed>
      */
-    public function getInternal()
+    public function getInternal(): array
     {
         return $this->internal;
     }
@@ -1032,7 +1007,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return array<mixed>
      */
-    public function getSocialCache()
+    public function getSocialCache(): array
     {
         return $this->socialCache;
     }
@@ -1122,7 +1097,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int, LeadNote>
      */
-    public function getNotes()
+    public function getNotes(): Collection
     {
         return $this->notes;
     }
@@ -1199,7 +1174,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<string, Tag>
      */
-    public function getTags()
+    public function getTags(): Collection
     {
         return $this->tags;
     }
@@ -1214,7 +1189,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int, UtmTag>
      */
-    public function getUtmTags()
+    public function getUtmTags(): Collection
     {
         return $this->utmtags;
     }
@@ -1262,7 +1237,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return Collection<int, FrequencyRule>
      */
-    public function getFrequencyRules()
+    public function getFrequencyRules(): Collection
     {
         return $this->frequencyRules;
     }
@@ -1644,7 +1619,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      *
      * @return array<mixed>
      */
-    public function getChannelRules()
+    public function getChannelRules(): array
     {
         if (null === $this->channelRules) {
             $frequencyRules = $this->frequencyRules->toArray();

@@ -62,7 +62,7 @@ final class TweetController extends FormController
      *
      * @return string|bool
      */
-    public function getUpdateSelect()
+    private function getUpdateSelect()
     {
         $request = $this->getCurrentRequest();
 

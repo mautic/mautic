@@ -11,10 +11,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250904111834 extends PreUpAssertionMigration
 {
-    /**
-     * @var string
-     */
-    protected const TABLE_NAME = Event::TABLE_NAME;
+    protected const string TABLE_NAME = Event::TABLE_NAME;
 
     protected function preUpAssertions(): void
     {

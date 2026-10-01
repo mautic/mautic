@@ -399,7 +399,7 @@ class Focus extends FormEntity implements UuidInterface
     /**
      * @return array<mixed>
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -416,10 +416,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getUtmTags()
+    public function getUtmTags(): array
     {
         return $this->utmTags;
     }

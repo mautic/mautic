@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\Event;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -16,9 +15,9 @@ use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-readonly class ActionExecutioner implements EventInterface
+final readonly class ActionExecutioner implements EventInterface
 {
-    public const TYPE = 'action';
+    public const string TYPE = 'action';
 
     public function __construct(
         private ActionDispatcher $dispatcher,
@@ -34,7 +33,7 @@ readonly class ActionExecutioner implements EventInterface
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      */
-    public function execute(AbstractEventAccessor $config, ArrayCollection $logs): EvaluatedContacts
+    public function execute(AbstractEventAccessor $config, Collection $logs): EvaluatedContacts
     {
         \assert($config instanceof ActionAccessor);
 

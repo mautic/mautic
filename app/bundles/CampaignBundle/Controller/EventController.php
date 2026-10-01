@@ -49,7 +49,7 @@ final class EventController extends CommonFormController
     }
 
     #[Route(
-        '/s/campaigns/events/{objectAction}/{objectId}',
+        path: '/s/campaigns/events/{objectAction}/{objectId}',
         name: 'mautic_campaignevent_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -586,6 +586,7 @@ final class EventController extends CommonFormController
         }
 
         // Render the template and store it in the appropriate variable
+        $passThroughVars                  = [];
         $passThroughKey                   = ('edit' === $action) ? 'updateHtml' : 'eventHtml';
         $passThroughVars[$passThroughKey] = $this->renderView($template, $templateVars);
 

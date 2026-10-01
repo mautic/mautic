@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Field\SchemaDefinition;
 use Monolog\Logger;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-#[AsDoctrineListener(ToolEvents::postGenerateSchema)]
+#[AsDoctrineListener(event: ToolEvents::postGenerateSchema)]
 final readonly class DoctrineSubscriber
 {
     public function __construct(

@@ -49,35 +49,35 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ]
 )]
 #[EntityEvent]
-#[OwnershipParent('campaign')]
+#[OwnershipParent(association: 'campaign')]
 class Event implements ChannelInterface, UuidInterface
 {
     use UuidTrait;
     use DateAddedTrait;
 
-    public const TABLE_NAME = 'campaign_events';
+    public const string TABLE_NAME = 'campaign_events';
 
-    public const ENTITY_NAME = 'campaign_event';
+    public const string ENTITY_NAME = 'campaign_event';
 
-    public const TYPE_DECISION  = 'decision';
+    public const string TYPE_DECISION  = 'decision';
 
-    public const TYPE_ACTION    = 'action';
+    public const string TYPE_ACTION    = 'action';
 
-    public const TYPE_CONDITION = 'condition';
+    public const string TYPE_CONDITION = 'condition';
 
-    public const PATH_INACTION = 'no';
+    public const string PATH_INACTION = 'no';
 
-    public const PATH_ACTION   = 'yes';
+    public const string PATH_ACTION   = 'yes';
 
-    public const TRIGGER_MODE_DATE      = 'date';
+    public const string TRIGGER_MODE_DATE      = 'date';
 
-    public const TRIGGER_MODE_INTERVAL  = 'interval';
+    public const string TRIGGER_MODE_INTERVAL  = 'interval';
 
-    public const TRIGGER_MODE_IMMEDIATE = 'immediate';
+    public const string TRIGGER_MODE_IMMEDIATE = 'immediate';
 
-    public const TRIGGER_MODE_OPTIMIZED = 'optimized';
+    public const string TRIGGER_MODE_OPTIMIZED = 'optimized';
 
-    public const CHANNEL_EMAIL = 'email';
+    public const string CHANNEL_EMAIL = 'email';
 
     /**
      * @var int
@@ -198,7 +198,7 @@ class Event implements ChannelInterface, UuidInterface
      */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC'])]
+    #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $children;
 
     /**
@@ -563,10 +563,7 @@ class Event implements ChannelInterface, UuidInterface
         $this->log->removeElement($log);
     }
 
-    /**
-     * @return Collection
-     */
-    public function getLog()
+    public function getLog(): Collection
     {
         return $this->log;
     }
@@ -611,7 +608,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int,Event>|Collection<(int|string), mixed>
+     * @return Collection<int,Event>|Collection<(int|string), mixed>
      */
     public function getChildren()
     {
@@ -621,7 +618,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int,Event>
      */
     public function getPositiveChildren()
     {
@@ -631,7 +628,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int,Event>
      */
     public function getNegativeChildren()
     {
@@ -643,7 +640,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * @param string $type
      *
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int,Event>
      */
     public function getChildrenByType($type)
     {
@@ -653,7 +650,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int,Event>
      */
     public function getChildrenByEventType(string $type)
     {

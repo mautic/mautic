@@ -9,76 +9,60 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * Used to get statistical data from subscribed tables.
  */
-class StatsEvent extends Event
+final class StatsEvent extends Event
 {
     /**
      * Database table containing statistical data available to get the results from.
      */
-    protected string $table;
+    private readonly string $table;
 
     /**
      * Array of columns to fetch.
-     *
-     * @var array|null
      */
-    protected $select;
+    private ?array $select = null;
 
     /**
      * Database tables which the subscribers already asked for.
-     *
-     * @var array
      */
-    protected $tables = [];
+    private array $tables = [];
 
-    /**
-     * @var array
-     */
-    protected $tableColumns = [];
-
-    /**
-     * Array of where filters.
-     *
-     * @var array
-     */
-    protected $where = [];
+    private array $tableColumns = [];
 
     /**
      * Array of the result data.
-     *
-     * @var array
      */
-    protected $results = [];
+    private array $results = [];
 
     /**
      * Flag if some results were set.
-     *
-     * @var bool
      */
-    protected $hasResults = false;
+    private bool $hasResults = false;
 
     /**
      * Source repository to fetch the results from.
      *
      * @var CommonRepository<object>
      */
-    protected $repository;
+    private ?\Mautic\CoreBundle\Entity\CommonRepository $repository = null;
 
     public function __construct(
         $table,
         /**
          * The page where to start with.
          */
-        protected int $start,
+        private readonly int $start,
         /**
          * The rows per page limit.
          */
-        protected int $limit,
-        protected array $order,
-        array $where,
-        protected User $user,
+        private readonly int $limit,
+        private readonly array $order,
+        /**
+         * Array of where filters.
+         */
+        private array $where,
+        private readonly User $user,
     ) {
         $this->table = strtolower(trim(str_replace(MAUTIC_TABLE_PREFIX, '', strip_tags($table))));
-        $this->where = $where;
     }
 
     /**
@@ -118,10 +102,7 @@ class StatsEvent extends Event
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getSelect()
+    public function getSelect(): ?array
     {
         return $this->select;
     }
@@ -159,10 +140,8 @@ class StatsEvent extends Event
 
     /**
      * Returns the where.
-     *
-     * @return array
      */
-    public function getWhere()
+    public function getWhere(): array
     {
         return $this->where;
     }
@@ -189,20 +168,16 @@ class StatsEvent extends Event
 
     /**
      * Returns the results.
-     *
-     * @return array
      */
-    public function getResults()
+    public function getResults(): array
     {
         return $this->results;
     }
 
     /**
      * Returns the subscribed tables untill the match was found.
-     *
-     * @return array
      */
-    public function getTables()
+    public function getTables(): array
     {
         sort($this->tables);
 
@@ -221,10 +196,8 @@ class StatsEvent extends Event
 
     /**
      * Returns boolean if the results were set or not.
-     *
-     * @return bool
      */
-    public function hasResults()
+    public function hasResults(): bool
     {
         return $this->hasResults;
     }

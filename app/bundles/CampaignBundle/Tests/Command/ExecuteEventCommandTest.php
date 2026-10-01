@@ -92,7 +92,7 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $this->em->flush();
         $this->em->clear();
 
-        $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
+        $leadEventLogRepository = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class);
         $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
@@ -141,7 +141,7 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
         $this->em->flush();
         $this->em->clear();
 
-        $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
+        $leadEventLogRepository = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class);
         $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
@@ -188,7 +188,7 @@ final class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         $this->assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
 
-        $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
+        $leadEventLogRepository = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class);
         $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);

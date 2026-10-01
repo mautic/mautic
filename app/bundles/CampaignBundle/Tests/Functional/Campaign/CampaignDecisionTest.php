@@ -124,12 +124,12 @@ final class CampaignDecisionTest extends MauticMysqlTestCase
         array $yesEventLeads,
         array $noEventLeads,
     ): void {
-        $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)
+        $campaignEventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)
             ->findBy(['campaign' => $campaign, 'event' => $yesEvent], ['event' => 'ASC']);
         $this->assertCount(count($yesEventLeads), $campaignEventLogs);
         $this->assertSame($yesEventLeads, $this->getLeadIds($campaignEventLogs));
 
-        $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)
+        $campaignEventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)
             ->findBy(['campaign' => $campaign, 'event' => $noEvent], ['event' => 'ASC']);
         $this->assertCount(count($noEventLeads), $campaignEventLogs);
         $this->assertSame($noEventLeads, $this->getLeadIds($campaignEventLogs));

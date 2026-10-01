@@ -4,32 +4,19 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MaintenanceEvent extends Event
+final class MaintenanceEvent extends Event
 {
-    protected int $daysOld;
+    private readonly \DateTimeInterface $date;
 
-    protected \DateTimeInterface $date;
+    private array $stats = [];
 
-    /**
-     * @var array
-     */
-    protected $stats = [];
-
-    /**
-     * @var array
-     */
-    protected $debug = [];
-
-    /**
-     * @param int $daysOld
-     */
+    private array $debug = [];
     public function __construct(
-        $daysOld,
-        protected bool $dryRun,
-        protected bool $gdpr,
+        private readonly int $daysOld,
+        private readonly bool $dryRun,
+        private readonly bool $gdpr,
     ) {
-        $this->daysOld = (int) $daysOld;
-        $this->date    = new \DateTime("{$daysOld} days ago", new \DateTimeZone('UTC'));
+        $this->date    = new \DateTime("{$this->daysOld} days ago", new \DateTimeZone('UTC'));
     }
 
     /**
@@ -54,7 +41,7 @@ class MaintenanceEvent extends Event
      * @param string $key
      * @param int    $recordCount
      */
-    public function setStat($key, $recordCount, $sql = null, $parameters = []): void
+    public function setStat($key, $recordCount, $sql = null, array $parameters = []): void
     {
         $this->stats[$key] = (int) $recordCount;
 
@@ -69,10 +56,7 @@ class MaintenanceEvent extends Event
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getStats()
+    public function getStats(): array
     {
         ksort($this->stats, SORT_NATURAL);
 
@@ -87,10 +71,7 @@ class MaintenanceEvent extends Event
         return $this->dryRun;
     }
 
-    /**
-     * @return array
-     */
-    public function getDebug()
+    public function getDebug(): array
     {
         return $this->debug;
     }

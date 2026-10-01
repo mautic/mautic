@@ -38,6 +38,7 @@ final readonly class SegmentFilterTypeaheadSubscriber implements EventSubscriber
             return;
         }
 
+        $dataArray            = [];
         $dataArray['error']   = 'Alias cannot be empty';
         $dataArray['success'] = 0;
 

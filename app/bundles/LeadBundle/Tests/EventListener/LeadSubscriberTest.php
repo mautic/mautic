@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -29,12 +28,13 @@ use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class LeadSubscriberTest extends CommonMocks
+final class LeadSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&AuditLogModel
@@ -197,7 +197,7 @@ final class LeadSubscriberTest extends CommonMocks
         $matcher   = $this->exactly(2);
 
         $this->leadEventLogRepository->expects($matcher)
-            ->method('getEvents')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $leadEvent, $logs) {
+            ->method('getEvents')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $leadEvent, $logs): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($lead, $parameters[0]);
                     $this->assertSame('lead', $parameters[1]);
@@ -216,6 +216,8 @@ final class LeadSubscriberTest extends CommonMocks
 
                     return ['total' => 0, 'results' => []];
                 }
+
+                return [];
             });
 
         $subscriber = new LeadSubscriber(

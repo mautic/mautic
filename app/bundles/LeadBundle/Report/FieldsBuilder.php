@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Model\UserModel;
 
-readonly class FieldsBuilder
+final readonly class FieldsBuilder
 {
     public function __construct(
         private FieldModel $fieldModel,

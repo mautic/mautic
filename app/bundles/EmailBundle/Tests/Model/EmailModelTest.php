@@ -88,10 +88,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\Stub $themeHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&Mailbox
-     */
-    private \PHPUnit\Framework\MockObject\Stub $mailboxHelper;
+    private Mailbox&\PHPUnit\Framework\MockObject\Stub $mailboxHelper;
 
     /**
      * @var MockObject&MailHelper
@@ -103,20 +100,11 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\Stub $leadModel;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&TrackableModel
-     */
-    private \PHPUnit\Framework\MockObject\Stub $trackableModel;
+    private TrackableModel&\PHPUnit\Framework\MockObject\Stub $trackableModel;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&UserModel
-     */
-    private \PHPUnit\Framework\MockObject\Stub $userModel;
+    private UserModel&\PHPUnit\Framework\MockObject\Stub $userModel;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&UserHelper
-     */
-    private \PHPUnit\Framework\MockObject\Stub $userHelper;
+    private UserHelper&\PHPUnit\Framework\MockObject\Stub $userHelper;
 
     /**
      * @var MockObject&Translator
@@ -153,10 +141,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $frequencyRepository;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&MessageQueueModel
-     */
-    private \PHPUnit\Framework\MockObject\Stub $messageModel;
+    private MessageQueueModel&\PHPUnit\Framework\MockObject\Stub $messageModel;
 
     /**
      * @var MockObject&CompanyModel
@@ -175,10 +160,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $deviceTrackerMock;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&RedirectRepository
-     */
-    private \PHPUnit\Framework\MockObject\Stub $redirectRepositoryMock;
+    private RedirectRepository&\PHPUnit\Framework\MockObject\Stub $redirectRepositoryMock;
 
     private EmailModel $emailModel;
 

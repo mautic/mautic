@@ -440,6 +440,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
+        $params             = [];
         $params['start']    = '2019-05-22 19:36:30';
         $params['end']      = '2030-05-22 19:36:30';
 
@@ -512,6 +513,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
+        $params             = [];
         $params['start']    = '2019-05-22 19:36:30';
         $params['end']      = '2030-05-22 19:36:30';
 

@@ -43,10 +43,7 @@ trait DynamicContentEntityTrait
     #[ORM\Column(name: 'dynamic_content', type: 'array', nullable: true)]
     private $dynamicContent = [];
 
-    /**
-     * @return array
-     */
-    public function getDynamicContent()
+    public function getDynamicContent(): array
     {
         return (empty($this->dynamicContent)) ? $this->getDefaultDynamicContent() : $this->dynamicContent;
     }
@@ -65,10 +62,7 @@ trait DynamicContentEntityTrait
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getDefaultDynamicContent()
+    public function getDefaultDynamicContent(): array
     {
         return self::$defaultDynamicContent;
     }

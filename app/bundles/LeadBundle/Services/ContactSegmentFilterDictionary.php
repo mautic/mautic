@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder
 use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ContactSegmentFilterDictionary
+final class ContactSegmentFilterDictionary
 {
     /**
      * @var mixed[]

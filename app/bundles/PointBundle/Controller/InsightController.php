@@ -28,7 +28,7 @@ final class InsightController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/points/insights/{objectAction}/{objectId}',
+        path: '/s/points/insights/{objectAction}/{objectId}',
         name: 'mautic_point.insight_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -39,7 +39,7 @@ final class InsightController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/points/insights/{page}',
+        path: '/s/points/insights/{page}',
         name: 'mautic_point.insight_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

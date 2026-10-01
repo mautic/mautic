@@ -120,7 +120,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
 
         // Reboot kernel to reload all themes
         self::bootKernel();
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 

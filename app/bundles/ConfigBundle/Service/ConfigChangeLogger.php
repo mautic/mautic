@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 /**
  * Compare normalized for data and log changes.
  */
-class ConfigChangeLogger
+final class ConfigChangeLogger
 {
     /**
      * Keys to remove from log.

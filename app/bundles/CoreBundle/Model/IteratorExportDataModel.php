@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 
-class IteratorExportDataModel implements \Iterator
+final class IteratorExportDataModel implements \Iterator
 {
     private int $position = 0;
 

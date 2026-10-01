@@ -6,11 +6,11 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder as BaseExpressionBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 
-class ExpressionBuilder extends BaseExpressionBuilder
+final class ExpressionBuilder extends BaseExpressionBuilder
 {
-    public const REGEXP   = 'REGEXP';
+    public const string REGEXP   = 'REGEXP';
 
-    public const BETWEEN  = 'BETWEEN';
+    public const string BETWEEN  = 'BETWEEN';
 
     private const string IN_LAST = 'inLast';
 

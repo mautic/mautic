@@ -13,9 +13,9 @@ use MauticPlugin\MauticFullContactBundle\Exception\NotImplementedException;
  */
 class FullContact_Base
 {
-    public const REQUEST_LATENCY = 0.2;
+    public const float REQUEST_LATENCY = 0.2;
 
-    public const USER_AGENT      = 'caseysoftware/fullcontact-php-0.9.0';
+    public const string USER_AGENT      = 'caseysoftware/fullcontact-php-0.9.0';
 
     private \DateTime $_next_req_time;
 

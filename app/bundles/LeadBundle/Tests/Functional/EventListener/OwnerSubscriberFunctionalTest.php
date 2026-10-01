@@ -42,7 +42,7 @@ final class OwnerSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $lead = $this->em->getRepository(Lead::class)->find($lead->getId());
+        $lead = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
 
         $event = new UrlTokenReplaceEvent('https://example.mautic/author/{ownerfield=firstname}/', $lead);
@@ -60,7 +60,7 @@ final class OwnerSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $lead = $this->em->getRepository(Lead::class)->find($lead->getId());
+        $lead = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
 
         $event = new UrlTokenReplaceEvent('https://example.mautic/author/{ownerfield=firstname}/', $lead);

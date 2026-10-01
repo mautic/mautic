@@ -8,18 +8,16 @@ use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 /**
  * @property ConnectwiseIntegration $integration
  */
-class ConnectwiseApi extends CrmApi
+final class ConnectwiseApi extends CrmApi
 {
     /**
      * @param string $endpoint
      * @param array  $parameters
-     * @param string $method
      *
      * @return mixed|string
-     *
      * @throws ApiErrorException
      */
-    protected function request($endpoint, $parameters = [], $method = 'GET')
+    private function request($endpoint, $parameters = [], string $method = 'GET')
     {
         $apiUrl = $this->integration->getApiUrl();
 
@@ -169,11 +167,9 @@ class ConnectwiseApi extends CrmApi
     /**
      * @param array $params
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function postActivity($params = [])
+    public function postActivity($params = []): array
     {
         return $this->request('sales/activities', $params, 'POST');
     }

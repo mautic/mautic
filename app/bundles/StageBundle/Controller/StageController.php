@@ -32,7 +32,7 @@ final class StageController extends AbstractFormController
     }
 
     #[Route(
-        '/s/stages/{objectAction}/{objectId}',
+        path: '/s/stages/{objectAction}/{objectId}',
         name: 'mautic_stage_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -43,7 +43,7 @@ final class StageController extends AbstractFormController
     }
 
     #[Route(
-        '/s/stages/{page}',
+        path: '/s/stages/{page}',
         name: 'mautic_stage_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

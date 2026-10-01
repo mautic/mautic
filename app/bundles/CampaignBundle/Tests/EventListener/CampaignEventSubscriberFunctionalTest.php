@@ -48,7 +48,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         $dispatcher->dispatch($unpublishEvent);
 
         // Check for notifications - use a more general query
-        $notifications = $this->em->getRepository(Notification::class)
+        $notifications = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class)
             ->findBy(
                 [
                     'type'    => 'error',
@@ -62,7 +62,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         $dispatcher->dispatch($unpublishEvent);
 
         // Query for all notifications
-        $notifications = $this->em->getRepository(Notification::class)
+        $notifications = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class)
             ->findBy([
                 'type'    => 'error',
                 'message' => "{$campaign->getName()} / Send email to user",

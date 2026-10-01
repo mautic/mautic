@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventCollector\Accessor\Event;
 
-class ActionAccessor extends AbstractEventAccessor
+final class ActionAccessor extends AbstractEventAccessor
 {
     public function __construct(array $config)
     {

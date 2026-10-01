@@ -7,9 +7,9 @@ namespace MauticPlugin\MauticClearbitBundle\Services;
  */
 class Clearbit_Base
 {
-    public const REQUEST_LATENCY = 0.2;
+    public const float REQUEST_LATENCY = 0.2;
 
-    public const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
+    public const string USER_AGENT      = 'mautic/clearbit-php-0.1.0';
 
     private \DateTime $_next_req_time;
 
