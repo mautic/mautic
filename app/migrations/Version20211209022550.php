@@ -32,8 +32,14 @@ final class Version20211209022550 extends AbstractMauticMigration
             ],
         ]);
 
-        /** @var Role $role */
-        foreach ($roles as $role) {
+        foreach ($roles as $roleResult) {
+            // RoleRepository adds a scalar user count to this query, so Doctrine
+            // hydrates each row as [Role, user_count] instead of Role.
+            $role = is_array($roleResult) ? ($roleResult[0] ?? null) : $roleResult;
+            if (!$role instanceof Role) {
+                continue;
+            }
+
             $rawPermissions = $role->getRawPermissions();
             if (empty($rawPermissions)) {
                 continue;
