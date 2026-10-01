@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\ApiBundle\Tests\Controller;
+namespace Mautic\ApiBundle\Tests\Functional\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
