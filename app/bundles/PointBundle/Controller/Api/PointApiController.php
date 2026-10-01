@@ -94,7 +94,7 @@ final class PointApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, int $leadId, $operator, $delta): Response
+    public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, int|string $leadId, $operator, $delta): Response
     {
         $lead = $this->checkLeadAccess($leadId, 'edit');
         if ($lead instanceof Response) {

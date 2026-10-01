@@ -156,7 +156,7 @@ final class EmailApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function sendLeadAction(Request $request, int $id, int $leadId): Response
+    public function sendLeadAction(Request $request, int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 

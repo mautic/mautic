@@ -95,7 +95,7 @@ final class CompanyApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addContactAction(int $companyId, int $contactId): Response
+    public function addContactAction(int $companyId, int|string $contactId): Response
     {
         $company = $this->model->getEntity($companyId);
         $view    = $this->view(['success' => 1], Response::HTTP_OK);

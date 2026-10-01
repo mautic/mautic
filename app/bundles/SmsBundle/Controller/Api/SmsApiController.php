@@ -71,7 +71,7 @@ final class SmsApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function sendAction(TransportChain $transportChain, LoggerInterface $mauticLogger, int $id, int $contactId): JsonResponse|Response
+    public function sendAction(TransportChain $transportChain, LoggerInterface $mauticLogger, int $id, int|string $contactId): JsonResponse|Response
     {
         if (!$transportChain->getEnabledTransports()) {
             return new JsonResponse(json_encode(['error' => ['message' => 'SMS transport is disabled.', 'code' => Response::HTTP_EXPECTATION_FAILED]]));
