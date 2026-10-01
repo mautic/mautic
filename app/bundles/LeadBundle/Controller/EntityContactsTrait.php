@@ -12,10 +12,14 @@ trait EntityContactsTrait
 {
     private DoNotContactRepository $doNotContactRepository;
 
+    private LeadRepository $entityContactsLeadRepository;
+
     #[Required]
-    public function setDoNotContactRepositoryEntityContactsTrait(
+    public function autowireEntityContactsTrait(
+        LeadRepository $entityContactsLeadRepository,
         DoNotContactRepository $doNotContactRepository,
     ): void {
+        $this->entityContactsLeadRepository = $entityContactsLeadRepository;
         $this->doNotContactRepository = $doNotContactRepository;
     }
 
@@ -113,9 +117,7 @@ trait EntityContactsTrait
             $start = 0;
         }
 
-        /** @var LeadRepository $repo */
-        $repo     = $this->getModel('lead')->getRepository();
-        $contacts = $repo->getEntityContacts(
+        $contacts = $this->entityContactsLeadRepository->getEntityContacts(
             [
                 'withTotalCount' => (null === $count),
                 'start'          => $start,
