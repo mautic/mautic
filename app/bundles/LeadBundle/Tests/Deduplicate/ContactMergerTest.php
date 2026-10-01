@@ -594,7 +594,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $loser  = new Lead();
 
         $this->getMerger()->mergeStages($winner, $loser);
-        $this->assertNull($winner->getStage());
+        $this->assertNotInstanceOf(Stage::class, $winner->getStage());
     }
 
     public function testMergePoints(): void
