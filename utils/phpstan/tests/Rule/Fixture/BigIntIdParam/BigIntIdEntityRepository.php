@@ -32,7 +32,11 @@ final class BigIntIdEntityRepository extends EntityRepository
     {
     }
 
-    public function findByOtherParam(int $leadId): void
+    public function findByLeadId(int $leadId): void
+    {
+    }
+
+    public function findByOtherParam(int $relatedId): void
     {
     }
 }

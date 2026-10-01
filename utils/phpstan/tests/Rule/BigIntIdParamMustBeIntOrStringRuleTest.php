@@ -29,6 +29,10 @@ final class BigIntIdParamMustBeIntOrStringRuleTest extends RuleTestCase
                 'Param "$id" of "findByStringId()" must be "int|string", as the entity id is unsigned bigint hydrated as string.',
                 19,
             ],
+            [
+                'Param "$leadId" of "findByLeadId()" must be "int|string", as the entity id is unsigned bigint hydrated as string.',
+                35,
+            ],
         ]);
     }
 

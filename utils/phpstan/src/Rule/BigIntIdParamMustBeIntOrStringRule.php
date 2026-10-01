@@ -34,7 +34,10 @@ use PHPStan\Type\TypeCombinator;
  */
 final readonly class BigIntIdParamMustBeIntOrStringRule implements Rule
 {
-    private const string ID_PARAM_NAME = 'id';
+    /**
+     * @var string[]
+     */
+    private const array ID_PARAM_NAMES = ['id', 'leadId'];
 
     private const string CONTROLLER_SUFFIX = 'Controller.php';
 
@@ -78,7 +81,7 @@ final readonly class BigIntIdParamMustBeIntOrStringRule implements Rule
         $ruleErrors = [];
 
         foreach ($classMethod->params as $param) {
-            if (!$param->var instanceof Variable || self::ID_PARAM_NAME !== $param->var->name) {
+            if (!$param->var instanceof Variable || !in_array($param->var->name, self::ID_PARAM_NAMES, true)) {
                 continue;
             }
 
