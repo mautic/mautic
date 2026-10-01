@@ -596,7 +596,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
                 // Validate owner permissions
                 if (!$this->security->isGranted('lead:leads:viewother')) {
-                    $composite->with(
+                    $composite = $composite->with(
                         $expr->or(
                             $expr->and(
                                 $expr->isNull('comp.owner_id'),
