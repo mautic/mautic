@@ -466,18 +466,14 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $campaignSources = ['forms' => [$formId => $formId]];
-
         /** @var CampaignModel $campaignModel */
         $campaignModel = self::getContainer()->get(CampaignModel::class);
 
-        $campaign = new Campaign();
-        $campaign->setName('Test Campaign');
-        $campaign->setIsPublished(true);
-        $campaignModel->setLeadSources($campaign, $campaignSources, []);
-
-        $this->em->persist($campaign);
-        $this->em->flush();
+        $campaign = $this->createPublishedCampaignForForm(
+            $campaignModel,
+            $formId,
+            'Test Campaign'
+        );
 
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
@@ -491,6 +487,26 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['campaign' => $campaign->getId()]);
         $this->assertCount(1, $campaignLeads);
+    }
+
+    private function createPublishedCampaignForForm(
+        CampaignModel $campaignModel,
+        int $formId,
+        string $name,
+    ): Campaign {
+        $campaign = new Campaign();
+        $campaign->setName($name);
+        $campaign->setIsPublished(true);
+        $campaignModel->setLeadSources(
+            $campaign,
+            ['forms' => [$formId => $formId]],
+            []
+        );
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
     }
 
     /**
@@ -1552,6 +1568,220 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $resultCount = (int) $qb->executeQuery()->fetchOne();
 
         $this->assertSame(0, $resultCount);
+    }
+
+    public function testKioskSubmissionWithoutMappedContactFieldsDoesNotRequireContactForCampaign(): void
+    {
+        $payload = $this->getPayLoad([
+            'name'   => 'Kiosk campaign form without contact fields',
+            'fields' => [
+                [
+                    'label' => 'Message',
+                    'type'  => 'text',
+                    'alias' => 'message',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ]);
+        $payload['inKioskMode'] = true;
+        $payload['postAction']  = 'return';
+
+        $form   = $this->createFormViaApi($payload);
+        $formId = (int) $form['id'];
+        $prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
+
+        /** @var CampaignModel $campaignModel */
+        $campaignModel = self::getContainer()->get(CampaignModel::class);
+
+        $campaign = $this->createPublishedCampaignForForm(
+            $campaignModel,
+            $formId,
+            'Kiosk campaign without contact fields'
+        );
+
+        $this->client->getCookieJar()->clear();
+
+        $before = (int) $this->connection->fetchOne(
+            "SELECT COUNT(*) FROM {$prefix}leads"
+        );
+
+        $campaignsBeforeSubmit = $campaignModel->getCampaignsByForm($formId);
+
+        $this->assertCount(
+            1,
+            $campaignsBeforeSubmit,
+            'The form must be attached to the published campaign before submission.'
+        );
+        $this->assertTrue($campaignsBeforeSubmit[0]->isPublished());
+
+        $this->client->followRedirects(false);
+
+        $this->client->request(
+            Request::METHOD_POST,
+            "/form/submit?formId={$formId}",
+            [
+                'mauticform' => [
+                    'message'  => 'Kiosk submission without contact mapping',
+                    'formId'   => $formId,
+                    'formName' => 'Kiosk campaign form without contact fields',
+                ],
+            ]
+        );
+
+        $this->assertSame(
+            Response::HTTP_FOUND,
+            $this->client->getResponse()->getStatusCode()
+        );
+
+        $this->client->followRedirects(true);
+
+        $submissionCount = (int) $this->connection->fetchOne(
+            "SELECT COUNT(*) FROM {$prefix}form_submissions WHERE form_id = ?",
+            [$formId]
+        );
+
+        $this->assertSame(
+            1,
+            $submissionCount,
+            'The kiosk form submission must actually reach persistence.'
+        );
+
+        $after = (int) $this->connection->fetchOne(
+            "SELECT COUNT(*) FROM {$prefix}leads"
+        );
+
+        $this->assertSame(0, $after - $before);
+
+        $this->assertNotInstanceOf(
+            \Symfony\Component\BrowserKit\Cookie::class,
+            $this->client->getCookieJar()->get('mautic_device_id')
+        );
+        $this->assertNotInstanceOf(
+            \Symfony\Component\BrowserKit\Cookie::class,
+            $this->client->getCookieJar()->get('mtc_id')
+        );
+
+        $campaignLeads = $this->em
+            ->getRepository(Lead::class)
+            ->findBy(['campaign' => $campaign->getId()]);
+
+        $this->assertCount(0, $campaignLeads);
+    }
+
+    #[DataProvider('trackingStateOnSubmissionProvider')]
+    public function testTrackingStateOnSubmissionRespectsKioskMode(
+        bool $inKioskMode,
+        bool $expectTrackingState,
+        string $email,
+        string $formName,
+    ): void {
+        $payload = $this->getPayLoad([
+            'name'   => $formName,
+            'fields' => [
+                [
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'leadField'    => 'email',
+                    'mappedField'  => 'email',
+                    'mappedObject' => 'contact',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ]);
+        $payload['inKioskMode'] = $inKioskMode;
+        $payload['postAction']  = 'return';
+
+        $form   = $this->createFormViaApi($payload);
+        $formId = (int) $form['id'];
+        $prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
+
+        $this->client->getCookieJar()->clear();
+
+        $before = (int) $this->connection->fetchOne(
+            "SELECT COUNT(*) FROM {$prefix}leads"
+        );
+
+        $this->client->request(
+            Request::METHOD_POST,
+            "/form/submit?formId={$formId}",
+            [
+                'mauticform' => [
+                    'email'  => $email,
+                    'formId' => $formId,
+                ],
+            ]
+        );
+
+        $deviceCookie = $this->client->getCookieJar()->get('mautic_device_id');
+        $mtcCookie    = $this->client->getCookieJar()->get('mtc_id');
+
+        $after = (int) $this->connection->fetchOne(
+            "SELECT COUNT(*) FROM {$prefix}leads"
+        );
+
+        $this->assertSame(
+            1,
+            $after - $before,
+            'A form submission must create only the submitted contact.'
+        );
+
+        $submittedContacts = (int) $this->connection->fetchOne(
+            "SELECT COUNT(*) FROM {$prefix}leads WHERE email = ?",
+            [$email]
+        );
+        $this->assertSame(1, $submittedContacts);
+
+        if ($expectTrackingState) {
+            $this->assertInstanceOf(\Symfony\Component\BrowserKit\Cookie::class, $deviceCookie);
+            $this->assertInstanceOf(\Symfony\Component\BrowserKit\Cookie::class, $mtcCookie);
+
+            $trackedContactEmail = $this->connection->fetchOne(
+                "SELECT email FROM {$prefix}leads WHERE id = ?",
+                [(int) $mtcCookie->getValue()]
+            );
+
+            $this->assertSame($email, $trackedContactEmail);
+
+            return;
+        }
+
+        $this->assertNotInstanceOf(
+            \Symfony\Component\BrowserKit\Cookie::class,
+            $deviceCookie,
+            'Kiosk mode must not generate a mautic_device_id tracking cookie.'
+        );
+        $this->assertNotInstanceOf(
+            \Symfony\Component\BrowserKit\Cookie::class,
+            $mtcCookie,
+            'Kiosk mode must not generate an mtc_id tracking cookie.'
+        );
+    }
+
+    /**
+     * @return \Iterator<string, array{bool, bool, string, string}>
+     */
+    public static function trackingStateOnSubmissionProvider(): \Iterator
+    {
+        yield 'kiosk mode' => [
+            true,
+            false,
+            'kiosk@example.test',
+            'Kiosk tracking state test form',
+        ];
+
+        yield 'normal mode' => [
+            false,
+            true,
+            'normal@example.test',
+            'Normal tracking state test form',
+        ];
     }
 
     protected function beforeTearDown(): void
