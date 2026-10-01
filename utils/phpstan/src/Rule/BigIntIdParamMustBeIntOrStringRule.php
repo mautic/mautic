@@ -15,9 +15,11 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\UnionType;
 use PhpParser\NodeFinder;
 use PHPStan\Analyser\Scope;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 
@@ -204,26 +206,15 @@ final readonly class BigIntIdParamMustBeIntOrStringRule implements Rule
             return null;
         }
 
-        // only "$this->property->method(...)" calls are resolvable from class reflection alone
-        if (!$methodCall->var instanceof PropertyFetch
-            || !$methodCall->var->var instanceof Variable
-            || 'this' !== $methodCall->var->var->name
-            || !$methodCall->var->name instanceof Identifier
-        ) {
-            return null;
-        }
-
         $classReflection = $scope->getClassReflection();
         if (null === $classReflection) {
             return null;
         }
 
-        $propertyName = $methodCall->var->name->toString();
-        if (!$classReflection->hasInstanceProperty($propertyName)) {
+        $callerType = $this->resolveCallerType($methodCall, $classReflection, $scope);
+        if (!$callerType instanceof Type) {
             return null;
         }
-
-        $callerType = $classReflection->getInstanceProperty($propertyName, $scope)->getReadableType();
 
         $methodName = $methodCall->name->toString();
         if (!$callerType->hasMethod($methodName)->yes()) {
@@ -235,6 +226,30 @@ final readonly class BigIntIdParamMustBeIntOrStringRule implements Rule
         $variants = $methodReflection->getVariants();
 
         return $variants[0]->getReturnType();
+    }
+
+    private function resolveCallerType(MethodCall $methodCall, ClassReflection $classReflection, Scope $scope): ?Type
+    {
+        // "$this->method(...)" calls, e.g. $this->checkLeadAccess($id)
+        if ($methodCall->var instanceof Variable && 'this' === $methodCall->var->name) {
+            return new ObjectType($classReflection->getName());
+        }
+
+        // "$this->property->method(...)" calls, e.g. $this->model->getEntity($id)
+        if (!$methodCall->var instanceof PropertyFetch
+            || !$methodCall->var->var instanceof Variable
+            || 'this' !== $methodCall->var->var->name
+            || !$methodCall->var->name instanceof Identifier
+        ) {
+            return null;
+        }
+
+        $propertyName = $methodCall->var->name->toString();
+        if (!$classReflection->hasInstanceProperty($propertyName)) {
+            return null;
+        }
+
+        return $classReflection->getInstanceProperty($propertyName, $scope)->getReadableType();
     }
 
     private function isEntityRepository(Scope $scope): bool

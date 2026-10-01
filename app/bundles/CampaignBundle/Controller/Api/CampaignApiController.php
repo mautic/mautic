@@ -164,7 +164,7 @@ final class CampaignApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function removeLeadAction(int $id, int $leadId): Response
+    public function removeLeadAction(int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {

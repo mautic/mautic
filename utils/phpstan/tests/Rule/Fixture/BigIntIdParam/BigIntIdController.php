@@ -41,4 +41,14 @@ final class BigIntIdController
     {
         $this->bigIntIdEntityModel->getEntity(1);
     }
+
+    public function thisMethodAction(int $contactId): void
+    {
+        $this->checkAccess($contactId);
+    }
+
+    private function checkAccess(int|string $id): ?BigIntIdEntity
+    {
+        return $this->bigIntIdEntityModel->getEntity($id);
+    }
 }

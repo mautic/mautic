@@ -104,7 +104,7 @@ final class EventLogApiController extends FetchCommonApiController
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getContactEventsAction(Request $request, UserHelper $userHelper, int $contactId, ?int $campaignId = null): Response
+    public function getContactEventsAction(Request $request, UserHelper $userHelper, int|string $contactId, ?int $campaignId = null): Response
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -158,7 +158,7 @@ final class EventLogApiController extends FetchCommonApiController
         defaults: ['_format' => 'json'],
         methods: ['PUT']
     )]
-    public function editContactEventAction(Request $request, int $eventId, int $contactId): Response
+    public function editContactEventAction(Request $request, int $eventId, int|string $contactId): Response
     {
         $parameters = $request->request->all();
 

@@ -48,6 +48,10 @@ final class BigIntIdParamMustBeIntOrStringRuleTest extends RuleTestCase
                 'Param "$leadId" of "nullableAction()" must be "int|string", as the entity id is unsigned bigint hydrated as string.',
                 20,
             ],
+            [
+                'Param "$contactId" of "thisMethodAction()" must be "int|string", as the entity id is unsigned bigint hydrated as string.',
+                45,
+            ],
         ]);
     }
 }
