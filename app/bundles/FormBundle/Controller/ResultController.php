@@ -221,7 +221,7 @@ final class ResultController extends CommonFormController
         path: '/forms/results/file/{submissionId}/{field}',
         name: 'mautic_form_file_download',
     )]
-    public function downloadFileAction(int $submissionId, string $field, FormUploader $formUploader): BinaryFileResponse
+    public function downloadFileAction(int|string $submissionId, string $field, FormUploader $formUploader): BinaryFileResponse
     {
         $submission             = $this->submissionResultLoader->getSubmissionWithResult($submissionId);
 

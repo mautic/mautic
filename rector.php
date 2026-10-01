@@ -45,6 +45,7 @@ return RectorConfig::configure()
         Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
         Utils\Rector\TestGetRepositoryToContainerGetRector::class,
+        Utils\Rector\RouteRequirementParamTypeRector::class,
     ])
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
@@ -63,6 +64,12 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
             // doctrine magic
             __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
+        ],
+
+        // getEntities() is declared iterable, but callers rely on the countable Paginator it returns
+        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
+            __DIR__.'/app/bundles/DynamicContentBundle/Tests/Unit/Helper/DynamicContentHelperTest.php',
         ],
 
         // test fixtures

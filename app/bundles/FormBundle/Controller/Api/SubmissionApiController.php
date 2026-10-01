@@ -87,9 +87,6 @@ final class SubmissionApiController extends CommonApiController
 
     /**
      * Obtains a list of entities for specific form and contact.
-     *
-     * @param int $formId
-     * @param int $contactId
      */
     #[Route(
         path: '/api/forms/{formId}/submissions/contact/{contactId}',
@@ -98,7 +95,7 @@ final class SubmissionApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId): Response
+    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, int $formId, int|string $contactId): Response
     {
         $filter = [
             'filter' => [
@@ -106,7 +103,7 @@ final class SubmissionApiController extends CommonApiController
                     [
                         'col'  => 's.lead_id',
                         'expr' => 'eq',
-                        'val'  => (int) $contactId,
+                        'val'  => $contactId,
                     ],
                 ],
             ],

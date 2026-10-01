@@ -542,7 +542,6 @@ final class ReportController extends FormController
      * Shows a report.
      *
      * @param int $objectId   Report ID
-     * @param int $reportPage
      */
     #[Route(
         path: '/s/reports/view/{objectId}/{reportPage}',
@@ -550,7 +549,7 @@ final class ReportController extends FormController
         requirements: ['reportPage' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['reportPage' => 1, 'objectId' => 0],
     )]
-    public function viewAction(Request $request, $objectId, $reportPage = 1): Response
+    public function viewAction(Request $request, $objectId, int $reportPage = 1): Response
     {
         $entity   = $this->reportModel->getEntity($objectId);
 

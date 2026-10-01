@@ -54,7 +54,6 @@ final class CategoryController extends AbstractFormController
 
     /**
      * @param string $bundle
-     * @param int    $page
      */
     #[Route(
         path: '/s/categories/{bundle}/{page}',
@@ -62,7 +61,7 @@ final class CategoryController extends AbstractFormController
         requirements: ['page' => '\d+'],
         defaults: ['bundle' => 'category', 'page' => 0],
     )]
-    public function indexAction(Request $request, CategorySearchScopeProvider $categorySearchScopeProvider, $bundle, $page = 1): Response
+    public function indexAction(Request $request, CategorySearchScopeProvider $categorySearchScopeProvider, $bundle, int $page = 1): Response
     {
         $session = $request->getSession();
 

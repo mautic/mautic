@@ -144,7 +144,7 @@ final class AuditLogRepository extends CommonRepository
     /**
      * Get array of objects which belongs to the object.
      */
-    public function getLogForObject(?string $object = null, ?string $id = null, int $limit = 10, $afterDate = null, $bundle = null): array
+    public function getLogForObject(?string $object = null, int|string|null $id = null, int $limit = 10, $afterDate = null, $bundle = null): array
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')

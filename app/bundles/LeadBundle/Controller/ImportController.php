@@ -76,16 +76,13 @@ final class ImportController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/{object}/import/{page}',
         name: 'mautic_import_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         $initEvent = $this->dispatchImportOnInit();
         $this->requestStack->getSession()->set('mautic.import.object', $initEvent->objectSingular);

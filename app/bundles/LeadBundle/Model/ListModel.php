@@ -1191,7 +1191,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function isFieldUsed(LeadField $field): bool
     {
-        return 0 < $this->getFieldSegments($field)->count();
+        return 0 < count($this->getFieldSegments($field));
     }
 
     public function getFieldSegments(LeadField $field)

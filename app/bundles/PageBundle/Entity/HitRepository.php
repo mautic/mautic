@@ -510,7 +510,7 @@ final class HitRepository extends CommonRepository
             ->executeStatement();
     }
 
-    public function getLatestHitDateByLead(int $leadId, ?string $trackingId = null): ?\DateTime
+    public function getLatestHitDateByLead(int|string $leadId, ?string $trackingId = null): ?\DateTime
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('MAX(date_hit)')

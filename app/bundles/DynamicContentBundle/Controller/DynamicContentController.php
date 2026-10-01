@@ -73,7 +73,7 @@ final class DynamicContentController extends FormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, DynamicContentSearchScopeProvider $dynamicContentSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, DynamicContentSearchScopeProvider $dynamicContentSearchScopeProvider, int $page = 1): Response
     {
         $permissions = $this->getPermissions();
 

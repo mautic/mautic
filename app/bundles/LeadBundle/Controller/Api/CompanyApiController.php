@@ -86,9 +86,6 @@ final class CompanyApiController extends CommonApiController
     /**
      * Adds a contact to a company.
      *
-     * @param int $companyId Company ID
-     * @param int $contactId Contact ID
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     #[Route(
@@ -98,7 +95,7 @@ final class CompanyApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addContactAction($companyId, $contactId): Response
+    public function addContactAction(int $companyId, int|string $contactId): Response
     {
         $company = $this->model->getEntity($companyId);
         $view    = $this->view(['success' => 1], Response::HTTP_OK);
@@ -120,8 +117,8 @@ final class CompanyApiController extends CommonApiController
     /**
      * Removes given contact from a company.
      *
-     * @param int $companyId List ID
-     * @param int $contactId Lead ID
+     * @param int        $companyId List ID
+     * @param int|string $contactId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -132,7 +129,7 @@ final class CompanyApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function removeContactAction($companyId, $contactId): Response
+    public function removeContactAction(int $companyId, int|string $contactId): Response
     {
         $company = $this->model->getEntity($companyId);
         $view    = $this->view(['success' => 1], Response::HTTP_OK);

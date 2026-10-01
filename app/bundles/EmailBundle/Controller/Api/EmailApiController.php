@@ -112,7 +112,7 @@ final class EmailApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function sendAction(Request $request, $id): Response
+    public function sendAction(Request $request, int $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -146,7 +146,6 @@ final class EmailApiController extends CommonApiController
      * Sends the email to a specific lead.
      *
      * @param int $id     Email ID
-     * @param int $leadId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -157,7 +156,7 @@ final class EmailApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function sendLeadAction(Request $request, $id, $leadId): Response
+    public function sendLeadAction(Request $request, int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 

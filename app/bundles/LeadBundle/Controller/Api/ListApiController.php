@@ -151,7 +151,6 @@ final class ListApiController extends CommonApiController
      * Adds a lead to a list.
      *
      * @param int $id     List ID
-     * @param int $leadId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -162,7 +161,7 @@ final class ListApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addLeadAction($id, $leadId): Response
+    public function addLeadAction(int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -202,7 +201,7 @@ final class ListApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addLeadsAction(Request $request, $id): Response
+    public function addLeadsAction(Request $request, int $id): Response
     {
         $contactIds = $request->request->all()['ids'] ?? null;
         if (null === $contactIds) {
@@ -241,7 +240,6 @@ final class ListApiController extends CommonApiController
      * Removes given contact from a list.
      *
      * @param int $id     List ID
-     * @param int $leadId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -252,7 +250,7 @@ final class ListApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function removeLeadAction($id, $leadId): Response
+    public function removeLeadAction(int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 

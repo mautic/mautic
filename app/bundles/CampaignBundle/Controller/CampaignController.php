@@ -464,7 +464,6 @@ final class CampaignController extends AbstractStandardFormController
 
     /**
      * @param string|int $objectId
-     * @param int        $page
      * @param int|null   $count
      */
     #[Route(
@@ -477,7 +476,7 @@ final class CampaignController extends AbstractStandardFormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1,
+        int $page = 1,
         $count = null,
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
@@ -613,16 +612,13 @@ final class CampaignController extends AbstractStandardFormController
         return $this->editStandard($request, $objectId, $ignorePost);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/campaigns/{page}',
         name: 'mautic_campaign_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, CampaignSearchScopeProvider $campaignSearchScopeProvider, $page = null): Response
+    public function indexAction(Request $request, CampaignSearchScopeProvider $campaignSearchScopeProvider, ?int $page = null): Response
     {
         $this->indexSearchScopes = $campaignSearchScopeProvider->getScopes();
 

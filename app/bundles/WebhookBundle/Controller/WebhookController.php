@@ -64,16 +64,13 @@ final class WebhookController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/webhooks/{page}',
         name: 'mautic_webhook_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, WebhookSearchScopeProvider $webhookSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, WebhookSearchScopeProvider $webhookSearchScopeProvider, int $page = 1): Response
     {
         $this->indexSearchScopes = $webhookSearchScopeProvider->getScopes();
 

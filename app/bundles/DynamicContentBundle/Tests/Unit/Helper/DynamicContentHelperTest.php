@@ -54,7 +54,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $matcher = $this->exactly(2);
         $this->mockModel->expects($matcher)
-            ->method('getEntities')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getEntities')->willReturnCallback(function (...$parameters) use ($matcher): iterable {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame([
                         'filter' => [
@@ -92,6 +92,8 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
 
                     return [];
                 }
+
+                return [];
             });
 
         // Only get published

@@ -44,7 +44,7 @@ final class InsightController extends AbstractStandardFormController
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, PointInsightSearchScopeProvider $pointInsightSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, PointInsightSearchScopeProvider $pointInsightSearchScopeProvider, int $page = 1): Response
     {
         $this->indexSearchScopes = $pointInsightSearchScopeProvider->getScopes();
 

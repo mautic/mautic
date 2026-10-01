@@ -184,7 +184,7 @@ final class UserApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function isGrantedAction(Request $request, $id): Response
+    public function isGrantedAction(Request $request, int $id): Response
     {
         $entity = $this->model->getEntity($id);
         if (!$entity instanceof $this->entityClass) {
