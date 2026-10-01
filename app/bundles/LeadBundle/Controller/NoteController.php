@@ -377,7 +377,7 @@ final class NoteController extends FormController
         requirements: ['leadId' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
-    public function executeNoteAction(Request $request, $objectAction, $objectId = 0, int $leadId = 0): Response
+    public function executeNoteAction(Request $request, $objectAction, $objectId = 0, int|string $leadId = 0): Response
     {
         if (method_exists($this, "{$objectAction}Action")) {
             return $this->{"{$objectAction}Action"}($request, $leadId, $objectId);
