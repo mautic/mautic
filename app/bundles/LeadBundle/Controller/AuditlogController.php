@@ -21,7 +21,7 @@ final class AuditlogController extends CommonController
         requirements: ['leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, int $leadId, int $page = 1): Response
+    public function indexAction(Request $request, int|string $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -76,7 +76,7 @@ final class AuditlogController extends CommonController
         name: 'mautic_contact_auditlog_export_action',
         requirements: ['leadId' => '\d+'],
     )]
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, int $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, int|string $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

@@ -34,7 +34,7 @@ final class NoteController extends FormController
         requirements: ['leadId' => '\d+', 'page' => '\d+'],
         defaults: ['leadId' => 0, 'page' => 0],
     )]
-    public function indexAction(Request $request, NoteModel $model, int $leadId = 0, int $page = 1): Response
+    public function indexAction(Request $request, NoteModel $model, int|string $leadId = 0, int $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
