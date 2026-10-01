@@ -227,10 +227,7 @@ class Stat
         $this->lastSent = $lastSent;
     }
 
-    /**
-     * @return array
-     */
-    public function getSentDetails()
+    public function getSentDetails(): array
     {
         return $this->sentDetails;
     }
@@ -275,10 +272,7 @@ class Stat
         $this->sourceId = $sourceId;
     }
 
-    /**
-     * @return array
-     */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }

@@ -443,10 +443,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         $this->message = $message;
     }
 
-    /**
-     * @return array
-     */
-    public function getUtmTags()
+    public function getUtmTags(): array
     {
         return $this->utmTags;
     }
@@ -601,10 +598,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getMobileSettings()
+    public function getMobileSettings(): array
     {
         return $this->mobileSettings ?? [];
     }

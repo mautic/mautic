@@ -619,10 +619,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getContent()
+    public function getContent(): array|string
     {
         return $this->content;
     }
@@ -635,10 +632,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getUtmTags()
+    public function getUtmTags(): array
     {
         return $this->utmTags;
     }
@@ -1119,10 +1113,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->assetAttachments;
     }
 
-    /**
-     * @return array
-     */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }

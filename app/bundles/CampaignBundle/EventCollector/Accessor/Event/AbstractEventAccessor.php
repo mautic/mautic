@@ -51,10 +51,7 @@ abstract class AbstractEventAccessor
         return $this->getProperty('formType');
     }
 
-    /**
-     * @return array
-     */
-    public function getFormTypeOptions()
+    public function getFormTypeOptions(): array
     {
         return $this->getProperty('formTypeOptions', []);
     }
@@ -75,18 +72,12 @@ abstract class AbstractEventAccessor
         return $this->getProperty('timelineTemplate');
     }
 
-    /**
-     * @return array
-     */
-    public function getConnectionRestrictions()
+    public function getConnectionRestrictions(): array
     {
         return $this->getProperty('connectionRestrictions', []);
     }
 
-    /**
-     * @return array
-     */
-    public function getExtraProperties()
+    public function getExtraProperties(): array
     {
         return $this->extraProperties;
     }

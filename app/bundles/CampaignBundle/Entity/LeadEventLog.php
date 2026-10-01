@@ -370,7 +370,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @return mixed[]
      */
-    public function getMetadata()
+    public function getMetadata(): array
     {
         return $this->metadata;
     }

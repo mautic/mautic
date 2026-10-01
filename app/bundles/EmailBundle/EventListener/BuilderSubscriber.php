@@ -254,7 +254,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
                     $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough);
             }
 
-            if ($utmTags) {
+            if ($utmTags !== []) {
                 $url = $this->pageRedirectModel->applyUtmTags($url, $utmTags);
             }
 

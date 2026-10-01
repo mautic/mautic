@@ -572,10 +572,8 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
 
     /**
      * Gets a list of published campaigns.
-     *
-     * @return array
      */
-    public function getPublishedCampaigns(bool $forList = false)
+    public function getPublishedCampaigns(bool $forList = false): array
     {
         static $campaigns = [];
 

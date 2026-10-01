@@ -806,3 +806,23 @@
     | `ChannelBundle\Entity\Channel` | `getProperties()` |
     | `ChannelBundle\Entity\MessageQueue` | `getMetadata()` |
     | `CoreBundle\Entity\AuditLog` | `getDetails()` |
+- Methods in Campaign, Email, Point, Notification, DynamicContent and Sms bundle base classes, entities, events and interfaces that documented `@return array` now declare a native return type. If a plugin class implements one of these interfaces or overrides one of these methods, add a compatible return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with Y::method(): array". The return type is `array` unless noted:
+
+    | Class | Methods |
+    | --- | --- |
+    | `EmailBundle\Entity\EmailReplyRepositoryInterface` | `getByLeadIdForTimeline()` |
+    | `CampaignBundle\Event\AbstractLogCollectionEvent` | `getContactIds()` |
+    | `CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor` | `getFormTypeOptions()`, `getConnectionRestrictions()`, `getExtraProperties()` |
+    | `EmailBundle\Stats\Helper\AbstractHelper` | `fetchStats()` |
+    | `CampaignBundle\Event\CampaignExecutionEvent` | `getLeadFields()`, `getEvent()`, `getEventArray()`, `getConfig()` |
+    | `CampaignBundle\Entity\Event` | `getProperties()` |
+    | `CampaignBundle\Entity\LeadEventLog` | `getMetadata()` |
+    | `EmailBundle\Entity\Email` | `getContent()` (`array\|string`), `getUtmTags()`, `getHeaders()` |
+    | `EmailBundle\Entity\Stat` | `getOpenDetails()` |
+    | `EmailBundle\Event\EmailSendEvent` | `getSource()` |
+    | `NotificationBundle\Entity\Notification` | `getUtmTags()`, `getMobileSettings()` |
+    | `NotificationBundle\Entity\Stat` | `getTokens()`, `getClickDetails()` |
+    | `DynamicContentBundle\Entity\Stat` | `getSentDetails()`, `getTokens()` |
+    | `SmsBundle\Entity\Stat` | `getTokens()`, `getDetails()` |
+    | `PointBundle\Entity\Point`, `PointBundle\Entity\TriggerEvent` | `getProperties()` |
+    | `PointBundle\Entity\PointInsight` | `getPointGroups()` |
