@@ -10,6 +10,7 @@
 {% set isPublished = variant.isPublished() %}
 {% set isWinner = abTestResults.winners is defined and variant.id in abTestResults.winners and variants.parent.variantStartDate and isPublished %}
 {% set isCurrent = variant.id == activeEntity.id %}
+{% set canMakeWinner = variants.parent.variantStartDate and isPublished %}
 
 {# Render variant list item #}
 <div class="list-group-item variant-item d-flex ai-center {% if isCurrent %}bg-aut bg-dark-xs{% endif %}" style="padding: 4px 8px;">
@@ -46,6 +47,19 @@
 
     {# Action buttons #}
     <div class="variant-actions d-flex" style="flex-shrink: 0;">
+        {% if canMakeWinner %}
+            <a href="{{ path(actionRoute, {'objectAction': 'winner', 'objectId': variant.id}) }}"
+               class="btn btn-warning btn--icon-only btn-sm btn-nospin"
+               title="{{ 'mautic.core.ab_test.make_winner'|trans }}"
+               data-toggle="confirmation"
+               data-message="{{ ('mautic.core.ab_test.confirm_make_winner'|trans({'%name%': attribute(variant, nameGetter)})|e) }}"
+               data-confirm-text="{{ 'mautic.core.ab_test.make_winner'|trans|escape }}"
+               data-confirm-callback="executeAction"
+               data-cancel-text="{{ 'mautic.core.form.cancel'|trans|escape }}">
+                <i class="{{ isWinner ? 'ri-trophy-fill' : 'ri-trophy-line' }}"></i>
+            </a>
+        {% endif %}
+
         <a href="{{ path('mautic_email_preview', {'objectId': variant.id}) }}"
            class="btn btn-ghost btn--icon-only btn-sm btn-nospin"
            title="{{ 'mautic.core.preview'|trans }}"
