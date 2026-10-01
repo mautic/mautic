@@ -218,7 +218,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
     /**
      * Get a list of lead entities.
      */
-    public function getLeadsByUniqueFields(iterable $uniqueFieldsWithData, ?int $leadId = null, ?int $limit = null): array
+    public function getLeadsByUniqueFields(iterable $uniqueFieldsWithData, int|string|null $leadId = null, ?int $limit = null): array
     {
         $results = $this->getLeadFieldsByUniqueFields($uniqueFieldsWithData, 'l.*', $leadId, $limit);
 
@@ -264,7 +264,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
      *
      * @return array<array{id: string}>
      */
-    public function getLeadIdsByUniqueFields(iterable $uniqueFieldsWithData, ?int $leadId = null, ?int $limit = null): array
+    public function getLeadIdsByUniqueFields(iterable $uniqueFieldsWithData, int|string|null $leadId = null, ?int $limit = null): array
     {
         return $this->getLeadFieldsByUniqueFields($uniqueFieldsWithData, 'l.id', $leadId, $limit);
     }
@@ -274,7 +274,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
      *
      * @return array<array<mixed>>
      */
-    private function getLeadFieldsByUniqueFields(iterable $uniqueFieldsWithData, string $select, ?int $leadId = null, ?int $limit = null): array
+    private function getLeadFieldsByUniqueFields(iterable $uniqueFieldsWithData, string $select, int|string|null $leadId = null, ?int $limit = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select($select)

@@ -651,7 +651,7 @@ SQL;
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function isLastFailed(int $leadId, int $eventId): bool
+    public function isLastFailed(int|string $leadId, int $eventId): bool
     {
         /** @var LeadEventLog $log */
         $log = $this->findOneBy(['lead' => $leadId, 'event' => $eventId], ['dateTriggered' => 'DESC']);

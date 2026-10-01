@@ -216,7 +216,7 @@ class DownloadRepository extends CommonRepository
         return $downloads;
     }
 
-    public function updateLeadByTrackingId(int $leadId, ?string $newTrackingId, string $oldTrackingId): void
+    public function updateLeadByTrackingId(int|string $leadId, ?string $newTrackingId, string $oldTrackingId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'asset_downloads')
