@@ -305,6 +305,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->addIndex(['date_added'], 'lead_date_added')
             ->addIndex(['date_modified'], 'lead_date_modified')
             ->addIndex(['date_identified'], 'date_identified')
+            ->addIndex(['email'], 'email_search')
             ->addIndex(['last_active'], 'last_active');
 
         $builder->addBigIntIdField();
