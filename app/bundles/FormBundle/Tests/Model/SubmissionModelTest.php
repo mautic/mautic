@@ -363,7 +363,8 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $field->setType('boolean');
         $this->assertFalse($method->invokeArgs($this->submissionModel, ['', $field]));
         $this->assertFalse($method->invokeArgs($this->submissionModel, [null, $field]));
-        $this->assertTrue($method->invokeArgs($this->submissionModel, ['0', $field]));
+        $this->assertFalse($method->invokeArgs($this->submissionModel, ['0', $field]));
+        $this->assertFalse($method->invokeArgs($this->submissionModel, [['0'], $field]));
         $this->assertTrue($method->invokeArgs($this->submissionModel, ['1', $field]));
         $this->assertTrue($method->invokeArgs($this->submissionModel, [['1'], $field]));
     }
@@ -375,7 +376,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             'no'  => '',
         ]);
 
-        $this->assertSame(['boolean' => false], $submissionEvent->getContactFieldMatches());
+        $this->assertSame(['boolean' => 0], $submissionEvent->getContactFieldMatches());
     }
 
     public function testSaveSubmissionMapsUncheckedBooleanWithOnlyNoLabelToTrue(): void
@@ -385,7 +386,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             'no'  => 'Do not subscribe me',
         ]);
 
-        $this->assertSame(['boolean' => true], $submissionEvent->getContactFieldMatches());
+        $this->assertSame(['boolean' => 1], $submissionEvent->getContactFieldMatches());
     }
 
     /**
@@ -421,10 +422,24 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         return $fields;
     }
 
+    public function testSaveSubmissionMapsCheckedOnlyNoLabelToZero(): void
+    {
+        $submissionEvent = $this->saveBooleanSubmission(
+            [
+                'yes' => '',
+                'no'  => 'Do not subscribe me',
+            ],
+            ['boolean' => ['0']]
+        );
+
+        $this->assertSame(['boolean' => 0], $submissionEvent->getContactFieldMatches());
+    }
+
     /**
      * @param array<string,string> $properties
+     * @param array<string,mixed>  $submittedValues
      */
-    private function saveBooleanSubmission(array $properties): SubmissionEvent
+    private function saveBooleanSubmission(array $properties, array $submittedValues = []): SubmissionEvent
     {
         $request = new Request();
         $request->setMethod('POST');
@@ -437,12 +452,12 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             default           => $submissionRepository,
         });
 
-        $post = [
+        $post      = array_merge([
             'formId'   => 1,
             'return'   => '',
             'formName' => 'testform',
             'formid'   => 1,
-        ];
+        ], $submittedValues);
 
         $form   = new Form();
         $fields = [
