@@ -9,6 +9,7 @@
     - limit
     - tmpl
     - canDelete
+    - canBlockDomains
 #}
 {% set formId = form.id %}
 <div class="table-responsive table-responsive-force">
@@ -81,12 +82,31 @@
               <tr>
                   {% if canDelete %}
                   <td>
+                      {% set custom = [] %}
+                      {% set hasEmail = false %}
+                      {% for key, r in item.results %}
+                          {% if 'email' == r.type and r.value is not empty %}
+                              {% set hasEmail = true %}
+                          {% endif %}
+                      {% endfor %}
+                      {% if canBlockDomains and hasEmail %}
+                          {% set custom = custom|merge([{
+                              'attr': {
+                                  'href': path('mautic_form_results_action', {'objectAction': 'markSpam', 'objectId': item.id, 'formId': formId}),
+                                  'data-toggle': 'ajax',
+                                  'data-method': 'POST',
+                              },
+                              'btnText': 'mautic.form.result.markspam'|trans,
+                              'iconClass': 'ri-spam-2-line',
+                          }]) %}
+                      {% endif %}
                       {{ include('@MauticCore/Helper/list_actions.html.twig', {
                           'item': item,
                           'templateButtons': {'delete': canDelete},
                           'route': 'mautic_form_results_action',
                           'langVar': 'form.results',
                           'query': {'formId': formId, 'objectAction': 'delete'},
+                          'customButtons': custom,
                       }) }}
                   </td>
                   {% endif %}
