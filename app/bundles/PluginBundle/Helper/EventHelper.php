@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Helper;
 
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PluginBundle\EventListener\PushToIntegrationTrait;
 
-class EventHelper
+final class EventHelper
 {
     use PushToIntegrationTrait;
 
@@ -16,9 +18,9 @@ class EventHelper
     {
         $contact = $leadRepository->getEntityWithPrimaryCompany($lead);
 
-        static::setStaticIntegrationHelper($integrationHelper);
+        self::setStaticIntegrationHelper($integrationHelper);
         $errors  = [];
 
-        return static::pushIt($config, $contact, $errors);
+        return self::pushIt($config, $contact, $errors);
     }
 }

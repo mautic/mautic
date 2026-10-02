@@ -38,7 +38,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $ct           = $this->getEncodedClickThroughValue($stat->getTrackingHash(), (int) $lead->getId());
+        $ct           = $this->getEncodedClickThroughValue($stat->getTrackingHash(), $lead->getId());
         $requestParam = '?ct='.$ct.'&page_title='.$page->getTitle();
 
         // hitPage() tracks only anonymous requests.
@@ -58,7 +58,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), (int) $lead->getId());
+        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), $lead->getId());
         // Use tracking pixel endpoint without page_title to trigger validation failure
         // This will have no page, no redirect, and no urlTitle (since page_title is missing)
         $requestParam = '?ct='.$ct;

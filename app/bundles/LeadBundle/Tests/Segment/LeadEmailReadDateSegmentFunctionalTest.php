@@ -59,9 +59,9 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
 
         $memberLeadIds = $this->getSegmentMemberLeadIds($segment);
 
-        $this->assertMembership((int) $recentOnly->getId(), $memberLeadIds, $expectRecentOnly);
-        $this->assertMembership((int) $oldOnly->getId(), $memberLeadIds, $expectOldOnly);
-        $this->assertMembership((int) $both->getId(), $memberLeadIds, $expectBoth);
+        $this->assertMembership($recentOnly->getId(), $memberLeadIds, $expectRecentOnly);
+        $this->assertMembership($oldOnly->getId(), $memberLeadIds, $expectOldOnly);
+        $this->assertMembership($both->getId(), $memberLeadIds, $expectBoth);
     }
 
     /**

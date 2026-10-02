@@ -1,0 +1,48 @@
+<div class="timeline timeline-right">
+  {% if header is defined and header is not empty %}
+    <div class="header">{{ header|trans }}</div>
+  {% endif %}
+
+  <ul class="events">
+    {% for event in events %}
+      <li class="wrapper">
+        <div class="figure">
+          <i class="{{ event.icon|default('ri-history-line')|e('html_attr') }}"></i>
+        </div>
+        {% if event.contentTemplate is defined %}
+          {% set details = include(event.contentTemplate, {'event': event}, ignore_missing=true)|trim %}
+        {% else %}
+          {% set details = '' %}
+        {% endif %}
+        {% set panelTag = details is not empty ? 'button' : 'div' %}
+        <{{ panelTag }}
+          class="panel"
+          {% if details is not empty %}
+            type="button"
+            data-toggle="popover"
+            data-container="body"
+            data-content="{{ details|escape('html_attr') }}"
+            data-placement="left"
+            data-html="true"
+          {% endif %}
+        >
+        <h3 class="type-heading-01 mb-sm">
+          {% if event.eventLabelHref is defined and event.eventLabelHref is not empty %}
+            <a href="{{ event.eventLabelHref|e('html_attr') }}" target="_blank" rel="noopener noreferrer">{{ event.eventLabel|purify }}</a>
+          {% else %}
+            {{ event.eventLabel|purify }}
+          {% endif %}
+        </h3>
+          {% if event.eventDescription|default('') is not empty %}
+            <div class="panel-meta">
+              <span class="event-description">{{ event.eventDescription|purify }}</span>
+            </div>
+          {% endif %}
+          <div class="event-timestamp type-label-01 text-secondary mt-xs">
+            <span data-toggle="tooltip" title="{{ dateToFull(event.timestamp)|e('html_attr') }}">{{ dateToHumanized(event.timestamp, 'local') }}</span>
+          </div>
+        </{{ panelTag }}>
+      </li>
+    {% endfor %}
+  </ul>
+</div>

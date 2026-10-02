@@ -132,8 +132,8 @@ final class ConfigFormTest extends KernelTestCase
         $pluginModel          = $this->createMock(PluginModel::class);
         $coreParametersHelper = new CoreParametersHelper(self::$kernel->getContainer());
 
-        $registeredPluginBundles = static::getContainer()->getParameter('mautic.plugin.bundles');
-        $mauticPlugins           = static::getContainer()->getParameter('mautic.bundles');
+        $registeredPluginBundles = self::getContainer()->getParameter('mautic.plugin.bundles');
+        $mauticPlugins           = self::getContainer()->getParameter('mautic.bundles');
         $bundleHelper->method('getPluginBundles')->willReturn($registeredPluginBundles);
 
         $bundleHelper->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\ORM\Mapping as ORM;

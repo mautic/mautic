@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class EmailPermissions extends AbstractPermissions
+final class EmailPermissions extends AbstractPermissions
 {
     /**
      * @param mixed[] $params

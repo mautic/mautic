@@ -1336,7 +1336,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get an array of public data.
      *
-     * @return mixed[]|void
+     * @return mixed[]|ResponseInterface|void
      */
     public function getUserData($identifier, &$socialCache)
     {
@@ -1469,7 +1469,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $leadFields = $availableIntegrationFields;
         }
 
-        if (!empty($leadFields)) {
+        if ([] !== $leadFields) {
             $cleanup($submittedFields, $leadFields, $mauticLeadFields, 'leadFields');
             $featureSettings['leadFields'] = $submittedFields;
         }
@@ -2373,7 +2373,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        if (!empty($formattedFields)) {
+        if ([] !== $formattedFields) {
             $fields = $formattedFields;
         }
 

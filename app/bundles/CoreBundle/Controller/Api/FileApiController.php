@@ -23,17 +23,29 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<object>
  */
-class FileApiController extends CommonApiController
+final class FileApiController extends CommonApiController
 {
     /**
      * Holds array of allowed file extensions.
      *
      * @var array
      */
-    protected $allowedExtensions = [];
+    private $allowedExtensions = [];
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        private readonly LoggerInterface $mauticLogger,
+    ) {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
         $this->allowedExtensions = $coreParametersHelper->get('allowed_extensions');
@@ -43,13 +55,11 @@ class FileApiController extends CommonApiController
 
     /**
      * Uploads a file.
-     *
-     * @return Response
      */
-    public function createAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
+    public function createAction(Request $request, PathsHelper $pathsHelper, $dir): Response
     {
         try {
-            $path = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir, true);
+            $path = $this->getAbsolutePath($request, $pathsHelper, $dir, true);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -82,13 +92,11 @@ class FileApiController extends CommonApiController
 
     /**
      * List the files in /media directory.
-     *
-     * @return Response
      */
-    public function listAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
+    public function listAction(Request $request, PathsHelper $pathsHelper, $dir): Response
     {
         try {
-            $filePath = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir);
+            $filePath = $this->getAbsolutePath($request, $pathsHelper, $dir);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -113,15 +121,13 @@ class FileApiController extends CommonApiController
 
     /**
      * Delete a file from /media directory.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $file)
+    public function deleteAction(Request $request, PathsHelper $pathsHelper, $dir, $file): Response
     {
         $response = ['success' => false];
 
         try {
-            $filePath = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir).'/'.basename($file);
+            $filePath = $this->getAbsolutePath($request, $pathsHelper, $dir).'/'.basename($file);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -146,7 +152,7 @@ class FileApiController extends CommonApiController
      * @param string $dir
      * @param bool   $createDir
      */
-    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false): string
+    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, $dir, $createDir = false): string
     {
         try {
             $possibleDirs = ['media', 'images'];
@@ -193,7 +199,7 @@ class FileApiController extends CommonApiController
 
             return $path;
         } catch (\Exception $e) {
-            $mauticLogger->error($e->getMessage(), ['exception' => $e]);
+            $this->mauticLogger->error($e->getMessage(), ['exception' => $e]);
 
             throw $e;
         }

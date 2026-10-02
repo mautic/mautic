@@ -14,7 +14,8 @@ final class ConstructorAndAutowireController
     }
 
     #[Required]
-    public function autowireConstructorAndAutowireController(SomeModel $someModel): void
-    {
+    public function autowireConstructorAndAutowireController(
+        SomeModel $someModel,
+    ): void {
     }
 }

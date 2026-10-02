@@ -40,10 +40,10 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $this->configParams[self::CAMPAIGN_RANGE_PARAM]   = in_array($this->name(), $functionForUseRange);
         parent::setUp();
 
-        $model = static::getContainer()->get(CampaignModel::class);
+        $model = self::getContainer()->get(CampaignModel::class);
 
         $this->campaignModel                                           = $model;
-        $this->campaignLeadsLabel                                      = static::getContainer()->get(TranslatorInterface::class)->trans('mautic.campaign.campaign.leads');
+        $this->campaignLeadsLabel                                      = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.campaign.campaign.leads');
         $this->configParams['delete_campaign_event_log_in_background'] = false;
     }
 

@@ -27,7 +27,9 @@ class EventModel extends FormModel
 
     #[Required]
     public function autowireEventModel(
-        EventRepository $eventRepository, CampaignRepository $campaignRepository, LeadEventLogRepository $leadEventLogRepository,
+        EventRepository $eventRepository,
+        CampaignRepository $campaignRepository,
+        LeadEventLogRepository $leadEventLogRepository,
     ): void {
         $this->eventRepository = $eventRepository;
         $this->campaignRepository = $campaignRepository;

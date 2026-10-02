@@ -90,6 +90,10 @@ class Asset extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[Sequentially([
+        new Assert\Url(message: 'mautic.asset.validation.error.url'),
+        new SafeRemoteUrl(),
+    ])]
     private $remotePath;
 
     /**
@@ -292,10 +296,6 @@ class Asset extends FormEntity implements UuidInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new Upload());
-        $metadata->addPropertyConstraint('remotePath', new Sequentially([
-            new Assert\Url(message: 'mautic.asset.validation.error.url'),
-            new SafeRemoteUrl(),
-        ]));
     }
 
     /**
@@ -357,7 +357,7 @@ class Asset extends FormEntity implements UuidInterface
         $this->file = $file;
 
         // check if we have an old asset path
-        if (isset($this->path)) {
+        if (null !== $this->path) {
             // store the old name to delete after the update
             $this->temp = $this->path;
             $this->path = null;
@@ -705,7 +705,7 @@ class Asset extends FormEntity implements UuidInterface
         $this->setFileInfoFromFile();
 
         // check if we have an old asset
-        if (isset($this->temp) && file_exists($filePath)) {
+        if (null !== $this->temp && file_exists($filePath)) {
             // delete the old asset
             unlink($filePath);
             // clear the temp asset path

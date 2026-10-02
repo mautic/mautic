@@ -50,7 +50,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         /** @var EmailModel $emailModel */
-        $emailModel = static::getContainer()->get(EmailModel::class);
+        $emailModel = self::getContainer()->get(EmailModel::class);
         $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
     }
@@ -145,7 +145,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get(LeadModel::class);
+        $contactModel = self::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 
@@ -570,7 +570,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->addContactsToSegment(array_slice($contacts, 2, 3), $segment);
 
-        static::getContainer()->get(EventDispatcherInterface::class)->dispatch(
+        self::getContainer()->get(EventDispatcherInterface::class)->dispatch(
             new ListChangeEvent($contacts[2], $segment, true),
             LeadEvents::LEAD_LIST_CHANGE
         );
@@ -590,7 +590,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->emailModel->getPendingLeads($email, null, true);
 
-        $listModel = static::getContainer()->get(ListModel::class);
+        $listModel = self::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {
@@ -612,7 +612,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->emailModel->getPendingLeads($email, null, true);
 
-        $listModel = static::getContainer()->get(ListModel::class);
+        $listModel = self::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {

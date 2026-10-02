@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Psr7\Query;
 
-class UrlHelper
+final class UrlHelper
 {
     /**
      * Append query string to URL.

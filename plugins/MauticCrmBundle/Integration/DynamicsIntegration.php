@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<DynamicsApi>
  */
-class DynamicsIntegration extends CrmAbstractIntegration
+final class DynamicsIntegration extends CrmAbstractIntegration
 {
     public function getName(): string
     {
@@ -163,10 +163,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return true;
     }
 
-    /**
-     * @return string|array
-     */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('custom' === $section) {
             return [
@@ -208,11 +205,11 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param array<string, mixed> $settings
      *
      * @return array|mixed
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('contacts', $settings);
     }
@@ -318,7 +315,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $object = 'contacts';
                 $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object, 'lead', $lead->getId());
-                if (!empty($integrationId)) {
+                if ([] !== $integrationId) {
                     $integrationEntityId = $integrationId[0]['integration_entity_id'];
                     $this->getApiHelper()->updateLead($mappedData, $integrationEntityId);
 
@@ -700,7 +697,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             unset($leadFields[$key]);
         }
 
-        if (empty($leadFields)) {
+        if ([] === $leadFields) {
             return [0, 0, 0];
         }
 
@@ -714,7 +711,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $progress      = false;
         $totalToUpdate = array_sum($this->integrationEntityRepository->findLeadsToUpdate('Dynamics', 'lead', $fields, 0, $params['start'], $params['end'], [$object]));
         $totalToCreate = $this->integrationEntityRepository->findLeadsToCreate('Dynamics', $fields, 0, $params['start'], $params['end']);
-        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : (int) $totalToCreate;
+        $totalToCreate = is_array($totalToCreate) ? count($totalToCreate) : $totalToCreate;
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {

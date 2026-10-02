@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Exception;
 
 use Mautic\CoreBundle\Exception\InvalidValueException;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Exception\InvalidValueException;
 final class InvalidEmailException extends InvalidValueException
 {
     public function __construct(
-        protected string $emailAddress,
+        private readonly string $emailAddress,
         string $message = '',
         int $code = 0,
         ?\Throwable $previous = null,

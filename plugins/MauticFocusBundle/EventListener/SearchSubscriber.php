@@ -35,7 +35,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             '@MauticFocus/SubscribedEvents/Search/global.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.focus.header', $results);
         }
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\Update\PreUpdateChecks;
 
-class PreUpdateCheckError
+final class PreUpdateCheckError
 {
     /**
      * Create a new error. Errors are supposed to be translatable, so please provide proper translation keys. If that's not possible, please provide a clear error message in English.

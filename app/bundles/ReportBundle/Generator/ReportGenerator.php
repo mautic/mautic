@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-class ReportGenerator
+final class ReportGenerator
 {
     private string $validInterface = ReportBuilderInterface::class;
 
@@ -65,7 +65,7 @@ class ReportGenerator
     /**
      * @throws RuntimeException
      */
-    protected function getBuilder(): MauticReportBuilder
+    private function getBuilder(): MauticReportBuilder
     {
         $className = MauticReportBuilder::class;
 

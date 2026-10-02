@@ -5,9 +5,9 @@ namespace Mautic\CoreBundle\Test\DoctrineExtensions;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
-class TablePrefix
+final class TablePrefix
 {
-    protected string $prefix;
+    private readonly string $prefix;
 
     /**
      * @param string $prefix

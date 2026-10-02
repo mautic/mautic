@@ -56,7 +56,7 @@ class EmailDefaultsHelper
     private function applyUtmTagDefaults(Email $email): void
     {
         $existingTags = array_filter($email->getUtmTags(), static fn ($tag): bool => null !== $tag && '' !== $tag);
-        if (!empty($existingTags)) {
+        if ([] !== $existingTags) {
             return;
         }
 

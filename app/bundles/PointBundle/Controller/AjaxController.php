@@ -16,8 +16,9 @@ final class AjaxController extends CommonAjaxController
     private PointModel $pointModel;
 
     #[Required]
-    public function autowirePointAjaxController(PointModel $pointModel): void
-    {
+    public function autowirePointAjaxController(
+        PointModel $pointModel,
+    ): void {
         $this->pointModel = $pointModel;
     }
 

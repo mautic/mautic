@@ -30,7 +30,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         // Clear owners cache (to leave a clean environment for future tests):
         /** @var MailHelper $mailHelper */
-        $mailHelper = static::getContainer()->get(MailHelper::class);
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
 
@@ -61,7 +61,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     private function createCompany(string $name, string $address1 = ''): Company
     {
         /** @var CompanyModel $model */
-        $model   = static::getContainer()->get(CompanyModel::class);
+        $model   = self::getContainer()->get(CompanyModel::class);
         $company = new Company();
         $company->setIsPublished(true)->setName($name)->setAddress1($address1);
         $model->saveEntity($company);
@@ -159,7 +159,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     private function setUpMailer(): void
     {
         /** @var MailHelper $mailHelper */
-        $mailHelper = static::getContainer()->get(MailHelper::class);
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
         ReflectionHelper::setValue($mailHelper, 'mailer', $mailer);

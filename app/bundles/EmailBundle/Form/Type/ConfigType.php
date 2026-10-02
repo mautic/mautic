@@ -266,7 +266,7 @@ final class ConfigType extends AbstractType
                     new NotBlank(
                         message: 'mautic.core.email.required'
                     ),
-                    new EmailOrEmailTokenList(['allowMultiple' => false]),
+                    new EmailOrEmailTokenList(allowMultiple: false),
                 ],
             ]
         );
@@ -595,6 +595,21 @@ final class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.enable.draft.tooltip',
                 ],
+            ]
+        );
+
+        $builder->add(
+            'validate_unsubscribe_emails',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.validate_unsubscribe_emails',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.validate_unsubscribe_emails.tooltip',
+                ],
+                'data'       => $options['data']['validate_unsubscribe_emails'] ?? true,
+                'required'   => false,
             ]
         );
     }

@@ -45,7 +45,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     private function setUpMailer(): void
     {
         /** @var MailHelper $mailHelper */
-        $mailHelper = static::getContainer()->get(MailHelper::class);
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
         ReflectionHelper::setValue($mailHelper, 'mailer', $mailer);
@@ -58,7 +58,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Clear owners cache (to leave a clean environment for future tests):
         /** @var MailHelper $mailHelper */
-        $mailHelper = static::getContainer()->get(MailHelper::class);
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
 
@@ -485,7 +485,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $trackingHash = 'tracking_hash_123';
 
         /** @var StatRepository $statRepository */
-        $statRepository = static::getContainer()->get(StatRepository::class);
+        $statRepository = self::getContainer()->get(StatRepository::class);
 
         // Create a test email stat.
         $stat = new Stat();
@@ -540,7 +540,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
 
         $user->setPassword($hasher->hash('password'));
@@ -827,12 +827,8 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     private function getUser(string $userName): ?User
     {
         $repository = $this->em->getRepository(User::class);
-        $user       = $repository->findOneBy(['username' => $userName]);
-        if (!$user instanceof User) {
-            return null;
-        }
 
-        return $user;
+        return $repository->findOneBy(['username' => $userName]);
     }
 
     /**

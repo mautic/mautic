@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Helper;
 
-class PointActionHelper
+final class PointActionHelper
 {
     public static function validateFormSubmit($eventDetails, array $action): bool
     {

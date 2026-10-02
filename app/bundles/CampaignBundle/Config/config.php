@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -58,6 +60,16 @@ return [
             'mautic_campaign_metrics_event_details' => [
                 'path'       => '/campaign/metrics/event-details/{objectId}',
                 'controller' => 'Mautic\CampaignBundle\Controller\CampaignMetricsController::eventDetailsAction',
+            ],
+        ],
+        'public' => [
+            'mautic_campaign_share_download' => [
+                'path'         => '/campaign-share/{token}',
+                'controller'   => 'Mautic\CampaignBundle\Controller\CampaignShareDownloadController::downloadAction',
+                'method'       => 'GET',
+                'requirements' => [
+                    'token' => '[a-f0-9]{32}',
+                ],
             ],
         ],
         'api'  => [
@@ -145,26 +157,6 @@ return [
             'class' => Mautic\CampaignBundle\Entity\Campaign::class,
         ],
     ],
-
-    'services' => [
-        'services' => [
-            'mautic.campaign.service.campaign'=> [
-                /** @phpstan-ignore-next-line */
-                'class'     => Mautic\CampaignBundle\Service\Campaign::class,
-                'arguments' => [
-                    'mautic.campaign.repository.campaign',
-                    'mautic.email.repository.email',
-                ],
-            ],
-        ],
-        'fixtures' => [
-            'mautic.campaign.fixture.campaign' => [
-                'class'    => Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class,
-                'tag'      => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'optional' => true,
-            ],
-        ],
-    ],
     'parameters' => [
         'campaign_time_wait_on_event_false'                                                     => 'PT1H',
         'campaign_use_summary'                                                                  => 0,
@@ -181,7 +173,8 @@ return [
         'import_campaigns_dir'                                                                  => '%kernel.project_dir%/var/import',
         'campaigns_resume_stuck_records_after'                                                  => '2025-10-01 00:00:00',
         'campaign_republish_behavior'                                                           => Mautic\CampaignBundle\Enum\RepublishBehavior::COUNT_ALL_TIME->value,
-        'campaign_contact_count_cache_ttl'                                                      => 43200, // 12 hours in seconds
         'campaign_event_cache_ttl'                                                              => 600, // seconds
+        'campaign_contact_count_cache_ttl'                                                      => 43200, // 12 hours in seconds
+        'marketplace_website_url'                                                               => '%env(default::MARKETPLACE_WEBSITE_URL)%',
     ],
 ];

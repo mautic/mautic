@@ -9,10 +9,10 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
-class FormatterExtension extends AbstractExtension
+final class FormatterExtension extends AbstractExtension
 {
     public function __construct(
-        protected FormatterHelper $formatterHelper,
+        private readonly FormatterHelper $formatterHelper,
     ) {
     }
 

@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Scheduler\BuilderInterface;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 
-class SchedulerTemplateFactory
+final class SchedulerTemplateFactory
 {
     /**
      * @throws NotSupportedScheduleTypeException

@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -32,7 +33,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         private AuthorizationCheckerInterface $securityContext,
         private EventDispatcherInterface $dispatcher,
         private RequestStack $requestStack,
-        private readonly \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        private UserRepository $userRepository,
     ) {
     }
 
@@ -253,7 +254,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         }
         if (isset($details['format'])) {
             $defaults['_format'] = $details['format'];
-        } elseif ('api' == $type) {
+        } elseif ('api' === $type) {
             $defaults['_format'] = 'json';
         }
         $method = [];
@@ -284,7 +285,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
                 $requirements['objectId'] = '[a-zA-Z0-9_-]+';
             }
         }
-        if ('api' == $type) {
+        if ('api' === $type) {
             if (str_contains($details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';

@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
 final class CustomContentEvent extends Event
 {
-    /**
-     * @var array
-     */
-    private $content = [];
+    private array $content = [];
 
     private array $templates = [];
 
@@ -75,10 +74,7 @@ final class CustomContentEvent extends Event
         return $this->vars;
     }
 
-    /**
-     * @return array
-     */
-    public function getContent()
+    public function getContent(): array
     {
         return $this->content;
     }
