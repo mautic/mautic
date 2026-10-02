@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;

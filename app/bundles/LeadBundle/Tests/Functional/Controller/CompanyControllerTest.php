@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -26,6 +27,41 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/companies/merge/1');
         $clientResponse         = $this->client->getResponse();
         $this->assertEquals(403, $clientResponse->getStatusCode());
+    }
+
+    public function testBatchOwnersAction(): void
+    {
+        $this->client->request('GET', '/s/companies/batchOwners/0');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('lead_batch_owner', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testBatchOwnersActionPost(): void
+    {
+        $owner = $this->createUser($this->createRole());
+        $company = new Company();
+        $company->setName('Batch owner company');
+        $this->em->persist($company);
+        $this->em->flush();
+
+        $this->client->request('POST', '/s/companies/batchOwners/0', [
+            'lead_batch_owner' => [
+                'ids'      => json_encode([$company->getId()], JSON_THROW_ON_ERROR),
+                'addowner' => (string) $owner->getId(),
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $response = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertTrue($response['closeModal']);
+        $this->assertArrayHasKey('flashes', $response);
+
+        $this->em->clear();
+        $updatedCompany = $this->em->getRepository(Company::class)->find($company->getId());
+        $this->assertInstanceOf(Company::class, $updatedCompany);
+        $this->assertSame($owner->getId(), $updatedCompany->getOwner()->getId());
     }
 
     private function createAndLoginUser(): User

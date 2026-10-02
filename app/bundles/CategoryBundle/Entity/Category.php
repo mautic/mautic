@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CategoryBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;

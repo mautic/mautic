@@ -28,6 +28,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
@@ -115,6 +116,7 @@ final class UserModelTest extends TestCase
             $this->createStub(PermissionRepository::class),
             $this->createStub(RoleRepository::class),
             $this->userInviteRepository,
+            $this->createStub(UserPasswordHasherInterface::class)
         );
     }
 

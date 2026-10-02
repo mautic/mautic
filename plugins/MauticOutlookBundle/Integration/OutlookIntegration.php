@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticOutlookBundle\Integration;
 
 use Mautic\CoreBundle\Helper\UrlHelper;

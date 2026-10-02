@@ -26,6 +26,7 @@ final class CampaignEventLeadFieldValueType extends AbstractType
         private readonly Translator $translator,
         private readonly LeadModel $leadModel,
         private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly FormFieldHelper $formFieldHelper,
     ) {
     }
 
@@ -100,9 +101,7 @@ final class CampaignEventLeadFieldValueType extends AbstractType
                             case 'date':
                             case 'datetime':
                                 if ('date' === $operator) {
-                                    $fieldHelper = new FormFieldHelper();
-                                    $fieldHelper->setTranslator($this->translator);
-                                    $fieldValues = $fieldHelper->getDateChoices();
+                                    $fieldValues = $this->formFieldHelper->getDateChoices();
                                     $customText  = $this->translator->trans('mautic.campaign.event.timed.choice.custom');
                                     $customValue = (empty($data['value']) || isset($fieldValues[$data['value']])) ? 'custom' : $data['value'];
                                     $fieldValues = array_merge(

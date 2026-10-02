@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Mapper\Helper;
 
 final class ConfigHelper

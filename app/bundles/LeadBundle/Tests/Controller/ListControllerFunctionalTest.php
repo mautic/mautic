@@ -46,13 +46,11 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->listModel = self::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $this->listModel);
         $this->listRepo = $this->listModel->getRepository();
-        $this->assertInstanceOf(LeadListRepository::class, $this->listRepo);
         /** @var LeadModel $leadModel */
         $leadModel = self::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $leadModel);
         $this->segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
         $this->leadRepo                = $leadModel->getRepository();
-        $this->assertInstanceOf(LeadRepository::class, $this->leadRepo);
         $this->prefix                  = self::getContainer()->getParameter('mautic.db_table_prefix');
         $this->translator              = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $this->translator);
@@ -173,7 +171,6 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $segment = $this->listRepo->find($segmentId);
         $this->assertInstanceOf(LeadList::class, $segment);
         $this->assertInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
-        $this->assertInstanceOf(LeadList::class, $segment);
 
         // Set last built date in the future to allow testing without waiting.
         // (Same second built date as the modified date is shown as "Building" still in the UI).

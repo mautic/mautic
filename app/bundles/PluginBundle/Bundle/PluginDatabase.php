@@ -44,7 +44,7 @@ final readonly class PluginDatabase
 
         foreach ($installQueries as $q) {
             // Check if the query is a DDL statement
-            if (self::isDDLStatement($q)) {
+            if ($this->isDDLStatement($q)) {
                 // Execute DDL statements outside of a transaction
                 $this->connection->executeStatement($q);
             } else {
@@ -102,7 +102,7 @@ final readonly class PluginDatabase
         }
     }
 
-    private static function isDDLStatement(string $query): bool|int
+    private function isDDLStatement(string $query): bool|int
     {
         return preg_match('/^(CREATE|ALTER|DROP|RENAME|TRUNCATE|COMMENT)\s/i', $query);
     }

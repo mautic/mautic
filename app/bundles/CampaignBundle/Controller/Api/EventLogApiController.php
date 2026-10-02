@@ -88,10 +88,8 @@ final class EventLogApiController extends FetchCommonApiController
 
     /**
      * Get a list of events.
-     *
-     * @return Response
      */
-    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null)
+    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null): Response
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -138,10 +136,7 @@ final class EventLogApiController extends FetchCommonApiController
         return $this->getEntitiesAction($request, $userHelper);
     }
 
-    /**
-     * @return Response
-     */
-    public function editContactEventAction(Request $request, $eventId, $contactId)
+    public function editContactEventAction(Request $request, $eventId, $contactId): Response
     {
         $parameters = $request->request->all();
 
