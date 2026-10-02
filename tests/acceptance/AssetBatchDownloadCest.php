@@ -8,6 +8,9 @@ final class AssetBatchDownloadCest
     {
         $tester->login();
         $tester->amOnPage('/s/assets');
+        $tester->waitForElement('[data-mautic-batch-download]', 30);
+        $tester->waitForElement('#assetTable thead [data-toggle="checkall"]', 30);
+        $tester->click('#assetTable thead [data-toggle="checkall"]');
         $tester->waitForElementVisible('[data-mautic-batch-download]', 30);
         $tester->waitForJS("return typeof Mautic.batchAssetDownload === 'function';", 30);
 
@@ -18,13 +21,6 @@ final class AssetBatchDownloadCest
             if (!trigger || !table || typeof Mautic.batchAssetDownload !== 'function') {
                 return null;
             }
-
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.className = 'list-checkbox';
-            checkbox.value = '42';
-            checkbox.checked = true;
-            table.appendChild(checkbox);
 
             const expectedToken = trigger.getAttribute('data-csrf-token');
             const expectedAction = new URL(trigger.getAttribute('data-mautic-batch-download'), window.location.href).pathname;
@@ -47,7 +43,7 @@ final class AssetBatchDownloadCest
                 };
             };
 
-            Mautic.batchAssetDownload(trigger.getAttribute('data-mautic-batch-download'), trigger);
+            trigger.click();
 
             return submission;
         JS);
