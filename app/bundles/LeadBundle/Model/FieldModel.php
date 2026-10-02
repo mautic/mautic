@@ -6,7 +6,6 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
@@ -714,7 +713,7 @@ class FieldModel extends FormModel
     /**
      * Returns list of all segments that use $field.
      *
-     * @return Paginator
+     * @return \Countable
      */
     public function getFieldSegments(LeadField $field): iterable
     {
