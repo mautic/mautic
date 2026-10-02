@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Collector;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Identifier;
@@ -57,7 +58,7 @@ final class ServiceAliasCollector implements Collector
     /**
      * An alias is named either by a service id string or by a class name, e.g. SomeHelper::class.
      */
-    private function matchAliasName(Node $aliasValue): ?string
+    private function matchAliasName(Expr $aliasValue): ?string
     {
         if ($aliasValue instanceof String_) {
             return $aliasValue->value;
