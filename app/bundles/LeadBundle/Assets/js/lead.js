@@ -154,11 +154,12 @@ Mautic.leadOnLoad = function (container, response) {
 
     // Adding behavior to be able to create new tags by pressing the `Enter` or `Escape` key
     // when the search field is active (ie: the tag name we are typing is a substring of an existing tag)
-    mQuery('#lead_tags_chosen input').keyup(function(el) {
-        const newTag = mQuery('#lead_tags_chosen input').val().trim();
+    mQuery('#lead_tags_chosen input, #company_tags_chosen input').keyup(function(el) {
+        const chosenInput = mQuery(this);
+        const newTag = chosenInput.val().trim();
         if ((el.key === "Escape" || el.key === "Enter") && newTag !== '') {
-            const selectElement = mQuery('#lead_tags').get();
-            const selectedValues = mQuery('#lead_tags').val() || [];
+            const selectElement = chosenInput.closest('.chosen-container').prev('select');
+            const selectedValues = mQuery(selectElement).val() || [];
             const payload = [...selectedValues, newTag];
 
             Mautic.activateLabelLoadingIndicator(mQuery(selectElement).attr('id'));
@@ -1332,6 +1333,23 @@ Mautic.removeTagFromLead = function (el, leadId, tagId, event) {
     });
 
     Mautic.showConfirmation(el);
+};
+
+Mautic.removeTagFromCompany = function (el, companyId, tagId, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    mQuery(el).find('i').removeClass('ri-close-line').addClass('ri-loader-3-line ri-spin');
+
+    Mautic.ajaxActionRequest('lead:removeTagFromCompany', {'companyId': companyId, 'tagId': tagId}, function(response) {
+        if (response.success) {
+            mQuery('#companyTagLabel' + tagId).fadeOut(300, function() { mQuery(this).remove(); });
+            return;
+        }
+
+        mQuery(el).find('i').removeClass('ri-loader-3-line ri-spin').addClass('ri-close-line');
+    });
 };
 
 Mautic.toggleLiveLeadListUpdate = function () {
