@@ -82,10 +82,12 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $admin);
         $adminRole = $admin->getRole();
         $this->assertInstanceOf(Role::class, $adminRole);
-        $admin->setLastLogin('2024-02-22 10:30:00');
-
+        $loggedInUser = $this->createUser($adminRole, 'alreadyloggedin@example.com');
+        $loggedInUser->setLastLogin(new \DateTime('2024-02-22 10:30:00'));
         $neverLoggedInUser = $this->createUser($adminRole, 'neverloggedinfilter@example.com');
         $this->em->flush();
+        $this->em->refresh($loggedInUser);
+        $this->assertInstanceOf(\DateTimeInterface::class, $loggedInUser->getLastLogin());
 
         $crawler = $this->client->request('GET', '/s/users?search=is%3Anever_logged_in&tmpl=list');
 
@@ -95,7 +97,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->assertContains($neverLoggedInUser->getUsername(), $usernames);
-        $this->assertNotContains('admin', $usernames);
+        $this->assertNotContains($loggedInUser->getUsername(), $usernames);
     }
 
     public function testInviteActionShowsForm(): void
