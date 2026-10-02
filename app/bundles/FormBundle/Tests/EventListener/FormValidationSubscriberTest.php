@@ -259,6 +259,27 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('Use a US phone number.', $event->getInvalidReason());
     }
 
+    public function testCountryPhoneValidationFallsBackToDefaultMessageWhenCustomMessageIsEmpty(): void
+    {
+        $this->translator
+            ->method('trans')
+            ->with('mautic.form.submission.phone.invalid_country', ['%country%' => 'United States'], 'validators')
+            ->willReturn('Please enter a valid United States phone number.');
+
+        $field = new Field();
+        $field->setType('tel');
+        $field->setValidation([
+            'country'               => 'US',
+            'country_validationmsg' => '',
+        ]);
+
+        $event = new ValidationEvent($field, '+551****9999');
+        $this->subscriber->onFormValidate($event);
+
+        $this->assertFalse($event->isValid());
+        $this->assertSame('Please enter a valid United States phone number.', $event->getInvalidReason());
+    }
+
     public function testCountryPhoneValidationAllowsMatchingCountry(): void
     {
         $field = new Field();
