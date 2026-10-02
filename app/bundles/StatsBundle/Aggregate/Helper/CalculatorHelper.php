@@ -4,7 +4,7 @@ namespace Mautic\StatsBundle\Aggregate\Helper;
 
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatDAO;
 
-class CalculatorHelper
+final class CalculatorHelper
 {
     /**
      * @throws \Exception

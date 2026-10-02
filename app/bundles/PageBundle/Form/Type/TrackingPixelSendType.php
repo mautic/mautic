@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\PageBundle\Helper\TrackingHelper;
@@ -15,7 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 final class TrackingPixelSendType extends AbstractType
 {
     public function __construct(
-        protected TrackingHelper $trackingHelper,
+        private readonly TrackingHelper $trackingHelper,
     ) {
     }
 

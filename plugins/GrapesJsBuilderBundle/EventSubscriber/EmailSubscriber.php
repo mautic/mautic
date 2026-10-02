@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -21,8 +23,8 @@ final class EmailSubscriber implements EventSubscriberInterface
         private readonly Config $config,
         private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
         private readonly EmailConfigInterface $emailConfig,
-        private readonly \MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository $grapesJsBuilderRepository,
-        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
+        private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
+        private readonly EmailRepository $emailRepository,
     ) {
     }
 

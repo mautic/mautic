@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\LeadBundle\Form\Type\ContactChannelsType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
 final class ContactChannelsTypeTest extends AbstractMauticTestCase
@@ -42,7 +43,7 @@ final class ContactChannelsTypeTest extends AbstractMauticTestCase
      */
     private function createForm(bool $publicView): FormInterface
     {
-        return self::getContainer()->get('form.factory')->create(
+        return self::getContainer()->get(FormFactoryInterface::class)->create(
             ContactChannelsType::class,
             null,
             [

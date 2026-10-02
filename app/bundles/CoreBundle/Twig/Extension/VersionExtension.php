@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\AppVersion;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class VersionExtension extends AbstractExtension
+final class VersionExtension extends AbstractExtension
 {
     public function __construct(
         private readonly AppVersion $appVersion,

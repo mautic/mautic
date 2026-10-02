@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class IpstackLookup extends AbstractRemoteDataLookup
+final class IpstackLookup extends AbstractRemoteDataLookup
 {
     public string $country_code = '';
 

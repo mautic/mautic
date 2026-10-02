@@ -43,8 +43,14 @@ class TagModel extends FormModel
     private TagRepository $tagRepository;
 
     #[Required]
-    public function autowireTagModel(TagRepository $tagRepository, EventRepository $eventRepository, ActionRepository $actionRepository, TriggerEventRepository $triggerEventRepository, LeadListRepository $leadListRepository, ReportRepository $reportRepository): void
-    {
+    public function autowireTagModel(
+        TagRepository $tagRepository,
+        EventRepository $eventRepository,
+        ActionRepository $actionRepository,
+        TriggerEventRepository $triggerEventRepository,
+        LeadListRepository $leadListRepository,
+        ReportRepository $reportRepository,
+    ): void {
         $this->tagRepository = $tagRepository;
         $this->eventRepository = $eventRepository;
         $this->actionRepository = $actionRepository;

@@ -24,7 +24,7 @@ final readonly class PluginSubscriber implements EventSubscriberInterface
         $eventMetadata = $event->getMetadata();
 
         if (null === $eventMetadata) {
-            $metadata = self::getMetadata($this->entityManager);
+            $metadata = $this->getMetadata();
         } else {
             $metadata = [];
             foreach ($eventMetadata as $class => $classMetadata) {
@@ -60,10 +60,10 @@ final readonly class PluginSubscriber implements EventSubscriberInterface
      *
      * @return array<class-string, ClassMetadata>
      */
-    private static function getMetadata(EntityManagerInterface $em): array
+    private function getMetadata(): array
     {
-        $allMetadata   = $em->getMetadataFactory()->getAllMetadata();
-        $currentSchema = $em->getConnection()->createSchemaManager()->introspectSchema();
+        $allMetadata   = $this->entityManager->getMetadataFactory()->getAllMetadata();
+        $currentSchema = $this->entityManager->getConnection()->createSchemaManager()->introspectSchema();
 
         $classes = [];
 

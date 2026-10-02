@@ -91,7 +91,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
 
         // 2.c Save campaign through CampaignModel to trigger audit log creation
         /** @var CampaignModel $campaignModel */
-        $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
+        $campaignModel = self::getContainer()->get(CampaignModel::class);
         $campaign      = $campaignModel->getEntity($campaignId);
         $event         = $this->em->find(Event::class, $eventId);
         $this->assertInstanceOf(Event::class, $event);
@@ -106,7 +106,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, $campaignViewUrl);
         $this->assertResponseIsSuccessful();
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->assertStringContainsString(
@@ -122,7 +122,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
 
     public function testCampaignMultipleProjectAdditionsShowInAuditLog(): void
     {
-        $campaignModel = self::getContainer()->get('mautic.campaign.model.campaign');
+        $campaignModel = self::getContainer()->get(CampaignModel::class);
 
         // Create projects first
         $project1 = $this->createProject('First Project');

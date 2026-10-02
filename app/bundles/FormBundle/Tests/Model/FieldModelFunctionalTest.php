@@ -52,7 +52,7 @@ final class FieldModelFunctionalTest extends MauticMysqlTestCase
         $form = $this->createForm($formData);
 
         /** @var ColumnSchemaHelper $helper */
-        $helper = $this->getContainer()->get('mautic.schema.helper.column');
+        $helper = $this->getContainer()->get(ColumnSchemaHelper::class);
 
         // Table name to check the fields.
         $name         = 'form_results_'.$form->getId().'_'.$form->getAlias();
@@ -62,7 +62,7 @@ final class FieldModelFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(5, $schemaHelper->getColumns());
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.form.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
 
         $ids = $this->getDeleteIds($fieldModel);
 
@@ -84,7 +84,7 @@ final class FieldModelFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         /** @var FormModel $formModel */
-        $formModel = $this->getContainer()->get('mautic.form.model.form');
+        $formModel = $this->getContainer()->get(FormModel::class);
 
         return $formModel->getEntity($response['form']['id']);
     }

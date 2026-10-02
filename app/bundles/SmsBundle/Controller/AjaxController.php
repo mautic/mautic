@@ -95,7 +95,7 @@ final class AjaxController extends CommonAjaxController
      *
      * @return array<string, string>
      */
-    protected function getBuilderTokens(string $query): array
+    private function getBuilderTokens(string $query): array
     {
         $components   = $this->emailModel->getBuilderComponents(null, ['tokens'], $query);
         $findTokens   = ['{contactfield=', '{assetlink', '{pagelink'];

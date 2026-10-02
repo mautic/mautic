@@ -5,6 +5,7 @@ namespace Mautic\PluginBundle\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Entity\PluginRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
 use Mautic\PluginBundle\Facade\ReloadFacade;
@@ -22,13 +23,15 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class PluginController extends FormController
 {
-    private \Mautic\PluginBundle\Entity\PluginRepository $pluginRepository;
+    private PluginRepository $pluginRepository;
 
     private PluginModel $pluginModel;
 
     #[Required]
-    public function autowirePluginController(PluginModel $pluginModel, \Mautic\PluginBundle\Entity\PluginRepository $pluginRepository): void
-    {
+    public function autowirePluginController(
+        PluginModel $pluginModel,
+        PluginRepository $pluginRepository,
+    ): void {
         $this->pluginModel = $pluginModel;
         $this->pluginRepository = $pluginRepository;
     }

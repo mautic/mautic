@@ -2,10 +2,10 @@
 
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Exception\ExitMonitorException;
@@ -13,7 +13,7 @@ use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use MauticPlugin\MauticSocialBundle\Model\PostCountModel;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TwitterCommandHelper
+final class TwitterCommandHelper
 {
     private ?OutputInterface $output = null;
 
@@ -33,9 +33,9 @@ class TwitterCommandHelper
         private readonly MonitoringModel $monitoringModel,
         private readonly PostCountModel $postCountModel,
         private readonly Translator $translator,
-        private readonly EntityManagerInterface $em,
+        private readonly \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorLeadRepository,
         CoreParametersHelper $coreParametersHelper,
-        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
         private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
@@ -93,8 +93,8 @@ class TwitterCommandHelper
         $handleFieldGroup = $leadField->getGroup();
 
         // Just a means to let any LeadEvents listeners know that many leads are likely coming in case that matters to their logic
-        defined('MASS_LEADS_MANIPULATION') or define('MASS_LEADS_MANIPULATION', 1);
-        defined('SOCIAL_MONITOR_IMPORT') or define('SOCIAL_MONITOR_IMPORT', 1);
+        defined('MASS_LEADS_MANIPULATION') || define('MASS_LEADS_MANIPULATION', 1);
+        defined('SOCIAL_MONITOR_IMPORT') || define('SOCIAL_MONITOR_IMPORT', 1);
 
         // Get a list of existing leads to tone down on queries
         $usersByHandles    = [];
@@ -129,7 +129,7 @@ class TwitterCommandHelper
         }
         unset($expr);
 
-        if (!empty($usersByHandles)) {
+        if ([] !== $usersByHandles) {
             $leads = $this->leadRepository->getEntities(
                 [
                     'filter' => [
@@ -341,10 +341,7 @@ class TwitterCommandHelper
         $monitorLead->setLead($lead);
         $monitorLead->setDateAdded(new \DateTime());
 
-        /** @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
-        $monitorRepository = $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\Lead::class);
-
-        $monitorRepository->saveEntity($monitorLead);
+        $this->monitorLeadRepository->saveEntity($monitorLead);
     }
 
     /**

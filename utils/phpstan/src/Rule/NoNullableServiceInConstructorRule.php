@@ -21,7 +21,7 @@ use PHPStan\Rules\RuleErrorBuilder;
  * A service is always provided by the container, so "?SomeService $service" or "SomeService|null $service" only hides
  * the fact that it is really required. Non-service nullables are left alone: scalars/arrays, date value objects, and
  * exceptions (whose "$previous" is nullable by PHP convention). Data-holder classes living in an entity, event, DTO,
- * message, DAO or token namespace are skipped whole - those constructors carry values, not services.
+ * message, DAO, token or value object namespace are skipped whole - those constructors carry values, not services.
  *
  * @implements Rule<ClassMethod>
  */
@@ -30,7 +30,7 @@ final class NoNullableServiceInConstructorRule implements Rule
     /**
      * @var string[]
      */
-    private const SKIPPED_NAMESPACE_PARTS = ['\\Entity\\', '\\Event\\', '\\DTO\\', '\\Message\\', '\\DAO\\', '\\Token\\', '\\Exception\\', '\\Helper\\'];
+    private const SKIPPED_NAMESPACE_PARTS = ['\\Entity\\', '\\Event\\', '\\DTO\\', '\\Message\\', '\\DAO\\', '\\Token\\', '\\Exception\\', '\\Helper\\', '\\ValueObject\\'];
 
     /**
      * @var string[]

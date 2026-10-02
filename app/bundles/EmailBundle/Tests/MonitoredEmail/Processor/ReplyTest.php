@@ -20,7 +20,6 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -68,20 +67,18 @@ final class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->statRepo           = $this->createMock(StatRepository::class);
         $this->emailStatModel     = $this->createMock(EmailStatModel::class);
         $this->contactFinder      = $this->createMock(ContactFinder::class);
-        $leadModel                = $this->createMock(LeadModel::class);
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $this->contactTracker     = $this->createMock(ContactTracker::class);
         $emailAddressHelper       = new EmailAddressHelper();
         $this->leadRepository     = $this->createMock(LeadRepository::class);
-        $leadModel->method('getRepository')->willReturn($this->leadRepository);
         $this->processor          = new Reply(
             $this->emailStatModel,
             $this->contactFinder,
-            $leadModel,
             $this->dispatcher,
             $this->createStub(Logger::class),
             $this->contactTracker,
-            $emailAddressHelper
+            $emailAddressHelper,
+            $this->leadRepository
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepo);

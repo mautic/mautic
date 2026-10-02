@@ -22,10 +22,10 @@ final class PointInsightsFunctionalTest extends MauticMysqlTestCase
     public function testPointInsightExecutionWithSingleWinner(): void
     {
         /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get(LeadModel::class);
 
         /** @var PointGroupModel $pointGroupModel */
-        $pointGroupModel = self::getContainer()->get('mautic.point.model.group');
+        $pointGroupModel = self::getContainer()->get(PointGroupModel::class);
 
         $groupA      = $this->createGroup('Group A');
         $groupB      = $this->createGroup('Group B');
@@ -54,10 +54,10 @@ final class PointInsightsFunctionalTest extends MauticMysqlTestCase
     public function testPointInsightExecutionWithTieBreaker(): void
     {
         /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get(LeadModel::class);
 
         /** @var PointGroupModel $pointGroupModel */
-        $pointGroupModel = self::getContainer()->get('mautic.point.model.group');
+        $pointGroupModel = self::getContainer()->get(PointGroupModel::class);
 
         $groupA      = $this->createGroup('Group A');
         $groupB      = $this->createGroup('Group B');
@@ -98,10 +98,10 @@ final class PointInsightsFunctionalTest extends MauticMysqlTestCase
     public function testPointInsightExecutionForMultipleContacts(): void
     {
         /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get(LeadModel::class);
 
         /** @var PointGroupModel $pointGroupModel */
-        $pointGroupModel = self::getContainer()->get('mautic.point.model.group');
+        $pointGroupModel = self::getContainer()->get(PointGroupModel::class);
 
         $groupA      = $this->createGroup('Multi Group A');
         $groupB      = $this->createGroup('Multi Group B');
@@ -184,7 +184,7 @@ final class PointInsightsFunctionalTest extends MauticMysqlTestCase
     private function createCustomField(string $alias): LeadField
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         $field = new LeadField();
         $field->setLabel(ucfirst(str_replace('_', ' ', $alias)));

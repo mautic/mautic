@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
-use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
@@ -15,6 +15,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
+use Mautic\UserBundle\Entity\RoleRepository;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -33,6 +34,11 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @var array<string, int>
      */
+    /**
+     * @var MockObject&AuditLogRepository
+     */
+    private MockObject $auditLogRepository;
+
     private array $maxInvocations = [];
 
     private ?string $specialSfCase = null;
@@ -103,7 +109,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
     }
 
     /**
@@ -718,24 +724,24 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     protected function setMocks(): void
     {
-        $integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
+        $this->auditLogRepository = $this->createMock(AuditLogRepository::class);
 
         // we need insight into the entities persisted
-        $integrationEntityRepository->method('saveEntities')
+        $this->integrationEntityRepository->method('saveEntities')
             ->willReturnCallback(
                 function (): void {
                     $this->persistedIntegrationEntities = array_merge($this->persistedIntegrationEntities, func_get_arg(0));
                 }
             );
 
-        $integrationEntityRepository
+        $this->integrationEntityRepository
             ->expects($spy = $this->any())
             ->method('getIntegrationsEntityId')
             ->willReturnCallback(
                 function () use ($spy): array {
                     // WARNING: this is using a PHPUnit undocumented workaround:
                     // https://github.com/sebastianbergmann/phpunit/issues/3888
-                    $spyParentProperties = self::getParentPrivateProperties($spy);
+                    $spyParentProperties = $this->getParentPrivateProperties($spy);
                     $invocations         = $spyParentProperties['invocations'];
 
                     if (count($invocations) > $this->getMaxInvocations('getIntegrationsEntityId')) {
@@ -746,9 +752,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     return $this->getLeadsToUpdate('Lead', 2, 2, 'Lead')['Lead'];
                 }
             );
-        $auditLogRepo = $this->createMock(AuditLogRepository::class);
-
-        $auditLogRepo
+        $this->auditLogRepository
             ->method('getAuditLogsForLeads')
             ->willReturn(
                 [
@@ -777,20 +781,11 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 ]
             );
 
-        $this->em->expects($this->atLeastOnce())->method('getRepository')
-            ->willReturnMap(
-                [
-                    [IntegrationEntity::class, $integrationEntityRepository],
-                    [AuditLog::class, $auditLogRepo],
-                ]
-            );
-
         $this->em->method('getReference')
             ->willReturnCallback(
                 function () {
-                    switch (func_get_arg(0)) {
-                        case IntegrationEntity::class:
-                            return new IntegrationEntity();
+                    if (IntegrationEntity::class === func_get_arg(0)) {
+                        return new IntegrationEntity();
                     }
                 }
             );
@@ -972,6 +967,14 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ])
             ->onlyMethods($this->sfMockMethods)
             ->getMock();
+
+        $this->autowireIntegrationRepositories($sf);
+
+        $sf->autowireSalesforceIntegration(
+            $this->createMock(RoleRepository::class),
+            $this->auditLogRepository,
+            $this->createMock(NotificationRepository::class)
+        );
 
         $sf->method('makeRequest')
             ->willReturnCallback(
@@ -1402,7 +1405,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @return array<string, mixed>
      */
-    private static function getParentPrivateProperties(mixed $instance): array
+    private function getParentPrivateProperties(mixed $instance): array
     {
         $reflectionClass       = new \ReflectionClass($instance::class);
         $parentReflectionClass = $reflectionClass->getParentClass();

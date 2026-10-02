@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -10,19 +12,19 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class CampaignDecisionEvent extends Event
 {
-    protected $decisionTriggered = false;
+    private $decisionTriggered = false;
 
     /**
      * @param LeadEventLog[] $logs
      */
     public function __construct(
-        protected $lead,
-        protected $decisionType,
-        protected $decisionEventDetails,
-        protected $events,
-        protected $eventSettings,
-        protected $isRootLevel = false,
-        protected $logs = [],
+        private $lead,
+        private $decisionType,
+        private $decisionEventDetails,
+        private $events,
+        private $eventSettings,
+        private $isRootLevel = false,
+        private $logs = [],
     ) {
     }
 

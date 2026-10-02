@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\TagModel;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Security\UserTokenSetter;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -265,7 +266,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertSelectorExists('.alert.alert-danger a.text-danger');
-        $translator = self::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->assertSelectorTextContains(
@@ -344,7 +345,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $field->setProperties($properties);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -398,9 +399,9 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $this->getContainer()->get('mautic.security.user_token_setter')->setUser($import->getCreatedBy());
+        $this->getContainer()->get(UserTokenSetter::class)->setUser($import->getCreatedBy());
         /** @var ImportModel $importModel */
-        $importModel = static::getContainer()->get('mautic.lead.model.import');
+        $importModel = self::getContainer()->get(ImportModel::class);
         $importModel->saveEntity($import);
 
         return $import;
@@ -456,7 +457,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $tag->setTag($tagName);
 
         /** @var TagModel $tagModel */
-        $tagModel = static::getContainer()->get('mautic.lead.model.tag');
+        $tagModel = self::getContainer()->get(TagModel::class);
         $tagModel->saveEntity($tag);
 
         return $tag;

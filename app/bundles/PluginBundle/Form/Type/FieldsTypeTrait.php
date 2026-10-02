@@ -141,7 +141,7 @@ trait FieldsTypeTrait
                             'mapped'       => false,
                         ]
                     );
-                    if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
+                    if (isset($options['enable_data_priority']) && $options['enable_data_priority']) {
                         $updateName = 'update_mautic';
 
                         if ($fieldObject) {

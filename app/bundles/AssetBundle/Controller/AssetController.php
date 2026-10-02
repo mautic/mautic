@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\AssetBundle\Service\ArchiveBuilder;
 use Mautic\AssetBundle\Service\BatchDownloadRequestValidator;
@@ -45,10 +46,10 @@ final class AssetController extends FormController
         $this->batchFileCollector            = $batchFileCollector;
         $this->archiveBuilder                = $archiveBuilder;
         $this->batchDownloadResponder        = $batchDownloadResponder;
-        $this->auditLogModel = $auditLogModel;
+        $this->auditLogModel                 = $auditLogModel;
     }
 
-    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
+    public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, AssetSearchScopeProvider $assetSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -135,8 +136,9 @@ final class AssetController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue' => $search,
-                'items'       => $assets,
+                'searchValue'     => $search,
+                'searchScopes'    => $assetSearchScopeProvider->getScopes(),
+                'items'           => $assets,
                 'categories'  => $categories,
                 'limit'       => $limit,
                 'permissions' => $permissions,
@@ -421,10 +423,8 @@ final class AssetController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $objectId, $ignorePost = false): Response
     {
         $entity = $model->getEntity($objectId);
 
@@ -614,10 +614,8 @@ final class AssetController extends FormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, AssetModel $model, $objectId)
+    public function deleteAction(Request $request, AssetModel $model, $objectId): Response
     {
         $page      = $request->getSession()->get('mautic.asset.page', 1);
         $returnUrl = $this->generateUrl('mautic_asset_index', ['page' => $page]);
@@ -752,7 +750,7 @@ final class AssetController extends FormController
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 $entities = $model->deleteEntities($deleteIds);
 
                 $flashes[] = [
@@ -774,8 +772,6 @@ final class AssetController extends FormController
 
     /**
      * Renders the container for the remote file browser.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response
     {

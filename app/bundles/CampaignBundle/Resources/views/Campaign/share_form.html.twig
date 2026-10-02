@@ -1,0 +1,183 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block headerTitle %}{{ 'mautic.campaign.share.header'|trans({'%name%': campaignName}) }}{% endblock %}
+
+{% block content %}
+{% set stashedImages = stashedImages ?? {} %}
+<div class="box-layout">
+    <div class="col-md-8 col-md-offset-2 height-auto">
+        <div class="pa-lg">
+            {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+            {# ── Section 1: Basic Info ── #}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ 'mautic.campaign.share.panel_title'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                {{ form_label(form.title) }}
+                                {{ form_widget(form.title) }}
+                                {{ form_errors(form.title) }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{ form_label(form.version) }}
+                                {{ form_widget(form.version) }}
+                                {{ form_errors(form.version) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.vendorName) }}
+                        {{ form_widget(form.vendorName) }}
+                        {{ form_errors(form.vendorName) }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.headline) }}
+                        {{ form_widget(form.headline) }}
+                        {{ form_errors(form.headline) }}
+                        <span class="help-block">
+                            {{ 'mautic.campaign.share.headline.help'|trans }}
+                            <span class="pull-right" id="headline-counter">0/60</span>
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description) }}
+                        {{ form_errors(form.description) }}
+                        <span class="help-block">{{ 'mautic.campaign.share.description.help'|trans }}</span>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.keywords) }}
+                        {{ form_widget(form.keywords) }}
+                        <span class="help-block">{{ 'mautic.campaign.share.keywords.help'|trans }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 2: Images ── #}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ 'mautic.campaign.share.images_section'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        {{ form_label(form.bannerImage) }}
+                        {{ form_widget(form.bannerImage) }}
+                        {{ form_errors(form.bannerImage) }}
+                        {{ form_widget(form.bannerImageStash, stashedImages.bannerImageStash is defined ? {'value': stashedImages.bannerImageStash.token} : {}) }}
+                        {% if stashedImages.bannerImageStash is defined %}
+                            <span class="help-block"><i class="ri-attachment-2"></i> {{ stashedImages.bannerImageStash.name }}</span>
+                        {% endif %}
+                        <span class="help-block">
+                            <i class="ri-information-line"></i>
+                            {{ 'mautic.campaign.share.banner_image.help'|trans }}
+                        </span>
+                    </div>
+
+                    <hr>
+                    <h4>{{ 'mautic.campaign.share.gallery_title'|trans }}</h4>
+                    <p class="text-muted">{{ 'mautic.campaign.share.gallery.help'|trans }}</p>
+
+                    <div id="gallery-slots">
+                        {% for i in 1..8 %}
+                        {% set slotStash = stashedImages['galleryImageStash' ~ i] ?? null %}
+                        {# Keep slots visible after a failed-validation re-render when they carry a stashed image or an alt text. #}
+                        {% set slotHasContent = slotStash is not null or attribute(form, 'galleryAlt' ~ i).vars.value is not empty %}
+                        <div class="row gallery-row" data-gallery-slot="{{ i }}" {% if i > 1 and not slotHasContent %}style="display: none; margin-top: 10px;"{% endif %}>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="campaign_share_galleryImage{{ i }}">{{ 'mautic.campaign.share.gallery_image'|trans }} {{ i }}</label>
+                                    {{ form_widget(attribute(form, 'galleryImage' ~ i), {id: 'campaign_share_galleryImage' ~ i}) }}
+                                    {{ form_errors(attribute(form, 'galleryImage' ~ i)) }}
+                                    {{ form_widget(attribute(form, 'galleryImageStash' ~ i), slotStash ? {'value': slotStash.token} : {}) }}
+                                    {% if slotStash %}
+                                        <span class="help-block"><i class="ri-attachment-2"></i> {{ slotStash.name }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="campaign_share_galleryAlt{{ i }}">{{ 'mautic.campaign.share.gallery_alt'|trans }} {{ i }}</label>
+                                    {{ form_widget(attribute(form, 'galleryAlt' ~ i)) }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {# btn-nospin: this button adds a slot client-side only, so the global icon
+                       spinner would never be stopped by an AJAX response. #}
+                    <button type="button" id="add-gallery-slot" class="btn btn-default btn-sm btn-nospin">
+                        <i class="ri-add-line"></i> {{ 'mautic.campaign.share.gallery_add_more'|trans }}
+                    </button>
+                </div>
+            </div>
+
+            {# ── Section 3: Compatibility & Languages ── #}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ 'mautic.campaign.share.compatibility_section'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        {{ form_label(form.worksWithVersions) }}
+                        <div class="checkbox-group">
+                            {% for child in form.worksWithVersions %}
+                                <div class="checkbox">
+                                    <label>
+                                        {{ form_widget(child) }}
+                                        {{ child.vars.label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {{ form_errors(form.worksWithVersions) }}
+                        <span class="help-block">{{ 'mautic.campaign.share.works_with.help'|trans }}</span>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.languages) }}
+                        {{ form_widget(form.languages) }}
+                        <span class="help-block">{{ 'mautic.campaign.share.languages.help'|trans }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 4: Pricing ── #}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ 'mautic.campaign.share.pricing_section'|trans }}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        {{ form_label(form.price) }}
+                        {{ form_widget(form.price) }}
+                        {{ form_errors(form.price) }}
+                        {# Paid packages are temporarily disabled; swap back to price.help
+                           and the price.notice alert when the field is re-enabled. #}
+                        <span class="help-block">{{ 'mautic.campaign.share.price.coming_soon'|trans }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Actions ── #}
+            <div class="text-right">
+                <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': campaignId}) }}" class="btn btn-default">
+                    {{ 'mautic.core.form.cancel'|trans }}
+                </a>
+                {{ form_widget(form.download) }}
+                {{ form_widget(form.publish) }}
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

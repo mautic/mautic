@@ -42,7 +42,7 @@ final class BouncedHelperTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->bouncedHelper = static::getContainer()->get('mautic.email.stats.helper_bounced');
+        $this->bouncedHelper = self::getContainer()->get(BouncedHelper::class);
 
         $this->createUsers();
         $this->createEmailAndCampaign();
@@ -288,7 +288,6 @@ final class BouncedHelperTest extends MauticMysqlTestCase
         $stat1->setEmailAddress($this->lead1->getEmail());
         $stat1->setDateSent(new \DateTime());
         $stat1->setSource('campaign.event');
-        $this->assertInstanceOf(Event::class, $event);
         $stat1->setSourceId($event->getId());
         $this->em->persist($stat1);
 

@@ -23,11 +23,19 @@ final class NoContainerGetRuleTest extends RuleTestCase
         $this->analyse([__DIR__.'/Fixture/ContainerGetService.php'], [
             [
                 'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.',
-                18,
+                20,
             ],
             [
                 'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.',
-                23,
+                25,
+            ],
+            [
+                'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.',
+                30,
+            ],
+            [
+                'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.',
+                35,
             ],
         ]);
 
@@ -36,5 +44,13 @@ final class NoContainerGetRuleTest extends RuleTestCase
 
         // a scoped ServiceLocator is an allowed, explicit set of services
         $this->analyse([__DIR__.'/Fixture/ServiceLocatorGetService.php'], []);
+
+        // in a test the container fetch is allowed, but only by a class constant
+        $this->analyse([__DIR__.'/Fixture/ContainerGetInTestCase.php'], [
+            [
+                'Do not fetch a service from the container by a string name. Use a class constant, e.g. ->get(SomeService::class), to get a typed service.',
+                20,
+            ],
+        ]);
     }
 }

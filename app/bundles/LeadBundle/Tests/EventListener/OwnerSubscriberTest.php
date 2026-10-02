@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
@@ -281,6 +282,7 @@ final class OwnerSubscriberTest extends TestCase
             $this->createStub(RedirectModel::class),
             $this->createStub(SMimeHelper::class),
             $this->createStub(EmailStatModel::class),
+            $this->createStub(CopyRepository::class),
         );
         $mailerHelper->setLead($lead);
 

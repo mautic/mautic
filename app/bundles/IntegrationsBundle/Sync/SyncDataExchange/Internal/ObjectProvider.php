@@ -62,7 +62,7 @@ class ObjectProvider
      */
     private function collectObjects(): void
     {
-        if (empty($this->objects)) {
+        if ([] === $this->objects) {
             $event = new InternalObjectEvent();
             $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS);
             $this->objects = $event->getObjects();

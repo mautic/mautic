@@ -19,7 +19,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
     protected function beforeTearDown(): void
     {
         /** @var PathsHelper $pathsHelper */
-        $pathsHelper = static::getContainer()->get('mautic.helper.paths');
+        $pathsHelper = self::getContainer()->get(PathsHelper::class);
         $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
 
         if (is_dir($folderPath)) {
@@ -29,7 +29,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 
     public function testElfinderCreateFolderPermissions(): void
     {
-        $elFinderLoader = new class(static::getContainer()) extends ElFinderLoader {
+        $elFinderLoader = new class(self::getContainer()) extends ElFinderLoader {
             public function __construct(ContainerInterface $container)
             {
                 /** @phpstan-ignore symfonyContainer.privateService */
@@ -51,7 +51,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
             }
         };
 
-        static::getContainer()->set('fm_elfinder.loader', $elFinderLoader);
+        self::getContainer()->set('fm_elfinder.loader', $elFinderLoader);
 
         $this->folderName = (string) time();
         $user             = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
@@ -64,7 +64,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
         );
         self::assertResponseIsSuccessful();
         /** @var PathsHelper $pathsHelper */
-        $pathsHelper = static::getContainer()->get('mautic.helper.paths');
+        $pathsHelper = self::getContainer()->get(PathsHelper::class);
         $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
         $this->assertDirectoryExists($folderPath);
         $this->assertSame('777', substr(sprintf('%o', fileperms($folderPath)), -3));

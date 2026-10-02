@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Exception;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -64,7 +65,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         private UtmTagRepository $utmTagRepository,
         private DoNotContactRepository $doNotContactRepository,
         ModelFactory $modelFactory,
-        private readonly \Mautic\CoreBundle\Entity\AuditLogRepository $auditLogRepository,
+        private readonly AuditLogRepository $auditLogRepository,
         private $isTest = false,
     ) {
         $this->setModelFactory($modelFactory);
@@ -189,7 +190,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
             return;
         }
-        $leadId     = (int) $event->getLead()->getId();
+        $leadId     = $event->getLead()->getId();
         $segmentIds = $this->leadListRepository->getLeadSegmentIds($leadId);
 
         foreach ($segmentIds as $segmentId) {

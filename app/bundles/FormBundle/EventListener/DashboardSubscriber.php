@@ -40,8 +40,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected SubmissionModel $formSubmissionModel,
-        protected FormModel $formModel,
+        private readonly SubmissionModel $formSubmissionModel,
+        private readonly FormModel $formModel,
         private readonly RouterInterface $router,
     ) {
     }

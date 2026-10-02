@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 final class MobileNotificationDetailsType extends AbstractType
 {
     public function __construct(
-        protected IntegrationHelper $integrationHelper,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
     }
 

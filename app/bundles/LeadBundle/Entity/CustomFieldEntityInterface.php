@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 interface CustomFieldEntityInterface
@@ -14,7 +16,7 @@ interface CustomFieldEntityInterface
      *
      * @return mixed
      */
-    public function setFields($fields);
+    public function setFields(array $fields);
 
     /**
      * @return mixed

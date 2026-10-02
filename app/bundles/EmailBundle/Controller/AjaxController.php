@@ -34,8 +34,9 @@ final class AjaxController extends CommonAjaxController
     private EmailModel $emailModel;
 
     #[Required]
-    public function autowireEmailAjaxController(EmailModel $emailModel): void
-    {
+    public function autowireEmailAjaxController(
+        EmailModel $emailModel,
+    ): void {
         $this->emailModel = $emailModel;
     }
 

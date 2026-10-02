@@ -71,7 +71,7 @@ trait RequestTrait
                     }
 
                     // find property by value
-                    if (!empty($fields)) {
+                    if ([] !== $fields) {
                         $properties = ArrayHelper::getValue('properties', $fields[$name]);
                         if (is_array($properties)) {
                             $valuesAsKeys = array_flip(array_values($properties));

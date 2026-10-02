@@ -5,10 +5,10 @@ namespace Mautic\LeadBundle\Segment\Decorator;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 
-class DateCompanyDecorator implements FilterDecoratorInterface
+final readonly class DateCompanyDecorator implements FilterDecoratorInterface
 {
     public function __construct(
-        private readonly FilterDecoratorInterface $dateDecorator,
+        private FilterDecoratorInterface $dateDecorator,
     ) {
     }
 

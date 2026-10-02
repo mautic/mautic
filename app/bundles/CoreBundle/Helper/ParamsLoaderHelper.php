@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\Middleware\ConfigAwareTrait;
 
-class ParamsLoaderHelper
+final class ParamsLoaderHelper
 {
     use ConfigAwareTrait;
 

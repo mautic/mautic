@@ -65,7 +65,7 @@ class ConfigChangeLogger
             }
         }
 
-        if (empty($diff)) {
+        if ([] === $diff) {
             return;
         }
 

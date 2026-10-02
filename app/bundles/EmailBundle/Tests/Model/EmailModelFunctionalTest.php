@@ -29,6 +29,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
@@ -49,7 +50,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         /** @var EmailModel $emailModel */
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get(EmailModel::class);
         $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
     }
@@ -144,7 +145,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 
@@ -569,7 +570,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->addContactsToSegment(array_slice($contacts, 2, 3), $segment);
 
-        static::getContainer()->get('event_dispatcher')->dispatch(
+        self::getContainer()->get(EventDispatcherInterface::class)->dispatch(
             new ListChangeEvent($contacts[2], $segment, true),
             LeadEvents::LEAD_LIST_CHANGE
         );
@@ -589,7 +590,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->emailModel->getPendingLeads($email, null, true);
 
-        $listModel = static::getContainer()->get('mautic.lead.model.list');
+        $listModel = self::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {
@@ -611,7 +612,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->emailModel->getPendingLeads($email, null, true);
 
-        $listModel = static::getContainer()->get('mautic.lead.model.list');
+        $listModel = self::getContainer()->get(ListModel::class);
         $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {

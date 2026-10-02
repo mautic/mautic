@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
+final class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
     use ConfigAwareTrait;
 

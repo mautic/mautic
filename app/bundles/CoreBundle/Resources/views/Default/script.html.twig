@@ -1,4 +1,5 @@
 {% set mautic_content = mauticContent is defined ? mauticContent : '' %}
+{% set includeEditorScripts = includeEditor is defined ? includeEditor : true %}
 
 {% set editor_fonts = getSortedEditorFonts(configGetParameter('editor_fonts')) %}
 
@@ -19,4 +20,4 @@
     var LoginUserName                   = '{{ (app.user and app.user.getUsername()) ? app.user.getUsername()|escape('js') : 'Anonymous' }}'
     var LoginUserId                     = {{ (app.user and app.user.getId()) ? app.user.getId() : 0 }}
 </script>
-{{ outputSystemScripts(true) }}
+{{ outputSystemScripts(includeEditorScripts) }}

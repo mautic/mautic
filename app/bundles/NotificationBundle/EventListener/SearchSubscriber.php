@@ -47,7 +47,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             '@MauticNotification/SubscribedEvents/Search/global-web.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.notification.notification.header', $results);
         }
     }
@@ -70,7 +70,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             '@MauticNotification/SubscribedEvents/Search/global-mobile.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.notification.mobile_notification.header', $results);
         }
     }

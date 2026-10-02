@@ -116,7 +116,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
 
         // Get the time format from CoreParametersHelper
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $timeFormat           = $coreParametersHelper->get('date_format_timeonly');
 
         // Generate expected hour labels based on the actual time format

@@ -88,7 +88,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $field->setAlias($fieldDetails['alias']);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 

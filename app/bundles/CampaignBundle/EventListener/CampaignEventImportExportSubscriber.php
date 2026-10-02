@@ -54,7 +54,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
             return;
         }
 
-        $campaignId = (int) $event->getEntityId();
+        $campaignId = $event->getEntityId();
         $campaign   = $this->campaignModel->getEntity($campaignId);
 
         if (!$campaign instanceof Campaign) {

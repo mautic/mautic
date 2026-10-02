@@ -5,12 +5,25 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\Notification\Handler;
 
 use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class HandlerContainer
+final class HandlerContainer
 {
     private array $handlers = [];
 
-    public function registerHandler(HandlerInterface $handler): void
+    /**
+     * @param iterable<HandlerInterface> $handlers
+     */
+    public function __construct(
+        #[AutowireIterator('mautic.sync.notification_handler')]
+        iterable $handlers = [],
+    ) {
+        foreach ($handlers as $handler) {
+            $this->registerHandler($handler);
+        }
+    }
+
+    private function registerHandler(HandlerInterface $handler): void
     {
         if (!isset($this->handlers[$handler->getIntegration()])) {
             $this->handlers[$handler->getIntegration()] = [];

@@ -19,8 +19,9 @@ class TriggerEventModel extends CommonFormModel
     private TriggerEventRepository $triggerEventRepository;
 
     #[Required]
-    public function autowireTriggerEventModel(TriggerEventRepository $triggerEventRepository): void
-    {
+    public function autowireTriggerEventModel(
+        TriggerEventRepository $triggerEventRepository,
+    ): void {
         $this->triggerEventRepository = $triggerEventRepository;
     }
 

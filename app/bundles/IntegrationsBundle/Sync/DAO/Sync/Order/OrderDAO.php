@@ -290,7 +290,7 @@ class OrderDAO
 
     public function shouldSync(): bool
     {
-        return !empty($this->changedObjects);
+        return [] !== $this->changedObjects;
     }
 
     public function getObjectCount(): int

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -9,8 +11,8 @@ use Mautic\PointBundle\Entity\Point;
 final class PointActionEvent extends CommonEvent
 {
     public function __construct(
-        protected Point $point,
-        protected Lead $lead,
+        private Point $point,
+        private Lead $lead,
     ) {
     }
 

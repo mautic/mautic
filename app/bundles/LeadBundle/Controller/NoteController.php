@@ -18,8 +18,9 @@ final class NoteController extends FormController
     private NoteModel $noteModel;
 
     #[Required]
-    public function autowireNoteController(NoteModel $noteModel): void
-    {
+    public function autowireNoteController(
+        NoteModel $noteModel,
+    ): void {
         $this->noteModel = $noteModel;
     }
 
@@ -364,10 +365,8 @@ final class NoteController extends FormController
      *
      * @param int $objectId
      * @param int $leadId
-     *
-     * @return Response
      */
-    public function executeNoteAction(Request $request, $objectAction, $objectId = 0, $leadId = 0)
+    public function executeNoteAction(Request $request, $objectAction, $objectId = 0, $leadId = 0): Response
     {
         if (method_exists($this, "{$objectAction}Action")) {
             return $this->{"{$objectAction}Action"}($request, $leadId, $objectId);

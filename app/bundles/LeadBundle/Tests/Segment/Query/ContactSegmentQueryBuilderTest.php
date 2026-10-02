@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -25,7 +26,7 @@ final class ContactSegmentQueryBuilderTest extends TestCase
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
         $queryBuilder->where('NULL');
 
-        $filterQueryBuilder = new ContactSegmentQueryBuilder($this->createStub(EntityManager::class), new RandomParameterName(), new EventDispatcher());
+        $filterQueryBuilder = new ContactSegmentQueryBuilder($this->createStub(EntityManager::class), new RandomParameterName(), new EventDispatcher(), $this->createStub(LeadListRepository::class));
 
         $this->assertSame($queryBuilder, $filterQueryBuilder->addNewContactsRestrictions($queryBuilder, 8));
         $this->assertSame('SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE (NULL) AND (l.id NOT IN (SELECT par0.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads par0 WHERE par0.leadlist_id = 8))', $queryBuilder->getDebugOutput());
@@ -53,7 +54,7 @@ final class ContactSegmentQueryBuilderTest extends TestCase
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
         $queryBuilder->where('NULL');
 
-        $filterQueryBuilder = new ContactSegmentQueryBuilder($this->createStub(EntityManager::class), new RandomParameterName(), new EventDispatcher());
+        $filterQueryBuilder = new ContactSegmentQueryBuilder($this->createStub(EntityManager::class), new RandomParameterName(), new EventDispatcher(), $this->createStub(LeadListRepository::class));
 
         $this->assertSame($queryBuilder, $filterQueryBuilder->addNewContactsRestrictions($queryBuilder, 8, $batchLimiters));
         $this->assertSame('SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE (NULL) AND (l.id NOT IN (SELECT par0.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads par0 WHERE (par0.leadlist_id = 8) AND ('.$expectedWhereClause.')))', $queryBuilder->getDebugOutput());

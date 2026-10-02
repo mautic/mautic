@@ -9,6 +9,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FocusControllerTest extends MauticMysqlTestCase
 {
@@ -73,7 +74,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
         ]);
 
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get('mautic.focus.model.focus');
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $focusModel->saveEntity($focus);
 
         $this->em->clear();
@@ -87,7 +88,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/focus/view/'.$focus->getId());
         $this->assertResponseIsSuccessful();
 
-        $translator = self::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), (string) $this->client->getResponse()->getContent());
         $this->assertCount(2, $crawler->filterXPath('//ul[contains(@class, "media-list-feed")]/li'));

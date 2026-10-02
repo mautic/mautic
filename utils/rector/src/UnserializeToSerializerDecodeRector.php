@@ -15,8 +15,6 @@ use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Scalar\String_;
 use Rector\Rector\AbstractRector;
-use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
-use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 
 /**
  * Replaces raw unserialize() calls with the secure Serializer::decode() helper,
@@ -31,23 +29,6 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
  */
 final class UnserializeToSerializerDecodeRector extends AbstractRector
 {
-    public function getRuleDefinition(): RuleDefinition
-    {
-        return new RuleDefinition(
-            'Replace unserialize() with Serializer::decode() to prevent PHP Object Injection',
-            [
-                new CodeSample(
-                    'unserialize($data);',
-                    '\\Mautic\\CoreBundle\\Helper\\Serializer::decode($data);',
-                ),
-                new CodeSample(
-                    "unserialize(\$data, ['allowed_classes' => false]);",
-                    '\\Mautic\\CoreBundle\\Helper\\Serializer::decode($data);',
-                ),
-            ]
-        );
-    }
-
     /**
      * @return array<class-string<Node>>
      */

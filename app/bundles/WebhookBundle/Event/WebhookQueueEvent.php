@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -13,7 +15,7 @@ final class WebhookQueueEvent extends CommonEvent
      */
     public function __construct(
         WebhookQueue $webhookQueue,
-        protected Webhook $webhook,
+        private Webhook $webhook,
         $isNew = false,
     ) {
         $this->entity  = $webhookQueue;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'name'        => 'Clearbit',
     'description' => 'Enables integration with Clearbit for contact and company lookup',

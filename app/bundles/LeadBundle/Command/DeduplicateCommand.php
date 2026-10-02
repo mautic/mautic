@@ -25,7 +25,7 @@ The <info>%command.name%</info> command will dedpulicate contacts based on uniqu
 <info>php %command.full_name%</info>
 TXT
 )]
-class DeduplicateCommand extends Command
+final class DeduplicateCommand extends Command
 {
     public const NAME = 'mautic:contacts:deduplicate';
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\NotificationBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -11,9 +13,9 @@ final class NotificationSendEvent extends CommonEvent
      * @param string $message
      */
     public function __construct(
-        protected $message,
-        protected $heading,
-        protected Lead $lead,
+        private $message,
+        private $heading,
+        private readonly Lead $lead,
     ) {
     }
 
