@@ -798,10 +798,6 @@ final class ListController extends FormController
                 'campaignStats'      => $segmentCampaignShare->getCampaignList($list->getId()),
                 'stats'              => $segmentContactsLineChartData,
                 'list'               => $list,
-                'segmentCount'       => $this->leadListRepository->getLeadCount($list->getId()),
-                'activeSegmentCount' => $listModel->getActiveSegmentContactCount($list->getId()),
-                'manuallyAddedSegmentCount' => $this->leadListRepository->getManuallyAddedLeadCount($list->getId()),
-                'filterAddedSegmentCount'   => $this->leadListRepository->getFilterAddedLeadCount($list->getId()),
                 'permissions'        => $this->security->isGranted($permissions, 'RETURN_ARRAY'),
                 'security'           => $this->security,
                 'dateRangeForm'      => $dateRangeForm->createView(),
@@ -819,6 +815,34 @@ final class ListController extends FormController
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'list',
             ],
+        ]);
+    }
+
+    public function segmentStatsAction(int $objectId): Response
+    {
+        $segment = $this->getSegment(
+            $objectId,
+            LeadPermissions::LISTS_VIEW_OWN,
+            LeadPermissions::LISTS_VIEW_OTHER
+        );
+        $statistics = $this->leadListRepository->getSegmentStatistics(
+            $segment->getId(),
+            !empty($segment->getFilters())
+        );
+        $activeSegmentCount = $this->listModel->getActiveSegmentContactCount(
+            $segment->getId(),
+            $statistics['total']
+        );
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'list'                      => $segment,
+                'segmentCount'              => $statistics['total'],
+                'activeSegmentCount'        => $activeSegmentCount,
+                'manuallyAddedSegmentCount' => $statistics['manuallyAdded'],
+                'filterAddedSegmentCount'   => $statistics['filterAdded'],
+            ],
+            'contentTemplate' => '@MauticLead/List/_segment_stats.html.twig',
         ]);
     }
 

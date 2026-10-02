@@ -327,37 +327,38 @@ class LeadListRepository extends CommonRepository
         return (1 === $countListIds) ? $return[$listIds[0]] : $return;
     }
 
-    public function getManuallyAddedLeadCount(int $listId): int
+    /**
+     * @return array{total: int, manuallyAdded: int, filterAdded: int|null}
+     */
+    public function getSegmentStatistics(int $listId, bool $includeFilterAdded): array
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('count(l.lead_id) as thecount')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
-            ->where(
-                $q->expr()->eq('l.leadlist_id', ':listId'),
-                $q->expr()->eq('l.manually_removed', ':false'),
-                $q->expr()->eq('l.manually_added', ':true')
-            )
+        $queryBuilder = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $queryBuilder->select(
+            'COUNT(l.lead_id) AS total_count',
+            'COALESCE(SUM(CASE WHEN l.manually_added = :true THEN 1 ELSE 0 END), 0) AS manually_added_count'
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
+        $queryBuilder = $this->forceUseIndex($queryBuilder, MAUTIC_TABLE_PREFIX.'manually_removed');
+
+        if ($includeFilterAdded) {
+            $queryBuilder->addSelect('COALESCE(SUM(CASE WHEN l.manually_added = :false THEN 1 ELSE 0 END), 0) AS filter_added_count');
+        }
+
+        $stats = $queryBuilder->where(
+            $queryBuilder->expr()->eq('l.leadlist_id', ':listId'),
+            $queryBuilder->expr()->eq('l.manually_removed', ':false')
+        )
             ->setParameter('listId', $listId)
             ->setParameter('false', false, 'boolean')
-            ->setParameter('true', true, 'boolean');
+            ->setParameter('true', true, 'boolean')
+            ->executeQuery()
+            ->fetchAssociative() ?: [];
 
-        return (int) $q->executeQuery()->fetchOne();
-    }
-
-    public function getFilterAddedLeadCount(int $listId): int
-    {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('count(l.lead_id) as thecount')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
-            ->where(
-                $q->expr()->eq('l.leadlist_id', ':listId'),
-                $q->expr()->eq('l.manually_removed', ':false'),
-                $q->expr()->eq('l.manually_added', ':false')
-            )
-            ->setParameter('listId', $listId)
-            ->setParameter('false', false, 'boolean');
-
-        return (int) $q->executeQuery()->fetchOne();
+        return [
+            'total'         => (int) ($stats['total_count'] ?? 0),
+            'manuallyAdded' => (int) ($stats['manually_added_count'] ?? 0),
+            'filterAdded'   => $includeFilterAdded ? (int) ($stats['filter_added_count'] ?? 0) : null,
+        ];
     }
 
     private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
