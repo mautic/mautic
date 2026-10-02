@@ -1,9 +1,14 @@
 <td class="visible-md visible-lg">
-    <a size="sm" class="label label-gray"
-       href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.company_id'|trans~':'~item.id}) }}"
-       data-toggle="ajax"
-       {% set contactCount = leadCounts[item.id]|default(0) %}
-       {% if 0 == contactCount %}disabled="disabled"{% endif %}>
-        {{ 'mautic.lead.company.viewleads_count'|trans({'%count%': contactCount}) }}
-    </a>
+    {% set contactCount = leadCounts[item.id]|default(0) %}
+    {% include '@MauticCore/Helper/_tag.html.twig' with {
+        tags: [{
+            label: 'mautic.lead.company.viewleads_count'|trans({'%count%': contactCount}),
+            color: 'gray',
+            size: 'sm',
+            attributes: {
+                href: path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.company_id'|trans ~ ':' ~ item.id}),
+                'data-toggle': 'ajax'
+            }|merge(0 == contactCount ? {disabled: 'disabled'} : {})
+        }]
+    } %}
 </td>

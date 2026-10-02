@@ -135,9 +135,18 @@
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        <a href="{{ path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" size="sm" class="label label-gray" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>
-                           {{- 'mautic.form.form.viewresults'|trans({'%count%': i['submission_count']}) -}}
-                        </a>
+                        {% include '@MauticCore/Helper/_tag.html.twig' with {
+                            tags: [{
+                                label: 'mautic.form.form.viewresults'|trans({'%count%': i['submission_count']}),
+                                color: 'gray',
+                                size: 'sm',
+                                attributes: {
+                                    href: path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}),
+                                    'data-toggle': 'ajax',
+                                    'data-menu-link': 'mautic_form_index'
+                                }|merge(0 == i.submission_count ? {disabled: 'disabled'} : {})
+                            }]
+                        } %}
                     </td>
                     <td class="visible-md visible-lg">{% if item.dateAdded %}{{ dateToFull(item.dateAdded) }}{% endif %}</td>
                     <td class="visible-md visible-lg">{% if item.dateModified %}{{ dateToFull(item.dateModified) }}{% endif %}</td>
@@ -176,7 +185,7 @@
                     heading: 'mautic.form.list.heading',
                     copy: 'mautic.form.list.copy',
                 }) }}
-                
+
                 {% set formFeaturesContainer %}
                 <div class="row">
                     <div class="col-sm-6 col-xs-12">
@@ -218,13 +227,13 @@
                     } %}
                 </div>
                 {% endset %}
-                
+
                 {{ include('@MauticCore/Components/content-group.html.twig', {
                     heading: 'mautic.form.list.uses.heading',
                     childContainer: formUsesContainer,
                 }) }}
                 {% endset %}
-                
+
                 {{ include('@MauticCore/Components/content-block.html.twig', {
                     heading: 'mautic.form.list.block.heading',
                     subheading: 'mautic.form.list.block.subheading',
