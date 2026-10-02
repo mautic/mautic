@@ -1025,7 +1025,7 @@ final class CampaignController extends AbstractStandardFormController
         return '@MauticCampaign/Campaign';
     }
 
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $session        = $this->getCurrentRequest()->getSession();
         $currentFilters = $session->get('mautic.campaign.list_filters', []);
