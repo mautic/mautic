@@ -236,9 +236,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
      */
     private function handlePreferenceCenterReplacements(string $content, array $params): string
     {
-        $xpath = $this->createDOMXPathForContent($content);
-
-        $content = $this->replacePreferenceCenterTokens($xpath->document->saveHTML(), $params);
+        $content = $this->replacePreferenceCenterTokens($content, $params);
 
         return $this->wrapPreferenceCenterInFormTag($content, $params);
     }
@@ -441,30 +439,44 @@ final class BuilderSubscriber implements EventSubscriberInterface
             return $content;
         }
 
-        $xpath = $this->createDOMXPathForContent($content);
-        $node  = $this->getFirstNodeThatContainsAPreferenceCenterToken($xpath);
+        $xpath    = $this->createDOMXPathForContent($content);
+        $nodeList = $xpath->query('//*[@data-prefs-center-first="1"]');
 
-        if (null === $node) {
+        if (false === $nodeList || 0 === $nodeList->length) {
             return $content;
         }
 
-        $parentNode = $this->getFirstParentNodeThatContainsAllFormInputs($node);
+        $firstNode  = $nodeList->item(0);
+        $parentNode = $this->getFirstParentNodeThatContainsAllFormInputs($firstNode);
+
+        // If the parent is <body> or <html>, create a wrapper div around the preference center
+        // elements so the entire page is not wrapped in a form. This allows users to add
+        // other forms (like {form=1}) to the preference center page.
+        if (in_array($parentNode->nodeName, ['body', 'html'], true)) {
+            $wrapper = $parentNode->ownerDocument->createElement('div');
+            $wrapper->setAttribute('class', 'preference-center-form-wrapper');
+
+            // Collect all preference center nodes to move them into the wrapper
+            $prefNodes = [];
+            for ($i = 0; $i < $nodeList->length; ++$i) {
+                $prefNodes[] = $nodeList->item($i);
+            }
+
+            // Insert wrapper before the first preference center node
+            $firstNode->parentNode->insertBefore($wrapper, $firstNode);
+
+            // Move all preference center nodes into the wrapper
+            foreach ($prefNodes as $prefNode) {
+                $wrapper->appendChild($prefNode);
+            }
+
+            $parentNode = $wrapper;
+        }
 
         $parentNode->insertBefore(new \DOMElement('startform'), $parentNode->firstChild);
         $parentNode->appendChild(new \DOMElement('endform'));
 
         return str_replace(['<startform></startform>', '<endform></endform>'], [$params['startform'], '</form>'], $xpath->document->saveHTML());
-    }
-
-    private function getFirstNodeThatContainsAPreferenceCenterToken(\DOMXPath $xpath): ?\DOMNode
-    {
-        $nodeList = $xpath->query('//*[@data-prefs-center-first="1"]');
-
-        if (false !== $nodeList) {
-            return $nodeList->item(0);
-        }
-
-        return null;
     }
 
     private function getFirstParentNodeThatContainsAllFormInputs(\DOMNode $node): \DOMNode
