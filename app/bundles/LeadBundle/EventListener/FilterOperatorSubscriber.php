@@ -144,6 +144,20 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             ]
         );
 
+        $event->addChoice(
+            'lead',
+            'tags',
+            [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+                'properties' => [
+                    'type' => 'tags',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'tags'),
+                ],
+            ]
+        );
+
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
         if (!$event->isForSegmentation()) {
             return;
@@ -198,15 +212,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
-            ],
-            'tags' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
-                'object'     => 'lead',
-                'properties' => [
-                    'type' => 'tags',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'tags'),
-                ],
             ],
             'device_type' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.device_type'),

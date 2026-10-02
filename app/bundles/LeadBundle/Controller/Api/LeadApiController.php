@@ -237,7 +237,7 @@ final class LeadApiController extends CommonApiController
             Response::HTTP_OK
         );
 
-        $context = $view->getContext()->setGroups(['leadNoteDetails']);
+        $context = $view->getContext()->setGroups(['leadNoteDetails', 'publishDetails']);
         $view->setContext($context);
 
         return $this->handleView($view);

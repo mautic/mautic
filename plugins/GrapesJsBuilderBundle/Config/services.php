@@ -10,7 +10,6 @@ return function (ContainerConfigurator $configurator): void {
         ->defaults()
         ->autowire()
         ->autoconfigure()
-        ->bind('string $projectDir', '%kernel.project_dir%')
         ->public();
 
     $excludes = [

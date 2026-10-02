@@ -128,8 +128,13 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.security.saml.id_store', Mautic\UserBundle\Security\SAML\Store\IdStore::class);
 
     $services->set(Mautic\UserBundle\Security\UserTokenSetter::class);
+    $services->alias('mautic.security.logout_handler', Mautic\UserBundle\EventListener\LogoutListener::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\UserBundle\EventListener\LogoutListener::class.'" service instead.');
+    $services->alias('mautic.security.user_token_setter', Mautic\UserBundle\Security\UserTokenSetter::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\UserBundle\Security\UserTokenSetter::class.'" service instead.');
 
     $services->set('mautic.user.model.user_token_service', Mautic\UserBundle\Model\UserToken\UserTokenService::class);
+
     // Decorate the form_login class to ensure no user enumeration can
     // happen via timing attacks.
     $services->set('mautic.security.authenticator.form_login.decorator', Mautic\UserBundle\Security\TimingSafeFormLoginAuthenticator::class)

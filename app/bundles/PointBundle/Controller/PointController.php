@@ -5,6 +5,7 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Helper\PointSearchScopeProvider;
 use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +23,7 @@ final class PointController extends AbstractFormController
         $this->pointModel = $pointModel;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, PointSearchScopeProvider $pointSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -81,8 +82,9 @@ final class PointController extends AbstractFormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue' => $search,
-                'items'       => $points,
+                'searchValue'     => $search,
+                'searchScopes'    => $pointSearchScopeProvider->getScopes(),
+                'items'           => $points,
                 'actions'     => $actions['actions'],
                 'page'        => $page,
                 'limit'       => $limit,
