@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\WebhookBundle\Helper\WebhookSearchScopeProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +27,11 @@ final class WebhookController extends FormController
      * @var array<string, mixed>
      */
     private array $listFilters = [];
+
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
 
     public function __construct(
         FormFactoryInterface $formFactory,
@@ -57,8 +63,10 @@ final class WebhookController extends FormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, WebhookSearchScopeProvider $webhookSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $webhookSearchScopeProvider->getScopes();
+
         return parent::indexStandard($request, $page);
     }
 
@@ -83,7 +91,7 @@ final class WebhookController extends FormController
 
     /**
      * @param array<string, mixed> $args
-     * @param mixed                $action
+     * @param string               $action
      *
      * @return array<string, mixed>
      */
@@ -93,7 +101,13 @@ final class WebhookController extends FormController
             $args['viewParameters']['filters'] = $this->listFilters;
         }
 
-        return $args;
+        if ('index' === $action && null !== $this->indexSearchScopes) {
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
+        }
+
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
+        return parent::getViewArguments($args, $action);
     }
 
     /**

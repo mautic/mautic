@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Helper\DynamicContentSearchScopeProvider;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,7 +53,7 @@ final class DynamicContentController extends FormController
         );
     }
 
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, DynamicContentSearchScopeProvider $dynamicContentSearchScopeProvider, $page = 1): Response
     {
         $permissions = $this->getPermissions();
 
@@ -109,10 +110,11 @@ final class DynamicContentController extends FormController
                     'route'         => $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]),
                 ],
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'filters'     => $categoryFilters['filters'],
-                    'items'       => $entities,
-                    'categories'  => $categoryFilters['categories'],
+                    'searchValue'  => $search,
+                    'searchScopes' => $dynamicContentSearchScopeProvider->getScopes(),
+                    'filters'      => $categoryFilters['filters'],
+                    'items'        => $entities,
+                    'categories'   => $categoryFilters['categories'],
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,

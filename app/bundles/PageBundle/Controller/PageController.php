@@ -20,6 +20,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageEditSubmitEvent;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Mautic\PageBundle\Helper\PageConfig;
+use Mautic\PageBundle\Helper\PageSearchScopeProvider;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,7 +42,7 @@ final class PageController extends FormController
         $this->pageModel = $pageModel;
     }
 
-    public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, int $page = 1): Response
+    public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, PageSearchScopeProvider $pageSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -156,10 +157,11 @@ final class PageController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue' => $search,
-                'filters'     => $categoryFilters['filters'],
-                'items'       => $pages,
-                'categories'  => $categoryFilters['categories'],
+                'searchValue'  => $search,
+                'searchScopes' => $pageSearchScopeProvider->getScopes(),
+                'filters'      => $categoryFilters['filters'],
+                'items'        => $pages,
+                'categories'   => $categoryFilters['categories'],
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,

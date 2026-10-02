@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\PageHelperInterface;
 use Mautic\PointBundle\Entity\Trigger;
+use Mautic\PointBundle\Helper\TriggerSearchScopeProvider;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\Form\FormError;
@@ -31,7 +32,7 @@ final class TriggerController extends FormController
         $this->triggerModel      = $triggerModel;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, TriggerSearchScopeProvider $triggerSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -89,9 +90,10 @@ final class TriggerController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue' => $search,
-                'filters'     => $categoryFilters['filters'],
-                'items'       => $triggers,
+                'searchValue'  => $search,
+                'searchScopes' => $triggerSearchScopeProvider->getScopes(),
+                'filters'      => $categoryFilters['filters'],
+                'items'        => $triggers,
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
