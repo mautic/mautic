@@ -712,8 +712,6 @@ class FieldModel extends FormModel
 
     /**
      * Returns list of all segments that use $field.
-     *
-     * @return \Countable
      */
     public function getFieldSegments(LeadField $field): iterable
     {

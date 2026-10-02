@@ -1194,7 +1194,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         return 0 < count($this->getFieldSegments($field));
     }
 
-    public function getFieldSegments(LeadField $field): \Countable
+    public function getFieldSegments(LeadField $field)
     {
         $alias       = $field->getAlias();
         $aliasLength = mb_strlen($alias);
