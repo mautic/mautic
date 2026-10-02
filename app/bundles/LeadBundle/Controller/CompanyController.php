@@ -242,8 +242,9 @@ final class CompanyController extends FormController
     /**
      * Removes selected contacts from a company.
      */
-    public function batchRemoveContactsAction(Request $request, string|int $companyId): Response
+    public function batchRemoveContactsAction(Request $request, string|int $objectId): Response
     {
+        $companyId = $objectId;
         $returnUrl = $this->generateUrl('mautic_company_action', [
             'objectAction' => 'view',
             'objectId'     => $companyId,
