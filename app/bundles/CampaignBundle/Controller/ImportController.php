@@ -23,7 +23,6 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -50,21 +49,17 @@ final class ImportController extends AbstractFormController
 
     private PathsHelper $pathsHelper;
 
-    private FormFactoryInterface $formFactory;
-
     #[Required]
     public function autowireImportController(
         UserHelper $userHelper,
         RequestStack $requestStack,
         LoggerInterface $logger,
         PathsHelper $pathsHelper,
-        FormFactoryInterface $formFactory,
     ): void {
         $this->userHelper   = $userHelper;
         $this->requestStack = $requestStack;
         $this->logger       = $logger;
         $this->pathsHelper  = $pathsHelper;
-        $this->formFactory  = $formFactory;
     }
 
     #[Route(

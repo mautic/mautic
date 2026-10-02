@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Controller;
 
 use JMS\Serializer\SerializerInterface;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class UserController extends FormController
+final class UserController extends AbstractFormController
 {
     private RoleRepository $roleRepository;
 
