@@ -96,8 +96,6 @@ class FormController extends CommonFormController
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $filter['force'][] = ['column' => 'f.translationParent', 'expr' => 'isNull'];
-
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
         $forms      = $this->formModel->getEntities(

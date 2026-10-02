@@ -87,6 +87,11 @@ final class FormTranslationFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('French translation', $crawler->filter('#translation-container')->text());
         $this->assertGreaterThan(0, $crawler->filter('#translation-container a[href="/s/forms/view/'.$childId.'"]')->count());
 
+        $crawler = $this->client->request('GET', '/s/forms');
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString('French translation', $crawler->filter('#formTable')->text());
+        $this->assertGreaterThan(0, $crawler->filter('#formTable a[href="/s/forms/view/'.$childId.'"]')->count());
+
         $crawler = $this->client->request('GET', '/s/forms/edit/'.$childId);
         self::assertResponseIsSuccessful();
         $this->assertSame((string) $parentId, $crawler->filter('#mauticform_translationParent option:selected')->attr('value'));
