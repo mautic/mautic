@@ -37,6 +37,106 @@ final class ParameterLoaderTest extends TestCase
         $this->assertFalse($loader->getDefaultParameters()['api_enabled']);
     }
 
+    public function testGetWebrootDirReturnsProjectRootWhenNoWebRootConfigured(): void
+    {
+        $tempDir = sys_get_temp_dir().'/mautic_test_'.uniqid();
+        mkdir($tempDir);
+
+        // Create a composer.json without web-root configuration
+        file_put_contents($tempDir.'/composer.json', json_encode([
+            'name' => 'test/project',
+            'extra' => [
+                'public-dir' => '.',
+            ],
+        ]));
+
+        $result = ParameterLoader::getWebrootDir($tempDir);
+
+        $this->assertSame($tempDir, $result);
+
+        // Cleanup
+        unlink($tempDir.'/composer.json');
+        rmdir($tempDir);
+    }
+
+    public function testGetWebrootDirDetectsMauticScaffoldWebRoot(): void
+    {
+        $tempDir = sys_get_temp_dir().'/mautic_test_'.uniqid();
+        mkdir($tempDir);
+        mkdir($tempDir.'/docroot');
+
+        // Create a composer.json with mautic-scaffold web-root (recommended-project style)
+        file_put_contents($tempDir.'/composer.json', json_encode([
+            'name' => 'mautic/recommended-project',
+            'extra' => [
+                'mautic-scaffold' => [
+                    'locations' => [
+                        'web-root' => 'docroot/',
+                    ],
+                ],
+            ],
+        ]));
+
+        $result = ParameterLoader::getWebrootDir($tempDir);
+
+        $this->assertSame($tempDir.'/docroot', $result);
+
+        // Cleanup
+        unlink($tempDir.'/composer.json');
+        rmdir($tempDir.'/docroot');
+        rmdir($tempDir);
+    }
+
+    public function testGetWebrootDirDetectsSymfonyPublicDir(): void
+    {
+        $tempDir = sys_get_temp_dir().'/mautic_test_'.uniqid();
+        mkdir($tempDir);
+        mkdir($tempDir.'/public');
+
+        // Create a composer.json with Symfony's public-dir
+        file_put_contents($tempDir.'/composer.json', json_encode([
+            'name' => 'test/project',
+            'extra' => [
+                'public-dir' => 'public',
+            ],
+        ]));
+
+        $result = ParameterLoader::getWebrootDir($tempDir);
+
+        $this->assertSame($tempDir.'/public', $result);
+
+        // Cleanup
+        unlink($tempDir.'/composer.json');
+        rmdir($tempDir.'/public');
+        rmdir($tempDir);
+    }
+
+    public function testGetWebrootDirFallsBackToProjectRootWhenDirectoryDoesNotExist(): void
+    {
+        $tempDir = sys_get_temp_dir().'/mautic_test_'.uniqid();
+        mkdir($tempDir);
+
+        // Create a composer.json pointing to a non-existent directory
+        file_put_contents($tempDir.'/composer.json', json_encode([
+            'name' => 'test/project',
+            'extra' => [
+                'mautic-scaffold' => [
+                    'locations' => [
+                        'web-root' => 'nonexistent/',
+                    ],
+                ],
+            ],
+        ]));
+
+        $result = ParameterLoader::getWebrootDir($tempDir);
+
+        $this->assertSame($tempDir, $result);
+
+        // Cleanup
+        unlink($tempDir.'/composer.json');
+        rmdir($tempDir);
+    }
+
     /**
      * A value already present because a real .env/.env.local file set it earlier during the
      * application's bootstrap must win over the value computed from local.php. Symfony tracks

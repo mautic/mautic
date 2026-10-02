@@ -15,10 +15,12 @@ use Mautic\LeadBundle\Field\CustomFieldFindReplace;
 use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
+use Mautic\LeadBundle\Helper\CompanySearchScopeProvider;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Services\CompanyColumnsDictionary;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +32,7 @@ final class CompanyController extends FormController
 
     private CompanyRepository $companyRepository;
 
-    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+    private UserRepository $userRepository;
 
     private FieldModel $fieldModel;
 
@@ -44,7 +46,7 @@ final class CompanyController extends FormController
         CompanyModel $companyModel,
         FieldModel $fieldModel,
         CompanyRepository $companyRepository,
-        \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        UserRepository $userRepository,
     ): void {
         $this->leadModel = $leadModel;
         $this->companyModel = $companyModel;
@@ -93,7 +95,7 @@ final class CompanyController extends FormController
         ]);
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, CompanySearchScopeProvider $companySearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -174,8 +176,9 @@ final class CompanyController extends FormController
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,
-                    'tmpl'        => $tmpl,
-                    'totalItems'  => $count,
+                    'tmpl'            => $tmpl,
+                    'totalItems'      => $count,
+                    'searchScopes'    => $companySearchScopeProvider->getScopes(),
                 ],
                 'contentTemplate' => '@MauticLead/Company/list.html.twig',
                 'passthroughVars' => [

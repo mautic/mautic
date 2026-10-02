@@ -147,9 +147,7 @@
             {
                 color: 'high-contrast',
                 icon: emailType == 'list' ? 'ri-pie-chart-line' : 'ri-mail-open-line',
-                label: emailType == 'list'
-                    ? 'mautic.email.type.list.header'
-                    : (emailType == 'template' ? 'mautic.email.type.template.header' : type)
+                label: 'mautic.email.type.' ~ emailType ~ '.header'
             }
         ] } %}
 
