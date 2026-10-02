@@ -24,7 +24,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
     public function __construct(
         OAuth2 $serverService,
         UserCheckerInterface $userChecker,
-        private readonly TokenPermissions $tokenPermissions,
+        private readonly ?TokenPermissions $tokenPermissions = null,
     ) {
         parent::__construct($serverService, $userChecker);
     }
@@ -54,7 +54,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
             $user   = $accessToken->getUser();
             $client = $accessToken->getClient();
 
-            if (null === $user) {
+            if (null === $user && null !== $this->tokenPermissions) {
                 $user = $this->tokenPermissions->setActivePermissionsOnAuthToken($accessToken);
             }
 
