@@ -9,7 +9,9 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class CampaignOptimisticLockTest extends MauticMysqlTestCase
 {
     use CampaignControllerTrait;

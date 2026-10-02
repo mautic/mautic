@@ -11,10 +11,12 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Group('non-parallel')]
 final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
     private const string CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';

@@ -11,7 +11,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class CampaignSummarizationFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

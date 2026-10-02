@@ -13,9 +13,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('non-parallel')]
 final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
 {
     private const string STAGE_NAME_TOKEN       = '%stage_name%';

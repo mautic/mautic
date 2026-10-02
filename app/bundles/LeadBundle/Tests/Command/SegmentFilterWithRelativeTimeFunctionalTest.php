@@ -12,7 +12,9 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class SegmentFilterWithRelativeTimeFunctionalTest extends MauticMysqlTestCase
 {
     #[DataProvider('getRelativeHours')]

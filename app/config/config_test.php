@@ -19,6 +19,14 @@ EnvLoader::load();
 defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 defined('MAUTIC_ENV') || define('MAUTIC_ENV', getenv('MAUTIC_ENV') ?: 'test');
 
+// Isolate the application cache per parallel-test worker. The CacheProvider filesystem
+// adapter namespaces entries by this prefix; without a per-worker value every paratest
+// worker shares one cache namespace, so entries keyed by reused low IDs (e.g. segment
+// counts "segment.1.lead") collide across workers and cause non-deterministic failures.
+if (false !== ($testToken = getenv('TEST_TOKEN')) && '' !== $testToken) {
+    $container->setParameter('mautic.cache_prefix', 'worker_'.$testToken);
+}
+
 // Twig Configuration
 $container->loadFromExtension('twig', [
     'cache'            => false,

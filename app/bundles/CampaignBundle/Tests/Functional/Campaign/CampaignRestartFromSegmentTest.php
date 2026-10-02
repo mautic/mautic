@@ -9,10 +9,12 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * @see https://github.com/mautic/mautic/issues/16026
  */
+#[Group('non-parallel')]
 final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
 {
     use CampaignEntitiesTrait;

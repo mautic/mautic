@@ -14,9 +14,11 @@ use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+#[Group('non-parallel')]
 final class ContactTrackerFunctionalLastActiveTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

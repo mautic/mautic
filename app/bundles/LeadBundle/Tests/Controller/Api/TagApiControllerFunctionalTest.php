@@ -7,9 +7,11 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('non-parallel')]
 final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testTagWorkflow(): void
