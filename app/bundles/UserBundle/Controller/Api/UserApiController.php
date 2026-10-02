@@ -72,7 +72,7 @@ final class UserApiController extends CommonApiController
     /**
      * Creates a new user.
      */
-    public function newEntityAction(Request $request)
+    public function newEntityAction(Request $request): Response
     {
         $entity = $this->model->getEntity();
 
@@ -95,11 +95,9 @@ final class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return Response
-     *
      * @throws NotFoundHttpException
      */
-    public function editEntityAction(Request $request, $id)
+    public function editEntityAction(Request $request, $id): Response
     {
         $entity     = $this->model->getEntity($id);
         $parameters = $request->request->all();

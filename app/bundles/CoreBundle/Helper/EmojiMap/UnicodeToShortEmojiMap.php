@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper\EmojiMap;
 
+/**
+ * @deprecated as unused. No replacement.
+ */
 final class UnicodeToShortEmojiMap
 {
-    public static $map = [
+    /** @var array<string, string> */
+    public static array $map = [
         "\xc2\xa9"                                                                                                     => ':copyright:',
         "\xf3\xbe\xac\xa9"                                                                                             => ':copyright:',
         "\xee\x9c\xb1"                                                                                                 => ':copyright:',

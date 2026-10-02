@@ -12,6 +12,7 @@ use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -520,35 +521,68 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns a andX Expr() that takes into account isPublished, publishUp and publishDown dates
-     * The Expr() sets a :now and :true parameter that must be set in the calling function.
-     *
-     * @param string|null $alias
-     * @param bool        $setNowParameter
-     * @param bool        $setTrueParameter
-     * @param bool        $allowNullForPublishedUp Allow entities without a published up date
-     *
-     * @return mixed
+     * Returns an ORM expression that takes into account isPublished, publishUp and publishDown dates.
+     * The expression sets :now and :true parameters in the provided query builder when requested.
      */
-    public function getPublishedByDateExpression(
-        $q,
-        $alias = null,
-        $setNowParameter = true,
-        $setTrueParameter = true,
-        $allowNullForPublishedUp = true,
-    ) {
-        $isORM = $q instanceof QueryBuilder;
-
-        if (null === $alias) {
-            $alias = $this->getTableAlias();
-        }
+    public function getPublishedByDateOrmExpression(
+        QueryBuilder $q,
+        ?string $alias = null,
+        bool $setNowParameter = true,
+        bool $setTrueParameter = true,
+        bool $allowNullForPublishedUp = true,
+    ): Andx {
+        $alias ??= $this->getTableAlias();
 
         if ($setNowParameter) {
-            $now = new \DateTime();
-            if (!$isORM) {
-                $dtHelper = new DateTimeHelper($now, 'Y-m-d H:i:s', 'local');
-                $now      = $dtHelper->toUtcString();
-            }
+            $q->setParameter('now', new \DateTime());
+        }
+
+        if ($setTrueParameter) {
+            $q->setParameter('true', true, 'boolean');
+        }
+
+        $expr = $q->expr()->andX(
+            $q->expr()->eq("{$alias}.isPublished", ':true'),
+            $q->expr()->orX(
+                $q->expr()->isNull("{$alias}.publishDown"),
+                $q->expr()->gte("{$alias}.publishDown", ':now')
+            )
+        );
+
+        if ($allowNullForPublishedUp) {
+            $expr->add(
+                $q->expr()->orX(
+                    $q->expr()->isNull("{$alias}.publishUp"),
+                    $q->expr()->lte("{$alias}.publishUp", ':now')
+                )
+            );
+        } else {
+            $expr->add(
+                $q->expr()->andX(
+                    $q->expr()->isNotNull("{$alias}.publishUp"),
+                    $q->expr()->lte("{$alias}.publishUp", ':now')
+                )
+            );
+        }
+
+        return $expr;
+    }
+
+    /**
+     * Returns a DBAL expression that takes into account is_published, publish_up and publish_down dates.
+     * The expression sets :now and :true parameters in the provided query builder when requested.
+     */
+    public function getPublishedByDateDbalExpression(
+        DbalQueryBuilder $q,
+        ?string $alias = null,
+        bool $setNowParameter = true,
+        bool $setTrueParameter = true,
+        bool $allowNullForPublishedUp = true,
+    ): CompositeExpression {
+        $alias ??= $this->getTableAlias();
+
+        if ($setNowParameter) {
+            $now = (new DateTimeHelper(new \DateTime(), 'Y-m-d H:i:s', 'local'))->toUtcString();
             $q->setParameter('now', $now);
         }
 
@@ -556,41 +590,43 @@ class CommonRepository extends ServiceEntityRepository
             $q->setParameter('true', true, 'boolean');
         }
 
-        if ($isORM) {
-            $pub     = 'isPublished';
-            $pubUp   = 'publishUp';
-            $pubDown = 'publishDown';
-        } else {
-            $pub     = 'is_published';
-            $pubUp   = 'publish_up';
-            $pubDown = 'publish_down';
-        }
-
-        $expr = $q->expr()->andX(
-            $q->expr()->eq("{$alias}.{$pub}", ':true'),
-            $q->expr()->orX(
-                $q->expr()->isNull("{$alias}.{$pubDown}"),
-                $q->expr()->gte("{$alias}.{$pubDown}", ':now')
+        $publishedUpExpression = $allowNullForPublishedUp
+            ? $q->expr()->or(
+                $q->expr()->isNull("{$alias}.publish_up"),
+                $q->expr()->lte("{$alias}.publish_up", ':now')
             )
-        );
+            : $q->expr()->and(
+                $q->expr()->isNotNull("{$alias}.publish_up"),
+                $q->expr()->lte("{$alias}.publish_up", ':now')
+            );
 
-        if ($allowNullForPublishedUp) {
-            $expr->add(
-                $q->expr()->orX(
-                    $q->expr()->isNull("{$alias}.{$pubUp}"),
-                    $q->expr()->lte("{$alias}.{$pubUp}", ':now')
-                )
-            );
-        } else {
-            $expr->add(
-                $q->expr()->andX(
-                    $q->expr()->isNotNull("{$alias}.{$pubUp}"),
-                    $q->expr()->lte("{$alias}.{$pubUp}", ':now')
-                )
-            );
+        return $q->expr()->and(
+            $q->expr()->eq("{$alias}.is_published", ':true'),
+            $q->expr()->or(
+                $q->expr()->isNull("{$alias}.publish_down"),
+                $q->expr()->gte("{$alias}.publish_down", ':now')
+            ),
+            $publishedUpExpression
+        );
+    }
+
+    /**
+     * @deprecated use getPublishedByDateOrmExpression() or getPublishedByDateDbalExpression()
+     *
+     * @return Andx|CompositeExpression
+     */
+    public function getPublishedByDateExpression(
+        QueryBuilder|DbalQueryBuilder $q,
+        ?string $alias = null,
+        bool $setNowParameter = true,
+        bool $setTrueParameter = true,
+        bool $allowNullForPublishedUp = true,
+    ) {
+        if ($q instanceof QueryBuilder) {
+            return $this->getPublishedByDateOrmExpression($q, $alias, $setNowParameter, $setTrueParameter, $allowNullForPublishedUp);
         }
 
-        return $expr;
+        return $this->getPublishedByDateDbalExpression($q, $alias, $setNowParameter, $setTrueParameter, $allowNullForPublishedUp);
     }
 
     /**
@@ -1577,94 +1613,92 @@ class CommonRepository extends ServiceEntityRepository
         $justColumn  = ['isNull', 'isNotNull', 'isEmpty', 'isNotEmpty'];
         $andOr       = ['andX', 'orX'];
 
-        if ($clauses && is_array($clauses)) {
-            foreach ($clauses as $clause) {
-                if (!empty($clause['internal']) && 'formula' === $clause['expr']) {
-                    $whereClause = array_key_exists('value', $clause) ? $clause['value'] : $clause['val'];
+        foreach ($clauses as $clause) {
+            if (!empty($clause['internal']) && 'formula' === $clause['expr']) {
+                $whereClause = array_key_exists('value', $clause) ? $clause['value'] : $clause['val'];
+                if ($expr) {
+                    $expr->add($whereClause);
+                } else {
+                    $query->andWhere($whereClause);
+                }
+
+                continue;
+            }
+
+            if (in_array($clause['expr'], $andOr)) {
+                $composite = $query->expr()->{$clause['expr']}();
+                $this->buildWhereClauseFromArray($query, $clause['val'], $composite);
+
+                if (null === $expr) {
+                    $query->andWhere($composite);
+                } else {
+                    $expr->add($composite);
+                }
+            } else {
+                $clause = $this->validateWhereClause($clause);
+                $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+
+                $whereClause = null;
+                switch ($clause['expr']) {
+                    case 'between':
+                    case 'notBetween':
+                        if (is_array($clause['val']) && 2 === count($clause['val'])) {
+                            $not   = 'notBetween' === $clause['expr'] ? ' NOT' : '';
+                            $param = $this->generateRandomParameterName();
+                            $query->setParameter($param, $clause['val'][0]);
+                            $param2 = $this->generateRandomParameterName();
+                            $query->setParameter($param2, $clause['val'][1]);
+
+                            $whereClause = $column.$not.' BETWEEN :'.$param.' AND :'.$param2;
+                        }
+                        break;
+                    case 'isEmpty':
+                    case 'isNotEmpty':
+                        if ('isEmpty' === $clause['expr']) {
+                            $whereClause = $query->expr()->orX(
+                                $query->expr()->eq($column, $query->expr()->literal('')),
+                                $query->expr()->isNull($column)
+                            );
+                        } else {
+                            $whereClause = $query->expr()->andX(
+                                $query->expr()->neq($column, $query->expr()->literal('')),
+                                $query->expr()->isNotNull($column)
+                            );
+                        }
+                        break;
+                    case 'in':
+                    case 'notIn':
+                        $parsed = CsvHelper::strGetCsv(html_entity_decode($clause['val']), ',', '"');
+
+                        $param = $this->generateRandomParameterName();
+                        $arg   = count($parsed) > 1 ? $parsed : array_shift($parsed);
+
+                        if (is_array($arg)) {
+                            $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
+                            $query->setParameter($param, $arg, ArrayParameterType::STRING);
+                        } else {
+                            $expression  = 'in' === $clause['expr'] ? 'eq' : 'neq';
+                            $whereClause = $query->expr()->{$expression}($column, ':'.$param);
+                            $query->setParameter($param, $arg);
+                        }
+                        break;
+                    default:
+                        if (method_exists($query->expr(), $clause['expr'])) {
+                            if (in_array($clause['expr'], $columnValue)) {
+                                $param       = $this->generateRandomParameterName();
+                                $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
+                                $query->setParameter($param, $clause['val']);
+                            } elseif (in_array($clause['expr'], $justColumn)) {
+                                $whereClause = $query->expr()->{$clause['expr']}($column);
+                            }
+                        }
+                }
+
+                if ($whereClause) {
                     if ($expr) {
                         $expr->add($whereClause);
                     } else {
                         $query->andWhere($whereClause);
-                    }
-
-                    continue;
-                }
-
-                if (in_array($clause['expr'], $andOr)) {
-                    $composite = $query->expr()->{$clause['expr']}();
-                    $this->buildWhereClauseFromArray($query, $clause['val'], $composite);
-
-                    if (null === $expr) {
-                        $query->andWhere($composite);
-                    } else {
-                        $expr->add($composite);
-                    }
-                } else {
-                    $clause = $this->validateWhereClause($clause);
-                    $column = (!str_contains($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
-
-                    $whereClause = null;
-                    switch ($clause['expr']) {
-                        case 'between':
-                        case 'notBetween':
-                            if (is_array($clause['val']) && 2 === count($clause['val'])) {
-                                $not   = 'notBetween' === $clause['expr'] ? ' NOT' : '';
-                                $param = $this->generateRandomParameterName();
-                                $query->setParameter($param, $clause['val'][0]);
-                                $param2 = $this->generateRandomParameterName();
-                                $query->setParameter($param2, $clause['val'][1]);
-
-                                $whereClause = $column.$not.' BETWEEN :'.$param.' AND :'.$param2;
-                            }
-                            break;
-                        case 'isEmpty':
-                        case 'isNotEmpty':
-                            if ('isEmpty' === $clause['expr']) {
-                                $whereClause = $query->expr()->orX(
-                                    $query->expr()->eq($column, $query->expr()->literal('')),
-                                    $query->expr()->isNull($column)
-                                );
-                            } else {
-                                $whereClause = $query->expr()->andX(
-                                    $query->expr()->neq($column, $query->expr()->literal('')),
-                                    $query->expr()->isNotNull($column)
-                                );
-                            }
-                            break;
-                        case 'in':
-                        case 'notIn':
-                            $parsed = CsvHelper::strGetCsv(html_entity_decode($clause['val']), ',', '"');
-
-                            $param = $this->generateRandomParameterName();
-                            $arg   = count($parsed) > 1 ? $parsed : array_shift($parsed);
-
-                            if (is_array($arg)) {
-                                $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
-                                $query->setParameter($param, $arg, ArrayParameterType::STRING);
-                            } else {
-                                $expression  = 'in' === $clause['expr'] ? 'eq' : 'neq';
-                                $whereClause = $query->expr()->{$expression}($column, ':'.$param);
-                                $query->setParameter($param, $arg);
-                            }
-                            break;
-                        default:
-                            if (method_exists($query->expr(), $clause['expr'])) {
-                                if (in_array($clause['expr'], $columnValue)) {
-                                    $param       = $this->generateRandomParameterName();
-                                    $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
-                                    $query->setParameter($param, $clause['val']);
-                                } elseif (in_array($clause['expr'], $justColumn)) {
-                                    $whereClause = $query->expr()->{$clause['expr']}($column);
-                                }
-                            }
-                    }
-
-                    if ($whereClause) {
-                        if ($expr) {
-                            $expr->add($whereClause);
-                        } else {
-                            $query->andWhere($whereClause);
-                        }
                     }
                 }
             }
@@ -1808,6 +1842,10 @@ class CommonRepository extends ServiceEntityRepository
     private function convertOrmPropertiesToColumns(array &$filters, array $properties): void
     {
         foreach ($filters as &$f) {
+            if ($this->convertGroupedOrmPropertiesToColumns($f, $properties)) {
+                continue;
+            }
+
             $key   = (isset($f['col'])) ? 'col' : 'column';
             $col   = $f[$key];
             $alias = '';
@@ -1822,6 +1860,26 @@ class CommonRepository extends ServiceEntityRepository
 
             $f[$key] = (!empty($alias)) ? $alias.'.'.$col : $col;
         }
+    }
+
+    /**
+     * @param array<string, mixed> $filter
+     * @param array<int, string>   $properties
+     */
+    private function convertGroupedOrmPropertiesToColumns(array &$filter, array $properties): bool
+    {
+        if (!isset($filter['group']) || !is_array($filter['group'])) {
+            return false;
+        }
+
+        foreach ($filter['group'] as &$groupFilters) {
+            if (is_array($groupFilters)) {
+                $this->convertOrmPropertiesToColumns($groupFilters, $properties);
+            }
+        }
+        unset($groupFilters);
+
+        return true;
     }
 
     /**

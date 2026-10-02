@@ -55,10 +55,8 @@ final class FileApiController extends CommonApiController
 
     /**
      * Uploads a file.
-     *
-     * @return Response
      */
-    public function createAction(Request $request, PathsHelper $pathsHelper, $dir)
+    public function createAction(Request $request, PathsHelper $pathsHelper, $dir): Response
     {
         try {
             $path = $this->getAbsolutePath($request, $pathsHelper, $dir, true);
@@ -94,10 +92,8 @@ final class FileApiController extends CommonApiController
 
     /**
      * List the files in /media directory.
-     *
-     * @return Response
      */
-    public function listAction(Request $request, PathsHelper $pathsHelper, $dir)
+    public function listAction(Request $request, PathsHelper $pathsHelper, $dir): Response
     {
         try {
             $filePath = $this->getAbsolutePath($request, $pathsHelper, $dir);
@@ -125,10 +121,8 @@ final class FileApiController extends CommonApiController
 
     /**
      * Delete a file from /media directory.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, PathsHelper $pathsHelper, $dir, $file)
+    public function deleteAction(Request $request, PathsHelper $pathsHelper, $dir, $file): Response
     {
         $response = ['success' => false];
 

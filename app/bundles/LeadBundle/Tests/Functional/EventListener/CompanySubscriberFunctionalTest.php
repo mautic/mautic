@@ -68,7 +68,6 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $companyModel->deleteEntity($company);
 
         $this->em->refresh($lead);
-        $this->assertInstanceOf(Lead::class, $lead);
         $this->assertNull($lead->getCompany());
     }
 }

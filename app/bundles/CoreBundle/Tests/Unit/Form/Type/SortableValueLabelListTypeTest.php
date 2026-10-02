@@ -109,10 +109,8 @@ final class SortableValueLabelListTypeTest extends TestCase
     private function getEventListenerFromBuildForm(SortableValueLabelListType $type, MockObject $builder): callable
     {
         $eventListener = null;
-        // @phpstan-ignore-next-line
         $builder->expects($this->exactly(2))
             ->method('add');
-        // @phpstan-ignore-next-line
         $builder->expects($this->once())
             ->method('addEventListener')
             ->with(FormEvents::PRE_SUBMIT, $this->callback(function ($callback) use (&$eventListener): true {

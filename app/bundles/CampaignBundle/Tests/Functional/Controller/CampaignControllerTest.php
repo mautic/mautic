@@ -8,7 +8,6 @@ use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
-use GuzzleHttp\Utils;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
@@ -21,7 +20,6 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -281,7 +279,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $url    = sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $before->format('Y-m-d'), $after->format('Y-m-d'));
         $this->client->request('GET', $url);
         $response = $this->client->getResponse();
-        $body     = Utils::jsonDecode($response->getContent(), true);
+        $body     = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->client->restart();
 
         return new Crawler($body['actions']);

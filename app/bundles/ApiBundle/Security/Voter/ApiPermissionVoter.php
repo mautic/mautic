@@ -2,7 +2,10 @@
 
 namespace Mautic\ApiBundle\Security\Voter;
 
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -12,6 +15,7 @@ final class ApiPermissionVoter extends Voter
 {
     public function __construct(
         private readonly CorePermissions $security,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -23,6 +27,16 @@ final class ApiPermissionVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
+        $permissionContextEvent = new ApiPlatformPermissionContextEvent(
+            $attribute,
+            $attribute,
+            $subject,
+        );
+        $this->dispatcher->dispatch($permissionContextEvent, ApiEvents::API_PLATFORM_PERMISSION_CONTEXT);
+
+        $attribute = $permissionContextEvent->getPermission();
+        $subject   = $permissionContextEvent->getRequestObject();
+
         $user = $token->getUser();
 
         if (!$user instanceof UserInterface) {

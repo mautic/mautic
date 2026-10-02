@@ -12,8 +12,11 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
+use Mautic\CampaignBundle\Form\Type\CampaignShareType;
+use Mautic\CampaignBundle\Helper\CampaignSearchScopeProvider;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Service\CampaignShareService;
 use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
@@ -29,6 +32,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Psr\Log\LoggerInterface;
@@ -37,6 +41,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -94,6 +99,11 @@ class CampaignController extends AbstractStandardFormController
     protected $modifiedEvents = [];
 
     protected $sessionId;
+
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
 
     public function __construct(
         FormFactoryInterface $formFactory,
@@ -207,6 +217,160 @@ class CampaignController extends AbstractStandardFormController
         return $this->handleExportDownload($exportHelper, $jsonOutput, $assetList, $exportFileName);
     }
 
+    public function shareAction(Request $request, CampaignModel $campaignModel, CampaignShareService $shareService, ExportHelper $exportHelper, int $objectId): RedirectResponse|BinaryFileResponse|Response
+    {
+        if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
+            $this->throwAccessDenied();
+        }
+
+        $campaign = $campaignModel->getEntity($objectId);
+
+        if (!$campaign instanceof Campaign) {
+            return $this->notFound();
+        }
+
+        $form = $this->createShareForm($campaign);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            return $this->handleShareSubmission($form, $campaign, $shareService, $exportHelper, $objectId);
+        }
+
+        // Failed validation: park the uploaded images server-side so the corrected
+        // re-submit doesn't lose them (browsers never repopulate file inputs).
+        $stashedImages = $form->isSubmitted() ? $this->stashShareImages($form, $shareService) : [];
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form'          => $form->createView(),
+                'stashedImages' => $stashedImages,
+                'campaignName'  => $campaign->getName(),
+                'campaignId'    => $campaign->getId(),
+            ],
+            'contentTemplate' => '@MauticCampaign/Campaign/share_form.html.twig',
+            'passthroughVars' => [
+                'mauticContent' => 'campaign',
+                'route'         => $this->generateUrl('mautic_campaign_action', [
+                    'objectAction' => 'share',
+                    'objectId'     => $objectId,
+                ]),
+            ],
+        ]);
+    }
+
+    private function createShareForm(Campaign $campaign): FormInterface
+    {
+        // The works-with choices are per major series (5.0, 6.0, 7.0), so map the running
+        // version to its series; e.g. 7.2.0-rc must preselect 7.0 or the choice is dropped.
+        $mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : '7.0';
+        if (preg_match('/^(\d+)\./', $mauticVersion, $matches)) {
+            $mauticVersion = $matches[1].'.0';
+        }
+
+        $campaignName = $campaign->getName() ?: '';
+        $headline     = mb_strlen($campaignName) > 60
+            ? mb_substr($campaignName, 0, 57).'...'
+            : $campaignName;
+
+        $description = (new PlainTextHelper(['width' => 0]))
+            ->setHtml($campaign->getDescription() ?: '')
+            ->getText();
+
+        return $this->createForm(CampaignShareType::class, [
+            'title'             => $campaignName,
+            'headline'          => $headline,
+            'description'       => $description,
+            'version'           => '1.0.0',
+            'worksWithVersions' => [$mauticVersion],
+            'languages'         => ['en'],
+        ]);
+    }
+
+    /**
+     * Keeps valid image uploads (and previously stashed ones) across a failed
+     * validation round-trip. Returns stash info keyed by the hidden stash field
+     * name, for the template to re-emit tokens and show "kept" hints.
+     *
+     * @return array<string, array{token: string, name: string}>
+     */
+    private function stashShareImages(FormInterface $form, CampaignShareService $shareService): array
+    {
+        $fields = ['bannerImage' => 'bannerImageStash'];
+        for ($i = 1; $i <= 8; ++$i) {
+            $fields['galleryImage'.$i] = 'galleryImageStash'.$i;
+        }
+
+        $stashed = [];
+        foreach ($fields as $imageField => $stashField) {
+            $file = $form->get($imageField)->getData();
+            if ($file instanceof UploadedFile && 0 === \count($form->get($imageField)->getErrors())) {
+                $stashed[$stashField] = $shareService->stashImage($file);
+                continue;
+            }
+
+            // No new upload this round — carry an earlier stash forward if one exists.
+            $token = $form->get($stashField)->getData();
+            $name  = $shareService->stashedImageName(\is_string($token) ? $token : null);
+            if (null !== $name && \is_string($token)) {
+                $stashed[$stashField] = ['token' => $token, 'name' => $name];
+            }
+        }
+
+        return $stashed;
+    }
+
+    private function handleShareSubmission(FormInterface $form, Campaign $campaign, CampaignShareService $shareService, ExportHelper $exportHelper, int $objectId): RedirectResponse|BinaryFileResponse|Response
+    {
+        $formData = $form->getData();
+
+        // Fill image slots from the failed-validation stash when the user didn't
+        // pick the files again on the corrected submit.
+        $formData['bannerImage'] ??= $shareService->restoreStashedImage($formData['bannerImageStash'] ?? null);
+        for ($i = 1; $i <= 8; ++$i) {
+            $formData['galleryImage'.$i] ??= $shareService->restoreStashedImage($formData['galleryImageStash'.$i] ?? null);
+        }
+
+        $event = new EntityExportEvent(Campaign::ENTITY_NAME, $objectId);
+        $event = $this->dispatcher->dispatch($event);
+        $data  = $event->getEntities();
+
+        $assetListEvent = new AssetExportListEvent([$data]);
+        $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
+        $assetList      = $assetListEvent->getList();
+
+        $metadata = $shareService->buildShareMetadata($formData);
+
+        $publishButton = $form->get('publish');
+        \assert($publishButton instanceof \Symfony\Component\Form\SubmitButton);
+
+        if ($publishButton->isClicked()) {
+            // The transient ZIP is fetched same-origin by the browser, then forwarded to the
+            // marketplace popup via postMessage. The marketplace never sees the Mautic URL,
+            // which sidesteps SSRF and firewall concerns of the previous pull-based flow.
+            $archiveUrl   = $shareService->share($campaign, $data, $assetList, $metadata);
+            $marketplace  = $shareService->getMarketplaceUrl();
+
+            return $this->delegateView([
+                'viewParameters' => [
+                    'archiveUrl'      => $archiveUrl,
+                    'marketplaceUrl'  => $marketplace,
+                    'campaignName'    => $campaign->getName(),
+                    'campaignId'      => $campaign->getId(),
+                ],
+                'contentTemplate' => '@MauticCampaign/Campaign/share_redirect.html.twig',
+                'passthroughVars' => ['mauticContent' => 'campaign'],
+            ]);
+        }
+
+        $date           = (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB);
+        $exportFileName = $this->translator->trans('mautic.campaign.campaign_export_file.name', ['%date%' => $date]);
+        // Same archive as the publish flow, so the Download button also carries the
+        // banner and gallery images attached in the form.
+        $filePath       = $shareService->buildShareZip($campaign, $data, $assetList, $metadata);
+
+        return $exportHelper->downloadAsZip($filePath, $exportFileName);
+    }
+
     public function batchExportAction(Request $request, ExportHelper $exportHelper): JsonResponse|BinaryFileResponse|Response
     {
         // set some permissions
@@ -286,8 +450,6 @@ class CampaignController extends AbstractStandardFormController
      * @param string|int $objectId
      * @param int        $page
      * @param int|null   $count
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,
@@ -297,7 +459,7 @@ class CampaignController extends AbstractStandardFormController
         $count = null,
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
-    ) {
+    ): Response {
         $session = $request->getSession();
         $session->set('mautic.campaign.contact.page', $page);
 
@@ -423,8 +585,10 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = null): Response
+    public function indexAction(Request $request, CampaignSearchScopeProvider $campaignSearchScopeProvider, $page = null): Response
     {
+        $this->indexSearchScopes = $campaignSearchScopeProvider->getScopes();
+
         return $this->indexStandard($request, $page);
     }
 
@@ -469,15 +633,9 @@ class CampaignController extends AbstractStandardFormController
                         $this->campaignModel->saveEntity($campaign);
                         $this->afterEntitySave($campaign, $form, 'new', $valid);
 
-                        if (method_exists($this, 'viewAction')) {
-                            $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
-                        } else {
-                            $viewParameters = ['page' => $page];
-                            $returnUrl      = $this->generateUrl('mautic_campaign_index', $viewParameters);
-                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
-                        }
+                        $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
+                        $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
+                        $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
                     }
                 }
 
@@ -1030,6 +1188,10 @@ class CampaignController extends AbstractStandardFormController
                         null,
                         true));
                 $args['viewParameters']['enableExportPermission'] = $this->security->isAdmin() || $this->security->isGranted('campaign:export:enable', 'MATCH_ONE');
+                if (null !== $this->indexSearchScopes) {
+                    $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+                    $this->indexSearchScopes                = null;
+                }
                 break;
             case 'view':
                 /** @var Campaign $entity */
