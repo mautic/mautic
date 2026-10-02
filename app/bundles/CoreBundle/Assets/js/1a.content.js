@@ -2435,7 +2435,8 @@ Mautic.initiateFileDownload = function (link, data) {
     });
 
     if (data) {
-        const iframeName = `mautic-file-download-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        Mautic.fileDownloadFrameSequence = (Mautic.fileDownloadFrameSequence || 0) + 1;
+        const iframeName = `mautic-file-download-${Mautic.fileDownloadFrameSequence}`;
         iframe.attr('name', iframeName);
 
         const form = document.createElement('form');

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 final class AssetBatchDownloadCest
 {
-    public function batchDownloadSubmitsPostWithCsrfToken(AcceptanceTester $I): void
+    public function batchDownloadSubmitsPostWithCsrfToken(AcceptanceTester $tester): void
     {
-        $I->login();
-        $I->amOnPage('/s/assets');
-        $I->waitForElementVisible('[data-mautic-batch-download]', 30);
-        $I->waitForJS("return typeof Mautic.batchAssetDownload === 'function';", 30);
+        $tester->login();
+        $tester->amOnPage('/s/assets');
+        $tester->waitForElementVisible('[data-mautic-batch-download]', 30);
+        $tester->waitForJS("return typeof Mautic.batchAssetDownload === 'function';", 30);
 
-        $submission = $I->executeJS(<<<'JS'
+        $submission = $tester->executeJS(<<<'JS'
             const trigger = document.querySelector('[data-mautic-batch-download]');
             const table = document.querySelector('#assetTable');
 
@@ -52,12 +52,12 @@ final class AssetBatchDownloadCest
             return submission;
         JS);
 
-        $I->assertIsArray($submission);
-        $I->assertSame('POST', $submission['method']);
-        $I->assertSame($submission['expectedAction'], $submission['action']);
-        $I->assertSame($submission['expectedIds'], $submission['ids']);
-        $I->assertNotEmpty($submission['token']);
-        $I->assertSame($submission['expectedToken'], $submission['token']);
-        $I->assertNotEmpty($submission['target']);
+        $tester->assertIsArray($submission);
+        $tester->assertSame('POST', $submission['method']);
+        $tester->assertSame($submission['expectedAction'], $submission['action']);
+        $tester->assertSame($submission['expectedIds'], $submission['ids']);
+        $tester->assertNotEmpty($submission['token']);
+        $tester->assertSame($submission['expectedToken'], $submission['token']);
+        $tester->assertNotEmpty($submission['target']);
     }
 }
