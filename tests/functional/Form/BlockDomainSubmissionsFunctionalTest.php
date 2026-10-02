@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Mautic\Tests\Functional\Form;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
 {
+    use UserEntityTrait;
+
     protected $useCleanupRollback   = false;
 
     protected bool $authenticateApi = true;
@@ -74,6 +77,34 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $batchIds = urlencode(json_encode([$submission->getId()], JSON_THROW_ON_ERROR));
+        $this->client->request(
+            Request::METHOD_POST,
+            "/s/forms/results/{$formId}/batchMarkSpam?ids={$batchIds}"
+        );
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $editor = $this->createUserWithPermission([
+            'email'      => 'form-editor@mautic-test.com',
+            'user-name'  => 'form-editor',
+            'first-name' => 'Form',
+            'last-name'  => 'Editor',
+            'role'       => [
+                'name'        => 'form-editor-role',
+                'permissions' => ['form:forms' => 1023],
+            ],
+        ]);
+        $this->em->flush();
+        $this->loginOtherUser($editor);
+
+        foreach ([
+            "/s/forms/results/{$formId}/markSpam/{$submission->getId()}",
+            "/s/forms/results/{$formId}/batchMarkSpam?ids={$batchIds}",
+        ] as $url) {
+            $this->client->request(Request::METHOD_POST, $url);
+            $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        }
 
         $this->setUpSymfony($this->configParams);
 
