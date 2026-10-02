@@ -12,8 +12,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecord;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
-use Mautic\LeadBundle\Event\LeadMergeEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
+use Mautic\LeadBundle\Event\LeadPreMergeEvent;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -42,8 +42,7 @@ final readonly class ContactMerger
         $this->logger->debug('CONTACT: ID# '.$loser->getId().' will be merged into ID# '.$winner->getId());
 
         // Dispatch pre merge event
-        $event = new LeadMergeEvent($winner, $loser);
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_PRE_MERGE);
+        $this->dispatcher->dispatch(new LeadPreMergeEvent($winner, $loser));
 
         // Merge everything
         $this->updateMergeRecords($winner, $loser)
@@ -59,7 +58,7 @@ final readonly class ContactMerger
         $this->leadModel->saveEntity($winner, false);
 
         // Dispatch post merge event
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_MERGE);
+        $this->dispatcher->dispatch(new LeadPostMergeEvent($winner, $loser));
 
         // Delete the loser
         $this->leadModel->deleteEntity($loser);

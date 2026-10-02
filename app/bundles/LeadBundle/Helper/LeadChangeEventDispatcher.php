@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class LeadChangeEventDispatcher
@@ -36,7 +35,7 @@ final class LeadChangeEventDispatcher
             return;
         }
 
-        $this->dispatcher->dispatch($event, LeadEvents::LEAD_IDENTIFIED);
+        $this->dispatcher->dispatch(new Events\LeadIdentifiedEvent($this->lead, $event->isNew(), $event->getChanges()));
     }
 
     private function dispatchPointChangeEvent(Events\LeadEvent $event): void
@@ -58,7 +57,7 @@ final class LeadChangeEventDispatcher
         }
 
         $pointsEvent = new Events\PointsChangeEvent($this->lead, $this->changes['points'][0], $this->changes['points'][1]);
-        $this->dispatcher->dispatch($pointsEvent, LeadEvents::LEAD_POINTS_CHANGE);
+        $this->dispatcher->dispatch($pointsEvent);
     }
 
     private function dispatchUtmTagsChangeEvent(): void

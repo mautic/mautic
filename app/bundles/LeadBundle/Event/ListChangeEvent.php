@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class ListChangeEvent extends Event
+class ListChangeEvent extends Event
 {
     private ?Lead $lead = null;
 

@@ -7,7 +7,8 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\ImportEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\ImportPostDeleteEvent;
+use Mautic\LeadBundle\Event\ImportPostSaveEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ImportSubscriber implements EventSubscriberInterface
@@ -21,8 +22,8 @@ final readonly class ImportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::IMPORT_POST_SAVE   => ['onImportPostSave', 0],
-            LeadEvents::IMPORT_POST_DELETE => ['onImportDelete', 0],
+            ImportPostSaveEvent::class   => ['onImportPostSave', 0],
+            ImportPostDeleteEvent::class => ['onImportDelete', 0],
         ];
     }
 
