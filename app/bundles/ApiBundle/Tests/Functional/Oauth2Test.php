@@ -149,6 +149,20 @@ final class Oauth2Test extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('"users":[', (string) $this->client->getResponse()->getContent());
+
+        // Client-credentials tokens must also authenticate API Platform v2 requests.
+        $this->client->request(
+            Request::METHOD_GET,
+            '/api/v2/projects',
+            [],
+            [],
+            [
+                'HTTP_Authorization' => "Bearer {$accessToken}",
+                'HTTP_ACCEPT'        => 'application/json',
+            ],
+        );
+
+        self::assertResponseIsSuccessful();
     }
 
     public function testUserBoundBearerTokenAuthenticatesOnApiV1AndApiV2(): void
