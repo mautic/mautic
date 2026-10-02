@@ -20,7 +20,11 @@ final class OAuthReplacePass implements CompilerPassInterface
         $oAuthAuthenticatorDefinition = $container->getDefinition('fos_oauth_server.security.authenticator.manager');
         $oAuthAuthenticatorDefinition->setClass(Oauth2Authenticator::class);
 
-        foreach (['security.authenticator.oauth2.api', 'security.authenticator.oauth2.v2api'] as $serviceId) {
+        foreach ([
+            'security.authenticator.oauth2',
+            'security.authenticator.oauth2.api',
+            'security.authenticator.oauth2.v2api',
+        ] as $serviceId) {
             if (!$container->hasDefinition($serviceId)) {
                 continue;
             }
