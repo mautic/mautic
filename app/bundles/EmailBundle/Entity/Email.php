@@ -242,16 +242,20 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $stats;
 
     /**
-     * @var int
+     * Get's incremented every time an email is sent the same as the sentCount.
+     * But unlike sentCount it will be incremented only when the email is a variant.
+     * And unlike sentCount it will be cleared when a variant is updated.
      */
     #[Groups(['email:read', 'download:read'])]
-    private $variantSentCount = 0;
+    private int $variantSentCount = 0;
 
     /**
-     * @var int
+     * Get's incremented every time an email is read the same as the readCount.
+     * But unlike readCount it will be incremented only when the email is a variant.
+     * And unlike readCount it will be cleared when a variant is updated.
      */
     #[Groups(['email:read', 'download:read'])]
-    private $variantReadCount = 0;
+    private int $variantReadCount = 0;
 
     /**
      * @var Form|null
@@ -976,6 +980,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
+    public function increaseSentCount(): void
+    {
+        ++$this->sentCount;
+    }
+
     /**
      * @return int
      */
@@ -984,7 +993,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantSentCount') : $this->variantSentCount;
     }
 
-    public function setVariantSentCount($variantSentCount): static
+    public function increaseVariantSentCount(): void
+    {
+        ++$this->variantSentCount;
+    }
+
+    public function setVariantSentCount(int $variantSentCount): static
     {
         $this->variantSentCount = $variantSentCount;
 
@@ -1078,15 +1092,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getVariantReadCount()
+    public function getVariantReadCount(): int
     {
         return $this->variantReadCount;
     }
 
-    public function setVariantReadCount($variantReadCount): static
+    public function setVariantReadCount(int $variantReadCount): static
     {
         $this->variantReadCount = $variantReadCount;
 

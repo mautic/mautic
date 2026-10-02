@@ -98,7 +98,7 @@ class MailHelper
     protected $errors = [];
 
     /**
-     * @var array|Lead
+     * @var array<string, mixed>|null
      */
     protected $lead;
 
@@ -323,11 +323,13 @@ class MailHelper
         if (empty($this->message->getReplyTo()) && !empty($this->getReplyTo())) {
             $this->setMessageReplyTo($this->getReplyTo());
         }
-        // Set system return path if applicable
+        // Sender wins over Return-Path in Symfony's envelope resolution, so drop it whenever a Return-Path is set.
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->returnPath($bounceEmail);
+            $this->message->getHeaders()->remove('Sender');
         } elseif (!empty($this->returnPath)) {
             $this->message->returnPath($this->returnPath);
+            $this->message->getHeaders()->remove('Sender');
         }
 
         $this->dispatchPreSendEvent();
@@ -1167,7 +1169,7 @@ class MailHelper
     }
 
     /**
-     * @return array|Lead
+     * @return array<string, mixed>|null
      */
     public function getLead()
     {
@@ -1175,7 +1177,7 @@ class MailHelper
     }
 
     /**
-     * @param array|Lead $lead
+     * @param array<string, mixed> $lead
      */
     public function setLead($lead, $interalSend = false): void
     {
@@ -1911,7 +1913,7 @@ class MailHelper
     {
         return [
             'name'        => $name,
-            'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
+            'leadId'      => $this->lead['id'] ?? null,
             'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
             'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
             'hashId'      => $this->idHash,
@@ -2014,7 +2016,7 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend && null !== $emailToSend->getFromAddress()) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
@@ -2041,7 +2043,7 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set and global reply-to is not configured.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend && null !== $emailToSend->getFromAddress()) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;

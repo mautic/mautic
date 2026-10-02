@@ -317,13 +317,29 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
     }
 
     /**
-     * Avoid flaky test when executing the test right whe the minute is increasing.
+     * Avoid flaky test when the test crosses an hour boundary between data provider and execution.
+     * Both values are truncated to hours via 'Y-m-d H:00:00', so compare at hour precision.
      */
     private static function assertPlusMinusOneMinuteOf(string $expectedDateString, string $actualDateString): void
     {
         $expectedDate = new \DateTime($expectedDateString);
         $actualDate   = new \DateTime($actualDateString);
-        Assert::assertLessThanOrEqual($expectedDate->modify('+1 minute'), $actualDate);
-        Assert::assertGreaterThanOrEqual($expectedDate->modify('-2 minute'), $actualDate);
+
+        // Don't use modify() since it mutates in place and can compound errors.
+        $from = (clone $expectedDate)->modify('-1 hour');
+        $to   = (clone $expectedDate)->modify('+1 hour');
+
+        Assert::assertThat(
+            $actualDate,
+            Assert::logicalAnd(
+                Assert::greaterThanOrEqual($from),
+                Assert::lessThanOrEqual($to),
+            ),
+            sprintf(
+                'Failed asserting that trigger date %s is within one hour of %s.',
+                $actualDate->format('Y-m-d H:i:s'),
+                $expectedDate->format('Y-m-d H:i:s'),
+            ),
+        );
     }
 }
