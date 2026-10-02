@@ -93,4 +93,19 @@ final class InstallControllerTest extends \PHPUnit\Framework\TestCase
         );
         $this->assertSame(302, $response->getStatusCode());
     }
+
+    public function testStepActionDoesNotTouchTheFilesystemWhenInstalled(): void
+    {
+        $this->installer->method('checkIfInstalled')->willReturn(true);
+        $this->installer->expects($this->never())->method('prepareDirectories');
+
+        $this->routerMock->method('generate')->willReturn('http://localhost/');
+
+        $this->controller->stepAction(
+            new Request(),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(PathsHelper::class),
+            InstallService::CHECK_STEP
+        );
+    }
 }
