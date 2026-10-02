@@ -159,20 +159,16 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Get available company fields for choices in the config UI.
-     *
-     * @return array
      */
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('company', $settings);
     }
 
     /**
      * @param array<string, mixed> $settings
-     *
-     * @return array|mixed
      */
-    public function getFormLeadFields(array $settings = [])
+    public function getFormLeadFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('Contact', $settings);
     }
@@ -774,10 +770,8 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return mixed
      */
-    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic'): array
     {
         if ('company' == $object) {
             $priority = parent::getPriorityFieldsForMautic($config, $object, 'mautic_company');
@@ -790,11 +784,9 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     *
      * @throws \Exception
      */
-    public function getCampaigns()
+    public function getCampaigns(): array
     {
         $campaigns = [];
         try {

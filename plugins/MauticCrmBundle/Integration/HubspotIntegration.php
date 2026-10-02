@@ -120,20 +120,16 @@ final class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * Get available company fields for choices in the config UI.
-     *
-     * @return array
      */
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('company', $settings);
     }
 
     /**
      * @param array<string, mixed> $settings
-     *
-     * @return array|mixed
      */
-    public function getFormLeadFields(array $settings = [])
+    public function getFormLeadFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('contacts', $settings);
     }
