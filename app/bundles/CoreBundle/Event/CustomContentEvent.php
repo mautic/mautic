@@ -48,7 +48,7 @@ final class CustomContentEvent extends Event
         ];
     }
 
-    public function getViewName(): string
+    public function getViewName(): ?string
     {
         return $this->viewName;
     }
