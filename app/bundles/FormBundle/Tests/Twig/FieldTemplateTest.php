@@ -6,6 +6,8 @@ namespace Mautic\FormBundle\Tests\Twig;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
+use Symfony\Component\DomCrawler\Crawler;
+use Twig\Environment;
 
 final class FieldTemplateTest extends MauticMysqlTestCase
 {
@@ -14,6 +16,8 @@ final class FieldTemplateTest extends MauticMysqlTestCase
     private const FULL_WIDTH_CLASS    = 'mauticform-100';
 
     private const TEXT_FIELD_TEMPLATE = '@MauticForm/Field/text.html.twig';
+
+    private const RADIO_GROUP_FIELD_TEMPLATE = '@MauticForm/Field/radiogrp.html.twig';
 
     public function testFieldTemplateRendersWithCssClasses(): void
     {
@@ -77,6 +81,23 @@ final class FieldTemplateTest extends MauticMysqlTestCase
         $this->assertStringContainsString('mauticform-25', $html);
     }
 
+    public function testRadioGroupDoesNotSelectZeroOptionWithoutDefaultValue(): void
+    {
+        $crawler = new Crawler($this->renderRadioGroupField($this->createRadioGroupField()));
+
+        $this->assertCount(0, $crawler->filter('input[type="radio"][checked]'), $crawler->html());
+    }
+
+    public function testRadioGroupSelectsZeroOptionWhenConfiguredAsDefault(): void
+    {
+        $field = $this->createRadioGroupField();
+        $field->setDefaultValue('0');
+
+        $crawler = new Crawler($this->renderRadioGroupField($field));
+
+        $this->assertCount(1, $crawler->filter('input[type="radio"][value="0"][checked]'), $crawler->html());
+    }
+
     private function createField(?string $fieldWidth = null): Field
     {
         $field = new Field();
@@ -94,7 +115,7 @@ final class FieldTemplateTest extends MauticMysqlTestCase
 
     private function renderTextField(Field $field): string
     {
-        $twig     = $this->getContainer()->get('twig');
+        $twig     = $this->getContainer()->get(Environment::class);
         $template = $twig->load(self::TEXT_FIELD_TEMPLATE);
 
         return $template->render([
@@ -105,6 +126,39 @@ final class FieldTemplateTest extends MauticMysqlTestCase
             'containerClass' => 'text',
             'type'           => 'text',
             'inputClass'     => 'input',
+        ]);
+    }
+
+    private function createRadioGroupField(): Field
+    {
+        $field = new Field();
+        $field->setType('radiogrp');
+        $field->setLabel(self::FIELD_LABEL);
+        $field->setAlias('test_radio_group');
+        $field->setOrder(1);
+        $field->setProperties([
+            'syncList'   => 0,
+            'optionlist' => [
+                'list' => [
+                    ['label' => 'Zero', 'value' => 0],
+                    ['label' => 'One', 'value' => 1],
+                ],
+            ],
+        ]);
+
+        return $field;
+    }
+
+    private function renderRadioGroupField(Field $field): string
+    {
+        $twig     = $this->getContainer()->get(Environment::class);
+        $template = $twig->load(self::RADIO_GROUP_FIELD_TEMPLATE);
+
+        return $template->render([
+            'field'    => $field,
+            'fields'   => [],
+            'id'       => 'test_id',
+            'formName' => 'test_form',
         ]);
     }
 }

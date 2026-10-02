@@ -6,7 +6,7 @@ use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
-class UnsubscribedHelper extends AbstractHelper
+final class UnsubscribedHelper extends AbstractHelper
 {
     public const NAME = 'email-unsubscribed';
 

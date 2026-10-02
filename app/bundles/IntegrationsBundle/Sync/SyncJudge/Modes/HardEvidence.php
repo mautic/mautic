@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 
-class HardEvidence implements JudgementModeInterface
+final class HardEvidence implements JudgementModeInterface
 {
     use DateComparisonTrait;
 

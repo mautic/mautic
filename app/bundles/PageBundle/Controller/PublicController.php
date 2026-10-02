@@ -39,7 +39,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class PublicController extends AbstractFormController
+final class PublicController extends AbstractFormController
 {
     /**
      * @param string $slug
@@ -231,7 +231,7 @@ class PublicController extends AbstractFormController
                     );
                     \assert($translatedEntity instanceof Page);
 
-                    if ($translationParent && $translatedEntity !== $entity) {
+                    if ($translatedEntity !== $entity) {
                         if (!$request->get('ntrd', 0)) {
                             $url = $model->generateUrl($translatedEntity, false);
                             $model->hitPage($entity, $request, 302, $lead, $query);
@@ -499,7 +499,7 @@ class PublicController extends AbstractFormController
                     // Invalid ct value so we must unset it
                     // and process the request without it
 
-                    $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+                    $logger->warning(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
 
                     $request->request->remove('ct');
                     $request->query->remove('ct');

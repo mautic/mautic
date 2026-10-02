@@ -90,6 +90,10 @@ class Asset extends FormEntity implements UuidInterface
      * @var string|null
      */
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[Sequentially([
+        new Assert\Url(message: 'mautic.asset.validation.error.url'),
+        new SafeRemoteUrl(),
+    ])]
     private $remotePath;
 
     /**
@@ -292,10 +296,6 @@ class Asset extends FormEntity implements UuidInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new Upload());
-        $metadata->addPropertyConstraint('remotePath', new Sequentially([
-            new Assert\Url(message: 'mautic.asset.validation.error.url'),
-            new SafeRemoteUrl(),
-        ]));
     }
 
     /**
@@ -357,7 +357,7 @@ class Asset extends FormEntity implements UuidInterface
         $this->file = $file;
 
         // check if we have an old asset path
-        if (isset($this->path)) {
+        if (null !== $this->path) {
             // store the old name to delete after the update
             $this->temp = $this->path;
             $this->path = null;
@@ -654,12 +654,12 @@ class Asset extends FormEntity implements UuidInterface
 
     public function setFileNameFromRemote(): void
     {
-        $fileName = basename($this->getRemotePath());
+        $fileName = basename($this->remotePath);
 
         $this->setOriginalFileName($fileName);
 
         // set the asset title as original file name if title is missing
-        if (null === $this->getTitle()) {
+        if (null === $this->title) {
             $this->setTitle($fileName);
         }
     }
@@ -668,7 +668,7 @@ class Asset extends FormEntity implements UuidInterface
     {
         if (null !== $this->getFile()) {
             // set the asset title as original file name if title is missing
-            if (null === $this->getTitle()) {
+            if (null === $this->title) {
                 $this->setTitle($this->file->getClientOriginalName());
             }
 
@@ -680,7 +680,7 @@ class Asset extends FormEntity implements UuidInterface
                 $extension = pathinfo($this->originalFileName, PATHINFO_EXTENSION);
             }
             $this->path = $filename.'.'.$extension;
-        } elseif ($this->isRemote() && null !== $this->getRemotePath()) {
+        } elseif ($this->isRemote() && null !== $this->remotePath) {
             $this->setFileNameFromRemote();
         }
     }
@@ -705,7 +705,7 @@ class Asset extends FormEntity implements UuidInterface
         $this->setFileInfoFromFile();
 
         // check if we have an old asset
-        if (isset($this->temp) && file_exists($filePath)) {
+        if (null !== $this->temp && file_exists($filePath)) {
             // delete the old asset
             unlink($filePath);
             // clear the temp asset path
@@ -847,7 +847,7 @@ class Asset extends FormEntity implements UuidInterface
         }
 
         if ($this->isRemote()) {
-            return pathinfo(parse_url($this->getRemotePath(), PHP_URL_PATH), PATHINFO_EXTENSION);
+            return pathinfo(parse_url($this->remotePath, PHP_URL_PATH), PATHINFO_EXTENSION);
         }
 
         if (null === $this->loadFile()) {
@@ -1073,7 +1073,7 @@ class Asset extends FormEntity implements UuidInterface
      */
     public function getFilePath()
     {
-        return $this->isRemote() ? $this->getRemotePath() : $this->getAbsolutePath();
+        return $this->isRemote() ? $this->remotePath : $this->getAbsolutePath();
     }
 
     /**

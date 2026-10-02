@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -25,14 +25,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Lead>
  */
-class LeadType extends AbstractType
+final class LeadType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
     public function __construct(
         private TranslatorInterface $translator,
         private CompanyModel $companyModel,
-        private EntityManager $entityManager,
+        private EntityManagerInterface $entityManager,
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
@@ -79,16 +79,11 @@ class LeadType extends AbstractType
                     ],
                     'mapped'      => false,
                     'constraints' => [
-                        new File(
-                            [
-                                'mimeTypes' => [
-                                    'image/gif',
-                                    'image/jpeg',
-                                    'image/png',
-                                ],
-                                'mimeTypesMessage' => 'mautic.lead.avatar.types_invalid',
-                            ]
-                        ),
+                        new File(mimeTypes: [
+                            'image/gif',
+                            'image/jpeg',
+                            'image/png',
+                        ], mimeTypesMessage: 'mautic.lead.avatar.types_invalid'),
                     ],
                 ]
             );
@@ -182,6 +177,17 @@ class LeadType extends AbstractType
                 [
                     'apply_text' => false,
                     'save_text'  => 'mautic.core.form.save',
+                    'post_extra_buttons' => [
+                        [
+                            'name'  => 'save_and_new',
+                            'label' => 'mautic.lead.lead.save_and_new',
+                            'type'  => true,
+                            'attr'  => [
+                                'class' => 'btn btn-secondary btn-save-and-new',
+                                'icon'  => 'ri-add-line',
+                            ],
+                        ],
+                    ],
                 ]
             );
         }

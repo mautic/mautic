@@ -32,7 +32,7 @@ class EmailStatModel
 
         $this->dispatcher->dispatch($event, EmailEvents::ON_EMAIL_STAT_PRE_SAVE);
 
-        $this->getRepository()->saveEntities($stats);
+        $this->statRepository->saveEntities($stats);
 
         $this->dispatcher->dispatch($event, EmailEvents::ON_EMAIL_STAT_POST_SAVE);
     }

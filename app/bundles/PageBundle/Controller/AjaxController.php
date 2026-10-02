@@ -14,15 +14,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
 
     private PageModel $pageModel;
 
     #[Required]
-    public function autowirePageAjaxController(PageModel $pageModel): void
-    {
+    public function autowirePageAjaxController(
+        PageModel $pageModel,
+    ): void {
         $this->pageModel = $pageModel;
     }
 

@@ -5,10 +5,10 @@ namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode;
 use Mautic\CampaignBundle\Entity\Event;
 use Psr\Log\LoggerInterface;
 
-class DateTime implements ScheduleModeInterface
+final readonly class DateTime implements ScheduleModeInterface
 {
     public function __construct(
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 

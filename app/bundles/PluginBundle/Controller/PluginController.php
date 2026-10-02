@@ -5,6 +5,7 @@ namespace Mautic\PluginBundle\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Entity\PluginRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
 use Mautic\PluginBundle\Facade\ReloadFacade;
@@ -20,14 +21,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class PluginController extends FormController
+final class PluginController extends FormController
 {
+    private PluginRepository $pluginRepository;
+
     private PluginModel $pluginModel;
 
     #[Required]
-    public function autowirePluginController(PluginModel $pluginModel): void
-    {
+    public function autowirePluginController(
+        PluginModel $pluginModel,
+        PluginRepository $pluginRepository,
+    ): void {
         $this->pluginModel = $pluginModel;
+        $this->pluginRepository = $pluginRepository;
     }
 
     public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
@@ -366,7 +372,7 @@ class PluginController extends FormController
             $this->throwAccessDenied();
         }
 
-        $bundle = $this->pluginModel->getRepository()->findOneBy(
+        $bundle = $this->pluginRepository->findOneBy(
             [
                 'bundle' => InputHelper::clean($name),
             ]

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UploadController extends DropzoneController
+final class UploadController extends DropzoneController
 {
     private TranslatorInterface $translator;
 
@@ -18,9 +18,8 @@ class UploadController extends DropzoneController
         $request  = $this->getRequest();
         $response = new EmptyResponse();
         $files    = $this->getFiles($request->files);
-        $this->autowireUploadController($this->container->get('translator'));
 
-        if (!empty($files)) {
+        if ([] !== $files) {
             foreach ($files as $file) {
                 try {
                     $this->handleUpload($file, $response, $request);

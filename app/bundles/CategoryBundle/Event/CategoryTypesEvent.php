@@ -5,12 +5,12 @@ namespace Mautic\CategoryBundle\Event;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-class CategoryTypesEvent extends CommonEvent
+final class CategoryTypesEvent extends CommonEvent
 {
     /**
      * @var array
      */
-    protected $types = [];
+    private $types = [];
 
     /**
      * Returns the array of Category Types.

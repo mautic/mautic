@@ -14,13 +14,13 @@ use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class NotificationSubscriber implements EventSubscriberInterface
+final readonly class NotificationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly AuditLogModel $auditLogModel,
-        private readonly TrackableModel $trackableModel,
-        private readonly PageTokenHelper $pageTokenHelper,
-        private readonly AssetTokenHelper $assetTokenHelper,
+        private AuditLogModel $auditLogModel,
+        private TrackableModel $trackableModel,
+        private PageTokenHelper $pageTokenHelper,
+        private AssetTokenHelper $assetTokenHelper,
     ) {
     }
 

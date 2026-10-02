@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class MarketplacePermissions extends AbstractPermissions
+final class MarketplacePermissions extends AbstractPermissions
 {
     public const BASE                 = 'marketplace';
 

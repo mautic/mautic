@@ -10,15 +10,15 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
+use Mautic\LeadBundle\Helper\FieldSearchScopeProvider;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class FieldController extends FormController
+final class FieldController extends FormController
 {
     private FieldModel $fieldModel;
 
@@ -34,7 +34,7 @@ class FieldController extends FormController
      *
      * @param int $page
      */
-    public function indexAction(Request $request, FieldModel $fieldModel, $page = 1): Response
+    public function indexAction(Request $request, FieldModel $fieldModel, FieldSearchScopeProvider $fieldSearchScopeProvider, $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(['lead:fields:view', 'lead:fields:full'], 'RETURN_ARRAY');
@@ -106,9 +106,10 @@ class FieldController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'items'       => $fields,
-                'searchValue' => $search,
-                'permissions' => $permissions,
+                'items'           => $fields,
+                'searchValue'     => $search,
+                'searchScopes'    => $fieldSearchScopeProvider->getScopes(),
+                'permissions'     => $permissions,
                 'tmpl'        => $tmpl,
                 'totalItems'  => $count,
                 'limit'       => $limit,
@@ -125,10 +126,8 @@ class FieldController extends FormController
 
     /**
      * Generate's new form and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, ?LeadField $entity = null)
+    public function newAction(Request $request, ?LeadField $entity = null): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             $this->throwAccessDenied();
@@ -242,10 +241,8 @@ class FieldController extends FormController
      * Generate's edit form and processes post data.
      *
      * @param bool|false $ignorePost
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             $this->throwAccessDenied();
@@ -403,10 +400,8 @@ class FieldController extends FormController
 
     /**
      * Delete a field.
-     *
-     * @return Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             $this->throwAccessDenied();

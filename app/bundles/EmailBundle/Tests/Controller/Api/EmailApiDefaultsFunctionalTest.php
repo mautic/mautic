@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Functional tests proving that email defaults from config are applied
+ * Functional tests proving that persisted email defaults from config are applied
  * when creating emails via the API (EMAIL_PRE_SAVE subscriber).
  */
 final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
@@ -33,7 +33,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    public function testNewEmailViaApiAppliesConfiguredDefaults(): void
+    public function testNewEmailViaApiAppliesOnlyPersistedConfiguredDefaults(): void
     {
         $preferenceCenter = $this->createPreferenceCenterPage('API Default PC');
         $this->em->flush();
@@ -68,12 +68,11 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('config-campaign', $response['utmTags']['utmCampaign']);
         $this->assertSame('config-content', $response['utmTags']['utmContent']);
 
-        // Verify preference center from database since API serialization may return it differently.
+        // Verify the preference center stays null so the global default can be resolved at runtime.
         $emailId    = $response['id'];
         $savedEmail = $this->em->find(Email::class, $emailId);
         $this->assertInstanceOf(Email::class, $savedEmail, 'Email must be persisted');
-        $this->assertInstanceOf(Page::class, $savedEmail->getPreferenceCenter(), 'Preference center must be set by defaults');
-        $this->assertSame($pageId, $savedEmail->getPreferenceCenter()->getId());
+        $this->assertNotInstanceOf(Page::class, $savedEmail->getPreferenceCenter(), 'Preference center must remain null for runtime fallback');
     }
 
     public function testNewEmailViaApiDoesNotOverwriteExplicitValues(): void

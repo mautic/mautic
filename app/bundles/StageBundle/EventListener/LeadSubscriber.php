@@ -11,13 +11,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly StagesChangeLogRepository $stagesChangeLogRepository,
-        private readonly LeadStageLogRepository $leadStageLogRepository,
-        private readonly TranslatorInterface $translator,
-        private readonly RouterInterface $router,
+        private StagesChangeLogRepository $stagesChangeLogRepository,
+        private LeadStageLogRepository $leadStageLogRepository,
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
     ) {
     }
 

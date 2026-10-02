@@ -7,10 +7,10 @@ use Mautic\StatsBundle\Event\AggregateStatRequestEvent;
 use Mautic\StatsBundle\StatEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GraphAggregateStatsSubscriber implements EventSubscriberInterface
+final readonly class GraphAggregateStatsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly StatsCollectionHelper $statsCollectionHelper,
+        private StatsCollectionHelper $statsCollectionHelper,
     ) {
     }
 

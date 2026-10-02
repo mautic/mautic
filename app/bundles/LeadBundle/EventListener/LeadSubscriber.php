@@ -3,23 +3,22 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Exception;
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
-use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDevice;
-use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
-use Mautic\LeadBundle\Entity\LeadNote;
-use Mautic\LeadBundle\Entity\ListLead;
-use Mautic\LeadBundle\Entity\PointsChangeLog;
-use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\LeadNoteRepository;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
@@ -32,7 +31,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
@@ -52,19 +51,24 @@ class LeadSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         private LeadChangeEventDispatcher $leadEventDispatcher,
         private DncReasonHelper $dncReasonHelper,
-        private EntityManager $entityManager,
         private TranslatorInterface $translator,
         private RouterInterface $router,
         private LeadListRepository $leadListRepository,
         private SegmentCountCacheHelper $segmentCountCacheHelper,
         private CoreParametersHelper $coreParametersHelper,
         private CompanyLeadRepository $companyLeadRepository,
-        ?ModelFactory $modelFactory = null,
+        private LeadEventLogRepository $leadEventLogRepository,
+        private PointsChangeLogRepository $pointsChangeLogRepository,
+        private ListLeadRepository $listLeadRepository,
+        private LeadNoteRepository $leadNoteRepository,
+        private LeadDeviceRepository $leadDeviceRepository,
+        private UtmTagRepository $utmTagRepository,
+        private DoNotContactRepository $doNotContactRepository,
+        ModelFactory $modelFactory,
+        private readonly AuditLogRepository $auditLogRepository,
         private $isTest = false,
     ) {
-        if ($modelFactory) {
-            $this->setModelFactory($modelFactory);
-        }
+        $this->setModelFactory($modelFactory);
     }
 
     public static function getSubscribedEvents(): array
@@ -186,7 +190,7 @@ class LeadSubscriber implements EventSubscriberInterface
         if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
             return;
         }
-        $leadId     = (int) $event->getLead()->getId();
+        $leadId     = $event->getLead()->getId();
         $segmentIds = $this->leadListRepository->getLeadSegmentIds($leadId);
 
         foreach ($segmentIds as $segmentId) {
@@ -268,7 +272,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     public function preLeadMerge(Events\LeadMergeEvent $event): void
     {
-        $this->entityManager->getRepository(LeadEventLog::class)->updateLead(
+        $this->leadEventLogRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
@@ -276,22 +280,22 @@ class LeadSubscriber implements EventSubscriberInterface
 
     public function onLeadMerge(Events\LeadMergeEvent $event): void
     {
-        $this->entityManager->getRepository(PointsChangeLog::class)->updateLead(
+        $this->pointsChangeLogRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
 
-        $this->entityManager->getRepository(ListLead::class)->updateLead(
+        $this->listLeadRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
 
-        $this->entityManager->getRepository(LeadNote::class)->updateLead(
+        $this->leadNoteRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
 
-        $this->entityManager->getRepository(LeadDevice::class)->updateLead(
+        $this->leadDeviceRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
@@ -379,7 +383,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $lead = $event->getLead();
-        $rows = $this->auditLogModel->getRepository()->getLeadIpLogs($lead, $event->getQueryOptions());
+        $rows = $this->auditLogRepository->getLeadIpLogs($lead, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
             // Add to counter
@@ -486,8 +490,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     private function addTimelineUtmEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
-        $utmRepo = $this->entityManager->getRepository(UtmTag::class);
-        $utmTags = $utmRepo->getUtmTagsByLead($event->getLead(), $event->getQueryOptions());
+        $utmTags = $this->utmTagRepository->getUtmTagsByLead($event->getLead(), $event->getQueryOptions());
         // Add to counter
         $event->addToCounter($eventTypeKey, $utmTags);
 
@@ -542,10 +545,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
-        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->entityManager->getRepository(DoNotContact::class);
-
-        $rows = $dncRepo->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
+        $rows = $this->doNotContactRepository->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $rows);
@@ -608,9 +608,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
     private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
-        /** @var LeadEventLogRepository $eventLogRepo */
-        $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
-        $imports      = $eventLogRepo->getEvents(
+        $imports = $this->leadEventLogRepository->getEvents(
             $event->getLead(),
             'lead',
             'import',
@@ -664,16 +662,14 @@ class LeadSubscriber implements EventSubscriberInterface
 
     private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
-        /** @var LeadEventLogRepository $eventLogRepo */
-        $eventLogRepo    = $this->entityManager->getRepository(LeadEventLog::class);
-        $apiSingleEvents = $eventLogRepo->getEvents(
+        $apiSingleEvents = $this->leadEventLogRepository->getEvents(
             $event->getLead(),
             'lead',
             'api-single',
             null,
             $event->getQueryOptions()
         );
-        $apiBatchEvents = $eventLogRepo->getEvents(
+        $apiBatchEvents = $this->leadEventLogRepository->getEvents(
             $event->getLead(),
             'lead',
             'api-batch',

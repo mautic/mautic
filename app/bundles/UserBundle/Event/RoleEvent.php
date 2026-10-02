@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\UserBundle\Entity\Role;
 
-class RoleEvent extends CommonEvent
+final class RoleEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

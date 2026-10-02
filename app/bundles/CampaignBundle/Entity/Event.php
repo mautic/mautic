@@ -218,10 +218,7 @@ class Event implements ChannelInterface, UuidInterface
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $channelId;
 
-    /**
-     * @var array
-     */
-    private $changes = [];
+    private array $changes = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTimeInterface $deleted = null;
@@ -229,7 +226,7 @@ class Event implements ChannelInterface, UuidInterface
     private int $failedCount = 0;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    private ?Event $redirectEvent;
+    private ?Event $redirectEvent = null;
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?\DateTime $dateLinked = null;
@@ -245,7 +242,6 @@ class Event implements ChannelInterface, UuidInterface
     {
         $this->log               = new ArrayCollection();
         $this->children          = new ArrayCollection();
-        $this->redirectEvent     = null;
         $this->redirectingEvents = new ArrayCollection();
 
         if ($dateAdded) {
@@ -529,7 +525,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
-        if ('category' === $prop || 'parent' === $prop) {
+        if ('category' === $prop || 'parent' === $prop || 'redirectEvent' === $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -546,10 +542,7 @@ class Event implements ChannelInterface, UuidInterface
         return false;
     }
 
-    /**
-     * @return array
-     */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changes;
     }
@@ -716,7 +709,7 @@ class Event implements ChannelInterface, UuidInterface
             ->andWhere(Criteria::expr()->eq('rotation', $rotation))
             ->setMaxResults(1);
 
-        $log = $this->getLog()->matching($criteria);
+        $log = $this->log->matching($criteria);
 
         if (count($log)) {
             return $log->first();
@@ -833,11 +826,7 @@ class Event implements ChannelInterface, UuidInterface
 
     public function setTriggerDate(mixed $triggerDate = 'now'): void
     {
-        if (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate['date']);
-        } elseif (is_string($triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate);
-        }
+        $triggerDate = $this->convertToDateTime($triggerDate);
 
         $this->isChanged('triggerDate', $triggerDate);
         $this->triggerDate = $triggerDate;
@@ -1154,11 +1143,25 @@ class Event implements ChannelInterface, UuidInterface
     private function convertToDateTime(mixed $triggerDate): mixed
     {
         if (empty($triggerDate)) {
-            $triggerDate = null;
-        } elseif (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate['date']);
-        } elseif (is_string($triggerDate)) {
-            $triggerDate = new \DateTime($triggerDate);
+            return null;
+        }
+
+        if ($triggerDate instanceof \DateTimeInterface) {
+            return $triggerDate instanceof \DateTimeImmutable
+                ? \DateTime::createFromInterface($triggerDate)
+                : clone $triggerDate;
+        }
+
+        if (is_array($triggerDate) && array_key_exists('date', $triggerDate)) {
+            $timezone = !empty($triggerDate['timezone'])
+                ? new \DateTimeZone($triggerDate['timezone'])
+                : null;
+
+            return new \DateTime($triggerDate['date'], $timezone);
+        }
+
+        if (is_string($triggerDate)) {
+            return new \DateTime($triggerDate);
         }
 
         return $triggerDate;
@@ -1204,6 +1207,6 @@ class Event implements ChannelInterface, UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getCampaign()->getCreatedBy();
+        return $this->campaign->getCreatedBy();
     }
 }

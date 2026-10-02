@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
-class MauticOutlookExtension extends Extension
+final class MauticOutlookExtension extends Extension
 {
     /**
      * @param mixed[] $configs

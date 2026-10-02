@@ -15,7 +15,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-#[AsCommand(name: self::COMMAND_NAME, description: 'Export entity data.')]
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Export entity data.'
+)]
 final class EntityExportCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:entity:export';
@@ -47,7 +50,7 @@ final class EntityExportCommand extends ModeratedCommand
 
         $entityIds = array_filter(array_map(intval(...), explode(',', (string) $idOption)));
 
-        if (empty($entityName) || empty($entityIds)) {
+        if (empty($entityName) || [] === $entityIds) {
             $output->writeln('<error>You must specify the entity and at least one valid entity ID.</error>');
 
             return self::FAILURE;
@@ -59,12 +62,12 @@ final class EntityExportCommand extends ModeratedCommand
             $event = $this->dispatchEntityExportEvent($entityName, $entityId);
             $data  = $event->getEntities();
 
-            if (!empty($data)) {
+            if ([] !== $data) {
                 $allData[] = $data;
             }
         }
 
-        if (empty($allData)) {
+        if ([] === $allData) {
             $output->writeln('<error>No data found for export.</error>');
 
             return self::FAILURE;

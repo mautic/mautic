@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecord;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -35,6 +36,7 @@ class ContactMerger
         protected EventDispatcherInterface $dispatcher,
         protected LoggerInterface $logger,
         protected CompanyLeadRepository $companyLeadRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 
@@ -126,11 +128,11 @@ class ContactMerger
 
         // It may happen that the Lead entities doesn't have fields fill in. Fill them in if not.
         if (!$newest->hasFields()) {
-            $newest->setFields($this->leadModel->getRepository()->getFieldValues($newest->getId()));
+            $newest->setFields($this->leadRepository->getFieldValues($newest->getId()));
         }
 
         if (!$oldest->hasFields()) {
-            $oldest->setFields($this->leadModel->getRepository()->getFieldValues($oldest->getId()));
+            $oldest->setFields($this->leadRepository->getFieldValues($oldest->getId()));
         }
 
         $newestFields = $newest->getProfileFields();

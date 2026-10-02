@@ -122,7 +122,7 @@ jobs:
 
     - name: Upload coverage report
       if: ${{ env.COVERAGE == 'true' }}
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
@@ -168,7 +168,7 @@ jobs:
       run: echo -e "APP_ENV=test\nAPP_DEBUG=1" > .env.local
 
     - name: Run E2E tests
-      run: ddev composer e2e-test
+      run: ddev exec composer e2e-test
 
     - name: Upload test artifacts
       if: failure()
@@ -288,6 +288,19 @@ jobs:
 
           # test if console is executable
           ./bin/console cache:clear
+
+          # test that local_root is auto-detected from composer.json's mautic-scaffold.locations.web-root
+          # This ensures ElFinder and other webroot-relative paths resolve correctly for recommended-project
+          php -r "
+            require 'vendor/autoload.php';
+            \$projectRoot = getcwd();
+            \$webrootDir = Mautic\CoreBundle\Loader\ParameterLoader::getWebrootDir(\$projectRoot);
+            if (\$webrootDir !== \$projectRoot . '/docroot') {
+              echo \"ERROR: Expected webroot to be {\$projectRoot}/docroot, got {\$webrootDir}\n\";
+              exit(1);
+            }
+            echo \"OK: Webroot correctly auto-detected as {\$webrootDir}\n\";
+          "
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer validate --ansi
         else

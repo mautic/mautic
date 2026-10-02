@@ -2,30 +2,19 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Form\Type\EventType;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
-use Mautic\FormBundle\Helper\FormFieldHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class EventController extends CommonFormController
+final class EventController extends CommonFormController
 {
     /**
      * @var string[]
@@ -36,24 +25,25 @@ class EventController extends CommonFormController
         Event::TYPE_CONDITION,
     ];
 
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        private readonly EventCollector $eventCollector,
-        private readonly DateHelper $dateHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly CampaignModel $campaignModel,
-        private readonly EventModel $eventModel,
-    ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private EventCollector $eventCollector;
+
+    private DateHelper $dateHelper;
+
+    private CampaignModel $campaignModel;
+
+    private EventModel $eventModel;
+
+    #[Required]
+    public function autowireEventController(
+        EventCollector $eventCollector,
+        DateHelper $dateHelper,
+        CampaignModel $campaignModel,
+        EventModel $eventModel,
+    ): void {
+        $this->eventCollector = $eventCollector;
+        $this->dateHelper = $dateHelper;
+        $this->campaignModel = $campaignModel;
+        $this->eventModel = $eventModel;
     }
 
     /**
@@ -75,11 +65,10 @@ class EventController extends CommonFormController
         $valid   = $cancelled   = false;
         $this->setCampaignElements($request->request);
         if ('1' === $request->request->get('submit')) {
-            $event                = $request->request->all()['campaignevent'] ?? [];
-            $type                 = $event['type'];
-            $eventType            = $event['eventType'];
-            $campaignId           = $event['campaignId'];
-            $event['triggerDate'] = (!empty($event['triggerDate'])) ? (new DateTimeHelper($event['triggerDate']))->getDateTime() : null;
+            $event      = $request->request->all()['campaignevent'] ?? [];
+            $type       = $event['type'];
+            $eventType  = $event['eventType'];
+            $campaignId = $event['campaignId'];
         } else {
             $type       = $request->query->get('type');
             $eventType  = $request->query->get('eventType');
@@ -352,9 +341,6 @@ class EventController extends CommonFormController
         return new JsonResponse($passthroughVars);
     }
 
-    /**
-     * Deletes the entity.
-     */
     public function deleteAction(Request $request, $objectId): JsonResponse
     {
         $this->setCampaignElements($request->request);
@@ -374,7 +360,7 @@ class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
@@ -416,9 +402,6 @@ class EventController extends CommonFormController
         return new JsonResponse($dataArray);
     }
 
-    /**
-     * Undeletes the entity.
-     */
     public function undeleteAction(Request $request, $objectId): JsonResponse
     {
         $campaignId     = $request->query->get('campaignId');
@@ -439,7 +422,7 @@ class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
@@ -506,7 +489,7 @@ class EventController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+        $event = $modifiedEvents[$objectId] ?? null;
 
         if ('POST' === $request->getMethod() && null !== $event) {
             $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));

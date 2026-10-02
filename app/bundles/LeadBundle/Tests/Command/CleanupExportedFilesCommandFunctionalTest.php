@@ -49,7 +49,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
         $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
 
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper    = self::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper    = self::getContainer()->get(CoreParametersHelper::class);
         $zipFileName             = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()
                 ->format('Y_m_d_H_i_s').'.zip';
         $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
@@ -72,7 +72,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
         }
 
         /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $leadModel->saveEntities($contacts);
     }
 

@@ -19,10 +19,17 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        $this->configParams['form_field_autofill'] = true;
+
+        parent::setUp();
+    }
+
     public function testConditionalFieldsPreserveOrderAfterDatabaseSave(): void
     {
         /** @var FormModel $formModel */
-        $formModel = static::getContainer()->get('mautic.form.model.form');
+        $formModel = self::getContainer()->get(FormModel::class);
 
         // Parent session key must contain 'new' so FormConditionalSubscriber resolves it to a persisted field ID.
         $sessionFields = ConditionalFieldOrderTestData::createSessionFields([
@@ -209,7 +216,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
         $multiselectFieldId = $this->createMultiselectLeadField();
 
         /** @var FieldModel $fieldModel */
-        $fieldModel       = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel       = $this->getContainer()->get(FieldModel::class);
         $multiselectField = $fieldModel->getEntity($multiselectFieldId);
         $this->assertInstanceOf(LeadField::class, $multiselectField);
         $fieldAlias       = $multiselectField->getAlias();
@@ -226,7 +233,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
         $this->logoutUser();
 
         /** @var ContactTracker $contactTracker */
-        $contactTracker = $this->getContainer()->get('mautic.tracker.contact');
+        $contactTracker = $this->getContainer()->get(ContactTracker::class);
         $contactTracker->setTrackedContact($lead);
 
         $this->client->request('GET', "/form/{$formId}");
@@ -284,7 +291,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         /** @var FormModel $formModel */
-        $formModel = $this->getContainer()->get('mautic.form.model.form');
+        $formModel = $this->getContainer()->get(FormModel::class);
 
         return $formModel->getEntity($response['form']['id']);
     }
@@ -292,7 +299,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
     private function createMultiselectLeadField(): int
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $alias      = 'test_multiselect_'.uniqid();
 
         $field = new LeadField();

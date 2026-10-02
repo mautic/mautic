@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class SerializerExtension extends AbstractExtension
+final class SerializerExtension extends AbstractExtension
 {
     public function getFunctions(): array
     {

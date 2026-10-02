@@ -23,26 +23,26 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @implements AjaxLookupModelInterface<Tweet>
  */
-class TweetModel extends FormModel implements AjaxLookupModelInterface
+final class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
     private TweetStatRepository $tweetStatRepository;
 
     private TweetRepository $tweetRepository;
 
     #[Required]
-    public function autowireTweetModel(TweetRepository $tweetRepository, TweetStatRepository $tweetStatRepository): void
-    {
+    public function autowireTweetModel(
+        TweetRepository $tweetRepository,
+        TweetStatRepository $tweetStatRepository,
+    ): void {
         $this->tweetRepository = $tweetRepository;
         $this->tweetStatRepository = $tweetStatRepository;
     }
 
     /**
-     * @param string $filter
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $options
+     * @param string|array<int, string> $filter
+     * @param array<string, mixed>      $options
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
 
@@ -54,9 +54,8 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
                     $filter = '';
                 }
 
-                $tweetRepo = $this->getRepository();
-                $tweetRepo->setCurrentUser($this->userHelper->getUser());
-                $entities = $tweetRepo->getTweetList(
+                $this->tweetRepository->setCurrentUser($this->userHelper->getUser());
+                $entities = $this->tweetRepository->getTweetList(
                     $filter,
                     $limit,
                     $start,
@@ -86,10 +85,8 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      */
     public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null): static
     {
-        $statRepo = $this->getStatRepository();
-
         // Update failed tweet
-        $stat = $statRepo->findOneBy(
+        $stat = $this->tweetStatRepository->findOneBy(
             [
                 'lead'     => $lead->getId(),
                 'tweet'    => $tweet->getId(),
@@ -128,7 +125,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
             $stat->setIsFailed(true);
         }
 
-        $statRepo->saveEntity($stat);
+        $this->tweetStatRepository->saveEntity($stat);
 
         return $this;
     }

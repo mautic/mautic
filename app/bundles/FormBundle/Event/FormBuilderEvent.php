@@ -4,12 +4,13 @@ namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormBuilderEvent extends Event
+final class FormBuilderEvent extends Event
 {
     use ComponentValidationTrait;
 
@@ -126,7 +127,7 @@ class FormBuilderEvent extends Event
         if (isset($field['valueFilter'])
             && (!is_string($field['valueFilter'])
                 || !is_callable(
-                    [\Mautic\CoreBundle\Helper\InputHelper::class, $field['valueFilter']]
+                    [InputHelper::class, $field['valueFilter']]
                 ))
         ) {
             $callbacks = ['valueFilter'];
@@ -171,7 +172,7 @@ class FormBuilderEvent extends Event
      */
     public function addValidatorsToBuilder(FormInterface $form): void
     {
-        if (!empty($this->validators)) {
+        if ([] !== $this->validators) {
             $validationData = $form->getData()['validation'] ?? [];
             foreach ($this->validators as $validator) {
                 if (isset($validator['formType']) && isset($validator['fieldType']) && $validator['fieldType'] == $form->getData()['type']) {

@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Event;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class SyncEvent extends Event
+final class SyncEvent extends Event
 {
     public function __construct(
         private readonly InputOptionsDAO $inputOptionsDAO,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormSubmitActionDownloadFileType extends AbstractType
+final class FormSubmitActionDownloadFileType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

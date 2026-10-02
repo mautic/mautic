@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PointBundle\Entity\Trigger;
 
-class TriggerEvent extends CommonEvent
+final class TriggerEvent extends CommonEvent
 {
     /**
      * @var Trigger

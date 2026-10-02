@@ -27,7 +27,7 @@ class OwnerProvider
      */
     public function getOwnersForObjectIds(string $objectName, array $objectIds): array
     {
-        if (empty($objectIds)) {
+        if ([] === $objectIds) {
             return [];
         }
 

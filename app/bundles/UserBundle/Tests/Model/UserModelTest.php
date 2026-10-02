@@ -11,9 +11,12 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserInvite;
+use Mautic\UserBundle\Entity\UserInviteRepository;
 use Mautic\UserBundle\Entity\UserInviteRepositoryInterface;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Entity\UserToken;
@@ -25,6 +28,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
@@ -77,6 +81,9 @@ final class UserModelTest extends TestCase
      */
     private MockObject $userInviteRepository;
 
+    /**
+     * @var MockObject&UserRepository
+     */
     private MockObject $userRepository;
 
     protected function setUp(): void
@@ -90,7 +97,7 @@ final class UserModelTest extends TestCase
         $this->logger           = $this->createMock(LoggerInterface::class);
         $this->twig             = $this->createMock(Environment::class);
 
-        $this->userInviteRepository = $this->createMock(\Mautic\UserBundle\Entity\UserInviteRepository::class);
+        $this->userInviteRepository = $this->createMock(UserInviteRepository::class);
         $this->userRepository = $this->createMock(UserRepository::class);
 
         $this->userModel = new UserModel(
@@ -106,9 +113,10 @@ final class UserModelTest extends TestCase
             $this->createStub(CoreParametersHelper::class),
             $this->twig,
             $this->userRepository,
-            $this->createStub(\Mautic\UserBundle\Entity\PermissionRepository::class),
-            $this->createStub(\Mautic\UserBundle\Entity\RoleRepository::class),
+            $this->createStub(PermissionRepository::class),
+            $this->createStub(RoleRepository::class),
             $this->userInviteRepository,
+            $this->createStub(UserPasswordHasherInterface::class)
         );
     }
 
@@ -241,7 +249,7 @@ final class UserModelTest extends TestCase
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with('mautic_user_invite_register', $this->isType('array'), UrlGeneratorInterface::ABSOLUTE_URL)
+            ->with('mautic_user_invite_register', $this->isArray(), UrlGeneratorInterface::ABSOLUTE_URL)
             ->willReturn($link);
 
         $this->translator->expects($this->exactly(2))

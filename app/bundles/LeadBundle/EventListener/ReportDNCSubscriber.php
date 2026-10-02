@@ -13,16 +13,16 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class ReportDNCSubscriber implements EventSubscriberInterface
+final readonly class ReportDNCSubscriber implements EventSubscriberInterface
 {
     public const DNC = 'contact.dnc';
 
     public function __construct(
-        private readonly FieldsBuilder $fieldsBuilder,
-        private readonly CompanyReportData $companyReportData,
-        private readonly RouterInterface $router,
-        private readonly ChannelListHelper $channelListHelper,
-        private readonly DncFormatterHelper $dncFormatter,
+        private FieldsBuilder $fieldsBuilder,
+        private CompanyReportData $companyReportData,
+        private RouterInterface $router,
+        private ChannelListHelper $channelListHelper,
+        private DncFormatterHelper $dncFormatter,
     ) {
     }
 

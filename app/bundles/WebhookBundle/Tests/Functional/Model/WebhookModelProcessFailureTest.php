@@ -26,7 +26,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
         $this->configParams['disable_auto_unpublish'] = 'testDisableAutoUnpublishIsEnabled' === $this->name();
         parent::setUp();
 
-        $this->webhookModel                = self::$kernel->getContainer()->get('mautic.webhook.model.webhook');
+        $this->webhookModel                = self::$kernel->getContainer()->get(WebhookModel::class);
         $this->clientMockHandler           = new MockHandler();
     }
 

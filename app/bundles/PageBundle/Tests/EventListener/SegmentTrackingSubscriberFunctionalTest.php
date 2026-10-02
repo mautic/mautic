@@ -29,7 +29,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['append_segment_id_tracking_url'] = 'testFeatureFlagIsDisabled' !== $this->name();
         parent::setUp();
-        $this->dispatcher = $this->getContainer()->get('event_dispatcher');
+        $this->dispatcher = $this->getContainer()->get(EventDispatcherInterface::class);
     }
 
     public function testFeatureFlagIsDisabled(): void

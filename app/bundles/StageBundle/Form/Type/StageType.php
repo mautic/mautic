@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Stage>
  */
-class StageType extends AbstractType
+final class StageType extends AbstractType
 {
     public function __construct(
         private readonly CorePermissions $security,

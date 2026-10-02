@@ -27,7 +27,7 @@ final class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
 
         // Create additional contacts to exceed the limit
         /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
         for ($i = 0; $i < 3; ++$i) {
             $contact = new Lead();
             $contact->setFirstname("Test{$i}");

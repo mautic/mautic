@@ -13,7 +13,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * Almost all other Mautic Bundle controllers extend this default controller.
  */
-class DefaultController extends CommonController
+final class DefaultController extends CommonController
 {
     private NotificationModel $notificationModel;
 

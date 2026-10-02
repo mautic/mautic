@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class TriggerEventType extends AbstractType
+final class TriggerEventType extends AbstractType
 {
     /**
      * @param FormBuilderInterface<array<mixed>|null> $builder

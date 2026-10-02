@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\Exception as DBALException;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Illuminate\Support\Collection;
@@ -33,6 +33,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\FrequencyRule;
@@ -140,7 +141,7 @@ class LeadModel extends FormModel
         private ContactTracker $contactTracker,
         private DeviceTracker $deviceTracker,
         private IpAddressModel $ipAddressModel,
-        EntityManager $em,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -164,14 +165,14 @@ class LeadModel extends FormModel
         private readonly CompanyLeadRepository $companyLeadRepository,
         private readonly DoNotContactRepository $doNotContactRepository,
         private readonly StatRepository $statRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): LeadRepository
     {
-        $repo = $this->leadRepository;
-        $repo->setDispatcher($this->dispatcher);
+        $this->leadRepository->setDispatcher($this->dispatcher);
 
         if (!$this->repoSetup) {
             $this->repoSetup = true;
@@ -180,16 +181,16 @@ class LeadModel extends FormModel
             $fields = $this->leadFieldModel->getFieldList(true, false);
 
             $socialFields = (!empty($fields['social'])) ? array_keys($fields['social']) : [];
-            $repo->setAvailableSocialFields($socialFields);
+            $this->leadRepository->setAvailableSocialFields($socialFields);
 
             $searchFields = [];
             foreach ($fields as $groupFields) {
                 $searchFields = array_merge($searchFields, array_keys($groupFields));
             }
-            $repo->setAvailableSearchFields($searchFields);
+            $this->leadRepository->setAvailableSearchFields($searchFields);
         }
 
-        return $repo;
+        return $this->leadRepository;
     }
 
     /**
@@ -309,7 +310,7 @@ class LeadModel extends FormModel
 
         if (null === $entity) {
             // Check if this contact was merged into another and if so, return the new contact
-            if ($entity = $this->getMergeRecordRepository()->findMergedContact($id)) {
+            if ($entity = $this->mergeRecordRepository->findMergedContact($id)) {
                 // Hydrate fields with custom field data
                 $fields = $this->getRepository()->getFieldValues($entity->getId());
                 $entity->setFields($fields);
@@ -328,10 +329,11 @@ class LeadModel extends FormModel
     {
         $entities   = parent::getEntities($args);
         $contactIds = $this->getContactIdsFromArgs($args);
-        for ($i = 0; $i < count($contactIds); ++$i) {
+        $counter = count($contactIds);
+        for ($i = 0; $i < $counter; ++$i) {
             $contactId = (int) $contactIds[$i];
             if (empty($entities[$contactId])) {
-                if ($entity = $this->getMergeRecordRepository()->findMergedContact($contactId)) {
+                if ($entity = $this->mergeRecordRepository->findMergedContact($contactId)) {
                     $entity->setPreviousId($contactId);
 
                     if (isset($entities[$entity->getId()])) {
@@ -567,8 +569,7 @@ class LeadModel extends FormModel
         }
 
         if (isset($data['stage'])) {
-            $stagesChangeLogRepo  = $this->getStagesChangeLogRepository();
-            $currentLeadStageId   = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+            $currentLeadStageId   = $this->stagesChangeLogRepository->getCurrentLeadStage($lead->getId());
             $currentLeadStageName = null;
             if ($currentLeadStageId) {
                 /** @var Stage|null $currentStage */
@@ -599,7 +600,7 @@ class LeadModel extends FormModel
 
         if (empty($fieldValues) || $bindWithForm) {
             // Lead is new or they haven't been populated so let's build the fields now
-            if (empty($this->flattenedFields)) {
+            if ([] === $this->flattenedFields) {
                 /** @var Paginator<mixed[]> $paginator */
                 $paginator = $this->leadFieldModel->getEntities(
                     [
@@ -822,7 +823,7 @@ class LeadModel extends FormModel
         foreach ($fields as $field) {
             if ($field instanceof LeadField) {
                 $alias = $field->getAlias();
-                if ($field->isPublished() and 'Lead' === $field->getObject()) {
+                if ($field->isPublished() && 'Lead' === $field->getObject()) {
                     $group                                = $field->getGroup();
                     $array[$group][$alias]['id']          = $field->getId();
                     $array[$group][$alias]['group']       = $group;
@@ -833,7 +834,7 @@ class LeadModel extends FormModel
                 }
             } else {
                 $alias = $field['alias'];
-                if ($field['isPublished'] and 'lead' === $field['object']) {
+                if ($field['isPublished'] && 'lead' === $field['object']) {
                     $group                                = $field['group'];
                     $array[$group][$alias]['id']          = $field['id'];
                     $array[$group][$alias]['group']       = $group;
@@ -874,7 +875,7 @@ class LeadModel extends FormModel
     public function checkForDuplicateContact(array $queryFields, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
     {
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
-        if (empty($this->availableLeadFields)) {
+        if ([] === $this->availableLeadFields) {
             $filter = ['isPublished' => true, 'object' => 'lead'];
 
             if ($onlyPubliclyUpdateable) {
@@ -936,9 +937,7 @@ class LeadModel extends FormModel
      */
     public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
-        $repo = $this->leadListRepository;
-
-        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
+        return $this->leadListRepository->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
 
     /**
@@ -948,9 +947,7 @@ class LeadModel extends FormModel
      */
     public function getCompanies(Lead $lead): array
     {
-        $repo = $this->companyLeadRepository;
-
-        return $repo->getCompaniesByLeadId($lead->getId());
+        return $this->companyLeadRepository->getCompaniesByLeadId($lead->getId());
     }
 
     /**
@@ -978,41 +975,106 @@ class LeadModel extends FormModel
     /**
      * Add lead to Stage.
      *
-     * @param array|Lead  $lead
-     * @param array|Stage $stage
-     * @param bool        $manuallyAdded
+     * @param array|Lead $lead
+     * @param bool       $manuallyAdded
      */
-    public function addToStages($lead, $stage, $manuallyAdded = true): static
+    public function addToStages($lead, Stage $stage, $manuallyAdded = true): static
     {
+        $origin = is_string($manuallyAdded)
+            ? $manuallyAdded
+            : $this->translator->trans('mautic.stage.event.added.batch');
+
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
             $lead   = $this->em->getReference(Lead::class, $leadId);
         }
+
+        $this->addToStage($lead, $stage, $origin);
+
+        return $this;
+    }
+
+    public function addToStage(Lead $lead, Stage $stage, string $origin): static
+    {
         $lead->setStage($stage);
         $lead->stageChangeLogEntry(
             $stage,
             $stage->getId().': '.$stage->getName(),
-            $this->translator->trans('mautic.stage.event.added.batch')
+            $origin
         );
 
         return $this;
     }
 
+    public function changeStage(Lead $lead, Stage $stage, string $origin): void
+    {
+        $currentStage = $lead->getStage();
+
+        if (null !== $currentStage) {
+            if ($currentStage->getId() === $stage->getId()) {
+                throw new \UnexpectedValueException($this->translator->trans('mautic.stage.campaign.event.already_in_stage'));
+            }
+
+            if ($currentStage->getWeight() > $stage->getWeight()) {
+                throw new \UnexpectedValueException($this->translator->trans('mautic.stage.campaign.event.stage_invalid'));
+            }
+        }
+
+        $this->addToStage($lead, $stage, $origin);
+        $this->saveEntity($lead);
+
+        $this->logger->info(
+            sprintf(
+                'LeadBundle: Lead %s changed stage from %s (%s) to %s (%s) by %s',
+                $lead->getId(),
+                $currentStage?->getName(),
+                $currentStage?->getId(),
+                $stage->getName(),
+                $stage->getId(),
+                $origin
+            )
+        );
+    }
+
     /**
      * Remove lead from Stage.
      *
-     * @param bool $manuallyRemoved
+     * @param array|Lead $lead
+     * @param bool       $manuallyRemoved
      */
-    public function removeFromStages($lead, $stage, $manuallyRemoved = true): static
+    public function removeFromStages($lead, Stage $stage, $manuallyRemoved = true): static
     {
-        $lead->setStage(null);
+        $origin = is_string($manuallyRemoved)
+            ? $manuallyRemoved
+            : $this->translator->trans('mautic.stage.event.removed.batch');
+
+        if (!$lead instanceof Lead) {
+            $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
+            $lead   = $this->em->getReference(Lead::class, $leadId);
+        }
+
+        $this->removeFromStage($lead, $stage, $origin);
+
+        return $this;
+    }
+
+    public function removeFromStage(Lead $lead, Stage $stage, string $origin): void
+    {
+        $lead->setStage();
         $lead->stageChangeLogEntry(
             $stage,
             $stage->getId().': '.$stage->getName(),
-            $this->translator->trans('mautic.stage.event.removed.batch')
+            $origin
         );
 
-        return $this;
+        $this->saveEntity($lead);
+
+        $this->logger->info(
+            sprintf(
+                'LeadBundle: Lead %s removed from stage',
+                $lead->getId(),
+            )
+        );
     }
 
     /**
@@ -1026,10 +1088,9 @@ class LeadModel extends FormModel
             $channel = key($channel);
         }
 
-        $frequencyRuleRepo = $this->frequencyRuleRepository;
-        $frequencyRules    = $frequencyRuleRepo->getFrequencyRules($channel, $lead->getId());
+        $frequencyRules = $this->frequencyRuleRepository->getFrequencyRules($channel, $lead->getId());
 
-        if (empty($frequencyRules)) {
+        if ([] === $frequencyRules) {
             return [];
         }
 
@@ -1080,7 +1141,7 @@ class LeadModel extends FormModel
             }
         }
 
-        if (!empty($entities)) {
+        if ([] !== $entities) {
             $this->frequencyRuleRepository->saveEntities($entities);
         }
 
@@ -1091,7 +1152,7 @@ class LeadModel extends FormModel
         }
         // Delete lists that were removed
         $deletedLists = array_diff(array_keys($leadLists), $data['lead_lists']);
-        if (!empty($deletedLists)) {
+        if ([] !== $deletedLists) {
             $this->removeFromLists($lead, $deletedLists);
         }
 
@@ -1103,21 +1164,21 @@ class LeadModel extends FormModel
         // Update categories relations as removed those are removed.
         $unsubscribedCategories = array_diff($leadCategories, $data['global_categories']);
 
-        if (!empty($unsubscribedCategories)) {
+        if ([] !== $unsubscribedCategories) {
             $this->unsubscribeCategories($unsubscribedCategories);
         }
 
         // Add non associated categories relations as removed.
-        $nonAssociatedCategories = $this->getLeadCategoryRepository()->getNonAssociatedCategoryIdsForAContact($lead, ['global', 'email']);
+        $nonAssociatedCategories = $this->leadCategoryRepository->getNonAssociatedCategoryIdsForAContact($lead, ['global', 'email']);
 
         $unsubscribeNewCategories = array_diff($nonAssociatedCategories, $data['global_categories']);
-        if (!empty($unsubscribeNewCategories)) {
+        if ([] !== $unsubscribeNewCategories) {
             $this->addToCategory($lead, $unsubscribeNewCategories, false);
         }
 
         // Delete channels that were removed
         $deleted = array_diff_key($frequencyRules, $entities);
-        if (!empty($deleted)) {
+        if ([] !== $deleted) {
             $this->frequencyRuleRepository->deleteEntities($deleted);
         }
 
@@ -1140,7 +1201,7 @@ class LeadModel extends FormModel
             $dispatchEvent = false;
 
             /** @var ?LeadCategory $leadCategory */
-            $leadCategory = $this->getLeadCategoryRepository()->findOneBy(['lead' => $lead, 'category' => $category]);
+            $leadCategory = $this->leadCategoryRepository->findOneBy(['lead' => $lead, 'category' => $category]);
             if (null === $leadCategory) {
                 $dispatchEvent = true;
 
@@ -1167,8 +1228,8 @@ class LeadModel extends FormModel
             }
         }
 
-        if (!empty($results)) {
-            $this->getLeadCategoryRepository()->saveEntities($results);
+        if ([] !== $results) {
+            $this->leadCategoryRepository->saveEntities($results);
         }
 
         return $results;
@@ -1182,7 +1243,7 @@ class LeadModel extends FormModel
         $unsubscribedCats = [];
         foreach ($categories as $key => $category) {
             /** @var LeadCategory $category */
-            $category     = $this->getLeadCategoryRepository()->getEntity($key);
+            $category     = $this->leadCategoryRepository->getEntity($key);
             $category->setManuallyRemoved(true);
             $category->setManuallyAdded(false);
             $category->setDateAdded(new \DateTime());
@@ -1194,8 +1255,8 @@ class LeadModel extends FormModel
             }
         }
 
-        if (!empty($unsubscribedCats)) {
-            $this->getLeadCategoryRepository()->saveEntities($unsubscribedCats);
+        if ([] !== $unsubscribedCats) {
+            $this->leadCategoryRepository->saveEntities($unsubscribedCats);
         }
     }
 
@@ -1205,7 +1266,7 @@ class LeadModel extends FormModel
         if (is_array($categories)) {
             foreach ($categories as $key => $category) {
                 /** @var LeadCategory $category */
-                $category     = $this->getLeadCategoryRepository()->getEntity($key);
+                $category     = $this->leadCategoryRepository->getEntity($key);
                 $deleteCats[] = $category;
 
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
@@ -1220,14 +1281,14 @@ class LeadModel extends FormModel
             }
         }
 
-        if (!empty($deleteCats)) {
-            $this->getLeadCategoryRepository()->deleteEntities($deleteCats);
+        if ([] !== $deleteCats) {
+            $this->leadCategoryRepository->deleteEntities($deleteCats);
         }
     }
 
     public function getLeadCategories(Lead $lead): array
     {
-        $leadCategories   = $this->getLeadCategoryRepository()->getLeadCategories($lead);
+        $leadCategories   = $this->leadCategoryRepository->getLeadCategories($lead);
         $leadCategoryList = [];
         foreach ($leadCategories as $category) {
             $leadCategoryList[$category['id']] = $category['category_id'];
@@ -1243,7 +1304,7 @@ class LeadModel extends FormModel
      */
     public function getSubscribedAndNewCategoryIds(Lead $lead, array $types): array
     {
-        return $this->getLeadCategoryRepository()->getSubscribedAndNewCategoryIds($lead, $types);
+        return $this->leadCategoryRepository->getSubscribedAndNewCategoryIds($lead, $types);
     }
 
     /**
@@ -1251,7 +1312,7 @@ class LeadModel extends FormModel
      */
     public function getUnsubscribedLeadCategoriesIds(Lead $lead): array
     {
-        $leadCategories   = $this->getLeadCategoryRepository()->getUnsubscribedLeadCategories($lead);
+        $leadCategories   = $this->leadCategoryRepository->getUnsubscribedLeadCategories($lead);
         $leadCategoryList = [];
         foreach ($leadCategories as $category) {
             $leadCategoryList[$category['id']] = $category['category_id'];
@@ -1268,7 +1329,7 @@ class LeadModel extends FormModel
      * @param string[]|string|null         $tags
      * @param ?int                         $importId
      */
-    public function import(array $fields, array $data, $owner = null, $list = null, $tags = null, bool $persist = true, ?LeadEventLog $eventLog = null, $importId = null, bool $skipIfExists = false): bool
+    public function import(array $fields, array $data, $owner = null, $list = null, $tags = null, bool $persist = true, ?LeadEventLog $eventLog = null, $importId = null, bool $skipIfExists = false, bool $createNew = true): bool
     {
         $fields    = array_flip($fields);
 
@@ -1285,6 +1346,10 @@ class LeadModel extends FormModel
         $lead ??= $this->checkForDuplicateContact($fieldData);
         $merged = (bool) $lead->getId();
 
+        if (!$createNew && !$merged) {
+            throw new \Exception($this->translator->trans('mautic.lead.import.creating_contacts_disabled'));
+        }
+
         if ($merged) {
             $granted = $this->security->hasEntityAccess(
                 'lead:leads:editown',
@@ -1296,7 +1361,7 @@ class LeadModel extends FormModel
         }
 
         if (!$granted) {
-            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUsername()]));
+            throw new \Exception($this->translator->trans('mautic.lead.import.error.unauthorized', ['%username%' => $this->userHelper->getUser()->getUserIdentifier()]));
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
@@ -1324,8 +1389,7 @@ class LeadModel extends FormModel
         unset($fieldData['dateIdentified']);
 
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
-            $userRepo      = $this->userRepository;
-            $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
+            $createdByUser = $this->userRepository->findByIdentifier($data[$fields['createdByUser']]);
             if (null !== $createdByUser) {
                 $lead->setCreatedBy($createdByUser);
             }
@@ -1333,8 +1397,7 @@ class LeadModel extends FormModel
         unset($fieldData['createdByUser']);
 
         if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
-            $userRepo       = $this->userRepository;
-            $modifiedByUser = $userRepo->findByIdentifier($data[$fields['modifiedByUser']]);
+            $modifiedByUser = $this->userRepository->findByIdentifier($data[$fields['modifiedByUser']]);
             if (null !== $modifiedByUser) {
                 $lead->setModifiedBy($modifiedByUser);
             }
@@ -1593,7 +1656,7 @@ class LeadModel extends FormModel
             }
         }
 
-        if (!empty($tags)) {
+        if ([] !== $tags) {
             foreach ($tags as $tag) {
                 if (is_numeric($tag)) {
                     // Existing tag being added to this lead
@@ -1602,7 +1665,7 @@ class LeadModel extends FormModel
                     );
                 } else {
                     $lead->addTag(
-                        $this->getTagRepository()->getTagByNameOrCreateNewOne($tag)
+                        $this->tagRepository->getTagByNameOrCreateNewOne($tag)
                     );
                 }
             }
@@ -1614,7 +1677,7 @@ class LeadModel extends FormModel
 
             // Delete orphaned tags
             if ($tagsDeleted && $removeOrphans) {
-                $this->getTagRepository()->deleteOrphans();
+                $this->tagRepository->deleteOrphans();
             }
         }
     }
@@ -1642,7 +1705,7 @@ class LeadModel extends FormModel
         if (isset($params['query']) && !is_array($params['query'])) {
             // assume it's a query string; convert it to array
             parse_str($params['query'], $queryResult);
-            if (!empty($queryResult)) {
+            if ([] !== $queryResult) {
                 $params['query'] = $queryResult;
             } else {
                 // Something wrong with, remove it
@@ -1737,7 +1800,7 @@ class LeadModel extends FormModel
             $tags = explode(',', $tags);
         }
 
-        if (empty($tags) && empty($removeTags)) {
+        if ([] === $tags && empty($removeTags)) {
             return false;
         }
 
@@ -1751,7 +1814,7 @@ class LeadModel extends FormModel
         $tags = array_filter($tags, fn (string $tag): bool => '' !== $tag);
 
         // See which tags already exist
-        $foundTags = $this->getTagRepository()->getTagsByName($tags);
+        $foundTags = $this->tagRepository->getTagsByName($tags);
         foreach ($tags as $tag) {
             if (str_starts_with($tag, '-')) {
                 // Tag to be removed
@@ -1791,7 +1854,7 @@ class LeadModel extends FormModel
             $removeTags = array_filter($removeTags, fn (string $tag): bool => '' !== $tag);
 
             // See which tags really exist
-            $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
+            $foundRemoveTags = $this->tagRepository->getTagsByName($removeTags);
 
             foreach ($removeTags as $tag) {
                 // Tag to be removed
@@ -1851,7 +1914,7 @@ class LeadModel extends FormModel
      */
     public function getTagList(): array
     {
-        return $this->getTagRepository()->getSimpleList(null, [], 'tag', 'id');
+        return $this->tagRepository->getSimpleList(null, [], 'tag', 'id');
     }
 
     /**
@@ -2140,10 +2203,7 @@ class LeadModel extends FormModel
         return ($forTimeline) ? $payload : [$payload, $event->getSerializerGroups()];
     }
 
-    /**
-     * @return array
-     */
-    public function getEngagementTypes()
+    public function getEngagementTypes(): array
     {
         $event = new LeadTimelineEvent();
         $event->fetchTypesOnly();
@@ -2182,7 +2242,7 @@ class LeadModel extends FormModel
 
         $companyLead = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId(), $company->getId());
 
-        if (empty($companyLead)) {
+        if ([] === $companyLead) {
             $this->companyModel->addLeadToCompany($company, $lead);
 
             return true;
@@ -2232,8 +2292,8 @@ class LeadModel extends FormModel
      */
     public function getPreferredChannel(Lead $lead)
     {
-        $preferredChannel = $this->getFrequencyRuleRepository()->getPreferredChannel($lead->getId());
-        if (!empty($preferredChannel)) {
+        $preferredChannel = $this->frequencyRuleRepository->getPreferredChannel($lead->getId());
+        if ([] !== $preferredChannel) {
             return $preferredChannel[0];
         }
 
@@ -2279,7 +2339,7 @@ class LeadModel extends FormModel
             }
         }
 
-        if (!empty($companyArray)) {
+        if ([] !== $companyArray) {
             $this->leadRepository->saveEntity($lead);
             $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray, false);
         }
@@ -2305,8 +2365,8 @@ class LeadModel extends FormModel
             $success    = true;
         }
 
-        if (!empty($entities)) {
-            $this->companyModel->getRepository()->saveEntities($entities);
+        if ([] !== $entities) {
+            $this->companyRepository->saveEntities($entities);
         }
 
         return $success;
@@ -2390,9 +2450,7 @@ class LeadModel extends FormModel
             $channel = key($channel);
         }
 
-        $dncRepo = $this->doNotContactRepository;
-
-        $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
+        $dncEntries = $this->doNotContactRepository->getEntriesByLeadAndChannel($lead, $channel);
 
         // If the lead has no entries in the DNC table, we're good to go
         if (empty($dncEntries)) {
@@ -2418,15 +2476,13 @@ class LeadModel extends FormModel
      */
     public function getLeadEmailStats(Lead $lead): array
     {
-        $statRepository = $this->statRepository;
-
-        return $statRepository->getStatsSummaryForContacts([$lead->getId()])[$lead->getId()];
+        return $this->statRepository->getStatsSummaryForContacts([$lead->getId()])[$lead->getId()];
     }
 
     public function removeTagFromLead(int $leadId, int $tagId): void
     {
         $lead = $this->getEntity($leadId);
-        $tag  = $this->getTagRepository()->find($tagId);
+        $tag  = $this->tagRepository->find($tagId);
 
         if ($lead && $tag) {
             $lead->removeTag($tag);

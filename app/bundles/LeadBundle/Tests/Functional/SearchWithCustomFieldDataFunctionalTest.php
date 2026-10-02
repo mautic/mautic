@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Functional;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
 {
@@ -122,7 +123,7 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
         $this->assertStringContainsString('ABC', $crawler->html());
         $this->assertStringNotContainsString('XYZ', $crawler->html());
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         $this->assertStringContainsString(
             $translator->trans('mautic.core.pagination.items', ['%count%' => 1]),

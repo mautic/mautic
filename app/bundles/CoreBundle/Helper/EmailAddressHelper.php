@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-class EmailAddressHelper
+final class EmailAddressHelper
 {
     /**
      * Clean the email for comparison.
@@ -21,7 +21,7 @@ class EmailAddressHelper
     {
         $emails = [$email, $this->cleanEmail($email)];
         preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts);
-        if (!empty($parts)) {
+        if ([] !== $parts) {
             $emails[] = $parts[1].'@'.$parts[3];
         }
 

@@ -9,14 +9,14 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-class EmailPeriodMetrics
+final readonly class EmailPeriodMetrics
 {
     private const CAMPAIGN_EVENT_SOURCE = 'campaign.event';
 
     private const EMAIL_SOURCE          = 'email';
 
     public function __construct(
-        private readonly Connection $connection,
+        private Connection $connection,
     ) {
     }
 

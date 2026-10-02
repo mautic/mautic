@@ -60,7 +60,7 @@ class ExcelExporter
 
             // Add totals to export
             $totalsRow = $reportDataResult->getTotalsToExport($this->formatterHelper);
-            if (!empty($totalsRow)) {
+            if ([] !== $totalsRow) {
                 $this->putTotals($totalsRow, $objPHPExcelSheet, 'A'.++$rowCount);
             }
 

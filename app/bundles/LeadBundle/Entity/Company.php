@@ -262,11 +262,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addConstraint(new UniqueCustomField(['object' => 'company']));
-        $metadata->addPropertyConstraint('score', new Assert\Range([
-            'min' => 0,
-            'max' => 2147483647,
-        ]));
+        $metadata->addConstraint(new UniqueCustomField(object: 'company'));
+        $metadata->addPropertyConstraint('score', new Assert\Range(min: 0, max: 2147483647));
     }
 
     public static function getDefaultIdentifierFields(): array
@@ -292,7 +289,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
                 $this->addChange($prop, [$current, $val]);
             }
         } elseif ('owner' === $prop) {
-            $current = $this->getOwner();
+            $current = $this->owner;
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$current && $val) {
@@ -323,7 +320,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     public function getPrimaryIdentifier()
     {
-        if ($name = $this->getName()) {
+        if ($name = $this->name) {
             return $name;
         }
         if (!empty($this->fields['core']['companyemail']['value'])) {
@@ -353,7 +350,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     public function getPermissionUser()
     {
-        return $this->getOwner() ?? $this->getCreatedBy();
+        return $this->owner ?? $this->getCreatedBy();
     }
 
     /**

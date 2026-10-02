@@ -8,7 +8,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
-use Mautic\EmailBundle\Model\EmailModel;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\EmailSubscriber;
@@ -33,17 +32,15 @@ final class EmailSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->config               = $this->createMock(Config::class);
-        $grapesJsBuilderModel       = $this->createMock(GrapesJsBuilderModel::class);
-        $emailModel                 = $this->createMock(EmailModel::class);
-        $this->grapesJsBuilderRepo  = $this->createMock(GrapesJsBuilderRepository::class);
-        $this->subscriber           = new EmailSubscriber($this->config, $grapesJsBuilderModel, $emailModel, $this->createStub(EmailConfigInterface::class));
-
-        $emailModel->method('getRepository')
-            ->willReturn($this->createStub(EmailRepository::class));
-
-        $grapesJsBuilderModel->method('getRepository')
-            ->willReturn($this->grapesJsBuilderRepo);
+        $this->config              = $this->createMock(Config::class);
+        $this->grapesJsBuilderRepo = $this->createMock(GrapesJsBuilderRepository::class);
+        $this->subscriber          = new EmailSubscriber(
+            $this->config,
+            $this->createStub(GrapesJsBuilderModel::class),
+            $this->createStub(EmailConfigInterface::class),
+            $this->grapesJsBuilderRepo,
+            $this->createStub(EmailRepository::class)
+        );
     }
 
     public function testManageEmailDraftExitsWhenPluginNotPublished(): void

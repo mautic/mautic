@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -120,7 +121,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
         $privateKeyContent = file_get_contents($privateKeyPath);
 
         // Encrypt it using the EncryptionHelper
-        $encryptionHelper = $this->getContainer()->get(\Mautic\CoreBundle\Helper\EncryptionHelper::class);
+        $encryptionHelper = $this->getContainer()->get(EncryptionHelper::class);
         $encryptedContent = $encryptionHelper->encrypt($privateKeyContent);
 
         // Write the encrypted content to .pem.enc file

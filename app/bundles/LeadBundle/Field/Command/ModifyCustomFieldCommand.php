@@ -13,7 +13,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[AsCommand(name: 'mautic:fields:modify', description: 'Change the sizes of the fields')]
+#[AsCommand(
+    name: 'mautic:fields:modify',
+    description: 'Change the sizes of the fields'
+)]
 final class ModifyCustomFieldCommand extends Command
 {
     public function __construct(
@@ -61,7 +64,7 @@ final class ModifyCustomFieldCommand extends Command
             $fieldsNeedsToBeUpdated[$field['alias']] = $field;
         }
 
-        if (empty($fieldsNeedsToBeUpdated)) {
+        if ([] === $fieldsNeedsToBeUpdated) {
             $output->writeln('<info>No custom field(s) to update!!!</info>');
 
             return Command::SUCCESS;

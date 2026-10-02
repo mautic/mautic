@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Twig\Sandbox\ThemeSandboxPolicy;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -211,7 +212,7 @@ class ThemeHelper implements ThemeHelperInterface
             throw new FileNotFoundException($theme.' not found!');
         }
 
-        if (in_array($theme, $this->getDefaultThemes(), true)) {
+        if (in_array($theme, $this->defaultThemes, true)) {
             $this->addToHidden($theme);
 
             return;
@@ -329,7 +330,7 @@ class ThemeHelper implements ThemeHelperInterface
 
         $themeName = basename($zipFile, '.zip');
 
-        if (in_array($themeName, $this->getDefaultThemes())) {
+        if (in_array($themeName, $this->defaultThemes)) {
             throw new \Exception($this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators'));
         }
 
@@ -344,16 +345,21 @@ class ThemeHelper implements ThemeHelperInterface
         $requiredFiles      = ['config.json', 'html/message.html.twig'];
         $foundRequiredFiles = [];
         $allowedFiles       = [];
+        $zipEntries         = [];
         $allowedExtensions  = $this->coreParametersHelper->get('theme_import_allowed_extensions');
 
         $config = [];
         for ($i = 0; $i < $zipper->numFiles; ++$i) {
             $entry = $zipper->getNameIndex($i);
-            if (str_starts_with($entry, '/')) {
-                $entry = substr($entry, 1);
+            $entry = str_replace('\\', '/', $entry);
+
+            if ($this->isUnsafeArchivePath($entry)) {
+                $zipper->close();
+                throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
             }
 
-            $extension = pathinfo($entry, PATHINFO_EXTENSION);
+            $zipEntries[] = $entry;
+            $extension    = pathinfo($entry, PATHINFO_EXTENSION);
 
             // Check for required files
             if (in_array($entry, $requiredFiles)) {
@@ -365,7 +371,7 @@ class ThemeHelper implements ThemeHelperInterface
                 $allowedFiles[] = $entry;
             }
 
-            if ('config.json' === $entry) {
+            if ('config.json' === basename($entry)) {
                 $config = json_decode($zipper->getFromName($entry), true);
             }
         }
@@ -381,18 +387,171 @@ class ThemeHelper implements ThemeHelperInterface
             }
         }
 
+        $archivePrefix = $this->getThemeArchivePrefix($zipEntries, $requiredFiles);
         if ($missingFiles = array_diff($requiredFiles, $foundRequiredFiles)) {
-            throw new FileNotFoundException($this->translator->trans('mautic.core.theme.missing.files', ['%files%' => implode(', ', $missingFiles)], 'validators'));
+            if (null === $archivePrefix) {
+                throw new FileNotFoundException($this->translator->trans('mautic.core.theme.missing.files', ['%files%' => implode(', ', $missingFiles)], 'validators'));
+            }
+
+            foreach ($missingFiles as $missingFile) {
+                if (in_array($archivePrefix.'/'.$missingFile, $zipEntries, true)) {
+                    $foundRequiredFiles[] = $missingFile;
+                }
+            }
+
+            $missingFiles = array_diff($requiredFiles, $foundRequiredFiles);
+            if ($missingFiles) {
+                throw new FileNotFoundException($this->translator->trans('mautic.core.theme.missing.files', ['%files%' => implode(', ', $missingFiles)], 'validators'));
+            }
         }
 
-        // Extract the archive file now
-        if (!$zipper->extractTo($themePath, $allowedFiles)) {
-            throw new \Exception('mautic.core.update.error_extracting_package');
+        if (!is_dir($themePath) && !mkdir($themePath, 0755, true) && !is_dir($themePath)) {
+            $zipper->close();
+            throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
+        }
+
+        foreach ($allowedFiles as $file) {
+            $targetFile = $file;
+            if (null !== $archivePrefix && str_starts_with($file, $archivePrefix.'/')) {
+                $targetFile = substr($file, strlen($archivePrefix) + 1);
+            }
+
+            try {
+                $destination = $this->getSafeThemeDestination($themePath, $targetFile);
+            } catch (\Exception) {
+                $zipper->close();
+                throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
+            }
+
+            if (str_ends_with($file, '/')) {
+                if (!is_dir($destination) && !mkdir($destination, 0755, true) && !is_dir($destination)) {
+                    $zipper->close();
+                    throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
+                }
+
+                continue;
+            }
+
+            $stream = $zipper->getStream($file);
+            if (!$stream) {
+                $zipper->close();
+                throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
+            }
+
+            $destinationDir = dirname($destination);
+            if (!is_dir($destinationDir) && !mkdir($destinationDir, 0755, true) && !is_dir($destinationDir)) {
+                fclose($stream);
+                $zipper->close();
+                throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
+            }
+
+            $target = fopen($destination, 'wb');
+            if (!$target) {
+                fclose($stream);
+                $zipper->close();
+                throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
+            }
+
+            while (!feof($stream)) {
+                $chunk = fread($stream, 8192);
+                if (false === $chunk) {
+                    fclose($target);
+                    fclose($stream);
+                    $zipper->close();
+                    throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
+                }
+
+                if ('' !== $chunk) {
+                    fwrite($target, $chunk);
+                }
+            }
+
+            fclose($target);
+            fclose($stream);
         }
         $zipper->close();
         unlink($zipFile);
 
         return true;
+    }
+
+    /**
+     * Reject absolute paths and parent-directory segments that could escape the theme directory.
+     */
+    private function isUnsafeArchivePath(string $path): bool
+    {
+        if ('' === $path) {
+            return false;
+        }
+
+        $normalized = str_replace('\\', '/', $path);
+        if (Path::isAbsolute($normalized)) {
+            return true;
+        }
+
+        $trimmed = rtrim($normalized, '/');
+
+        return '' !== $trimmed && in_array('..', explode('/', $trimmed), true);
+    }
+
+    /**
+     * Build a destination path under the theme directory, rejecting zip-slip escapes.
+     *
+     * @throws \Exception
+     */
+    private function getSafeThemeDestination(string $themePath, string $relativePath): string
+    {
+        if ($this->isUnsafeArchivePath($relativePath)) {
+            throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
+        }
+
+        $themeRoot   = Path::canonicalize($themePath);
+        $destination = Path::canonicalize($themePath.'/'.$relativePath);
+
+        if ($destination !== $themeRoot && !Path::isBasePath($themeRoot, $destination)) {
+            throw new \Exception($this->translator->trans('mautic.core.update.error_extracting_package'));
+        }
+
+        return $destination;
+    }
+
+    /**
+     * @param string[] $zipEntries
+     * @param string[] $requiredFiles
+     */
+    private function getThemeArchivePrefix(array $zipEntries, array $requiredFiles): ?string
+    {
+        $prefixes = [];
+
+        foreach ($zipEntries as $entry) {
+            if (str_ends_with($entry, '/')) {
+                continue;
+            }
+
+            $parts = explode('/', $entry, 2);
+            if (2 !== count($parts)) {
+                return null;
+            }
+
+            $prefixes[$parts[0]] = true;
+        }
+
+        if (1 !== count($prefixes)) {
+            return null;
+        }
+
+        $prefix = array_key_first($prefixes);
+        if (null === $prefix) {
+            return null;
+        }
+
+        foreach ($requiredFiles as $requiredFile) {
+            if (!in_array($prefix.'/'.$requiredFile, $zipEntries, true)) {
+                return null;
+            }
+        }
+
+        return $prefix;
     }
 
     /**
@@ -679,7 +838,7 @@ class ThemeHelper implements ThemeHelperInterface
      */
     public function toggleVisibility(string $themeName): void
     {
-        if (!in_array($themeName, $this->getDefaultThemes(), true)) {
+        if (!in_array($themeName, $this->defaultThemes, true)) {
             return;
         }
 
@@ -731,7 +890,7 @@ class ThemeHelper implements ThemeHelperInterface
         if (false !== $keyToRemove) {
             unset($hiddenThemes[$keyToRemove]);
 
-            if (empty($hiddenThemes)) {
+            if ([] === $hiddenThemes) {
                 $this->filesystem->remove($hidden);
             } else {
                 $this->filesystem->dumpFile($hidden, sprintf('|%s', implode('|', $hiddenThemes)));

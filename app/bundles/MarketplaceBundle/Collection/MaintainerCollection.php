@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Collection;
 use Mautic\MarketplaceBundle\DTO\Maintainer;
 use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 
-class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
+final class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
 {
     /**
      * @var Maintainer[]

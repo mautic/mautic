@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Helper\AuthIntegrationsHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuthController extends CommonController
+final class AuthController extends CommonController
 {
     public function callbackAction(AuthIntegrationsHelper $authIntegrationsHelper, string $integration, Request $request): Response
     {

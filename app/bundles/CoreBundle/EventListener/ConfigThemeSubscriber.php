@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -7,7 +9,7 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\Form\Type\ConfigThemeType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigThemeSubscriber implements EventSubscriberInterface
+final class ConfigThemeSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

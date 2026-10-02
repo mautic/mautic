@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class ClearbitController extends FormController
+final class ClearbitController extends FormController
 {
     private CompanyModel $companyModel;
 
@@ -32,8 +32,6 @@ class ClearbitController extends FormController
 
     /**
      * @param string $objectId
-     *
-     * @return JsonResponse
      *
      * @throws \InvalidArgumentException
      */
@@ -125,8 +123,6 @@ class ClearbitController extends FormController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @throws \InvalidArgumentException
      */
     public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
@@ -281,8 +277,6 @@ class ClearbitController extends FormController
     /**
      * @param string $objectId
      *
-     * @return JsonResponse
-     *
      * @throws \InvalidArgumentException
      */
     public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
@@ -372,8 +366,6 @@ class ClearbitController extends FormController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @throws \InvalidArgumentException
      */
     public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response

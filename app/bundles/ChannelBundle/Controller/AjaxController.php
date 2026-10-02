@@ -9,15 +9,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
     private MessageQueueModel $messageQueueModel;
 
     #[Required]
-    public function autowireChannelAjaxController(MessageQueueModel $messageQueueModel): void
-    {
+    public function autowireChannelAjaxController(
+        MessageQueueModel $messageQueueModel,
+    ): void {
         $this->messageQueueModel = $messageQueueModel;
     }
 

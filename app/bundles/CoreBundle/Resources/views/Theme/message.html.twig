@@ -1389,6 +1389,7 @@ input[type=radio][disabled] {
 .as-center {align-self: center;}
 </style>
 <div class="container min-h-100vh jc-center">
+    {% block message_content %}
 
     {% if 'form' in message %}
     <!-- Default preference center -->
@@ -1419,6 +1420,8 @@ input[type=radio][disabled] {
         </div>
     </div>
     {% endif %}
+
+    {% endblock %}
 
 </div>
 {% endblock %}

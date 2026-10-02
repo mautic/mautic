@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class PublicController extends FormController
+final class PublicController extends FormController
 {
     private CompanyModel $companyModel;
 
@@ -172,7 +172,7 @@ class PublicController extends FormController
                 $this->leadModel->setFieldValues($lead, $data);
                 $this->leadModel->saveEntity($lead);
 
-                if ($notify && (!isset($lead->imported) || !$lead->imported)) {
+                if ($notify && (!$lead->imported)) {
                     if ($user = $this->userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),

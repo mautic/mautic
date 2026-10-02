@@ -6,10 +6,12 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
+use Mautic\AssetBundle\Tests\RemoteFileServerTrait;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
@@ -17,10 +19,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
     use ControllerTrait;
+    use RemoteFileServerTrait;
 
     private const SALES_USER = 'sales';
 
@@ -37,7 +41,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
             $this->configParams['allowed_remote_domains']  = [
                 'first-allowed.tld',
                 'second-allowed.tld',
-                'fastly.picsum.photos',
+                '127.0.0.1',
             ];
         }
 
@@ -47,7 +51,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     public function testCreateAndEditRemoteImageAssetWithQueryString(): void
     {
         $title   = 'Remote image asset with query string';
-        $fileUrl = 'https://fastly.picsum.photos/id/13/2500/1667.jpg?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s';
+        $fileUrl = $this->serveRemoteFile('image.jpg').'?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s';
 
         $crawlerCreate = $this->client->request('GET', '/s/assets/new');
         $createForm    = $crawlerCreate->selectButton('Save')->form();
@@ -59,7 +63,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $crawlerAfterSubmit = $this->client->submit($createForm);
         $this->assertResponseIsSuccessful();
-        $this->assertCount(0, $crawlerAfterSubmit->filter('div.has-error'), 'Expected no validation errors for valid remote image URL with query string');
+        $createErrors = $crawlerAfterSubmit->filter('div.has-error')->each(static fn ($node): string => trim($node->text()));
+        $this->assertCount(0, $createErrors, 'Expected no validation errors for valid remote image URL with query string, got: '.implode(' | ', $createErrors));
 
         $asset = $this->em->getRepository(Asset::class)->findOneBy(['title' => $title]);
         $this->assertInstanceOf(Asset::class, $asset, 'Asset should be created successfully');
@@ -69,7 +74,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $crawlerAfterEdit = $this->client->submit($editForm);
         $this->assertResponseIsSuccessful();
-        $this->assertCount(0, $crawlerAfterEdit->filter('div.has-error'), 'Expected no validation errors when re-saving edited remote asset URL with query string');
+        $editErrors = $crawlerAfterEdit->filter('div.has-error')->each(static fn ($node): string => trim($node->text()));
+        $this->assertCount(0, $editErrors, 'Expected no validation errors when re-saving edited remote asset URL with query string, got: '.implode(' | ', $editErrors));
 
         $this->em->clear();
         $editedAsset = $this->em->find(Asset::class, $asset->getId());
@@ -327,7 +333,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $container = $this->getContainer();
 
         // Get CSRF token
-        $csrfToken = $container->get('security.csrf.token_manager')->getToken('mautic_ajax_post')->getValue();
+        $csrfToken = $container->get(CsrfTokenManagerInterface::class)->getToken('mautic_ajax_post')->getValue();
 
         // Create a temporary file
         $tempFile = tempnam(sys_get_temp_dir(), 'test_');
@@ -396,7 +402,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     private function setPermission(User $user, array $permissions): void
     {
         $role = $user->getRole();
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\Role::class, $role);
+        $this->assertInstanceOf(Role::class, $role);
 
         // Delete previous permissions
         $this->em->createQueryBuilder()
@@ -410,7 +416,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         /** @var RoleModel $roleModel */
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel = self::getContainer()->get(RoleModel::class);
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);

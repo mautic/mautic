@@ -70,7 +70,8 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
             $this->reportHelper,
             $this->createStub(CoreParametersHelper::class),
             $this->createStub(TranslatorInterface::class),
-            $this->createStub(DncReportService::class)
+            $this->createStub(DncReportService::class),
+            $this->formRepository
         );
     }
 
@@ -185,10 +186,6 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
         $form = new Form();
         $form->addField('email', $field);
         $field->setForm($form);
-
-        $this->formModel->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->formRepository);
 
         $this->formModel->expects($this->once())
             ->method('getCustomComponents')

@@ -60,7 +60,7 @@ final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCa
         $this->em->flush();
 
         /** @var LeadModel $leadModel */
-        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $this->assertTrue($leadModel->addToCompany($contact, $company));
         $this->assertTrue($leadModel->addToCompany($contact, $company2));
 

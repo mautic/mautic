@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper;
 
-class Category
+final class Category
 {
     /**
      * @param string $category

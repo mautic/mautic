@@ -8,13 +8,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     private ReportModel $reportModel;
 
     #[Required]
-    public function autowireReportAjaxController(ReportModel $reportModel): void
-    {
+    public function autowireReportAjaxController(
+        ReportModel $reportModel,
+    ): void {
         $this->reportModel = $reportModel;
     }
 

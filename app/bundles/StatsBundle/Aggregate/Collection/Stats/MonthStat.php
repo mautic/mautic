@@ -2,7 +2,7 @@
 
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
-class MonthStat implements StatInterface
+final class MonthStat implements StatInterface
 {
     /**
      * @var DayStat[]
@@ -43,10 +43,7 @@ class MonthStat implements StatInterface
         return $this->stats;
     }
 
-    /**
-     * @return int
-     */
-    public function getSum(): int|float
+    public function getSum(): int
     {
         $sum = 0;
         foreach ($this->stats as $stat) {

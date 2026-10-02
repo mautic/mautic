@@ -7,7 +7,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<array<string>|string|null, string>
  */
-class ArrayStringTransformer implements DataTransformerInterface
+final class ArrayStringTransformer implements DataTransformerInterface
 {
     /**
      * @param array<string>|string|null $array

@@ -8,7 +8,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Twig\TwigTest;
 
-class ObjectExtension extends AbstractExtension
+final class ObjectExtension extends AbstractExtension
 {
     public function getFunctions(): array
     {

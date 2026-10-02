@@ -8,11 +8,11 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriber implements EventSubscriberInterface
+final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly HitRepository $hitRepository,
-        private readonly TranslatorInterface $translator,
+        private HitRepository $hitRepository,
+        private TranslatorInterface $translator,
     ) {
     }
 
