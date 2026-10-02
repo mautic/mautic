@@ -11,7 +11,6 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event as Events;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
@@ -28,8 +27,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class DynamicContentSubscriber implements EventSubscriberInterface
 {
-    use MatchFilterForLeadTrait;
-
     public function __construct(
         private TrackableModel $trackableModel,
         private PageTokenHelper $pageTokenHelper,

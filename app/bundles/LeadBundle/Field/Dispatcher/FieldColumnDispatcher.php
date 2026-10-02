@@ -44,14 +44,15 @@ class FieldColumnDispatcher
      */
     public function dispatchPreUpdateColumnEvent(LeadField $leadField): void
     {
-        $action = LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN;
+        $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
+        $action                    = LeadEvents::LEAD_FIELD_PRE_UPDATE_COLUMN;
 
-        if (!$this->dispatcher->hasListeners($action)) {
+        // Act in the same way as the dispatchPreAddColumnEvent: dispatch listeners and throw an exception if in processed in background.
+        if (!$shouldProcessInBackground && !$this->dispatcher->hasListeners($action)) {
             throw new NoListenerException('There is no Listener for this event');
         }
 
-        $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
-        $event                     = new UpdateColumnEvent($leadField, $shouldProcessInBackground);
+        $event = new UpdateColumnEvent($leadField, $shouldProcessInBackground);
 
         $this->dispatcher->dispatch($event, $action);
 
@@ -66,13 +67,13 @@ class FieldColumnDispatcher
      */
     public function dispatchPreDeleteColumnEvent(LeadField $leadField): void
     {
-        $action = LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN;
+        $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
+        $action                    = LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN;
 
-        if (!$this->dispatcher->hasListeners($action)) {
+        // Act in the same way as the dispatchPreAddColumnEvent: dispatch listeners and throw an exception if in processed in background.
+        if (!$shouldProcessInBackground && !$this->dispatcher->hasListeners($action)) {
             throw new NoListenerException('There is no Listener for this event');
         }
-
-        $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
 
         $event = new DeleteColumnEvent($leadField, $shouldProcessInBackground);
 
