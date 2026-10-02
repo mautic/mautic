@@ -6,7 +6,6 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
@@ -716,10 +715,8 @@ class FieldModel extends FormModel
 
     /**
      * Returns list of all segments that use $field.
-     *
-     * @return Paginator
      */
-    public function getFieldSegments(LeadField $field): iterable
+    public function getFieldSegments(LeadField $field): \Countable
     {
         return $this->leadListModel->getFieldSegments($field);
     }
@@ -780,11 +777,9 @@ class FieldModel extends FormModel
     /**
      * Get list of custom field values for autopopulate fields.
      *
-     * @param string $type
-     * @param string $filter
      * @param int    $limit
      */
-    public function getLookupResults($type, $filter = '', $limit = 10): array
+    public function getLookupResults(string $type, string $filter = '', $limit = 10): array
     {
         return $this->leadRepository->getValueList($type, $filter, $limit);
     }

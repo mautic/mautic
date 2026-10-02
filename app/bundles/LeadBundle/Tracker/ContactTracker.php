@@ -154,7 +154,7 @@ final class ContactTracker
         return $this->contactTrackingService->getTrackedIdentifier();
     }
 
-    public function setUseSystemContact(?bool $useSystemContact): void
+    public function setUseSystemContact(bool $useSystemContact): void
     {
         $this->useSystemContact = $useSystemContact;
     }
