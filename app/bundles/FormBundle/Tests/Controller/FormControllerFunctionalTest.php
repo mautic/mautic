@@ -58,7 +58,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $legacyForm = $this->em->find(Form::class, $form->getId());
         $this->assertInstanceOf(Form::class, $legacyForm);
-        $this->assertNotEmpty($legacyForm->getLanguage());
+        $this->assertNull($legacyForm->getLanguage());
 
         $this->client->request('GET', '/s/forms');
 

@@ -113,7 +113,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     public function getEntity($id = null): ?Form
     {
         if (null === $id) {
-            return new Form();
+            $entity = new Form();
+            $entity->setLanguage($this->coreParametersHelper->get('locale'));
+
+            return $entity;
         }
 
         $entity = parent::getEntity($id);
@@ -322,6 +325,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     public function saveEntity($entity, $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
+
+        if (!$entity->getLanguage()) {
+            $entity->setLanguage($this->coreParametersHelper->get('locale'));
+        }
 
         if ($isNew && !$entity->getAlias()) {
             $alias = $this->cleanAlias($entity->getName(), '', 10);

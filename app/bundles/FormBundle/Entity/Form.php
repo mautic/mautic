@@ -201,6 +201,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     public function __clone()
     {
         $this->id = null;
+        $this->clearTranslations();
 
         parent::__clone();
     }
@@ -625,36 +626,6 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
             ),
             fn (array $elem): bool => isset($elem['mappedObject']) && isset($elem['mappedField']),
         );
-    }
-
-    public function setLanguage(?string $language): self
-    {
-        if (null === $language || '' === $language) {
-            $language = $this->getDefaultLanguage();
-        }
-        $this->isChanged('language', $language);
-        $this->language = $language;
-
-        return $this;
-    }
-
-    public function getLanguage(): ?string
-    {
-        return $this->language ?: $this->getDefaultLanguage();
-    }
-
-    private function getDefaultLanguage(): string
-    {
-        $language = 'en';
-
-        if (function_exists('locale_get_default')) {
-            $defaultLocale = \locale_get_default();
-            if ($defaultLocale) {
-                $language = $defaultLocale;
-            }
-        }
-
-        return $language;
     }
 
     /**
