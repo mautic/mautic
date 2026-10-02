@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\SmsEvents;
@@ -25,7 +26,7 @@ final class OwnerSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private readonly TranslatorInterface $translator,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 

@@ -19,7 +19,7 @@ final class UploadController extends DropzoneController
         $response = new EmptyResponse();
         $files    = $this->getFiles($request->files);
 
-        if (!empty($files)) {
+        if ([] !== $files) {
             foreach ($files as $file) {
                 try {
                     $this->handleUpload($file, $response, $request);

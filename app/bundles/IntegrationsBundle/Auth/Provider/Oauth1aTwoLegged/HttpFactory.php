@@ -16,7 +16,7 @@ use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 /**
  * Factory for building HTTP clients that will sign the requests with Oauth1a headers.
  */
-class HttpFactory implements AuthProviderInterface
+final class HttpFactory implements AuthProviderInterface
 {
     public const NAME = 'oauth1a_two_legged';
 

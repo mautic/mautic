@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
  * Custom console output to prefix all messages with the current datetime
  * Heavily inspired by https://github.com/8p/AssistBundle.
  */
-class ConsoleDatetimeOutput extends ConsoleOutput implements ConsoleOutputInterface
+final class ConsoleDatetimeOutput extends ConsoleOutput implements ConsoleOutputInterface
 {
     /**
      * Prefix message with current datetime.

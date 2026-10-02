@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Event;
 
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,6 +38,11 @@ final class ChannelBroadcastEvent extends Event
      */
     private int $batch = 50;
 
+    /**
+     * If this is the A/B Test winner.
+     */
+    private bool $abTestWinner = false;
+
     private ?int $maxThreads = null;
 
     private ?int $threadId = null;
@@ -49,7 +56,7 @@ final class ChannelBroadcastEvent extends Event
          * Specific ID of a specific channel.
          */
         private readonly string|int|null $id,
-        private readonly OutputInterface $output,
+        private readonly ?OutputInterface $output = null,
     ) {
     }
 
@@ -91,7 +98,7 @@ final class ChannelBroadcastEvent extends Event
         return true;
     }
 
-    public function getOutput(): OutputInterface
+    public function getOutput(): ?OutputInterface
     {
         return $this->output;
     }
@@ -166,5 +173,15 @@ final class ChannelBroadcastEvent extends Event
     public function setThreadId(?int $threadId): void
     {
         $this->threadId = $threadId;
+    }
+
+    public function isAbTestWinner(): bool
+    {
+        return $this->abTestWinner;
+    }
+
+    public function setAbTestWinner(bool $abTestWinner): void
+    {
+        $this->abTestWinner = $abTestWinner;
     }
 }

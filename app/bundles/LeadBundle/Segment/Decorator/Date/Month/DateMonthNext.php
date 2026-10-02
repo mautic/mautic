@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Month;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-class DateMonthNext extends DateMonthAbstract
+final class DateMonthNext extends DateMonthAbstract
 {
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper): void
     {

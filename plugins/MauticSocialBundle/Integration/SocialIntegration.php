@@ -2,26 +2,12 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Mautic\PluginBundle\Model\IntegrationEntityModel;
-use Monolog\Logger;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class SocialIntegration extends AbstractIntegration
@@ -33,43 +19,13 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     protected TranslatorInterface $translator;
 
-    public function __construct(
-        EventDispatcherInterface $eventDispatcher,
-        CacheStorageHelper $cacheStorageHelper,
-        EntityManagerInterface $entityManager,
-        RequestStack $requestStack,
-        RouterInterface $router,
-        Translator $translator,
-        Logger $logger,
-        EncryptionHelper $encryptionHelper,
-        LeadModel $leadModel,
-        CompanyModel $companyModel,
-        PathsHelper $pathsHelper,
-        NotificationModel $notificationModel,
-        FieldModel $fieldModel,
-        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        IntegrationEntityModel $integrationEntityModel,
-        DoNotContact $doNotContact,
-        protected IntegrationHelper $integrationHelper,
-    ) {
-        parent::__construct(
-            $eventDispatcher,
-            $cacheStorageHelper,
-            $entityManager,
-            $requestStack,
-            $router,
-            $translator,
-            $logger,
-            $encryptionHelper,
-            $leadModel,
-            $companyModel,
-            $pathsHelper,
-            $notificationModel,
-            $fieldModel,
-            $integrationEntityModel,
-            $doNotContact,
-            $fieldsWithUniqueIdentifier
-        );
+    protected IntegrationHelper $integrationHelper;
+
+    #[Required]
+    public function autowireSocialIntegration(
+        IntegrationHelper $integrationHelper,
+    ): void {
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**
@@ -104,7 +60,7 @@ abstract class SocialIntegration extends AbstractIntegration
         if (empty($fields)) {
             $s         = $this->getName();
             $available = $this->getAvailableLeadFields($settings);
-            if (empty($available)) {
+            if ([] === $available) {
                 return [];
             }
             // create social profile fields

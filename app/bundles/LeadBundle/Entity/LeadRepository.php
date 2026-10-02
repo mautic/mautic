@@ -167,7 +167,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
              * @see https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/query-builder.html#line-number-0a267d5a2c69797a7656aae33fcc140d16b0a566-72
              */
             $valueParams = [];
-            for ($i = 0; $i < count($value); ++$i) {
+            $counter = count($value);
+            for ($i = 0; $i < $counter; ++$i) {
                 $valueParams[':'.$this->generateRandomParameterName()] = $value[$i];
             }
 
@@ -866,7 +867,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 // logic. In query, Sum(manually_removed) should be less than the current)
                 $pluck    = count($imploder);
-                $imploder = (string) implode(',', $imploder);
+                $imploder = implode(',', $imploder);
 
                 $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $sq->select('duplicate.lead_id')
@@ -1050,7 +1051,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.form',
         ];
 
-        if (!empty($this->availableSearchFields)) {
+        if ([] !== $this->availableSearchFields) {
             $commands = array_merge($commands, $this->availableSearchFields);
         }
 
@@ -1140,7 +1141,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function isContactInOneOfStages(Lead $lead, array $stages = []): bool
     {
-        if (empty($stages)) {
+        if ([] === $stages) {
             return false;
         }
 
@@ -1214,7 +1215,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getContactCollection(array $ids): ArrayCollection
     {
-        if (empty($ids)) {
+        if ([] === $ids) {
             return new ArrayCollection();
         }
 

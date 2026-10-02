@@ -19,7 +19,7 @@ final class TweetControllerTest extends MauticMysqlTestCase
         parent::setUp();
 
         /** @var TweetModel $tweetsModel */
-        $tweetsModel      = static::getContainer()->get(TweetModel::class);
+        $tweetsModel      = self::getContainer()->get(TweetModel::class);
         $this->tweetsRepo = $tweetsModel->getRepository();
 
         $tweet = new Tweet();

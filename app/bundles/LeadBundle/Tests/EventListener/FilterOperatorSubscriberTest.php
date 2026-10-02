@@ -491,18 +491,18 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object'    => 'lead',
                 'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']
         );
     }
 
-    public function testOnlyCustomFieldsAreLoadedForNonSegmentRoutes(): void
+    public function testFieldsAreLoadedForNonSegmentRoutes(): void
     {
         $request = new Request();
         $request->attributes->set('_route', 'mautic_dynamicContent_action');
@@ -795,11 +795,11 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object'    => 'lead',
                 'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']

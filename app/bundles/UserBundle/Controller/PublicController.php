@@ -4,6 +4,7 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
 use Mautic\UserBundle\Form\Type\PasswordResetType;
 use Mautic\UserBundle\Form\Type\UserInviteRegistrationType;
@@ -13,19 +14,18 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends FormController
 {
-    private \Mautic\UserBundle\Entity\UserRepository $userRepository;
+    private UserRepository $userRepository;
 
     private UserModel $userModel;
 
     #[Required]
     public function autowirePublicController(
         UserModel $userModel,
-        \Mautic\UserBundle\Entity\UserRepository $userRepository,
+        UserRepository $userRepository,
     ): void {
         $this->userModel = $userModel;
         $this->userRepository = $userRepository;
@@ -86,7 +86,7 @@ final class PublicController extends FormController
         ]);
     }
 
-    public function passwordResetConfirmAction(Request $request, UserPasswordHasherInterface $hasher): RedirectResponse|Response
+    public function passwordResetConfirmAction(Request $request): RedirectResponse|Response
     {
         $action   = $this->generateUrl('mautic_user_passwordresetconfirm');
         $form     = $this->formFactory->create(PasswordResetConfirmType::class, [], ['action' => $action]);
@@ -101,7 +101,7 @@ final class PublicController extends FormController
         if ('POST' === $request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
                 $data     = $form->getData();
-                $response = $this->handlePasswordResetConfirm($request, $this->userModel, $hasher, $data);
+                $response = $this->handlePasswordResetConfirm($request, $data);
             }
         }
 
@@ -111,7 +111,7 @@ final class PublicController extends FormController
     /**
      * @param array<string, mixed> $data
      */
-    private function handlePasswordResetConfirm(Request $request, UserModel $model, UserPasswordHasherInterface $hasher, array $data): ?Response
+    private function handlePasswordResetConfirm(Request $request, array $data): ?Response
     {
         $response = null;
         $user     = $this->userRepository->findByIdentifier($data['identifier']);
@@ -124,10 +124,10 @@ final class PublicController extends FormController
             $this->addFlashMessage('mautic.user.user.notice.passwordreset.missingtoken');
 
             $response = $this->redirectToRoute('mautic_user_passwordresetconfirm');
-        } elseif ($model->confirmResetToken($user, $request->getSession()->get('resetToken'))) {
-            $encodedPassword = $model->checkNewPassword($user, $hasher, $data['plainPassword']);
+        } elseif ($this->userModel->confirmResetToken($user, $request->getSession()->get('resetToken'))) {
+            $encodedPassword = $this->userModel->checkNewPassword($user, $data['plainPassword']);
             $user->setPassword($encodedPassword);
-            $model->saveEntity($user);
+            $this->userModel->saveEntity($user);
 
             $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
             $request->getSession()->remove('resetToken');
@@ -151,7 +151,7 @@ final class PublicController extends FormController
         ]);
     }
 
-    public function inviteAction(Request $request, UserPasswordHasherInterface $hasher, UserModel $model, LoggerInterface $logger): RedirectResponse|Response
+    public function inviteAction(Request $request, UserModel $model, LoggerInterface $logger): RedirectResponse|Response
     {
         $token    = $request->attributes->getString('token');
         $invite   = $model->getInvite($token);
@@ -188,7 +188,7 @@ final class PublicController extends FormController
                         $formUser          = $request->request->all()['user_invite_registration'] ?? [];
                         $submittedPassword = $formUser['plainPassword']['password'] ?? null;
 
-                        $user->setPassword($model->checkNewPassword($user, $hasher, $submittedPassword));
+                        $user->setPassword($model->checkNewPassword($user, $submittedPassword));
                         $model->markInviteUsed($invite);
                         $model->saveEntity($user);
                         $this->addFlashMessage('mautic.user.invite.account_created', [], 'notice', 'flashes');

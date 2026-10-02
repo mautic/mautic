@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,7 +22,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Tweet>
  */
-class TweetApiController extends CommonApiController
+final class TweetApiController extends CommonApiController
 {
     /**
      * @var TweetModel|null

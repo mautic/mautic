@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use IP2Location\Database;
 
-class IP2LocationBinLookup extends AbstractLocalDataLookup
+final class IP2LocationBinLookup extends AbstractLocalDataLookup
 {
     public function getAttribution(): string
     {

@@ -14,12 +14,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\Oauth2Authenticator
+final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\Oauth2Authenticator
 {
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): bool
     {
         // needed until the oAuth2 library will not be updated to 4.0.5
         return null !== $this->serverService->getBearerToken($request);
@@ -30,7 +29,7 @@ class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\
      * token user's identifier when one is available instead of always using the
      * OAuth client identifier.
      */
-    public function authenticate(Request $request): Passport
+    public function authenticate(Request $request): SelfValidatingPassport
     {
         try {
             $tokenString = $this->serverService->getBearerToken($request);

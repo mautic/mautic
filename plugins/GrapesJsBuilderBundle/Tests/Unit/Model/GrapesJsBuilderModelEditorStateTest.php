@@ -149,9 +149,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         ?GrapesJsBuilderRepository $grapesJsBuilderRepository = null,
         ?EmailRepository $emailRepository = null,
     ): GrapesJsBuilderModel {
-        return new GrapesJsBuilderModel(
-            $requestStack,
-            $emailModel,
+        $grapesJsBuilderModel = new GrapesJsBuilderModel(
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
@@ -160,8 +158,14 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $grapesJsBuilderRepository ?? $this->createStub(GrapesJsBuilderRepository::class), // $grapesJsBuilderRepository
-            $emailRepository ?? $this->createStub(EmailRepository::class), // $emailRepository
         );
+        $grapesJsBuilderModel->autowireGrapesJsBuilderModel(
+            $requestStack,
+            $emailModel,
+            $grapesJsBuilderRepository ?? $this->createStub(GrapesJsBuilderRepository::class),
+            $emailRepository ?? $this->createStub(EmailRepository::class),
+        );
+
+        return $grapesJsBuilderModel;
     }
 }

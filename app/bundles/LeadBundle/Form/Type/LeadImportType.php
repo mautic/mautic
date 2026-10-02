@@ -30,10 +30,8 @@ final class LeadImportType extends AbstractType
                 'constraints' => [
                     new File(mimeTypes: ['text/*', 'application/octet-stream', 'application/csv'], mimeTypesMessage: 'mautic.core.invalid_file_type'),
                     new EncodingValidation(
-                        [
-                            'encodingFormat'        => ['UTF-8'],
-                            'encodingFormatMessage' => 'mautic.core.invalid_file_encoding',
-                        ]
+                        encodingFormatMessage: 'mautic.core.invalid_file_encoding',
+                        encodingFormat: ['UTF-8'],
                     ),
                     new NotBlank(
                         message: 'mautic.import.file.required'

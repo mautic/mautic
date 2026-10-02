@@ -6,13 +6,13 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.campaign_time_wait_on_event_false) }}
-                    {{ form_row(form.campaign_republish_behavior) }}
-                    {{ form_row(form.campaign_by_range) }}
+                    {{ formRowIfExists(form, 'campaign_time_wait_on_event_false') }}
+                    {{ formRowIfExists(form, 'campaign_republish_behavior') }}
+                    {{ formRowIfExists(form, 'campaign_by_range') }}
                 </div>
                 <div class="col-md-6">
-                    {{ form_row(form.campaign_use_summary) }}
-                    {{ form_row(form.campaign_email_stats_enabled) }}
+                    {{ formRowIfExists(form, 'campaign_use_summary') }}
+                    {{ formRowIfExists(form, 'campaign_email_stats_enabled') }}
                 </div>
             </div>
         </div>
@@ -26,15 +26,15 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.peak_interaction_timer_best_default_hour_start) }}
-                    {{ form_row(form.peak_interaction_timer_best_default_hour_end) }}
-                    {{ form_row(form.peak_interaction_timer_best_default_days) }}
+                    {{ formRowIfExists(form, 'peak_interaction_timer_best_default_hour_start') }}
+                    {{ formRowIfExists(form, 'peak_interaction_timer_best_default_hour_end') }}
+                    {{ formRowIfExists(form, 'peak_interaction_timer_best_default_days') }}
                 </div>
                 <hr>
                 <div class="col-xs-12">
-                    {{ form_row(form.peak_interaction_timer_cache_timeout) }}
-                    {{ form_row(form.peak_interaction_timer_fetch_interactions_from) }}
-                    {{ form_row(form.peak_interaction_timer_fetch_limit) }}
+                    {{ formRowIfExists(form, 'peak_interaction_timer_cache_timeout') }}
+                    {{ formRowIfExists(form, 'peak_interaction_timer_fetch_interactions_from') }}
+                    {{ formRowIfExists(form, 'peak_interaction_timer_fetch_limit') }}
                 </div>
             </div>
         </div>

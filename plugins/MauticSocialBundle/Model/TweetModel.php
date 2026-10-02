@@ -23,7 +23,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @implements AjaxLookupModelInterface<Tweet>
  */
-class TweetModel extends FormModel implements AjaxLookupModelInterface
+final class TweetModel extends FormModel implements AjaxLookupModelInterface
 {
     private TweetStatRepository $tweetStatRepository;
 

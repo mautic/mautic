@@ -7,10 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class CustomButtonEvent extends AbstractCustomRequestEvent
 {
-    /**
-     * @var array
-     */
-    private $buttons = [];
+    private array $buttons = [];
 
     public function __construct(
         private $location,
@@ -33,10 +30,7 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this->location;
     }
 
-    /**
-     * @return array
-     */
-    public function getButtons()
+    public function getButtons(): array
     {
         return $this->buttons;
     }

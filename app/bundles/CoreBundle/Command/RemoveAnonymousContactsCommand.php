@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: self::COMMAND_NAME,
     description: 'Delete all anonymous contacts from segment, campaign and campaign event logs.'
 )]
-class RemoveAnonymousContactsCommand extends Command
+final class RemoveAnonymousContactsCommand extends Command
 {
     /**
      * @var string

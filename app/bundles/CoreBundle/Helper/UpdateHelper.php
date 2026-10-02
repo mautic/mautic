@@ -178,7 +178,7 @@ class UpdateHelper
             $checkResults[] = new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('mautic.core.update.check.error.release_data')]);
         }
 
-        if (!empty($checkResults)) {
+        if ([] !== $checkResults) {
             return $checkResults;
         }
 

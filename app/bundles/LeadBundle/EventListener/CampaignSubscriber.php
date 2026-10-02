@@ -10,10 +10,14 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Form\Type\AddToCompanyActionType;
@@ -64,9 +68,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly DoNotContact $doNotContact,
         private readonly PointGroupModel $groupModel,
         private readonly FilterOperatorProvider $filterOperatorProvider,
-        private readonly \Mautic\LeadBundle\Entity\LeadListRepository $leadListRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
-        private readonly \Mautic\LeadBundle\Entity\LeadFieldRepository $leadFieldRepository,
+        private readonly LeadListRepository $leadListRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
     ) {
     }
 
@@ -651,7 +655,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
                     if (!empty($url)) {
                         $pageUrl = html_entity_decode($pageHitUrl);
-                        if (fnmatch($url, $pageUrl)) {
+                        if (UrlMatcher::hasMatch([$url], $pageUrl)) {
                             if ($hit['dateLeft'] && $totalSpentTime) {
                                 $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -
                                     (new \DateTime($hit['dateHit']->format('Y-m-d H:i')))->getTimestamp();

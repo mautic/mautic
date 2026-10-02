@@ -5,10 +5,10 @@ namespace Mautic\CoreBundle\EventListener;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
-class ConsoleTerminateListener
+final readonly class ConsoleTerminateListener
 {
     public function __construct(
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 

@@ -14,7 +14,9 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -35,8 +37,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
         private readonly TranslatorInterface $translator,
         private readonly MailHashHelper $mailHash,
         private readonly FromEmailHelper $fromEmailHelper,
-        private readonly \Mautic\PageBundle\Entity\TrackableRepository $trackableRepository,
-        private readonly \Mautic\PageBundle\Entity\RedirectRepository $redirectRepository,
+        private readonly TrackableRepository $trackableRepository,
+        private readonly RedirectRepository $redirectRepository,
     ) {
     }
 
@@ -147,7 +149,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
     public function onEmailGenerate(EmailSendEvent $event): void
     {
-        $idHash = $event->getIdHash();
+        $idHash = $event->getIdHash() ?? uniqid(); // Generate a bogus idHash to prevent errors for routes that may include it
         $lead   = $event->getLead();
         /** @var Email|null $email */
         $email  = $event->getEmail();
@@ -161,14 +163,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         // Get email hash
-        $unsubscribeHash = null;
+        $unsubscribeHash = 'unknown';
         if ($toEmail) {
             $unsubscribeHash = $this->mailHash->getEmailHash($toEmail);
-        }
-
-        if (null == $idHash) {
-            // Generate a bogus idHash to prevent errors for routes that may include it
-            $idHash = uniqid();
         }
 
         $unsubscribeText = $this->coreParametersHelper->get('unsubscribe_text');
@@ -176,14 +173,21 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
 
+        if ($this->coreParametersHelper->get('validate_unsubscribe_emails')) {
+            $unsubscribeUrl = $this->emailModel->buildUrl('mautic_email_validate_email_form', ['action' => 'unsubscribe', 'secretHash' => $unsubscribeHash, 'idHash' => $idHash]);
+            $resubscribeUrl = $this->emailModel->buildUrl('mautic_email_validate_email_form', ['action' => 'resubscribe', 'secretHash' => $unsubscribeHash, 'idHash' => $idHash]);
+        } else {
+            $unsubscribeUrl = $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]);
+            $resubscribeUrl = $this->emailModel->buildUrl('mautic_email_resubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]);
+        }
+
         // We will replace tokens in unsubscribe text too
-        $unsubscribeLink = $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]);
         $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
-        $unsubscribeText = str_replace('|URL|', $unsubscribeLink, $unsubscribeText);
+        $unsubscribeText = str_replace('|URL|', $unsubscribeUrl, $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
-        $event->addToken('{unsubscribe_url}', $unsubscribeLink);
+        $event->addToken('{unsubscribe_url}', $unsubscribeUrl);
         $event->addToken('{dnc_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe_all', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
-        $event->addToken('{resubscribe_url}', $this->emailModel->buildUrl('mautic_email_resubscribe', ['idHash' => $idHash]));
+        $event->addToken('{resubscribe_url}', $resubscribeUrl);
 
         $webviewText = $this->coreParametersHelper->get('webview_text');
         if (!$webviewText) {

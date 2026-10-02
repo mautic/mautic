@@ -16,16 +16,16 @@ use Mautic\WebhookBundle\Event\WebhookNotificationEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-class WebhookNotificationSender
+final readonly class WebhookNotificationSender
 {
     public function __construct(
-        private readonly Environment $twig,
-        private readonly NotificationModel $notificationModel,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly MailHelper $mailer,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly UserRepository $userRepository,
-        private readonly EventDispatcherInterface $dispatcher,
+        private Environment $twig,
+        private NotificationModel $notificationModel,
+        private EntityManagerInterface $entityManager,
+        private MailHelper $mailer,
+        private CoreParametersHelper $coreParametersHelper,
+        private UserRepository $userRepository,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

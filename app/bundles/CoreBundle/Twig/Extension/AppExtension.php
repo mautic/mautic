@@ -8,7 +8,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Twig\TwigTest;
 
-class AppExtension extends AbstractExtension
+final class AppExtension extends AbstractExtension
 {
     /**
      * @return TwigFunction[]

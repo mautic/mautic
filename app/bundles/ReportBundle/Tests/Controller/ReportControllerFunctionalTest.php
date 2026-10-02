@@ -118,6 +118,10 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
         $this->assertInstanceOf(Report::class, $report);
 
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        self::assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('a#clone'));
+
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
         self::assertResponseIsSuccessful();
 
@@ -177,7 +181,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
         $report->setColumns($coulmns);
 
-        static::getContainer()->get(ReportModel::class)->saveEntity($report);
+        self::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
@@ -187,7 +191,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = static::getContainer()->get(LeadModel::class);
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         // Create and save contacts
         $payload = [
@@ -269,7 +273,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
                 'function'  => 'AVG',
             ],
         ]);
-        static::getContainer()->get(ReportModel::class)->saveEntity($report);
+        self::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Expected report table values [ID, Company name, MIN Points, Max Points, SUM Points, COUNT Points, AVG Points]
         $expected = [
@@ -447,7 +451,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report->setName('HTML Test');
         $report->setDescription('<b>This is allowed HTML</b>');
         $report->setSource('email');
-        static::getContainer()->get(ReportModel::class)->saveEntity($report);
+        self::getContainer()->get(ReportModel::class)->saveEntity($report);
 
         // Check the details page
         $this->client->request('GET', '/s/reports/'.$report->getId());
@@ -707,7 +711,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $reportModel->method('getFilterList')->willReturn($filterDefinitions);
-        static::getContainer()->set('mautic.report.model.report', $reportModel);
+        self::getContainer()->set('mautic.report.model.report', $reportModel);
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
         self::assertResponseIsSuccessful();

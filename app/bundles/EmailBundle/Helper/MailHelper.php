@@ -98,7 +98,7 @@ class MailHelper
     protected $errors = [];
 
     /**
-     * @var array|Lead
+     * @var array<string, mixed>|null
      */
     protected $lead;
 
@@ -323,11 +323,13 @@ class MailHelper
         if (empty($this->message->getReplyTo()) && !empty($this->getReplyTo())) {
             $this->setMessageReplyTo($this->getReplyTo());
         }
-        // Set system return path if applicable
+        // Sender wins over Return-Path in Symfony's envelope resolution, so drop it whenever a Return-Path is set.
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->returnPath($bounceEmail);
+            $this->message->getHeaders()->remove('Sender');
         } elseif (!empty($this->returnPath)) {
             $this->message->returnPath($this->returnPath);
+            $this->message->getHeaders()->remove('Sender');
         }
 
         $this->dispatchPreSendEvent();
@@ -734,10 +736,8 @@ class MailHelper
      *
      * @param string $template
      * @param bool   $returnContent
-     *
-     * @return void|string
      */
-    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null): ?string
     {
         $content = $this->twig->render($template, $vars);
 
@@ -749,6 +749,8 @@ class MailHelper
 
         $this->setBody($content, 'text/html', $charset);
         unset($content);
+
+        return null;
     }
 
     public function setSubject($subject): void
@@ -1167,7 +1169,7 @@ class MailHelper
     }
 
     /**
-     * @return array|Lead
+     * @return array<string, mixed>|null
      */
     public function getLead()
     {
@@ -1175,7 +1177,7 @@ class MailHelper
     }
 
     /**
-     * @param array|Lead $lead
+     * @param array<string, mixed> $lead
      */
     public function setLead($lead, $interalSend = false): void
     {
@@ -1579,7 +1581,7 @@ class MailHelper
     protected function createAssetDownloadEntries(): void
     {
         // Nothing was sent out so bail
-        if ($this->fatal || empty($this->assetStats)) {
+        if ($this->fatal || [] === $this->assetStats) {
             return;
         }
 
@@ -1591,7 +1593,7 @@ class MailHelper
         }
 
         // Create a download entry if there is an Asset attachment
-        if (!empty($this->assetStats)) {
+        if ([] !== $this->assetStats) {
             foreach ($this->assets as $asset) {
                 foreach ($this->assetStats as $stat) {
                     $this->assetModel->trackDownload(
@@ -1615,7 +1617,7 @@ class MailHelper
      */
     protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null): void
     {
-        if ($this->internalSend || empty($this->assets)) {
+        if ($this->internalSend || [] === $this->assets) {
             return;
         }
 
@@ -1870,7 +1872,7 @@ class MailHelper
         $headers = $this->getCustomHeaders();
 
         // Set custom headers
-        if (!empty($headers)) {
+        if ([] !== $headers) {
             $tokens = $this->getTokens();
             // Replace tokens
             $messageHeaders = $this->message->getHeaders();
@@ -1911,7 +1913,7 @@ class MailHelper
     {
         return [
             'name'        => $name,
-            'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
+            'leadId'      => $this->lead['id'] ?? null,
             'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
             'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
             'hashId'      => $this->idHash,
@@ -2014,7 +2016,7 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend && null !== $emailToSend->getFromAddress()) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
@@ -2041,7 +2043,7 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set and global reply-to is not configured.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend && null !== $emailToSend->getFromAddress()) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
@@ -2094,7 +2096,7 @@ class MailHelper
         $this->skip               = $event->isSkip();
         $this->fatal              = $event->isFatal();
         $errors                   = $event->getErrors();
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $currentErrors = [];
             if (isset($this->errors['failures']) && is_array($this->errors['failures'])) {
                 $currentErrors = $this->errors['failures'];

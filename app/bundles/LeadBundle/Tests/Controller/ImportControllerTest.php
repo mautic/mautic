@@ -447,8 +447,8 @@ final class ImportControllerTest extends MauticMysqlTestCase
     private function addCancellationNotification(?Import $import = null): void
     {
         /** @var NotificationModel $notificationModel */
-        $notificationModel = static::getContainer()->get(NotificationModel::class);
-        $translator        = static::getContainer()->get(TranslatorInterface::class);
+        $notificationModel = self::getContainer()->get(NotificationModel::class);
+        $translator        = self::getContainer()->get(TranslatorInterface::class);
 
         $fileName = basename('/tmp/test.csv');
         $message  = $import && $import->getId()
