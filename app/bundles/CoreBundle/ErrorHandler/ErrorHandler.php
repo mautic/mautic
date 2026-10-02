@@ -15,10 +15,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
     {
         public static $handler;
 
-        /**
-         * @var string
-         */
-        private static $environment;
+        private static ?string $environment = null;
 
         /**
          * @var LoggerInterface
@@ -359,7 +356,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed $mainLogger
+         * @param LoggerInterface $mainLogger
          */
         public function setMainLogger($mainLogger): static
         {

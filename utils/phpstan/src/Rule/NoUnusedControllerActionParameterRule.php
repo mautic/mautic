@@ -34,6 +34,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * unused in one action body is still required to keep the positions aligned.
  *
  * @implements Rule<InClassNode>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoUnusedControllerActionParameterRuleTest
  */
 final readonly class NoUnusedControllerActionParameterRule implements Rule
 {

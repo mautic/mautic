@@ -435,7 +435,7 @@ class CommonController extends AbstractController implements MauticController
     {
         if (method_exists($this, $objectAction.'Action')) {
             return $this->forward(
-                static::class.'::'.$objectAction.'Action',
+                $this::class.'::'.$objectAction.'Action',
                 array_merge(
                     [
                         'objectId'    => $objectId,

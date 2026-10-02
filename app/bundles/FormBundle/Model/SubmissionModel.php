@@ -571,13 +571,11 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param string               $format
-     * @param object               $page
      * @param array<string, mixed> $queryArgs
      *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, array $queryArgs): StreamedResponse|Response
+    public function exportResultsForPage(string $format, object $page, array $queryArgs): StreamedResponse|Response
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
@@ -823,11 +821,10 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of top submission referrers.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      */
-    public function getTopSubmissionReferrers(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmissionReferrers(int $limit = 10, $dateFrom = null, $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -852,11 +849,10 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of the most submisions per lead.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      */
-    public function getTopSubmitters(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmitters(int $limit = 10, $dateFrom = null, $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')

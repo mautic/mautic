@@ -68,7 +68,7 @@ final class PhpUnitConfigCommand extends Command
         return ExitCode::SUCCESS;
     }
 
-    private function isFunctional(\SplFileInfo $file): bool
+    private function isFunctional(\Symfony\Component\Finder\SplFileInfo $file): bool
     {
         if (1 === preg_match('~/Functional/~', $file->getRealPath())) {
             return true;

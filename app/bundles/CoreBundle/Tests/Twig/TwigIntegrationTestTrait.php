@@ -30,7 +30,7 @@ trait TwigIntegrationTestTrait
     protected static function getFixturesDirectory(): string
     {
         // Get the directory of the class that uses this trait
-        $reflection = new \ReflectionClass(static::class);
+        $reflection = new \ReflectionClass(self::class);
 
         return dirname($reflection->getFileName()).'/Fixtures/';
     }
@@ -44,7 +44,7 @@ trait TwigIntegrationTestTrait
     protected static function getIntegrationTestData(): iterable
     {
         // Create a temporary instance of the actual test class
-        $reflection = new \ReflectionClass(static::class);
+        $reflection = new \ReflectionClass(self::class);
         $instance   = $reflection->newInstanceWithoutConstructor();
 
         // Call the parent's getTests method

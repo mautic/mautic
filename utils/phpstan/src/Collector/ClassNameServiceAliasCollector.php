@@ -58,7 +58,7 @@ final class ClassNameServiceAliasCollector implements Collector
         return [$className, $args[1]->value->value, $node->getStartLine()];
     }
 
-    private function matchClassName(Node $aliasValue): ?string
+    private function matchClassName(Node\Expr $aliasValue): ?string
     {
         if (!$aliasValue instanceof ClassConstFetch || !$aliasValue->class instanceof Name) {
             return null;

@@ -581,7 +581,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         return strtolower((string) preg_replace('/[`"\s]+/', '', $column));
     }
 
-    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions): void
+    private function applyFilters(array $filters, TrackingQueryBuilder $queryBuilder, array $filterDefinitions): void
     {
         $expr     = $queryBuilder->expr();
         $orGroups = [];
@@ -639,7 +639,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $columnValue = ":{$paramName}";
                         $expression  = $queryBuilder->expr()->or(
                             $queryBuilder->expr()->isNull($filter['column']),
-                            $queryBuilder->expr()->{$exprFunction}($filter['column'], $columnValue)
+                            $queryBuilder->expr()->neq($filter['column'], $columnValue)
                         );
                         $queryBuilder->setParameter($paramName, $filter['value']);
                         $andGroup[] = $expression;

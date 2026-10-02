@@ -26,6 +26,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * Only the injection entry points are allowed to take a service: "__construct()" and "autowire*()"/#[Required] methods.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoServiceInMethodParameterRuleTest
  */
 final readonly class NoServiceInMethodParameterRule implements Rule
 {

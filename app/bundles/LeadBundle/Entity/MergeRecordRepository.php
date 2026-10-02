@@ -31,8 +31,8 @@ final class MergeRecordRepository extends CommonRepository
     {
         $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'contact_merge_records')
-            ->set('contact_id', (int) $toId)
-            ->where('contact_id = '.(int) $fromId)
+            ->set('contact_id', $toId)
+            ->where('contact_id = '.$fromId)
             ->executeQuery();
     }
 }

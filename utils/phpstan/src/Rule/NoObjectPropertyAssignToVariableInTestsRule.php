@@ -16,6 +16,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * A test must not copy an object property into a local variable, use the property directly instead.
  *
  * @implements Rule<Assign>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoObjectPropertyAssignToVariableInTestsRuleTest
  */
 final class NoObjectPropertyAssignToVariableInTestsRule implements Rule
 {

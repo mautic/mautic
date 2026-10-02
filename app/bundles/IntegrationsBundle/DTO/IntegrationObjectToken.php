@@ -10,27 +10,15 @@ namespace Mautic\IntegrationsBundle\DTO;
  */
 final class IntegrationObjectToken
 {
-    /**
-     * @var string
-     */
-    private $objectName;
+    private ?string $objectName = null;
 
-    /**
-     * @var string
-     */
-    private $integration;
+    private ?string $integration = null;
 
     private string $defaultValue = '';
 
-    /**
-     * @var string
-     */
-    private $linkText;
+    private ?string $linkText = null;
 
-    /**
-     * @var string
-     */
-    private $baseURL;
+    private ?string $baseURL = null;
 
     public function __construct(
         private readonly string $token,

@@ -75,7 +75,7 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param string[] $location
+     * @param array<string, string> $location
      *
      * @throws ORMException
      */

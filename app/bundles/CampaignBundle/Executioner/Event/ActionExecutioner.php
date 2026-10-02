@@ -60,7 +60,7 @@ final readonly class ActionExecutioner implements EventInterface
     }
 
     /**
-     * @param Collection<LeadEventLog> $logs
+     * @param Collection<int, LeadEventLog> $logs
      */
     private function lockLogs(Collection $logs): void
     {

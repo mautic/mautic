@@ -176,11 +176,9 @@ final readonly class ExportHelper
     }
 
     /**
-     * @param \Iterator<mixed> $data
-     *
      * @throws SignalCaughtException
      */
-    private function exportAsCsvIntoFile(\Iterator $data, string $fileName): string
+    private function exportAsCsvIntoFile(IteratorExportDataModel $data, string $fileName): string
     {
         $filePath  = $this->getValidContactExportFileName($fileName);
         $handler   = @fopen($filePath, 'ab+');

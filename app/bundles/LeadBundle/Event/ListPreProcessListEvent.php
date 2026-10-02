@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 final class ListPreProcessListEvent extends CommonEvent
 {
-    private $result;
+    private ?bool $result = null;
 
     public function __construct(
         private array $list,

@@ -21,7 +21,7 @@ final class DBALMocker
 
     private ?MockObject $mockQueryBuilder = null;
 
-    private $queryResponse;
+    private ?array $queryResponse = null;
 
     /**
      * @var array<string, mixed[]>
