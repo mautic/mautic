@@ -52,7 +52,7 @@ final class DataExporterHelper
             }
         }
 
-        $model->getRepository()->detachEntities($items);
+        $model->getRepository()->detachEntities(array_filter($items, 'is_object'));
 
         return $toExport;
     }
