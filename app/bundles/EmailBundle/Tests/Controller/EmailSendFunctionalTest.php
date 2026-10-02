@@ -71,23 +71,41 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
             static fn (MauticMessage $a, MauticMessage $b): int => $a->getTo()[0]->toString() <=> $b->getTo()[0]->toString()
         );
 
-        $unsubscribeUrlPattern = '/https?:\/\/[^\/]+\/email\/unsubscribe\/([0-9a-z]{20})/';
-        $resubscribeUrlPattern = '/https?:\/\/[^\/]+\/email\/resubscribe\/([0-9a-z]{20})/';
+        $unsubscribeUrlPattern = '/https?:\/\/[^\/]+\/email\/validate\/unsubscribe\/([a-f0-9]{64})\/([0-9a-z]{20})/';
+        $resubscribeUrlPattern = '/https?:\/\/[^\/]+\/email\/validate\/resubscribe\/([a-f0-9]{64})\/([0-9a-z]{20})/';
 
         // First email:
         $this->assertStringContainsString('contact-flood-0@doe.com', $messages[0]->toString());
         preg_match($unsubscribeUrlPattern, $messages[0]->getHtmlBody(), $unsubscribeMatches1);
         preg_match($resubscribeUrlPattern, $messages[0]->getHtmlBody(), $resubscribeMatches1);
 
-        $this->assertSame(20, strlen($unsubscribeMatches1[1]), $messages[0]->getHtmlBody());
+        $this->assertArrayHasKey(1, $unsubscribeMatches1, $messages[0]->getHtmlBody());
+        $this->assertArrayHasKey(2, $unsubscribeMatches1, $messages[0]->getHtmlBody());
+        $this->assertArrayHasKey(1, $resubscribeMatches1, $messages[0]->getHtmlBody());
+        $this->assertArrayHasKey(2, $resubscribeMatches1, $messages[0]->getHtmlBody());
+        $this->assertSame(64, strlen($unsubscribeMatches1[1]), $messages[0]->getHtmlBody());
+        $this->assertSame(20, strlen($unsubscribeMatches1[2]), $messages[0]->getHtmlBody());
         $this->assertSame($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
+        $this->assertSame($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
+        $this->assertSame($unsubscribeMatches1[2], $resubscribeMatches1[2], $messages[0]->getHtmlBody());
 
         // Second email:
         $this->assertStringContainsString('contact-flood-1@doe.com', $messages[1]->toString());
         preg_match($unsubscribeUrlPattern, $messages[1]->getHtmlBody(), $unsubscribeMatches2);
         preg_match($resubscribeUrlPattern, $messages[1]->getHtmlBody(), $resubscribeMatches2);
 
-        $this->assertSame(20, strlen($unsubscribeMatches2[1]), $messages[1]->getHtmlBody());
+        $this->assertArrayHasKey(1, $unsubscribeMatches2, $messages[1]->getHtmlBody());
+        $this->assertArrayHasKey(2, $unsubscribeMatches2, $messages[1]->getHtmlBody());
+        $this->assertArrayHasKey(1, $resubscribeMatches2, $messages[1]->getHtmlBody());
+        $this->assertArrayHasKey(2, $resubscribeMatches2, $messages[1]->getHtmlBody());
+        $this->assertSame($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
+        $this->assertSame($unsubscribeMatches2[2], $resubscribeMatches2[2], $messages[1]->getHtmlBody());
+
+        // The email stat hashes cannot be the same in different emails:
+        $this->assertNotSame($unsubscribeMatches1[2], $unsubscribeMatches2[2], $messages[0]->getHtmlBody());
+
+        $this->assertSame(64, strlen($unsubscribeMatches2[1]), $messages[1]->getHtmlBody());
+        $this->assertSame(20, strlen($unsubscribeMatches2[2]), $messages[1]->getHtmlBody());
         $this->assertSame($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
 
         // The email stat hashes cannot be the same in different emails:
