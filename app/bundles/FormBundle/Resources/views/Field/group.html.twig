@@ -240,6 +240,17 @@
             'type': type,
             'value': listValue|e,
     }) %}
+    {% if field.type == 'boolean' %}
+      {% if listValue == '1' %}
+        {% set listInputAttributes = listInputAttributes|merge({
+                'class': listInputAttributes.class|default([])|merge(['mauticform-boolean-positive']),
+        }) %}
+      {% elseif listValue == '0' %}
+        {% set listInputAttributes = listInputAttributes|merge({
+                'class': listInputAttributes.class|default([])|merge(['mauticform-boolean-negative']),
+        }) %}
+      {% endif %}
+    {% endif %}
     {% if field.defaultValue is defined and field.defaultValue is not null and field.defaultValue == listValue %}
       {% set listInputAttributes = listInputAttributes|merge({
               'checked': 'checked',

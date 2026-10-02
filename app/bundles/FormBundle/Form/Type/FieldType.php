@@ -144,6 +144,7 @@ final class FieldType extends AbstractType
                 case 'file':
                     $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
+                case 'boolean':
                 case 'rating':
                     $addDefaultValue = false;
                     break;
@@ -690,6 +691,21 @@ final class FieldType extends AbstractType
                         ]
                     );
                     break;
+                case 'boolean':
+                    if (empty($options['data']['id']) && empty($propertiesData)) {
+                        $propertiesData['yes'] = $this->translator->trans('mautic.core.form.yes');
+                        $propertiesData['no']  = $this->translator->trans('mautic.core.form.no');
+                    }
+
+                    $builder->add(
+                        'properties',
+                        FormFieldBooleanType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
                 case 'file':
                     if (!isset($propertiesData['public'])) {
                         $propertiesData['public'] = false;
@@ -733,6 +749,7 @@ final class FieldType extends AbstractType
             'email'         => 'email',
             'country'       => 'country',
             'tel'           => 'phone',
+            'boolean'       => 'boolean',
             'companyLookup' => 'company',
             default         => '',
         };
