@@ -226,6 +226,54 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertNotContains($unrelatedContact->getId(), $companyLeadIds);
     }
 
+    public function testBatchRemoveContactsCountsDuplicateContactOnlyOnce(): void
+    {
+        $contact = $this->createLead('Duplicate', 'Contact', 'duplicate@example.com');
+
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf(
+                '/s/companies/batchRemoveContacts/%d?ids=%s',
+                $this->company1Id,
+                urlencode((string) json_encode([$contact->getId(), $contact->getId()]))
+            )
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertStringContainsString('1 contact removed from company', (string) $response->getContent());
+        $this->assertNotContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsRejectsMoreThanOneThousandIds(): void
+    {
+        $contact = $this->createLead('Limited', 'Contact', 'limited@example.com');
+
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf(
+                '/s/companies/batchRemoveContacts/%d?ids=%s',
+                $this->company1Id,
+                urlencode((string) json_encode(array_fill(0, 1001, $contact->getId())))
+            )
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsReportsMissingCompany(): void
+    {
+        $companyId = 999999999;
+
+        $this->client->request(Request::METHOD_GET, sprintf('/s/companies/batchRemoveContacts/%d', $companyId));
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertStringContainsString('Company not found.', (string) $response->getContent());
+    }
+
     public function testBatchRemoveContactsDeniesUsersWithoutCompanyAccess(): void
     {
         $contact = $this->createLead('Protected', 'Contact', 'protected@example.com');

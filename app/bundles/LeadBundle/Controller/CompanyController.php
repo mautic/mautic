@@ -28,9 +28,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class CompanyController extends FormController
 {
-    private const MAX_BATCH_REMOVE_CONTACTS = 1000;
-
     use LeadDetailsTrait;
+    private const MAX_BATCH_REMOVE_CONTACTS = 1000;
 
     private CompanyRepository $companyRepository;
 
@@ -269,7 +268,7 @@ final class CompanyController extends FormController
             $flashes[] = [
                 'type'    => 'error',
                 'msg'     => 'mautic.company.error.notfound',
-                'msgVars' => ['%id%' => $objectId],
+                'msgVars' => ['%id%' => $companyId],
             ];
         } elseif (!$this->security->hasEntityAccess(
             'lead:leads:viewown',
