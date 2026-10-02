@@ -35,6 +35,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     private const NOT_EXISTS_EXPRESSION = 'NOT EXISTS';
 
+    private const LIST_SEARCH_COMMAND   = 'mautic.lead.lead.searchcommand.list';
+
+    private const SOURCE_SEARCH_COMMAND = 'mautic.lead.lead.searchcommand.source';
+
     private CompanyRepository $companyRepository;
 
     private FrequencyRuleRepository $frequencyRuleRepository;
@@ -76,8 +80,15 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     private ?ListLeadRepository $listLeadRepository = null;
 
-    /** @var array<int> Segment IDs resolved from the current search query's list/segment command */
+    /** @var list<int> Segment IDs resolved from the current search query's list/segment command */
     private array $activeSearchSegmentIds = [];
+
+    /** @var array<string, list<int>> */
+    private array $searchSegmentIdsByAlias = [];
+
+    private bool $searchSegmentContextInitialized = false;
+
+    private bool $combineSegmentAndSourceFilters = false;
 
     /**
      * Used by search functions to search social profiles.
@@ -481,6 +492,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function getEntities(array $args = [])
     {
         $this->activeSearchSegmentIds = [];
+        $this->searchSegmentIdsByAlias = [];
+        $this->searchSegmentContextInitialized = false;
+        $this->combineSegmentAndSourceFilters = false;
 
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',
@@ -721,6 +735,18 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return $this->addStandardCatchAllWhereClause($q, $filter, $columns);
     }
 
+    protected function addAdvancedSearchWhereClause($qb, $filters): array
+    {
+        if (!$this->searchSegmentContextInitialized) {
+            $this->searchSegmentIdsByAlias = $this->getSearchSegmentIdsByAlias($filters);
+            $this->activeSearchSegmentIds = array_values(array_unique(array_merge([], ...array_values($this->searchSegmentIdsByAlias))));
+            $this->combineSegmentAndSourceFilters = $this->canCombineSegmentAndSourceFilters($filters);
+            $this->searchSegmentContextInitialized = true;
+        }
+
+        return parent::addAdvancedSearchWhereClause($qb, $filters);
+    }
+
     /**
      * Adds the command where clause to the QueryBuilder.
      *
@@ -797,10 +823,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $expr            = $q->expr()->{$likeExpr}('l.email', ":{$unique}");
                 $returnParameter = true;
                 break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.list', [], null, 'en_US'):
-                $listIds                      = $this->getListIdsByAlias($string) ?: [0];
-                $this->activeSearchSegmentIds = $listIds;
+            case $this->translator->trans(self::LIST_SEARCH_COMMAND):
+            case $this->translator->trans(self::LIST_SEARCH_COMMAND, [], null, 'en_US'):
+                if ($this->combineSegmentAndSourceFilters) {
+                    break;
+                }
+
+                $listIds = $this->searchSegmentIdsByAlias[$string] ?? $this->getListIdsByAlias($string);
+                $listIds = $listIds ?: [0];
 
                 $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $sq->select('1')
@@ -820,8 +850,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $q->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
                 $q->setParameter($unique, $listIds, ArrayParameterType::INTEGER);
                 break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.source'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.source', [], null, 'en_US'):
+            case $this->translator->trans(self::SOURCE_SEARCH_COMMAND):
+            case $this->translator->trans(self::SOURCE_SEARCH_COMMAND, [], null, 'en_US'):
                 $manuallyAddedValue   = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added');
                 $manuallyAddedValueEn = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added', [], null, 'en_US');
                 $filterAddedValue     = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added');
@@ -839,8 +869,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 // This command is designed to be used together with segment:alias.
                 // Without a segment context it returns no results to prevent unintended broad matches.
-                $activeSegmentIds = $this->getActiveSearchSegmentIds();
-                if (empty($activeSegmentIds)) {
+                $activeSegmentIds = $this->activeSearchSegmentIds;
+                if ([] === $activeSegmentIds) {
                     $expr = $q->expr()->eq(1, 0);
                     break;
                 }
@@ -1074,7 +1104,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.isanonymous',
             'mautic.core.searchcommand.ismine',
             'mautic.lead.lead.searchcommand.isunowned',
-            'mautic.lead.lead.searchcommand.list',
+            self::LIST_SEARCH_COMMAND,
             'mautic.lead.lead.searchcommand.campaign_membership',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
@@ -1098,7 +1128,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.web_sent',
             'mautic.lead.lead.searchcommand.mobile_sent',
             'mautic.lead.lead.searchcommand.dnc',
-            'mautic.lead.lead.searchcommand.source',
+            self::SOURCE_SEARCH_COMMAND,
             'mautic.lead.lead.searchcommand.form',
         ];
 
@@ -1532,18 +1562,134 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * Returns the segment IDs stored from the most recently processed list/segment search command.
-     * Used by the source: command to scope results to the active segment context.
-     *
-     * @return array<int>
+     * @return array<string, list<int>>
      */
-    private function getActiveSearchSegmentIds(): array
+    private function getSearchSegmentIdsByAlias(mixed $filters): array
     {
-        return $this->activeSearchSegmentIds;
+        $segmentIdsByAlias = [];
+        $this->collectSearchSegmentIdsByAlias($filters, $segmentIdsByAlias);
+
+        return $segmentIdsByAlias;
     }
 
     /**
-     * @return array<int>
+     * @param array<string, list<int>> $segmentIdsByAlias
+     */
+    private function collectSearchSegmentIdsByAlias(mixed $filters, array &$segmentIdsByAlias): void
+    {
+        $listCommands = [
+            $this->translator->trans(self::LIST_SEARCH_COMMAND),
+            $this->translator->trans(self::LIST_SEARCH_COMMAND, [], null, 'en_US'),
+        ];
+
+        if ($filters instanceof \stdClass) {
+            if (isset($filters->command, $filters->string) && in_array($filters->command, $listCommands, true)) {
+                $alias = (string) $filters->string;
+                if (!array_key_exists($alias, $segmentIdsByAlias)) {
+                    $segmentIdsByAlias[$alias] = $this->getListIdsByAlias($alias) ?: [0];
+                }
+
+                return;
+            }
+
+            $filters = get_object_vars($filters);
+        }
+
+        if (!is_array($filters)) {
+            return;
+        }
+
+        foreach ($filters as $filter) {
+            $this->collectSearchSegmentIdsByAlias($filter, $segmentIdsByAlias);
+        }
+    }
+
+    private function canCombineSegmentAndSourceFilters(mixed $filters): bool
+    {
+        $filters = $this->getConjunctiveSearchFilters($filters);
+        if (null === $filters) {
+            return false;
+        }
+
+        $listCommands = [
+            $this->translator->trans(self::LIST_SEARCH_COMMAND),
+            $this->translator->trans(self::LIST_SEARCH_COMMAND, [], null, 'en_US'),
+        ];
+        $sourceCommands = [
+            $this->translator->trans(self::SOURCE_SEARCH_COMMAND),
+            $this->translator->trans(self::SOURCE_SEARCH_COMMAND, [], null, 'en_US'),
+        ];
+        $listCount   = 0;
+        $sourceCount = 0;
+
+        foreach ($filters as $filter) {
+            if (in_array($filter->command, $listCommands, true)) {
+                if (!empty($filter->not)) {
+                    return false;
+                }
+
+                ++$listCount;
+            } elseif (in_array($filter->command, $sourceCommands, true)) {
+                if (!empty($filter->not)) {
+                    return false;
+                }
+
+                ++$sourceCount;
+            }
+        }
+
+        return 1 === $listCount && 1 === $sourceCount;
+    }
+
+    /**
+     * @return array<int, \stdClass>|null
+     */
+    private function getConjunctiveSearchFilters(mixed $filters): ?array
+    {
+        if ($filters instanceof \stdClass) {
+            if (isset($filters->root)) {
+                return $this->getConjunctiveSearchFilters($filters->root);
+            }
+
+            if (isset($filters->children)) {
+                if (!empty($filters->not) || (isset($filters->type) && 'and' !== $filters->type)) {
+                    return null;
+                }
+
+                return $this->getConjunctiveSearchFilters($filters->children);
+            }
+
+            return isset($filters->command) ? [$filters] : [];
+        }
+
+        if (!is_array($filters)) {
+            return [];
+        }
+
+        $conjunctiveFilters = [];
+        foreach ($filters as $filter) {
+            if (!$filter instanceof \stdClass || 'and' !== ($filter->type ?? null)) {
+                return null;
+            }
+
+            if (isset($filter->children)) {
+                $nestedFilters = $this->getConjunctiveSearchFilters($filter->children);
+                if (null === $nestedFilters) {
+                    return null;
+                }
+
+                $conjunctiveFilters = array_merge($conjunctiveFilters, $nestedFilters);
+                continue;
+            }
+
+            $conjunctiveFilters[] = $filter;
+        }
+
+        return $conjunctiveFilters;
+    }
+
+    /**
+     * @return list<int>
      */
     private function getListIdsByAlias(string $alias): array
     {

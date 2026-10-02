@@ -96,9 +96,15 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $leadRepository = $this->em->getRepository(Lead::class);
         $this->assertInstanceOf(LeadRepository::class, $leadRepository);
         $this->assertContains('mautic.lead.lead.searchcommand.source', $leadRepository->getSearchCommands());
+        $this->client->enableProfiler();
 
         $this->assertSearchResult('segment%3A'.$list->getAlias().'%20source%3Amanually_added', [$leadTwo], [$leadOne, $leadThree]);
         $this->assertSearchResult('segment%3A'.$list->getAlias().'%20source%3Afilter_added', [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchResult('source%3Amanually_added%20segment%3A'.$list->getAlias(), [$leadTwo], [$leadOne, $leadThree]);
+        $this->assertSearchResult('source%3Afilter_added%20segment%3A'.$list->getAlias(), [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchUsesSingleSegmentMembershipLookup();
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20!source%3Amanually_added', [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchResult('!source%3Amanually_added%20segment%3A'.$list->getAlias(), [$leadOne, $leadThree], [$leadTwo]);
         $this->assertSearchResult('source%3Amanually_added', [], [$leadOne, $leadTwo, $leadThree]);
     }
 
@@ -139,6 +145,21 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
 
         foreach ($notExpectedLeads as $notExpectedLead) {
             $this->assertStringNotContainsString($notExpectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should not be in the result.', $notExpectedLead->getEmail()));
+        }
+    }
+
+    private function assertSearchUsesSingleSegmentMembershipLookup(): void
+    {
+        /** @var DoctrineDataCollector $dbCollector */
+        $dbCollector = $this->client->getProfile()->getCollector('db');
+        $queries     = array_filter(
+            $dbCollector->getQueries()['default'],
+            fn (array $query): bool => str_contains($query['sql'], 'FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads')
+        );
+
+        $this->assertNotEmpty($queries);
+        foreach ($queries as $query) {
+            $this->assertSame(1, substr_count($query['sql'], 'FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads'), $query['sql']);
         }
     }
 
