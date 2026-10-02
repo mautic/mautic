@@ -18,7 +18,9 @@ final class OAuthReplacePass implements CompilerPassInterface
         }
 
         $oAuthAuthenticatorDefinition = $container->getDefinition('fos_oauth_server.security.authenticator.manager');
-        $oAuthAuthenticatorDefinition->setClass(Oauth2Authenticator::class);
+        $oAuthAuthenticatorDefinition
+            ->setClass(Oauth2Authenticator::class)
+            ->setArgument(2, new Reference('security.token.permissions'));
 
         foreach ([
             'security.authenticator.oauth2',
