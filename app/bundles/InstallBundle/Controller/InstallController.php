@@ -44,6 +44,10 @@ final class InstallController extends CommonController
             return $this->redirectToRoute('mautic_dashboard_index');
         }
 
+        // The requirements check reports a missing directory as unwritable, so create the
+        // ones the installer needs before it runs.
+        $this->installer->prepareDirectories();
+
         if ($index - floor($index) > 0) {
             $subIndex = (int) (round($index - floor($index), 1) * 10);
             $index    = floor($index);

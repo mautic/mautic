@@ -6,6 +6,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
+use Mautic\CoreBundle\Event\SearchHelpEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -23,6 +24,7 @@ use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Form\Type\ScheduleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
+use Mautic\EmailBundle\Helper\EmailSearchScopeProvider;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -70,7 +72,7 @@ final class EmailController extends FormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1): Response
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, EmailSearchScopeProvider $emailSearchScopeProvider, $page = 1): Response
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
@@ -260,10 +262,14 @@ final class EmailController extends FormController
         }
         $session->set('mautic.email.page', $page);
 
+        $searchHelpEvent = new SearchHelpEvent('mautic.email.help.searchcommands', 'email');
+        $this->dispatcher->dispatch($searchHelpEvent);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'searchValue'    => $search,
+                    'searchHelp'     => $searchHelpEvent->getHelp(),
                     'filters'        => $listFilters,
                     'items'          => $emails,
                     'totalItems'     => $count,
@@ -273,6 +279,7 @@ final class EmailController extends FormController
                     'permissions'    => $permissions,
                     'model'          => $model,
                     'isDraftEnabled' => $isDraftEnabled,
+                    'searchScopes'   => $emailSearchScopeProvider->getScopes(),
                 ],
                 'contentTemplate' => '@MauticEmail/Email/list.html.twig',
                 'passthroughVars' => [

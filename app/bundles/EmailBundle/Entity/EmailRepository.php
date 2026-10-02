@@ -12,10 +12,14 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Event\SearchCommandEvent;
+use Mautic\CoreBundle\Event\SearchQueryEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends CommonRepository<Email>
@@ -24,6 +28,14 @@ class EmailRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
     use QueryBuilderManipulatorTrait;
+
+    protected EventDispatcherInterface $dispatcher;
+
+    #[Required]
+    public function autowireDispatcher(EventDispatcherInterface $dispatcher): void
+    {
+        $this->dispatcher = $dispatcher;
+    }
 
     public const EMAILS_PREFIX        = 'e';
 
@@ -333,6 +345,32 @@ class EmailRepository extends CommonRepository
     }
 
     /**
+     * Useful to get next batch of contacts to send email to.
+     *
+     * Returns 0 if there are no rows.
+     */
+    public function getBatchMaxContactId(Email $email, int $minId, int $batchSize): int
+    {
+        $pq = $this->getEmailPendingQuery(
+            $email->getId(),
+            $email->getRelatedEntityIds()
+        );
+
+        $pq->select('l.id');
+        $pq->andWhere('l.id >= :minId');
+        $pq->setParameter('minId', $minId);
+        $pq->orderBy('l.id', 'ASC');
+        $pq->setMaxResults($batchSize);
+
+        $outerQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $outerQb->select('MAX(id)');
+        $outerQb->from("({$pq->getSQL()})", 'subquery');
+        $outerQb->setParameters($pq->getParameters());
+
+        return (int) $outerQb->executeQuery()->fetchOne();
+    }
+
+    /**
      * @param int        $emailId
      * @param int[]|null $variantIds
      * @param int[]|null $listIds
@@ -578,6 +616,8 @@ class EmailRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      * @param object                                  $filter
+     *
+     * @return array{0: mixed, 1: array<string, mixed>}
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -590,6 +630,8 @@ class EmailRepository extends CommonRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
      * @param object                                  $filter
+     *
+     * @return array{0: mixed, 1: array<string, mixed>}
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -598,9 +640,15 @@ class EmailRepository extends CommonRepository
             return [$expr, $parameters];
         }
 
+        [$expr, $parameters] = $this->dispatchAddSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $parameters      = [];
 
         switch ($command) {
             case $this->translator->trans('mautic.email.email.searchcommand.isexpired'):
@@ -639,6 +687,16 @@ class EmailRepository extends CommonRepository
                     $filter->string,
                     $filter->not
                 );
+            case $this->translator->trans('mautic.core.searchcommand.name'):
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                $expr            = $q->expr()->like('e.name', ":$unique");
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.email.email.searchcommand.subject'):
+            case $this->translator->trans('mautic.email.email.searchcommand.subject', [], null, 'en_US'):
+                $expr            = $q->expr()->like('e.subject', ":$unique");
+                $returnParameter = true;
+                break;
         }
 
         if ($expr && $filter->not) {
@@ -665,12 +723,18 @@ class EmailRepository extends CommonRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
+            'mautic.core.searchcommand.name',
+            'mautic.email.email.searchcommand.subject',
             'mautic.email.email.searchcommand.isexpired',
             'mautic.email.email.searchcommand.ispending',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
             'mautic.project.searchcommand.name',
         ];
+
+        $searchCommandEvent = new SearchCommandEvent($commands, 'email');
+        $this->dispatcher->dispatch($searchCommandEvent);
+        $commands = $searchCommandEvent->getCommands();
 
         return array_merge($commands, parent::getSearchCommands());
     }
@@ -825,15 +889,15 @@ class EmailRepository extends CommonRepository
     /**
      * @return iterable<Email>
      */
-    public function getPublishedBroadcastsIterable(?int $id = null): iterable
+    public function getPublishedBroadcastsIterable(?int $id = null, bool $allowNullForPublishedUp = false): iterable
     {
-        return $this->getPublishedBroadcastsQuery($id)->toIterable();
+        return $this->getPublishedBroadcastsQuery($id, $allowNullForPublishedUp)->toIterable();
     }
 
-    private function getPublishedBroadcastsQuery(?int $id = null): Query
+    private function getPublishedBroadcastsQuery(?int $id = null, bool $allowNullForPublishedUp = false): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
-        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, false);
+        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, $allowNullForPublishedUp);
 
         $expr->add(
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
@@ -958,5 +1022,18 @@ class EmailRepository extends CommonRepository
             ->where($expr);
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $query
+     *
+     * @return array<mixed>
+     */
+    private function dispatchAddSearchCommandWhereClause($query, object $filter): array
+    {
+        $searchQueryEvent = new SearchQueryEvent($filter, $query, $this->getTableAlias(), 'email');
+        $this->dispatcher->dispatch($searchQueryEvent);
+
+        return [$searchQueryEvent->getExpr(), $searchQueryEvent->getParameters()];
     }
 }
