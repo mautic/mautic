@@ -111,7 +111,7 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     private function isDoNotSubmitEmail(string $email, array $filters): bool
     {
         $email  = strtolower(trim($email));
-        $domain = strtolower((string) substr(strrchr($email, '@') ?: '', 1));
+        $domain = strtolower(substr(strrchr($email, '@') ?: '', 1));
 
         foreach ($filters as $filter) {
             $filter = strtolower(trim((string) $filter));

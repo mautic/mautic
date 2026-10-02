@@ -758,7 +758,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             }
         }
 
-        if (empty($fieldIds)) {
+        if ([] === $fieldIds) {
             return [];
         }
 
@@ -779,7 +779,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function enableDonotSubmitValidationOnEmailFields(array $fieldsToUpdate): void
     {
-        if (empty($fieldsToUpdate)) {
+        if ([] === $fieldsToUpdate) {
             return;
         }
 
