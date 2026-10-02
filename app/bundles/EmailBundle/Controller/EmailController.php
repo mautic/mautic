@@ -1643,9 +1643,9 @@ final class EmailController extends FormController
             ]];
 
             foreach (is_array($ids) ? $ids : [] as $objectId) {
-                $entity = $this->emailModel->getEntity($objectId);
+                $email = $this->emailModel->getEntity($objectId);
 
-                if (!$entity instanceof Email) {
+                if (!$email instanceof Email) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.email.error.notfound',
@@ -1654,12 +1654,12 @@ final class EmailController extends FormController
                 } elseif (!$this->security->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
-                    $entity->getCreatedBy()
+                    $email->getCreatedBy()
                 )) {
                     $flashes[] = $this->getAccessDeniedFlash();
                 } else {
-                    $entity->setSubject(sprintf('%s %s', self::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject()));
-                    $errors = $this->emailModel->sendSampleEmailToUser($entity, $users, $fields, [], [], false);
+                    $email->setSubject(sprintf('%s %s', self::EXAMPLE_EMAIL_SUBJECT_PREFIX, $email->getSubject()));
+                    $errors = $this->emailModel->sendSampleEmailToUser($email, $users, $fields, [], [], false);
 
                     if ([] === $errors) {
                         ++$sent;
@@ -1667,7 +1667,7 @@ final class EmailController extends FormController
                         $flashes[] = [
                             'type'    => 'error',
                             'msg'     => 'mautic.email.error.batch_test_failed',
-                            'msgVars' => ['%name%' => $entity->getName()],
+                            'msgVars' => ['%name%' => $email->getName()],
                         ];
                     }
                 }
