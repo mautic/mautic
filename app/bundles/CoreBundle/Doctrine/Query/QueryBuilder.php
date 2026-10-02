@@ -540,7 +540,7 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @param list<array-key> $knownAliases
      */
-    protected function nonUniqueAliasException(string $alias, array $knownAliases): DbalException
+    protected function nonUniqueAliasException(string $alias, array $knownAliases): \Throwable
     {
         return new DbalException(sprintf(
             'The given alias "%s" is not unique in FROM and JOIN clause table. The currently registered aliases are: %s.',
@@ -552,7 +552,7 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @param list<array-key> $knownAliases
      */
-    protected function unknownAliasException(string $alias, array $knownAliases): DbalException
+    protected function unknownAliasException(string $alias, array $knownAliases): \Throwable
     {
         return new DbalException(sprintf(
             'The given alias "%s" is not part of any FROM or JOIN clause table. The currently registered aliases are: %s.',
