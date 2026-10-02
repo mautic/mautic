@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -20,7 +21,6 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class SegmentImportExportSubscriber implements EventSubscriberInterface
 {
@@ -35,7 +35,7 @@ final class SegmentImportExportSubscriber implements EventSubscriberInterface
         private EventDispatcherInterface $dispatcher,
         private FieldModel $fieldModel,
         private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private ImportEntityDenormalizer $serializer,
     ) {
     }
 

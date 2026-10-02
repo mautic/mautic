@@ -20,6 +20,8 @@
 {% endblock %}
 
 {% block actions %}
+	{% set addEntityType = editableTypes|length == 1 ? editableTypes|keys|first : null %}
+	{% set addEntityLabel = addEntityType ? editableTypes[addEntityType].label|trans : 'mautic.project.add_entity'|trans %}
 	{{ include('@MauticCore/Helper/page_actions.html.twig', {
         'item': project,
         'customButtons': [
@@ -27,11 +29,11 @@
                 'attr': {
                     'data-toggle': 'ajaxmodal',
                     'data-target': '#MauticSharedModal',
-                    'data-header': 'mautic.project.add_entity'|trans,
-                    'href': path('mautic_project_action', {'objectAction': 'selectEntityType', 'objectId': project.getId()})
+                    'data-header': addEntityType ? 'mautic.project.add'|trans ~ ' ' ~ addEntityLabel : 'mautic.project.add_entity'|trans,
+                    'href': path('mautic_project_action', addEntityType ? {'objectAction': 'addEntity', 'objectId': project.getId(), 'entityType': addEntityType} : {'objectAction': 'selectEntityType', 'objectId': project.getId()})
                 },
                 'iconClass': 'ri-add-line',
-                'btnText': 'mautic.project.add_entity',
+                'btnText': addEntityType ? 'mautic.project.add'|trans ~ ' ' ~ addEntityLabel : 'mautic.project.add_entity'|trans,
                 'primary': true
             }
         ],

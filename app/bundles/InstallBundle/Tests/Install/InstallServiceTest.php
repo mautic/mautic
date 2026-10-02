@@ -9,7 +9,9 @@ use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
@@ -55,6 +57,8 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
 
     private InstallService $installer;
 
+    private ?string $tempDir = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -76,7 +80,8 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
             $this->validator,
             $this->createStub(UserPasswordHasher::class),
             $this->createStub(FixturesLoaderInterface::class),
-            $this->userRepository
+            $this->userRepository,
+            new Filesystem()
         );
     }
 
@@ -176,6 +181,28 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn('test');
 
         $this->assertSame($messages, $this->installer->checkOptionalSettings($step));
+    }
+
+    public function testCheckOptionalSettingsPassesMemoryLimitParameter(): void
+    {
+        $step = $this->createMock(StepInterface::class);
+        $step->expects($this->once())
+            ->method('checkOptionalSettings')
+            ->willReturn(['mautic.install.memory.limit']);
+
+        $translated = 'The memory_limit setting is lower than the suggested minimum limit of 512M.';
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                'mautic.install.memory.limit',
+                ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT],
+                null,
+                null
+            )
+            ->willReturn($translated);
+
+        $this->assertSame([$translated], $this->installer->checkOptionalSettings($step));
     }
 
     public function testSaveConfigurationWhenNoCacheClear(): void
@@ -369,5 +396,90 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
         });
 
         $this->assertSame([0 => 'password'], $this->installer->createAdminUserStep($data));
+    }
+
+    protected function tearDown(): void
+    {
+        if (null !== $this->tempDir && file_exists($this->tempDir)) {
+            if (is_dir($this->tempDir.'/var')) {
+                chmod($this->tempDir.'/var', 0700);
+            }
+
+            (new Filesystem())->remove($this->tempDir);
+        }
+
+        $this->tempDir = null;
+
+        parent::tearDown();
+    }
+
+    public function testPrepareDirectoriesCreatesThemWhenTheyAreAbsent(): void
+    {
+        $projectDir = $this->createTempProjectDir();
+
+        $this->stubPaths($projectDir);
+
+        $this->installer->prepareDirectories();
+
+        $this->assertDirectoryExists($projectDir.'/var/logs');
+        $this->assertDirectoryExists($projectDir.'/var/cache/dev');
+    }
+
+    public function testPrepareDirectoriesLeavesAnExistingDirectoryAlone(): void
+    {
+        $projectDir = $this->createTempProjectDir();
+        mkdir($projectDir.'/var/logs', 0700, true);
+        file_put_contents($projectDir.'/var/logs/mautic_prod.php', 'a log line');
+
+        $this->stubPaths($projectDir);
+
+        $this->installer->prepareDirectories();
+
+        $this->assertSame('a log line', file_get_contents($projectDir.'/var/logs/mautic_prod.php'));
+    }
+
+    public function testPrepareDirectoriesDoesNotThrowWhenTheParentIsNotADirectory(): void
+    {
+        $projectDir = $this->createTempProjectDir();
+
+        // A regular file where var/ should be, so the directories cannot be created.
+        file_put_contents($projectDir.'/var', 'not a directory');
+
+        $this->stubPaths($projectDir);
+
+        $this->installer->prepareDirectories();
+
+        $this->assertDirectoryDoesNotExist($projectDir.'/var/logs');
+    }
+
+    public function testPrepareDirectoriesDoesNotThrowWhenTheParentIsReadOnly(): void
+    {
+        $projectDir = $this->createTempProjectDir();
+        mkdir($projectDir.'/var', 0700, true);
+        chmod($projectDir.'/var', 0500);
+
+        if (is_writable($projectDir.'/var')) {
+            self::markTestSkipped('chmod had no effect, the suite is probably running as root');
+        }
+
+        $this->stubPaths($projectDir);
+
+        $this->installer->prepareDirectories();
+
+        $this->assertDirectoryDoesNotExist($projectDir.'/var/logs');
+    }
+
+    private function createTempProjectDir(): string
+    {
+        $this->tempDir = sys_get_temp_dir().'/mautic_install_service_'.uniqid('', true);
+        mkdir($this->tempDir, 0700, true);
+
+        return $this->tempDir;
+    }
+
+    private function stubPaths(string $projectDir): void
+    {
+        $this->pathsHelper->method('getCachePath')->willReturn($projectDir.'/var/cache/dev');
+        $this->pathsHelper->method('getLogsPath')->willReturn($projectDir.'/var/logs');
     }
 }
