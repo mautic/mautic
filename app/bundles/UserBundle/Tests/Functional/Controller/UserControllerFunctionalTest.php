@@ -8,10 +8,14 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DomCrawler\Crawler;
 
 final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateEntityTrait;
+
     protected function setUp(): void
     {
         $this->configParams += [
@@ -70,6 +74,28 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
+    }
+
+    public function testNeverLoggedInQuickFilterShowsUsersWithoutLastLogin(): void
+    {
+        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $admin);
+        $adminRole = $admin->getRole();
+        $this->assertInstanceOf(Role::class, $adminRole);
+        $admin->setLastLogin('2024-02-22 10:30:00');
+
+        $neverLoggedInUser = $this->createUser($adminRole, 'neverloggedinfilter@example.com');
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/s/users?search=is%3Anever_logged_in&tmpl=list');
+
+        $this->assertResponseIsSuccessful();
+        $usernames = $crawler->filter('#userTable tbody tr td:nth-child(4)')->each(
+            static fn (Crawler $cell): string => $cell->text()
+        );
+
+        $this->assertContains($neverLoggedInUser->getUsername(), $usernames);
+        $this->assertNotContains('admin', $usernames);
     }
 
     public function testInviteActionShowsForm(): void
