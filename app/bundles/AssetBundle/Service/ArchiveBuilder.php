@@ -10,6 +10,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 
 final class ArchiveBuilder
 {
+    public const MAX_TOTAL_ASSET_SIZE_BYTES = 500 * 1024 * 1024;
+
     /**
      * @param array<int, Asset> $assets
      */
@@ -57,7 +59,8 @@ final class ArchiveBuilder
      */
     private function addAssetsToArchive(\ZipArchive $zipArchive, array $assets): void
     {
-        $usedNames = [];
+        $usedNames      = [];
+        $totalAssetSize = 0;
 
         foreach ($assets as $asset) {
             $filename = $this->generateFilename($asset, $usedNames);
@@ -66,15 +69,31 @@ final class ArchiveBuilder
                 throw new BatchDownloadException('mautic.asset.asset.batch_download.error.remote_unsupported');
             }
 
-            $this->addLocalAsset($zipArchive, $asset, $filename);
+            $this->addLocalAsset($zipArchive, $asset, $filename, $totalAssetSize);
         }
     }
 
-    private function addLocalAsset(\ZipArchive $zipArchive, Asset $asset, string $filename): void
+    private function addLocalAsset(\ZipArchive $zipArchive, Asset $asset, string $filename, int &$totalAssetSize): void
     {
         $absolutePath = $asset->getAbsolutePath();
 
-        if (empty($absolutePath) || false === $zipArchive->addFile($absolutePath, $filename)) {
+        if (empty($absolutePath) || !is_file($absolutePath) || !is_readable($absolutePath)) {
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.unavailable');
+        }
+
+        $assetSize = filesize($absolutePath);
+
+        if (false === $assetSize) {
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.unavailable');
+        }
+
+        if ($assetSize > self::MAX_TOTAL_ASSET_SIZE_BYTES - $totalAssetSize) {
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.too_large');
+        }
+
+        $totalAssetSize += $assetSize;
+
+        if (false === $zipArchive->addFile($absolutePath, $filename)) {
             throw new BatchDownloadException('mautic.asset.asset.batch_download.error.unavailable');
         }
     }

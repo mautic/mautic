@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Service\ArchiveBuilder;
+use Mautic\AssetBundle\Service\BatchDownloadRequestValidator;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 use Mautic\AssetBundle\Tests\RemoteFileServerTrait;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
@@ -16,6 +19,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,6 +52,12 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         }
 
         parent::setUp();
+    }
+
+    private function requestBatchDownload(array $parameters = []): void
+    {
+        $parameters['_token'] = $this->getCsrfToken(BatchDownloadRequestValidator::CSRF_TOKEN_ID);
+        $this->client->request(Request::METHOD_POST, self::BATCH_DOWNLOAD_PATH, $parameters);
     }
 
     public function testCreateAndEditRemoteImageAssetWithQueryString(): void
@@ -172,6 +182,17 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->getControllerColumnTests($urlAlias, $routeAlias, $column, $tableAlias, $column2);
     }
 
+    public function testAssetIndexRendersCsrfTokenForBatchDownloadAction(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/assets');
+
+        $this->assertResponseIsSuccessful();
+
+        $downloadButton = $this->client->getCrawler()->filter('[data-mautic-batch-download]');
+        $this->assertCount(1, $downloadButton);
+        $this->assertNotEmpty($downloadButton->attr('data-csrf-token'));
+    }
+
     public function testAssetSizes(): void
     {
         $this->client->request('GET', '/s/ajax?action=email:getAttachmentsSize&assets%5B%5D='.$this->asset->getId());
@@ -179,12 +200,34 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertSame('{"size":"178 bytes"}', $this->client->getResponse()->getContent());
     }
 
+    public function testBatchDownloadRejectsGetRequests(): void
+    {
+        $this->client->request(Request::METHOD_GET, self::BATCH_DOWNLOAD_PATH);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
+        $this->assertSame(Request::METHOD_POST, $this->client->getResponse()->headers->get('Allow'));
+    }
+
+    public function testBatchDownloadRejectsPostWithoutCsrfToken(): void
+    {
+        $this->client->request(Request::METHOD_POST, self::BATCH_DOWNLOAD_PATH);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    public function testBatchDownloadRejectsPostWithInvalidCsrfToken(): void
+    {
+        $this->client->request(Request::METHOD_POST, self::BATCH_DOWNLOAD_PATH, ['_token' => 'invalid']);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
     public function testBatchDownloadWithoutIdsReturnsError(): void
     {
-        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH);
+        $this->requestBatchDownload();
 
         $response   = $this->client->getResponse();
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(Translator::class);
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
@@ -197,9 +240,59 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     public function testBatchDownloadRejectsObjectShapedIds(): void
     {
-        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH, ['ids' => '{"asset": 1}']);
+        $this->requestBatchDownload(['ids' => '{"asset": 1}']);
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+    }
+
+    public function testBatchDownloadRejectsMoreThanOneHundredAssets(): void
+    {
+        $ids = json_encode(array_fill(0, 101, 99999999), JSON_THROW_ON_ERROR);
+        $this->requestBatchDownload(['ids' => $ids]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+
+        $content    = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $translator = self::getContainer()->get(Translator::class);
+
+        $this->assertSame(
+            $translator->trans('mautic.asset.asset.batch_download.error.too_many', [], 'flashes'),
+            $content['message']
+        );
+    }
+
+    public function testBatchDownloadRejectsAssetsAboveMaximumTotalSize(): void
+    {
+        $file = fopen($this->csvPath, 'c+');
+        \assert(false !== $file);
+
+        try {
+            $this->assertTrue(ftruncate($file, ArchiveBuilder::MAX_TOTAL_ASSET_SIZE_BYTES + 1));
+        } finally {
+            fclose($file);
+        }
+
+        $ids = json_encode([$this->asset->getId()], JSON_THROW_ON_ERROR);
+        $this->requestBatchDownload(['ids' => $ids]);
+
+        $response   = $this->client->getResponse();
+        $archivePath = $response instanceof BinaryFileResponse ? $response->getFile()->getPathname() : null;
+
+        try {
+            self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+
+            $content    = json_decode((string) $response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+            $translator = self::getContainer()->get(Translator::class);
+
+            $this->assertSame(
+                $translator->trans('mautic.asset.asset.batch_download.error.too_large', [], 'flashes'),
+                $content['message']
+            );
+        } finally {
+            if (null !== $archivePath && is_file($archivePath)) {
+                unlink($archivePath);
+            }
+        }
     }
 
     public function testBatchDownloadReturnsZipWithSanitizedTitles(): void
@@ -210,7 +303,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $ids = json_encode([$this->asset->getId()], JSON_THROW_ON_ERROR);
 
-        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH, ['ids' => $ids]);
+        $this->requestBatchDownload(['ids' => $ids]);
 
         $response = $this->client->getResponse();
 
@@ -254,12 +347,12 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $ids = json_encode([$remoteAsset->getId()], JSON_THROW_ON_ERROR);
 
-        $this->client->request('GET', self::BATCH_DOWNLOAD_PATH, ['ids' => $ids]);
+        $this->requestBatchDownload(['ids' => $ids]);
 
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content    = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(Translator::class);
 
         $this->assertSame(
             $translator->trans('mautic.asset.asset.batch_download.error.remote_unsupported', [], 'flashes'),

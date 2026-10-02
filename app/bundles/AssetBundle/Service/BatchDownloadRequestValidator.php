@@ -7,11 +7,18 @@ namespace Mautic\AssetBundle\Service;
 use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 final readonly class BatchDownloadRequestValidator
 {
+    public const MAX_ASSETS_PER_REQUEST = 100;
+
+    public const CSRF_TOKEN_ID = 'mautic_asset_batch_download';
+
     public function __construct(
         private CorePermissions $security,
+        private CsrfTokenManagerInterface $csrfTokenManager,
     ) {
     }
 
@@ -23,6 +30,17 @@ final readonly class BatchDownloadRequestValidator
         ], 'RETURN_ARRAY');
 
         return $permissions['asset:assets:viewown'] || $permissions['asset:assets:viewother'];
+    }
+
+    public function hasValidCsrfToken(Request $request): bool
+    {
+        $token = $request->request->get('_token');
+
+        if (!is_string($token) || '' === $token) {
+            return false;
+        }
+
+        return $this->csrfTokenManager->isTokenValid(new CsrfToken(self::CSRF_TOKEN_ID, $token));
     }
 
     /**
@@ -42,8 +60,12 @@ final readonly class BatchDownloadRequestValidator
             throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
         }
 
-        if (!is_array($ids) || !array_is_list($ids) || empty($ids)) {
+        if (!is_array($ids) || !array_is_list($ids) || [] === $ids) {
             throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
+        }
+
+        if (count($ids) > self::MAX_ASSETS_PER_REQUEST) {
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.too_many');
         }
 
         $validIds = [];

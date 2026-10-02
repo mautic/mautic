@@ -33,6 +33,7 @@
                             'attr': {
                                 'href': '#',
                                 'data-mautic-batch-download': path('mautic_asset_action', {'objectAction': 'batchDownload'}),
+                                'data-csrf-token': csrf_token('mautic_asset_batch_download'),
                                 'data-target': '#assetTable',
                                 'data-toggle': 'none',
                             },

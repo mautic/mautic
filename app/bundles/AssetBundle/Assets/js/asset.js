@@ -12,11 +12,13 @@ Mautic.assetOnUnload = function(id) {
 };
 
 Mautic.batchAssetDownload = function (action, el) {
-    const items       = Mautic.getCheckedListIds(el, true);
-    const downloadUrl = new URL(action, window.location.href);
-    downloadUrl.searchParams.set('ids', items);
+    const items     = Mautic.getCheckedListIds(el, true);
+    const csrfToken = mQuery(el).data('csrf-token');
 
-    Mautic.initiateFileDownload(downloadUrl.toString());
+    Mautic.initiateFileDownload(action, {
+        ids: items,
+        _token: csrfToken
+    });
 };
 
 mQuery(document).on('click', '[data-mautic-batch-download]', function (event) {

@@ -673,7 +673,15 @@ final class AssetController extends FormController
 
     public function batchDownloadAction(Request $request): Response
     {
+        if (!$request->isMethod(Request::METHOD_POST)) {
+            return new Response('', Response::HTTP_METHOD_NOT_ALLOWED, ['Allow' => Request::METHOD_POST]);
+        }
+
         if (!$this->batchDownloadRequestValidator->validatePermissions()) {
+            $this->throwAccessDenied();
+        }
+
+        if (!$this->batchDownloadRequestValidator->hasValidCsrfToken($request)) {
             $this->throwAccessDenied();
         }
 

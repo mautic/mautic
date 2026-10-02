@@ -2406,7 +2406,7 @@ Mautic.activateSortable = function(el) {
  *
  * @param link
  */
-Mautic.initiateFileDownload = function (link) {
+Mautic.initiateFileDownload = function (link, data) {
     if (mauticContactExportInBackground === 1 && link.indexOf('filetype=csv') >= 0) {
         Mautic.processCsvContactExport(link);
         return;
@@ -2415,7 +2415,6 @@ Mautic.initiateFileDownload = function (link) {
     // For direct downloads, use iframe with response checking
     const iframe = mQuery("<iframe/>")
         .attr({
-            src: link,
             style: "visibility:hidden;display:none"
         })
         .appendTo(mQuery('body'));
@@ -2434,6 +2433,33 @@ Mautic.initiateFileDownload = function (link) {
             // If JSON.parse fails, it means we got a file download - this is expected
         }
     });
+
+    if (data) {
+        const iframeName = `mautic-file-download-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        iframe.attr('name', iframeName);
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = link;
+        form.target = iframeName;
+        form.style.display = 'none';
+
+        Object.entries(data).forEach(([name, value]) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = String(value);
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+        form.remove();
+
+        return;
+    }
+
+    iframe.attr('src', link);
 };
 
 Mautic.processCsvContactExport = function (route) {
