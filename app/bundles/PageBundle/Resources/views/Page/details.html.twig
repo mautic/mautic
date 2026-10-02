@@ -56,7 +56,6 @@
         'entity': activePage,
         'status': 'available'
     }) -}}
-    <div class="label__divider"></div>
 
     {% set blueTags = [] %}
     {% set grayTags = [] %}
@@ -78,9 +77,9 @@
     {% endif %}
 
     {% if activePage.isVariant(true) %}
-        {% set grayTags = grayTags|merge([{ 
-            color: 'warm-gray', 
-            label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), 
+        {% set grayTags = grayTags|merge([{
+            color: 'warm-gray',
+            label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}),
             icon: 'ri-organization-chart',
             attributes: {
                 'href': path('mautic_page_action', {'objectAction': 'view', 'objectId': variants.parent.id}),
@@ -90,9 +89,9 @@
     {% endif %}
 
     {% if activePage.isTranslation(true) %}
-        {% set grayTags = grayTags|merge([{ 
-            color: 'warm-gray', 
-            label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), 
+        {% set grayTags = grayTags|merge([{
+            color: 'warm-gray',
+            label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}),
             icon: 'ri-translate',
             attributes: {
                 'href': path('mautic_page_action', {'objectAction': 'view', 'objectId': translations.parent.id}),
@@ -105,7 +104,11 @@
         {% set grayTags = grayTags|merge([{ label: activePage.language|language_name, icon: 'ri-translate-2', color: 'warm-gray', attributes: { 'data-toggle': 'tooltip', 'data-placement': 'top', 'title': 'mautic.core.language'|trans } }]) %}
     {% endif %}
 
-    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: blueTags|merge(grayTags) } %}
+    {% set allTags = blueTags|merge(grayTags) %}
+    {% if allTags is not empty %}
+        <div class="label__divider"></div>
+        {% include '@MauticCore/Helper/_tag.html.twig' with { tags: allTags } %}
+    {% endif %}
 
 {% endblock %}
 

@@ -16,7 +16,7 @@ class ReportDAO
 
     private array $remappedObjects = [];
 
-    private RelationsDAO $relationsDAO;
+    private readonly RelationsDAO $relationsDAO;
 
     /**
      * @param string $integration
@@ -35,10 +35,7 @@ class ReportDAO
         return $this->integration;
     }
 
-    /**
-     * @return $this
-     */
-    public function addObject(ObjectDAO $objectDAO)
+    public function addObject(ObjectDAO $objectDAO): static
     {
         if (!isset($this->objects[$objectDAO->getObject()])) {
             $this->objects[$objectDAO->getObject()] = [];
@@ -68,7 +65,7 @@ class ReportDAO
      * @throws ObjectNotFoundException
      * @throws FieldNotFoundException
      */
-    public function getInformationChangeRequest($objectName, $objectId, $fieldName): InformationChangeRequestDAO
+    public function getInformationChangeRequest($objectName, $objectId, string $fieldName): InformationChangeRequestDAO
     {
         if (empty($this->objects[$objectName][$objectId])) {
             throw new ObjectNotFoundException($objectName.':'.$objectId);
@@ -136,7 +133,7 @@ class ReportDAO
 
     public function shouldSync(): bool
     {
-        return !empty($this->objects);
+        return [] !== $this->objects;
     }
 
     public function getRelations(): RelationsDAO

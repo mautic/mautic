@@ -62,10 +62,10 @@ class OrderDAO
      * @param string $integration
      */
     public function __construct(
-        private \DateTimeInterface $syncDateTime,
+        private readonly \DateTimeInterface $syncDateTime,
         private $isFirstTimeSync,
         private $integration,
-        private array $options = [],
+        private readonly array $options = [],
     ) {
     }
 
@@ -101,7 +101,7 @@ class OrderDAO
             return $this->changedObjects[$objectType];
         }
 
-        throw new UnexpectedValueException("There are no change objects for object type '$objectType'");
+        throw new UnexpectedValueException("There are no change objects for object type '{$objectType}'");
     }
 
     /**
@@ -242,7 +242,7 @@ class OrderDAO
     /**
      * @return NotificationDAO[]
      */
-    public function getNotifications()
+    public function getNotifications(): array
     {
         return $this->notifications;
     }
@@ -290,7 +290,7 @@ class OrderDAO
 
     public function shouldSync(): bool
     {
-        return !empty($this->changedObjects);
+        return [] !== $this->changedObjects;
     }
 
     public function getObjectCount(): int

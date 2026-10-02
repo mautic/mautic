@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -30,11 +31,12 @@ class ExportHelper
     public const EXPORT_TYPE_CSV   = 'csv';
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
-        private FilePathResolver $filePathResolver,
-        private ProcessSignalService $processSignalService,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly FilePathResolver $filePathResolver,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -101,7 +103,7 @@ class ExportHelper
             return $zipFilePath;
         }
 
-        throw new FilePathException("Could not create zip archive at $zipFilePath.");
+        throw new FilePathException("Could not create zip archive at {$zipFilePath}.");
     }
 
     private function exportAsExcel(\Iterator $data, string $filename): StreamedResponse
@@ -205,8 +207,8 @@ class ExportHelper
         $contactExportDir = $this->coreParametersHelper->get('contact_export_dir');
         $this->filePathResolver->createDirectory($contactExportDir);
         $filePath     = $contactExportDir.'/'.$fileName;
-        $fileName     = (string) pathinfo($filePath, PATHINFO_FILENAME);
-        $extension    = (string) pathinfo($filePath, PATHINFO_EXTENSION);
+        $fileName     = pathinfo($filePath, PATHINFO_FILENAME);
+        $extension    = pathinfo($filePath, PATHINFO_EXTENSION);
         $originalName = $fileName;
         $i            = 1;
 
@@ -277,6 +279,13 @@ class ExportHelper
             foreach ($assetList as $assetPath) {
                 if (file_exists($assetPath)) {
                     $zip->addFile($assetPath, 'assets/'.basename($assetPath));
+                } else {
+                    // Surface the gap instead of silently shipping an archive without the
+                    // file — a missing asset here means the export/share ZIP is incomplete.
+                    $this->logger?->warning('Export asset file not found; skipping it in the ZIP archive.', [
+                        'assetPath' => $assetPath,
+                        'zipFilePath' => $zipFilePath,
+                    ]);
                 }
             }
 

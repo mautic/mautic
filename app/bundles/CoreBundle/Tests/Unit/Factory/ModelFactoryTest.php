@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Factory;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\PointBundle\Model\TriggerModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class ModelFactoryTest extends TestCase
+final class ModelFactoryTest extends TestCase
 {
     /**
-     * @var MockObject|ContainerInterface
+     * @var MockObject&ServiceLocator
      */
     private MockObject $container;
 
@@ -22,13 +24,13 @@ class ModelFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerInterface::class);
+        $this->container = $this->createMock(ServiceLocator::class);
         $this->factory   = new ModelFactory($this->container);
     }
 
     public function testModelKeyIsLowerCaseToMatchServiceKeys(): void
     {
-        $pointTriggerModel = $this->createMock(TriggerModel::class);
+        $pointTriggerModel = $this->createStub(TriggerModel::class);
         $modelName         = 'point.triggerEvent';
         $containerKey      = 'mautic.point.model.triggerEvent';
 

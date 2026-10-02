@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\PhpVersionHelper;
 
-class PhpVersionHelperTest extends \PHPUnit\Framework\TestCase
+final class PhpVersionHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetCurrentSemver(): void
     {

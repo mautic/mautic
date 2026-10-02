@@ -9,7 +9,7 @@ use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 
-class UserLoginTest extends MauticMysqlTestCase
+final class UserLoginTest extends MauticMysqlTestCase
 {
     use CreateEntityTrait;
 
@@ -42,8 +42,7 @@ class UserLoginTest extends MauticMysqlTestCase
         ]);
         $crawler = $this->client->submit($form);
 
-        $clientResponse = $this->client->getResponse();
-        $this->assertEquals(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         // user has logged in
         $title = $crawler->filterXPath('//head/title')->text();

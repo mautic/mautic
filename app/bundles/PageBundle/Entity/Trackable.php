@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -86,10 +88,7 @@ class Trackable
         return $this->redirect;
     }
 
-    /**
-     * @return Trackable
-     */
-    public function setRedirect(Redirect $redirect)
+    public function setRedirect(Redirect $redirect): static
     {
         $this->redirect = $redirect;
 
@@ -106,10 +105,8 @@ class Trackable
 
     /**
      * @param string $channel
-     *
-     * @return Trackable
      */
-    public function setChannel($channel)
+    public function setChannel($channel): static
     {
         $this->channel = $channel;
 
@@ -126,10 +123,8 @@ class Trackable
 
     /**
      * @param int $channelId
-     *
-     * @return Trackable
      */
-    public function setChannelId($channelId)
+    public function setChannelId($channelId): static
     {
         $this->channelId = $channelId;
 
@@ -146,10 +141,8 @@ class Trackable
 
     /**
      * @param int $hits
-     *
-     * @return Trackable
      */
-    public function setHits($hits)
+    public function setHits($hits): static
     {
         $this->hits = $hits;
 
@@ -166,10 +159,8 @@ class Trackable
 
     /**
      * @param int $uniqueHits
-     *
-     * @return Trackable
      */
-    public function setUniqueHits($uniqueHits)
+    public function setUniqueHits($uniqueHits): static
     {
         $this->uniqueHits = $uniqueHits;
 

@@ -24,7 +24,7 @@ final class ImportUrlValidationSubscriber implements EventSubscriberInterface
     private ?array $urlFields = null;
 
     public function __construct(
-        private FieldModel $fieldModel,
+        private readonly FieldModel $fieldModel,
     ) {
     }
 

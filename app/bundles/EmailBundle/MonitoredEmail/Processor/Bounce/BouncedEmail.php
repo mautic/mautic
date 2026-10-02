@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 
-class BouncedEmail
+final class BouncedEmail
 {
     /**
      * @var string|null
@@ -41,10 +43,8 @@ class BouncedEmail
 
     /**
      * @param string $email
-     *
-     * @return BouncedEmail
      */
-    public function setContactEmail($email)
+    public function setContactEmail($email): static
     {
         $this->email = $email;
 
@@ -61,10 +61,8 @@ class BouncedEmail
 
     /**
      * @param string $ruleCategory
-     *
-     * @return BouncedEmail
      */
-    public function setRuleCategory($ruleCategory)
+    public function setRuleCategory($ruleCategory): static
     {
         $this->ruleCategory = $ruleCategory;
 
@@ -81,10 +79,8 @@ class BouncedEmail
 
     /**
      * @param string $ruleNumber
-     *
-     * @return BouncedEmail
      */
-    public function setRuleNumber($ruleNumber)
+    public function setRuleNumber($ruleNumber): static
     {
         $this->ruleNumber = $ruleNumber;
 
@@ -101,10 +97,8 @@ class BouncedEmail
 
     /**
      * @param mixed $bounceType
-     *
-     * @return BouncedEmail
      */
-    public function setType($bounceType)
+    public function setType($bounceType): static
     {
         $this->bounceType = $bounceType;
 
@@ -118,10 +112,8 @@ class BouncedEmail
 
     /**
      * @param bool $final
-     *
-     * @return BouncedEmail
      */
-    public function setIsFinal($final)
+    public function setIsFinal($final): static
     {
         $this->final = (bool) $final;
 
@@ -136,10 +128,7 @@ class BouncedEmail
         return $this->bounceAddress;
     }
 
-    /**
-     * @return BouncedEmail
-     */
-    public function setBounceAddress($bounceAddress)
+    public function setBounceAddress($bounceAddress): static
     {
         $this->bounceAddress = $bounceAddress;
 

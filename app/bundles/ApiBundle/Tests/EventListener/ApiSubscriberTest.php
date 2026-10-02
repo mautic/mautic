@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Tests\EventListener;
 
 use Mautic\ApiBundle\EventListener\ApiSubscriber;
@@ -12,25 +14,20 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-class ApiSubscriberTest extends CommonMocks
+final class ApiSubscriberTest extends CommonMocks
 {
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var Translator&MockObject
-     */
-    private MockObject $translator;
-
-    /**
-     * @var Request&MockObject
+     * @var MockObject&Request
      */
     private MockObject $request;
 
     /**
-     * @var RequestEvent&MockObject
+     * @var MockObject&RequestEvent
      */
     private MockObject $event;
 
@@ -41,13 +38,12 @@ class ApiSubscriberTest extends CommonMocks
         parent::setUp();
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->translator           = $this->createMock(Translator::class);
         $this->request              = $this->createMock(Request::class);
         $this->request->headers     = new HeaderBag();
         $this->event                = $this->createMock(RequestEvent::class);
         $this->subscriber           = new ApiSubscriber(
             $this->coreParametersHelper,
-            $this->translator
+            $this->createStub(Translator::class)
         );
     }
 
@@ -87,7 +83,7 @@ class ApiSubscriberTest extends CommonMocks
             ->with($this->isInstanceOf(JsonResponse::class))
             ->willReturnCallback(
                 function (JsonResponse $response): void {
-                    $this->assertEquals(403, $response->getStatusCode());
+                    $this->assertSame(403, $response->getStatusCode());
                 }
             );
 

@@ -21,11 +21,11 @@ class ActionExecutioner implements EventInterface
     public const TYPE = 'action';
 
     public function __construct(
-        private ActionDispatcher $dispatcher,
-        private EventLogger $eventLogger,
-        private OptimisticLockServiceInterface $optimisticLockService,
+        private readonly ActionDispatcher $dispatcher,
+        private readonly EventLogger $eventLogger,
+        private readonly OptimisticLockServiceInterface $optimisticLockService,
         #[Autowire(service: 'monolog.logger.mautic')]
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -38,8 +38,8 @@ class ActionExecutioner implements EventInterface
     {
         \assert($config instanceof ActionAccessor);
 
-        /** @var LeadEventLog $firstLog */
-        if (!$firstLog = $logs->first()) {
+        $firstLog = $logs->first();
+        if (!$firstLog instanceof LeadEventLog) {
             return new EvaluatedContacts();
         }
 

@@ -9,20 +9,20 @@ use Mautic\UserBundle\Entity\User;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class SecurityExtension extends AbstractExtension
+final class SecurityExtension extends AbstractExtension
 {
     public function __construct(
-        private SecurityHelper $securityHelper,
+        private readonly SecurityHelper $securityHelper,
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('securityGetAuthenticationContext', [$this, 'getContext']),
-            new TwigFunction('securityGetCsrfToken', [$this, 'getCsrfToken']),
-            new TwigFunction('securityHasEntityAccess', [$this, 'hasEntityAccess']),
-            new TwigFunction('securityIsGranted', [$this, 'isGranted']),
+            new TwigFunction('securityGetAuthenticationContext', $this->getContext(...)),
+            new TwigFunction('securityGetCsrfToken', $this->getCsrfToken(...)),
+            new TwigFunction('securityHasEntityAccess', $this->hasEntityAccess(...)),
+            new TwigFunction('securityIsGranted', $this->isGranted(...)),
         ];
     }
 
@@ -48,10 +48,7 @@ class SecurityExtension extends AbstractExtension
         return $this->securityHelper->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
     }
 
-    /**
-     * @return mixed
-     */
-    public function isGranted(string $permission)
+    public function isGranted(string $permission): bool
     {
         return $this->securityHelper->isGranted($permission);
     }

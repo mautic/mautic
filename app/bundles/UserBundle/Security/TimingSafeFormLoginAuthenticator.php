@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
-class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
+final class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {
     /**
      * @var array<mixed>
@@ -37,8 +37,12 @@ class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, Authen
     /**
      * @param array<mixed> $options
      */
-    public function __construct(private FormLoginAuthenticator $authenticator, private UserProviderInterface $userProvider, private PasswordHasherFactoryInterface $passwordHasherFactory, array $options)
-    {
+    public function __construct(
+        private FormLoginAuthenticator $authenticator,
+        private UserProviderInterface $userProvider,
+        private PasswordHasherFactoryInterface $passwordHasherFactory,
+        array $options,
+    ) {
         $this->authenticator         = $authenticator;
         $this->userProvider          = $userProvider;
         $this->passwordHasherFactory = $passwordHasherFactory;
@@ -54,16 +58,15 @@ class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, Authen
         ], $options);
     }
 
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): bool
     {
         return $this->authenticator->supports($request);
     }
 
     public function authenticate(Request $request): Passport
     {
-        $credentials           = $this->getCredentials($request);
-        $passwordHasherFactory = $this->passwordHasherFactory;
-        $userLoader            = function (string $identifier) use ($passwordHasherFactory, $credentials): UserInterface {
+        $credentials = $this->getCredentials($request);
+        $userLoader  = function (string $identifier) use ($credentials): UserInterface {
             try {
                 // Attempt to load the real user.
                 return $this->userProvider->loadUserByIdentifier($identifier);
@@ -74,7 +77,7 @@ class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, Authen
                 // the same amount of time, and we pass the actual entered password so the response
                 // timing varies with the given password the same way it does for existing users.
                 $user = new User();
-                $passwordHasherFactory->getPasswordHasher($user)->verify('$2y$13$aAwXNyqA87lcXQQuk8Cp6eo2amRywLct29oG2uWZ8lYBeamFZ8UhK', $credentials['password']);
+                $this->passwordHasherFactory->getPasswordHasher($user)->verify('$2y$13$aAwXNyqA87lcXQQuk8Cp6eo2amRywLct29oG2uWZ8lYBeamFZ8UhK', $credentials['password']);
                 // Rethrow exception
                 throw $e;
             }
@@ -104,7 +107,7 @@ class TimingSafeFormLoginAuthenticator implements AuthenticatorInterface, Authen
         return $this->authenticator->onAuthenticationSuccess($request, $token, $firewallName);
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         return $this->authenticator->onAuthenticationFailure($request, $exception);
     }

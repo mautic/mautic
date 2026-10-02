@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Event\CustomContentEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-final class ContentHelper
+final readonly class ContentHelper
 {
     public function __construct(
         private Environment $twig,

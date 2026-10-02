@@ -12,7 +12,7 @@ final class ColorsExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('contrast_color', [$this, 'getContrastColor'], ['is_safe' => ['html']]),
+            new TwigFunction('contrast_color', $this->getContrastColor(...), ['is_safe' => ['html']]),
         ];
     }
 

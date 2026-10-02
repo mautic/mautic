@@ -14,15 +14,22 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ChartQueryTest extends TestCase
+final class ChartQueryTest extends TestCase
 {
     private \DateTime $dateFrom;
+
     private DateTimeHelper $dateTimeHelper;
+
     private \DateTime $dateTo;
+
     private MockObject&Connection $connection;
+
     private MockObject&QueryBuilder $queryBuilder;
+
     private string $dateColumn;
+
     private string $unit;
+
     private ChartQuery $chartQuery;
 
     protected function setUp(): void
@@ -94,7 +101,7 @@ class ChartQueryTest extends TestCase
             ->method('orderBy')
             ->with("DATE_FORMAT(CONVERT_TZ(t.date_sent, '+00:00', '+00:00'), '%Y-%m-%d')");
 
-        $this->queryBuilder->method('getQueryPart')
+        $this->queryBuilder->expects($this->atLeast(3))->method('getQueryPart')
             ->willReturnMap(
                 [
                     ['from', [[
@@ -295,10 +302,7 @@ class ChartQueryTest extends TestCase
     private function assertTimeDataWithoutSqlOrder(array $expectedResult, array $data): void
     {
         $this->createChartQuery();
-        self::assertSame(
-            $expectedResult,
-            $this->chartQuery->completeTimeData($data)
-        );
+        $this->assertSame($expectedResult, $this->chartQuery->completeTimeData($data));
     }
 
     public function testPrepareTimeDataQueryWithLeadEventLog(): void

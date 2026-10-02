@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticClearbitBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ButtonSubscriber implements EventSubscriberInterface
+final readonly class ButtonSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private IntegrationHelper $helper,
+        private IntegrationsHelper $integrationsHelper,
         private TranslatorInterface $translator,
         private RouterInterface $router,
     ) {
@@ -29,10 +31,13 @@ class ButtonSubscriber implements EventSubscriberInterface
 
     public function injectViewButtons(CustomButtonEvent $event): void
     {
-        /** @var ClearbitIntegration $myIntegration */
-        $myIntegration = $this->helper->getIntegrationObject('Clearbit');
+        try {
+            $integration = $this->integrationsHelper->getIntegration('Clearbit');
+        } catch (IntegrationNotFoundException) {
+            return;
+        }
 
-        if (false === $myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
+        if (!$integration->getIntegrationConfiguration()->getIsPublished()) {
             return;
         }
 

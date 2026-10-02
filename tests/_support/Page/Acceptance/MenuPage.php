@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Page\Acceptance;
 
-class MenuPage
+final class MenuPage
 {
     public static $ADMIN_USER       = 'admin';
     public static $ADMIN_PASSWORD   = 'Maut1cR0cks!';
@@ -12,5 +12,5 @@ class MenuPage
     public static $POINTS           = 'Points';
     public static $MANAGE_GROUPS    = 'Manage Groups';
     public static $MANAGE_GROUPS_ID = '#mautic_point.group_index';
-    public static $ACTIVE_NAV_GROUP = '.nav-group.last.active';
+    public static $ACTIVE_NAV_GROUP = '#mautic_points_root_child > li:nth-child(3)';
 }

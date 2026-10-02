@@ -9,7 +9,7 @@ use Mautic\StatsBundle\Aggregate\Collection\Stats\WeekStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat;
 use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
-class StatsDAO
+final class StatsDAO
 {
     /**
      * @var YearStat[]
@@ -31,7 +31,7 @@ class StatsDAO
     /**
      * @return YearStat[]
      */
-    public function getYears()
+    public function getYears(): array
     {
         ksort($this->years);
 

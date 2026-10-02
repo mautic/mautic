@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
@@ -17,11 +18,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailSubscriber implements EventSubscriberInterface
+final readonly class EmailSubscriber implements EventSubscriberInterface
 {
     public const PREHEADER_HTML_ELEMENT_BEFORE  = '<div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">';
+
     public const PREHEADER_HTML_ELEMENT_AFTER   = '</div>';
+
     public const PREHEADER_HTML_SEARCH_PATTERN  = '/<body[^>]*>.*?<div class="preheader"[^>]*>(.*?)<\/div>/s';
+
     public const PREHEADER_HTML_REPLACE_PATTERN = '/<div class="preheader"[^>]*>(.*?)<\/div>/s';
 
     private const RETRY_COUNT = 3;
@@ -33,12 +37,14 @@ class EmailSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private EntityManagerInterface $entityManager,
         private EmailDraftModel $emailDraftModel,
+        private EmailRepository $emailRepository,
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
+            EmailEvents::EMAIL_PRE_SAVE       => ['cloneParentEmailDataForVariant', 0],
             EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
             EmailEvents::EMAIL_ON_SEND        => ['onEmailSendAddPreheaderText', 200],
             EmailEvents::EMAIL_ON_DISPLAY     => ['onEmailSendAddPreheaderText', 200],
@@ -48,6 +54,14 @@ class EmailSubscriber implements EventSubscriberInterface
             EmailEvents::ON_EMAIL_EDIT_SUBMIT => ['manageEmailDraft'],
             EmailEvents::EMAIL_PRE_DELETE     => ['deleteEmailDraft'],
         ];
+    }
+
+    public function cloneParentEmailDataForVariant(EmailEvent $event): void
+    {
+        $email = $event->getEmail();
+        if ($email->isVariant()) {
+            $this->emailRepository->cloneFromParentToVariant($email);
+        }
     }
 
     /**
@@ -165,7 +179,7 @@ class EmailSubscriber implements EventSubscriberInterface
         $editedEmail = $event->getCurrentEmail();
 
         if (
-            ((true === $event->isSaveAndClose()) || (true === $event->isApply()))
+            ($event->isSaveAndClose() || $event->isApply())
             && $editedEmail->hasDraft()
         ) {
             $emailDraft = $editedEmail->getDraft();
@@ -177,7 +191,7 @@ class EmailSubscriber implements EventSubscriberInterface
             $this->entityManager->persist($editedEmail);
         }
 
-        if (true === $event->isSaveAsDraft()) {
+        if ($event->isSaveAsDraft()) {
             $emailDraft = $this
                 ->emailDraftModel
                 ->createDraft($editedEmail, $editedEmail->getCustomHtml(), $editedEmail->getTemplate());
@@ -188,14 +202,14 @@ class EmailSubscriber implements EventSubscriberInterface
             $this->emailModel->saveEntity($editedEmail);
         }
 
-        if (true === $event->isDiscardDraft()) {
+        if ($event->isDiscardDraft()) {
             $this->revertEmailModifications($liveEmail, $editedEmail);
             $this->emailDraftModel->deleteDraft($editedEmail);
             $editedEmail->setDraft(null);
             $this->entityManager->persist($editedEmail);
         }
 
-        if (true === $event->isApplyDraft()) {
+        if ($event->isApplyDraft()) {
             $this->emailDraftModel->deleteDraft($editedEmail);
             $editedEmail->setDraft(null);
         }

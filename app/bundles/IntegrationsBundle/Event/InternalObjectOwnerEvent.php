@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Event;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class InternalObjectOwnerEvent extends Event
+final class InternalObjectOwnerEvent extends Event
 {
     /**
      * Format: [object_id => owner_id].
@@ -18,8 +18,8 @@ class InternalObjectOwnerEvent extends Event
      * @param int[] $objectIds
      */
     public function __construct(
-        private ObjectInterface $object,
-        private array $objectIds,
+        private readonly ObjectInterface $object,
+        private readonly array $objectIds,
     ) {
     }
 

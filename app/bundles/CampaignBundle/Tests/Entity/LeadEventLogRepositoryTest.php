@@ -11,13 +11,14 @@ use Doctrine\ORM\UnitOfWork;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class LeadEventLogRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('isLastFailedDataProvider')]
+    #[DataProvider('isLastFailedDataProvider')]
     public function testIsLastFailed(?LeadEventLog $leadEventLog, bool $expectedResult): void
     {
         $emMock                 = $this->createMock(EntityManager::class);
@@ -34,7 +35,7 @@ final class LeadEventLogRepositoryTest extends TestCase
             ->willReturn($leadEventLog);
 
         $leadEventLogRepository = $this->configureRepository(LeadEventLog::class, $emMock);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $isLastFailed = $leadEventLogRepository->isLastFailed(42, 4242);
         $this->assertSame($expectedResult, $isLastFailed);

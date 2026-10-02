@@ -6,9 +6,12 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class ApiPermissions extends AbstractPermissions
+final class ApiPermissions extends AbstractPermissions
 {
-    public function __construct($params)
+    /**
+     * @param mixed[] $params
+     */
+    public function __construct(array $params)
     {
         parent::__construct($params);
 

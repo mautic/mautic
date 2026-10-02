@@ -19,6 +19,8 @@
                 </div> #}
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
+                'searchScopes': searchScopes|default([]),
+                'searchScopeHint': searchScopeHint|default(null),
                 'filters': {
                     'bundle': {
                         'options': categoryTypes,

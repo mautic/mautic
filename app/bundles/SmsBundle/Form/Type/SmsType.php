@@ -2,7 +2,7 @@
 
 namespace Mautic\SmsBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -11,10 +11,12 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -27,10 +29,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Sms>
  */
-class SmsType extends AbstractType
+final class SmsType extends AbstractType
 {
     public function __construct(
-        private readonly EntityManager $em,
+        private readonly EntityManagerInterface $em,
     ) {
     }
 
@@ -79,8 +81,45 @@ class SmsType extends AbstractType
             'label' => 'mautic.core.form.available',
         ]);
 
+        $builder->add(
+            'isMms',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.sms.form.is_mms',
+                'data'  => (bool) $options['data']->getIsMms(),
+                'attr'  => [
+                    'onchange' => 'Mautic.toggleIsMms()',
+                ],
+            ]
+        );
+
+        $mediaFields = function (FormEvent $event): void {
+            $form        = $event->getForm();
+            $data        = $event->getData();
+            $mediaChoice = $data instanceof Sms ? $data->getMedia() : ($data['media'] ?? []);
+            if ($form->has('media')) {
+                $form->remove('media');
+            }
+            $form->add(
+                'media',
+                ChoiceType::class,
+                [
+                    'label'             => 'mautic.sms.form.media',
+                    'choices'           => array_combine($mediaChoice, $mediaChoice),
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'required'          => false,
+                ]
+            );
+        };
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, $mediaFields);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $mediaFields);
+
+        $builder->add('isPublished', YesNoButtonGroupType::class);
+
         // add lead lists
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);
+        $transformer = new IdToEntityModelTransformer($this->em, LeadList::class, 'id', true);
         $builder->add(
             $builder->create(
                 'lists',
@@ -156,7 +195,7 @@ class SmsType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $data = $event->getData();
                 if (isset($data['translationParentSelector'])) {
                     $data['translationParent'] = $data['translationParentSelector'];

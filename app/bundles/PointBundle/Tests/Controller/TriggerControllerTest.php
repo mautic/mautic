@@ -31,7 +31,7 @@ final class TriggerControllerTest extends MauticMysqlTestCase
     public function testCloneAction(): void
     {
         /** @var TriggerModel $triggerModel */
-        $triggerModel = self::getContainer()->get('mautic.point.model.trigger');
+        $triggerModel = self::getContainer()->get(TriggerModel::class);
 
         $triggerRepo      = $triggerModel->getRepository();
         $triggerEventRepo = $triggerModel->getEventRepository();
@@ -47,7 +47,7 @@ final class TriggerControllerTest extends MauticMysqlTestCase
         $this->assertCount(2, $triggerEventRepo->findAll());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/points/triggers/clone/'.$trigger->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $form    = $crawler->selectButton('Save')->form();
         $this->client->submit($form);

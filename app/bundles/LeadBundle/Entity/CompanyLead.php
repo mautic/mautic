@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -7,9 +9,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class CompanyLead
 {
+    public const TABLE_NAME = 'companies_leads';
+
     /**
      * @var Company
-     **/
+     */
     private $company;
 
     /**
@@ -31,7 +35,7 @@ class CompanyLead
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('companies_leads')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(CompanyLeadRepository::class);
 
         $builder->createManyToOne('company', 'Company')
@@ -66,7 +70,7 @@ class CompanyLead
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead()
     {
@@ -114,7 +118,7 @@ class CompanyLead
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getPrimary()
     {

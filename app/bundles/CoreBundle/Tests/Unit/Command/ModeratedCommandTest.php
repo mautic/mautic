@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
@@ -14,18 +16,22 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Lock\LockInterface;
 
-class ModeratedCommandTest extends TestCase
+final class ModeratedCommandTest extends TestCase
 {
     private string $lockFilePath;
-    private CoreParametersHelper|MockObject $coreParametersHelper;
 
     /**
-     * @var MockObject|InputInterface
+     * @var MockObject&CoreParametersHelper
+     */
+    private MockObject $coreParametersHelper;
+
+    /**
+     * @var MockObject&InputInterface
      */
     private MockObject $input;
 
     /**
-     * @var MockObject|PathsHelper
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 
@@ -67,7 +73,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): ?string => match ($name) {
                     'lock_mode' => 'file_lock',
                     default     => null,
                 }
@@ -83,7 +89,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): string|true|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_FLOCK,
                     'bypass-locking' => true,
                     default          => null,
@@ -100,7 +106,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): bool|string|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_FLOCK,
                     'bypass-locking' => false,
                     'force'          => true,
@@ -126,7 +132,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): string|false|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_PID,
                     'bypass-locking' => false,
                     default          => null,
@@ -144,7 +150,7 @@ class ModeratedCommandTest extends TestCase
             ->name('sf*')
             ->files();
 
-        $this->assertEquals(1, $finder->count());
+        $this->assertCount(1, $finder);
 
         // Complete the command
         $this->fakeModeratedCommand->forceCompleteRun();
@@ -155,10 +161,66 @@ class ModeratedCommandTest extends TestCase
             ->name('sf*')
             ->files();
 
-        $this->assertEquals(0, $finder->count());
+        $this->assertCount(0, $finder);
 
         // Cleanup
         rmdir($runDir);
+    }
+
+    public function testPidLockThrowsWhenTheLockFileCannotBeOpened(): void
+    {
+        if (!$this->fakeModeratedCommand->isPidSupported()) {
+            $this->markTestSkipped('getmypid and/or posix_getpgid are not available');
+        }
+
+        // Directories of this test's own, so the cleanup below only removes what it created.
+        $baseDir  = sys_get_temp_dir().'/mautic_moderated_command_'.uniqid();
+        $cacheDir = $baseDir.'/tmp';
+        $runDir   = $baseDir.'/run';
+        mkdir($cacheDir, 0755, true);
+
+        // Make the run directory non-writable so opening the lock file inside it fails. This
+        // mirrors a run directory owned by another user, e.g. one created by a console command
+        // executed as root while the scheduled commands run as the web server user.
+        mkdir($runDir);
+        chmod($runDir, 0500);
+        clearstatcache(true, $runDir);
+
+        if (is_writable($runDir)) {
+            rmdir($runDir);
+            rmdir($cacheDir);
+            rmdir($baseDir);
+            $this->markTestSkipped('The run directory could not be made non-writable; the test is running as a privileged user or on a filesystem without POSIX permissions.');
+        }
+
+        $this->pathsHelper->expects($this->once())
+            ->method('getSystemPath')
+            ->with('cache')
+            ->willReturn($cacheDir);
+
+        $this->input->method('getOption')
+            ->willReturnCallback(
+                fn (string $name): string|false|null => match ($name) {
+                    'lock_mode'      => ModeratedCommand::MODE_PID,
+                    'bypass-locking' => false,
+                    default          => null,
+                }
+            );
+
+        // Without the guard, fopen() returns false and flock() raises a TypeError on PHP 8.
+        // Returning false instead of throwing would report this permanent failure as ordinary
+        // lock contention, which every caller of checkRunStatus() maps to a successful exit.
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/could not be opened/');
+
+        try {
+            $this->fakeModeratedCommand->run($this->input, $this->output);
+        } finally {
+            chmod($runDir, 0700);
+            rmdir($runDir);
+            rmdir($cacheDir);
+            rmdir($baseDir);
+        }
     }
 
     public function testFileLock(): void
@@ -172,7 +234,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): string|false|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_FLOCK,
                     'bypass-locking' => false,
                     default          => null,
@@ -189,7 +251,7 @@ class ModeratedCommandTest extends TestCase
             ->name('sf*')
             ->files();
 
-        $this->assertEquals(1, $finder->count());
+        $this->assertCount(1, $finder);
 
         // Check the file is locked
         $file        = $this->getFirstFile($finder);
@@ -223,7 +285,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): string|false|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_REDIS,
                     'bypass-locking' => false,
                     default          => null,
@@ -284,7 +346,7 @@ class ModeratedCommandTest extends TestCase
     public function testCompleteRunHandlesNullLockObject(): void
     {
         // Ensure lock object is null
-        $this->fakeModeratedCommand->setLock(null);
+        $this->fakeModeratedCommand->setLock();
 
         // Create a dummy lock file
         file_put_contents($this->lockFilePath, 'test_lock');

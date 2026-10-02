@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class NormalizeFormExtension extends AbstractTypeExtension
+final class NormalizeFormExtension extends AbstractTypeExtension
 {
     /**
      * @param array<mixed> $options
@@ -22,7 +22,7 @@ class NormalizeFormExtension extends AbstractTypeExtension
             return;
         }
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
             $data = $event->getData();
 
             if (!\is_string($data)) {

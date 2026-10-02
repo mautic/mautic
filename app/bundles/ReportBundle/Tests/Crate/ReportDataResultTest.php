@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-class ReportDataResultTest extends \PHPUnit\Framework\TestCase
+final class ReportDataResultTest extends \PHPUnit\Framework\TestCase
 {
     public function testValidData(): void
     {
@@ -112,7 +112,7 @@ class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $expectedDateFrom = Fixtures::getDateFrom();
 
         $this->assertEquals($expectedDateFrom, $reportDataResult->getDateFrom());
-        $this->assertTrue($reportDataResult->getDateFrom() instanceof \DateTime);
+        $this->assertInstanceOf(\DateTime::class, $reportDataResult->getDateFrom());
     }
 
     public function testGetDateTo(): void
@@ -121,7 +121,7 @@ class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $dateTo           = Fixtures::getDateTo();
 
         $this->assertEquals($dateTo, $reportDataResult->getDateTo());
-        $this->assertTrue($reportDataResult->getDateTo() instanceof \DateTime);
+        $this->assertInstanceOf(\DateTime::class, $reportDataResult->getDateTo());
     }
 
     public function testIsLastPage(): void
@@ -157,29 +157,29 @@ class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $calc         = $reportDataResult->calcTotal('AVG', $valuesCount, $values);
         $calcWithPrev = $reportDataResult->calcTotal('AVG', $valuesCount + 2, $values, 10);
 
-        $this->assertEquals(round(array_sum($values) / $valuesCount, FormatterHelper::FLOAT_PRECISION), $calc);
-        $this->assertEquals(round((array_sum($values) + 10) / ($valuesCount + 2), FormatterHelper::FLOAT_PRECISION), $calcWithPrev);
+        $this->assertSame(round(array_sum($values) / $valuesCount, FormatterHelper::FLOAT_PRECISION), $calc);
+        $this->assertSame(round((array_sum($values) + 10) / ($valuesCount + 2), FormatterHelper::FLOAT_PRECISION), $calcWithPrev);
 
         // Calc test MIN
         $calc         = $reportDataResult->calcTotal('MIN', $valuesCount, $values);
         $calcWithPrev = $reportDataResult->calcTotal('MIN', $valuesCount, $values, 0);
 
-        $this->assertEquals(1, $calc);
-        $this->assertEquals(0, $calcWithPrev);
+        $this->assertSame(1, $calc);
+        $this->assertEqualsWithDelta(0.0, $calcWithPrev, PHP_FLOAT_EPSILON);
 
         // Calc test MAX
         $calc         = $reportDataResult->calcTotal('MAX', $valuesCount, $values);
         $calcWithPrev = $reportDataResult->calcTotal('MAX', $valuesCount, $values, 25);
 
-        $this->assertEquals(20, $calc);
-        $this->assertEquals(25, $calcWithPrev);
+        $this->assertSame(20, $calc);
+        $this->assertEqualsWithDelta(25.0, $calcWithPrev, PHP_FLOAT_EPSILON);
 
         // Calc test 'default'
         $calc         = $reportDataResult->calcTotal('RANDOM', $valuesCount, $values);
         $calcWithPrev = $reportDataResult->calcTotal('RANDOM', $valuesCount, $values, 50);
 
         $this->assertNull($calc);
-        $this->assertEquals(50, $calcWithPrev);
+        $this->assertEqualsWithDelta(50.0, $calcWithPrev, PHP_FLOAT_EPSILON);
     }
 
     public function testGetColumnKeys(): void

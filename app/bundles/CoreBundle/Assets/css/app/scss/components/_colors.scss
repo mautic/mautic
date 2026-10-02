@@ -1,0 +1,39 @@
+//
+// Colors
+// --------------------------------------------------
+
+.bg-white {
+  @include bg-color(#fff, $text-color);
+}
+.bg-auto {
+  @include bg-color($body-bg, $text-color);
+}
+.bg-transparent {
+  background-color: transparent !important;
+  color: $text-color;
+}
+
+// Brand primary
+.bg-primary {
+  @include bg-color(var(--background-brand), var(--text-on-color));
+}
+
+// Brand success
+.bg-success {
+  @include bg-color(var(--support-success), var(--text-inverse));
+}
+
+// Brand info
+.bg-info {
+  @include bg-color(var(--support-info), var(--text-inverse));
+}
+
+// Brand warning
+.bg-warning {
+  @include bg-color(var(--support-warning), var(--text-inverse));
+}
+
+// Brand danger
+.bg-danger {
+  @include bg-color(var(--support-error), var(--text-inverse));
+}

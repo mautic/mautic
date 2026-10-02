@@ -11,9 +11,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FileManagerController extends AjaxController
+final class FileManagerController extends AjaxController
 {
     private const DEFAULT_PAGE  = 1;
+
     private const DEFAULT_LIMIT = 20;
 
     public function uploadAction(Request $request, FileManager $fileManager): Response

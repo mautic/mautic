@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
+use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\NotificationBundle\Helper\NotificationHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class BuildJsSubscriber implements EventSubscriberInterface
+final readonly class BuildJsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private NotificationHelper $notificationHelper,
@@ -28,6 +31,10 @@ class BuildJsSubscriber implements EventSubscriberInterface
 
     public function onBuildJs(BuildJsEvent $event): void
     {
+        if (!$event->acceptsScope(BuildJsScope::TRACKING)) {
+            return;
+        }
+
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
         if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
@@ -40,6 +47,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
         $height         = 450;
 
         $js = <<<JS
+if (window.MauticJS && window.MauticJS.runtimeReady === true) {
         
         {$this->notificationHelper->getHeaderScript()}
        
@@ -86,8 +94,9 @@ MauticJS.notification = {
 };
 
 MauticJS.documentReady(MauticJS.notification.init);
+}
 JS;
 
-        $event->appendJs($js, 'Mautic Notification JS');
+        $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic Notification JS');
     }
 }

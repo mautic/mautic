@@ -10,11 +10,11 @@ use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ChannelExtension extends AbstractExtension
+final class ChannelExtension extends AbstractExtension
 {
     public function __construct(
-        private DncReasonHelper $dncReasonHelper,
-        private ChannelListHelper $channelListHelper,
+        private readonly DncReasonHelper $dncReasonHelper,
+        private readonly ChannelListHelper $channelListHelper,
     ) {
     }
 
@@ -24,8 +24,8 @@ class ChannelExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('getChannelDncText', [$this, 'getChannelDncText']),
-            new TwigFunction('getChannelLabel', [$this, 'getChannelLabel']),
+            new TwigFunction('getChannelDncText', $this->getChannelDncText(...)),
+            new TwigFunction('getChannelLabel', $this->getChannelLabel(...)),
         ];
     }
 

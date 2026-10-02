@@ -9,13 +9,11 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\User\UserInterface;
 
-class UserCreator implements UserCreatorInterface
+final class UserCreator implements UserCreatorInterface
 {
-    private int $defaultRole;
+    private readonly int $defaultRole;
 
     private array $requiredFields = [
         'username',
@@ -25,18 +23,14 @@ class UserCreator implements UserCreatorInterface
     ];
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private UserMapper $userMapper,
-        private UserModel $userModel,
-        private UserPasswordHasher $hasher,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserMapper $userMapper,
+        private readonly UserModel $userModel,
         $defaultRole,
     ) {
         $this->defaultRole   = (int) $defaultRole;
     }
 
-    /**
-     * @return UserInterface|null
-     */
     public function createUser(Response $response): User
     {
         if (empty($this->defaultRole)) {
@@ -47,7 +41,7 @@ class UserCreator implements UserCreatorInterface
         $defaultRole = $this->entityManager->getReference(Role::class, $this->defaultRole);
 
         $user = $this->userMapper->getUser($response);
-        $user->setPassword($this->userModel->checkNewPassword($user, $this->hasher, EncryptionHelper::generateKey()));
+        $user->setPassword($this->userModel->checkNewPassword($user, EncryptionHelper::generateKey()));
         $user->setRole($defaultRole);
 
         $this->validateUser($user);
@@ -66,7 +60,7 @@ class UserCreator implements UserCreatorInterface
         foreach ($this->requiredFields as $field) {
             $getter = 'get'.ucfirst($field);
 
-            if (!$user->$getter()) {
+            if (!$user->{$getter}()) {
                 throw new BadCredentialsException('User does not include required fields.');
             }
         }

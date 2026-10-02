@@ -6,10 +6,11 @@ namespace Mautic\LeadBundle\Tests\Segment\DoNotContact;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
+final class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
+    #[DataProvider('dataProvider')]
     public function testParts(string $field, string $channel, int $type): void
     {
         $doNotContactParts = new DoNotContactParts($field);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -17,67 +19,33 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var array
-     */
-    private $config = [
-        'useremail' => [
-            'email' => 0,
-        ],
-        'user_id'  => [6, 7],
-        'to_owner' => true,
-        'to'       => 'hello@there.com, bob@bobek.cz',
-        'bcc'      => 'hidden@translation.in',
-    ];
-
-    /**
-     * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
-
-    /**
-     * @var RealTimeExecutioner&\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $realTimeExecutioner;
-
-    /**
-     * @var SendEmailToUser|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&SendEmailToUser
      */
     private \PHPUnit\Framework\MockObject\MockObject $sendEmailToUser;
-
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     private CampaignSubscriber $subscriber;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->emailModel          = $this->createMock(EmailModel::class);
-        $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
         $this->sendEmailToUser     = $this->createMock(SendEmailToUser::class);
-        $this->translator          = $this->createMock(TranslatorInterface::class);
-        $leadModel                 = $this->createMock(LeadModel::class);
-        $statRepository            = $this->createMock(StatRepository::class);
 
         $this->subscriber = new CampaignSubscriber(
-            $this->emailModel,
-            $this->realTimeExecutioner,
+            $this->createStub(EmailModel::class),
+            $this->createStub(RealTimeExecutioner::class),
             $this->sendEmailToUser,
-            $this->translator,
-            $leadModel,
-            $statRepository
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(LeadModel::class),
+            $this->createStub(StatRepository::class)
         );
     }
 
     public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $event         = new Event();
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 
@@ -102,7 +70,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 
@@ -129,7 +97,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 
@@ -153,7 +121,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->sendEmailToUser->expects($this->once())
             ->method('sendEmailToUsers')
             ->with([], $lead)
-            ->will($this->throwException(new EmailCouldNotBeSentException('Something happened')));
+            ->willThrowException(new EmailCouldNotBeSentException('Something happened'));
 
         $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
         $this->subscriber->onCampaignTriggerActionSendEmailToUser($pendingEvent);
@@ -165,6 +133,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var LeadEventLog $failure */
         $failure    = $failures->first();
         $failedLead = $failure->getLead();
+        $this->assertInstanceOf(Lead::class, $failedLead);
 
         $this->assertSame('tester@mautic.org', $failedLead->getEmail());
     }
@@ -175,7 +144,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnCampaignTriggerActionSendEmailToContactWithWrongEventType(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $event         = new Event();
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 

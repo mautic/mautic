@@ -13,7 +13,7 @@
             heading: 'mautic.form.list.heading',
             copy: 'mautic.form.list.copy',
         }) }}
-        
+
         {% set formFeaturesContainer %}
         <div class="row">
             <div class="col-sm-6 col-xs-12">
@@ -55,13 +55,13 @@
             } %}
         </div>
         {% endset %}
-        
+
         {{ include('@MauticCore/Components/content-group.html.twig', {
             heading: 'mautic.form.list.uses.heading',
             childContainer: formUsesContainer,
         }) }}
     {% endset %}
-    
+
     {{ include('@MauticCore/Components/content-block.html.twig', {
         heading: 'mautic.form.list.block.heading',
         subheading: 'mautic.form.list.block.subheading',

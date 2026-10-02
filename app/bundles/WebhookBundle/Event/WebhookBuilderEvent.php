@@ -11,7 +11,7 @@ class WebhookBuilderEvent extends Event
     private array $events = [];
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -26,7 +26,7 @@ class WebhookBuilderEvent extends Event
     public function addEvent($key, array $event): void
     {
         if (array_key_exists($key, $this->events)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another webhook event. Please use a different key.");
+            throw new InvalidArgumentException("The key, '{$key}' is already used by another webhook event. Please use a different key.");
         }
 
         $event['label']       = $this->translator->trans($event['label']);
@@ -37,10 +37,8 @@ class WebhookBuilderEvent extends Event
 
     /**
      * Get webhook events.
-     *
-     * @return array
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         static $sorted = false;
 

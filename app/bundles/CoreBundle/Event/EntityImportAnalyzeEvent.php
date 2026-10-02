@@ -16,8 +16,10 @@ final class EntityImportAnalyzeEvent extends Event
     /**
      * @param array<string, mixed> $data
      */
-    public function __construct(private string $entityName, private array $data)
-    {
+    public function __construct(
+        private readonly string $entityName,
+        private readonly array $data,
+    ) {
     }
 
     /**
@@ -44,8 +46,8 @@ final class EntityImportAnalyzeEvent extends Event
     /**
      * @return array<string, mixed>
      */
-    public function getSummary(): ?array
+    public function getSummary(): array
     {
-        return $this->summary ?? null;
+        return $this->summary;
     }
 }

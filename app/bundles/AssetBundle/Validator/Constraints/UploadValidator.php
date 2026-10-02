@@ -16,8 +16,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 final class UploadValidator extends ConstraintValidator
 {
     public function __construct(
-        private FileUploadValidator $fileUploadValidator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly FileUploadValidator $fileUploadValidator,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

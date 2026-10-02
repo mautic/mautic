@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
-class IntegrationsExtension extends Extension
+final class IntegrationsExtension extends Extension
 {
     /**
      * @param mixed[] $configs

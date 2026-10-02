@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Tests\Service;
 
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 
-class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
+final class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetOriginalNormData(): void
     {
-        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
-        $auditLogModel  = $this->createMock(AuditLogModel::class);
+        $ipLookupHelper = $this->createStub(IpLookupHelper::class);
+        $auditLogModel  = $this->createStub(AuditLogModel::class);
         $logger         = new ConfigChangeLogger($ipLookupHelper, $auditLogModel);
 
         $this->assertEquals($logger, $logger->setOriginalNormData([]));

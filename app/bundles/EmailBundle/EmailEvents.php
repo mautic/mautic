@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle;
 
 /**
@@ -78,6 +80,16 @@ final class EmailEvents
     public const EMAIL_ON_BUILD = 'mautic.email_on_build';
 
     /**
+     * The mautic.email_on_toggle_publish event is dispatched right before an email is toggle publish.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailEvent instance.
+     *
+     * @var string
+     */
+    public const EMAIL_ON_TOGGLE_PUBLISH = 'mautic.email_on_toggle_publish';
+
+    /**
      * The mautic.email_pre_save event is dispatched right before a email is persisted.
      *
      * The event listener receives a
@@ -108,7 +120,7 @@ final class EmailEvents
     public const EMAIL_PRE_DELETE = 'mautic.email_pre_delete';
 
     /**
-     * The mautic.email_post_delete event is dispatched after a email is deleted.
+     * The mautic.email_post_delete event is dispatched after an email is deleted.
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailEvent instance.

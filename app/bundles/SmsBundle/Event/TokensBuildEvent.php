@@ -1,16 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class TokensBuildEvent extends Event
+final class TokensBuildEvent extends Event
 {
     /**
      * @param array<string, string> $tokens
      */
-    public function __construct(private array $tokens)
-    {
+    public function __construct(
+        private array $tokens,
+    ) {
     }
 
     /**
@@ -24,7 +27,7 @@ class TokensBuildEvent extends Event
     /**
      * @param array<string, string> $tokens
      */
-    public function setTokens($tokens): void
+    public function setTokens(array $tokens): void
     {
         $this->tokens = $tokens;
     }

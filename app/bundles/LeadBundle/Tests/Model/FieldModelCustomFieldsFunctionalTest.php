@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -13,7 +15,7 @@ final class FieldModelCustomFieldsFunctionalTest extends MauticMysqlTestCase
     public function testGetLeadFields(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
         $fields     = $fieldModel->getLeadFields();
         $expected   = count(FieldModel::$coreFields);
         $this->assertGreaterThanOrEqual($expected, count($fields));
@@ -22,7 +24,7 @@ final class FieldModelCustomFieldsFunctionalTest extends MauticMysqlTestCase
     public function testLeadFieldCustomFields(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
         $this->assertEmpty($fields, 'There are no Custom Fields.');
@@ -36,13 +38,13 @@ final class FieldModelCustomFieldsFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($leadField);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
-        $this->assertEquals(1, count($fields));
+        $this->assertCount(1, $fields);
     }
 
     public function testGetLeadCustomFieldsSchemaDetails(): void
     {
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
 
         // Add field.
         $leadField = new LeadField();
@@ -53,6 +55,6 @@ final class FieldModelCustomFieldsFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($leadField);
 
         $schemas = $fieldModel->getLeadFieldCustomFieldSchemaDetails();
-        $this->assertEquals(1, count($schemas));
+        $this->assertCount(1, $schemas);
     }
 }

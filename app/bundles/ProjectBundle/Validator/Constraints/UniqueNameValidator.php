@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 final class UniqueNameValidator extends ConstraintValidator
 {
     public function __construct(
-        private ProjectRepository $projectRepository,
+        private readonly ProjectRepository $projectRepository,
     ) {
     }
 

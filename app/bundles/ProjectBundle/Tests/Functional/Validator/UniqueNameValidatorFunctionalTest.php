@@ -24,11 +24,11 @@ final class UniqueNameValidatorFunctionalTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         $form['project_entity[name]']->setValue('QWERTY');
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $this->assertStringContainsString(
             'A project with this name already exists.',
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
 
         $this->assertCount(1, $this->em->getRepository(Project::class)->findBy(['name' => $project->getName()]));

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
 
-class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
+final class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
 {
     public function testPreviewSettingsAllEnabled(): void
     {
@@ -27,27 +27,18 @@ class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
         $mainPageId = $pageMain->getId();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/pages');
-        self::assertStringContainsString($pageMain->getTitle(), $crawler->text());
+        $this->assertStringContainsString($pageMain->getTitle(), $crawler->text());
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/view/{$mainPageId}");
 
         // Translation choice is not visible
-        self::assertCount(
-            0,
-            $crawler->filterXPath('//*[@id="content_preview_settings_translation"]')
-        );
+        $this->assertCount(0, $crawler->filterXPath('//*[@id="content_preview_settings_translation"]'));
 
         // Variant choice is not visible
-        self::assertCount(
-            0,
-            $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
-        );
+        $this->assertCount(0, $crawler->filterXPath('//*[@id="content_preview_settings_variant"]'));
 
         // Contact lookup is not visible
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_contact"]'));
 
         $pageTranslated = new Page();
         $pageTranslated->setIsPublished(true);
@@ -82,31 +73,16 @@ class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/view/{$mainPageId}");
 
         // Translation choice is visible
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_translation"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_translation"]'));
 
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_translation"]/option[@value="'.$pageTranslated->getId().'"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_translation"]/option[@value="'.$pageTranslated->getId().'"]'));
 
         // Variant choice is visible
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_variant"]'));
 
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_variant"]/option[@value="'.$pageVariant->getId().'"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_variant"]/option[@value="'.$pageVariant->getId().'"]'));
 
         // Contact lookup is visible
-        self::assertCount(
-            1,
-            $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
-        );
+        $this->assertCount(1, $crawler->filterXPath('//*[@id="content_preview_settings_contact"]'));
     }
 }

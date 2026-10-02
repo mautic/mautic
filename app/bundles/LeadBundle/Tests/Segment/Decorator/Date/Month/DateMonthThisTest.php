@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Month;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -8,14 +10,15 @@ use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthThis;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(DateMonthThis::class)]
-class DateMonthThisTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(DateMonthThis::class)]
+final class DateMonthThisTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorBetween(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
-        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
+        $timezoneResolver = $this->createStub(TimezoneResolver::class);
 
         $filter        = [
             'operator' => '=',
@@ -31,7 +34,7 @@ class DateMonthThisTest extends \PHPUnit\Framework\TestCase
     public function testGetOperatorLessOrEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
-        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+        $timezoneResolver = $this->createStub(TimezoneResolver::class);
 
         $dateDecorator->method('getOperator')
             ->with()
@@ -50,7 +53,7 @@ class DateMonthThisTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParameterValueBetween(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('', null, 'local');
@@ -74,7 +77,7 @@ class DateMonthThisTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParameterValueSingle(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('', null, 'local');

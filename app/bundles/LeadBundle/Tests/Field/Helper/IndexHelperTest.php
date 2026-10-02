@@ -12,14 +12,14 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
-class IndexHelperTest extends \PHPUnit\Framework\TestCase
+final class IndexHelperTest extends \PHPUnit\Framework\TestCase
 {
     public const COLUMN_NAME_KEY = 'Column_name';
 
     public function testGetIndexCountAndColumns(): void
     {
         $tableName   = 'table_name';
-        $sql         = "SHOW INDEXES FROM `$tableName`";
+        $sql         = "SHOW INDEXES FROM `{$tableName}`";
         $columnNames = [
             'id', '0', '1', '1', '2', '2',
         ];
@@ -27,9 +27,7 @@ class IndexHelperTest extends \PHPUnit\Framework\TestCase
             $sqlResult[][self::COLUMN_NAME_KEY] = $columnName;
         }
         $expectedColumnNames = array_map(
-            function ($column) {
-                return $column[self::COLUMN_NAME_KEY];
-            },
+            fn (array $column): string => $column[self::COLUMN_NAME_KEY],
             $sqlResult
         );
 
@@ -71,6 +69,6 @@ class IndexHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($sqlResult);
 
         $this->assertEquals($expectedColumnNames, $helper->getIndexedColumnNames());
-        $this->assertEquals($expectedCount, $helper->getIndexCount());
+        $this->assertSame($expectedCount, $helper->getIndexCount());
     }
 }

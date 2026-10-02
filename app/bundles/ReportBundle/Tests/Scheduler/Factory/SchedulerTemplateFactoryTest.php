@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Factory;
 
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerDailyBuilder;
@@ -11,7 +13,7 @@ use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 
-class SchedulerTemplateFactoryTest extends \PHPUnit\Framework\TestCase
+final class SchedulerTemplateFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testNowBuilder(): void
     {

@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Exception;
 
-class ValidationException extends \Exception
+final class ValidationException extends \Exception
 {
     /**
      * @var mixed[]

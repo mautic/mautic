@@ -1,6 +1,3 @@
-/* FormBundle */
-
-/* Panel Styles */
 .panel2 {
     --layout-density-padding-inline-local: 3px 6px;
     -webkit-box-shadow: 0px 1px 1px #00000012;
@@ -11,13 +8,11 @@
     font-size: 1em;
 }
 
-/* Form Submit Action Group Header */
 .form-submitaction-group-header {
     font-size: 1.1em;
     font-weight: bold;
 }
 
-/* Form Field Wrapper */
 .form-field-wrapper {
     position: relative;
     width: 100%;
@@ -31,44 +26,23 @@
     margin: 0 25px 25px 25px;
 }
 
-/* Field Width Classes */
-.mauticform-full-width {
-    width: 100%;
-}
+.mauticform-100 { width: 100%; }
+.mauticform-75 { width: 75%; }
+.mauticform-66 { width: 66.66%; }
+.mauticform-50 { width: 50%; }
+.mauticform-33 { width: 33.33%; }
+.mauticform-25 { width: 25%; }
 
-.mauticform-three-quarters-width {
-    width: 75%;
-}
-
-.mauticform-two-thirds-width {
-    width: 66.66%;
-}
-
-.mauticform-half-width {
-    width: 50%;
-}
-
-.mauticform-one-third-width {
-    width: 33.33%;
-}
-
-.mauticform-one-quarter-width {
-    width: 25%;
-}
-
-
-/* Responsive adjustment for mobile */
 @media (max-width: 767px) {
-    .mauticform-three-quarters-width,
-    .mauticform-two-thirds-width,
-    .mauticform-half-width,
-    .mauticform-one-third-width,
-    .mauticform-one-quarter-width {
+    .mauticform-75,
+    .mauticform-66,
+    .mauticform-50,
+    .mauticform-33,
+    .mauticform-25 {
         width: 100%;
     }
 }
 
-/* Mautic Forms Fields and Actions */
 #mauticforms_actions .mauticform-row .action-label {
     font-size: 1.1em;
     font-weight: bold;
@@ -99,12 +73,10 @@
     line-height: inherit;
 }
 
-/* Textarea Form HTML */
 textarea.form-html {
     height: 200px;
 }
 
-/* Column Widths */
 .col-form-id, .col-formresult-id {
     width: 75px;
 }
@@ -112,7 +84,6 @@ textarea.form-html {
     width: 100px;
 }
 
-/* Form Result List */
 .formresult-list th .input-group {
     margin-top: 10px;
 }
@@ -123,12 +94,10 @@ textarea.form-html {
     min-width: 125px;
 }
 
-/* Inline Spacer */
 .inline-spacer {
     padding-right: 20px;
 }
 
-/* Mautic Form Wrapper */
 .mauticform_wrapper {
     max-width: 600px;
     margin: 10px auto;
@@ -209,11 +178,9 @@ textarea.form-html {
     font-weight: normal;
     line-height: 1em;
 }
-/* Checkbox group styling */
 .mauticform-checkboxgrp-checkbox {
     margin-right: 5px;
 }
-/* Radio group row styling */
 .mauticform-radiogrp-row {
     margin-bottom: 5px;
 }
@@ -227,7 +194,6 @@ input[type="radio"].mauticform-radiogrp-radio {
     margin-right: 4px;
 }
 
-/* Mautic Form Button Styles */
 .mauticform-button-wrapper .mauticform-button,
 .mauticform-pagebreak-wrapper .mauticform-pagebreak {
     margin-bottom: 0;
@@ -247,4 +213,22 @@ input[type="radio"].mauticform-radiogrp-radio {
 }
 .mauticform-pagebreak-wrapper .mauticform-button-wrapper {
     display: inline;
+}
+.mauticform-rating .mauticform-rating-row {
+    direction: rtl;
+    display: inline-flex;
+}
+.mauticform-rating .mauticform-rating-radio {
+    display: none;
+}
+.mauticform-rating .mauticform-rating-label {
+    font-size: 1.5em;
+    color: var(--base-color, #ccc);
+    cursor: pointer;
+    padding: 0 2px;
+}
+.mauticform-rating .mauticform-rating-radio:checked ~ label.mauticform-rating-label,
+.mauticform-rating .mauticform-rating-label:hover,
+.mauticform-rating .mauticform-rating-label:hover ~ label.mauticform-rating-label {
+    color: var(--star-color, #f5b301);
 }

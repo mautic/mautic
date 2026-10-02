@@ -11,8 +11,8 @@ use Psr\Cache\InvalidArgumentException;
 class SegmentCountCacheHelper
 {
     public function __construct(
-        private CacheProviderInterface $cacheProvider,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CacheProviderInterface $cacheProvider,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

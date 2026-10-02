@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Event\Options;
 
 class FetchOptions
@@ -13,10 +15,8 @@ class FetchOptions
 
     /**
      * @param int $value
-     *
-     * @return $this
      */
-    public function setItemId($value)
+    public function setItemId($value): static
     {
         $this->itemId = $value;
 
@@ -34,10 +34,8 @@ class FetchOptions
     /**
      * @param string $key
      * @param mixed  $value
-     *
-     * @return $this
      */
-    public function setOption($key, $value)
+    public function setOption($key, $value): static
     {
         $this->options[$key] = $value;
 

@@ -20,12 +20,16 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class SentHelperTest extends TestCase
+final class SentHelperTest extends TestCase
 {
     private DateTimeHelper $dateTimeHelper;
+
     private SentHelper $sentHelper;
+
     private MockObject&GeneratedColumnsProviderInterface $generatedColumnsProvider;
+
     private MockObject&QueryBuilder $queryBuilder;
+
     private MockObject&Result $result;
 
     private GeneratedColumns $generatedColumns;
@@ -52,13 +56,13 @@ class SentHelperTest extends TestCase
             new Collector(new EventDispatcher()),
             $connection,
             $this->generatedColumnsProvider,
-            $this->createMock(UserHelper::class)
+            $this->createStub(UserHelper::class)
         );
     }
 
     public function testGenerateStatsDaily(): void
     {
-        $this->generatedColumnsProvider->expects($this->any())
+        $this->generatedColumnsProvider
             ->method('generatedColumnsAreSupported')
             ->willReturn(true);
 
@@ -104,7 +108,7 @@ class SentHelperTest extends TestCase
 
     public function testGenerateStatsHourly(): void
     {
-        $this->generatedColumnsProvider->expects($this->any())
+        $this->generatedColumnsProvider
             ->method('generatedColumnsAreSupported')
             ->willReturn(true);
 
@@ -153,7 +157,7 @@ class SentHelperTest extends TestCase
 
     private function mockQueryPart(): void
     {
-        $this->queryBuilder->method('getQueryPart')
+        $this->queryBuilder->expects($this->atLeast(2))->method('getQueryPart')
             ->willReturnMap(
                 [
                     [

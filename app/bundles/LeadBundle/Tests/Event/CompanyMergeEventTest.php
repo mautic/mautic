@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Event\CompanyMergeEvent;
 use PHPUnit\Framework\TestCase;
 
-class CompanyMergeEventTest extends TestCase
+final class CompanyMergeEventTest extends TestCase
 {
     public function testConstructGettersSetters(): void
     {

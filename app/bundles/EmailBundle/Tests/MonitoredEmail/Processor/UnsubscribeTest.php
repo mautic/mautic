@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -13,18 +15,19 @@ use Mautic\EmailBundle\Tests\MonitoredEmail\Transport\TestTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
-class UnsubscribeTest extends \PHPUnit\Framework\TestCase
+final class UnsubscribeTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the transport interface processes the message appropriately')]
+    #[TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void
     {
         $transport     = new TestTransport();
         $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
-                function ($email) {
+                function ($email): Result {
                     $stat = new Stat();
 
                     $lead = new Lead();
@@ -46,11 +49,11 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createStub(Translator::class);
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
-        $doNotContact = $this->createMock(DoNotContact::class);
+        $doNotContact = $this->createStub(DoNotContact::class);
 
         $processor = new Unsubscribe($transport, $contactFinder, $translator, $logger, $doNotContact);
 
@@ -58,14 +61,14 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($processor->process($message));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
+    #[TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessageAndDncRecordAdded(): void
     {
         $transport     = new NullTransport();
         $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
-                function ($email) {
+                function ($email): Result {
                     $stat = new Stat();
 
                     $lead = new Lead();
@@ -87,11 +90,11 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createStub(Translator::class);
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
-        $doNotContact = $this->createMock(DoNotContact::class);
+        $doNotContact = $this->createStub(DoNotContact::class);
 
         $processor = new Unsubscribe($transport, $contactFinder, $translator, $logger, $doNotContact);
 

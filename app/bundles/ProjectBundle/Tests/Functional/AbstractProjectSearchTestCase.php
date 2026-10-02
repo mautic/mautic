@@ -7,6 +7,7 @@ namespace Mautic\ProjectBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -18,7 +19,7 @@ abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
      * @param string[] $expectedEntities
      * @param string[] $unexpectedEntities
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('searchDataProvider')]
+    #[DataProvider('searchDataProvider')]
     abstract public function testProjectSearch(string $searchTerm, array $expectedEntities, array $unexpectedEntities): void;
 
     /**
@@ -43,15 +44,15 @@ abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
             $content = $isApiRequest ? $this->client->getResponse()->getContent() : $crawler->filter('body')->text();
 
             foreach ($expectedEntities as $expectedEntity) {
-                Assert::assertStringContainsString($expectedEntity, $content);
+                $this->assertStringContainsString($expectedEntity, (string) $content);
             }
 
             foreach ($unexpectedEntities as $unexpectedEntity) {
-                Assert::assertStringNotContainsString($unexpectedEntity, $content);
+                $this->assertStringNotContainsString($unexpectedEntity, (string) $content);
             }
 
             if ($isApiRequest) {
-                Assert::assertJson($content, 'API response should be of type JSON.');
+                $this->assertJson($content, 'API response should be of type JSON.');
                 $this->assertProjectDataInApiResponse(json_decode($content, true));
             }
         }
@@ -77,8 +78,7 @@ abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
             return;
         }
 
-        Assert::assertEqualsCanonicalizing(['id', 'name'], array_keys(reset($projectData)),
-            'Project data should contain only "id" and "name".');
+        $this->assertEqualsCanonicalizing(['id', 'name'], array_keys(reset($projectData)), 'Project data should contain only "id" and "name".');
     }
 
     /**

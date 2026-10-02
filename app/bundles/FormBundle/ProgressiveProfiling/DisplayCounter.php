@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\ProgressiveProfiling;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
-class DisplayCounter
+final class DisplayCounter
 {
     private int $displayedFields = 0;
 
     private int $alreadyAlwaysDisplayed = 0;
 
     public function __construct(
-        private Form $form,
+        private readonly Form $form,
     ) {
     }
 

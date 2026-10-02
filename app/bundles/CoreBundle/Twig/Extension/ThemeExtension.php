@@ -9,18 +9,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ThemeExtension extends AbstractExtension
+final class ThemeExtension extends AbstractExtension
 {
     public function __construct(
-        private ThemeHelper $themeHelper,
-        private TranslatorInterface $translator,
+        private readonly ThemeHelper $themeHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('getThemeName', [$this, 'getThemeName']),
+            new TwigFunction('getThemeName', $this->getThemeName(...)),
         ];
     }
 

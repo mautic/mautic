@@ -2,6 +2,7 @@
 
 namespace Mautic\NotificationBundle\Api;
 
+use GuzzleHttp\RequestOptions;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Exception\MissingApiKeyException;
 use Mautic\NotificationBundle\Exception\MissingAppIDException;
@@ -39,12 +40,12 @@ class OneSignalApi extends AbstractNotificationApi
         return $this->http->post(
             $this->apiUrlBase.$endpoint,
             [
-                \GuzzleHttp\RequestOptions::HEADERS => [
+                RequestOptions::HEADERS => [
                     'Authorization' => 'Basic '.$restApiKey,
                     'Content-Type'  => 'application/json',
                 ],
-                \GuzzleHttp\RequestOptions::JSON        => $data,
-                \GuzzleHttp\RequestOptions::HTTP_ERRORS => false,
+                RequestOptions::JSON        => $data,
+                RequestOptions::HTTP_ERRORS => false,
             ]
         );
     }
@@ -103,7 +104,7 @@ class OneSignalApi extends AbstractNotificationApi
         return $this->send('/notifications', $data);
     }
 
-    protected function addMobileData(array &$data, array $mobileConfig)
+    protected function addMobileData(array &$data, array $mobileConfig): void
     {
         foreach ($mobileConfig as $key => $value) {
             switch ($key) {

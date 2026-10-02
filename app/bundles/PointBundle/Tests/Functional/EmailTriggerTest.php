@@ -8,14 +8,16 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailTriggerTest extends MauticMysqlTestCase
+final class EmailTriggerTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testButtonsAreEnabledOnEditSendEmailToUserWhenEmailIsSelected(): void
     {
         $email = new Email();
@@ -36,14 +38,14 @@ class EmailTriggerTest extends MauticMysqlTestCase
 
         [$crawler, $form] = $this->fetchForm($trigger, $triggerEvent);
 
-        self::assertEquals($email->getId(), $form->get('pointtriggerevent[properties][useremail][email]')->getValue(), 'Current email should be selected.');
-        self::assertNull($crawler->selectButton('Preview')->attr('disabled'), 'Preview button should not be disabled.');
-        self::assertNull($crawler->selectButton('Edit Email')->attr('disabled'), 'Edit Email button should not be disabled.');
-        self::assertStringContainsString('"origin":"#pointtriggerevent_properties_useremail_email"', $crawler->selectButton('Preview')->attr('onclick'), 'The origin value should be correct.');
+        $this->assertEquals($email->getId(), $form->get('pointtriggerevent[properties][useremail][email]')->getValue(), 'Current email should be selected.');
+        $this->assertNull($crawler->selectButton('Preview')->attr('disabled'), 'Preview button should not be disabled.');
+        $this->assertNull($crawler->selectButton('Edit Email')->attr('disabled'), 'Edit Email button should not be disabled.');
+        $this->assertStringContainsString('"origin":"#pointtriggerevent_properties_useremail_email"', (string) $crawler->selectButton('Preview')->attr('onclick'), 'The origin value should be correct.');
     }
 
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testButtonsAreDisabledWhenEmailIsNotSelected(): void
     {
         $trigger      = $this->createTrigger();
@@ -55,9 +57,9 @@ class EmailTriggerTest extends MauticMysqlTestCase
 
         [$crawler, $form] = $this->fetchForm($trigger, $triggerEvent);
 
-        self::assertEmpty($form->get('pointtriggerevent[properties][useremail][email]')->getValue(), 'No email should be selected.');
-        self::assertNotNull($crawler->selectButton('Preview')->attr('disabled'), 'Preview button should be disabled.');
-        self::assertNotNull($crawler->selectButton('Edit Email')->attr('disabled'), 'Edit Email button should be disabled.');
+        $this->assertEmpty($form->get('pointtriggerevent[properties][useremail][email]')->getValue(), 'No email should be selected.');
+        $this->assertNotNull($crawler->selectButton('Preview')->attr('disabled'), 'Preview button should be disabled.');
+        $this->assertNotNull($crawler->selectButton('Edit Email')->attr('disabled'), 'Edit Email button should be disabled.');
     }
 
     /**
@@ -66,11 +68,11 @@ class EmailTriggerTest extends MauticMysqlTestCase
     private function fetchForm(Trigger $trigger, TriggerEvent $triggerEvent): array
     {
         $this->client->request(Request::METHOD_GET, '/s/points/triggers/edit/'.$trigger->getId());
-        self::assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $uri = sprintf('/s/points/triggers/events/edit/%s?triggerId=%s', $triggerEvent->getId(), $trigger->getId());
         $this->client->xmlHttpRequest(Request::METHOD_GET, $uri);
-        self::assertTrue($this->client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $crawler      = new Crawler($responseData['newContent'], $this->client->getInternalRequest()->getUri());

@@ -5,18 +5,15 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-class CustomButtonEvent extends AbstractCustomRequestEvent
+final class CustomButtonEvent extends AbstractCustomRequestEvent
 {
-    /**
-     * @var array
-     */
-    protected $buttons = [];
+    private array $buttons = [];
 
     public function __construct(
-        protected $location,
+        private $location,
         Request $request,
         array $buttons = [],
-        protected $item = null,
+        private $item = null,
     ) {
         parent::__construct($request);
 
@@ -33,20 +30,15 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this->location;
     }
 
-    /**
-     * @return array
-     */
-    public function getButtons()
+    public function getButtons(): array
     {
         return $this->buttons;
     }
 
     /**
      * Add an array of buttons.
-     *
-     * @return $this
      */
-    public function addButtons(array $buttons, $location = null, $route = null)
+    public function addButtons(array $buttons, $location = null, $route = null): static
     {
         if (!$this->checkLocationContext($location) || !$this->checkRouteContext($route)) {
             return $this;
@@ -68,10 +60,8 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
      *
      * @param string|null $location
      * @param string|null $route
-     *
-     * @return $this
      */
-    public function addButton(array $button, $location = null, $route = null)
+    public function addButton(array $button, $location = null, $route = null): static
     {
         if (!$this->checkLocationContext($location) || !$this->checkRouteContext($route)) {
             return $this;
@@ -86,7 +76,10 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this;
     }
 
-    public function removeButton($button): void
+    /**
+     * @param mixed[] $button
+     */
+    public function removeButton(array $button): void
     {
         $buttonKey = $this->generateButtonKey($button);
         if (isset($this->buttons[$buttonKey])) {
@@ -116,7 +109,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Generate a button ID that can be overridden by other plugins.
      */
-    protected function generateButtonKey($button): string
+    private function generateButtonKey(array $button): string
     {
         $buttonKey = '';
         if (!empty($button['btnText'])) {

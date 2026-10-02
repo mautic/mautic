@@ -12,7 +12,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportDevicesSubscriber implements EventSubscriberInterface
+final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
 {
     public const DEVICES = 'contact.devices';
 

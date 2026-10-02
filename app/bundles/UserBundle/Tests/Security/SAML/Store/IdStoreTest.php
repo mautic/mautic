@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
-use Doctrine\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
 use LightSaml\Provider\TimeProvider\TimeProviderInterface;
 use Mautic\UserBundle\Entity\IdEntry;
 use Mautic\UserBundle\Security\SAML\Store\IdStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class IdStoreTest extends TestCase
+final class IdStoreTest extends TestCase
 {
     /**
-     * @var ObjectManager|MockObject
+     * @var MockObject&EntityManager
      */
     private MockObject $manager;
 
     /**
-     * @var TimeProviderInterface|MockObject
+     * @var MockObject&TimeProviderInterface
      */
     private MockObject $timeProvider;
 
@@ -25,7 +27,7 @@ class IdStoreTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->manager      = $this->createMock(ObjectManager::class);
+        $this->manager      = $this->createMock(EntityManager::class);
         $this->timeProvider = $this->createMock(TimeProviderInterface::class);
         $this->store        = new IdStore($this->manager, $this->timeProvider);
     }
@@ -38,7 +40,7 @@ class IdStoreTest extends TestCase
             ->willReturnCallback(function (IdEntry $idEntry) use ($expiry): void {
                 $this->assertEquals('foobar', $idEntry->getEntityId());
                 $this->assertEquals('abc', $idEntry->getId());
-                $this->assertEquals($expiry->getTimestamp(), $idEntry->getExpiryTime()->getTimestamp());
+                $this->assertSame($expiry->getTimestamp(), $idEntry->getExpiryTime()->getTimestamp());
             });
 
         $this->store->set('foobar', 'abc', $expiry);

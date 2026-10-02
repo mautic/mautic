@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DwcEntryFiltersType extends AbstractType
+final class DwcEntryFiltersType extends AbstractType
 {
     use FilterTrait;
 

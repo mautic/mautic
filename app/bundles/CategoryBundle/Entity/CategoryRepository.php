@@ -57,7 +57,7 @@ class CategoryRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('c.id', ':search'))
                     ->setParameter('search', $search);
             } else {
@@ -99,12 +99,12 @@ class CategoryRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
             case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
-                $expr                = $q->expr()->eq('c.isPublished', ":$unique");
+                $expr                = $q->expr()->eq('c.isPublished', ":{$unique}");
                 $parameters[$unique] = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
             case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
-                $expr                = $q->expr()->eq('c.isPublished', ":$unique");
+                $expr                = $q->expr()->eq('c.isPublished', ":{$unique}");
                 $parameters[$unique] = false;
                 break;
         }

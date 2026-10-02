@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class TrustMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
+final class TrustMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
     use ConfigAwareTrait;
 

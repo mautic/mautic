@@ -1,0 +1,52 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'pointInsight' %}
+
+{%- block headerTitle -%}
+    {%- if entity.id -%}
+        {{ 'mautic.point.insight.header.edit'|trans({'%name%': entity.name|trans}) }}
+    {%- else -%}
+        {{ 'mautic.point.insight.header.new'|trans }}
+    {%- endif -%}
+{%- endblock -%}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div class="box-layout">
+        <div class="col-md-9 height-auto">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="pa-md">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="pa-md">
+                                    {{ form_row(form.name) }}
+                                    {{ form_row(form.description, {'attr': {'class': 'form-control editor'}}) }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="pa-md">
+                                    {{ form_row(form.infoText) }}
+                                    <div style="display: none;">
+                                        {{ form_widget(form.insightType) }}
+                                        {{ form_widget(form.insightAction) }}
+                                    </div>
+                                    {{ form_row(form.pointGroups) }}
+                                    {{ form_row(form.customField) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 height-auto bdr-l">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                {{ form_row(form.category) }}
+                {{ form_row(form.isPublished) }}
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+
+{% endblock %}

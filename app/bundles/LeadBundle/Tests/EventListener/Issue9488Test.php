@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -8,12 +10,11 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
 
-class Issue9488Test extends MauticMysqlTestCase
+final class Issue9488Test extends MauticMysqlTestCase
 {
     private LeadRepository $contactRepository;
 
@@ -70,7 +71,7 @@ class Issue9488Test extends MauticMysqlTestCase
             ]
         );
 
-        Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
+        $this->assertSame(0, $exitCode, $applicationTester->getDisplay());
 
         /** @var Lead $contactA */
         $contactA = $this->contactRepository->getEntity($contactIds[0]);
@@ -79,9 +80,9 @@ class Issue9488Test extends MauticMysqlTestCase
         /** @var Lead $contactC */
         $contactC = $this->contactRepository->getEntity($contactIds[2]);
 
-        Assert::assertSame(1, $contactA->getPoints());
-        Assert::assertSame(2, $contactB->getPoints());
-        Assert::assertSame(2, $contactC->getPoints());
+        $this->assertSame(1, $contactA->getPoints());
+        $this->assertSame(2, $contactB->getPoints());
+        $this->assertSame(2, $contactC->getPoints());
     }
 
     /**
@@ -93,10 +94,10 @@ class Issue9488Test extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        Assert::assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
-        Assert::assertEquals(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
-        Assert::assertEquals(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());
 
         return [
             $response['contacts'][0]['id'],

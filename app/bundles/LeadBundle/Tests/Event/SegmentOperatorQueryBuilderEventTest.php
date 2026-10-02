@@ -12,12 +12,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 final class SegmentOperatorQueryBuilderEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|QueryBuilder
+     * @var MockObject&QueryBuilder
      */
     private MockObject $queryBuilder;
 
     /**
-     * @var MockObject|ContactSegmentFilter
+     * @var MockObject&ContactSegmentFilter
      */
     private MockObject $filter;
 

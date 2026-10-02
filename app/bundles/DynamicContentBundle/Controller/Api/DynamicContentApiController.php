@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DynamicContentBundle\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,13 +22,22 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<DynamicContent>
  */
-class DynamicContentApiController extends CommonApiController
+final class DynamicContentApiController extends CommonApiController
 {
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $dynamicContentModel = $modelFactory->getModel('dynamicContent');
-        \assert($dynamicContentModel instanceof DynamicContentModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        DynamicContentModel $dynamicContentModel,
+    ) {
         $this->model            = $dynamicContentModel;
         $this->entityClass      = DynamicContent::class;
         $this->entityNameOne    = 'dynamicContent';

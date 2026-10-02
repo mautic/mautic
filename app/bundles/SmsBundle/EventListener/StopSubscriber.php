@@ -8,7 +8,7 @@ use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class StopSubscriber implements EventSubscriberInterface
+final readonly class StopSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private DoNotContactModel $doNotContactModel,

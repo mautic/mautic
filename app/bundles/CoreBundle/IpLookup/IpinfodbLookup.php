@@ -2,11 +2,14 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class IpinfodbLookup extends AbstractRemoteDataLookup
+final class IpinfodbLookup extends AbstractRemoteDataLookup
 {
     public string $statusCode    = '';
+
     public string $statusMessage = '';
+
     public string $ipAddress     = '';
+
     public string $countryCode   = '';
 
     public function getAttribution(): string
@@ -19,7 +22,7 @@ class IpinfodbLookup extends AbstractRemoteDataLookup
         return "http://api.ipinfodb.com/v3/ip-city/?key={$this->auth}&format=json&ip={$this->ip}";
     }
 
-    protected function parseResponse($response)
+    protected function parseResponse($response): void
     {
         $data = json_decode($response);
 
@@ -43,7 +46,7 @@ class IpinfodbLookup extends AbstractRemoteDataLookup
                         break;
                 }
 
-                $this->$key = ucfirst($value);
+                $this->{$key} = ucfirst($value);
             }
         }
     }

@@ -131,8 +131,6 @@ class ObjectMappingRepository extends CommonRepository
 
     /**
      * @param string[]|string $objectIds
-     *
-     * @return \Doctrine\DBAL\Driver\Statement|int
      */
     public function markAsDeleted(string $integration, string $objectName, $objectIds): int
     {

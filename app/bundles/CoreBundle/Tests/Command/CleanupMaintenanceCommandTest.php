@@ -6,8 +6,9 @@ namespace Mautic\CoreBundle\Tests\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 
-class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
+final class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -22,7 +23,7 @@ class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
 
         $this->assertNull(
-            static::getContainer()->get('mautic.lead.model.lead')->getEntity($contactId),
+            self::getContainer()->get(LeadModel::class)->getEntity($contactId),
             'Purge an unidentified lead that is considered inactive'
         );
 
@@ -41,7 +42,7 @@ class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
 
         $this->assertNotNull(
-            static::getContainer()->get('mautic.lead.model.lead')->getEntity($contactId),
+            self::getContainer()->get(LeadModel::class)->getEntity($contactId),
             'Keep an unidentified lead that is still considered active'
         );
     }
@@ -58,7 +59,7 @@ class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--gdpr' => 1, '--no-interaction' => true]);
         $this->assertNotNull(
-            $this->getContainer()->get('mautic.lead.model.lead')->getEntity($contactId),
+            $this->getContainer()->get(LeadModel::class)->getEntity($contactId),
             'Keep an identified contact that is still considered active.'
         );
 
@@ -68,7 +69,7 @@ class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--gdpr' => 1, '--no-interaction' => true]);
         $this->assertNull(
-            $this->getContainer()->get('mautic.lead.model.lead')->getEntity($contactId),
+            $this->getContainer()->get(LeadModel::class)->getEntity($contactId),
             'Purge an identified contact that is considered inactive'
         );
 
@@ -79,7 +80,7 @@ class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand('mautic:maintenance:cleanup', ['--gdpr' => 1, '--no-interaction' => true]);
         $this->assertNotNull(
-            $this->getContainer()->get('mautic.lead.model.lead')->getEntity($contactId),
+            $this->getContainer()->get(LeadModel::class)->getEntity($contactId),
             'Keep an identified contact that is still considered active because of custom "gdpr_user_purge_threshold".'
         );
     }

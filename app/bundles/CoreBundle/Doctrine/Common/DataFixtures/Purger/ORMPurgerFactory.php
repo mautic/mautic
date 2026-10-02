@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Common\DataFixtures\Event\PreExecuteEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class ORMPurgerFactory implements PurgerFactory
+final readonly class ORMPurgerFactory implements PurgerFactory
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DynamicContentBundle\Tests\Unit\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
@@ -21,62 +23,62 @@ use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|TrackableModel
+     * @var MockObject&TrackableModel
      */
     private MockObject $trackableModel;
 
     /**
-     * @var MockObject|PageTokenHelper
+     * @var MockObject&PageTokenHelper
      */
     private MockObject $pageTokenHelper;
 
     /**
-     * @var MockObject|AssetTokenHelper
+     * @var MockObject&AssetTokenHelper
      */
     private MockObject $assetTokenHelper;
 
     /**
-     * @var MockObject|FormTokenHelper
+     * @var MockObject&FormTokenHelper
      */
     private MockObject $formTokenHelper;
 
     /**
-     * @var MockObject|FocusTokenHelper
+     * @var MockObject&FocusTokenHelper
      */
     private MockObject $focusTokenHelper;
 
     /**
-     * @var MockObject|AuditLogModel
-     */
-    private MockObject $auditLogModel;
-
-    /**
-     * @var MockObject|DynamicContentHelper
+     * @var MockObject&DynamicContentHelper
      */
     private MockObject $dynamicContentHelper;
 
     /**
-     * @var MockObject|DynamicContentModel
+     * @var MockObject&DynamicContentModel
      */
     private MockObject $dynamicContentModel;
 
     /**
-     * @var MockObject|CorePermissions
+     * @var MockObject&CorePermissions
      */
     private MockObject $security;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
     private MockObject $contactTracker;
-    private \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository $companyLeadRepositoryMock;
+
+    /**
+     * @var MockObject&CompanyLeadRepository
+     */
+    private MockObject $companyLeadRepositoryMock;
 
     private DynamicContentSubscriber $subscriber;
+
     /**
-     * @var CompanyModel|(CompanyModel&MockObject)|MockObject
+     * @var MockObject&CompanyModel
      */
     private MockObject $companyModel;
 
@@ -89,7 +91,6 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assetTokenHelper          = $this->createMock(AssetTokenHelper::class);
         $this->formTokenHelper           = $this->createMock(FormTokenHelper::class);
         $this->focusTokenHelper          = $this->createMock(FocusTokenHelper::class);
-        $this->auditLogModel             = $this->createMock(AuditLogModel::class);
         $this->contactTracker            = $this->createMock(ContactTracker::class);
         $this->dynamicContentHelper      = $this->createMock(DynamicContentHelper::class);
         $this->dynamicContentModel       = $this->createMock(DynamicContentModel::class);
@@ -103,7 +104,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->assetTokenHelper,
             $this->formTokenHelper,
             $this->focusTokenHelper,
-            $this->auditLogModel,
+            $this->createStub(AuditLogModel::class),
             $this->dynamicContentHelper,
             $this->dynamicContentModel,
             $this->security,
@@ -254,6 +255,110 @@ HTML;
         $event->expects($this->once())
             ->method('setContent')
             ->with($expected);
+
+        $this->subscriber->decodeTokens($event);
+    }
+
+    public function testDecodeTokensWithDwcTokenInHrefAttribute(): void
+    {
+        $content = <<< HTML
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h2>Hello there!</h2>
+        <a href="{dwc=link-token}">Click here</a>
+        {dwc=link-token}
+    </body>
+</html>
+
+HTML;
+
+        $expected = <<< HTML
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h2>Hello there!</h2>
+        <a href="https://example.com/path">Click here</a>
+        <p>https://example.com/path</p>
+    </body>
+</html>
+
+HTML;
+        $dwcContent = '<p>https://example.com/path</p>';
+        $event      = $this->createMock(PageDisplayEvent::class);
+        $contact    = new Lead();
+
+        $event->expects($this->once())
+            ->method('getContent')
+            ->willReturn($content);
+
+        $event->method('getLead')
+            ->willReturn(null);
+
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
+        $this->contactTracker->expects($this->once())
+            ->method('getContact')
+            ->willReturn($contact);
+
+        $this->dynamicContentHelper->expects($this->once())
+            ->method('findDwcTokens')
+            ->with($content, $contact)
+            ->willReturn([
+                '{dwc=link-token}' => [
+                    'content' => $dwcContent,
+                    'filters' => [],
+                ],
+            ]);
+
+        $this->dynamicContentHelper->expects($this->never())
+            ->method('getDynamicContentForLead');
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->with($expected);
+
+        $this->subscriber->decodeTokens($event);
+    }
+
+    public function testDecodeTokensEscapesHrefAttributeContent(): void
+    {
+        $content    = '<html><body><a href="{dwc=link-token}">Click here</a>{dwc=link-token}</body></html>';
+        $dwcContent = '<p>https://example.com/?q=" onmouseover="alert(1)&raw=1&amp;encoded=2&quot;quoted</p>';
+        $contact    = new Lead();
+        $event      = $this->createMock(PageDisplayEvent::class);
+
+        $event->method('getLead')->willReturn($contact);
+        $event->method('getContent')->willReturn($content);
+
+        $this->dynamicContentHelper->expects($this->once())
+            ->method('findDwcTokens')
+            ->with($content, $contact)
+            ->willReturn([
+                '{dwc=link-token}' => [
+                    'content' => $dwcContent,
+                    'filters' => [],
+                ],
+            ]);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->willReturnCallback(function (string $output) use ($dwcContent): void {
+                $dom = new \DOMDocument();
+                $dom->loadHTML($output, LIBXML_NOERROR | LIBXML_NOWARNING);
+                $link = $dom->getElementsByTagName('a')->item(0);
+
+                $this->assertInstanceOf(\DOMElement::class, $link);
+                $this->assertSame(1, $link->attributes->length);
+                $this->assertFalse($link->hasAttribute('onmouseover'));
+                $this->assertSame('https://example.com/?q=" onmouseover="alert(1)&raw=1&encoded=2"quoted', $link->getAttribute('href'));
+                $this->assertStringContainsString('href="https://example.com/?q=&quot; onmouseover=&quot;alert(1)&amp;raw=1&amp;encoded=2&quot;quoted"', $output);
+                $this->assertStringContainsString($dwcContent, $output);
+            });
 
         $this->subscriber->decodeTokens($event);
     }

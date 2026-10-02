@@ -9,15 +9,15 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AuditlogController extends CommonController
+final class AuditlogController extends CommonController
 {
     use LeadAccessTrait;
     use LeadDetailsTrait;
 
-    public function indexAction(Request $request, $leadId, $page = 1)
+    public function indexAction(Request $request, $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $lead = $this->checkLeadAccess($leadId, 'view');
@@ -28,7 +28,7 @@ class AuditlogController extends CommonController
         $this->setListFilters();
 
         $session = $request->getSession();
-        if ('POST' == $request->getMethod() && $request->request->has('search')) {
+        if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
@@ -64,13 +64,10 @@ class AuditlogController extends CommonController
         );
     }
 
-    /**
-     * @return array|Response
-     */
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId)
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         if (empty($leadId)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $lead = $this->checkLeadAccess($leadId, 'view');
@@ -79,13 +76,13 @@ class AuditlogController extends CommonController
         }
 
         if (!$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
 
         $session = $request->getSession();
-        if ('POST' == $request->getMethod() && $request->request->has('search')) {
+        if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
@@ -103,7 +100,7 @@ class AuditlogController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function ($event) use ($dateHelper): array {
+        $resultsCallback = function (array $event) use ($dateHelper): array {
             $userName = $event['userName'] ?? $event['eventType'];
             if (is_array($userName)) {
                 $userName = $userName['label'];

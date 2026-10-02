@@ -7,7 +7,6 @@ namespace Mautic\PageBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageDraft;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PageDraftFunctionalTest extends MauticMysqlTestCase
@@ -23,9 +22,9 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
     {
         $page    = $this->createNewPage();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/edit/{$page->getId()}");
-        Assert::assertEquals(0, $crawler->selectButton('Save as Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Apply Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Discard Draft')->count());
+        $this->assertCount(0, $crawler->selectButton('Save as Draft'));
+        $this->assertCount(0, $crawler->selectButton('Apply Draft'));
+        $this->assertCount(0, $crawler->selectButton('Discard Draft'));
     }
 
     public function testPageDraftConfigured(): void
@@ -33,9 +32,9 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $page    = $this->createNewPage();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/edit/{$page->getId()}");
 
-        Assert::assertEquals(1, $crawler->selectButton('Save as Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Apply Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Discard Draft')->count());
+        $this->assertCount(1, $crawler->selectButton('Save as Draft'));
+        $this->assertCount(0, $crawler->selectButton('Apply Draft'));
+        $this->assertCount(0, $crawler->selectButton('Discard Draft'));
     }
 
     public function testCheckDraftInList(): void
@@ -53,10 +52,10 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $page = $this->createNewPage();
         $this->saveDraft($page);
         $crawler = $this->client->request(Request::METHOD_GET, "/page/preview/{$page->getId()}");
-        $this->assertEquals('Test html', $crawler->filter('body')->text());
+        $this->assertSame('Test html', $crawler->filter('body')->text());
 
         $crawler = $this->client->request(Request::METHOD_GET, "/page/preview/{$page->getId()}/draft");
-        $this->assertEquals('Test html Draft', $crawler->filter('body')->text());
+        $this->assertSame('Test html Draft', $crawler->filter('body')->text());
     }
 
     public function testSaveDraftAndApplyDraft(): void
@@ -78,12 +77,12 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/edit/{$page->getId()}");
         $form    = $crawler->selectButton('Apply Draft')->form();
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $pageDraft = $this->em->getRepository(PageDraft::class)->findOneBy(['page' => $page]);
 
-        Assert::assertNull($pageDraft);
-        Assert::assertSame('Test html Draft', $page->getCustomHtml());
+        $this->assertNotInstanceOf(PageDraft::class, $pageDraft);
+        $this->assertSame('Test html Draft', $page->getCustomHtml());
     }
 
     private function discardDraft(Page $page): void
@@ -91,12 +90,12 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/edit/{$page->getId()}");
         $form    = $crawler->selectButton('Discard Draft')->form();
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $pageDraft = $this->em->getRepository(PageDraft::class)->findOneBy(['page' => $page]);
 
-        Assert::assertNull($pageDraft);
-        Assert::assertSame('Test html', $page->getCustomHtml());
+        $this->assertNotInstanceOf(PageDraft::class, $pageDraft);
+        $this->assertSame('Test html', $page->getCustomHtml());
     }
 
     private function saveDraft(Page $page): void
@@ -106,11 +105,12 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $form                          = $crawler->selectButton('Save as Draft')->form();
         $form['page[customHtml]']      = 'Test html Draft';
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $pageDraft = $this->em->getRepository(PageDraft::class)->findOneBy(['page' => $page]);
-        Assert::assertEquals('Test html Draft', $pageDraft->getHtml());
-        Assert::assertSame('Test html', $page->getCustomHtml());
+        $this->assertInstanceOf(PageDraft::class, $pageDraft);
+        $this->assertSame('Test html Draft', $pageDraft->getHtml());
+        $this->assertSame('Test html', $page->getCustomHtml());
     }
 
     private function createNewPage(): Page

@@ -17,9 +17,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<LeadNote>
  */
-class NoteType extends AbstractType
+final class NoteType extends AbstractType
 {
-    private DateTimeHelper $dateHelper;
+    private readonly DateTimeHelper $dateHelper;
 
     public function __construct()
     {

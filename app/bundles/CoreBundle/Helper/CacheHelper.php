@@ -13,10 +13,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class CacheHelper
 {
     public function __construct(
-        private string $cacheDir,
-        private RequestStack $requestStack,
-        private PathsHelper $pathsHelper,
-        private KernelInterface $kernel,
+        private readonly string $cacheDir,
+        private readonly RequestStack $requestStack,
+        private readonly PathsHelper $pathsHelper,
+        private readonly KernelInterface $kernel,
     ) {
     }
 

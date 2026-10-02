@@ -5,29 +5,27 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Helper;
 
 use Mautic\FormBundle\Helper\BlockedFreeEmailProvidersHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(BlockedFreeEmailProvidersHelper::class)]
+#[CoversClass(BlockedFreeEmailProvidersHelper::class)]
 final class BlockedFreeEmailProvidersHelperTest extends TestCase
 {
     public function testLoadReturnsArrayFromValidJsonFile(): void
     {
         $providers = BlockedFreeEmailProvidersHelper::load();
 
-        self::assertIsArray($providers);
-        self::assertNotEmpty($providers);
-        self::assertContainsOnly('string', $providers);
+        $this->assertIsArray($providers);
+        $this->assertNotEmpty($providers);
     }
 
     public function testLoadReturnsArrayOfStrings(): void
     {
         $providers = BlockedFreeEmailProvidersHelper::load();
 
-        if (!empty($providers)) {
-            foreach ($providers as $provider) {
-                self::assertIsString($provider);
-                self::assertNotEmpty($provider);
-            }
+        foreach ($providers as $provider) {
+            $this->assertIsString($provider);
+            $this->assertNotEmpty($provider);
         }
     }
 
@@ -36,6 +34,6 @@ final class BlockedFreeEmailProvidersHelperTest extends TestCase
         $providers = BlockedFreeEmailProvidersHelper::load();
 
         // The JSON file should contain providers
-        self::assertGreaterThan(0, count($providers));
+        $this->assertGreaterThan(0, count($providers));
     }
 }

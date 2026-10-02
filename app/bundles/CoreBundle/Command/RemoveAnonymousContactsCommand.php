@@ -8,11 +8,16 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RemoveAnonymousContactsCommand extends Command
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Delete all anonymous contacts from segment, campaign and campaign event logs.'
+)]
+final class RemoveAnonymousContactsCommand extends Command
 {
     /**
      * @var string
@@ -20,17 +25,11 @@ class RemoveAnonymousContactsCommand extends Command
     public const COMMAND_NAME = 'mautic:remove:anonymous_contacts';
 
     public function __construct(
-        private ListLeadRepository $listLeadRepository,
-        private LeadRepository $campaignLeadRepository,
-        private LeadEventLogRepository $campaignLeadEventLog,
+        private readonly ListLeadRepository $listLeadRepository,
+        private readonly LeadRepository $campaignLeadRepository,
+        private readonly LeadEventLogRepository $campaignLeadEventLog,
     ) {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription('Delete all anonymous contacts from segment, campaign and campaign event logs.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

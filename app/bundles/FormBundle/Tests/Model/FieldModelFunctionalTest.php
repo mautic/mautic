@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\DBAL\Schema\Column;
@@ -10,7 +12,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class FieldModelFunctionalTest extends MauticMysqlTestCase
+final class FieldModelFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -50,17 +52,17 @@ class FieldModelFunctionalTest extends MauticMysqlTestCase
         $form = $this->createForm($formData);
 
         /** @var ColumnSchemaHelper $helper */
-        $helper = $this->getContainer()->get('mautic.schema.helper.column');
+        $helper = $this->getContainer()->get(ColumnSchemaHelper::class);
 
         // Table name to check the fields.
         $name         = 'form_results_'.$form->getId().'_'.$form->getAlias();
         $schemaHelper = $helper->setName($name);
 
         // The table will have four column, 'submission_id', 'form_id', 'email', and 'fname'.
-        $this->assertEquals(5, count($schemaHelper->getColumns()));
+        $this->assertCount(5, $schemaHelper->getColumns());
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = $this->getContainer()->get('mautic.form.model.field');
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
 
         $ids = $this->getDeleteIds($fieldModel);
 
@@ -82,7 +84,7 @@ class FieldModelFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         /** @var FormModel $formModel */
-        $formModel = $this->getContainer()->get('mautic.form.model.form');
+        $formModel = $this->getContainer()->get(FormModel::class);
 
         return $formModel->getEntity($response['form']['id']);
     }

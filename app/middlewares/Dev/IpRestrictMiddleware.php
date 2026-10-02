@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
+final class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
     use ConfigAwareTrait;
 
@@ -44,7 +44,7 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
      * This check prevents access to debug front controllers
      * that are deployed by accident to production servers.
      *
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {

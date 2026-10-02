@@ -1,35 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class MonitoringControllerTest extends MauticMysqlTestCase
+final class MonitoringControllerTest extends MauticMysqlTestCase
 {
     public const USERNAME = 'jhony';
 
     public function testIndex(): void
     {
         $this->client->request('GET', '/s/monitoring');
-        $response = $this->client->getResponse();
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testNew(): void
     {
         $this->client->request('GET', '/s/monitoring/new');
-        $response = $this->client->getResponse();
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testEdit(): void
     {
         $this->client->request('GET', '/s/monitoring/edit/1');
-        $response = $this->client->getResponse();
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testIndexWithoutPermission(): void
@@ -91,8 +91,8 @@ class MonitoringControllerTest extends MauticMysqlTestCase
         $user->setLastName('Doe');
         $user->setUsername(self::USERNAME);
         $user->setEmail('john.doe@email.com');
-        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
 

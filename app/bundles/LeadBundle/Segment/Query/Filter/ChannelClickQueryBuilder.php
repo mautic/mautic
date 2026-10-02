@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
+final class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 {
     use LeadBatchLimiterTrait;
 
@@ -45,7 +45,7 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 
         if ($this->isDateBased($filter->getField())) {
             $expr = $expr->with(
-                $subQb->expr()->$filterOperator($tableAlias.'.date_hit', $filter->getParameterHolder($parameters))
+                $subQb->expr()->{$filterOperator}($tableAlias.'.date_hit', $filter->getParameterHolder($parameters))
             );
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Command;
 
 use Mautic\PluginBundle\Facade\ReloadFacade;
@@ -16,10 +18,10 @@ use Symfony\Component\Console\Output\OutputInterface;
         'mautic:plugins:update',
     ]
 )]
-class ReloadCommand extends Command
+final class ReloadCommand extends Command
 {
     public function __construct(
-        private ReloadFacade $reloadFacade,
+        private readonly ReloadFacade $reloadFacade,
     ) {
         parent::__construct();
     }

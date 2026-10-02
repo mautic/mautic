@@ -3,30 +3,31 @@
 namespace MauticPlugin\MauticCrmBundle\Services;
 
 use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
 
-class Transport implements TransportInterface
+final readonly class Transport implements TransportInterface
 {
     public function __construct(
         private Client $client,
     ) {
     }
 
-    public function post($uri, array $options = []): \Psr\Http\Message\ResponseInterface
+    public function post($uri, array $options = []): ResponseInterface
     {
         return $this->client->request('POST', $uri, $options);
     }
 
-    public function put($uri, array $options = []): \Psr\Http\Message\ResponseInterface
+    public function put($uri, array $options = []): ResponseInterface
     {
         return $this->client->request('PUT', $uri, $options);
     }
 
-    public function get($uri, array $options = []): \Psr\Http\Message\ResponseInterface
+    public function get($uri, array $options = []): ResponseInterface
     {
         return $this->client->request('GET', $uri, $options);
     }
 
-    public function delete($uri, array $options = []): \Psr\Http\Message\ResponseInterface
+    public function delete($uri, array $options = []): ResponseInterface
     {
         return $this->client->request('DELETE', $uri, $options);
     }

@@ -16,11 +16,19 @@
     {% set locale =  'en' %}
     {% endif %}
     jQuery().ready(function() {
+
+        const urlParams = new URL(window.location.href).searchParams;
+        const editorType = urlParams.get('editor');
+        let allowedMimeTypes = {{ onlyMimes|raw }};
+        if('media_form' === editorType) {
+            allowedMimeTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'];
+        }
+
         var $f = jQuery('.elfinder').elfinder({
             url : '{{path('ef_connect', { 'instance': instance, 'homeFolder': homeFolder } )}}',
             lang : '{{locale}}',
             i18nBaseUrl : '{{ asset("#{prefix}/../../media/bundles/fmelfinder/js/i18n/") }}',
-            onlyMimes: {{ onlyMimes|raw }},
+            onlyMimes: allowedMimeTypes,
             getFileCallback : function(file, fm) {
                 let fileUrl = file.url;
                 if (file.baseUrl == '' && typeof window.opener.mauticImagesPath !== 'undefined') {
@@ -29,11 +37,13 @@
                     fileUrl = file.baseUrl + '' + (file.path).replace('//', '');
                 }
 
-                const editorParam = new RegExp('(?:[\?&]|&amp;)editor=([^&]+)', 'i');
-                const editorMatch = window.location.search.match(editorParam);
-                if (editorMatch && editorMatch.length > 1 && editorMatch[1] == 'ckeditor') {
+                if ('ckeditor' === editorType) {
                     window.opener.document.ckEditorInsertImages(editor, fileUrl);
-                } else {
+                }
+                else if('media_form' === editorType) {
+                    window.opener.document.mediaManagerInsertImageCallback(fileUrl);
+                }
+                else {
                     window.opener.document.fileManagerInsertImageCallback('textarea.editor', fileUrl);
                 }
 

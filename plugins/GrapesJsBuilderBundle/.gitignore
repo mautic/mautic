@@ -1,3 +1,4 @@
 vendor/*
 node_modules/*
 !.npmrc
+Assets/library/js/dist/

@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class FormLoginAuthenticatorOptionsPass implements CompilerPassInterface
+final class FormLoginAuthenticatorOptionsPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

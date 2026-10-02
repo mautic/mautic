@@ -10,7 +10,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigTest;
 
-class FocusBundleExtension extends AbstractExtension
+final class FocusBundleExtension extends AbstractExtension
 {
     /**
      * @return TwigFilter[]
@@ -18,8 +18,8 @@ class FocusBundleExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('less_compile', [$this, 'compileLess'], ['is_safe' => ['all']]),
-            new TwigFilter('css_minify', [$this, 'minifyCss'], ['is_safe' => ['all']]),
+            new TwigFilter('less_compile', $this->compileLess(...), ['is_safe' => ['all']]),
+            new TwigFilter('css_minify', $this->minifyCss(...), ['is_safe' => ['all']]),
         ];
     }
 
@@ -29,7 +29,7 @@ class FocusBundleExtension extends AbstractExtension
     public function getTests(): array
     {
         return [
-            new TwigTest('color light', fn (string $hexColor) => FocusModel::isLightColor($hexColor)),
+            new TwigTest('color light', fn (string $hexColor): bool => FocusModel::isLightColor($hexColor)),
         ];
     }
 

@@ -9,9 +9,10 @@ use Mautic\IntegrationsBundle\Helper\FieldMergerHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FieldMergerHelperTest extends TestCase
+final class FieldMergerHelperTest extends TestCase
 {
     public function testNonExistingFieldsAreRemoved(): void
     {
@@ -30,11 +31,11 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertFalse(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayNotHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testFieldUnsetIfMappingIsDeleted(): void
@@ -52,11 +53,11 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertFalse(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayNotHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testCurrentFieldMappingsAreMerged(): void
@@ -73,7 +74,7 @@ class FieldMergerHelperTest extends TestCase
         ];
 
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -88,13 +89,13 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
         $this->assertEquals($updatedFieldMappings['field1']['mappedField'], $mergedFieldMappings['Lead']['field1']['mappedField']);
         $this->assertEquals($updatedFieldMappings['field1']['syncDirection'], $mergedFieldMappings['Lead']['field1']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testCurrentFieldMappingsAreMergedWithJustMappedFieldUpdated(): void
@@ -110,7 +111,7 @@ class FieldMergerHelperTest extends TestCase
         ];
 
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field4 */
+        /** @var MappedFieldInfoInterface&MockObject $field4 */
         $field4 = $integrationFields['field4'];
         $field4->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -125,13 +126,13 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
         $this->assertEquals($updatedFieldMappings['field4']['mappedField'], $mergedFieldMappings['Lead']['field4']['mappedField']);
         $this->assertEquals(ObjectMappingDAO::SYNC_TO_MAUTIC, $mergedFieldMappings['Lead']['field4']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testCurrentFieldMappingsAreMergedWithJustSyncDirectionUpdated(): void
@@ -147,7 +148,7 @@ class FieldMergerHelperTest extends TestCase
         ];
 
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field4 */
         $field4 = $integrationFields['field4'];
         $field4->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -162,13 +163,13 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
         $this->assertEquals($fields['Lead']['field4']['mappedField'], $mergedFieldMappings['Lead']['field4']['mappedField']);
         $this->assertEquals($updatedFieldMappings['field4']['syncDirection'], $mergedFieldMappings['Lead']['field4']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testFieldUnsetIfDirectionIsUpdatedWithoutMappedField(): void
@@ -189,11 +190,11 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertFalse(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayNotHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testDefaultSyncDirectionSetWithExisting(): void
@@ -202,7 +203,7 @@ class FieldMergerHelperTest extends TestCase
 
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field4 */
         $field4 = $integrationFields['field4'];
         $field4->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -224,12 +225,12 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
         $this->assertEquals(ObjectMappingDAO::SYNC_TO_MAUTIC, $mergedFieldMappings['Lead']['field4']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testDefaultSyncDirectionSetWithBidirectionalSupported(): void
@@ -239,7 +240,7 @@ class FieldMergerHelperTest extends TestCase
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
 
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -261,12 +262,12 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
         $this->assertEquals(ObjectMappingDAO::SYNC_BIDIRECTIONALLY, $mergedFieldMappings['Lead']['field1']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testDefaultSyncDirectionSetWithIntegrationDirectionalSupported(): void
@@ -276,7 +277,7 @@ class FieldMergerHelperTest extends TestCase
 
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -299,12 +300,12 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
         $this->assertEquals(ObjectMappingDAO::SYNC_TO_INTEGRATION, $mergedFieldMappings['Lead']['field1']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testDefaultSyncDirectionSetWithMauticDirectionalSupported(): void
@@ -314,7 +315,7 @@ class FieldMergerHelperTest extends TestCase
 
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -337,12 +338,12 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
         $this->assertEquals(ObjectMappingDAO::SYNC_TO_MAUTIC, $mergedFieldMappings['Lead']['field1']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testCurrentSyncDirectionOverwrittenWithSupportedDirectionalSync(): void
@@ -351,7 +352,7 @@ class FieldMergerHelperTest extends TestCase
 
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -374,12 +375,12 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
         $this->assertEquals(ObjectMappingDAO::SYNC_TO_MAUTIC, $mergedFieldMappings['Lead']['field1']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testDefaultSyncDirectionThrowsExceptionIfFieldDoesNotHaveSyncDirectionSupportDefined(): void
@@ -391,7 +392,7 @@ class FieldMergerHelperTest extends TestCase
 
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -413,10 +414,7 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigFormSyncInterface
-     */
-    private function getIntegrationObject(bool $removeFirstField = false): ConfigFormSyncInterface
+    private function getIntegrationObject(bool $removeFirstField = false): MockObject&ConfigFormSyncInterface
     {
         $field1 = $this->createMock(MappedFieldInfoInterface::class);
         $field1->method('getName')
@@ -453,6 +451,9 @@ class FieldMergerHelperTest extends TestCase
         return $integrationObject;
     }
 
+    /**
+     * @return array<string, array<string, array<string, string>>>
+     */
     private function getCurrentFieldMappings(): array
     {
         return [

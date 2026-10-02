@@ -6,9 +6,12 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class EmailPermissions extends AbstractPermissions
+final class EmailPermissions extends AbstractPermissions
 {
-    public function __construct($params)
+    /**
+     * @param mixed[] $params
+     */
+    public function __construct(array $params)
     {
         parent::__construct($params);
 
@@ -58,7 +61,7 @@ class EmailPermissions extends AbstractPermissions
         }
 
         $builder->add(
-            "$bundle:$level",
+            "{$bundle}:{$level}",
             PermissionListType::class,
             [
                 'choices'           => $choices,

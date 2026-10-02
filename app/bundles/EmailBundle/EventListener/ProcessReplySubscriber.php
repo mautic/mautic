@@ -10,7 +10,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ProcessReplySubscriber implements EventSubscriberInterface
+final readonly class ProcessReplySubscriber implements EventSubscriberInterface
 {
     public const BUNDLE     = 'EmailBundle';
 
@@ -49,7 +49,7 @@ class ProcessReplySubscriber implements EventSubscriberInterface
         // Using * will return the last UID even if the starting UID doesn't exist so let's just use a highball number
         $endingUID = $startingUID + 1_000_000_000;
 
-        $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID." $startingUID:$endingUID");
+        $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID." {$startingUID}:{$endingUID}");
     }
 
     public function onEmailParse(ParseEmailEvent $event): void

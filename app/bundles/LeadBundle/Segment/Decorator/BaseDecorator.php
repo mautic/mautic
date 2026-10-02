@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 
 class BaseDecorator implements FilterDecoratorInterface
 {
+    use ParseDateFilterValueTrait;
     use RegexTrait;
 
     public function __construct(
@@ -58,10 +59,8 @@ class BaseDecorator implements FilterDecoratorInterface
 
     /**
      * @param array|string $argument
-     *
-     * @return array|string
      */
-    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
+    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument): array|string
     {
         if (is_array($argument)) {
             $result = [];
@@ -80,7 +79,10 @@ class BaseDecorator implements FilterDecoratorInterface
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
-        $filter = $contactSegmentFilterCrate->getFilter();
+        $filter = $this->parseDateFilterValue(
+            $contactSegmentFilterCrate->getFilter(),
+            $contactSegmentFilterCrate->getOperator()
+        );
 
         if ($contactSegmentFilterCrate->filterValueDoNotNeedAdjustment()) {
             return $filter;

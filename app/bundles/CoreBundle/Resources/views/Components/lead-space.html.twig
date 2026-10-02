@@ -7,7 +7,7 @@ Variables:
 - gradientStyleScheme: with-gradient, without-gradient
 - gradientStyleSchemeColor: hex color
 - media: { src: 'path/to/image', alt: 'image alt text' }
-- buttons: array of buttons    
+- buttons: array of buttons
 #}
 
 {% set leadspaceGradientId = 'leadspace-gradient-' ~ random() %}
@@ -53,7 +53,7 @@ Variables:
                                 {% if description is defined %}
                                 <div part="row row--description" class="leadspace__row row">
                                     <div class="col-lg-5 col-md-9 col-xs-12">
-                                        <p part="description" id="leadspace__desc" class="leadspace__desc type-heading-03 {% if gradientStyleSchemeColor is defined %} leadspace__context-aware-color{% endif %}">
+                                        <p part="description" class="leadspace__desc type-heading-03 {% if gradientStyleSchemeColor is defined %} leadspace__context-aware-color{% endif %}">
                                             {{ description|trans }}
                                         </p>
                                     </div>
@@ -61,18 +61,17 @@ Variables:
                                 {% endif %}
                                 {% set buttons = (buttons|default([]))|filter(button => button is not null) %}
                                 {% if buttons is not empty %}
-                                <div part="action" role="list"
-                                    style="--button-group--item-count: {{ buttons|length }};"
+                                <div part="action" style="--button-group--item-count: {{ buttons|length }};"
                                     class="leadspace__action mt-32">
-                                    {% set buttons = buttons|map((button, index) => 
+                                    {% set buttons = buttons|map((button, index) =>
                                         button|merge({
                                             'variant': index == 0 ? 'primary' : 'tertiary',
                                             'size': 'lg',
                                             'wide': true,
-                                            'attributes': index == 0 ? 
-                                                (button.attributes is defined ? button.attributes : {}) : 
-                                                (button.attributes is defined ? 
-                                                    button.attributes|merge({'class': (button.attributes.class is defined ? button.attributes.class ~ ' ' : '') ~ (gradientStyleSchemeColor is defined ? 'leadspace__context-aware-color' : '')}) : 
+                                            'attributes': index == 0 ?
+                                                (button.attributes is defined ? button.attributes : {}) :
+                                                (button.attributes is defined ?
+                                                    button.attributes|merge({'class': (button.attributes.class is defined ? button.attributes.class ~ ' ' : '') ~ (gradientStyleSchemeColor is defined ? 'leadspace__context-aware-color' : '')}) :
                                                     {'class': gradientStyleSchemeColor is defined ? 'leadspace__context-aware-color' : ''}
                                                 )
                                         })
@@ -85,7 +84,7 @@ Variables:
                         </div>
                     </div>
                     {% if media is defined %}
-                    <div id="background-media" gradient-direction="left-to-right" mobile-position="bottom"
+                    <div gradient-direction="left-to-right" mobile-position="bottom"
                         class="background-media {% if gradientStyleScheme is defined and gradientStyleScheme == 'with-gradient' %}background-media--with-gradient{% endif %}">
                         <div part="container"
                             class="background-media--container background-media--mobile-position background-media--mobile-position--bottom background-media--image">

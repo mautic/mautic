@@ -13,6 +13,7 @@ use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadg
 use Mautic\UserBundle\Security\Authenticator\SsoAuthenticator;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use Mautic\UserBundle\UserEvents;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,19 +30,19 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
-class SsoAuthenticatorTest extends TestCase
+final class SsoAuthenticatorTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideIsPost')]
+    #[DataProvider('provideIsPost')]
     public function testIsPost(string $method, bool $isPost, bool $expected): void
     {
         $path              = '/path';
         $options           = ['post_only' => $isPost, 'check_path' => $path, 'form_only' => false];
         $httpUtils         = $this->createMock(HttpUtils::class);
-        $userProvider      = $this->createMock(UserProviderInterface::class);
-        $successHandler    = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $failureHandler    = $this->createMock(AuthenticationFailureHandlerInterface::class);
-        $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $dispatcher        = $this->createMock(EventDispatcherInterface::class);
+        $userProvider      = $this->createStub(UserProviderInterface::class);
+        $successHandler    = $this->createStub(AuthenticationSuccessHandlerInterface::class);
+        $failureHandler    = $this->createStub(AuthenticationFailureHandlerInterface::class);
+        $integrationHelper = $this->createStub(IntegrationHelper::class);
+        $dispatcher        = $this->createStub(EventDispatcherInterface::class);
 
         $authenticator = new SsoAuthenticator(
             $options,
@@ -56,7 +57,7 @@ class SsoAuthenticatorTest extends TestCase
         $request = new Request();
         $request->server->set('REQUEST_METHOD', $method);
 
-        if (true === $expected) {
+        if ($expected) {
             $httpUtils->method('checkRequestPath')
                 ->with($request, $path)
                 ->willReturn(true);
@@ -68,7 +69,7 @@ class SsoAuthenticatorTest extends TestCase
             }
         }
 
-        self::assertSame($expected, $authenticator->supports($request));
+        $this->assertSame($expected, $authenticator->supports($request));
     }
 
     public static function provideIsPost(): \Generator
@@ -79,17 +80,17 @@ class SsoAuthenticatorTest extends TestCase
         yield 'is POST and not POST only' => [Request::METHOD_POST, false, true];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideCheckPath')]
+    #[DataProvider('provideCheckPath')]
     public function testCheckPath(bool $expected): void
     {
         $path              = '/path';
         $options           = ['post_only' => true, 'check_path' => $path, 'form_only' => false];
         $httpUtils         = $this->createMock(HttpUtils::class);
-        $userProvider      = $this->createMock(UserProviderInterface::class);
-        $successHandler    = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $failureHandler    = $this->createMock(AuthenticationFailureHandlerInterface::class);
-        $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $dispatcher        = $this->createMock(EventDispatcherInterface::class);
+        $userProvider      = $this->createStub(UserProviderInterface::class);
+        $successHandler    = $this->createStub(AuthenticationSuccessHandlerInterface::class);
+        $failureHandler    = $this->createStub(AuthenticationFailureHandlerInterface::class);
+        $integrationHelper = $this->createStub(IntegrationHelper::class);
+        $dispatcher        = $this->createStub(EventDispatcherInterface::class);
 
         $authenticator = new SsoAuthenticator(
             $options,
@@ -105,12 +106,12 @@ class SsoAuthenticatorTest extends TestCase
         $request->server->set('REQUEST_METHOD', Request::METHOD_POST);
         $request->request->set('integration', 'integration');
 
-        $httpUtils->expects(self::once())
+        $httpUtils->expects($this->once())
             ->method('checkRequestPath')
             ->with($request, $path)
             ->willReturn($expected);
 
-        self::assertSame($expected, $authenticator->supports($request));
+        $this->assertSame($expected, $authenticator->supports($request));
     }
 
     public static function provideCheckPath(): \Generator
@@ -119,17 +120,17 @@ class SsoAuthenticatorTest extends TestCase
         yield 'Is not correct path' => [false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideFormOnly')]
+    #[DataProvider('provideFormOnly')]
     public function testFormOnly(string $mimeType, bool $isForm, bool $expected): void
     {
         $path              = '/path';
         $options           = ['post_only' => true, 'check_path' => $path, 'form_only' => $isForm];
         $httpUtils         = $this->createMock(HttpUtils::class);
-        $userProvider      = $this->createMock(UserProviderInterface::class);
-        $successHandler    = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $failureHandler    = $this->createMock(AuthenticationFailureHandlerInterface::class);
-        $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $dispatcher        = $this->createMock(EventDispatcherInterface::class);
+        $userProvider      = $this->createStub(UserProviderInterface::class);
+        $successHandler    = $this->createStub(AuthenticationSuccessHandlerInterface::class);
+        $failureHandler    = $this->createStub(AuthenticationFailureHandlerInterface::class);
+        $integrationHelper = $this->createStub(IntegrationHelper::class);
+        $dispatcher        = $this->createStub(EventDispatcherInterface::class);
 
         $authenticator = new SsoAuthenticator(
             $options,
@@ -147,12 +148,12 @@ class SsoAuthenticatorTest extends TestCase
 
         $request->headers->set('CONTENT_TYPE', $mimeType);
 
-        $httpUtils->expects(self::once())
+        $httpUtils->expects($this->once())
             ->method('checkRequestPath')
             ->with($request, $path)
             ->willReturn(true);
 
-        self::assertSame($expected, $authenticator->supports($request));
+        $this->assertSame($expected, $authenticator->supports($request));
     }
 
     public static function provideFormOnly(): \Generator
@@ -163,17 +164,17 @@ class SsoAuthenticatorTest extends TestCase
         yield 'is form and not form only' => ['application/x-www-form-urlencoded', false, true];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideRequestIntegrationParameter')]
+    #[DataProvider('provideRequestIntegrationParameter')]
     public function testHasRequestIntegrationParameter(?bool $addToPost, bool $isPost, bool $expected): void
     {
         $path              = '/path';
         $options           = ['post_only' => $isPost, 'check_path' => $path, 'form_only' => false];
         $httpUtils         = $this->createMock(HttpUtils::class);
-        $userProvider      = $this->createMock(UserProviderInterface::class);
-        $successHandler    = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $failureHandler    = $this->createMock(AuthenticationFailureHandlerInterface::class);
-        $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $dispatcher        = $this->createMock(EventDispatcherInterface::class);
+        $userProvider      = $this->createStub(UserProviderInterface::class);
+        $successHandler    = $this->createStub(AuthenticationSuccessHandlerInterface::class);
+        $failureHandler    = $this->createStub(AuthenticationFailureHandlerInterface::class);
+        $integrationHelper = $this->createStub(IntegrationHelper::class);
+        $dispatcher        = $this->createStub(EventDispatcherInterface::class);
 
         $authenticator = new SsoAuthenticator(
             $options,
@@ -196,12 +197,12 @@ class SsoAuthenticatorTest extends TestCase
             }
         }
 
-        $httpUtils->expects(self::once())
+        $httpUtils->expects($this->once())
             ->method('checkRequestPath')
             ->with($request, $path)
             ->willReturn(true);
 
-        self::assertSame($expected, $authenticator->supports($request));
+        $this->assertSame($expected, $authenticator->supports($request));
     }
 
     public static function provideRequestIntegrationParameter(): \Generator
@@ -213,7 +214,7 @@ class SsoAuthenticatorTest extends TestCase
         yield 'has no POST or GET parameter and is not POST only' => [null, false, false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideEnableCsrf')]
+    #[DataProvider('provideEnableCsrf')]
     public function testBadges(bool $enableCsrf): void
     {
         $username          = 'mautic';
@@ -221,14 +222,14 @@ class SsoAuthenticatorTest extends TestCase
         $integration       = 'integration';
         $csrfToken         = 'token';
         $options           = ['post_only' => true, 'enable_csrf' => $enableCsrf];
-        $httpUtils         = $this->createMock(HttpUtils::class);
-        $userProvider      = $this->createMock(UserProviderInterface::class);
-        $successHandler    = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $failureHandler    = $this->createMock(AuthenticationFailureHandlerInterface::class);
-        $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $dispatcher        = $this->createMock(EventDispatcherInterface::class);
+        $httpUtils         = $this->createStub(HttpUtils::class);
+        $userProvider      = $this->createStub(UserProviderInterface::class);
+        $successHandler    = $this->createStub(AuthenticationSuccessHandlerInterface::class);
+        $failureHandler    = $this->createStub(AuthenticationFailureHandlerInterface::class);
+        $integrationHelper = $this->createStub(IntegrationHelper::class);
+        $dispatcher        = $this->createStub(EventDispatcherInterface::class);
         $session           = $this->createMock(SessionInterface::class);
-        $session->expects(self::once())
+        $session->expects($this->once())
             ->method('set')
             ->with(SecurityRequestAttributes::LAST_USERNAME, $username);
 
@@ -251,32 +252,32 @@ class SsoAuthenticatorTest extends TestCase
 
         $passport = $authenticator->authenticate($request);
         $badges   = $passport->getBadges();
-        self::assertCount($enableCsrf ? 4 : 3, $badges);
+        $this->assertCount($enableCsrf ? 4 : 3, $badges);
 
         $userBadge = $passport->getBadge(UserBadge::class);
-        \assert($userBadge instanceof UserBadge);
-        self::assertSame($username, $userBadge->getUserIdentifier());
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame($username, $userBadge->getUserIdentifier());
 
         $passwordBadge = $passport->getBadge(PasswordCredentials::class);
-        \assert($passwordBadge instanceof PasswordCredentials);
-        self::assertSame($password, $passwordBadge->getPassword());
+        $this->assertInstanceOf(PasswordCredentials::class, $passwordBadge);
+        $this->assertSame($password, $passwordBadge->getPassword());
 
-        self::assertTrue($passport->hasBadge(RememberMeBadge::class));
+        $this->assertTrue($passport->hasBadge(RememberMeBadge::class));
 
         // Badge will be added later by PasswordStrengthSubscriber
         $passwordStrengthBadge = $passport->getBadge(PasswordStrengthBadge::class);
-        self::assertNull($passwordStrengthBadge);
+        $this->assertNotInstanceOf(PasswordStrengthBadge::class, $passwordStrengthBadge);
 
         if (!$enableCsrf) {
-            self::assertFalse($passport->hasBadge(CsrfTokenBadge::class));
+            $this->assertFalse($passport->hasBadge(CsrfTokenBadge::class));
 
             return;
         }
 
         $csrfTokenBadge = $passport->getBadge(CsrfTokenBadge::class);
-        \assert($csrfTokenBadge instanceof CsrfTokenBadge);
-        self::assertSame($csrfToken, $csrfTokenBadge->getCsrfToken());
-        self::assertSame('authenticate', $csrfTokenBadge->getCsrfTokenId());
+        $this->assertInstanceOf(CsrfTokenBadge::class, $csrfTokenBadge);
+        $this->assertSame($csrfToken, $csrfTokenBadge->getCsrfToken());
+        $this->assertSame('authenticate', $csrfTokenBadge->getCsrfTokenId());
     }
 
     public static function provideEnableCsrf(): \Generator
@@ -292,29 +293,29 @@ class SsoAuthenticatorTest extends TestCase
         $integration       = 'integration';
         $csrfToken         = 'token';
         $options           = ['post_only' => true];
-        $httpUtils         = $this->createMock(HttpUtils::class);
+        $httpUtils         = $this->createStub(HttpUtils::class);
         $userProvider      = $this->createMock(UserProvider::class);
-        $successHandler    = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $failureHandler    = $this->createMock(AuthenticationFailureHandlerInterface::class);
+        $successHandler    = $this->createStub(AuthenticationSuccessHandlerInterface::class);
+        $failureHandler    = $this->createStub(AuthenticationFailureHandlerInterface::class);
         $integrationHelper = $this->createMock(IntegrationHelper::class);
         $dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $session           = $this->createMock(SessionInterface::class);
-        $session->expects(self::once())
+        $session->expects($this->once())
             ->method('set')
             ->with(SecurityRequestAttributes::LAST_USERNAME, $username);
 
-        $integrations = [$this->createMock(AbstractSsoServiceIntegration::class)];
-        $integrationHelper->expects(self::once())
+        $integrations = [$this->createStub(AbstractSsoServiceIntegration::class)];
+        $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with($integration, ['sso_form'], false, null, true)
             ->willReturn($integrations);
 
-        $userProvider->expects(self::once())
+        $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($username)
             ->willThrowException(new UserNotFoundException());
 
-        $dispatcher->expects(self::once())
+        $dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(UserEvents::USER_FORM_AUTHENTICATION)
             ->willReturn(false);
@@ -339,8 +340,8 @@ class SsoAuthenticatorTest extends TestCase
         $passport = $authenticator->authenticate($request);
 
         $userBadge = $passport->getBadge(UserBadge::class);
-        \assert($userBadge instanceof UserBadge);
-        self::assertSame($username, $userBadge->getUserIdentifier());
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame($username, $userBadge->getUserIdentifier());
 
         $this->expectException(UserNotFoundException::class);
 
@@ -354,33 +355,33 @@ class SsoAuthenticatorTest extends TestCase
         $integration       = 'integration';
         $csrfToken         = 'token';
         $options           = ['post_only' => true];
-        $httpUtils         = $this->createMock(HttpUtils::class);
+        $httpUtils         = $this->createStub(HttpUtils::class);
         $userProvider      = $this->createMock(UserProvider::class);
-        $successHandler    = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $failureHandler    = $this->createMock(AuthenticationFailureHandlerInterface::class);
+        $successHandler    = $this->createStub(AuthenticationSuccessHandlerInterface::class);
+        $failureHandler    = $this->createStub(AuthenticationFailureHandlerInterface::class);
         $integrationHelper = $this->createMock(IntegrationHelper::class);
         $dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $session           = $this->createMock(SessionInterface::class);
-        $session->expects(self::once())
+        $session->expects($this->once())
             ->method('set')
             ->with(SecurityRequestAttributes::LAST_USERNAME, $username);
 
-        $integrations = [$this->createMock(AbstractSsoServiceIntegration::class)];
-        $integrationHelper->expects(self::once())
+        $integrations = [$this->createStub(AbstractSsoServiceIntegration::class)];
+        $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with($integration, ['sso_form'], false, null, true)
             ->willReturn($integrations);
 
         $user = $this->createMock(User::class);
-        $user->expects(self::once())
+        $user->expects($this->once())
             ->method('getRoles')
             ->willReturn([]);
-        $userProvider->expects(self::once())
+        $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($username)
             ->willReturn($user);
 
-        $dispatcher->expects(self::once())
+        $dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(UserEvents::USER_FORM_AUTHENTICATION)
             ->willReturn(false);
@@ -405,9 +406,9 @@ class SsoAuthenticatorTest extends TestCase
         $passport = $authenticator->authenticate($request);
 
         $userBadge = $passport->getBadge(UserBadge::class);
-        \assert($userBadge instanceof UserBadge);
-        self::assertSame($username, $userBadge->getUserIdentifier());
-        self::assertSame($user, $userBadge->getUser());
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame($username, $userBadge->getUserIdentifier());
+        $this->assertSame($user, $userBadge->getUser());
     }
 
     public function testAuthenticateListenerForcesFailure(): void
@@ -419,28 +420,28 @@ class SsoAuthenticatorTest extends TestCase
         $userRoles         = ['ROLE'];
         $options           = ['post_only' => true];
         $failedMessage     = 'Failure';
-        $httpUtils         = $this->createMock(HttpUtils::class);
+        $httpUtils         = $this->createStub(HttpUtils::class);
         $userProvider      = $this->createMock(UserProvider::class);
-        $successHandler    = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $failureHandler    = $this->createMock(AuthenticationFailureHandlerInterface::class);
+        $successHandler    = $this->createStub(AuthenticationSuccessHandlerInterface::class);
+        $failureHandler    = $this->createStub(AuthenticationFailureHandlerInterface::class);
         $integrationHelper = $this->createMock(IntegrationHelper::class);
         $dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $session           = $this->createMock(SessionInterface::class);
-        $session->expects(self::once())
+        $session->expects($this->once())
             ->method('set')
             ->with(SecurityRequestAttributes::LAST_USERNAME, $username);
 
-        $integrations = [$this->createMock(AbstractSsoServiceIntegration::class)];
-        $integrationHelper->expects(self::once())
+        $integrations = [$this->createStub(AbstractSsoServiceIntegration::class)];
+        $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with($integration, ['sso_form'], false, null, true)
             ->willReturn($integrations);
 
         $user = $this->createMock(User::class);
-        $user->expects(self::once())
+        $user->expects($this->once())
             ->method('getRoles')
             ->willReturn($userRoles);
-        $userProvider->expects(self::once())
+        $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($username)
             ->willReturn($user);
@@ -474,11 +475,11 @@ class SsoAuthenticatorTest extends TestCase
         $returnEvent->setFailedAuthenticationMessage($failedMessage);
         $returnEvent->setIsFailedAuthentication();
 
-        $dispatcher->expects(self::once())
+        $dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(UserEvents::USER_FORM_AUTHENTICATION)
             ->willReturn(true);
-        $dispatcher->expects(self::once())
+        $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with($callEvent, UserEvents::USER_FORM_AUTHENTICATION)
             ->willReturn($returnEvent);
@@ -496,8 +497,8 @@ class SsoAuthenticatorTest extends TestCase
         $passport = $authenticator->authenticate($request);
 
         $userBadge = $passport->getBadge(UserBadge::class);
-        \assert($userBadge instanceof UserBadge);
-        self::assertSame($username, $userBadge->getUserIdentifier());
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame($username, $userBadge->getUserIdentifier());
 
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage($failedMessage);
@@ -512,25 +513,25 @@ class SsoAuthenticatorTest extends TestCase
         $integration       = 'integration';
         $csrfToken         = 'token';
         $options           = ['post_only' => true];
-        $httpUtils         = $this->createMock(HttpUtils::class);
+        $httpUtils         = $this->createStub(HttpUtils::class);
         $userProvider      = $this->createMock(UserProvider::class);
-        $successHandler    = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $failureHandler    = $this->createMock(AuthenticationFailureHandlerInterface::class);
+        $successHandler    = $this->createStub(AuthenticationSuccessHandlerInterface::class);
+        $failureHandler    = $this->createStub(AuthenticationFailureHandlerInterface::class);
         $integrationHelper = $this->createMock(IntegrationHelper::class);
         $dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $session           = $this->createMock(SessionInterface::class);
-        $session->expects(self::once())
+        $session->expects($this->once())
             ->method('set')
             ->with(SecurityRequestAttributes::LAST_USERNAME, $username);
 
-        $integrations = [$this->createMock(AbstractSsoServiceIntegration::class)];
-        $integrationHelper->expects(self::once())
+        $integrations = [$this->createStub(AbstractSsoServiceIntegration::class)];
+        $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with($integration, ['sso_form'], false, null, true)
             ->willReturn($integrations);
 
-        $user = $this->createMock(User::class);
-        $userProvider->expects(self::once())
+        $user = $this->createStub(User::class);
+        $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($username)
             ->willThrowException(new UserNotFoundException());
@@ -563,11 +564,11 @@ class SsoAuthenticatorTest extends TestCase
         $returnEvent = clone $callEvent;
         $returnEvent->setIsAuthenticated($integration, $user, false);
 
-        $dispatcher->expects(self::once())
+        $dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(UserEvents::USER_FORM_AUTHENTICATION)
             ->willReturn(true);
-        $dispatcher->expects(self::once())
+        $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with($callEvent, UserEvents::USER_FORM_AUTHENTICATION)
             ->willReturn($returnEvent);
@@ -585,9 +586,9 @@ class SsoAuthenticatorTest extends TestCase
         $passport = $authenticator->authenticate($request);
 
         $userBadge = $passport->getBadge(UserBadge::class);
-        \assert($userBadge instanceof UserBadge);
-        self::assertSame($username, $userBadge->getUserIdentifier());
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame($username, $userBadge->getUserIdentifier());
 
-        self::assertSame($user, $userBadge->getUser());
+        $this->assertSame($user, $userBadge->getUser());
     }
 }

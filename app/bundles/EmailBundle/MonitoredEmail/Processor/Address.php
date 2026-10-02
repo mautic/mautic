@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
-class Address
+final class Address
 {
     /**
      * @param string $addresses String of email address from an email header

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -9,6 +11,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\ReportBundle\Entity\ReportRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\CsvExporter;
@@ -22,7 +25,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-class ReportModelTest extends \PHPUnit\Framework\TestCase
+final class ReportModelTest extends \PHPUnit\Framework\TestCase
 {
     private ReportModel $reportModel;
 
@@ -34,7 +37,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         $mockDispatcher = $this->createMock(EventDispatcher::class);
         $mockDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (ReportBuilderEvent $event) {
+                function (ReportBuilderEvent $event): ReportBuilderEvent {
                     $reportBuilderData = Fixtures::getReportBuilderEventData();
                     $event->addTable('assets', $reportBuilderData['all']['tables']['assets']);
 
@@ -47,21 +50,22 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         $translatorMock->method('trans')->withAnyParameters()->willReturnArgument(0);
 
         $this->reportModel = new ReportModel(
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(Environment::class),
-            new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class)),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(Environment::class),
+            new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class)),
             $fieldModelMock,
-            new ReportHelper($this->createMock(EventDispatcherInterface::class)),
-            $this->createMock(CsvExporter::class),
-            $this->createMock(ExcelExporter::class),
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
+            new ReportHelper($this->createStub(EventDispatcherInterface::class)),
+            $this->createStub(CsvExporter::class),
+            $this->createStub(ExcelExporter::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
             $mockDispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $translatorMock,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(RequestStack::class)
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(RequestStack::class),
+            $this->createStub(ReportRepository::class), // $reportRepository
         );
 
         // Do this to build the initial set of data from the subscribers that get used in all other contexts

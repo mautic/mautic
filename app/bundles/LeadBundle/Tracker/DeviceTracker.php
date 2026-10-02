@@ -19,10 +19,10 @@ class DeviceTracker
     private array $trackedDevice = [];
 
     public function __construct(
-        private DeviceCreatorServiceInterface $deviceCreatorService,
-        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        private DeviceTrackingServiceInterface $deviceTrackingService,
-        private LoggerInterface $logger,
+        private readonly DeviceCreatorServiceInterface $deviceCreatorService,
+        private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private readonly DeviceTrackingServiceInterface $deviceTrackingService,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

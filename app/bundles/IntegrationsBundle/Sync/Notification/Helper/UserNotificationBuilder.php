@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UserNotificationBuilder
+final readonly class UserNotificationBuilder
 {
     public function __construct(
         private UserHelper $userHelper,

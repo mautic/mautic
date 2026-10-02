@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -12,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TrackingHelper $trackingHelper,
@@ -51,16 +53,18 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('focus.show', $action);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $focusId = (int) $event->getConfig()['focus'];
         if (!$focusId) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
         $values                 = [];
         $values['focus_item'][] = ['id' => $focusId, 'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], UrlGeneratorInterface::ABSOLUTE_URL)];
         $this->trackingHelper->updateCacheItem($values);
 
-        return $event->setResult(true);
+        $event->setResult(true);
     }
 }

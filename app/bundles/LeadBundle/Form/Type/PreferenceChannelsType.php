@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\LeadModel;
@@ -11,10 +13,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class PreferenceChannelsType extends AbstractType
+final class PreferenceChannelsType extends AbstractType
 {
     public function __construct(
-        private LeadModel $leadModel,
+        private readonly LeadModel $leadModel,
     ) {
     }
 
@@ -24,7 +26,7 @@ class PreferenceChannelsType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'choices'     => fn (Options $options) => $model->getPreferenceChannels(),
+                'choices'     => fn (Options $options): array => $model->getPreferenceChannels(),
                 'placeholder' => '',
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
@@ -35,7 +37,7 @@ class PreferenceChannelsType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

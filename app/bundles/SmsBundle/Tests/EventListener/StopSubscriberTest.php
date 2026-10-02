@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\EventListener;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -8,7 +10,7 @@ use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\EventListener\StopSubscriber;
 
-class StopSubscriberTest extends \PHPUnit\Framework\TestCase
+final class StopSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&DoNotContactModel
@@ -33,10 +35,7 @@ class StopSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->StopSubscriber()->onReply($event);
     }
 
-    /**
-     * @return StopSubscriber
-     */
-    private function StopSubscriber()
+    private function StopSubscriber(): StopSubscriber
     {
         return new StopSubscriber($this->doNotContactModel);
     }

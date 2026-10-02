@@ -7,9 +7,12 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 
-class DateAnniversary implements FilterDecoratorInterface
+final readonly class DateAnniversary implements FilterDecoratorInterface
 {
+    use ParseDateFilterValueTrait;
+
     public function __construct(
         private DateDecorator $dateDecorator,
         private DateOptionParameters $dateOptionParameters,
@@ -36,21 +39,19 @@ class DateAnniversary implements FilterDecoratorInterface
 
     /**
      * @param array|string $argument
-     *
-     * @return array|string
      */
-    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
+    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument): string|array
     {
         return $this->dateDecorator->getParameterHolder($contactSegmentFilterCrate, $argument);
     }
 
-    /**
-     * @return array|bool|float|string|null
-     */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
         $date           = $this->dateOptionParameters->getDefaultDate();
-        $filter         = $contactSegmentFilterCrate->getFilter();
+        $filter = $this->parseDateFilterValue(
+            $contactSegmentFilterCrate->getFilter(),
+            $contactSegmentFilterCrate->getOperator()
+        );
         $relativeFilter = is_string($filter) ? trim(str_replace(['anniversary', 'birthday'], '', $filter)) : $filter;
 
         if ($relativeFilter) {

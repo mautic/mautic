@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -8,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class PointActionAssetDownloadType extends AbstractType
+final class PointActionAssetDownloadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

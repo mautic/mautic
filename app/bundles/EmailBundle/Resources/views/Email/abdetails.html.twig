@@ -1,0 +1,168 @@
+{% if 'list' == email.emailType and not email.isEnableAbTest() and email.getSentCount() == 0 %}
+    <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel-body pt-xs">
+            {% include '@MauticCore/Components/card.html.twig' with {
+                type: 'link',
+                heading: 'mautic.core.ab_test.create',
+                copy: 'mautic.core.ab_test.create.description',
+                href: path('mautic_abtest_generate', {'objectId': email.getId()}),
+                attributes: {
+                    'data-toggle': 'ajaxmodal',
+                    'data-target': '#MauticSharedModal',
+                    'data-header': 'mautic.email.abtest.button'|trans
+                }
+            } %}
+        </div>
+    </div>
+{% elseif email.isEnableAbTest() %}
+    {# @var \Mautic\EmailBundle\Model\AbTest\EmailStatus emailStatus #}
+    <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel-body pt-xs">
+            <div class="tile" style="outline: 1px solid var(--border-tile);">
+                <div class="d-flex ai-center jc-space-between mb-sm">
+                    <h3 class="type-heading-02 mb-0">{{ 'mautic.core.variants.abtest'|trans }}
+                        {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': variants.parent, 'model': 'email', 'status': email.getPublishStatus(), 'size': 'ri-xl'}) -}}
+                    </h3>
+                    <a href="{{ path('mautic_abtest_generate', {'objectId': parentId}) }}"
+                       data-toggle="ajaxmodal"
+                       data-target="#MauticSharedModal"
+                       data-header="{{ 'mautic.email.abtest.settings'|trans }}"
+                       class="btn btn-ghost btn-icon"
+                       title="{{ 'mautic.email.abtest.settings'|trans }}">
+                        <i class="ri-settings-3-line"></i>
+                    </a>
+                </div>
+
+                {# Variant list #}
+                {{- include('@MauticEmail/Variant/index.html.twig', {
+                    'activeEntity': email,
+                    'variants': variants,
+                    'abTestResults': abTestResults,
+                    'model': 'email',
+                    'actionRoute': 'mautic_email_action'
+                }) -}}
+
+                {# Status alerts and actions #}
+                {% if emailStatus.getStatus() == 'prepare' %}
+                    {% if not emailStatus.hasChildren() %}
+                        <div class="alert alert-warning mt-md mb-md">
+                            {{ 'mautic.email.abtest.not_ready'|trans }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mt-md mb-md">
+                            {{ 'mautic.email.ab.test.start.sending.start.tooltip'|trans({
+                                '%percentage%': variants.abTestSettings.totalWeight,
+                                '%hours%': variants.abTestSettings.sendWinnerDelay
+                            }) }}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex fd-column gap-sm abtest-sidebar-actions">
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [{
+                                label: 'mautic.email.ab_test.form.abtest.add',
+                                variant: 'tertiary',
+                                icon: 'ri-add-line',
+                                wide: true,
+                                href: path('mautic_email_action', {'objectAction': 'abTest', 'objectId': parentId}),
+                                attributes: {
+                                    'data-toggle': 'ajax'
+                                }
+                            }]
+                        } %}
+
+                        {% if emailStatus.hasChildren() %}
+                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                buttons: [{
+                                    label: 'mautic.email.ab_test.form.abtest.schedule.sending',
+                                    variant: 'primary',
+                                    icon: 'ri-send-plane-line',
+                                    wide: true,
+                                    href: path('mautic_email_action', {'objectAction': 'scheduleSend', 'objectId': parentId}),
+                                    attributes: {
+                                        'data-toggle': 'ajaxmodal',
+                                        'data-target': '#MauticSharedModal',
+                                        'data-header': 'mautic.email.send.schedule.abtest'|trans
+                                    }
+                                }]
+                            } %}
+                        {% endif %}
+                    </div>
+
+                {% elseif emailStatus.getStatus() == 'pending' %}
+                    <div class="alert alert-info mt-md mb-md">
+                        {{ 'mautic.core.form.pending.start_at'|trans({
+                            '%date%': dateToFullConcat(email.getPublishUp())
+                        }) }}
+                    </div>
+                    <div class="d-flex fd-column gap-sm abtest-sidebar-actions">
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [{
+                                label: 'mautic.email.ab_test.form.abtest.add',
+                                variant: 'tertiary',
+                                icon: 'ri-add-line',
+                                wide: true,
+                                href: path('mautic_email_action', {'objectAction': 'abTest', 'objectId': parentId}),
+                                attributes: {
+                                    'data-toggle': 'ajax'
+                                }
+                            }]
+                        } %}
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [{
+                                label: 'mautic.email.reschedule.send',
+                                variant: 'primary',
+                                icon: 'ri-time-line',
+                                wide: true,
+                                href: path('mautic_email_action', {'objectAction': 'scheduleSend', 'objectId': parentId}),
+                                attributes: {
+                                    'data-toggle': 'ajaxmodal',
+                                    'data-target': '#MauticSharedModal',
+                                    'data-header': 'mautic.email.send.schedule.abtest'|trans
+                                }
+                            }]
+                        } %}
+                    </div>
+
+                {% elseif emailStatus.getStatus() == 'running' %}
+                    {% if variants.hoursLeftToDetermineWinner is not null %}
+                        <div class="alert alert-info mt-md mb-md">
+                            {{ 'mautic.ab.test.hours.left.determine.winner'|trans({
+                                '%hours%': variants.hoursLeftToDetermineWinner.hours,
+                                '%minutes%': variants.hoursLeftToDetermineWinner.minutes
+                            }) }}
+                        </div>
+                    {% endif %}
+                    <div class="mt-md">
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [{
+                                label: 'mautic.core.ab_test.stats',
+                                variant: 'tertiary',
+                                icon: 'ri-pie-chart-line',
+                                attributes: {
+                                    'data-toggle': 'modal',
+                                    'data-target': '#abStatsModal'
+                                }
+                            }]
+                        } %}
+                    </div>
+
+                {% else %}
+                    <div class="mt-md">
+                        {% include '@MauticCore/Helper/button.html.twig' with {
+                            buttons: [{
+                                label: 'mautic.core.ab_test.stats',
+                                variant: 'tertiary',
+                                icon: 'ri-pie-chart-line',
+                                attributes: {
+                                    'data-toggle': 'modal',
+                                    'data-target': '#abStatsModal'
+                                }
+                            }]
+                        } %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}

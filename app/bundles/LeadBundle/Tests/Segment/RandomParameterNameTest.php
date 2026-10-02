@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Tests\Segment;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use PHPUnit\Framework\TestCase;
 
-class RandomParameterNameTest extends TestCase
+final class RandomParameterNameTest extends TestCase
 {
     public function testGenerateRandomParameterName(): void
     {
@@ -55,7 +55,7 @@ class RandomParameterNameTest extends TestCase
         ];
 
         foreach ($expectedValues as $expectedValue) {
-            self::assertSame($expectedValue, $generator->generateRandomParameterName());
+            $this->assertSame($expectedValue, $generator->generateRandomParameterName());
         }
     }
 }

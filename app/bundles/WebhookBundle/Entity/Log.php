@@ -59,7 +59,7 @@ class Log
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -67,17 +67,14 @@ class Log
     }
 
     /**
-     * @return Webhook
+     * @return Webhook|null
      */
     public function getWebhook()
     {
         return $this->webhook;
     }
 
-    /**
-     * @return Log
-     */
-    public function setWebhook(Webhook $webhook)
+    public function setWebhook(Webhook $webhook): static
     {
         $this->webhook = $webhook;
 
@@ -85,7 +82,7 @@ class Log
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getStatusCode()
     {
@@ -94,10 +91,8 @@ class Log
 
     /**
      * @param mixed $statusCode
-     *
-     * @return Log
      */
-    public function setStatusCode($statusCode)
+    public function setStatusCode($statusCode): static
     {
         $this->statusCode = $statusCode;
 
@@ -105,17 +100,14 @@ class Log
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
         return $this->dateAdded;
     }
 
-    /**
-     * @return Log
-     */
-    public function setDateAdded(\DateTime $dateAdded)
+    public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -138,7 +130,7 @@ class Log
     }
 
     /**
-     * @return float
+     * @return float|null
      */
     public function getRuntime()
     {
@@ -147,10 +139,8 @@ class Log
 
     /**
      * @param float $runtime
-     *
-     * @return Log
      */
-    public function setRuntime($runtime)
+    public function setRuntime($runtime): static
     {
         $this->runtime = round($runtime, 2);
 

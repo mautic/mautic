@@ -23,22 +23,17 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ObjectChangeGeneratorTest extends TestCase
+final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var SyncJudgeInterface&MockObject
+     * @var MockObject&SyncJudgeInterface
      */
     private MockObject $syncJudge;
 
     /**
-     * @var ValueHelper&MockObject
+     * @var MockObject&ValueHelper
      */
     private MockObject $valueHelper;
-
-    /**
-     * @var FieldHelper&MockObject
-     */
-    private MockObject $fieldHelper;
 
     /**
      * @var MockObject&BulkNotification
@@ -49,7 +44,6 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->syncJudge        = $this->createMock(SyncJudgeInterface::class);
         $this->valueHelper      = $this->createMock(ValueHelper::class);
-        $this->fieldHelper      = $this->createMock(FieldHelper::class);
         $this->bulkNotification = $this->createMock(BulkNotification::class);
     }
 
@@ -57,7 +51,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForMautic')
             ->willReturnCallback(
-                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -73,7 +67,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $integrationInformationChangeRequest
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest): InformationChangeRequestDAO => $integrationInformationChangeRequest
             );
 
         $objectChangeDAO = $this->createObjectGenerator()->getSyncObjectChange(
@@ -96,7 +90,7 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // Email should be a required field
         $requiredFields = $objectChangeDAO->getRequiredFields();
-        $this->assertTrue(isset($requiredFields['email']));
+        $this->assertArrayHasKey('email', $requiredFields);
 
         // Both fields should be included
         $fields = $objectChangeDAO->getFields();
@@ -104,7 +98,7 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // First name is presumed to be changed
         $changedFields = $objectChangeDAO->getChangedFields();
-        $this->assertTrue(isset($changedFields['firstname']));
+        $this->assertArrayHasKey('firstname', $changedFields);
 
         // First name should have changed to Robert because the sync judge returned the integration's information change request
         $this->assertEquals('Robert', $changedFields['firstname']->getValue()->getNormalizedValue());
@@ -114,7 +108,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForMautic')
             ->willReturnCallback(
-                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -140,7 +134,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest): InformationChangeRequestDAO => $internalInformationChangeRequest
             );
 
         $objectChangeDAO = $this->createObjectGenerator()->getSyncObjectChange(
@@ -163,7 +157,7 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // Email should be a required field
         $requiredFields = $objectChangeDAO->getRequiredFields();
-        $this->assertTrue(isset($requiredFields['email']));
+        $this->assertArrayHasKey('email', $requiredFields);
 
         // Both fields should be included
         $fields = $objectChangeDAO->getFields();
@@ -171,7 +165,7 @@ class ObjectChangeGeneratorTest extends TestCase
 
         // First name is presumed to be changed
         $changedFields = $objectChangeDAO->getChangedFields();
-        $this->assertTrue(isset($changedFields['firstname']));
+        $this->assertArrayHasKey('firstname', $changedFields);
 
         // First name should have changed to Robert because the sync judge returned the integration's information change request
         $this->assertEquals('Bob', $changedFields['firstname']->getValue()->getNormalizedValue());
@@ -207,14 +201,12 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
-                    return $internalInformationChangeRequest;
-                }
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest): InformationChangeRequestDAO => $internalInformationChangeRequest
             );
         $matcher = $this->exactly(2);
 
         $this->bulkNotification->expects($matcher)
-            ->method('addNotification')->willReturnCallback(function (...$parameters) use ($matcher, $exceptionMessage, $integrationName, $objectName) {
+            ->method('addNotification')->willReturnCallback(function (...$parameters) use ($matcher, $exceptionMessage, $integrationName, $objectName): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-email', $parameters[0]);
                     $this->assertSame($exceptionMessage, $parameters[1]);
@@ -274,14 +266,12 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
-                    return $internalInformationChangeRequest;
-                }
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest): InformationChangeRequestDAO => $internalInformationChangeRequest
             );
         $matcher = $this->exactly(2);
 
         $this->bulkNotification->expects($matcher)
-            ->method('addNotification')->willReturnCallback(function (...$parameters) use ($matcher, $exceptionMessage, $integrationName, $objectName) {
+            ->method('addNotification')->willReturnCallback(function (...$parameters) use ($matcher, $exceptionMessage, $integrationName, $objectName): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator-Test-lead-email', $parameters[0]);
                     $this->assertSame($exceptionMessage, $parameters[1]);
@@ -335,9 +325,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(1))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
-                    return $internalInformationChangeRequest;
-                }
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest): InformationChangeRequestDAO => $internalInformationChangeRequest
             );
 
         $this->bulkNotification->expects($this->exactly(1))
@@ -366,18 +354,18 @@ class ObjectChangeGeneratorTest extends TestCase
     public function testFieldsWithDirectionToIntegrationAreSkipped(): void
     {
         $objectChangeGenerator = new ObjectChangeGenerator(
-            new class implements SyncJudgeInterface {
+            new class() implements SyncJudgeInterface {
                 public function adjudicate(
                     $mode,
                     InformationChangeRequestDAO $leftChangeRequest,
                     InformationChangeRequestDAO $rightChangeRequest,
-                ) {
+                ): InformationChangeRequestDAO {
                     return $leftChangeRequest;
                 }
             },
-            new class extends ValueHelper {
+            new class() extends ValueHelper {
             },
-            new class extends FieldHelper {
+            new class() extends FieldHelper {
                 public function __construct()
                 {
                 }
@@ -389,7 +377,7 @@ class ObjectChangeGeneratorTest extends TestCase
                     return ['email' => []];
                 }
             },
-            new class extends BulkNotification {
+            new class() extends BulkNotification {
                 public function __construct()
                 {
                 }
@@ -416,14 +404,14 @@ class ObjectChangeGeneratorTest extends TestCase
         $objectChange = $objectChangeGenerator->getSyncObjectChange($reportDAO, $mappingManualDAO, $objectMappingDAO, $internalObject, $integrationObject);
 
         // The points/Score field should not be recorded as a change because it has direction to integration.
-        Assert::assertCount(2, $objectChange->getFields());
-        Assert::assertSame('john@doe.email', $objectChange->getField('email')->getValue()->getNormalizedValue());
-        Assert::assertSame('John', $objectChange->getField('firstname')->getValue()->getNormalizedValue());
-        Assert::assertSame('Lead', $objectChange->getMappedObject());
-        Assert::assertSame('integration-id-1', $objectChange->getMappedObjectId());
-        Assert::assertSame(Contact::NAME, $objectChange->getObject());
-        Assert::assertSame(123, $objectChange->getObjectId());
-        Assert::assertSame($integrationName, $objectChange->getIntegration());
+        $this->assertCount(2, $objectChange->getFields());
+        $this->assertSame('john@doe.email', $objectChange->getField('email')->getValue()->getNormalizedValue());
+        $this->assertSame('John', $objectChange->getField('firstname')->getValue()->getNormalizedValue());
+        $this->assertSame('Lead', $objectChange->getMappedObject());
+        $this->assertSame('integration-id-1', $objectChange->getMappedObjectId());
+        $this->assertSame(Contact::NAME, $objectChange->getObject());
+        $this->assertSame(123, $objectChange->getObjectId());
+        $this->assertSame($integrationName, $objectChange->getIntegration());
     }
 
     private function getMappingManual(string $integration, string $objectName): MappingManualDAO
@@ -472,7 +460,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return new ObjectChangeGenerator(
             $this->syncJudge,
             $this->valueHelper,
-            $this->fieldHelper,
+            $this->createStub(FieldHelper::class),
             $this->bulkNotification
         );
     }

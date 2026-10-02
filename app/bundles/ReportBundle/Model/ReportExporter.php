@@ -12,7 +12,7 @@ use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReportExporter
+final readonly class ReportExporter
 {
     public function __construct(
         private ScheduleModel $schedulerModel,

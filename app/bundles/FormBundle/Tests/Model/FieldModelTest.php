@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\DBAL\Connection;
@@ -9,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Model\FieldModel;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -16,16 +19,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FieldModelTest extends TestCase
+final class FieldModelTest extends TestCase
 {
     public function testGenerateAlias(): void
     {
         $connection = $this->createMock(Connection::class);
 
-        $platform = new class {
+        $platform = new class() {
             public function getReservedKeywordsList(): object
             {
-                return new class {
+                return new class() {
                     public function isKeyword(): bool
                     {
                         return false;
@@ -42,24 +45,27 @@ class FieldModelTest extends TestCase
         $connection->method('getDatabasePlatform')
             ->willReturn($platform);
 
-        $leadFieldModel = $this->createMock(\Mautic\LeadBundle\Model\FieldModel::class);
+        $leadFieldModel = $this->createStub(\Mautic\LeadBundle\Model\FieldModel::class);
         $entityManager  = $this->createMock(EntityManager::class);
-        $schemaHelper   = $this->createMock(ColumnSchemaHelper::class);
+        $schemaHelper   = $this->createStub(ColumnSchemaHelper::class);
         $fieldModel     = new FieldModel(
-            $leadFieldModel,
             $entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(RequestStack::class),
-            $schemaHelper
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+        );
+        $fieldModel->autowireFieldModel(
+            $leadFieldModel,
+            $this->createStub(RequestStack::class),
+            $schemaHelper,
+            $this->createStub(FieldRepository::class)
         );
 
-        $entityManager->expects($this->any())
+        $entityManager
             ->method('getConnection')
             ->willReturn($connection);
 

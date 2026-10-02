@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Tests\Integration;
 
 use Doctrine\ORM\EntityManager;
@@ -7,12 +9,16 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
+use Mautic\UserBundle\Entity\UserRepository;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -22,92 +28,107 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AbstractIntegrationTestCase extends TestCase
+abstract class AbstractIntegrationTestCase extends TestCase
 {
     /**
-     * @var EventDispatcherInterface&MockObject
+     * @var MockObject&EventDispatcherInterface
      */
-    protected $dispatcher;
+    protected MockObject $dispatcher;
 
     /**
-     * @var CacheStorageHelper&MockObject
+     * @var MockObject&CacheStorageHelper
      */
-    protected $cache;
+    protected MockObject $cache;
 
     /**
-     * @var EntityManager&MockObject
+     * @var MockObject&EntityManager
      */
-    protected $em;
+    protected MockObject $em;
 
     /**
-     * @var Session&MockObject
+     * @var MockObject&Session
      */
-    protected $session;
+    protected MockObject $session;
 
     /**
-     * @var RequestStack&MockObject
+     * @var MockObject&RequestStack
      */
-    protected $request;
+    protected MockObject $request;
 
     /**
-     * @var Router&MockObject
+     * @var MockObject&Router
      */
-    protected $router;
+    protected MockObject $router;
 
     /**
-     * @var TranslatorInterface&MockObject
+     * @var MockObject&TranslatorInterface
      */
-    protected $translator;
+    protected MockObject $translator;
 
     /**
-     * @var Logger&MockObject
+     * @var MockObject&Logger
      */
-    protected $logger;
+    protected MockObject $logger;
 
     /**
-     * @var EncryptionHelper&MockObject
+     * @var MockObject&EncryptionHelper
      */
-    protected $encryptionHelper;
+    protected MockObject $encryptionHelper;
 
     /**
-     * @var LeadModel&MockObject
+     * @var MockObject&LeadModel
      */
-    protected $leadModel;
+    protected MockObject $leadModel;
 
     /**
-     * @var CompanyModel&MockObject
+     * @var MockObject&CompanyModel
      */
-    protected $companyModel;
+    protected MockObject $companyModel;
 
     /**
-     * @var PathsHelper&MockObject
+     * @var MockObject&PathsHelper
      */
-    protected $pathsHelper;
+    protected MockObject $pathsHelper;
 
     /**
-     * @var NotificationModel&MockObject
+     * @var MockObject&NotificationModel
      */
-    protected $notificationModel;
+    protected MockObject $notificationModel;
 
     /**
-     * @var FieldModel&MockObject
+     * @var MockObject&FieldModel
      */
-    protected $fieldModel;
+    protected MockObject $fieldModel;
 
     /**
-     * @var IntegrationEntityModel&MockObject
+     * @var MockObject&IntegrationEntityModel
      */
-    protected $integrationEntityModel;
+    protected MockObject $integrationEntityModel;
 
     /**
-     * @var DoNotContact&MockObject
+     * @var MockObject&DoNotContact
      */
-    protected $doNotContact;
+    protected MockObject $doNotContact;
 
     /**
      * @var MockObject&FieldsWithUniqueIdentifier
      */
     protected MockObject $fieldsWithUniqueIdentifier;
+
+    /**
+     * @var MockObject&IntegrationEntityRepository
+     */
+    protected MockObject $integrationEntityRepository;
+
+    /**
+     * @var MockObject&LeadRepository
+     */
+    protected MockObject $leadRepository;
+
+    /**
+     * @var MockObject&UserRepository
+     */
+    protected MockObject $userRepository;
 
     protected function setUp(): void
     {
@@ -130,5 +151,20 @@ class AbstractIntegrationTestCase extends TestCase
         $this->integrationEntityModel     = $this->createMock(IntegrationEntityModel::class);
         $this->doNotContact               = $this->createMock(DoNotContact::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
+        $this->integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
+        $this->leadRepository              = $this->createMock(LeadRepository::class);
+        $this->userRepository              = $this->createMock(UserRepository::class);
+    }
+
+    /**
+     * Mimics the #[Required] autowiring of repositories that the container does for real services.
+     */
+    protected function autowireIntegrationRepositories(AbstractIntegration $integration): void
+    {
+        $integration->autowireAbstractIntegration(
+            $this->integrationEntityRepository,
+            $this->leadRepository,
+            $this->userRepository
+        );
     }
 }

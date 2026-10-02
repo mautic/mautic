@@ -11,12 +11,12 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class EmailRepositoryUpCountSentTest extends \PHPUnit\Framework\TestCase
+final class EmailRepositoryUpCountSentTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;
 
     /**
-     * @var MockObject|QueryBuilder
+     * @var MockObject&QueryBuilder
      */
     private MockObject $queryBuilderMock;
 
@@ -102,7 +102,7 @@ class EmailRepositoryUpCountSentTest extends \PHPUnit\Framework\TestCase
         $this->connection
             ->expects($this->exactly(3))
             ->method('executeStatement')
-            ->will($this->throwException(new DBALException()));
+            ->willThrowException(new DBALException());
 
         $this->expectException(DBALException::class);
         $this->repo->upCountSent(45);

@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 
-class ObjectChangeDAO
+final class ObjectChangeDAO
 {
     /**
      * @var FieldDAO[]
@@ -17,7 +17,7 @@ class ObjectChangeDAO
     private ?ObjectMapping $objectMapping = null;
 
     /**
-     * @var FieldDAO[]
+     * @var array<string, FieldDAO[]>
      */
     private array $fieldsByState = [
         ReportFieldDAO::FIELD_CHANGED   => [],
@@ -166,10 +166,7 @@ class ObjectChangeDAO
         return $this->changeDateTime;
     }
 
-    /**
-     * @return ObjectChangeDAO
-     */
-    public function setChangeDateTime(?\DateTimeInterface $changeDateTime = null)
+    public function setChangeDateTime(?\DateTimeInterface $changeDateTime = null): static
     {
         if (null === $changeDateTime) {
             $changeDateTime = new \DateTime();

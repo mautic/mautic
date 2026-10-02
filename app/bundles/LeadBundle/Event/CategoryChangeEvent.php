@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CategoryChangeEvent extends Event
+final class CategoryChangeEvent extends Event
 {
     private ?Lead $lead = null;
 
@@ -20,8 +22,8 @@ class CategoryChangeEvent extends Event
      */
     public function __construct(
         Lead|array $leads,
-        private Category $category,
-        private bool $added = true,
+        private readonly Category $category,
+        private readonly bool $added = true,
     ) {
         if (is_array($leads)) {
             $this->leads = $leads;
@@ -30,28 +32,20 @@ class CategoryChangeEvent extends Event
         }
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
 
     /**
      * Returns batch array of leads.
-     *
-     * @return array
      */
-    public function getLeads()
+    public function getLeads(): ?array
     {
         return $this->leads;
     }
 
-    /**
-     * @return Category
-     */
-    public function getCategory()
+    public function getCategory(): Category
     {
         return $this->category;
     }

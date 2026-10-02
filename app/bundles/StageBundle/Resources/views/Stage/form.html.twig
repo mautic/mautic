@@ -31,6 +31,31 @@
         <div class="col-md-3 height-auto">
             <div class="pr-lg pl-lg pt-md pb-md">
                 {{ form_row(form.weight) }}
+                {% if stageWeights|length %}
+                    <div class="table-responsive mt-sm mb-32" id="stage-weight-sequence"
+                         data-weights='{{ stageWeights|json_encode|escape('html_attr') }}'
+                         data-weight-field-id="{{ form.weight.vars.id }}"
+                         data-entity-id="{% if entity.getId() %}{{ entity.getId() }}{% endif %}">
+                        <div class="text-muted mb-xs">{{ 'mautic.stage.weight.current_sequence'|trans }}</div>
+                        <table class="table table-condensed mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'mautic.stage.stage'|trans }}</th>
+                                    <th>{{ 'mautic.stage.action.weight'|trans }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in stageWeights %}
+                                    <tr>
+                                        <td>{{ s.name }}</td>
+                                        <td>{{ s.weight }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                {% endif %}
                 {{ form_row(form.category) }}
                 {{ form_row(form.projects) }}
                 {{ form_row(form.isPublished) }}

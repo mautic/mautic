@@ -26,11 +26,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Form>
  */
-class FormType extends AbstractType
+final class FormType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security,
-        private LanguageHelper $langHelper,
+        private readonly CorePermissions $security,
+        private readonly LanguageHelper $langHelper,
     ) {
     }
 
@@ -206,7 +206,7 @@ class FormType extends AbstractType
         ]);
 
         $postAction = (isset($options['data'])) ? $options['data']->getPostAction() : '';
-        $required   = (in_array($postAction, ['redirect', 'message', 'hideform'])) ? true : false;
+        $required   = in_array($postAction, ['redirect', 'message', 'hideform']);
         $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
             'label_attr' => ['class' => 'control-label'],

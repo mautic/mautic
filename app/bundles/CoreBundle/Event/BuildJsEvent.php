@@ -5,15 +5,21 @@ namespace Mautic\CoreBundle\Event;
 use MatthiasMullie\Minify;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class BuildJsEvent extends Event
+final class BuildJsEvent extends Event
 {
     /**
-     * @param bool   $debugMode
-     * @param string $js
+     * @param bool           $debugMode
+     * @param string         $js
+     * @param BuildJsScope[] $acceptedScopes
      */
     public function __construct(
-        protected $js,
-        protected $debugMode = false,
+        private $js,
+        private $debugMode = false,
+        private readonly array $acceptedScopes = [
+            BuildJsScope::RUNTIME,
+            BuildJsScope::ESSENTIAL,
+            BuildJsScope::TRACKING,
+        ],
     ) {
     }
 
@@ -26,15 +32,24 @@ class BuildJsEvent extends Event
     }
 
     /**
-     * Append JS.
-     *
      * @param string $js
      * @param string $section The section name. Shows when in debug mode
-     *
-     * @return $this
      */
-    public function appendJs($js, $section = '')
+    public function appendJs($js, $section = ''): static
     {
+        return $this->appendJsForScope($js, BuildJsScope::TRACKING, $section);
+    }
+
+    /**
+     * @param string $js
+     * @param string $section The section name. Shows when in debug mode
+     */
+    public function appendJsForScope($js, BuildJsScope $scope, $section = ''): static
+    {
+        if (!$this->acceptsScope($scope)) {
+            return $this;
+        }
+
         if ($section && $this->debugMode) {
             $slashes = str_repeat('/', strlen($section) + 10);
             $this->js .= <<<JS
@@ -58,5 +73,10 @@ JS;
         }
 
         return $this;
+    }
+
+    public function acceptsScope(BuildJsScope $scope): bool
+    {
+        return in_array($scope, $this->acceptedScopes, true);
     }
 }

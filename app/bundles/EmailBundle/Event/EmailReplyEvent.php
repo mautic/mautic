@@ -6,30 +6,25 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EmailReplyEvent extends Event
+final class EmailReplyEvent extends Event
 {
-    private ?Email $email;
+    private readonly ?Email $email;
 
     public function __construct(
-        private Stat $stat,
+        private readonly Stat $stat,
     ) {
         $this->email = $stat->getEmail();
     }
 
     /**
      * Returns the Email entity.
-     *
-     * @return Email
      */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
 
-    /**
-     * @return Stat
-     */
-    public function getStat()
+    public function getStat(): Stat
     {
         return $this->stat;
     }

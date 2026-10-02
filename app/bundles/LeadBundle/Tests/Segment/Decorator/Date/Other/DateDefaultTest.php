@@ -1,18 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(DateDefault::class)]
-class DateDefaultTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(DateDefault::class)]
+final class DateDefaultTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetParameterValue(): void
     {
-        $dateDecorator             = $this->createMock(DateDecorator::class);
+        $dateDecorator             = $this->createStub(DateDecorator::class);
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
 
         $filterDecorator = new DateDefault($dateDecorator, '2018-03-02 01:02:03');

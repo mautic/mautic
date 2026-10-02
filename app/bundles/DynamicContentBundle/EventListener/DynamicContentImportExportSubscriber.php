@@ -12,10 +12,11 @@ use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class DynamicContentImportExportSubscriber implements EventSubscriberInterface
 {
@@ -24,9 +25,10 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
     public function __construct(
         private DynamicContentModel $dynamicContentModel,
         private EntityManagerInterface $entityManager,
+        private DynamicContentRepository $dynamicContentRepository,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private ImportEntityDenormalizer $serializer,
     ) {
     }
 
@@ -87,7 +89,7 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
         ];
 
         foreach ($event->getEntityData() as $element) {
-            $object = $this->entityManager->getRepository(DynamicContent::class)->findOneBy(['uuid' => $element['uuid']]);
+            $object = $this->dynamicContentRepository->findOneBy(['uuid' => $element['uuid']]);
             $isNew  = !$object;
 
             $object ??= new DynamicContent();
@@ -129,7 +131,7 @@ final class DynamicContentImportExportSubscriber implements EventSubscriberInter
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(DynamicContent::class)->find($id);
+            $entity = $this->dynamicContentRepository->find($id);
 
             if ($entity) {
                 $this->entityManager->remove($entity);

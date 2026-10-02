@@ -8,10 +8,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     private FixtureHelper $campaignFixturesHelper;
 
@@ -32,7 +31,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
-        Assert::assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
+        $this->assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
 
         $payload = [
             'action'    => 'campaign:cancelScheduledCampaignEvent',
@@ -53,8 +52,8 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         /** @var LeadEventLog $log */
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        Assert::assertSame('{"success":1}', $this->client->getResponse()->getContent());
-        Assert::assertFalse($log->getIsScheduled());
+        self::assertResponseIsSuccessful();
+        $this->assertSame('{"success":1}', $this->client->getResponse()->getContent());
+        $this->assertFalse($log->getIsScheduled());
     }
 }

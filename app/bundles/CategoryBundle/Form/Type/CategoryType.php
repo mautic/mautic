@@ -18,10 +18,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Category>
  */
-class CategoryType extends AbstractType
+final class CategoryType extends AbstractType
 {
     public function __construct(
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {
     }
 

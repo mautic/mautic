@@ -9,9 +9,9 @@
     {% set errors = item.fail_reason %}
 {% endif %}
 
-{% set parentDetails = false %}
-{% if (event.extra.parentDetails is defined) %}
-    {% set parentDetails = event.extra.parentDetails %}
+{% set eventDetails = false %}
+{% if (event.extra.eventDetails is defined) %}
+    {% set eventDetails = event.extra.eventDetails %}
 {% endif %}
 
 {% set cancelled = item.isScheduled is empty and item.dateTriggered is empty %}
@@ -78,13 +78,24 @@
             <p class="mt-0 mb-10">{{ 'mautic.campaign.campaign.description'|trans({'%description%' : item.event_description})|purify }}</p>
         {% endif %}
     {% endif %}
-    {% if parentDetails != false %}
+    {% if eventDetails != false %}
         <h6 class="mt-lg mb-sm">
-            {{ 'mautic.campaign.parent.details'|trans({'%path%': parentDetails.path, '%type%': parentDetails.type, '%name%': parentDetails.name})|purify }}
+            {% set props = eventDetails.properties|default({}) %}
+            {% if props.field is defined and props.operator is defined and props.comparisonValue is defined and props.value is defined %}
+                {% set comparisonValue = props.comparisonValue is iterable ? props.comparisonValue|join(',') : props.comparisonValue %}
+                {% set value = props.value is iterable ? props.value|join(',') : props.value %}
+                {{ 'mautic.campaign.event.condition.details'|trans({
+                    '%path%': eventDetails.path|default(''),
+                    '%field%': props.field ?? '',
+                    '%operator%': props.operator ?? '',
+                    '%comparisonValue%': comparisonValue ?? '',
+                    '%value%': value ?? '',
+                })|purify }}  
+            {% endif %}
         </h6>
         <dl class="dl-horizontal">
-            {% for key, value in parentDetails.properties %}
-                <dt>{{ key|capitalize }}:</dt>
+            {% for key, value in eventDetails.properties %}
+                <dt>{{ key|humanize }}:</dt>
                 <dd>{{ value|json_encode()|trim('"') }}</dd>
             {% endfor %}
         </dl>

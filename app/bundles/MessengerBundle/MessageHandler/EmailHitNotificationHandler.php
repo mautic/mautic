@@ -13,7 +13,7 @@ use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 
 #[AsMessageHandler]
-class EmailHitNotificationHandler
+final readonly class EmailHitNotificationHandler
 {
     private bool $isSyncTransport;
 
@@ -36,7 +36,7 @@ class EmailHitNotificationHandler
                 true
             );
         } catch (RetryableException $e) {
-            throw new RecoverableMessageHandlingException($e->getMessage());
+            throw new RecoverableMessageHandlingException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

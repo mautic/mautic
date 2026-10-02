@@ -99,18 +99,16 @@ final class ButtonHelper
     private int $listMarker = 3;
 
     public function __construct(
-        private Environment $twig,
-        private TranslatorInterface $translator,
-        private EventDispatcherInterface $dispatcher,
+        private readonly Environment $twig,
+        private readonly TranslatorInterface $translator,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
     /**
      * @param array<array<string,mixed>> $buttons
-     *
-     * @return $this
      */
-    public function addButtons(array $buttons)
+    public function addButtons(array $buttons): self
     {
         $this->buttonCount += count($buttons);
         $this->buttons = array_merge($this->buttons, $buttons);
@@ -120,10 +118,8 @@ final class ButtonHelper
 
     /**
      * @param array<string,mixed> $button
-     *
-     * @return $this
      */
-    public function addButton(array $button)
+    public function addButton(array $button): self
     {
         $this->buttons[] = $button;
         ++$this->buttonCount;
@@ -134,10 +130,8 @@ final class ButtonHelper
     /**
      * @param string|null $wrapOpeningTag
      * @param string|null $wrapClosingTag
-     *
-     * @return $this
      */
-    public function setWrappingTags($wrapOpeningTag, $wrapClosingTag)
+    public function setWrappingTags($wrapOpeningTag, $wrapClosingTag): self
     {
         $this->wrapOpeningTag = $wrapOpeningTag;
         $this->wrapClosingTag = $wrapClosingTag;
@@ -145,12 +139,7 @@ final class ButtonHelper
         return $this;
     }
 
-    /**
-     * @param string $groupType
-     *
-     * @return $this
-     */
-    public function setGroupType($groupType)
+    public function setGroupType(string $groupType): self
     {
         $this->groupType = $groupType;
 
@@ -159,20 +148,15 @@ final class ButtonHelper
 
     /**
      * @param string|null $menuLink
-     *
-     * @return $this
      */
-    public function setMenuLink($menuLink)
+    public function setMenuLink($menuLink): self
     {
         $this->menuLink = $menuLink;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getButtonCount()
+    public function getButtonCount(): int
     {
         return $this->buttonCount;
     }
@@ -197,7 +181,7 @@ final class ButtonHelper
                 $content .= $this->buildButton($button, $buttonCount);
 
                 $nextButton = $buttonCount + 1;
-                if (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $nextButton === $this->listMarker && $buttonCount !== $this->buttonCount) {
+                if (self::TYPE_BUTTON_DROPDOWN === $this->groupType && $nextButton === $this->listMarker && $buttonCount !== $this->buttonCount) {
                     $content .= $dropdownHtml;
                     $dropdownHtmlAppended = true;
                 }
@@ -221,10 +205,8 @@ final class ButtonHelper
 
     /**
      * @param mixed $location
-     *
-     * @return ButtonHelper
      */
-    public function setLocation($location)
+    public function setLocation($location): self
     {
         $this->location = $location;
 
@@ -235,11 +217,8 @@ final class ButtonHelper
      * Reset the buttons.
      *
      * @param string $buttonCount
-     * @param string $groupType
-     *
-     * @return $this
      */
-    public function reset(Request $request, $buttonCount, $groupType = self::TYPE_GROUP, $item = null)
+    public function reset(Request $request, $buttonCount, string $groupType = self::TYPE_GROUP, $item = null): self
     {
         // @escopecz: I think there is a possible bug here
         $this->location       = $buttonCount;
@@ -265,12 +244,12 @@ final class ButtonHelper
      * @param array<string,mixed> $button
      * @param int                 $buttonCount
      */
-    private function buildButton($button, $buttonCount = 0): string
+    private function buildButton(array $button, $buttonCount = 0): string
     {
         $buttons = '';
 
         // Wrap links in a <li> tag for dropdowns
-        if (self::TYPE_DROPDOWN == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount >= $this->listMarker)) {
+        if (self::TYPE_DROPDOWN === $this->groupType || (self::TYPE_BUTTON_DROPDOWN === $this->groupType && $buttonCount >= $this->listMarker)) {
             $this->wrapOpeningTag = "<li>\n";
             $this->wrapClosingTag = "</li>\n";
         }
@@ -280,7 +259,7 @@ final class ButtonHelper
         }
 
         // Add or remove button classes based on group type
-        if (self::TYPE_GROUP == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount < $this->listMarker)) {
+        if (self::TYPE_GROUP === $this->groupType || (self::TYPE_BUTTON_DROPDOWN === $this->groupType && $buttonCount < $this->listMarker)) {
             $this->addButtonClasses($button);
         } elseif (in_array($this->groupType, [self::TYPE_BUTTON_DROPDOWN, self::TYPE_DROPDOWN])) {
             $this->removeButtonClasses($button);
@@ -304,7 +283,7 @@ final class ButtonHelper
             // Prepare attributes for the `<a>` tag
             $attr = $this->menuLink;
             foreach ($button['attr'] as $k => $v) {
-                $attr .= " $k=".'"'.$v.'"';
+                $attr .= " {$k}=".'"'.$v.'"';
             }
 
             // Add aria-label if btnText is set
@@ -333,10 +312,7 @@ final class ButtonHelper
         return $buttons;
     }
 
-    /**
-     * @return $this
-     */
-    private function fetchCustomButtons()
+    private function fetchCustomButtons(): self
     {
         if (!$this->buttonsFetched && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS)) {
             $event = $this->dispatcher->dispatch(
@@ -362,11 +338,11 @@ final class ButtonHelper
 
         uasort(
             $this->buttons,
-            function ($a, $b): int {
+            function (array $a, array $b): int {
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : 0);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : 0);
 
-                if ($ap == $bp) {
+                if ($ap === $bp) {
                     $aText = $bText = '';
 
                     // Sort alphabetically
@@ -389,7 +365,7 @@ final class ButtonHelper
             }
         );
 
-        if (self::TYPE_BUTTON_DROPDOWN == $this->groupType) {
+        if (self::TYPE_BUTTON_DROPDOWN === $this->groupType) {
             // Find the start of the non-primary buttons
             $counter = 0;
             foreach ($this->buttons as $button) {
@@ -412,7 +388,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function validatePriority(&$button): void
+    private function validatePriority(array &$button): void
     {
         if (!empty($button['primary'])) {
             if (!isset($button['priority']) || $button['priority'] < 200) {
@@ -426,12 +402,12 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function generateTextAttributes(&$button): string
+    private function generateTextAttributes(array &$button): string
     {
         $btnTextAttr = '';
         if (isset($button['btnTextAttr'])) {
             foreach ($button['btnTextAttr'] as $k => $v) {
-                $btnTextAttr .= " $k=".'"'.$v.'"';
+                $btnTextAttr .= " {$k}=".'"'.$v.'"';
             }
         }
 
@@ -446,7 +422,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function generateTooltipAttributes($button): string
+    private function generateTooltipAttributes(array $button): string
     {
         $tooltip = '';
         if (isset($button['tooltip'])) {
@@ -456,7 +432,7 @@ final class ButtonHelper
                     if ('title' == $k) {
                         $v = $this->translator->trans($v);
                     }
-                    $tooltip .= " $k=".'"'.$v.'"';
+                    $tooltip .= " {$k}=".'"'.$v.'"';
                 }
             } else {
                 $tooltip .= ' title="'.$this->translator->trans($button['tooltip']).'" data-placement="left"';
@@ -469,7 +445,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function addMobileResponsiveClasses(&$button): void
+    private function addMobileResponsiveClasses(array &$button): void
     {
         if (isset($button['confirm'])) {
             $change = &$button['confirm'];
@@ -488,7 +464,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function addButtonClasses(&$button): void
+    private function addButtonClasses(array &$button): void
     {
         if (isset($button['confirm'])) {
             $addTo = &$button['confirm'];
@@ -518,7 +494,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function removeButtonClasses(&$button): void
+    private function removeButtonClasses(array &$button): void
     {
         if (isset($button['confirm'])) {
             $removeFrom = &$button['confirm'];

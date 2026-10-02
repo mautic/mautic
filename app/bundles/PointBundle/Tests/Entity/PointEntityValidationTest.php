@@ -8,16 +8,17 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Point;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PointEntityValidationTest extends MauticMysqlTestCase
+final class PointEntityValidationTest extends MauticMysqlTestCase
 {
     /**
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('deltaScenariosProvider')]
+    #[DataProvider('deltaScenariosProvider')]
     public function testDeltaValidationOnCreate(int $delta, string $errorMessage = ''): void
     {
         $crawler       = $this->client->request(Request::METHOD_GET, '/s/points/new');
@@ -27,7 +28,7 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         $this->testPointData($form, $delta, $errorMessage);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('deltaScenariosProvider')]
+    #[DataProvider('deltaScenariosProvider')]
     public function testDeltaValidationOnCreateViaAPI(int $delta, string $errorMessage = ''): void
     {
         $this->client->request(
@@ -45,18 +46,18 @@ class PointEntityValidationTest extends MauticMysqlTestCase
 
         if ($errorMessage) {
             self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-            self::assertStringContainsString('error', $response->getContent());
-            self::assertStringContainsString($errorMessage, $response->getContent());
+            $this->assertStringContainsString('error', (string) $response->getContent());
+            $this->assertStringContainsString($errorMessage, (string) $response->getContent());
         } else {
             self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
-            self::assertStringNotContainsString('error', $response->getContent());
+            $this->assertStringNotContainsString('error', (string) $response->getContent());
         }
     }
 
     /**
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('deltaScenariosProvider')]
+    #[DataProvider('deltaScenariosProvider')]
     public function testDeltaValidationOnUpdate(int $delta, string $errorMessage = ''): void
     {
         $point = new Point();
@@ -102,12 +103,12 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         $form['point[type]']->setValue('form.submit');
 
         $this->client->submit($form);
-        self::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $response = $this->client->getResponse()->getContent();
-        self::assertStringContainsString($errorMessage, (string) $response);
+        $this->assertStringContainsString($errorMessage, (string) $response);
 
         $pointDetail = $this->em->getRepository(Point::class)->findOneBy(['delta' => $delta]);
-        '' == $errorMessage ? self::assertNotNull($pointDetail) : self::assertNull($pointDetail);
+        '' === $errorMessage ? $this->assertInstanceOf(Point::class, $pointDetail) : $this->assertNotInstanceOf(Point::class, $pointDetail);
     }
 }

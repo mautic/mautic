@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
 use PHPUnit\Framework\TestCase;
 
-class IntegrationTokenTest extends TestCase
+final class IntegrationTokenTest extends TestCase
 {
     public function testGetters(): void
     {
@@ -15,10 +15,10 @@ class IntegrationTokenTest extends TestCase
         $extraData = ['foo' => 'bar'];
         $token     = new IntegrationToken('accessToken', 'refreshToken', $expires, $extraData);
 
-        $this->assertEquals('accessToken', $token->getAccessToken());
-        $this->assertEquals('refreshToken', $token->getRefreshToken());
-        $this->assertEquals($expires, $token->getExpiresAt());
-        $this->assertEquals($extraData, $token->getExtraData());
+        $this->assertSame('accessToken', $token->getAccessToken());
+        $this->assertSame('refreshToken', $token->getRefreshToken());
+        $this->assertSame($expires, $token->getExpiresAt());
+        $this->assertSame($extraData, $token->getExtraData());
     }
 
     public function testIsExpired(): void

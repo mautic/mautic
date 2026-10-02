@@ -6,23 +6,22 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 
 final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
 {
     /**
-     * @return array<string, array{bool}>
+     * @return \Iterator<string, array{bool}>
      */
-    public static function blockedTrackingCookieDataProvider(): array
+    public static function blockedTrackingCookieDataProvider(): \Iterator
     {
-        return [
-            'with blocked tracking cookie'    => [true],
-            'without blocked tracking cookie' => [false],
-        ];
+        yield 'with blocked tracking cookie' => [true];
+        yield 'without blocked tracking cookie' => [false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('blockedTrackingCookieDataProvider')]
+    #[DataProvider('blockedTrackingCookieDataProvider')]
     public function testClearTrackingCookiesBehavior(bool $shouldClearCookies): void
     {
         $this->logoutUser();
@@ -36,7 +35,7 @@ final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
         $this->em->flush();
 
         if ($shouldClearCookies) {
-            $this->client->getCookieJar()->set(new \Symfony\Component\BrowserKit\Cookie('Blocked-Tracking', '1'));
+            $this->client->getCookieJar()->set(new Cookie('Blocked-Tracking', '1'));
         }
 
         $this->client->request(Request::METHOD_GET, '/test-clear-cookies');
@@ -58,7 +57,7 @@ final class DeviceTrackingServiceClearCookiesTest extends MauticMysqlTestCase
             }
         }
 
-        Assert::assertSame($shouldClearCookies, $deviceIdCookieCleared);
-        Assert::assertSame($shouldClearCookies, $mtcIdCookieCleared);
+        $this->assertSame($shouldClearCookies, $deviceIdCookieCleared);
+        $this->assertSame($shouldClearCookies, $mtcIdCookieCleared);
     }
 }

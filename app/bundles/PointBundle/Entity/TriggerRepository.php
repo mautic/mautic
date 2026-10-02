@@ -38,7 +38,7 @@ class TriggerRepository extends CommonRepository
             ->select('partial t.{id, color, points}')
             ->from(Trigger::class, 't', 't.id');
 
-        $q->where($this->getPublishedByDateExpression($q));
+        $q->where($this->getPublishedByDateOrmExpression($q));
         $q->orderBy('t.points', Order::Ascending->value);
 
         return $q->getQuery()->getArrayResult();

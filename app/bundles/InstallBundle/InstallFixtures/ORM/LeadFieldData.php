@@ -10,10 +10,10 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -64,7 +64,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         }
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 4;
     }

@@ -15,10 +15,12 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-class ApiUserSubscriber implements EventSubscriberInterface
+final readonly class ApiUserSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private UserProviderInterface $userProvider, private TokenPermissions $tokenPermissions)
-    {
+    public function __construct(
+        private UserProviderInterface $userProvider,
+        private TokenPermissions $tokenPermissions,
+    ) {
     }
 
     /**

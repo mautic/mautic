@@ -9,7 +9,6 @@
 .php-cs-fixer.php
 .travis.yml
 codecov.yml
-Gruntfile.js
 README.md
 UPGRADE*.md
 app/console

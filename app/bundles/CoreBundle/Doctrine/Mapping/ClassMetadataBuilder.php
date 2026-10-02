@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
  * See @see https://github.com/doctrine/doctrine2/pull/1326/.
  */
-class ClassMetadataBuilder extends OrmClassMetadataBuilder
+final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 {
     /**
      * Max length of indexed VARCHAR fields for UTF8MB4 encoding.
@@ -114,10 +114,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Add Id column.
-     *
-     * @return $this
      */
-    public function addId()
+    public function addId(): static
     {
         $this->createField('id', Types::INTEGER)
             ->makePrimaryKey()
@@ -134,10 +132,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * @param string $columnName
      * @param bool   $isPrimary
      * @param bool   $isNullable
-     *
-     * @return ClassMetadataBuilder
      */
-    public function addBigIntIdField($fieldName = 'id', $columnName = 'id', $isPrimary = true, $isNullable = false)
+    public function addBigIntIdField($fieldName = 'id', $columnName = 'id', $isPrimary = true, $isNullable = false): static
     {
         $cm = $this->getClassMetadata();
         $cm->mapField(
@@ -162,10 +158,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Add UUID as Id.
-     *
-     * @return $this
      */
-    public function addUuid()
+    public function addUuid(): static
     {
         $this->createField('id', 'guid')
             ->makePrimaryKey()
@@ -179,10 +173,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      *
      * @param string $nameColumn
      * @param string $descriptionColumn
-     *
-     * @return $this
      */
-    public function addIdColumns($nameColumn = 'name', $descriptionColumn = 'description')
+    public function addIdColumns($nameColumn = 'name', $descriptionColumn = 'description'): static
     {
         $this->addId();
 
@@ -202,10 +194,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Add category to metadata.
-     *
-     * @return $this
      */
-    public function addCategory()
+    public function addCategory(): static
     {
         $this->createManyToOne('category', Category::class)
             ->cascadeMerge()
@@ -218,10 +208,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Add publish up and down dates to metadata.
-     *
-     * @return $this
      */
-    public function addPublishDates()
+    public function addPublishDates(): static
     {
         $this->createField('publishUp', Types::DATETIME_MUTABLE)
             ->columnName('publish_up')
@@ -240,10 +228,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * Added dateAdded column.
      *
      * @param bool|false $nullable
-     *
-     * @return $this
      */
-    public function addDateAdded($nullable = false)
+    public function addDateAdded($nullable = false): static
     {
         $dateAdded = $this->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added');
@@ -264,10 +250,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * @param string      $onDelete
      * @param bool|false  $isPrimaryKey
      * @param string|null $inversedBy
-     *
-     * @return $this
      */
-    public function addContact($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
+    public function addContact($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null): static
     {
         $lead = $this->createManyToOne('contact', Lead::class);
 
@@ -294,10 +278,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * @param bool|false $isPrimaryKey
      *
      * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
-     *
-     * @return $this
      */
-    public function addLead($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
+    public function addLead($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null): static
     {
         $lead = $this->createManyToOne('lead', Lead::class);
 
@@ -317,13 +299,9 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * Adds IP address.
-     *
      * @param bool $nullable
-     *
-     * @return $this
      */
-    public function addIpAddress($nullable = false)
+    public function addIpAddress($nullable = false): static
     {
         $this->createManyToOne('ipAddress', IpAddress::class)
             ->cascadePersist()
@@ -336,15 +314,11 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * Add a nullable field.
-     *
      * @param string      $name
      * @param string      $type
      * @param string|null $columnName
-     *
-     * @return $this
      */
-    public function addNullableField($name, $type = Types::STRING, $columnName = null)
+    public function addNullableField($name, $type = Types::STRING, $columnName = null): static
     {
         $field = $this->createField($name, $type)
             ->nullable();
@@ -366,10 +340,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * Add a field with a custom column name.
      *
      * @param bool $nullable
-     *
-     * @return $this
      */
-    public function addNamedField($name, $type, $columnName, $nullable = false)
+    public function addNamedField($name, $type, $columnName, $nullable = false): static
     {
         $field = $this->createField($name, $type)
             ->columnName($columnName);
@@ -463,12 +435,10 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * Adds Index with options.
-     *
      * @param list<string>         $columns
      * @param array<string, mixed> $options
      */
-    public function addIndexWithOptions(array $columns, string $name, array $options): ClassMetadataBuilder
+    public function addIndexWithOptions(array $columns, string $name, array $options): self
     {
         $cm = $this->getClassMetadata();
 

@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(LeadTimelineEvent::class)]
-class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(LeadTimelineEvent::class)]
+final class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Every event in the timeline should have a unique eventId so test that one is generated if the subscriber forgets')]
+    #[TestDox('Every event in the timeline should have a unique eventId so test that one is generated if the subscriber forgets')]
     public function testEventIdIsGeneratedIfNotSetBySubscriber(): void
     {
         $payload = [
@@ -56,14 +60,14 @@ class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
         $events = $event->getEvents();
 
         $id1 = hash('crc32', json_encode($payload[0]), false);
-        $this->assertTrue(isset($events[0]['eventId']));
+        $this->assertArrayHasKey('eventId', $events[0]);
         $this->assertEquals('foo'.$id1, $events[0]['eventId']);
 
         $id2 = hash('crc32', json_encode($payload[1]), false);
-        $this->assertTrue(isset($events[1]['eventId']));
+        $this->assertArrayHasKey('eventId', $events[1]);
         $this->assertEquals('bar'.$id2, $events[1]['eventId']);
 
-        $this->assertTrue(isset($events[2]['eventId']));
+        $this->assertArrayHasKey('eventId', $events[2]);
         $this->assertEquals('foobar123', $events[2]['eventId']);
     }
 }

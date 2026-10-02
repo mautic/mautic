@@ -11,20 +11,20 @@ use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DoNotContactFilterQueryBuilderTest extends TestCase
+final class DoNotContactFilterQueryBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
 
     public function testGetServiceId(): void
     {
-        Assert::assertSame('mautic.lead.query.builder.special.dnc', DoNotContactFilterQueryBuilder::getServiceId());
+        $this->assertSame('mautic.lead.query.builder.special.dnc', DoNotContactFilterQueryBuilder::getServiceId());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQuery')]
+    #[DataProvider('dataApplyQuery')]
     public function testApplyQuery(string $operator, string $parameterValue, string $expectedQuery): void
     {
         $queryBuilder = new QueryBuilder($this->createConnection());
@@ -35,8 +35,8 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher());
 
         $expectedQuery = str_replace('__MAUTIC_TABLE_PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
-        Assert::assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -65,12 +65,12 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
              * @noinspection PhpMissingParentConstructorInspection
              */
             public function __construct(
-                private string $operator,
-                private string $parameterValue,
+                private readonly string $operator,
+                private readonly string $parameterValue,
                 /**
                  * @var array<string, mixed>
                  */
-                private array $batchLimiters,
+                private readonly array $batchLimiters,
             ) {
             }
 

@@ -9,8 +9,11 @@ use Mautic\CoreBundle\Entity\AuditLog;
 final class PublishState
 {
     private \DateTimeInterface $dateAdded;
+
     private ?bool $published                 = null;
+
     private ?\DateTimeInterface $publishUp   = null;
+
     private ?\DateTimeInterface $publishDown = null;
 
     public function setFromAuditLog(AuditLog $auditLog, bool $defaultPublishState): void

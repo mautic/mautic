@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     public function sendHookTestAction(Request $request, Client $client, PathsHelper $pathsHelper): JsonResponse
     {
@@ -40,7 +40,7 @@ class AjaxController extends CommonAjaxController
 
         $selectedTypes = InputHelper::cleanArray($request->request->all()['types'] ?? []);
 
-        if (!$selectedTypes) {
+        if ([] === $selectedTypes) {
             throw new \InvalidArgumentException('mautic.webhook.label.no.events');
         }
 
@@ -93,13 +93,11 @@ class AjaxController extends CommonAjaxController
         );
     }
 
-    /*
-     * Get an array of all the payload paths we need to load
-     *
-     * @param $types array
-     * @return array
-     */
     /**
+     * Get an array of all the payload paths we need to load.
+     *
+     * @param mixed[] $types
+     *
      * @return non-falsy-string[]
      */
     public function getPayloadPaths($types, PathsHelper $pathsHelper): array
@@ -141,13 +139,11 @@ class AjaxController extends CommonAjaxController
         return $payloadPaths;
     }
 
-    /*
-     * Iterate through the paths and get the json payloads
-     *
-     * @param  $paths array
-     * @return $payload array
-     */
     /**
+     * Iterate through the paths and get the json payloads.
+     *
+     * @param mixed[] $paths
+     *
      * @return mixed[]
      */
     public function loadPayloads($paths): array

@@ -13,7 +13,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignEventDeleteSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventDeleteSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LeadEventLogRepository $leadEventLogRepository,

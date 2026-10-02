@@ -10,8 +10,6 @@ use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadge;
-use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
@@ -24,41 +22,22 @@ final class PasswordSubscriberTest extends TestCase
 {
     private PasswordSubscriber $passwordSubscriber;
 
-    private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel;
-
-    /**
-     * @var MockObject&AuthenticationEvent
-     */
-    private $authenticationEvent;
-
-    /**
-     * @var MockObject&PluginToken
-     */
-    private $pluginToken;
-
-    /**
-     * @var MockObject&EventDispatcherInterface
-     */
-    private $dispatcher;
-
     protected function setUp(): void
     {
-        $this->dispatcher                     = $this->createMock(EventDispatcherInterface::class);
-        $this->passwordStrengthEstimatorModel = new PasswordStrengthEstimatorModel($this->dispatcher);
-        $this->passwordSubscriber             = new PasswordSubscriber($this->passwordStrengthEstimatorModel);
-        $this->authenticationEvent            = $this->createMock(AuthenticationEvent::class);
-        $this->pluginToken                    = $this->createMock(PluginToken::class);
+        $passwordStrengthEstimatorModel       = new PasswordStrengthEstimatorModel($this->createStub(EventDispatcherInterface::class));
+        $this->passwordSubscriber             = new PasswordSubscriber($passwordStrengthEstimatorModel);
+        $authenticationEvent                  = $this->createMock(AuthenticationEvent::class);
 
-        $this->authenticationEvent->expects($this->any())
+        $authenticationEvent
             ->method('getToken')
-            ->willReturn($this->pluginToken);
+            ->willReturn($this->createStub(PluginToken::class));
     }
 
     public function testThatItIsSubscribedToEvents(): void
     {
         $subscribedEvents = PasswordSubscriber::getSubscribedEvents();
-        Assert::assertCount(1, $subscribedEvents);
-        Assert::assertArrayHasKey(CheckPassportEvent::class, $subscribedEvents);
+        $this->assertCount(1, $subscribedEvents);
+        $this->assertArrayHasKey(CheckPassportEvent::class, $subscribedEvents);
     }
 
     public function testThatItThrowsExceptionIfPasswordIsWeak(): void
@@ -69,10 +48,10 @@ final class PasswordSubscriberTest extends TestCase
 
         $this->passwordSubscriber->checkPassport(
             new CheckPassportEvent(
-                $this->createMock(AuthenticatorInterface::class),
+                $this->createStub(AuthenticatorInterface::class),
                 new Passport(
-                    $this->createMock(UserBadge::class),
-                    $this->createMock(CredentialsInterface::class),
+                    $this->createStub(UserBadge::class),
+                    $this->createStub(CredentialsInterface::class),
                     [$passwordStrengthBadge]
                 )
             )
@@ -85,10 +64,10 @@ final class PasswordSubscriberTest extends TestCase
 
         $this->passwordSubscriber->checkPassport(
             new CheckPassportEvent(
-                $this->createMock(AuthenticatorInterface::class),
+                $this->createStub(AuthenticatorInterface::class),
                 new Passport(
-                    $this->createMock(UserBadge::class),
-                    $this->createMock(CredentialsInterface::class),
+                    $this->createStub(UserBadge::class),
+                    $this->createStub(CredentialsInterface::class),
                     [$passwordStrengthBadge]
                 )
             )

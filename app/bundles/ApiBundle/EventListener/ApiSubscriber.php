@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ApiSubscriber implements EventSubscriberInterface
+final readonly class ApiSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

@@ -11,7 +11,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 
-class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
+final class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -19,8 +19,9 @@ class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 
         // This test require cache to be cleared
         // as the template override must exist before the cache is generated.
-        $pathsHelper = static::getContainer()->get('mautic.helper.paths');
-        \assert($pathsHelper instanceof PathsHelper);
+        /** @var PathsHelper $pathsHelper */
+        $pathsHelper = self::getContainer()->get(PathsHelper::class);
+        $this->assertInstanceOf(PathsHelper::class, $pathsHelper);
         $cacheDir    = $pathsHelper->getCachePath();
 
         $filesystem = new Filesystem();
@@ -40,11 +41,11 @@ class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 
     public function testUserProfilePageOverrideFromSystemThemDirectory(): void
     {
-        Assert::assertFileExists($this->getOverridePath().'/index.html.twig');
+        $this->assertFileExists($this->getOverridePath().'/index.html.twig');
 
         $this->client->request(Request::METHOD_GET, '/s/account');
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Override test', $this->client->getResponse()->getContent(), 'Page has not override.');
+        $this->assertStringContainsString('Override test', (string) $this->client->getResponse()->getContent(), 'Page has not override.');
     }
 
     protected function beforeTearDown(): void
@@ -59,7 +60,7 @@ class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
     private function getOverridePath(): string
     {
         /** @var PathsHelper $pathsHelper */
-        $pathsHelper = static::getContainer()->get('mautic.helper.paths');
+        $pathsHelper = self::getContainer()->get(PathsHelper::class);
 
         return $pathsHelper->getThemesPath().'/system/UserBundle/Resources/views/Profile';
     }

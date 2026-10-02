@@ -10,10 +10,11 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class SlotNameTypeValidator extends ConstraintValidator
+final class SlotNameTypeValidator extends ConstraintValidator
 {
-    public function __construct(private DynamicContentModel $dynamicContentModel)
-    {
+    public function __construct(
+        private readonly DynamicContentModel $dynamicContentModel,
+    ) {
     }
 
     public function validate(mixed $value, Constraint $constraint): void

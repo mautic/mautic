@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\Stats\Helper;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
-class FailedHelper extends AbstractHelper
+final class FailedHelper extends AbstractHelper
 {
     public const NAME = 'email-failed';
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Update\Github;
 
 use GuzzleHttp\Client;
@@ -10,7 +12,7 @@ use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Github\ReleaseParser;
 use PHPUnit\Framework\TestCase;
 
-class ReleaseParserTest extends TestCase
+final class ReleaseParserTest extends TestCase
 {
     private ReleaseParser $releaseParser;
 
@@ -20,27 +22,27 @@ class ReleaseParserTest extends TestCase
             [
                 'handler' => new MockHandler(
                     [
-                        function (Request $request, array $options) {
+                        function (Request $request, array $options): Response {
                             $metadata = file_get_contents(__DIR__.'/json/metadata-2.16.0.json');
 
                             return new Response(200, [], $metadata);
                         },
-                        function (Request $request, array $options) {
+                        function (Request $request, array $options): Response {
                             $metadata = file_get_contents(__DIR__.'/json/metadata-3.0.1-beta.json');
 
                             return new Response(200, [], $metadata);
                         },
-                        function (Request $request, array $options) {
+                        function (Request $request, array $options): Response {
                             $metadata = file_get_contents(__DIR__.'/json/metadata-3.0.1-alpha.json');
 
                             return new Response(200, [], $metadata);
                         },
-                        function (Request $request, array $options) {
+                        function (Request $request, array $options): Response {
                             $metadata = file_get_contents(__DIR__.'/json/metadata-3.0.0.json');
 
                             return new Response(200, [], $metadata);
                         },
-                        function (Request $request, array $options) {
+                        function (Request $request, array $options): Response {
                             $metadata = file_get_contents(__DIR__.'/json/metadata-2.15.0.json');
 
                             return new Response(200, [], $metadata);
@@ -108,7 +110,7 @@ class ReleaseParserTest extends TestCase
             [
                 'handler' => new MockHandler(
                     [
-                        fn (Request $request, array $options) => new Response(500),
+                        fn (Request $request, array $options): Response => new Response(500),
                     ]
                 ),
             ]
@@ -128,7 +130,7 @@ class ReleaseParserTest extends TestCase
             [
                 'handler' => new MockHandler(
                     [
-                        fn (Request $request, array $options) => new Response(200, [], json_encode(['foo' => 'bar'])),
+                        fn (Request $request, array $options): Response => new Response(200, [], json_encode(['foo' => 'bar'])),
                     ]
                 ),
             ]
@@ -137,6 +139,9 @@ class ReleaseParserTest extends TestCase
         (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getReleases(): array
     {
         return json_decode(file_get_contents(__DIR__.'/json/releases.json'), true);

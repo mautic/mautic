@@ -6,8 +6,9 @@ namespace Mautic\UserBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SecurityControllerTest extends MauticMysqlTestCase
+final class SecurityControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -25,10 +26,10 @@ class SecurityControllerTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
 
-        $this->assertEquals(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
-        $validationError = self::getContainer()->get('translator')->trans('mautic.user.security.saml.clearsession', [], 'flashes');
-        $this->assertStringContainsString($validationError, $clientResponse->getContent());
+        $validationError = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.user.security.saml.clearsession', [], 'flashes');
+        $this->assertStringContainsString($validationError, (string) $clientResponse->getContent());
     }
 
     public function testLoginRetryPageRedirectsToLoginWithoutSaml(): void
@@ -36,12 +37,22 @@ class SecurityControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/saml/login_retry');
 
         $clientResponse = $this->client->getResponse();
-        $this->assertEquals(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
-        $validationError = self::getContainer()->get('translator')->trans('mautic.user.security.saml.clearsession', [], 'flashes');
-        $this->assertStringNotContainsString($validationError, $clientResponse->getContent());
+        $validationError = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.user.security.saml.clearsession', [], 'flashes');
+        $this->assertStringNotContainsString($validationError, (string) $clientResponse->getContent());
 
-        $loginText = self::getContainer()->get('translator')->trans('mautic.user.auth.form.loginbtn', [], 'messages');
-        $this->assertStringContainsString($loginText, $clientResponse->getContent());
+        $loginText = self::getContainer()->get(TranslatorInterface::class)->trans('mautic.user.auth.form.loginbtn', [], 'messages');
+        $this->assertStringContainsString($loginText, (string) $clientResponse->getContent());
+    }
+
+    public function testLoginPageDoesNotLoadEditorAssets(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/login');
+
+        $this->assertResponseIsSuccessful();
+
+        $clientResponse = (string) $this->client->getResponse()->getContent();
+        $this->assertStringNotContainsString('ckeditor.js', $clientResponse);
     }
 }

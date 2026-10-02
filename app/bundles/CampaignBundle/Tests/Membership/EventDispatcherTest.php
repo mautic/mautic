@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Membership;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -8,14 +10,12 @@ use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
 use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\EventDispatcher;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EventDispatcherTest extends \PHPUnit\Framework\TestCase
+final class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    private MockObject&EventDispatcherInterface $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -40,7 +40,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getDispatcher()->dispatchBatchMembershipChange([new Lead()], new Campaign(), Adder::NAME);
     }
 
-    private function getDispatcher()
+    private function getDispatcher(): EventDispatcher
     {
         return new EventDispatcher($this->eventDispatcher);
     }

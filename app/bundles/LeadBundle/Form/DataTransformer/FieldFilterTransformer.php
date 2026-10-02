@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\RelativeDate;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -13,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @implements DataTransformerInterface<mixed, array<mixed>|mixed>
  */
-class FieldFilterTransformer implements DataTransformerInterface
+final class FieldFilterTransformer implements DataTransformerInterface
 {
     /**
      * @var string[]
@@ -26,9 +27,9 @@ class FieldFilterTransformer implements DataTransformerInterface
     private array $defaultStrings;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private RelativeDate $relativeDate,
-        private array $default = [],
+        private readonly TranslatorInterface $translator,
+        private readonly RelativeDate $relativeDate,
+        private readonly array $default = [],
     ) {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {
@@ -47,11 +48,16 @@ class FieldFilterTransformer implements DataTransformerInterface
         }
 
         foreach ($rawFilters as $key => $filter) {
-            if (!empty($this->default)) {
+            if ([] !== $this->default) {
                 $rawFilters[$key] = array_merge($this->default, $rawFilters[$key]);
             }
+            $operator = $filter['operator'] ?? '';
             $filterType = $filter['type'];
             if ('datetime' === $filterType || 'date' === $filterType) {
+                if (in_array($operator, [OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT])) {
+                    continue;
+                }
+
                 $bcFilter = $filter['filter'] ?? '';
                 $filter   = $filter['properties']['filter'] ?? $bcFilter;
                 if (empty($filter) || in_array($filter, $this->relativeDateStrings) || stristr($filter[0], '-') || stristr($filter[0], '+')) {
@@ -91,7 +97,13 @@ class FieldFilterTransformer implements DataTransformerInterface
         $rawFilters = array_values($rawFilters);
 
         foreach ($rawFilters as $k => $f) {
+            $operator = $f['operator'] ?? '';
+
             if ('datetime' == $f['type'] || 'date' === $f['type']) {
+                if (in_array($operator, [OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT])) {
+                    continue;
+                }
+
                 $bcFilter = $f['filter'] ?? '';
                 $filter   = $f['properties']['filter'] ?? $bcFilter;
                 $filter   = strtolower($filter);

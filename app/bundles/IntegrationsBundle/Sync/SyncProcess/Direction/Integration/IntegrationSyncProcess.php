@@ -27,9 +27,9 @@ class IntegrationSyncProcess
     private ?SyncDataExchangeInterface $syncDataExchange = null;
 
     public function __construct(
-        private SyncDateHelper $syncDateHelper,
-        private MappingHelper $mappingHelper,
-        private ObjectChangeGenerator $objectChangeGenerator,
+        private readonly SyncDateHelper $syncDateHelper,
+        private readonly MappingHelper $mappingHelper,
+        private readonly ObjectChangeGenerator $objectChangeGenerator,
     ) {
     }
 

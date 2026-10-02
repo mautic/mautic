@@ -2,12 +2,16 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class GeoipsLookup extends AbstractRemoteDataLookup
+final class GeoipsLookup extends AbstractRemoteDataLookup
 {
     public string $continent_name = '';
+
     public string $continent_code = '';
+
     public string $country_code   = '';
+
     public string $region_code    = '';
+
     public string $county_name    = '';
 
     public function getAttribution(): string
@@ -20,7 +24,7 @@ class GeoipsLookup extends AbstractRemoteDataLookup
         return "http://api.geoips.com/ip/{$this->ip}/key/{$this->auth}/output/json";
     }
 
-    protected function parseResponse($response)
+    protected function parseResponse($response): void
     {
         $data = json_decode($response);
 
@@ -41,7 +45,7 @@ class GeoipsLookup extends AbstractRemoteDataLookup
                         break;
                 }
 
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }

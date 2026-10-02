@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\ReportBundle\Model\ReportCleanup;
@@ -7,9 +9,12 @@ use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ReportCleanupTest extends TestCase
+final class ReportCleanupTest extends TestCase
 {
-    private MockObject|FileHandler $fileHandler;
+    /**
+     * @var MockObject&FileHandler
+     */
+    private MockObject $fileHandler;
 
     private ReportCleanup $cleanup;
 

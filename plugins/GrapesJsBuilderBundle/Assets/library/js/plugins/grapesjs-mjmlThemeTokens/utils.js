@@ -9,9 +9,9 @@ export const extractMjHeadContent = (mjml) => {
 };
 
 export const createHeadInjectingMjmlParser = (headContent = '') => {
-  const cleanHead = (headContent || '').replace(/<mj-preview[^>]*>[\s\S]*?<\/mj-preview>/gi, '');
+  let cleanHead = (headContent || '').replace(/<mj-preview[^>]*>[\s\S]*?<\/mj-preview>/gi, '');
 
-  return (input, opts) => {
+  const parser = (input, opts) => {
     if (typeof input !== 'string') {
       return mjml2html(input, opts);
     }
@@ -27,4 +27,11 @@ export const createHeadInjectingMjmlParser = (headContent = '') => {
 
     return mjml2html(withHead, opts);
   };
+
+  // Allow updating the head content before the code editor reparses components.
+  parser.updateHeadContent = (newHeadContent) => {
+    cleanHead = (newHeadContent || '').replace(/<mj-preview[^>]*>[\s\S]*?<\/mj-preview>/gi, '');
+  };
+
+  return parser;
 };

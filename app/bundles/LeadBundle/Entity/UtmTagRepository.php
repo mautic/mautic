@@ -16,14 +16,14 @@ class UtmTagRepository extends CommonRepository
      *
      * @return array
      */
-    public function getUtmTagsByLead(?Lead $lead = null, $options = [])
+    public function getUtmTagsByLead(?Lead $lead = null, array $options = [])
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_utmtags', 'ut');
 
         if ($lead instanceof Lead) {
-            $qb->where('ut.lead_id = '.(int) $lead->getId());
+            $qb->where('ut.lead_id = '.$lead->getId());
         }
 
         if (isset($options['search']) && $options['search']) {

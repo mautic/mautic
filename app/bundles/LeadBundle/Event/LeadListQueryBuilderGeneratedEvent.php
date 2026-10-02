@@ -1,31 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class LeadListQueryBuilderGeneratedEvent extends Event
+final class LeadListQueryBuilderGeneratedEvent extends Event
 {
     public function __construct(
-        private LeadList $segment,
-        private QueryBuilder $queryBuilder,
+        private readonly LeadList $segment,
+        private readonly QueryBuilder $queryBuilder,
     ) {
     }
 
-    /**
-     * @return LeadList
-     */
-    public function getSegment()
+    public function getSegment(): LeadList
     {
         return $this->segment;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }

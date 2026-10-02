@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class SegmentConfigType extends AbstractType
+final class SegmentConfigType extends AbstractType
 {
     /**
      * @param FormBuilderInterface<FormBuilderInterface> $builder

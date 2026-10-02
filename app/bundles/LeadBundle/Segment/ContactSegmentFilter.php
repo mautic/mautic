@@ -27,10 +27,10 @@ class ContactSegmentFilter implements \Stringable
      */
     public function __construct(
         ContactSegmentFilterCrate $contactSegmentFilterCrate,
-        private FilterDecoratorInterface $filterDecorator,
-        private TableSchemaColumnsCache $schemaCache,
-        private FilterQueryBuilderInterface $filterQueryBuilder,
-        private array $batchLimiters = [],
+        private readonly FilterDecoratorInterface $filterDecorator,
+        private readonly TableSchemaColumnsCache $schemaCache,
+        private readonly FilterQueryBuilderInterface $filterQueryBuilder,
+        private readonly array $batchLimiters = [],
     ) {
         $this->contactSegmentFilterCrate = $contactSegmentFilterCrate;
     }

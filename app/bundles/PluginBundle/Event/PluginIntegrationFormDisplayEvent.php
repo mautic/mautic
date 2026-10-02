@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
+final class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
 {
     /**
      * @param array<string, mixed> $settings
@@ -16,10 +18,7 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
         $this->integration = $integration;
     }
 
-    /**
-     * @return array
-     */
-    public function getSettings()
+    public function getSettings(): array
     {
         return $this->settings;
     }
