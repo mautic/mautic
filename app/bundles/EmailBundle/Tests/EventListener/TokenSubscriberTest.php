@@ -20,7 +20,6 @@ use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\PageBundle\Model\RedirectModel;
@@ -151,14 +150,12 @@ CONTENT
             );
         $mailHelper->setEmail($email);
 
-        $lead = new Lead();
-        $lead->setEmail('hello@someone.com');
-        $mailHelper->setLead($lead);
+        $mailHelper->setLead(['id' => 1, 'email' => 'hello@someone.com']);
 
         $dispatcher           = new EventDispatcher();
         $primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
-        $primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
-            ->willReturn(['email' => 'hello@someone.com']);
+        $primaryCompanyHelper->method('mergePrimaryCompanyWithProfileFields')
+            ->willReturn(['id' => 1, 'email' => 'hello@someone.com']);
         $segmentRepository    = $this->createStub(LeadListRepository::class);
 
         /** @var TokenSubscriber $subscriber */

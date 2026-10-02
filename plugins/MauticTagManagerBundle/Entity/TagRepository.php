@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
 final class TagRepository extends BaseTagRepository
@@ -37,6 +38,16 @@ final class TagRepository extends BaseTagRepository
             ->setParameter('tag', $tag);
 
         return $q->executeQuery()->rowCount();
+    }
+
+    public function getTagByName(string $tag): ?Tag
+    {
+        $qb = $this->createQueryBuilder($this->getTableAlias());
+        $qb->where($qb->expr()->eq($this->getTableAlias().'.tag', ':tag'))
+            ->setParameter('tag', $tag)
+            ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
