@@ -112,10 +112,6 @@
                         <table class="table table-hover mb-0">
                             <tbody>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': list}) }}
-                            <tr>
-                                <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.leads'|trans }}</span></td>
-                                <td>{{ segmentCount }}</td>
-                            </tr>
                             {% if list.lastBuiltTime %}
                             <tr>
                                 <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.list.last_built_time'|trans }}</span></td>
@@ -146,21 +142,9 @@
                 <div class="row">
                     <div class="col-sm-12">
                         {% if securityIsGranted('lead:leads:viewown') %}
-                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
-                                {
-                                    'title': 'mautic.lead.segments.total.contacts'|trans,
-                                    'value': segmentCount,
-                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias}),
-                                    'icon': 'ri-group-line'
-                                },
-                                {
-                                    'title': 'mautic.lead.segments.active.contacts'|trans,
-                                    'value': activeSegmentCount,
-                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias ~ ' !' ~ ('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.dnc.any'|trans)}),
-                                    'icon': 'ri-user-follow-line',
-                                    tooltip: 'mautic.lead.segments.active.contacts.tooltip'|trans
-                                }
-                            ]}) }}
+                            <div id="segment-stats" data-target-url="{{ path('mautic_segment_action', {'objectAction': 'segmentStats', 'objectId': list.id}) }}">
+                                <div class="spinner"><i class="ri-loader-3-line ri-spin"></i></div>
+                            </div>
                         {% endif %}
                         <div class="panel">
                             <div class="panel-body box-layout">
