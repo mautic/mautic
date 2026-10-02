@@ -2,8 +2,10 @@
 
 namespace Mautic\PointBundle\Controller;
 
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\PageHelperInterface;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Helper\TriggerSearchScopeProvider;
 use Mautic\PointBundle\Model\TriggerEventModel;
@@ -15,6 +17,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class TriggerController extends FormController
 {
+    use CategoryListFiltersTrait;
+
     private TriggerEventModel $triggerEventModel;
 
     private TriggerModel $triggerModel;
@@ -47,10 +51,10 @@ final class TriggerController extends FormController
 
         $pageHelper = $pageHelperFactory->make('mautic.point.trigger', $page);
 
-        $limit      = $pageHelper->getLimit();
-        $start      = $pageHelper->getStart();
-        $search     = $request->get('search', $request->getSession()->get('mautic.point.trigger.filter', ''));
-        $filter     = ['string' => $search, 'force' => []];
+        [$limit, $start, $search, $filter] = $this->initializeIndexFilters($pageHelper, $request, 'mautic.point.trigger.filter');
+
+        $categoryFilters = $this->applyCategoryListFilter($request, 'mautic.point.trigger.list_filters', 'point', 'cat.id', $filter);
+
         $orderBy    = $request->getSession()->get('mautic.point.trigger.orderby', 't.name');
         $orderByDir = $request->getSession()->get('mautic.point.trigger.orderbydir', 'ASC');
         $triggers   = $this->triggerModel->getEntities(
@@ -86,9 +90,10 @@ final class TriggerController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue'     => $search,
-                'searchScopes'    => $triggerSearchScopeProvider->getScopes(),
-                'items'           => $triggers,
+                'searchValue'  => $search,
+                'searchScopes' => $triggerSearchScopeProvider->getScopes(),
+                'filters'      => $categoryFilters['filters'],
+                'items'        => $triggers,
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
@@ -615,5 +620,18 @@ final class TriggerController extends FormController
         $session = $request->getSession();
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.modified');
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.deleted');
+    }
+
+    /**
+     * @return array{0: int, 1: int, 2: string, 3: array<string, array<int, array<string, mixed>>>}
+     */
+    private function initializeIndexFilters(PageHelperInterface $pageHelper, Request $request, string $sessionFilterKey): array
+    {
+        $limit  = $pageHelper->getLimit();
+        $start  = $pageHelper->getStart();
+        $search = $request->get('search', $request->getSession()->get($sessionFilterKey, ''));
+        $filter = ['string' => $search, 'force' => []];
+
+        return [$limit, $start, $search, $filter];
     }
 }
