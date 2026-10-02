@@ -15,12 +15,13 @@ parameters:
         param: 82.4
         property: 73.7
         constant: 99.9
-
-    # rules merged from rector/type-perfect, opt-in since type-coverage 2.3
     type_perfect:
         no_param_type_removal: true
         no_isset_on_object: true
         no_empty_on_object: true
+        narrow_return: true
+        narrow_param: true
+
     paths:
         - app/bundles
         - app/config
