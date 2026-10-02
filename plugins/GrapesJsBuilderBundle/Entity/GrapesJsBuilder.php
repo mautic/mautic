@@ -6,7 +6,6 @@ namespace MauticPlugin\GrapesJsBuilderBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
 
 #[ORM\Entity(repositoryClass: GrapesJsBuilderRepository::class)]
@@ -17,6 +16,9 @@ class GrapesJsBuilder
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     protected $id;
 
     /**
@@ -29,18 +31,11 @@ class GrapesJsBuilder
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'custom_mjml', type: Types::TEXT, nullable: true)]
     private $customMjml;
 
+    #[ORM\Column(name: 'draft_custom_mjml', type: Types::TEXT, nullable: true)]
     private ?string $draftCustomMjml = null;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder
-            ->addNamedField('customMjml', Types::TEXT, 'custom_mjml', true)
-            ->addNamedField('draftCustomMjml', Types::TEXT, 'draft_custom_mjml', true)
-            ->addId();
-    }
 
     /**
      * @return int

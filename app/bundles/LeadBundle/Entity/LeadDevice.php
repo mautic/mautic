@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: LeadDeviceRepository::class)]
 #[ORM\Table(name: 'lead_devices')]
@@ -24,6 +23,9 @@ class LeadDevice
     /**
      * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -42,6 +44,7 @@ class LeadDevice
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $device;
 
     /**
@@ -89,18 +92,8 @@ class LeadDevice
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addDateAdded();
-
-        $builder->addNullableField('device', 'string');
-    }
 
     /**
      * Prepares the metadata for API usage.

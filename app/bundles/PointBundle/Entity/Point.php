@@ -59,6 +59,9 @@ class Point extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['point:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -66,12 +69,14 @@ class Point extends FormEntity implements UuidInterface
      */
     #[Groups(['point:read', 'point:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -79,24 +84,28 @@ class Point extends FormEntity implements UuidInterface
      */
     #[Groups(['point:read', 'point:write'])]
     #[Assert\NotBlank(message: 'mautic.point.type.notblank')]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var bool
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(type: 'boolean')]
     private $repeatable = false;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
@@ -105,12 +114,14 @@ class Point extends FormEntity implements UuidInterface
     #[Groups(['point:read', 'point:write'])]
     #[Assert\NotBlank(message: 'mautic.point.delta.notblank')]
     #[Assert\Range(min: IntHelper::MIN_INTEGER_VALUE, max: IntHelper::MAX_INTEGER_VALUE)]
+    #[ORM\Column(type: 'integer')]
     private $delta = 0;
 
     /**
      * @var array
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
@@ -123,6 +134,8 @@ class Point extends FormEntity implements UuidInterface
      * @var Category|null
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     #[Groups(['point:read', 'point:write'])]
@@ -146,23 +159,6 @@ class Point extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->createField('repeatable', 'boolean')
-            ->build();
-
-        $builder->addField('delta', 'integer');
-
-        $builder->addField('properties', 'array');
-
-        $builder->addCategory();
 
         self::addProjectsField($builder, 'point_projects_xref', 'point_id');
     }

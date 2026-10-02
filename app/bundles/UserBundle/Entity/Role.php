@@ -15,7 +15,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -55,6 +54,9 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * @var int
      */
     #[Groups(['role:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -62,18 +64,21 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      */
     #[Groups(['role:read', 'role:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['role:read', 'role:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var bool
      */
     #[Groups(['role:read', 'role:write'])]
+    #[ORM\Column(name: 'is_admin', type: 'boolean')]
     private $isAdmin = false;
 
     /**
@@ -87,6 +92,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * @var array
      */
     #[Groups(['role:read', 'role:write'])]
+    #[ORM\Column(name: 'readable_permissions', type: 'array')]
     private $rawPermissions;
 
     /**
@@ -99,22 +105,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     {
         $this->permissions = new ArrayCollection();
         $this->users       = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('isAdmin', 'boolean')
-            ->columnName('is_admin')
-            ->build();
-
-        $builder->createField('rawPermissions', 'array')
-            ->columnName('readable_permissions')
-            ->build();
-
     }
 
     /**

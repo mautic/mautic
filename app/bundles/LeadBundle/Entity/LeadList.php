@@ -10,7 +10,6 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -60,14 +59,17 @@ class LeadList extends FormEntity implements UuidInterface
 
     use ProjectTrait;
 
-    public const string TABLE_NAME  = 'lead_lists';
+    public const TABLE_NAME  = 'lead_lists';
 
-    public const string ENTITY_NAME = 'lists';
+    public const ENTITY_NAME = 'lists';
 
     /**
      * @var int|null
      */
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -75,6 +77,7 @@ class LeadList extends FormEntity implements UuidInterface
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
@@ -88,12 +91,15 @@ class LeadList extends FormEntity implements UuidInterface
      * @var Category|null
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
      * @var string|null
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -114,6 +120,7 @@ class LeadList extends FormEntity implements UuidInterface
      * @var bool
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'is_global', type: 'boolean')]
     private $isGlobal = true;
 
     /**
@@ -138,6 +145,7 @@ class LeadList extends FormEntity implements UuidInterface
     private ?float $lastBuiltTime = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $deleted = null;
 
     public function __construct()
@@ -150,16 +158,7 @@ class LeadList extends FormEntity implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->addIdColumns();
-
-        $builder->addCategory();
-
-        $builder->createField('isGlobal', 'boolean')
-            ->columnName('is_global')
-            ->build();
-
         self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
-        $builder->addNullableField('deleted', 'datetime');
 
     }
 
@@ -368,7 +367,10 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->alias;
     }
 
-    public function getLeads(): Collection
+    /**
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getLeads()
     {
         return $this->leads;
     }

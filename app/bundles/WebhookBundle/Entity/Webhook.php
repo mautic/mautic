@@ -17,7 +17,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -55,6 +54,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var ?int
      */
     #[Groups(['webhook:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -62,12 +64,14 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      */
     #[Groups(['webhook:read', 'webhook:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -76,6 +80,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     #[Groups(['webhook:read', 'webhook:write'])]
     #[NotBlank(message: 'mautic.core.valid_url_required')]
     #[Assert\Url(message: 'mautic.core.valid_url_required', requireTld: false)]
+    #[ORM\Column(name: 'webhook_url', type: Types::TEXT)]
     private $webhookUrl;
 
     /**
@@ -89,6 +94,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var Category|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
@@ -137,33 +144,22 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         Order::Ascending->value,
         Order::Descending->value,
     ])]
+    #[ORM\Column(name: 'events_orderby_dir', type: Types::STRING, length: 191, nullable: true)]
     private $eventsOrderbyDir;
 
+    #[ORM\Column(name: 'marked_unhealthy_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $markedUnhealthyAt      = null;
 
+    #[ORM\Column(name: 'unhealthy_since', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $unHealthySince         = null;
 
+    #[ORM\Column(name: 'last_notification_sent_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $lastNotificationSentAt = null;
 
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->logs   = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addCategory();
-
-        $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
-        $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
-        $builder->addNullableField('markedUnhealthyAt', Types::DATETIME_IMMUTABLE, 'marked_unhealthy_at');
-        $builder->addNullableField('unHealthySince', Types::DATETIME_IMMUTABLE, 'unhealthy_since');
-        $builder->addNullableField('lastNotificationSentAt', Types::DATETIME_IMMUTABLE, 'last_notification_sent_at');
     }
 
     /**

@@ -87,6 +87,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @var int|string
      */
     #[Groups(['contact:read', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     #[Groups(['contact:read', 'contact:write'])]
@@ -338,8 +341,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
 
         self::loadFixedFieldMetadata(
             $builder,

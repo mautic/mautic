@@ -11,7 +11,6 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\UserBundle\ApiPlatform\UserProcessor;
@@ -57,15 +56,20 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * @var ?int
      */
     #[Groups(['user:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     protected $id;
 
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.username.notblank')]
+    #[ORM\Column(type: 'string', length: 191, unique: true)]
     protected ?string $username = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 64)]
     protected $password;
 
     /**
@@ -91,6 +95,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.firstname.notblank')]
+    #[ORM\Column(name: 'first_name', type: 'string', length: 191)]
     private $firstName;
 
     /**
@@ -98,6 +103,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.lastname.notblank')]
+    #[ORM\Column(name: 'last_name', type: 'string', length: 191)]
     private $lastName;
 
     /**
@@ -106,6 +112,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     #[Groups(['user:read', 'user:write'])]
     #[Assert\NotBlank(message: 'mautic.user.user.email.valid')]
     #[Assert\Email(message: 'mautic.user.user.email.valid', groups: ['SecondPass'])]
+    #[ORM\Column(type: 'string', length: 191, unique: true)]
     private $email;
 
     /**
@@ -113,6 +120,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      */
     #[Groups(['user:read', 'user:write'])]
     #[Assert\Length(max: 191, maxMessage: 'mautic.user.user.position.toolong')]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $position;
 
     /**
@@ -128,41 +136,47 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
      * @var string|null
      */
     #[Groups(['user:read', 'user:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $timezone = '';
 
     /**
      * @var string|null
      */
     #[Groups(['user:read', 'user:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $locale = '';
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['user:read'])]
+    #[ORM\Column(name: 'last_login', type: 'datetime', nullable: true)]
     private $lastLogin;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['user:read'])]
+    #[ORM\Column(name: 'last_active', type: 'datetime', nullable: true)]
     private $lastActive;
 
     /**
      * Stores active role permissions.
      */
-    private $activePermissions;
+    private ?array $activePermissions = null;
 
     /**
      * @var mixed[]
      */
     #[Groups(['user:read', 'user:write'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private array $preferences = [];
 
     /**
      * @var string|null
      */
     #[Groups(['user:read', 'user:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $signature;
 
     /**
@@ -171,68 +185,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     public function __construct(
         private $guest = false,
     ) {
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->createField('username', 'string')
-            ->length(191)
-            ->unique()
-            ->build();
-
-        $builder->createField('password', 'string')
-            ->length(64)
-            ->build();
-
-        $builder->createField('firstName', 'string')
-            ->columnName('first_name')
-            ->length(191)
-            ->build();
-
-        $builder->createField('lastName', 'string')
-            ->columnName('last_name')
-            ->length(191)
-            ->build();
-
-        $builder->createField('email', 'string')
-            ->length(191)
-            ->unique()
-            ->build();
-
-        $builder->createField('position', 'string')
-            ->length(191)
-            ->nullable()
-            ->build();
-
-        $builder->createField('timezone', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('locale', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastLogin', 'datetime')
-            ->columnName('last_login')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastActive', 'datetime')
-            ->columnName('last_active')
-            ->nullable()
-            ->build();
-
-        $builder->createField('preferences', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->createField('signature', 'text')
-            ->nullable()
-            ->build();
     }
 
     public static function determineValidationGroups(Form $form): array
@@ -519,10 +471,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getActivePermissions()
+    public function getActivePermissions(): ?array
     {
         return $this->activePermissions;
     }
