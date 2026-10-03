@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 final class FieldControllerTest extends MauticMysqlTestCase
@@ -22,12 +23,48 @@ final class FieldControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $filterButton = $crawler->filter('button[data-toggle="popover"]');
-        $filterContent = $filterButton->attr('data-content');
-
         $this->assertCount(1, $filterButton);
+        $filterContent = $filterButton->attr('data-content');
         $this->assertNotNull($filterContent);
-        $this->assertStringContainsString('Indexed', $filterContent);
-        $this->assertStringContainsString('Unique', $filterContent);
+        $filters = new Crawler($filterContent);
+        $this->assertCount(1, $filters->filter('[data-filter="is:indexed"]'));
+        $this->assertCount(1, $filters->filter('[data-filter="is:unique"]'));
+    }
+
+    #[DataProvider('quickFilterSearchProvider')]
+    public function testQuickFiltersSelectMatchingFields(string $search, bool $indexed, bool $unique): void
+    {
+        $matching = new LeadField();
+        $matching->setLabel('Matching audit field');
+        $matching->setAlias('matching_audit_field');
+        $matching->setType('text');
+        $matching->setIsIndex($indexed);
+        $matching->setIsUniqueIdentifer($unique);
+        $other = new LeadField();
+        $other->setLabel('Other audit field');
+        $other->setAlias('other_audit_field');
+        $other->setType('text');
+        $this->em->persist($matching);
+        $this->em->persist($other);
+        $this->em->flush();
+
+        foreach (['', '&tmpl=list'] as $template) {
+            $this->client->request(Request::METHOD_GET, '/s/contacts/fields?search='.$search.$template);
+            $this->assertResponseIsSuccessful();
+            $content = (string) $this->client->getResponse()->getContent();
+            $this->assertStringContainsString($matching->getLabel(), $content);
+            $this->assertStringNotContainsString($other->getLabel(), $content);
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string, bool, bool}>
+     */
+    public static function quickFilterSearchProvider(): iterable
+    {
+        yield 'indexed' => ['is:indexed', true, false];
+        yield 'unique' => ['is:unique', false, true];
+        yield 'combined' => ['is:indexed%20is:unique', true, true];
     }
 
     public function testLengthValidationOnLabelFieldWhenAddingCustomFieldFailure(): void
