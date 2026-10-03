@@ -4,50 +4,23 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticOutlookBundle\Integration;
 
-use Mautic\CoreBundle\Helper\UrlHelper;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 
-final class OutlookIntegration extends AbstractIntegration
+class OutlookIntegration extends BasicIntegration implements BasicInterface
 {
     public function getName(): string
     {
         return 'Outlook';
     }
 
-    /**
-     * Return's authentication method such as oauth2, oauth1a, key, etc.
-     */
-    public function getAuthenticationType(): string
+    public function getDisplayName(): string
     {
-        // Just use none for now and I'll build in "basic" later
-        return 'none';
+        return 'Outlook';
     }
 
-    /**
-     * Return array of key => label elements that will be converted to inputs to
-     * obtain from the user.
-     */
-    public function getRequiredKeyFields(): array
+    public function getIcon(): string
     {
-        return [
-            'secret' => 'mautic.integration.outlook.secret',
-        ];
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    public function getFormNotes($section)
-    {
-        if ('custom' === $section) {
-            return [
-                'template'   => '@MauticOutlook/Integration/form.html.twig',
-                'parameters' => [
-                    'mauticUrl' => UrlHelper::rel2abs('/index.php'),
-                ],
-            ];
-        }
-
-        return parent::getFormNotes($section);
+        return 'plugins/MauticOutlookBundle/Assets/img/outlook.png';
     }
 }
