@@ -82,8 +82,60 @@
                             {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
                             {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
                             {% if not isSamlUser %}
-                                {{ form_row(userForm.plainPassword.password) }}
-                                {{ form_row(userForm.plainPassword.confirm) }}
+                                <div class="form-group mb-md">
+                                    <label class="control-label">{{ 'mautic.core.password'|trans }}</label>
+                                    <div class="text-secondary small mb-xs">{{ 'mautic.user.config.account.password.change.helper'|trans }}</div>
+                                    {{ include('@MauticCore/Notification/inline_notification.html.twig', {
+                                        'title': 'mautic.user.config.account.password.save.warning.title',
+                                        'content': 'mautic.user.config.account.password.save.warning.content',
+                                        'alert_type': 'warning',
+                                        'dismissible': false,
+                                    }) }}
+                                    {% include '@MauticCore/Helper/button.html.twig' with {
+                                        buttons: [
+                                            {
+                                                label: 'mautic.user.config.account.password.change',
+                                                variant: 'secondary',
+                                                size: 'sm',
+                                                icon: 'ri-lock-fill',
+                                                attributes: {
+                                                    'type': 'button',
+                                                    'data-toggle': 'modal',
+                                                    'data-target': '#changePasswordModal',
+                                                }
+                                            }
+                                        ]
+                                    } %}
+                                    {% if form_errors(userForm.plainPassword) %}
+                                        <span class="help-block text-danger">{{ form_errors(userForm.plainPassword) }}</span>
+                                    {% endif %}
+                                </div>
+
+                                {% set changePasswordModalContent %}
+                                    {{ include('@MauticCore/Notification/inline_notification.html.twig', {
+                                        'title': 'mautic.user.config.account.password.save.warning.title',
+                                        'content': 'mautic.user.config.account.password.save.warning.content',
+                                        'alert_type': 'warning',
+                                        'dismissible': false,
+                                    }) }}
+                                    {{ form_row(userForm.plainPassword.password) }}
+                                    {{ form_row(userForm.plainPassword.confirm) }}
+                                {% endset %}
+                                {% include '@MauticCore/Components/modal.html.twig' with {
+                                    id: 'changePasswordModal',
+                                    modalHeading: 'mautic.user.config.account.password.change',
+                                    modalContent: changePasswordModalContent,
+                                    buttons: [
+                                        {
+                                            label: 'mautic.core.form.done',
+                                            variant: 'primary',
+                                            attributes: {
+                                                'type': 'button',
+                                                'data-dismiss': 'modal',
+                                            }
+                                        }
+                                    ]
+                                } %}
                             {% endif %}
                             <h3 id="learning" class="pt-20 mb-xs">{{ 'mautic.user.config.title.experience_and_learning'|trans }}</h3>
                             <div class="text-secondary small pb-20">{{ 'mautic.user.config.title.experience_and_learning.description'|trans }}</div>

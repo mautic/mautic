@@ -4,6 +4,8 @@ Mautic.userOnLoad = function (container) {
         if (mQuery('#user_position').length) {
             Mautic.activateTypeahead('#user_position', { displayKey: 'position' });
         }
+
+        Mautic.preventPasswordAutofill(container);
     } else {
         if (mQuery(container + ' #list-search').length) {
             Mautic.activateSearchAutocomplete('list-search', 'user.user');
@@ -60,6 +62,40 @@ Mautic.userOnLoad = function (container) {
         });
     }
 
+};
+
+/**
+ * Stops browsers from auto-filling the account "change password" fields with a
+ * previously saved credential. autocomplete="new-password" alone is not always
+ * honored, so the fields are kept readonly until the user deliberately focuses
+ * them - that's the one technique modern browsers do respect. They're left alone
+ * after that so a password the user actually typed still gets submitted when the
+ * page is saved.
+ */
+Mautic.preventPasswordAutofill = function (container) {
+    var passwordFields = mQuery(container + ' #user_plainPassword_password, ' + container + ' #user_plainPassword_confirm');
+
+    if (!passwordFields.length) {
+        return;
+    }
+
+    passwordFields.each(function () {
+        mQuery(this).val('').attr('readonly', 'readonly').attr('autocomplete', 'new-password');
+    });
+
+    passwordFields.on('focus', function () {
+        mQuery(this).removeAttr('readonly');
+    });
+
+    mQuery('#changePasswordModal').on('hidden.bs.modal', function () {
+        var passwordField = mQuery(container + ' #user_plainPassword_password');
+        var hasNewPassword = passwordField.length > 0 && passwordField.val().length > 0;
+        var message         = hasNewPassword
+            ? Mautic.translate('mautic.user.config.account.password.change.pending')
+            : Mautic.translate('mautic.user.config.account.password.change.unchanged');
+
+        Mautic.setFlashes(Mautic.addInfoFlashMessage(message));
+    });
 };
 
 Mautic.roleOnLoad = function (container, response) {
