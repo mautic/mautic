@@ -1,0 +1,218 @@
+Migration Plan: Move OpenIdBundle into UserBundle for Mautic 7/Symfony 7
+Overview
+Migrate the custom OpenIdBundle OIDC implementation into UserBundle under Security/OIDC/, following the existing Security/SAML/ pattern. This consolidates all backend user authentication (local, SAML, OIDC) in one place.
+
+Prerequisites
+The jumbojett/openid-connect-php dependency should already be in composer.json
+Familiarity with Symfony 7 security system changes (authenticators replace guards)
+Phase 1: Create Directory Structure
+Create the following structure under app/bundles/UserBundle/Security/OIDC/:
+
+
+Security/OIDC/
+├── Client/
+│   ├── ClientInterface.php
+│   ├── Client.php
+│   └── OpenIDConnectBridge.php
+├── User/
+│   ├── UserFactory.php
+│   ├── UserFactoryInterface.php
+│   └── Linker.php
+├── Store/
+│   └── SubjectIdStore.php
+├── Exception/
+│   ├── OidcException.php
+│   ├── AuthorizationRequestFailedException.php
+│   ├── RegistrationNotAllowedException.php
+│   ├── EmailRequiredException.php
+│   ├── EmailTakenException.php
+│   └── RoleNotFoundException.php
+├── DTO/
+│   ├── Settings.php
+│   ├── ClientCredentials.php
+│   └── UserCredentials.php
+├── Factory/
+│   ├── ClientFactory.php
+│   ├── ClientFactoryInterface.php
+│   ├── SettingsFactory.php
+│   └── UserCredentialsFactory.php
+├── EventListener/
+│   └── (migrate any event listeners)
+└── OidcAuthenticator.php  (new Symfony 7 authenticator)
+Phase 2: Migrate Core Classes
+2.1 Client Layer (copy and update namespace)
+Source	Target
+OpenIdBundle/Service/ClientInterface.php	UserBundle/Security/OIDC/Client/ClientInterface.php
+OpenIdBundle/Service/Client.php	UserBundle/Security/OIDC/Client/Client.php
+OpenIdBundle/Service/ClientBridgeInterface.php	UserBundle/Security/OIDC/Client/ClientBridgeInterface.php
+OpenIdBundle/Service/OpenIDConnectBridge.php	UserBundle/Security/OIDC/Client/OpenIDConnectBridge.php
+Update namespaces from Mautic\OpenIdBundle\Service to Mautic\UserBundle\Security\OIDC\Client.
+
+Symfony 7 changes needed in OpenIDConnectBridge.php:
+
+SessionInterface is now from Symfony\Component\HttpFoundation\RequestStack - inject RequestStack and get session via $requestStack->getSession()
+2.2 User Provisioning (copy and update namespace)
+Source	Target
+OpenIdBundle/Factory/UserFactory.php	UserBundle/Security/OIDC/User/UserFactory.php
+OpenIdBundle/Factory/UserFactoryInterface.php	UserBundle/Security/OIDC/User/UserFactoryInterface.php
+OpenIdBundle/Service/Linker.php	UserBundle/Security/OIDC/User/Linker.php
+OpenIdBundle/Service/LinkerInterface.php	UserBundle/Security/OIDC/User/LinkerInterface.php
+Update namespaces to Mautic\UserBundle\Security\OIDC\User.
+
+2.3 DTOs (copy and update namespace)
+Source	Target
+OpenIdBundle/DTO/Settings.php	UserBundle/Security/OIDC/DTO/Settings.php
+OpenIdBundle/DTO/ClientCredentials.php	UserBundle/Security/OIDC/DTO/ClientCredentials.php
+OpenIdBundle/DTO/UserCredentials.php	UserBundle/Security/OIDC/DTO/UserCredentials.php
+2.4 Factories (copy and update namespace)
+Source	Target
+OpenIdBundle/Factory/ClientFactory.php	UserBundle/Security/OIDC/Factory/ClientFactory.php
+OpenIdBundle/Factory/ClientFactoryInterface.php	UserBundle/Security/OIDC/Factory/ClientFactoryInterface.php
+OpenIdBundle/Factory/SettingsFactory.php	UserBundle/Security/OIDC/Factory/SettingsFactory.php
+OpenIdBundle/Factory/UserCredentialsFactory.php	UserBundle/Security/OIDC/Factory/UserCredentialsFactory.php
+OpenIdBundle/Factory/UserCredentialsFactoryInterface.php	UserBundle/Security/OIDC/Factory/UserCredentialsFactoryInterface.php
+2.5 Exceptions (copy and update namespace)
+Move all from OpenIdBundle/Exception/ to UserBundle/Security/OIDC/Exception/. Consider having them extend a base OidcException class.
+
+2.6 Entity
+Source	Target
+OpenIdBundle/Entity/SubjectId.php	UserBundle/Entity/OidcSubjectId.php
+OpenIdBundle/Repository/SubjectIdRepository.php	UserBundle/Entity/OidcSubjectIdRepository.php
+Update the entity:
+
+Change namespace to Mautic\UserBundle\Entity
+Update ORM mapping (table name should stay same or migrate data)
+Update any MauticOpenIdBundle:SubjectId references to MauticUserBundle:OidcSubjectId
+Phase 3: Create Symfony 7 Authenticator
+Create UserBundle/Security/OIDC/OidcAuthenticator.php implementing Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface.
+
+Replace the old guard/firewall approach with Symfony 7's authenticator system:
+
+
+<?php
+
+namespace Mautic\UserBundle\Security\OIDC;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+
+class OidcAuthenticator extends AbstractAuthenticator
+{
+    public function __construct(
+        private readonly ClientInterface $client,
+        private readonly Linker $linker,
+        private readonly SettingsFactory $settingsFactory,
+    ) {}
+
+    public function supports(Request $request): ?bool
+    {
+        // Check if this is the OIDC callback route
+        return $request->attributes->get('_route') === 'mautic_oidc_check';
+    }
+
+    public function authenticate(Request $request): Passport
+    {
+        // 1. Verify OIDC callback and get claims
+        // 2. Use Linker to find or create user
+        // 3. Return SelfValidatingPassport with UserBadge
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
+    {
+        // Redirect to dashboard or intended URL
+    }
+
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    {
+        // Redirect to login with error
+    }
+}
+Phase 4: Update Configuration
+4.1 Merge config into UserBundle
+Move OIDC config parameters from OpenIdBundle/Config/config.php into UserBundle/Config/config.php:
+
+Add OIDC service definitions under services:
+Add OIDC parameters under parameters:
+Register the authenticator
+4.2 Update Form Types
+Move/merge OpenIdBundle/Form/Type/ forms into UserBundle/Form/Type/:
+
+OIDC configuration fields should be added to the existing ConfigType.php alongside SAML settings
+Group them under an "OIDC Settings" section
+4.3 Update security.yaml
+Add OIDC authenticator to the firewall configuration:
+
+
+security:
+    firewalls:
+        main:
+            custom_authenticators:
+                - Mautic\UserBundle\Security\OIDC\OidcAuthenticator
+Phase 5: Migrate Routes and Controller
+5.1 Controller
+Move OpenIdBundle/Controller/SecurityController.php actions into UserBundle/Controller/SecurityController.php (or a new OidcController.php):
+
+loginAction → oidcLoginAction
+loginCheckAction → oidcCheckAction
+requiredAction → oidcRequiredAction
+5.2 Routes
+Add routes to UserBundle/Config/routing.php or create routing_oidc.php:
+
+
+'mautic_oidc_login' => [
+    'path' => '/oidc/login',
+    'controller' => 'Mautic\UserBundle\Controller\SecurityController::oidcLoginAction',
+],
+'mautic_oidc_check' => [
+    'path' => '/oidc/check',
+    'controller' => 'Mautic\UserBundle\Controller\SecurityController::oidcCheckAction',
+],
+Phase 6: Migrate Views and Translations
+6.1 Views
+Move from OpenIdBundle/Views/ to UserBundle/Views/Security/Oidc/ (or similar):
+
+Update template references in controllers
+Update any OpenIdBundle: view references
+6.2 Translations
+Merge OpenIdBundle/Translations/ into UserBundle/Translations/:
+
+Keep the mautic.open_id.* translation keys for backwards compatibility, or
+Rename to mautic.user.oidc.* and update all references
+Phase 7: Migrate Event Listeners
+Move any event listeners from OpenIdBundle/EventListener/ to UserBundle/EventSubscriber/ (Symfony 7 prefers subscribers):
+
+Update service tags from kernel.event_listener to use #[AsEventListener] attribute or EventSubscriberInterface
+Phase 8: Migrate Tests
+Move OpenIdBundle/Tests/ to UserBundle/Tests/Security/OIDC/:
+
+Update namespaces
+Update any mocked class references
+Ensure tests pass with Symfony 7 test utilities
+Phase 9: Cleanup
+Remove OpenIdBundle entirely from app/bundles/
+Update AppKernel.php or bundle registration - remove OpenIdBundle
+Update any imports/references across the codebase that referenced OpenIdBundle
+Run static analysis (PHPStan) to catch any remaining references
+Database migration - if entity table name changed, create a migration
+Phase 10: Verification Checklist
+ OIDC login flow works end-to-end
+ User provisioning creates new users correctly
+ Existing OIDC-linked users can still log in (SubjectId entity migration)
+ OIDC settings appear in configuration UI
+ SAML authentication still works (no regressions)
+ Local username/password login still works
+ All tests pass
+ PHPStan passes at configured level
+ CS fixer passes
+Key Symfony 7 Changes to Watch
+SessionInterface - Get from RequestStack, not injected directly
+Guards removed - Use AuthenticatorInterface instead
+PasswordEncoder → PasswordHasher - If any password operations exist
+Annotations → Attributes - Prefer PHP 8 attributes for routes, DI, etc.
+Return types - Ensure all methods have proper return type declarations

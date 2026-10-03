@@ -10,6 +10,8 @@ class PluginToken extends AbstractToken
 {
     private ?string $providerKey;
 
+    private string $isSupportUser;
+
     /**
      * @param UserInterface|string|null $user
      * @param array<string>             $roles
@@ -21,6 +23,7 @@ class PluginToken extends AbstractToken
         private string $credentials = '',
         array $roles = [],
         private readonly ?Response $response = null,
+        bool $isSupportUser = false,
     ) {
         parent::__construct($roles);
 
@@ -37,6 +40,7 @@ class PluginToken extends AbstractToken
         }
 
         $this->providerKey = $providerKey;
+        $this->isSupportUser = $isSupportUser ? 'yes' : 'no';
     }
 
     public function getCredentials(): string
@@ -47,6 +51,11 @@ class PluginToken extends AbstractToken
     public function getProviderKey(): ?string
     {
         return $this->providerKey;
+    }
+
+    public function isSupportUser(): bool
+    {
+        return 'yes' === $this->isSupportUser;
     }
 
     public function getAuthenticatingService(): ?string
@@ -64,7 +73,7 @@ class PluginToken extends AbstractToken
      */
     public function __serialize(): array
     {
-        return [$this->authenticatingService, $this->credentials, $this->providerKey, parent::__serialize()];
+        return [$this->authenticatingService, $this->credentials, $this->providerKey, $this->isSupportUser, parent::__serialize()];
     }
 
     /**
@@ -72,7 +81,7 @@ class PluginToken extends AbstractToken
      */
     public function __unserialize(array $data): void
     {
-        [$this->authenticatingService, $this->credentials, $this->providerKey, $parentArray] = $data;
+        [$this->authenticatingService, $this->credentials, $this->providerKey, $this->isSupportUser, $parentArray] = $data;
         parent::__unserialize($parentArray);
     }
 }

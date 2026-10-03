@@ -2,6 +2,79 @@
 {% set fields = form.children %}
 {% set fieldKeys = fields|keys %}
 
+
+    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.open_id.config.header'|trans }}</h4>
+    <div class="text-muted small pb-md">{{ 'mautic.open_id.config.header.description'|trans }}</div>
+    <div class="row">
+        <div class="panel panel-default mb-md">
+            <div class="panel-body">
+                {% if fields.open_id_is_enabled is defined %}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form_row(fields.open_id_is_enabled) }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if fields.open_id_is_required is defined %}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form_row(fields.open_id_is_required) }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if fields.open_id_is_user_registration_allowed is defined %}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form_row(fields.open_id_is_user_registration_allowed) }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if fields.open_id_registered_user_role is defined %}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form_row(fields.open_id_registered_user_role) }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if fields.open_id_client_url is defined %}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form_row(fields.open_id_client_url) }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if fields.open_id_client_id is defined %}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form_row(fields.open_id_client_id) }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if fields.open_id_client_secret is defined %}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form_row(fields.open_id_client_secret) }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if fields.open_id_mapping_field is defined %}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form_row(fields.open_id_mapping_field) }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
 {% if fieldKeys|filter(v => v in ['saml_idp_metadata', 'saml_idp_own_certificate', 'saml_idp_own_private_key', 'saml_idp_own_password'])|length > 0 %}
     <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.user.config.header.saml'|trans }}</h4>
     <div class="text-muted small pb-md">{{ 'mautic.core.config.header.saml.description'|trans }}</div>

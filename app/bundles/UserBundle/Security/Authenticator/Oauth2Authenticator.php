@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
@@ -64,11 +65,42 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
 
             $accessTokenBadge = new AccessTokenBadge($accessToken, $roles);
 
-            // Parent uses $client->getUserIdentifier() here, which breaks
-            // user-bound bearer tokens on /api/v2 because the client identifier
-            // is not a Mautic username.
+            // Provide a custom user loader to avoid the firewall's user provider
+            // trying to load a user by the OAuth client's random ID (which would fail
+            // for client_credentials tokens that have no user).
+            // For user-bound tokens, we return the user directly from the access token.
+            // For client-only tokens, we create a minimal UserInterface wrapper around the client.
+            $userLoader = static function () use ($user, $client, $roles): UserInterface {
+                if (null !== $user) {
+                    return $user;
+                }
+
+                // Create a minimal UserInterface for client_credentials tokens
+                return new class($client->getUserIdentifier(), $roles) implements UserInterface {
+                    public function __construct(
+                        private readonly string $identifier,
+                        private readonly array $roles,
+                    ) {
+                    }
+
+                    public function getRoles(): array
+                    {
+                        return $this->roles ?: ['ROLE_USER'];
+                    }
+
+                    public function eraseCredentials(): void
+                    {
+                    }
+
+                    public function getUserIdentifier(): string
+                    {
+                        return $this->identifier;
+                    }
+                };
+            };
+
             return new SelfValidatingPassport(
-                new UserBadge($user?->getUserIdentifier() ?? $client->getUserIdentifier()),
+                new UserBadge($user?->getUserIdentifier() ?? $client->getUserIdentifier(), $userLoader),
                 [$accessTokenBadge]
             );
         } catch (OAuth2ServerException $e) {
