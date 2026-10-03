@@ -24,7 +24,7 @@ export default class ButtonApplyCommand {
       const mjmlCode = MjmlService.getEditorMjmlContent(editor);
 
       if (!htmlCode || !mjmlCode) {
-        throw new Error('Could not generate html from MJML');
+        return;
       }
 
       ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode);
