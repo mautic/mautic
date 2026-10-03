@@ -4,6 +4,7 @@ namespace Mautic\StageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\StageBundle\Cache\StageCountCache;
 use Mautic\StageBundle\Form\Type\StageActionType;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -54,5 +55,31 @@ final class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function getLeadCountAction(Request $request, StageCountCache $countCache): JsonResponse
+    {
+        $id = (int) InputHelper::clean($request->request->get('id'));
+
+        $leadCount = $countCache->getStageContactCount($id);
+
+        return new JsonResponse($this->prepareJsonResponse($leadCount));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function prepareJsonResponse(int $leadCount): array
+    {
+        return [
+            'html' => $this->translator->trans(
+                'mautic.lead.list.viewleads_count',
+                ['%count%' => $leadCount]
+            ),
+            'leadCount' => $leadCount,
+        ];
     }
 }
