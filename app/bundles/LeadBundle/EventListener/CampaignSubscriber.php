@@ -360,23 +360,18 @@ final class CampaignSubscriber implements EventSubscriberInterface
         $lead   = $log->getLead();
         $fields = $lead->getFields(true);
 
-        try {
-            $tokenizedValues = [];
-            foreach ($values as $field => $value) {
-                if (is_string($value)) {
-                    $tokenizedValue = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
-                    $fieldEntity    = $this->leadFieldModel->getEntityByAlias($field);
-                    if ($fieldEntity && ($charLimit = $fieldEntity->getCharLengthLimit()) && mb_strlen($tokenizedValue) > $charLimit) {
-                        $tokenizedValue = mb_substr($tokenizedValue, 0, $charLimit);
-                    }
-                    $tokenizedValues[$field] = $tokenizedValue;
-                } else {
-                    $tokenizedValues[$field] = $value;
+        $tokenizedValues = [];
+        foreach ($values as $field => $value) {
+            if (is_string($value)) {
+                $tokenizedValue = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+                $fieldEntity    = $this->leadFieldModel->getEntityByAlias($field);
+                if ($fieldEntity && ($charLimit = $fieldEntity->getCharLengthLimit()) && mb_strlen($tokenizedValue) > $charLimit) {
+                    $tokenizedValue = mb_substr($tokenizedValue, 0, $charLimit);
                 }
+                $tokenizedValues[$field] = $tokenizedValue;
+            } else {
+                $tokenizedValues[$field] = $value;
             }
-            $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $tokenizedValues), false);
-        } catch (ImportFailedException $e) {
-            $event->fail($log, $e->getMessage());
         }
 
         foreach ($values as $alias => &$value) {
@@ -386,7 +381,14 @@ final class CampaignSubscriber implements EventSubscriberInterface
             }
         }
 
-        $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $tokenizedValues), false);
+        try {
+            $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $tokenizedValues), false);
+        } catch (ImportFailedException $e) {
+            $event->fail($log, $e->getMessage());
+
+            return;
+        }
+
         $this->leadModel->saveEntity($lead);
         $event->pass($log);
     }
