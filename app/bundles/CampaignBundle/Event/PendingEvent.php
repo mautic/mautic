@@ -28,6 +28,7 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * @throws \Exception
+     * @param Collection<int, LeadEventLog> $logs
      */
     public function __construct(AbstractEventAccessor $config, Event $event, Collection $logs)
     {

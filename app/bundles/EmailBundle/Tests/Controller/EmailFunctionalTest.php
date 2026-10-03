@@ -214,6 +214,7 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param int[]|null[] $expectedListIds
+     * @param Collection<int, LeadList> $collection
      */
     private function assertEmailLists(array $expectedListIds, Collection $collection): void
     {

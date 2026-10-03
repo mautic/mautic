@@ -101,6 +101,7 @@ final class Interval implements ScheduleModeInterface
 
     /**
      * @return GroupExecutionDateDAO[]
+     * @param Collection<int, Lead> $contacts
      */
     public function groupContactsByDate(Event $event, Collection $contacts, \DateTimeInterface $executionDate, ?\DateTimeInterface $compareFromDateTime = null): array
     {

@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -262,6 +263,8 @@ class InactiveExecutioner implements ExecutionerInterface
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
+     * @param Collection<int, Lead> $contacts
+     * @param Collection<int, Event> $events
      */
     private function executeLogsForInactiveEvents(Collection $events, Collection $contacts, Counter $childrenCounter, \DateTimeInterface $earliestLastActiveDateTime): void
     {

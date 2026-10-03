@@ -111,6 +111,7 @@ final class RealTimeExecutioner
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
+     * @param Collection<int, Event> $children
      */
     private function executeAssociatedEvents(Collection $children, \DateTime $now): void
     {

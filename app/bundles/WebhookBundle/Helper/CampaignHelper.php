@@ -5,6 +5,7 @@ namespace Mautic\WebhookBundle\Helper;
 use Doctrine\Common\Collections\Collection;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -153,6 +154,9 @@ final class CampaignHelper
         return $this->contactsValues[$contact->getId()];
     }
 
+    /**
+     * @param Collection<string, IpAddress> $ipAddresses
+     */
     private function ipAddressesToCsv(Collection $ipAddresses): string
     {
         $addresses = [];

@@ -67,6 +67,7 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $log2->method('getEvent')
             ->willReturn($event);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
             [
                 1 => $log1,
@@ -163,6 +164,7 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $log2->method('getEvent')
             ->willReturn($event);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
             [
                 1 => $log1,
@@ -224,6 +226,7 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $log2->method('getEvent')
             ->willReturn($event);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
             [
                 1 => $log1,

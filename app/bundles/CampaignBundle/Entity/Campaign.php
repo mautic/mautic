@@ -679,6 +679,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @see https://github.com/doctrine/doctrine2/issues/4693
      *
      * @return Collection<int, Event>
+     * @param Collection<int, Event> $events
      */
     private function reindexEventsByIdKey(Collection $events): Collection
     {
