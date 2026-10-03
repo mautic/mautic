@@ -468,18 +468,32 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testScheduledReportsSearchCommand(): void
     {
-        $scheduled = $this->createReport('Automation test scheduled report', 'email', []);
+        $scheduled = $this->createReport('Scheduled delivery report', 'email', []);
         $scheduled->setIsScheduled(true);
-        $this->createReport('Automation test unscheduled report', 'email', []);
+        $unscheduled = $this->createReport('Manual delivery report', 'email', []);
         $this->getContainer()->get(ReportModel::class)->saveEntity($scheduled);
+        $this->em->refresh($scheduled);
         $this->assertTrue($scheduled->isScheduled());
 
-        $this->client->request('GET', '/s/reports?search=is:scheduled');
+        foreach (['', '&tmpl=list'] as $template) {
+            $this->client->request('GET', '/s/reports?search=is:scheduled'.$template);
+            self::assertResponseIsSuccessful();
+            $content = (string) $this->client->getResponse()->getContent();
+            $this->assertStringContainsString($scheduled->getName(), $content);
+            $this->assertStringNotContainsString($unscheduled->getName(), $content);
+        }
 
+        $this->client->request('GET', '/s/reports?search=!is:scheduled');
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('Automation test scheduled report', $content);
-        $this->assertStringNotContainsString('Automation test unscheduled report', $content);
+        $this->assertStringContainsString($unscheduled->getName(), $content);
+        $this->assertStringNotContainsString($scheduled->getName(), $content);
+
+        $this->client->request('GET', '/s/reports?search=');
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($scheduled->getName(), $content);
+        $this->assertStringContainsString($unscheduled->getName(), $content);
     }
 
     public function testXssUrlFromQuery(): void
