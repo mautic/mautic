@@ -38,7 +38,7 @@ final class PageHitValidator extends ConstraintValidator
 
         if (!$value->getUrl() || !$value->getUrlTitle()) {
             $this->context
-                ->buildViolation('mautic.page.hit.validation.missing_fields')
+                ->buildViolation('page_id / redirect_id / page_url & page_title should not be empty')
                 ->addViolation();
         }
     }
