@@ -272,8 +272,12 @@ class IpLookupHelper
      * - Sec-GPC: 1 (Global Privacy Control - legally required by CCPA)
      * - DNT: 1 (Do Not Track - user preference)
      * - Known bots (existing IP/User-Agent filtering)
+     *
+     * When an explicit user action such as clicking a tracked email link is
+     * detected, callers can pass $isExplicitAction = true to allow the request
+     * through while still honoring HEAD, prefetch and bot checks.
      */
-    public function isRequestTrackable(): bool
+    public function isRequestTrackable(bool $isExplicitAction = false): bool
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -292,16 +296,18 @@ class IpLookupHelper
             return false;
         }
 
-        // Respect privacy signals - Global Privacy Control (legally required in California/CCPA)
-        $secGpc = trim((string) ($request->headers->get('Sec-GPC') ?? $request->server->get('HTTP_SEC_GPC')));
-        if ('1' === $secGpc) {
-            return false;
-        }
+        if (!$isExplicitAction) {
+            // Respect privacy signals - Global Privacy Control (legally required in California/CCPA)
+            $secGpc = trim((string) ($request->headers->get('Sec-GPC') ?? $request->server->get('HTTP_SEC_GPC')));
+            if ('1' === $secGpc) {
+                return false;
+            }
 
-        // Respect Do Not Track header
-        $dnt = trim((string) ($request->headers->get('DNT') ?? $request->server->get('HTTP_DNT')));
-        if ('1' === $dnt) {
-            return false;
+            // Respect Do Not Track header
+            $dnt = trim((string) ($request->headers->get('DNT') ?? $request->server->get('HTTP_DNT')));
+            if ('1' === $dnt) {
+                return false;
+            }
         }
 
         // Use existing IP/User-Agent based bot filtering

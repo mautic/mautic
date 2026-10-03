@@ -428,6 +428,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         bool $activeRequest = true,
         ?\DateTimeInterface $hitDateTime = null,
         bool $throwDoctrineExceptions = false,
+        bool $isExplicitAction = false,
     ): void {
         if (!$stat instanceof Stat) {
             $stat = $this->getEmailStatus($stat);
@@ -439,7 +440,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return;
         }
 
-        if (!$this->ipLookupHelper->isRequestTrackable()) {
+        if (!$this->ipLookupHelper->isRequestTrackable($isExplicitAction)) {
             return;
         }
 

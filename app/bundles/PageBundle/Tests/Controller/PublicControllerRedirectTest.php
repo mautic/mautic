@@ -6,6 +6,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
@@ -127,6 +128,92 @@ final class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $hit = $this->em->getRepository(Hit::class)->findOneBy(['url' => $url]);
         $this->assertInstanceOf(Hit::class, $hit);
+    }
+
+    #[DataProvider('privacySignalProvider')]
+    public function testRedirectWithPrivacySignalHeaderTracksEmailClick(string $header, string $value, string $emailAddress, string $emailName, string $emailSubject, string $trackingHash, string $redirectId): void
+    {
+        $url = 'https://example.com/test?registrants.source=email';
+
+        $lead = new Lead();
+        $lead->setEmail($emailAddress);
+        $this->em->persist($lead);
+
+        $email = new Email();
+        $email->setName($emailName);
+        $email->setSubject($emailSubject);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $stat = new Stat();
+        $stat->setTrackingHash($trackingHash);
+        $stat->setDateSent(new \DateTime());
+        $stat->setEmailAddress($emailAddress);
+        $stat->setEmail($email);
+        $stat->setLead($lead);
+        $this->em->persist($stat);
+        $this->em->flush();
+
+        $redirect = new Redirect();
+        $redirect->setUrl($url);
+        $redirect->setRedirectId($redirectId);
+        $this->em->persist($redirect);
+        $this->em->flush();
+
+        $ct = ClickthroughHelper::encodeArrayForUrl(
+            [
+                'source'  => ['email', $email->getId()],
+                'email'   => $email->getId(),
+                'stat'    => $stat->getTrackingHash(),
+                'lead'    => $lead->getId(),
+                'channel' => [
+                    'email' => $email->getId(),
+                ],
+            ]
+        );
+
+        $this->logoutUser();
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_GET, sprintf('/r/%s?ct=%s', $redirect->getRedirectId(), $ct), [], [], [$header => $value]);
+
+        $response = $this->client->getResponse();
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        $this->assertSame($url, $response->getTargetUrl());
+
+        $hit = $this->em->getRepository(Hit::class)->findOneBy(['url' => $url]);
+        $this->assertInstanceOf(Hit::class, $hit);
+        $this->assertSame($email->getId(), $hit->getEmail()->getId());
+
+        $this->em->refresh($stat);
+        $this->assertTrue($stat->isRead(), 'An explicit email click should mark the email stat as read.');
+    }
+
+    /**
+     * @return iterable<string, array{header: string, value: string, emailAddress: string, emailName: string, emailSubject: string, trackingHash: string, redirectId: string}>
+     */
+    public static function privacySignalProvider(): iterable
+    {
+        yield 'Sec-GPC header' => [
+            'header'        => 'HTTP_SEC_GPC',
+            'value'         => '1',
+            'emailAddress'  => 'testemail@domain.tld',
+            'emailName'     => 'Privacy test email',
+            'emailSubject'  => 'Privacy test subject',
+            'trackingHash'  => '62970e83798e0668813917',
+            'redirectId'    => '57cf5a66a9f9414f301082cf1',
+        ];
+
+        yield 'DNT header' => [
+            'header'        => 'HTTP_DNT',
+            'value'         => '1',
+            'emailAddress'  => 'testemail2@domain.tld',
+            'emailName'     => 'DNT test email',
+            'emailSubject'  => 'DNT test subject',
+            'trackingHash'  => '62970e83798e0668813918',
+            'redirectId'    => '57cf5a66a9f9414f301082cf2',
+        ];
     }
 
     private function getEncodedClickThroughValue(string $trackingHash, int $leadId): string
