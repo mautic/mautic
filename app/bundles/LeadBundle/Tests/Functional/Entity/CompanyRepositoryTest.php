@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Mailer;
 
@@ -60,13 +61,30 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
 
     public function testSearchesForUnownedCompanies(): void
     {
-        $name = 'Automation test unowned company '.random_int(1000, 9999);
-        $this->createCompany($name);
+        $unowned = $this->createCompany('Unowned company');
+        $owned   = $this->createCompany('Owned company');
+        $owner   = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $owner);
+        $owned->setOwner($owner);
+        $this->em->persist($owned);
+        $this->em->flush();
+        $this->em->refresh($owned);
+        $this->assertSame($owner, $owned->getOwner());
 
-        $this->client->request(Request::METHOD_GET, '/s/companies?search=is:unowned');
+        foreach (['', '&tmpl=list'] as $template) {
+            $this->client->request(Request::METHOD_GET, '/s/companies?search=is:unowned'.$template);
 
+            self::assertResponseIsSuccessful();
+            $content = (string) $this->client->getResponse()->getContent();
+            $this->assertStringContainsString($unowned->getName(), $content);
+            $this->assertStringNotContainsString($owned->getName(), $content);
+        }
+
+        $this->client->request(Request::METHOD_GET, '/s/companies?search=');
         self::assertResponseIsSuccessful();
-        $this->assertStringContainsString($name, (string) $this->client->getResponse()->getContent());
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($unowned->getName(), $content);
+        $this->assertStringContainsString($owned->getName(), $content);
     }
 
     private function createCompany(string $name, string $address1 = ''): Company
