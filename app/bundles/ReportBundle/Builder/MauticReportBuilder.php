@@ -4,7 +4,6 @@ namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -581,7 +580,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         return strtolower((string) preg_replace('/[`"\s]+/', '', $column));
     }
 
-    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions): void
+    private function applyFilters(array $filters, TrackingQueryBuilder $queryBuilder, array $filterDefinitions): void
     {
         $expr     = $queryBuilder->expr();
         $orGroups = [];

@@ -842,7 +842,7 @@ class EmailRepository extends CommonRepository
      * @param int $minContactId
      * @param int $maxContactId
      */
-    private function setMinMaxIds(QueryBuilder $q, string $column, $minContactId, $maxContactId): QueryBuilder
+    private function setMinMaxIds(TrackingQueryBuilder $q, string $column, $minContactId, $maxContactId): TrackingQueryBuilder
     {
         if ($minContactId && is_numeric($minContactId)) {
             $q->andWhere($column.' >= :minContactId');
