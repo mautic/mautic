@@ -70,11 +70,17 @@ trait ProjectTrait
         return $this->projects->removeElement($project);
     }
 
+    /**
+     * @return Collection<int, Project>
+     */
     public function getProjects(): Collection
     {
         return $this->projects;
     }
 
+    /**
+     * @param Collection<int, Project> $projects
+     */
     public function setProjects(Collection $projects): self
     {
         $this->projects = $projects;

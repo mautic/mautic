@@ -282,6 +282,7 @@ rules:
     - Symplify\PHPStanRules\Rules\RequireArrayShapeReturnRule
     - Utils\PHPStan\Rule\RepositoryMethodMustHaveReturnTypeRule
     - Utils\PHPStan\Rule\CollectionGetterMustReturnCollectionRule
+    - Utils\PHPStan\Rule\CollectionReturnMustHaveGenericDocblockRule
     - Utils\PHPStan\Rule\MockedMethodReturnMustMatchNativeTypeRule
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule

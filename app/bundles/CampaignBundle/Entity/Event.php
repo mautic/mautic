@@ -560,6 +560,9 @@ class Event implements ChannelInterface, UuidInterface
         $this->log->removeElement($log);
     }
 
+    /**
+     * @return Collection<int, LeadEventLog>
+     */
     public function getLog(): Collection
     {
         return $this->log;

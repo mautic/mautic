@@ -1108,6 +1108,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->assetAttachments->removeElement($asset);
     }
 
+    /**
+     * @return Collection<int, Asset>
+     */
     public function getAssetAttachments(): Collection
     {
         return $this->assetAttachments;

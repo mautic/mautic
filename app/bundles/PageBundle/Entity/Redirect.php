@@ -152,7 +152,7 @@ class Redirect extends FormEntity
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection<int, Trackable>
      */
     public function getTrackableList(): Collection
     {
