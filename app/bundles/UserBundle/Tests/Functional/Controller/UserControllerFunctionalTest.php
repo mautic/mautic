@@ -76,7 +76,8 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
     }
 
-    public function testNeverLoggedInQuickFilterShowsUsersWithoutLastLogin(): void
+    #[DataProvider('neverLoggedInSearchProvider')]
+    public function testNeverLoggedInQuickFilterShowsUsersWithoutLastLogin(string $query): void
     {
         $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $admin);
@@ -89,7 +90,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->refresh($loggedInUser);
         $this->assertInstanceOf(\DateTimeInterface::class, $loggedInUser->getLastLogin());
 
-        $crawler = $this->client->request('GET', '/s/users?search=is%3Anever_logged_in&tmpl=list');
+        $crawler = $this->client->request('GET', '/s/users?'.$query);
 
         $this->assertResponseIsSuccessful();
         $usernames = $crawler->filter('#userTable tbody tr td:nth-child(4)')->each(
@@ -98,6 +99,23 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertContains($neverLoggedInUser->getUsername(), $usernames);
         $this->assertNotContains($loggedInUser->getUsername(), $usernames);
+
+        $crawler = $this->client->request('GET', '/s/users?search=');
+        $this->assertResponseIsSuccessful();
+        $usernames = $crawler->filter('#userTable tbody tr td:nth-child(4)')->each(
+            static fn (Crawler $cell): string => $cell->text()
+        );
+        $this->assertContains($neverLoggedInUser->getUsername(), $usernames);
+        $this->assertContains($loggedInUser->getUsername(), $usernames);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function neverLoggedInSearchProvider(): iterable
+    {
+        yield 'full page' => ['search=is%3Anever_logged_in'];
+        yield 'list fragment' => ['search=is%3Anever_logged_in&tmpl=list'];
     }
 
     public function testInviteActionShowsForm(): void
