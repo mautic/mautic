@@ -200,6 +200,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testBatchRemoveContactsRemovesOnlySelectedContactsFromCompany(): void
     {
+        $this->setCsrfHeader();
         $selectedContact   = $this->createLead('Selected', 'Contact', 'selected@example.com');
         $remainingContact  = $this->createLead('Remaining', 'Contact', 'remaining@example.com');
         $unrelatedContact  = new Lead();
@@ -228,6 +229,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testBatchRemoveContactsCountsDuplicateContactOnlyOnce(): void
     {
+        $this->setCsrfHeader();
         $contact = $this->createLead('Duplicate', 'Contact', 'duplicate@example.com');
 
         $this->client->request(
@@ -247,6 +249,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
     public function testBatchRemoveContactsRejectsMoreThanOneThousandIds(): void
     {
+        $this->setCsrfHeader();
         $contact = $this->createLead('Limited', 'Contact', 'limited@example.com');
 
         $this->client->request(
@@ -260,6 +263,57 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsDeniesUsersWithoutContactEditAccess(): void
+    {
+        $contact = $this->createLead('Readonly', 'Contact', 'readonly@example.com');
+        $this->loginUser($this->createUserWithLeadPermissions(['viewown', 'viewother']));
+        $this->setCsrfHeader();
+        $this->client->request(Request::METHOD_POST, sprintf(
+            '/s/companies/batchRemoveContacts/%d?ids=%s',
+            $this->company1Id,
+            urlencode((string) json_encode([$contact->getId()]))
+        ));
+        $this->assertResponseIsSuccessful();
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsDoesNotRemoveOnGet(): void
+    {
+        $contact = $this->createLead('Retained', 'Contact', 'get@example.com');
+        $this->client->request(Request::METHOD_GET, sprintf(
+            '/s/companies/batchRemoveContacts/%d?ids=%s',
+            $this->company1Id,
+            urlencode((string) json_encode([$contact->getId()]))
+        ));
+        $this->assertResponseIsSuccessful();
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsRejectsMissingCsrfToken(): void
+    {
+        $contact = $this->createLead('Protected', 'Contact', 'csrf@example.com');
+        $this->client->request(Request::METHOD_POST, sprintf(
+            '/s/companies/batchRemoveContacts/%d?ids=%s',
+            $this->company1Id,
+            urlencode((string) json_encode([$contact->getId()]))
+        ));
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsIgnoresMalformedIds(): void
+    {
+        $this->setCsrfHeader();
+        $contact = $this->createLead('Retained', 'Contact', 'retained@example.com');
+        $this->client->request(Request::METHOD_POST, sprintf(
+            '/s/companies/batchRemoveContacts/%d?ids=%s',
+            $this->company1Id,
+            urlencode((string) json_encode([$contact->getId().'invalid', (float) $contact->getId(), [$contact->getId()], true, null], JSON_PRESERVE_ZERO_FRACTION))
+        ));
+        $this->assertResponseIsSuccessful();
         $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
     }
 
@@ -600,6 +654,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
         $roleModel = self::getContainer()->get(RoleModel::class);
         $roleModel->setRolePermissions($role, ['lead:leads' => $permissions]);
+        $roleModel->saveEntity($role);
 
         $user = new User();
         $user->setFirstName('Company')->setLastName('Editor');

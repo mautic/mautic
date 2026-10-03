@@ -278,11 +278,16 @@ final class CompanyController extends FormController
         )) {
             $this->throwAccessDenied();
         } elseif (Request::METHOD_POST === $request->getMethod()) {
+            if (!$this->isCsrfTokenValid('mautic_ajax_post', $request->headers->get('X-CSRF-Token'))) {
+                $this->throwAccessDenied();
+            }
+
             $ids = json_decode($request->query->get('ids', '[]'), true);
 
             if (is_array($ids) && count($ids) <= self::MAX_BATCH_REMOVE_CONTACTS) {
                 $companyLeadRepository = $this->companyModel->getCompanyLeadRepository();
                 $removed = 0;
+                $ids = array_filter($ids, static fn (mixed $id): bool => is_int($id) || (is_string($id) && ctype_digit($id)));
 
                 foreach (array_unique(array_map(intval(...), $ids)) as $contactId) {
                     $contactId = (int) $contactId;
