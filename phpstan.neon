@@ -259,16 +259,17 @@ rules:
     - Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
     - Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
     - Utils\PHPStan\Rule\NoRequiredMethodWithConstructorInControllerRule
-    - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
-    - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
-    - Symplify\PHPStanRules\Rules\Symfony\NoNullableServiceInConstructorRule
     - Utils\PHPStan\Rule\NoGetRepositoryWithEntityRule
     - Utils\PHPStan\Rule\NoContainerGetRule
-    - Symplify\PHPStanRules\Rules\Symfony\PreferInterfaceInConstructorRule
-    - Symplify\PHPStanRules\Rules\Complexity\NoPropertyToPropertyAssignRule
     - Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
     - Utils\PHPStan\Rule\NoPublicNonActionMethodInControllerRule
+
+    - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
+    - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
+    - Symplify\PHPStanRules\Rules\Symfony\NoNullableServiceInConstructorRule
+    - Symplify\PHPStanRules\Rules\Symfony\PreferInterfaceInConstructorRule
+    - Symplify\PHPStanRules\Rules\Complexity\NoPropertyToPropertyAssignRule
 
     - Utils\PHPStan\Rule\NoServicesInBundleConfigRule
     - Utils\PHPStan\Rule\NoServiceInMethodParameterRule
