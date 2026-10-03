@@ -40,14 +40,16 @@ final class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $corePermissions            = $this->createMock(CorePermissions::class);
         $this->themeHelper          = $this->createMock(ThemeHelperInterface::class);
         $emailConfig                = $this->createMock(EmailConfigInterface::class);
+        $entityManager              = $this->createStub(EntityManager::class);
+        $coreParametersHelper       = $this->createStub(CoreParametersHelper::class);
         $this->form                 = new EmailType(
             $translator,
-            $this->createStub(EntityManager::class),
-            $this->createStub(CoreParametersHelper::class),
+            $entityManager,
+            $coreParametersHelper,
             $this->themeHelper,
             $corePermissions,
             $emailConfig,
-            $this->createStub(EmailDefaultsHelper::class),
+            new EmailDefaultsHelper($coreParametersHelper, $entityManager),
             $this->createStub(StageRepository::class),
         );
 
