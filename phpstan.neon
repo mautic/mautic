@@ -6,7 +6,7 @@ parameters:
     tmpDir: ./var/phpstan-cache
     level: 6
 
-    reportUnmatchedIgnoredErrors: false
+    # reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
 
     # see https://github.com/tomasVotruba/type-coverage
@@ -56,7 +56,7 @@ parameters:
                 - method.unresolvableReturnType
             paths:
                 - */Tests/*
-                - */Test/*
+#                - */Test/*
 
         -
             identifier: argument.type
@@ -76,7 +76,7 @@ parameters:
         -
             identifier: mautic.noContainerGet
             paths:
-                - app/bundles/ApiBundle/Tests/Functional/OwnershipScopedSecurityMetadataTest.php
+#                - app/bundles/ApiBundle/Tests/Functional/OwnershipScopedSecurityMetadataTest.php
                 - app/bundles/CoreBundle/Tests/Functional/DependencyInjection/AbstractContainerSmokeTestCase.php
                 - app/bundles/CoreBundle/Tests/Functional/RouteMapTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
@@ -126,11 +126,6 @@ parameters:
         - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
         - '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
 
-        # on purposelater
-        #- '#Call to method PHPUnit\\Framework\\Assert::assertInstanceOf\(\) with (.*?) and (.*?) will always evaluate to#'
-
-        # can't figure out what the right type should be for FormBuilderInterface
-        - '#buildForm\(\) expects Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null>, Symfony\\Component\\Form\\FormBuilderInterface<array<mixed>\|null> given#'
         # on purpose type check
         -
             message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
@@ -305,6 +300,7 @@ rules:
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
+    - Utils\PHPStan\Rule\SingleArgumentDispatchRule
     # enable later, might not be needed
     - Symplify\PHPStanRules\Rules\NoDuplicateNonRepeatableAttributeRule
 
