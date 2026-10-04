@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Twig\Helper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationContentEvent;
-use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -60,9 +59,9 @@ final readonly class SecurityHelper
     {
         $request = $this->requestStack->getCurrentRequest();
         $content = '';
-        if ($this->dispatcher->hasListeners(UserEvents::USER_AUTHENTICATION_CONTENT)) {
+        if ($this->dispatcher->hasListeners(AuthenticationContentEvent::class)) {
             $event = new AuthenticationContentEvent($request);
-            $this->dispatcher->dispatch($event, UserEvents::USER_AUTHENTICATION_CONTENT);
+            $this->dispatcher->dispatch($event);
             $content = $event->getContent();
 
             // Remove post_logout session after content has been generated

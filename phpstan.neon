@@ -229,6 +229,44 @@ parameters:
             identifier: parameterByRef.type
             path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
 
+        # being migrated to event-class dispatch in PR #17545
+        -
+            identifier: mautic.singleArgumentDispatch
+            paths:
+                - app/bundles/LeadBundle/Command/ContactScheduledExportCommand.php
+                - app/bundles/LeadBundle/Deduplicate/ContactMerger.php
+        # @todo migrate per bundle; shared pre/post event objects and the reused LeadEvent block a plain arg drop
+        -
+            identifier: mautic.singleArgumentDispatch
+            paths:
+                - app/bundles/ApiBundle/Controller/FetchCommonApiController.php
+                - app/bundles/CampaignBundle/Executioner/Dispatcher/ConditionDispatcher.php
+                - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
+                - app/bundles/ConfigBundle/Controller/ConfigController.php
+                - app/bundles/CoreBundle/EventListener/CoreSubscriber.php
+                - app/bundles/DashboardBundle/Model/DashboardModel.php
+                - app/bundles/DynamicContentBundle/EventListener/CampaignSubscriber.php
+                - app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
+                - app/bundles/EmailBundle/MonitoredEmail/Fetcher.php
+                - app/bundles/IntegrationsBundle/Controller/ConfigController.php
+                - app/bundles/LeadBundle/Helper/ContactRequestHelper.php
+                - app/bundles/LeadBundle/Helper/LeadChangeEventDispatcher.php
+                - app/bundles/LeadBundle/Model/CompanyModel.php
+                - app/bundles/LeadBundle/Model/ListModel.php
+                - app/bundles/LeadBundle/Model/TagModel.php
+                - app/bundles/LeadBundle/Services/ContactSegmentFilterDictionary.php
+                - app/bundles/LeadBundle/Tracker/ContactTracker.php
+                - app/bundles/PageBundle/Model/PageModel.php
+                - app/bundles/PluginBundle/Integration/AbstractIntegration.php
+                - app/bundles/PointBundle/Model/PointModel.php
+                - app/bundles/PointBundle/Model/TriggerModel.php
+                - app/bundles/SmsBundle/Helper/ReplyHelper.php
+                - app/bundles/StatsBundle/Aggregate/Collector.php
+                - app/bundles/UserBundle/Security/Authenticator/PluginAuthenticator.php
+                - app/bundles/UserBundle/Security/Authenticator/SsoAuthenticator.php
+                - app/bundles/WebhookBundle/Model/WebhookModel.php
+                - plugins/MauticFocusBundle/Model/FocusModel.php
+
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
         - vendor/lightsaml2/sp-bundle/src
@@ -285,6 +323,7 @@ rules:
     - Utils\PHPStan\Rule\MockedMethodReturnMustMatchNativeTypeRule
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
+    - Utils\PHPStan\Rule\SingleArgumentDispatchRule
     # enable later, might not be needed
     - Symplify\PHPStanRules\Rules\NoDuplicateNonRepeatableAttributeRule
 
