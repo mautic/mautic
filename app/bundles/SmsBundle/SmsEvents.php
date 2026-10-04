@@ -26,16 +26,6 @@ final class SmsEvents
     public const string SMS_ON_SEND = 'mautic.sms_on_send';
 
     /**
-     * The mautic.sms.on_campaign_trigger_action event is fired when the campaign action triggers.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
-     *
-     * @depreacated
-     */
-    public const string ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.sms.on_campaign_trigger_action';
-
-    /**
      * The mautic.sms.on_campaign_trigger_batch_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
@@ -47,46 +37,6 @@ final class SmsEvents
      * The mautic.sms.on_campaign_reply event is dispatched when a SMS reply campaign decision is processed.
      *
      * The event listener receives a Mautic\SmsBundle\Event\ReplyEvent
-     *
-     * @var string
-     */
-
-    /**
-     * The mautic.sms.on_tokens_build event is dispatched when a contact generate tokens are build.
-     *
-     * The event listener receives a
-     * Mautic\SmsBundle\Event\TokensBuildEvent
-     */
-    public const string ON_SMS_TOKENS_BUILD = 'mautic.sms.on_tokens_build';
-
-    /**
-     * The mautic.sms.on_campaign_reply event is dispatched when a SMS reply campaign decision is processed.
-     *
-     * The event listener receives a Mautic\SmsBundle\Event\ReplyEvent
      */
     public const string ON_CAMPAIGN_REPLY = 'mautic.sms.on_campaign_reply';
-
-    /**
-     * The mautic.sms.dnc_filter_contacts_on_send event is dispatched when sending an SMS
-     * and filtering out contacts based on DNC records.
-     *
-     * The event listener receives a Mautic\SmsBundle\Event\DncEvent
-     */
-    public const string DNC_FILTER_CONTACTS_ON_SEND = 'mautic.sms.dnc_filter_contacts_on_send';
-
-    /**
-     * The mautic.sms.queue_filter_contacts_on_send event is dispatched when sending an SMS
-     * and filtering out contacts based on frequency rules.
-     *
-     * The event listener receives a Mautic\SmsBundle\Event\QueueEvent
-     */
-    public const string QUEUE_FILTER_CONTACTS_ON_SEND = 'mautic.sms.queue_filter_contacts_on_send';
-
-    /**
-     * The mautic.sms.filter_contacts_on_send event is dispatched when sending an SMS
-     * and filtering out contacts after DNC and Queue rules have been applied.
-     *
-     * The event listener receives a Mautic\SmsBundle\Event\FilterEvent
-     */
-    public const string FILTER_CONTACTS_ON_SEND = 'mautic.sms.filter_contacts_on_send';
 }
