@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
-use Mautic\CoreBundle\CoreEvents;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
@@ -15,11 +14,11 @@ use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
 /**
- * Dispatch CoreBundle events by the event object alone: $dispatcher->dispatch($event).
+ * Dispatch events by the event object alone: $dispatcher->dispatch($event).
  *
  * Since Symfony 4.3 the event class name is the event name, so the string event name passed as the
- * second argument is redundant. Passing it also keeps the legacy CoreEvents:: constants alive. Every
- * CoreBundle event class maps to exactly one event name, so dropping the second argument is safe.
+ * second argument is redundant and keeps the legacy *Events:: constants alive. Dropping it is safe
+ * once the event maps to a single name and its listeners key on the event class.
  *
  * @see https://symfony.com/blog/new-in-symfony-4-3-simpler-event-dispatching
  *
@@ -29,7 +28,7 @@ final class SingleArgumentDispatchRule implements Rule
 {
     private const string DISPATCH_METHOD = 'dispatch';
 
-    private const string ERROR_MESSAGE = 'Dispatch the event object alone: ->dispatch($event). The event class is the event name (Symfony 4.3+), so drop the CoreEvents::%s second argument.';
+    private const string ERROR_MESSAGE = 'Dispatch the event object alone: ->dispatch($event). The event class is the event name (Symfony 4.3+), so drop the %s second argument.';
 
     public function getNodeType(): string
     {
@@ -66,8 +65,9 @@ final class SingleArgumentDispatchRule implements Rule
         }
 
         $constantName = $secondArg->name instanceof Identifier ? $secondArg->name->toString() : '';
+        $eventNameReference = $secondArg->class->getLast().'::'.$constantName;
 
-        $ruleError = RuleErrorBuilder::message(sprintf(self::ERROR_MESSAGE, $constantName))
+        $ruleError = RuleErrorBuilder::message(sprintf(self::ERROR_MESSAGE, $eventNameReference))
             ->identifier('mautic.singleArgumentDispatch')
             ->build();
 
