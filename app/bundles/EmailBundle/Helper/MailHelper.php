@@ -370,7 +370,7 @@ class MailHelper
 
                 // Set metadata if applicable
                 foreach ($this->queuedRecipients as $email => $name) {
-                    $this->message->addMetadata($email, $this->buildMetadata($name, $tokens));
+                    $this->message->addMetadata($email, $this->buildMetadata($email, $name, $tokens));
                 }
 
                 // Replace tokens
@@ -479,7 +479,7 @@ class MailHelper
                     ];
                 }
 
-                $this->metadata[$metadataKey]['contacts'][$email] = $this->buildMetadata($name, $tokens);
+                $this->metadata[$metadataKey]['contacts'][$email] = $this->buildMetadata($email, $name, $tokens);
             }
 
             // Reset recipients
@@ -569,7 +569,7 @@ class MailHelper
                     if (!empty($contact['leadId'])) {
                         $this->queueAssetDownloadEntry($email, $contact);
                     }
-                    $this->message->addTo(new Address($email, $contact['name'] ?? ''));
+                    $this->message->addTo($this->limitAddressLength(new Address($email, $contact['name'] ?? '')));
                 }
 
                 $flushed = $this->send(false, true);
@@ -926,16 +926,7 @@ class MailHelper
         $this->checkBatchMaxRecipients();
 
         try {
-            $fullAddress          = (new AddressDTO($address, $name))->toMailerAddress();
-            $encodedAddressLength = strlen((new MailboxListHeader('To', [$fullAddress]))->getBodyAsString());
-
-            if ($encodedAddressLength > $this->addressLengthLimit) {
-                // When encoded address with name length doesn't meet the limit, use only the email
-                $shortAddress = (new AddressDTO($address))->toMailerAddress();
-                $this->message->addTo($shortAddress);
-            } else {
-                $this->message->addTo($fullAddress);
-            }
+            $this->message->addTo($this->limitAddressLength((new AddressDTO($address, $name))->toMailerAddress()));
             $this->queuedRecipients[$address] = $name;
 
             return true;
@@ -944,6 +935,24 @@ class MailHelper
 
             return false;
         }
+    }
+
+    /**
+     * Drops the display name when the encoded address exceeds the configured limit.
+     *
+     * Applied to the metadata as well as the To header: on a tokenized transport
+     * flushQueue() rebuilds the recipients from the metadata, and a batch transport such
+     * as SES builds its own recipient from that metadata rather than from the header.
+     */
+    private function limitAddressLength(Address $address): Address
+    {
+        $encodedAddressLength = strlen((new MailboxListHeader('To', [$address]))->getBodyAsString());
+
+        if ($encodedAddressLength > $this->addressLengthLimit) {
+            return new Address($address->getAddress());
+        }
+
+        return $address;
     }
 
     /**
@@ -1909,10 +1918,14 @@ class MailHelper
         }
     }
 
-    private function buildMetadata(?string $name, array $tokens): array
+    /**
+     * The name is limited here because the SES transport plugin builds its recipient from
+     * this field, not from the To header.
+     */
+    private function buildMetadata(string $email, ?string $name, array $tokens): array
     {
         return [
-            'name'        => $name,
+            'name'        => $this->limitAddressLength(new Address($email, $name ?? ''))->getName() ?: null,
             'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
             'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
             'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
