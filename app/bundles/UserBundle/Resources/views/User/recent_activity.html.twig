@@ -136,26 +136,26 @@
 							</div>
 							<div class="media-body">
 								{% if log.object == 'user' %}
-							{% if log.action == 'update' and userPath|default([])|length > 1 %}
+									{% if log.action == 'update' %}
 										{{ 'mautic.user.user.form.user'|trans }}
 										<a href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: userPath[0]}) }}" data-toggle="ajax">
 											{{ userPath[1] }}</a>
 										{{ 'mautic.user.role.form.updated_by'|trans }}
 
-							{% elseif log.action == 'create' and userPath|default([])|length > 1 %}
+									{% elseif log.action == 'create' %}
 										<a href="{{ path('mautic_user_action', {objectAction: 'edit', objectId: userPath[0]}) }}" data-toggle="ajax">
 											{{ userPath[1] }}</a>
 										{{ 'mautic.user.user.form.created_by'|trans }}
 									{% endif %}
 
 								{% elseif log.object == 'role' %}
-							{% if log.action == 'create' and rolePath|default([])|length > 1 %}
+									{% if log.action == 'create' %}
 										{{ 'mautic.role.role'|trans }}
 										<a href="{{ path('mautic_role_action', {objectAction: 'edit', objectId: rolePath[0]}) }}" data-toggle="ajax">
 											{{ rolePath[1] }}</a>
 										{{ 'mautic.user.user.form.created_by'|trans }}
 
-							{% elseif log.action == 'update' and rolePath|default([])|length > 1 %}
+									{% elseif log.action == 'update' %}
 										{{ 'mautic.role.role'|trans }}
 										<a href="{{ path('mautic_role_action', {objectAction: 'edit', objectId: rolePath[0]}) }}" data-toggle="ajax">
 											{{ rolePath[1] }}</a>
