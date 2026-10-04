@@ -7,7 +7,6 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
-use Mautic\SmsBundle\SmsEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -83,7 +82,7 @@ final readonly class ReplyHelper
     {
         $replyEvent = new ReplyEvent($contact, trim($message));
 
-        $this->eventDispatcher->dispatch($replyEvent, SmsEvents::ON_REPLY);
+        $this->eventDispatcher->dispatch($replyEvent);
 
         return $replyEvent->getResponse();
     }

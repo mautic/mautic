@@ -26,38 +26,6 @@ final class SmsEvents
     public const string SMS_ON_SEND = 'mautic.sms_on_send';
 
     /**
-     * The mautic.sms_pre_save event is thrown right before a sms is persisted.
-     *
-     * The event listener receives a
-     * Mautic\SmsBundle\Event\SmsEvent instance.
-     */
-    public const string SMS_PRE_SAVE = 'mautic.sms_pre_save';
-
-    /**
-     * The mautic.sms_post_save event is thrown right after a sms is persisted.
-     *
-     * The event listener receives a
-     * Mautic\SmsBundle\Event\SmsEvent instance.
-     */
-    public const string SMS_POST_SAVE = 'mautic.sms_post_save';
-
-    /**
-     * The mautic.sms_pre_delete event is thrown prior to when a sms is deleted.
-     *
-     * The event listener receives a
-     * Mautic\SmsBundle\Event\SmsEvent instance.
-     */
-    public const string SMS_PRE_DELETE = 'mautic.sms_pre_delete';
-
-    /**
-     * The mautic.sms_post_delete event is thrown after a sms is deleted.
-     *
-     * The event listener receives a
-     * Mautic\SmsBundle\Event\SmsEvent instance.
-     */
-    public const string SMS_POST_DELETE = 'mautic.sms_post_delete';
-
-    /**
      * The mautic.sms.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
@@ -74,13 +42,6 @@ final class SmsEvents
      * Mautic\CampaignBundle\Event\CampaignExecutionEvent
      */
     public const string ON_CAMPAIGN_TRIGGER_BATCH_ACTION = 'mautic.sms.on_campaign_trigger_batch_action';
-
-    /**
-     * The mautic.sms.on_reply event is dispatched when a SMS service receives a reply.
-     *
-     * The event listener receives a Mautic\SmsBundle\Event\ReplyEvent
-     */
-    public const string ON_REPLY = 'mautic.sms.on_reply';
 
     /**
      * The mautic.sms.on_campaign_reply event is dispatched when a SMS reply campaign decision is processed.

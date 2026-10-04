@@ -27,7 +27,7 @@ final readonly class CampaignReplySubscriber implements EventSubscriberInterface
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             SmsEvents::ON_CAMPAIGN_REPLY      => ['onCampaignReply', 0],
-            SmsEvents::ON_REPLY               => ['onReply', 0],
+            ReplyEvent::class                 => ['onReply', 0],
         ];
     }
 
