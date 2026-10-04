@@ -49,6 +49,14 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
             "{% block content %}<pre>{{ ['id']|reduce('system') }}</pre>{% endblock %}",
         ];
 
+        yield 'RCE via sort with system callback' => [
+            "{% block content %}<pre>{{ ['id', 0]|sort('system')|join }}</pre>{% endblock %}",
+        ];
+
+        yield 'RCE via find with system callback' => [
+            "{% block content %}<pre>{{ ['id', 0]|find('system') }}</pre>{% endblock %}",
+        ];
+
         yield 'credential leak via configGetParameter db_password' => [
             "{% block content %}<pre>{{ configGetParameter('db_password') }}</pre>{% endblock %}",
         ];
