@@ -5,8 +5,8 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -27,7 +27,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     {
         return [
             LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
         ];
     }
 

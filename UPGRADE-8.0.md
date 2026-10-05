@@ -16,6 +16,66 @@
     | `SMS_POST_DELETE` | `SmsPostDeleteEvent` |
     | `ON_REPLY` | `ReplyEvent` |
 - Unused constants `ON_CAMPAIGN_TRIGGER_ACTION`, `ON_SMS_TOKENS_BUILD`, `DNC_FILTER_CONTACTS_ON_SEND`, `QUEUE_FILTER_CONTACTS_ON_SEND` and `FILTER_CONTACTS_ON_SEND` removed from `Mautic\SmsBundle\SmsEvents`; they had no dispatcher or listener.
+- Constants removed from `Mautic\LeadBundle\LeadEvents`, these events are now dispatched by their own event class (all under `Mautic\LeadBundle\Event`). Subscribe to the event class instead of the constant, e.g. `LeadPostMergeEvent::class => 'onLeadMerge'`. Lifecycle events that used to share one event object now get a dedicated subclass of the former shared class (`CompanyEvent`, `TagEvent`, `LeadNoteEvent`, `LeadDeviceEvent`, `ImportEvent`, `LeadFieldEvent`, `LeadListEvent`, `LeadMergeEvent`, `CompanyMergeEvent`, `TagMergeEvent`, `SaveBatchLeadsEvent` and `ContactExportSchedulerEvent` are now `abstract`, instantiate one of the subclasses instead; `LeadEvent` and `ListChangeEvent` are no longer `final`), so listener type hints keep working; pre and post events are now separate objects.
+
+    | Removed `LeadEvents` constant | New event class |
+    |---|---|
+    | `LEAD_PRE_SAVE` | `LeadPreSaveEvent` |
+    | `LEAD_PRE_DELETE` | `LeadPreDeleteEvent` |
+    | `LEAD_PRE_MERGE` | `LeadPreMergeEvent` |
+    | `LEAD_POST_MERGE` | `LeadPostMergeEvent` |
+    | `LEAD_IDENTIFIED` | `LeadIdentifiedEvent` |
+    | `LEAD_LIST_BATCH_CHANGE` | `ListBatchChangeEvent` |
+    | `LEAD_PRE_BATCH_SAVE` | `LeadPreBatchSaveEvent` |
+    | `LEAD_POST_BATCH_SAVE` | `LeadPostBatchSaveEvent` |
+    | `CURRENT_LEAD_CHANGED` | `LeadChangeEvent` |
+    | `LIST_PRE_SAVE` | `ListPreSaveEvent` |
+    | `LIST_POST_SAVE` | `ListPostSaveEvent` |
+    | `LIST_PRE_UNPUBLISH` | `ListPreUnpublishEvent` |
+    | `LIST_PRE_DELETE` | `ListPreDeleteEvent` |
+    | `ON_LIST_DELETE` | `ListDeleteEvent` |
+    | `LIST_POST_DELETE` | `ListPostDeleteEvent` |
+    | `FIELD_PRE_SAVE` | `FieldPreSaveEvent` |
+    | `FIELD_POST_SAVE` | `FieldPostSaveEvent` |
+    | `FIELD_PRE_DELETE` | `FieldPreDeleteEvent` |
+    | `FIELD_POST_DELETE` | `FieldPostDeleteEvent` |
+    | `NOTE_PRE_SAVE` | `NotePreSaveEvent` |
+    | `NOTE_POST_SAVE` | `NotePostSaveEvent` |
+    | `NOTE_PRE_DELETE` | `NotePreDeleteEvent` |
+    | `NOTE_POST_DELETE` | `NotePostDeleteEvent` |
+    | `IMPORT_PRE_SAVE` | `ImportPreSaveEvent` |
+    | `IMPORT_POST_SAVE` | `ImportPostSaveEvent` |
+    | `IMPORT_PRE_DELETE` | `ImportPreDeleteEvent` |
+    | `IMPORT_POST_DELETE` | `ImportPostDeleteEvent` |
+    | `IMPORT_BATCH_PROCESSED` | `ImportBatchProcessedEvent` |
+    | `DEVICE_PRE_SAVE` | `DevicePreSaveEvent` |
+    | `DEVICE_POST_SAVE` | `DevicePostSaveEvent` |
+    | `DEVICE_PRE_DELETE` | `DevicePreDeleteEvent` |
+    | `DEVICE_POST_DELETE` | `DevicePostDeleteEvent` |
+    | `TAG_PRE_SAVE` | `TagPreSaveEvent` |
+    | `TAG_POST_SAVE` | `TagPostSaveEvent` |
+    | `TAG_PRE_DELETE` | `TagPreDeleteEvent` |
+    | `TAG_POST_DELETE` | `TagPostDeleteEvent` |
+    | `TAG_PRE_MERGE` | `TagPreMergeEvent` |
+    | `TAG_POST_MERGE` | `TagPostMergeEvent` |
+    | `COMPANY_PRE_SAVE` | `CompanyPreSaveEvent` |
+    | `COMPANY_PRE_DELETE` | `CompanyPreDeleteEvent` |
+    | `COMPANY_SOFT_DELETE` | `CompanySoftDeleteEvent` |
+    | `COMPANY_PRE_MERGE` | `CompanyPreMergeEvent` |
+    | `COMPANY_POST_MERGE` | `CompanyPostMergeEvent` |
+    | `LIST_FILTERS_CHOICES_ON_GENERATE` | `LeadListFiltersChoicesEvent` |
+    | `SEGMENT_DICTIONARY_ON_GENERATE` | `SegmentDictionaryGenerationEvent` |
+    | `LIST_FILTERS_ON_FILTERING` | `LeadListFilteringEvent` |
+    | `LIST_PRE_PROCESS_LIST` | `ListPreProcessListEvent` |
+    | `ON_CLICKTHROUGH_IDENTIFICATION` | `ContactIdentificationEvent` |
+    | `POST_CONTACT_EXPORT` | `ContactExportEvent` |
+    | `POST_CONTACT_EXPORT_SCHEDULED` | `ContactExportScheduledEvent` |
+    | `CONTACT_EXPORT_PREPARE_FILE` | `ContactExportPrepareFileEvent` |
+    | `CONTACT_EXPORT_SEND_EMAIL` | `ContactExportSendEmailEvent` |
+    | `POST_CONTACT_EXPORT_SEND_EMAIL` | `ContactExportEmailSentEvent` |
+
+- Events behind `LeadEvents::LEAD_POST_SAVE`, `LEAD_POST_DELETE`, `LEAD_POINTS_CHANGE`, `LEAD_COMPANY_CHANGE`, `LEAD_LIST_CHANGE`, `COMPANY_POST_SAVE` and `COMPANY_POST_DELETE` are now dispatched as `LeadPostSaveEvent`, `LeadPostDeleteEvent`, `PointsChangeEvent`, `LeadChangeCompanyEvent`, `ListChangeEvent`, `CompanyPostSaveEvent`, `CompanyPostDeleteEvent`. The constants stay, as they are still used as webhook event type identifiers, but listeners must key on the event class.
+- `Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher::dispatchEvent()` now takes the `LeadFieldEvent` to dispatch instead of an event name, entity and `isNew` flag.
 - Class `MauticPlugin\MauticSocialBundle\Event\SocialEvent` removed as unused, the monitor lifecycle events now extend `MauticPlugin\MauticSocialBundle\Event\AbstractMonitorEvent`.
 - Constants `MONITOR_PRE_SAVE`, `MONITOR_POST_SAVE`, `MONITOR_PRE_DELETE`, `MONITOR_POST_DELETE`, `MONITOR_POST_PROCESS`, `TWEET_PRE_SAVE`, `TWEET_POST_SAVE`, `TWEET_PRE_DELETE` and `TWEET_POST_DELETE` removed from `MauticPlugin\MauticSocialBundle\SocialEvents`. These events are now dispatched as dedicated event classes: `MonitorPreSaveEvent`, `MonitorPostSaveEvent`, `MonitorPreDeleteEvent`, `MonitorPostDeleteEvent`, `SocialMonitorEvent` (already dispatched by class), `TweetPreSaveEvent`, `TweetPostSaveEvent`, `TweetPreDeleteEvent` and `TweetPostDeleteEvent` (all under `MauticPlugin\MauticSocialBundle\Event`; monitor events extend `AbstractMonitorEvent`, tweet events extend `AbstractTweetEvent`). Subscribe to the event class instead of the constant, e.g. `TweetPostSaveEvent::class => 'onTweetPostSave'`.
 - Constants `USER_PRE_SAVE`, `USER_POST_SAVE`, `USER_PRE_DELETE`, `USER_POST_DELETE`, `ROLE_PRE_SAVE`, `ROLE_POST_SAVE`, `ROLE_PRE_DELETE` and `ROLE_POST_DELETE` removed from `Mautic\UserBundle\UserEvents`. These lifecycle events are now dispatched as dedicated event classes: `PreSaveUserEvent`, `PostSaveUserEvent`, `PreDeleteUserEvent`, `PostDeleteUserEvent`, `PreSaveRoleEvent`, `PostSaveRoleEvent`, `PreDeleteRoleEvent` and `PostDeleteRoleEvent` (all under `Mautic\UserBundle\Event`, extending `UserEvent` / `RoleEvent`, which are now `abstract`). Subscribe to the event class instead of the constant, e.g. `PostSaveUserEvent::class => 'onUserPostSave'`.

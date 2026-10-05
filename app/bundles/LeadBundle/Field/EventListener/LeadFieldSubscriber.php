@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\EventListener;
 
+use Mautic\LeadBundle\Event\FieldPreDeleteEvent;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -23,7 +23,7 @@ final readonly class LeadFieldSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::FIELD_PRE_DELETE    => ['onFieldPreDelete', 0],
+            FieldPreDeleteEvent::class    => ['onFieldPreDelete', 0],
         ];
     }
 

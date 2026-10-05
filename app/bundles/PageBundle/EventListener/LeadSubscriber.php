@@ -6,8 +6,8 @@ use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\VideoHitRepository;
@@ -41,8 +41,8 @@ final class LeadSubscriber implements EventSubscriberInterface
                 ['onTimelineGenerate', 0],
                 ['onTimelineGenerateVideo', 0],
             ],
-            LeadEvents::CURRENT_LEAD_CHANGED => ['onLeadChange', 0],
-            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
+            LeadChangeEvent::class => ['onLeadChange', 0],
+            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
         ];
     }
 

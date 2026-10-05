@@ -12,7 +12,7 @@ use Mautic\CampaignBundle\EventListener\LeadSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 
 final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
@@ -71,7 +71,7 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $this->assertCount(2, $leadModel->getCampaignLeads($campaign));
 
-        $leadMergeEvent = new LeadMergeEvent($victor, $loser);
+        $leadMergeEvent = new LeadPostMergeEvent($victor, $loser);
         /** @var LeadSubscriber $subscriber */
         $subscriber = self::getContainer()->get(LeadSubscriber::class);
 

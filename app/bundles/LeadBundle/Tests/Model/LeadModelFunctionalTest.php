@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -31,7 +31,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-        $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, $this->addPointsListener(...));
+        $eventDispatcher->addListener(LeadPostSaveEvent::class, $this->addPointsListener(...));
 
         /** @var LeadModel $model */
         $model = self::getContainer()->get(LeadModel::class);

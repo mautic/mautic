@@ -20,11 +20,19 @@ use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Event as Events;
+use Mautic\LeadBundle\Event\FieldPostDeleteEvent;
+use Mautic\LeadBundle\Event\FieldPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
+use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
+use Mautic\LeadBundle\Event\LeadPreMergeEvent;
+use Mautic\LeadBundle\Event\NotePostDeleteEvent;
+use Mautic\LeadBundle\Event\NotePostSaveEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -74,17 +82,17 @@ final class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LEAD_POST_SAVE       => ['onLeadPostSave', 0],
-            LeadEvents::LEAD_PRE_DELETE      => ['onLeadPreDelete', 0],
-            LeadEvents::LEAD_POST_DELETE     => ['onLeadDelete', 0],
-            LeadEvents::LEAD_PRE_MERGE       => ['preLeadMerge', 0],
-            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
-            LeadEvents::FIELD_POST_SAVE      => ['onFieldPostSave', 0],
-            LeadEvents::FIELD_POST_DELETE    => ['onFieldDelete', 0],
-            LeadEvents::NOTE_POST_SAVE       => ['onNotePostSave', 0],
-            LeadEvents::NOTE_POST_DELETE     => ['onNoteDelete', 0],
+            LeadPostSaveEvent::class       => ['onLeadPostSave', 0],
+            LeadPreDeleteEvent::class      => ['onLeadPreDelete', 0],
+            LeadPostDeleteEvent::class     => ['onLeadDelete', 0],
+            LeadPreMergeEvent::class       => ['preLeadMerge', 0],
+            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
+            FieldPostSaveEvent::class      => ['onFieldPostSave', 0],
+            FieldPostDeleteEvent::class    => ['onFieldDelete', 0],
+            NotePostSaveEvent::class       => ['onNotePostSave', 0],
+            NotePostDeleteEvent::class     => ['onNoteDelete', 0],
             Events\LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadEvents::LEAD_COMPANY_CHANGE  => ['onLeadCompanyChange', 0],
+            LeadChangeCompanyEvent::class  => ['onLeadCompanyChange', 0],
         ];
     }
 

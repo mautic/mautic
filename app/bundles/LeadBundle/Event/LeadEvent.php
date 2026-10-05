@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-final class LeadEvent extends CommonEvent
+class LeadEvent extends CommonEvent
 {
     private bool $alreadyProcessedInBatch = false;
 
