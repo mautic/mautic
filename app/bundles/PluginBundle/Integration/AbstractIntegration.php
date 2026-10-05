@@ -360,7 +360,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * @param bool|false $return Returns the key array rather than setting them
      *
-     * @return void|array
+     * @return null|mixed[]
      */
     public function mergeApiKeys(array $mergeKeys, $withKeys = [], $return = false)
     {
@@ -390,6 +390,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         // reset for events that depend on rebuilding auth objects
         $this->setIntegrationSettings($this->settings);
+        return null;
     }
 
     /**
@@ -447,10 +448,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $decryptedKeys[$serialized];
     }
 
-    /**
-     * @return array
-     */
-    public function encryptApiKeys(array $keys)
+    public function encryptApiKeys(array $keys): array
     {
         $encrypted = [];
 
@@ -462,10 +460,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $encrypted;
     }
 
-    /**
-     * @return array
-     */
-    public function decryptApiKeys(array $keys, bool $mainDecryptOnly = false)
+    public function decryptApiKeys(array $keys, bool $mainDecryptOnly = false): array
     {
         $decrypted = [];
 
@@ -515,7 +510,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array<int, string>
      */
-    public function getSecretKeys()
+    public function getSecretKeys(): array
     {
         return [$this->getClientSecretKey()];
     }
@@ -539,17 +534,15 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return string[]
      */
-    public function getRefreshTokenKeys()
+    public function getRefreshTokenKeys(): array
     {
         return [];
     }
 
     /**
      * Get a list of keys required to make an API call.  Examples are key, clientId, clientSecret.
-     *
-     * @return array
      */
-    public function getRequiredKeyFields()
+    public function getRequiredKeyFields(): array
     {
         return match ($this->getAuthenticationType()) {
             'oauth1a' => [
@@ -876,7 +869,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array<int, mixed>
      */
-    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType)
+    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType): array
     {
         $clientIdKey     = $this->getClientIdKey();
         $clientSecretKey = $this->getClientSecretKey();
@@ -1092,7 +1085,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     // Try refresh token
                     $refreshTokenKeys = $this->getRefreshTokenKeys();
 
-                    if (!empty($refreshTokenKeys)) {
+                    if ($refreshTokenKeys !== []) {
                         [$refreshTokenKey, $expiryKey] = $refreshTokenKeys;
 
                         $settings['refresh_token'] = $refreshTokenKey;
@@ -1187,13 +1180,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function isConfigured(): bool
     {
         $requiredTokens = $this->getRequiredKeyFields();
-        foreach ($requiredTokens as $token => $label) {
-            if (empty($this->keys[$token])) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($requiredTokens, fn($label, $token): bool => !empty($this->keys[$token]));
     }
 
     /**
@@ -1214,7 +1201,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 $refreshTokenKeys = $this->getRefreshTokenKeys();
                 if (!isset($this->keys[$authTokenKey])) {
                     $valid = false;
-                } elseif (!empty($refreshTokenKeys)) {
+                } elseif ($refreshTokenKeys !== []) {
                     [$refreshTokenKey, $expiryKey] = $refreshTokenKeys;
                     if (!empty($this->keys[$refreshTokenKey]) && !empty($expiryKey) && isset($this->keys[$expiryKey])
                         && time() > $this->keys[$expiryKey]
@@ -1375,10 +1362,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * @param array<string, mixed> $mauticLeadFields
-     *
-     * @return array
      */
-    public function cleanUpFields(Integration $entity, array $mauticLeadFields, array $mauticCompanyFields)
+    public function cleanUpFields(Integration $entity, array $mauticLeadFields, array $mauticCompanyFields): array
     {
         $featureSettings        = $entity->getFeatureSettings();
         $submittedFields        = $featureSettings['leadFields'] ?? [];
@@ -1473,10 +1458,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * @param string $fieldType
-     *
-     * @return array
      */
-    public function getRequiredFields(array $fields, $fieldType = '')
+    public function getRequiredFields(array $fields, $fieldType = ''): array
     {
         // use $fieldType to determine if email should be required. we use email as unique identifier for contacts only,
         // if any other fieldType use integrations own field types
@@ -1510,7 +1493,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return mixed[]
      */
-    public function populateLeadData($lead, $config = [])
+    public function populateLeadData($lead, $config = []): array
     {
         if (!isset($config['leadFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -1581,10 +1564,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Match Company data with integration fields.
-     *
-     * @return array
      */
-    public function populateCompanyData($entity, $config = [])
+    public function populateCompanyData($entity, $config = []): array
     {
         if (!isset($config['companyFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -1628,10 +1609,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param array       $config
      * @param string|null $object
-     *
-     * @return array
      */
-    public function populateMauticLeadData($data, $config = [], $object = null)
+    public function populateMauticLeadData($data, $config = [], $object = null): array
     {
         // Glean supported fields from what was returned by the integration
         $gleanedData = $data;
@@ -1696,7 +1675,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data);
 
-        if (empty($matchedFields)) {
+        if ($matchedFields === []) {
             return;
         }
 
@@ -1825,10 +1804,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Convert and assign the data to assignable fields.
      *
      * @param mixed $data
-     *
-     * @return array
      */
-    protected function matchUpData($data)
+    protected function matchUpData($data): array
     {
         $info      = [];
         $available = $this->getAvailableLeadFields();
@@ -2013,7 +1990,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array<mixed>
      */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('leadfield_match' == $section) {
             return ['mautic.integration.form.field_match_notes', 'info'];
@@ -2077,10 +2054,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getFormDisplaySettings()
+    public function getFormDisplaySettings(): array
     {
         /** @var PluginIntegrationFormDisplayEvent $event */
         $event = $this->dispatcher->dispatch(
@@ -2097,7 +2071,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return mixed[]
      */
-    public function getFormLeadFields(array $settings = [])
+    public function getFormLeadFields(array $settings = []): array
     {
         if (isset($settings['feature_settings']['objects']['company'])) {
             unset($settings['feature_settings']['objects']['company']);
@@ -2110,10 +2084,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Get available company fields for choices in the config UI.
      *
      * @param array<string, mixed> $settings
-     *
-     * @return array
      */
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         $settings['feature_settings']['objects']['company'] = 'company';
 
@@ -2145,7 +2117,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * @return array<string, mixed>
      */
-    protected function dispatchIntegrationKeyEvent(?string $eventName, array $keys = [])
+    protected function dispatchIntegrationKeyEvent(?string $eventName, array $keys = []): array
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(
@@ -2340,10 +2312,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * (usually used in campaign actions).
      *
      * @param array<string, mixed> $fields
-     *
-     * @return array
      */
-    public function formatMatchedFields(array $fields)
+    public function formatMatchedFields(array $fields): array
     {
         $formattedFields = [];
 

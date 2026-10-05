@@ -179,7 +179,7 @@ final class IcontactIntegration extends EmailAbstractIntegration
 
         $mappedData = $this->populateLeadData($lead, $config);
 
-        if (empty($mappedData)) {
+        if ($mappedData === []) {
             return false;
         }
         if (empty($mappedData['email'])) {
