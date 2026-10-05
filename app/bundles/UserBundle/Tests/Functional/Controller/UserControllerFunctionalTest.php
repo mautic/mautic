@@ -14,10 +14,10 @@ use Symfony\Component\DomCrawler\Crawler;
 
 final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateEntityTrait;
     private const ADMIN_USER = 'admin';
 
     public const USER_EDIT_PATH = '/s/users/edit/';
-    use CreateEntityTrait;
 
     protected function setUp(): void
     {
