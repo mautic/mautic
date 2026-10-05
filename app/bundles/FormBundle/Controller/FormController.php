@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController as CommonFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
