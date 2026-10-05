@@ -826,3 +826,56 @@
     | `SmsBundle\Entity\Stat` | `getTokens()`, `getDetails()` |
     | `PointBundle\Entity\Point`, `PointBundle\Entity\TriggerEvent` | `getProperties()` |
     | `PointBundle\Entity\PointInsight` | `getPointGroups()` |
+
+- Public methods in the Lead, Notification, Sms and Stage bundles now carry native parameter types instead of docblock-only types. Callers that pass a value of another type, e.g. a string to an `int` parameter or `null` to a non-nullable one, now hit a `TypeError`. If you extend one of the non-final classes below and override one of these methods, the override must stay compatible with the parent - either drop the parameter type or use the parent's type (or a wider one).
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `LeadBundle\Controller\CompanyController`, `FieldController`, `LeadController` | `editAction()` (`$objectId`) | `int` |
+    | `LeadBundle\Entity\CompanyRepository` | `getMostCompanies()` | `Mautic\CoreBundle\Doctrine\Query\QueryBuilder`, `int`, `int` |
+    | `LeadBundle\Entity\FrequencyRuleRepository` | `getPreferredChannel()` | `int` |
+    | `LeadBundle\Entity\ImportRepository` | `getQueryForStatuses()` | `array` |
+    | `LeadBundle\Entity\LeadDeviceRepository` | `getByTrackingId()` | `string` |
+    | `LeadBundle\Entity\LeadDeviceRepository`, `LeadEventLogRepository`, `LeadNoteRepository`, `ListLeadRepository`, `PointsChangeLogRepository` | `updateLead()` | `int`, `int` |
+    | `LeadBundle\Entity\LeadFieldRepository` | `getFieldAliases()`, `getFieldsByType()` | `string` |
+    | `LeadBundle\Entity\LeadFieldRepository` | `getPropertyByField()` | `string`, `Mautic\CoreBundle\Doctrine\Query\QueryBuilder` |
+    | `LeadBundle\Entity\LeadFieldRepository` | `compareDateValue()` (second parameter) | `string` |
+    | `LeadBundle\Entity\MergeRecordRepository` | `moveMergeRecord()` | `int`, `int` |
+    | `LeadBundle\Entity\StagesChangeLogRepository` | `getCurrentLeadStage()` | `int` |
+    | `LeadBundle\Event\ContactIdentificationEvent` | `setIdentifiedContact()` (second parameter) | `string` |
+    | `LeadBundle\Event\LeadListFiltersOperatorsEvent` | `addOperator()` | `string`, `array` |
+    | `LeadBundle\Event\ListPreProcessListEvent` | `setResult()` | `bool` |
+    | `LeadBundle\Model\FieldModel` | `getLookupResults()` | `string`, `string` |
+    | `LeadBundle\Model\ImportModel` | `beginImport()` (third parameter) | `int` |
+    | `LeadBundle\Model\ImportModel` | `getFailedRows()` | `?int`, `string` |
+    | `LeadBundle\Model\LeadModel` | `organizeFieldsByGroup()` | `iterable` |
+    | `LeadBundle\Model\LeadModel` | `getEngagementCount()` (fourth parameter) | `string` |
+    | `LeadBundle\Report\FieldsBuilder` | `getLeadFilter()` | `string`, `string` |
+    | `LeadBundle\Segment\ContactSegmentService` | `getOrphanedLeadListLeads()` (third parameter) | `?int` |
+    | `LeadBundle\Segment\Decorator\Date\TimezoneResolver` | `getDefaultDate()` | `bool` |
+    | `LeadBundle\Segment\Query\Expression\ExpressionBuilder` | `notExists()` | `string` |
+    | `LeadBundle\Segment\Query\QueryBuilder` | `replaceJoinCondition()` | `string`, `string` |
+    | `LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery` | `getDataFromLeadEventLog()` | `string` |
+    | `LeadBundle\Tracker\ContactTracker` | `setUseSystemContact()` | `bool` (no longer nullable) |
+    | `LeadBundle\Twig\Helper\AvatarHelper` | `createAvatarFromFile()` (second parameter) | `string` |
+    | `NotificationBundle\Entity\Notification` | `setName()`, `setButton()`, `setMessage()` | `?string` |
+    | `NotificationBundle\Entity\Notification` | `setUtmTags()` | `array` |
+    | `NotificationBundle\Entity\Notification` | `setNotificationType()` | `string` |
+    | `NotificationBundle\Entity\Notification`, `PushID` | `setMobile()` | `bool` |
+    | `NotificationBundle\Entity\PushID` | `setEnabled()` | `bool` |
+    | `NotificationBundle\Entity\Stat`, `SmsBundle\Entity\Stat` | `setDateSent()` | `\DateTimeInterface` |
+    | `NotificationBundle\Entity\StatRepository` | `getNotificationStatus()` | `string` |
+    | `SmsBundle\Entity\Sms` | `setName()` | `?string` |
+    | `SmsBundle\Entity\Sms` | `setSmsType()` | `string` |
+    | `SmsBundle\Entity\Stat` | `setTrackingHash()` | `string` |
+    | `SmsBundle\Entity\Stat` | `setIsFailed()` | `bool` |
+    | `SmsBundle\Entity\StatRepository` | `getSmsStatus()` | `string` |
+    | `SmsBundle\Sms\TransportChain` | `sendSms()` (second parameter) | `string` |
+    | `StageBundle\Entity\LeadStageLog` | `setDateFired()` | `\DateTimeInterface` |
+    | `StageBundle\Entity\LeadStageLog` | `setIpAddress()` | `IpAddress` |
+    | `StageBundle\Entity\LeadStageLog` | `setLead()` | `Lead` |
+    | `StageBundle\Entity\LeadStageLog` | `setStage()` | `Stage` |
+    | `StageBundle\Entity\Stage` | `setDescription()` | `?string` |
+    | `StageBundle\Entity\Stage` | `setCategory()` | `?Category` |
+
+    `ContactIdentificationEvent::getIdentifier()` now returns `?string` and `ListPreProcessListEvent::getResult()` returns `?bool`.

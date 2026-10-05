@@ -3,7 +3,7 @@
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
@@ -16,7 +16,7 @@ final class StatRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getNotificationStatus($trackingHash): ?Stat
+    public function getNotificationStatus(string $trackingHash): ?Stat
     {
         $q = $this->createQueryBuilder('s');
         $q->select('s')

@@ -93,7 +93,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             ) {
             }
 
-            public function getModel(?string $name): object
+            public function getModel(string $name): object
             {
                 return $this->model;
             }

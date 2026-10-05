@@ -27,12 +27,12 @@ final class MergeRecordRepository extends CommonRepository
     /**
      * Keep track of subseqent merges by cascading records to the latest lead that was merged into.
      */
-    public function moveMergeRecord($fromId, $toId): void
+    public function moveMergeRecord(int $fromId, int $toId): void
     {
         $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'contact_merge_records')
-            ->set('contact_id', (int) $toId)
-            ->where('contact_id = '.(int) $fromId)
+            ->set('contact_id', $toId)
+            ->where('contact_id = '.$fromId)
             ->executeQuery();
     }
 }
