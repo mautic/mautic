@@ -6,6 +6,11 @@ Mautic.userOnLoad = function (container) {
         }
 
         Mautic.preventPasswordAutofill(container);
+        Mautic.preventPasswordMismatchClose(container);
+
+        if (mQuery('#changePasswordModal').data('auto-open')) {
+            mQuery('#changePasswordModal').modal('show');
+        }
     } else {
         if (mQuery(container + ' #list-search').length) {
             Mautic.activateSearchAutocomplete('list-search', 'user.user');
@@ -88,13 +93,75 @@ Mautic.preventPasswordAutofill = function (container) {
     });
 
     mQuery('#changePasswordModal').on('hidden.bs.modal', function () {
-        var passwordField = mQuery(container + ' #user_plainPassword_password');
-        var hasNewPassword = passwordField.length > 0 && passwordField.val().length > 0;
-        var message         = hasNewPassword
-            ? Mautic.translate('mautic.user.config.account.password.change.pending')
+        var modal = mQuery(this);
+        var hasNewPassword = mQuery(container + ' #user_plainPassword_password').val().length > 0;
+        var message = hasNewPassword
+            ? Mautic.translate(modal.data('staged-message'))
             : Mautic.translate('mautic.user.config.account.password.change.unchanged');
 
         Mautic.setFlashes(Mautic.addInfoFlashMessage(message));
+    });
+};
+
+/**
+ * Live-checks the password/confirm fields and blocks the change-password modal
+ * from closing (Done button, the X button, a backdrop click, or Escape) while
+ * they don't match, so a mismatch is caught right there instead of only
+ * surfacing after a full page save. The mismatch check only kicks in once both
+ * fields have been touched (blurred at least once) and both have a value -
+ * otherwise a user still typing their confirmation would see a false "doesn't
+ * match yet" error on every keystroke before they're even done typing.
+ */
+Mautic.preventPasswordMismatchClose = function (container) {
+    var passwordField = mQuery(container + ' #user_plainPassword_password');
+    var confirmField   = mQuery(container + ' #user_plainPassword_confirm');
+    var mismatchError  = mQuery('#passwordMismatchError');
+    var dismissButtons = mQuery('#changePasswordModal [data-dismiss="modal"]');
+
+    if (!passwordField.length || !confirmField.length || !mismatchError.length) {
+        return;
+    }
+
+    mismatchError.text(Mautic.translate('mautic.user.config.account.password.mismatch'));
+
+    var passwordTouched = false;
+    var confirmTouched  = false;
+
+    var bothTouchedAndFilled = function () {
+        return passwordTouched && confirmTouched
+            && passwordField.val().length > 0
+            && confirmField.val().length > 0;
+    };
+
+    var passwordsMismatch = function () {
+        return bothTouchedAndFilled() && passwordField.val() !== confirmField.val();
+    };
+
+    var validate = function () {
+        var mismatch = passwordsMismatch();
+
+        mismatchError.toggleClass('hide', !mismatch);
+        dismissButtons.prop('disabled', mismatch);
+    };
+
+    passwordField.on('blur', function () {
+        passwordTouched = true;
+        validate();
+    });
+    confirmField.on('blur', function () {
+        confirmTouched = true;
+        validate();
+    });
+
+    passwordField.on('input', validate);
+    confirmField.on('input', validate);
+
+    validate();
+
+    mQuery('#changePasswordModal').on('hide.bs.modal', function (event) {
+        if (passwordsMismatch()) {
+            event.preventDefault();
+        }
     });
 };
 
