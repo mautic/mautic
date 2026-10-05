@@ -48,7 +48,7 @@ final class PublishState
         }
     }
 
-    public function getPublished(): bool
+    public function getPublished(): ?bool
     {
         return $this->published;
     }
