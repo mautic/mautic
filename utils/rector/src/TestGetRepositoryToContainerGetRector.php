@@ -184,7 +184,7 @@ final class TestGetRepositoryToContainerGetRector extends AbstractRector
     /**
      * Swaps the matched call for its replacement, in place, wherever it sits in the class.
      */
-    private function replaceNode(Class_ $class, MethodCall $oldNode, Node $newNode): void
+    private function replaceNode(Class_ $class, MethodCall $oldNode, MethodCall $newNode): void
     {
         $this->traverseNodesWithCallable($class, static fn (Node $node): ?Node => $node === $oldNode ? $newNode : null);
     }

@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -561,7 +562,7 @@ final class SubmissionRepository extends CommonRepository
         }
     }
 
-    public function getOrphanSubmissionRecords(string $tableName, int $maxResults): DbalQueryBuilder
+    public function getOrphanSubmissionRecords(string $tableName, int $maxResults): TrackingQueryBuilder
     {
         $submissionTable =  MAUTIC_TABLE_PREFIX.'form_submissions';
 

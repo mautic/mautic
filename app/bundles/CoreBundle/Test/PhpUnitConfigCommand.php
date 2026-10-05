@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 #[AsCommand(
     name: 'mautic:phpunit:config',
@@ -68,7 +69,7 @@ final class PhpUnitConfigCommand extends Command
         return ExitCode::SUCCESS;
     }
 
-    private function isFunctional(\SplFileInfo $file): bool
+    private function isFunctional(SplFileInfo $file): bool
     {
         if (1 === preg_match('~/Functional/~', $file->getRealPath())) {
             return true;

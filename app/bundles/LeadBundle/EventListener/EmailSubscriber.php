@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
@@ -65,7 +64,7 @@ final class EmailSubscriber implements EventSubscriberInterface
         $event->setContent(TokenHelper::findLeadTokens($event->getContent(), $event->getLead()->getProfileFields(), true));
     }
 
-    private function addContactFieldTokens(BuilderEvent $event): void
+    private function addContactFieldTokens(EmailOnBuildEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('lead.field', 'lead:fields', 'MauticLeadBundle');
         // the permissions are for viewing contact data, not for managing contact fields
