@@ -14,6 +14,7 @@ use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
@@ -162,6 +163,119 @@ final class ThemeHelperTest extends TestCase
         $this->assertFileExists(__DIR__.'/resource/themes/good-tmp');
 
         $fs->remove(__DIR__.'/resource/themes/good-tmp');
+    }
+
+    public function testThemeIsInstalledFromSingleTopLevelFolder(): void
+    {
+        $themeRoot = sys_get_temp_dir().'/theme_install_'.uniqid();
+        $this->pathsHelper->method('getSystemPath')
+            ->with('themes', true)
+            ->willReturn($themeRoot);
+
+        $zipPath = sys_get_temp_dir().'/theme_install_'.uniqid().'.zip';
+        $zipName = basename($zipPath, '.zip');
+
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        $zip->addFromString('my-theme/config.json', json_encode(['features' => []], JSON_THROW_ON_ERROR));
+        $zip->addFromString('my-theme/html/message.html.twig', '<p>Message</p>');
+        $zip->addFromString('my-theme/html/page.html.twig', '<p>Page</p>');
+        $zip->close();
+
+        try {
+            $this->themeHelper->install($zipPath);
+
+            $this->assertFileExists($themeRoot.'/'.$zipName.'/config.json');
+            $this->assertFileExists($themeRoot.'/'.$zipName.'/html/message.html.twig');
+            $this->assertFileExists($themeRoot.'/'.$zipName.'/html/page.html.twig');
+        } finally {
+            $filesystem = new Filesystem();
+            $filesystem->remove([$themeRoot, $zipPath]);
+        }
+    }
+
+    /**
+     * @param list<array{0: string, 1: string}> $zipEntries
+     * @param list<string>                      $escapedPaths absolute paths that must not be written
+     */
+    #[DataProvider('zipSlipThemeInstallProvider')]
+    public function testThemeInstallRejectsZipSlipEntries(array $zipEntries, array $escapedPaths): void
+    {
+        $themeRoot = sys_get_temp_dir().'/theme_install_'.uniqid();
+        $this->pathsHelper->method('getSystemPath')
+            ->with('themes', true)
+            ->willReturn($themeRoot);
+
+        $zipPath = sys_get_temp_dir().'/theme_install_'.uniqid().'.zip';
+        $zipName = basename($zipPath, '.zip');
+
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        foreach ($zipEntries as [$name, $contents]) {
+            $zip->addFromString($name, $contents);
+        }
+        $zip->close();
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('mautic.core.update.error_extracting_package')
+            ->willReturn('some translation');
+
+        $thrown = false;
+
+        try {
+            $this->themeHelper->install($zipPath);
+        } catch (\Exception $exception) {
+            $thrown = true;
+            $this->assertSame('some translation', $exception->getMessage());
+        } finally {
+            $filesystem = new Filesystem();
+            foreach ($escapedPaths as $escapedPath) {
+                $this->assertFileDoesNotExist(str_replace('{themeRoot}', $themeRoot, $escapedPath));
+            }
+            $this->assertDirectoryDoesNotExist($themeRoot.'/'.$zipName);
+            $filesystem->remove([$themeRoot, $zipPath]);
+        }
+
+        $this->assertTrue($thrown);
+    }
+
+    /**
+     * @return \Generator<string, array{0: list<array{0: string, 1: string}>, 1: list<string>}>
+     */
+    public static function zipSlipThemeInstallProvider(): \Generator
+    {
+        $config  = json_encode(['features' => []], JSON_THROW_ON_ERROR);
+        $message = '<p>Message</p>';
+        $page    = '<p>Page</p>';
+
+        yield 'parent directory entry' => [
+            [
+                ['config.json', $config],
+                ['html/message.html.twig', $message],
+                ['../outside.txt', 'zip-slip'],
+            ],
+            ['{themeRoot}/outside.txt'],
+        ];
+
+        yield 'absolute path entry' => [
+            [
+                ['config.json', $config],
+                ['html/message.html.twig', $message],
+                ['/tmp/absolute-theme-slip.txt', 'zip-slip'],
+            ],
+            ['/tmp/absolute-theme-slip.txt'],
+        ];
+
+        yield 'wrapped parent directory entry' => [
+            [
+                ['my-theme/config.json', $config],
+                ['my-theme/html/message.html.twig', $message],
+                ['my-theme/html/page.html.twig', $page],
+                ['my-theme/../../outside.txt', 'zip-slip'],
+            ],
+            ['{themeRoot}/outside.txt'],
+        ];
     }
 
     public function testThemeFallbackToDefaultIfTemplateIsMissing(): void
