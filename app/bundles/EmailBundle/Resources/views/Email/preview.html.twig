@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ app.getUser().locale|default(app.request.locale) }}">
 {{ include('@MauticCore/Default/head.html.twig', {headerTitle: 'mautic.email.preview'|trans}) }}
 <body>
 {{ outputScripts('bodyOpen') }}
@@ -13,7 +13,7 @@
         {{ form_end(previewOptionsForm) }}
     </div>
 
-    <iframe src="{{ previewPageUrl }}" onload='javascript:(function(o){o.style.height=o.contentWindow.document.body.scrollHeight+"px";}(this));' style="height:200px;width:100%;border:none;overflow:hidden;"></iframe>
+    <iframe src="{{ previewPageUrl }}" title="{{ 'mautic.email.preview'|trans }}" onload='javascript:(function(o){o.style.height=o.contentWindow.document.body.scrollHeight+"px";}(this));' style="height:200px;width:100%;border:none;overflow:hidden;"></iframe>
 </section>
 {{ outputScripts('bodyClose') }}
 <script>

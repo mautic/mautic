@@ -38,7 +38,7 @@ Mautic.updateCompanyPreviewLookupListFilter = function(field, item) {
  * Used in data-lookup-callback attr of form field in EmailPreviewOptionsType.
  */
 Mautic.updatePreviewLookupListFilter = function(field, item, obj) {
-    if (item && item.id) {
+    if (item?.id) {
         mQuery(field).val(item.value);
         Mautic.contentPreviewUrlModifier.regenerateDownloadPreviewUrl(
             item.id,
