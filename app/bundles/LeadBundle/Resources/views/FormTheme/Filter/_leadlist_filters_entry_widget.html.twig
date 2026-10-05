@@ -15,7 +15,7 @@
   {% else %}
       {% set object = form.vars.data.object|default('') %}
   {% endif %}
-  {% set objectIconClass = 'company' == object ? 'ri-building-2-line' : 'ri-user-6-fill' %}
+  {% set objectIconClass = object in ['company', 'company_all'] ? 'ri-building-2-line' : 'ri-user-6-fill' %}
   {% set filterTypeIconClass = fields[object][filterType]['iconClass']|default('') %}
 
   {% if isPrototype or fields[object][filterType].label is defined %}
