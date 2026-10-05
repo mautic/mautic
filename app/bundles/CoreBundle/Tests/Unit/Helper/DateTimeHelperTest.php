@@ -74,6 +74,23 @@ final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($date->format('P'), $helper->getLocalTimezoneOffset());
     }
 
+    public function testLocalTimezoneUsesCurrentPhpTimezone(): void
+    {
+        $originalTimezone = date_default_timezone_get();
+
+        try {
+            date_default_timezone_set('America/Sao_Paulo');
+            $helper = new DateTimeHelper(new \DateTimeImmutable('2026-10-05 00:07:30', new \DateTimeZone('UTC')));
+
+            date_default_timezone_set('Europe/Lisbon');
+            $helper->setDateTime($helper->getDateTime(), DateTimeHelper::FORMAT_DB, 'local');
+
+            $this->assertSame('2026-10-05 01:07:30', $helper->getLocalDateTime()->format(DateTimeHelper::FORMAT_DB));
+        } finally {
+            date_default_timezone_set($originalTimezone);
+        }
+    }
+
     public function testGetDiff(): void
     {
         // Initialize DateTimeHelper with a specific date and timezone

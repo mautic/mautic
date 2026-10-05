@@ -46,8 +46,14 @@ class DateTimeHelper
      */
     public function setDateTime($datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local'): void
     {
+        $localTimezone = self::$defaultLocalTimezone;
+
         if ('local' === $timezone) {
-            $timezone = self::$defaultLocalTimezone;
+            // The PHP default timezone is set from the authenticated user's session
+            // for web requests. Do not use the value cached during service creation,
+            // as that may be the system timezone from before the session was loaded.
+            $localTimezone = date_default_timezone_get();
+            $timezone      = $localTimezone;
         } elseif (empty($timezone)) {
             $timezone = 'UTC';
         }
@@ -56,7 +62,7 @@ class DateTimeHelper
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
-        $this->local = new \DateTimeZone(self::$defaultLocalTimezone);
+        $this->local = new \DateTimeZone($localTimezone);
 
         if ($datetime instanceof \DateTimeInterface) {
             // Always clone so timezone conversions below never mutate the caller's object.
