@@ -11,7 +11,9 @@ use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void

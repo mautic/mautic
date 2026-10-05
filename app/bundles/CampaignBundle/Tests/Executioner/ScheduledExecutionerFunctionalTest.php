@@ -14,8 +14,10 @@ use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\TestScheduledExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Console\Output\BufferedOutput;
 
+#[Group('non-parallel')]
 final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 {
     private ScheduledExecutioner $scheduledExecutioner;

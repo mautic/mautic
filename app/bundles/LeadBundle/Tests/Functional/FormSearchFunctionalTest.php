@@ -9,8 +9,10 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class FormSearchFunctionalTest extends MauticMysqlTestCase
 {
     public function testFormSearchReturnsContactsAssociatedWithFormSubmissions(): void

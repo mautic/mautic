@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('non-parallel')]
 final class UpdateLeadListsCommandCircularDependencyTest extends MauticMysqlTestCase
 {
     /**

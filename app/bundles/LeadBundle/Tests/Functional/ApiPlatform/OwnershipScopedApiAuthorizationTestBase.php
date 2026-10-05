@@ -8,9 +8,11 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
+#[Group('non-parallel')]
 abstract class OwnershipScopedApiAuthorizationTestBase extends MauticMysqlTestCase
 {
     /**
