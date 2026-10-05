@@ -30,6 +30,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
         $contact1->method('getTimezone')
             ->willReturn($localTimezone);
+        /** @var ArrayCollection<int, Lead> $contacts */
         $contacts = new ArrayCollection([$contact1]);
 
         $campaign = $this->createMock(Campaign::class);

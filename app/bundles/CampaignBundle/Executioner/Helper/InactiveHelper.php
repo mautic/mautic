@@ -125,6 +125,7 @@ final class InactiveHelper
 
     /**
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @param Collection<int, Event> $negativeChildren
      */
     public function getEarliestInactiveDate(Collection $negativeChildren, \DateTimeInterface $lastActiveDate): ?\DateTimeInterface
     {

@@ -295,6 +295,9 @@ class Point extends FormEntity implements UuidInterface
         $this->log->removeElement($log);
     }
 
+    /**
+     * @return Collection<int, LeadPointLog>
+     */
     public function getLog(): Collection
     {
         return $this->log;

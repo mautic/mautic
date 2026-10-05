@@ -55,6 +55,7 @@ final readonly class DecisionExecutioner implements EventInterface
 
     /**
      * @throws CannotProcessEventException
+     * @param Collection<int, LeadEventLog> $logs
      */
     public function execute(AbstractEventAccessor $config, Collection $logs): EvaluatedContacts
     {

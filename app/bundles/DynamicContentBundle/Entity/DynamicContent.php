@@ -439,7 +439,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection<int, Stat>
      */
     public function getStats(): Collection
     {

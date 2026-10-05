@@ -368,6 +368,9 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->alias;
     }
 
+    /**
+     * @return Collection<int, ListLead>
+     */
     public function getLeads(): Collection
     {
         return $this->leads;

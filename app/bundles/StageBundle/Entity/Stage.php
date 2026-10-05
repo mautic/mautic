@@ -228,6 +228,9 @@ class Stage extends FormEntity implements UuidInterface
         $this->log->removeElement($log);
     }
 
+    /**
+     * @return Collection<int, LeadStageLog>
+     */
     public function getLog(): Collection
     {
         return $this->log;

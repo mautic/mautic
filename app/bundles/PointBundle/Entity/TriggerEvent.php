@@ -286,6 +286,9 @@ class TriggerEvent implements UuidInterface
         $this->log->removeElement($log);
     }
 
+    /**
+     * @return Collection<int, LeadTriggerLog>
+     */
     public function getLog(): Collection
     {
         return $this->log;

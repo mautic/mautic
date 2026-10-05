@@ -27,6 +27,7 @@ final class InactiveContactFinder
     }
 
     /**
+     * @return Collection<int, Lead>
      * @throws NoContactsFoundException
      */
     public function getContacts(

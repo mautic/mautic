@@ -114,7 +114,7 @@ class Event
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection<int, WebhookQueue>
      */
     public function getQueues(): Collection
     {
