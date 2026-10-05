@@ -226,6 +226,8 @@
 - CampaignBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\CampaignBundle\CampaignEvents` string constants. Update any subscriber or listener that keys on one of the converted `CampaignEvents::*` constants (or the raw string name such as `mautic.campaign_on_build`) to key on the event class instead:
 - IntegrationsBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\IntegrationsBundle\IntegrationEvents` string constants. Update any subscriber or listener that keys on one of the converted `IntegrationEvents::*` constants to key on the event class instead:
 - CoreBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\CoreBundle\CoreEvents` string constants. Update any subscriber or listener that keys on a `CoreEvents::*` constant (or the raw string name such as `mautic.build_menu`) to key on the event class instead:
+- `Mautic\LeadBundle\Event\LeadListFilteringEvent` is now dispatched by the event object alone (Symfony 4.3+). Update any subscriber keying on `LeadEvents::LIST_FILTERS_ON_FILTERING` (or the raw string `mautic.list_filters_on_filtering`) to key on `LeadListFilteringEvent::class`.
+- `Mautic\UserBundle\Event\AuthenticationContentEvent` is now dispatched by the event object alone (Symfony 4.3+). Update any subscriber keying on `UserEvents::USER_AUTHENTICATION_CONTENT` (or the raw string `mautic.user_authentication_content`) to key on `AuthenticationContentEvent::class`.
 
     ```diff
      public static function getSubscribedEvents(): array
