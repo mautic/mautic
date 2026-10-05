@@ -10,9 +10,14 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class PreviewFunctionalTest extends MauticMysqlTestCase
 {
@@ -346,10 +351,98 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($fileName.'.html', (string) $response->headers->get('content-disposition'));
     }
 
+    public function testPreviewEmailForUnauthorizedContact(): void
+    {
+        $lead  = $this->createLead('Test');
+        // Create non-admin role
+        $permission = ['email:emails' => ['full'], 'lead:leads' => ['viewown', 'create']];
+        $role       = $this->createRole(false, $permission);
+        // Create permissions for the role
+        $this->createPermission('lead:leads', $role, 34);
+        $this->createPermission('email:emails', $role, 1024);
+        // Create non-admin user
+        $user = $this->createUser($role);
+        $this->em->flush();
+
+        // Login newly created non-admin user
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $email = $this->createEmail();
+        $this->em->flush();
+        $errorMsg = 'You do not have access to this contact.';
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?contactId={$lead->getId()}");
+        $content = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($errorMsg, (string) $content);
+        $this->assertStringContainsString('Contact emails is [Email]', $this->getIframeContent($crawler));
+
+        $lead  = $this->createLead('Test');
+        $lead->setOwner($user);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/email/download/preview/{$email->getId()}?contactId={$lead->getId()}");
+        $content = $this->client->getResponse()->getContent();
+        $this->assertStringNotContainsString($errorMsg, (string) $content);
+        $this->assertStringContainsString(sprintf('Contact emails is %s', $lead->getEmail()), $this->getIframeContent($crawler));
+    }
+
     private function getUrlResponse(string $url): Response
     {
         $this->client->request(Request::METHOD_GET, $url);
 
         return $this->client->getResponse();
+    }
+
+    private function getIframeContent(Crawler $crawler): string
+    {
+        $iframe    = $crawler->filterXPath('//iframe')->eq(0);
+        $iframeSrc = $iframe->attr('src');
+        $this->client->request('GET', $iframeSrc);
+
+        return $this->client->getResponse()->getContent();
+    }
+
+    /**
+     * @param array<mixed> $permission
+     */
+    private function createRole(bool $isAdmin = false, array $permission = []): Role
+    {
+        $role = new Role();
+        $role->setName('Role');
+        $role->setIsAdmin($isAdmin);
+        $role->setRawPermissions($permission);
+        $this->em->persist($role);
+
+        return $role;
+    }
+
+    private function createPermission(string $rawPermission, Role $role, int $bitwise): void
+    {
+        $parts      = explode(':', $rawPermission);
+        $permission = new Permission();
+        $permission->setBundle($parts[0]);
+        $permission->setName($parts[1]);
+        $permission->setRole($role);
+        $permission->setBitwise($bitwise);
+        $this->em->persist($permission);
+    }
+
+    private function createUser(Role $role): User
+    {
+        $user = new User();
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
+        $user->setUsername('john.doe');
+        $user->setEmail('john.doe@email.com');
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $user->setPassword($hasher->hash('Maut1cR0cks!'));
+
+        $user->setRole($role);
+        $this->em->persist($user);
+
+        return $user;
     }
 }

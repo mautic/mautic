@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
-{{ include('@MauticCore/Default/head.html.twig', {
-    headerTitle: 'mautic.email.preview'|trans
-}) }}
+{{ include('@MauticCore/Default/head.html.twig', {headerTitle: 'mautic.email.preview'|trans}) }}
 <body>
 {{ outputScripts('bodyOpen') }}
+{{ include('@MauticCore/Notification/flashes.html.twig', {class: ' alert-danger'}) }}
 <section id="app-content" class="container content-only container-preview">
     <div class="top-bar">
         {{ form_start(previewOptionsForm) }}
