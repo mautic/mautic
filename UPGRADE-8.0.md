@@ -6,6 +6,16 @@
 
 ## Removed code
 
+- Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. These events are now dispatched by their own event class (all under `Mautic\SmsBundle\Event`). The lifecycle events used to share one `SmsEvent` object; `SmsEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `SmsPostSaveEvent::class => 'onPostSave'`.
+
+    | Removed `SmsEvents` constant | New event class |
+    |---|---|
+    | `SMS_PRE_SAVE` | `SmsPreSaveEvent` |
+    | `SMS_POST_SAVE` | `SmsPostSaveEvent` |
+    | `SMS_PRE_DELETE` | `SmsPreDeleteEvent` |
+    | `SMS_POST_DELETE` | `SmsPostDeleteEvent` |
+    | `ON_REPLY` | `ReplyEvent` |
+- Unused constants `ON_CAMPAIGN_TRIGGER_ACTION`, `ON_SMS_TOKENS_BUILD`, `DNC_FILTER_CONTACTS_ON_SEND`, `QUEUE_FILTER_CONTACTS_ON_SEND` and `FILTER_CONTACTS_ON_SEND` removed from `Mautic\SmsBundle\SmsEvents`; they had no dispatcher or listener.
 - Constants `USER_PRE_SAVE`, `USER_POST_SAVE`, `USER_PRE_DELETE`, `USER_POST_DELETE`, `ROLE_PRE_SAVE`, `ROLE_POST_SAVE`, `ROLE_PRE_DELETE` and `ROLE_POST_DELETE` removed from `Mautic\UserBundle\UserEvents`. These lifecycle events are now dispatched as dedicated event classes: `PreSaveUserEvent`, `PostSaveUserEvent`, `PreDeleteUserEvent`, `PostDeleteUserEvent`, `PreSaveRoleEvent`, `PostSaveRoleEvent`, `PreDeleteRoleEvent` and `PostDeleteRoleEvent` (all under `Mautic\UserBundle\Event`, extending `UserEvent` / `RoleEvent`, which are now `abstract`). Subscribe to the event class instead of the constant, e.g. `PostSaveUserEvent::class => 'onUserPostSave'`.
 - Classes `Mautic\UserBundle\Event\UserEvent` and `Mautic\UserBundle\Event\RoleEvent` are now `abstract` and can no longer be instantiated directly. Dispatch one of the concrete `Pre*/Post*` subclasses listed above instead.
 - Method `setEntityManager()` and the `protected $em` property removed from `Mautic\CoreBundle\Event\CommonEvent`. The entity manager was set on the event by every model but never read. `Mautic\LeadBundle\Event\LeadListFilteringEvent` was the only reader; it now holds its own `$em` property (unchanged constructor and `getEntityManager()`). Remove any `$event->setEntityManager(...)` calls.

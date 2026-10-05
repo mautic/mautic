@@ -27,7 +27,10 @@ use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Event\DncEvent;
 use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
-use Mautic\SmsBundle\Event\SmsEvent;
+use Mautic\SmsBundle\Event\SmsPostDeleteEvent;
+use Mautic\SmsBundle\Event\SmsPostSaveEvent;
+use Mautic\SmsBundle\Event\SmsPreDeleteEvent;
+use Mautic\SmsBundle\Event\SmsPreSaveEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
 use Mautic\SmsBundle\Form\Type\SmsType;
@@ -405,34 +408,21 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
             throw new MethodNotAllowedHttpException(['Sms']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = SmsEvents::SMS_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = SmsEvents::SMS_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = SmsEvents::SMS_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = SmsEvents::SMS_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new SmsPreSaveEvent($entity, $isNew),
+            'post_save'   => new SmsPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new SmsPreDeleteEvent($entity, $isNew),
+            'post_delete' => new SmsPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new SmsEvent($entity, $isNew);
-            }
+        $this->dispatcher->dispatch($event);
 
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     /**

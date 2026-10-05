@@ -11,6 +11,8 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Event\SmsEvent;
+use Mautic\SmsBundle\Event\SmsPostDeleteEvent;
+use Mautic\SmsBundle\Event\SmsPostSaveEvent;
 use Mautic\SmsBundle\Helper\SmsHelper;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -30,8 +32,8 @@ final readonly class SmsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            SmsEvents::SMS_POST_SAVE     => ['onPostSave', 0],
-            SmsEvents::SMS_POST_DELETE   => ['onDelete', 0],
+            SmsPostSaveEvent::class      => ['onPostSave', 0],
+            SmsPostDeleteEvent::class    => ['onDelete', 0],
             SmsEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
         ];
     }
