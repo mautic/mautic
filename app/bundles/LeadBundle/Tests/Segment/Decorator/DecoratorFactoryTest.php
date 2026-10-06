@@ -15,19 +15,16 @@ use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
+final class DecoratorFactoryTest extends TestCase
 {
-    /**
-     * @var MockObject&EventDispatcherInterface
-     */
-    private MockObject $eventDispatcherMock;
+    private EventDispatcherInterface&MockObject $eventDispatcherMock;
 
-    /**
-     * @var MockObject&DateOptionFactory
-     */
-    private MockObject $dateOptionFactory;
+    private CompanyDecorator&\PHPUnit\Framework\MockObject\Stub $companyDecorator;
+
+    private DateOptionFactory&MockObject $dateOptionFactory;
 
     private DecoratorFactory $decoratorFactory;
 
@@ -37,13 +34,14 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcherMock            = $this->createMock(EventDispatcherInterface::class);
         $contactSegmentFilterDictionary       = new ContactSegmentFilterDictionary($this->eventDispatcherMock);
+        $this->companyDecorator               = $this->createStub(CompanyDecorator::class);
         $this->dateOptionFactory              = $this->createMock(DateOptionFactory::class);
         $this->decoratorFactory               = new DecoratorFactory(
             $contactSegmentFilterDictionary,
             $this->createStub(BaseDecorator::class),
             $this->createStub(CustomMappedDecorator::class),
             $this->dateOptionFactory,
-            $this->createStub(CompanyDecorator::class),
+            $this->companyDecorator,
             $this->eventDispatcherMock);
     }
 
@@ -69,6 +67,34 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(
             CustomMappedDecorator::class,
+            $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
+        );
+    }
+
+    public function testPrimaryCompanyDecorator(): void
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'object' => ContactSegmentFilterCrate::COMPANY_OBJECT,
+            'field'  => 'companycity',
+            'type'   => 'text',
+        ]);
+
+        $this->assertSame(
+            $this->companyDecorator,
+            $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
+        );
+    }
+
+    public function testCompanyAllDecorator(): void
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'object' => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+            'field'  => 'companycity',
+            'type'   => 'text',
+        ]);
+
+        $this->assertSame(
+            $this->companyDecorator,
             $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
         );
     }
