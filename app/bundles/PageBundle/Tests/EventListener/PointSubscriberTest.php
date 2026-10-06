@@ -21,7 +21,7 @@ final class PointSubscriberTest extends TestCase
     public function testSubscribedEvents(): void
     {
         $this->assertSame([
-            'mautic.point_on_build' => ['onPointBuild', 0],
+            PointBuilderEvent::class => ['onPointBuild', 0],
             PageHitEvent::class    => ['onPageHit', 0],
         ], PointSubscriber::getSubscribedEvents());
     }
