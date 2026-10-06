@@ -28,13 +28,6 @@ final class ApiEvents
     public const string CLIENT_POST_DELETE = 'mautic.client_post_delete';
 
     /**
-     * The mautic.build_api_route event is thrown to build Mautic API routes.
-     *
-     * The event listener receives a Mautic\CoreBundle\Event\RouteEvent instance.
-     */
-    public const string BUILD_ROUTE = 'mautic.build_api_route';
-
-    /**
      * The mautic.api_pre_serialization_context event is dispatched before the serialization context is created for the view.
      *
      * The event listener receives a Mautic\ApiBundle\Event\ApiSerializationContextEvent instance.
