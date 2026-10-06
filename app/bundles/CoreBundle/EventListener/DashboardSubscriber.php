@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Symfony\Component\Routing\RouterInterface;
@@ -40,7 +39,6 @@ final class DashboardSubscriber extends MainDashboardSubscriber
         private readonly AuditLogModel $auditLogModel,
         private readonly TranslatorInterface $translator,
         private readonly RouterInterface $router,
-        private readonly CorePermissions $security,
         private readonly EventDispatcherInterface $dispatcher,
         private readonly ModelFactory $modelFactory,
     ) {
@@ -96,7 +94,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
             }
             unset($log);
 
-            $iconEvent = new IconEvent($this->security);
+            $iconEvent = new IconEvent();
             $this->dispatcher->dispatch($iconEvent);
             $event->setTemplateData(['logs' => $logs, 'icons' => $iconEvent->getIcons()]);
         }
