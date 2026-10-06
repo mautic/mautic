@@ -9,7 +9,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
-use Mautic\DashboardBundle\Event\WidgetDetailEvent;
+use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Cache\CacheItem;
@@ -74,7 +74,7 @@ final class DashboardSubscriberTest extends \PHPUnit\Framework\TestCase
             'filter'     => $filter,
         ]);
 
-        $event = new WidgetDetailEvent($this->translator, $this->permissions, $widget, $this->cacheProvider);
+        $event = new GenerateWidgetDetailEvent($this->translator, $this->permissions, $widget, $this->cacheProvider);
 
         $this->permissions->method('isGranted')->willReturnCallback(static function (mixed $permission, mixed $mode = null): mixed {
             if (is_array($permission)) {
@@ -113,7 +113,7 @@ final class DashboardSubscriberTest extends \PHPUnit\Framework\TestCase
             'filter'   => [],
         ]);
 
-        $event = new WidgetDetailEvent($this->translator, $this->permissions, $widget, $this->cacheProvider);
+        $event = new GenerateWidgetDetailEvent($this->translator, $this->permissions, $widget, $this->cacheProvider);
 
         $this->permissions->method('isGranted')->willReturnCallback(static function (mixed $permission, mixed $mode = null): mixed {
             if (is_array($permission)) {
@@ -153,7 +153,7 @@ final class DashboardSubscriberTest extends \PHPUnit\Framework\TestCase
             'filter'   => [],
         ]);
 
-        $event = new WidgetDetailEvent($this->translator, $this->permissions, $widget, $this->cacheProvider);
+        $event = new GenerateWidgetDetailEvent($this->translator, $this->permissions, $widget, $this->cacheProvider);
 
         $this->permissions->method('isGranted')->willReturnCallback(static function (mixed $permission, mixed $mode = null): mixed {
             if (is_array($permission)) {
