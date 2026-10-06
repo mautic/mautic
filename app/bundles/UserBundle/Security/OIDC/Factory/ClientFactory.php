@@ -29,13 +29,11 @@ final readonly class ClientFactory implements ClientFactoryInterface
         $redirectUrl = $this->urlGenerator->generate('mautic_oidc_check', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $scopesEvent = new RegisterScopesEvent();
         $this->eventDispatcher->dispatch($scopesEvent);
-        $scopes = $scopesEvent->getScopes();
         $client = new OpenIDConnectBridge($clientCredentials->getClientUrl(), $clientCredentials->getClientId(), $clientCredentials->getClientSecret());
 
-        $session = $this->requestStack->getSession();
-        $client->setSession($session);
+        $client->setSession($this->requestStack->getSession());
         $client->setAllowImplicitFlow(true);
-        $client->addScope($scopes);
+        $client->addScope($scopesEvent->getScopes());
         $client->setRedirectURL($redirectUrl);
 
         return new Client($client, $clientCredentials->getMappingField());

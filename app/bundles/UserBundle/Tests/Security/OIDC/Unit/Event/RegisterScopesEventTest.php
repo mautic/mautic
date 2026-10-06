@@ -15,13 +15,6 @@ final class RegisterScopesEventTest extends TestCase
         $this->assertEmpty($event->getScopes());
     }
 
-    public function testAddScope(): void
-    {
-        $event  = new RegisterScopesEvent();
-        $event->addScope('address');
-        $this->assertSame(['address'], $event->getScopes());
-    }
-
     public function testAddScopes(): void
     {
         $event  = new RegisterScopesEvent();

@@ -18,15 +18,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SubjectIdTypeTest extends TestCase
 {
-    public function testGetBlockPrefix(): void
-    {
-        $linker        = $this->createStub(LinkerInterface::class);
-        $translator    = $this->createStub(TranslatorInterface::class);
-        $subjectIdType = new OidcSubjectIdType($linker, $translator);
-
-        $this->assertSame('user_openid', $subjectIdType->getBlockPrefix());
-    }
-
     public function testConfigureOptions(): void
     {
         $linker        = $this->createStub(LinkerInterface::class);

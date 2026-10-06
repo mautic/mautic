@@ -19,11 +19,6 @@ final class RegisterScopesEvent
         return $this->scopes;
     }
 
-    public function addScope(string $scope): void
-    {
-        $this->scopes[] = $scope;
-    }
-
     /**
      * @param string[] $scopes
      */

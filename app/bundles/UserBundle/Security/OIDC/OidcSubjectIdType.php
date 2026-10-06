@@ -64,9 +64,4 @@ final class OidcSubjectIdType extends AbstractType
             ]
         );
     }
-
-    public function getBlockPrefix(): string
-    {
-        return 'user_openid';
-    }
 }
