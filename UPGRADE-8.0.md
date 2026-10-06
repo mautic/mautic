@@ -293,6 +293,7 @@
 - Entity `MauticPlugin\MauticTagManagerBundle\Entity\Tag` removed. It mapped the same `lead_tags` table as `Mautic\LeadBundle\Entity\Tag`, declared no fields of its own and existed only to point at the plugin's repository, and ORM 3 rejects a subclass of a mapped entity that declares no inheritance mapping. Use `Mautic\LeadBundle\Entity\Tag`; the plugin's `TagRepository` is a service and is unchanged.
 - Method `Mautic\CoreBundle\Doctrine\Type\GeneratedType::getName()` removed, following DBAL 4's removal of `Doctrine\DBAL\Types\Type::getName()`. A type is identified by the name it is registered under.
 - Method `Mautic\PageBundle\Entity\HitRepository::getHitCountForSource()` removed as dead code. Nothing in Mautic has called it since it was added in 2014. Build the query with `createQueryBuilder()` if you need the count.
+- Constant `AGGREGATE_STAT_REQUEST` removed from `Mautic\StatsBundle\StatEvents`. The event is now dispatched by its own event class, `Mautic\StatsBundle\Event\AggregateStatRequestEvent`. Subscribe to the event class instead of the constant, e.g. `AggregateStatRequestEvent::class => 'onStatRequest'`.
 
 ## Changed code
 
