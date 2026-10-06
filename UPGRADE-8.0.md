@@ -299,6 +299,7 @@
     |---|---|
     | `PAGE_ON_BUILD` | `PageBuilderEvent` |
     | `PAGE_ON_DISPLAY` | `PageDisplayEvent` |
+- Constant `AGGREGATE_STAT_REQUEST` removed from `Mautic\StatsBundle\StatEvents`. The event is now dispatched by its own event class, `Mautic\StatsBundle\Event\AggregateStatRequestEvent`. Subscribe to the event class instead of the constant, e.g. `AggregateStatRequestEvent::class => 'onStatRequest'`.
 
 ## Changed code
 
