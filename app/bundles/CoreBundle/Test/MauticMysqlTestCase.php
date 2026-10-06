@@ -430,7 +430,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
             if ($sequence) {
                 $quotedSequence = $this->connection->quoteIdentifier($sequence);
-                $content .= "ALTER SEQUENCE $quotedSequence RESTART WITH 1";\n";
+                $content .= "ALTER SEQUENCE $quotedSequence RESTART WITH 1;\n";
             }
         }
 
