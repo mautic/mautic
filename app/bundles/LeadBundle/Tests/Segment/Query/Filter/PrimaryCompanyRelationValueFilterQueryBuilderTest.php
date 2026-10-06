@@ -18,7 +18,8 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $this->queryBuilder = new PrimaryCompanyRelationValueFilterQueryBuilder(
             $this->randomParameter,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->connectionMock
         );
     }
 
