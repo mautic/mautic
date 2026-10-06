@@ -55,7 +55,7 @@ final class ConfigController extends AbstractFormController
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event);
         $fileFields = $event->getFileFields();
         $formThemes = $event->getFormThemes();
 
@@ -210,7 +210,7 @@ final class ConfigController extends AbstractFormController
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
@@ -246,7 +246,7 @@ final class ConfigController extends AbstractFormController
 
         $success    = 0;
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();

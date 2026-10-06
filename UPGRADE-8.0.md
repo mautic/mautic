@@ -12,6 +12,7 @@
     |---|---|
     | `CAMPAIGN_ON_LEADCHANGE` | `CampaignSingleLeadChangeEvent` |
     | `LEAD_CAMPAIGN_BATCH_CHANGE` | `CampaignBatchLeadChangeEvent` |
+- Constant `CONFIG_ON_GENERATE` removed from `Mautic\ConfigBundle\ConfigEvents`. The config-generate event is now dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `Mautic\ConfigBundle\Event\ConfigBuilderEvent::class` instead of the constant, e.g. `ConfigBuilderEvent::class => 'onConfigGenerate'`. The `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants are intentionally kept - they share one mutable `ConfigEvent` object whose state is carried from the pre-save to the post-save dispatch, so they still dispatch by name.
 - Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. These events are now dispatched by their own event class (all under `Mautic\SmsBundle\Event`). The lifecycle events used to share one `SmsEvent` object; `SmsEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `SmsPostSaveEvent::class => 'onPostSave'`.
 
     | Removed `SmsEvents` constant | New event class |

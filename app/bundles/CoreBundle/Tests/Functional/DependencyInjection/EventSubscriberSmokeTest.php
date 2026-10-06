@@ -146,7 +146,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\PageBundle\EventListener\ReportSubscriber::class,
             \Mautic\PointBundle\EventListener\ReportSubscriber::class,
         ],
-        'mautic.config_on_generate' => [
+        \Mautic\ConfigBundle\Event\ConfigBuilderEvent::class => [
             \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
