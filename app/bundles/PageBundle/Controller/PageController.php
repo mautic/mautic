@@ -1133,7 +1133,6 @@ final class PageController extends AbstractStandardFormController
      * Export submissions from a page.
      *
      * @param int    $objectId
-     * @param string $format
      *
      * @throws \Exception
      */
@@ -1143,7 +1142,7 @@ final class PageController extends AbstractStandardFormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],
     )]
-    public function exportAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $format = 'csv'): Response
+    public function exportAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, string $format = 'csv'): Response
     {
         $activePage   = $pageModel->getEntity($objectId);
         $session      = $request->getSession();

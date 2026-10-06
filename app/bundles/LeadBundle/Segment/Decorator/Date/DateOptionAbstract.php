@@ -60,10 +60,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
         return $this->dateDecorator->getTable($contactSegmentFilterCrate);
     }
 
-    /**
-     * @return string
-     */
-    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         if ($this->dateOptionParameters->isBetweenRequired()) {
             return $this->getOperatorForBetweenRange($contactSegmentFilterCrate);

@@ -134,8 +134,8 @@ final class StatRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content_stats')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId)
             ->executeStatement();
     }
 

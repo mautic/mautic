@@ -80,10 +80,7 @@ final class InactiveContactFinder
         return $this->campaignMemberDatesAdded;
     }
 
-    /**
-     * @param int $campaignId
-     */
-    public function getContactCount($campaignId, array $decisionEvents, ContactLimiter $limiter): int
+    public function getContactCount(int $campaignId, array $decisionEvents, ContactLimiter $limiter): int
     {
         return $this->campaignLeadRepository->getInactiveContactCount($campaignId, $decisionEvents, $limiter);
     }

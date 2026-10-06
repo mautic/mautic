@@ -647,8 +647,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     {
         return $this->statRepository->findBy(
             [
-                'email' => (int) $emailId,
-                'lead'  => (int) $leadId,
+                'email' => $emailId,
+                'lead'  => $leadId,
             ],
             ['dateSent' => 'DESC']
         );
@@ -768,15 +768,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get a stats for email by list.
      *
-     * @param Email|int $email
      * @return array{labels: mixed[], datasets: mixed[]}
      */
     public function getEmailDeviceStats($email, bool $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {
-        if (!$email instanceof Email) {
-            $email = $this->getEntity($email);
-        }
-
         $emailIds      = ($includeVariants) ? $email->getRelatedEntityIds() : [$email->getId()];
         $templateEmail = 'template' === $email->getEmailType();
         $results       = $this->statDeviceRepository->getDeviceStats($emailIds, $dateFrom, $dateTo);
@@ -1932,8 +1927,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get pie chart data of ignored vs opened emails.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param \DateTimeInterface $dateFrom
+     * @param \DateTimeInterface $dateTo
      */
     public function getIgnoredVsReadPieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {

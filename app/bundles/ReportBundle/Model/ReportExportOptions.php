@@ -10,10 +10,7 @@ final class ReportExportOptions
 
     private int $page = 1;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateFrom;
+    private ?\DateTimeInterface $dateFrom = null;
 
     /**
      * @var \DateTimeInterface

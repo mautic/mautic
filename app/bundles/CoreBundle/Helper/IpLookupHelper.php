@@ -191,10 +191,7 @@ final class IpLookupHelper
         return self::$ipAddresses[$ip];
     }
 
-    /**
-     * @param string $ip
-     */
-    public function getIpDetails($ip): array
+    public function getIpDetails(string $ip): array
     {
         if ($this->ipLookup) {
             return $this->ipLookup->setIpAddress($ip)->getDetails();

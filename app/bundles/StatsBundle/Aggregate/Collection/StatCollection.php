@@ -18,15 +18,9 @@ final class StatCollection
     }
 
     /**
-     * @param int $year
-     * @param int $month
-     * @param int $day
-     * @param int $hour
-     * @param int $count
-     *
      * @throws \Exception
      */
-    public function addStat($year, $month, $day, $hour, $count): static
+    public function addStat(int $year, int $month, int $day, int $hour, int $count): static
     {
         $this->stats
             ->getYear($year)

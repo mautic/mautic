@@ -18,7 +18,7 @@ final class WeekStat
      */
     public function setCount($count): void
     {
-        $this->count = (int) $count;
+        $this->count = $count;
     }
 
     /**

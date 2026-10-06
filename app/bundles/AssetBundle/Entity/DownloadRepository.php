@@ -105,8 +105,6 @@ class DownloadRepository extends CommonRepository
     /**
      * Get pie graph data for http statuses.
      *
-     * @param QueryBuilder $query
-     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */

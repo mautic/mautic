@@ -638,7 +638,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $columnValue = ":{$paramName}";
                         $expression  = $queryBuilder->expr()->or(
                             $queryBuilder->expr()->isNull($filter['column']),
-                            $queryBuilder->expr()->{$exprFunction}($filter['column'], $columnValue)
+                            $queryBuilder->expr()->neq($filter['column'], $columnValue)
                         );
                         $queryBuilder->setParameter($paramName, $filter['value']);
                         $andGroup[] = $expression;
