@@ -47,4 +47,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\ReportBundle\Helper\ReportHelper::class)
         ->tag('twig.helper', ['alias' => 'report']);
+    $services->alias('mautic.report.helper.report', Mautic\ReportBundle\Helper\ReportHelper::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\ReportBundle\Helper\ReportHelper::class.'" service instead.');
 };

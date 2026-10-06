@@ -168,13 +168,17 @@ final class AjaxController extends CommonAjaxController
         $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
-            $formAdjustmentsProvider->adjustForm(
-                $form,
-                $fieldAlias,
-                $fieldObject,
-                $operator,
-                $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias]
-            );
+            $fieldConfig = $listModel->getChoiceFields($search)[$fieldObject][$fieldAlias] ?? null;
+
+            if (null !== $fieldConfig) {
+                $formAdjustmentsProvider->adjustForm(
+                    $form,
+                    $fieldAlias,
+                    $fieldObject,
+                    $operator,
+                    $fieldConfig
+                );
+            }
         }
 
         $formHtml = $this->renderView(
