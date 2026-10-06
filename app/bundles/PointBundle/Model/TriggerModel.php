@@ -272,7 +272,7 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
     {
         if ([] === $this->cachedEvents) {
             $event = new TriggerBuilderEvent($this->translator);
-            $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
+            $this->dispatcher->dispatch($event);
             $this->cachedEvents = $event->getEvents();
         }
 

@@ -8,7 +8,6 @@ use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
 use Mautic\PageBundle\Helper\PointActionHelper;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
-use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PointSubscriber implements EventSubscriberInterface
@@ -22,7 +21,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PointEvents::POINT_ON_BUILD => ['onPointBuild', 0],
+            PointBuilderEvent::class => ['onPointBuild', 0],
             Events\PageHitEvent::class     => ['onPageHit', 0],
         ];
     }
