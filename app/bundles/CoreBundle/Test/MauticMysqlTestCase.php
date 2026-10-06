@@ -160,12 +160,12 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      *
      * @throws DBALException
      */
-    protected function resetAutoincrement(array $tables): void
+    protected function resetAutoincrement(array $tables, bool $appendPrefix = true): void
     {
         $prefix = $this->getTablePrefix();
 
         foreach ($tables as $table) {
-            $fullTable = $prefix.$table;
+            $fullTable = $appendPrefix ? $prefix.$table : $table;
 
             if ($this->isMysqlPlatform()) {
                 $this->connection->executeStatement(sprintf('ALTER TABLE `%s` AUTO_INCREMENT=1', $fullTable));
@@ -335,7 +335,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                     $quotedTables = array_map($this->connection->quoteIdentifier(...), $prefixedTables);
                     $this->connection->executeStatement(
                         self::TRUNCATE_TABLE_SQL.' '.implode(', ', $quotedTables).' RESTART IDENTITY CASCADE'
-                    );
+                    );          
+
+                    $this->resetAutoincrement($prefixedTables, false);
                 }
 
                 $this->loadEssentialFixtures();
@@ -422,6 +424,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $content = "-- PostgreSQL reset script for prefixed tables\n";
         $content .= self::TRUNCATE_TABLE_SQL.' '.implode(', ', $quotedTables)." RESTART IDENTITY CASCADE;\n";
+
+        foreach($prefixedTables as $fullTable) {
+            $sequence = DatabasePlatform::getSerialSequence($this->connection, $fullTable);
+
+            if ($sequence) {
+                $quotedSequence = $this->connection->quoteIdentifier($sequence);
+                $content .= "ALTER SEQUENCE $quotedSequence RESTART WITH 1";\n";
+            }
+        }
 
         file_put_contents($file, $content);
     }
