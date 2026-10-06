@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -24,7 +23,7 @@ final readonly class DateTimeTokenSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PageEvents::PAGE_ON_BUILD                     => ['onPageBuild', 0],
+            PageBuilderEvent::class                     => ['onPageBuild', 0],
             PageDisplayEvent::class                   => ['onPageDisplay', 0],
         ];
     }

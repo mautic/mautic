@@ -9,7 +9,6 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -29,7 +28,7 @@ final class PageSubscriber implements EventSubscriberInterface
     {
         return [
             PageDisplayEvent::class => ['onPageDisplay', 0],
-            PageEvents::PAGE_ON_BUILD   => ['onPageBuild', 0],
+            PageBuilderEvent::class   => ['onPageBuild', 0],
         ];
     }
 
