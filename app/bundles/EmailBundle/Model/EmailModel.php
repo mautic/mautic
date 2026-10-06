@@ -770,7 +770,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return array{labels: mixed[], datasets: mixed[]}
      */
-    public function getEmailDeviceStats($email, bool $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
+    public function getEmailDeviceStats(Email $email, bool $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {
         $emailIds      = ($includeVariants) ? $email->getRelatedEntityIds() : [$email->getId()];
         $templateEmail = 'template' === $email->getEmailType();

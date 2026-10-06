@@ -375,12 +375,12 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
     /**
      * @param Event                         $redirectEvent The redirected event to update logs for
-     * @param Collection<int, LeadEventLog> $logs Collection of event logs to update
+     * @param Collection<int, LeadEventLog> $logs          Collection of event logs to update
      * @param Event                         $originalEvent The original event before redirection
      *
      * @throws NoResultException|NonUniqueResultException
      */
-    private function updateLogsForRedirectedEvent(Event $redirectEvent, ArrayCollection $logs,
+    private function updateLogsForRedirectedEvent(Event $redirectEvent, Collection $logs,
         Event $originalEvent): void
     {
         if ($logs->isEmpty()) {
@@ -449,9 +449,9 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     private function organizeByEvent(Collection $logs): Collection
     {
-        /** @var array<int, Collection<int, LeadEventLog>> $jumpTo */
+        /** @var array<int, ArrayCollection<int, LeadEventLog>> $jumpTo */
         $jumpTo = [];
-        /** @var array<int, Collection<int, LeadEventLog>> $other */
+        /** @var array<int, ArrayCollection<int, LeadEventLog>> $other */
         $other  = [];
 
         /** @var LeadEventLog $log */

@@ -517,7 +517,7 @@ class ChartQuery extends AbstractChart
     /**
      * Count how many rows is between a range of date diff in seconds.
      */
-    public function fetchCountDateDiff($query): int
+    public function fetchCountDateDiff(QueryBuilder $query): int
     {
         $data = $query->executeQuery()->fetchAssociative();
 
