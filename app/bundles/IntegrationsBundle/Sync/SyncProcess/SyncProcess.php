@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess;
 
-use Mautic\IntegrationsBundle\Event\CompletedSyncIterationEvent;
+use Mautic\IntegrationsBundle\Event\IntegrationToMauticSyncCompletedEvent;
+use Mautic\IntegrationsBundle\Event\MauticToIntegrationSyncCompletedEvent;
 use Mautic\IntegrationsBundle\Event\SyncEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
@@ -127,8 +127,7 @@ final class SyncProcess
             // Dispatch an event to allow subscribers to take action after this batch of objects has been synced to Mautic
             $orderResults = $this->getOrderResultsForIntegrationSync($syncOrder, $objectMappings);
             $this->eventDispatcher->dispatch(
-                new CompletedSyncIterationEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO),
-                IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC
+                new IntegrationToMauticSyncCompletedEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO)
             );
             unset($orderResults);
 
@@ -197,8 +196,7 @@ final class SyncProcess
             // Dispatch an event to allow subscribers to take action after this batch of objects has been synced to the integration
             $orderResults = $this->getOrderResultsForInternalSync($syncOrder);
             $this->eventDispatcher->dispatch(
-                new CompletedSyncIterationEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO),
-                IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION
+                new MauticToIntegrationSyncCompletedEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO)
             );
             unset($orderResults);
 

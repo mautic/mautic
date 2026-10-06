@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
-use Mautic\IntegrationsBundle\Event\InternalCompanyEvent;
-use Mautic\IntegrationsBundle\Event\InternalContactEvent;
+use Mautic\IntegrationsBundle\Event\InternalCompanyFullReportBuildEvent;
+use Mautic\IntegrationsBundle\Event\InternalContactFullReportBuildEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
@@ -150,22 +149,18 @@ final readonly class FullObjectReportBuilder
     private function dispatchBeforeFieldChangesEvent(string $integrationName, object $object): void
     {
         if ($object instanceof Lead) {
-            if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD)) {
-                $this->dispatcher->dispatch(
-                    new InternalContactEvent($integrationName, $object),
-                    IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD
-                );
+            $event = new InternalContactFullReportBuildEvent($integrationName, $object);
+            if ($this->dispatcher->hasListeners($event::class)) {
+                $this->dispatcher->dispatch($event);
             }
 
             return;
         }
 
         if ($object instanceof Company) {
-            if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD)) {
-                $this->dispatcher->dispatch(
-                    new InternalCompanyEvent($integrationName, $object),
-                    IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD
-                );
+            $event = new InternalCompanyFullReportBuildEvent($integrationName, $object);
+            if ($this->dispatcher->hasListeners($event::class)) {
+                $this->dispatcher->dispatch($event);
             }
 
             return;

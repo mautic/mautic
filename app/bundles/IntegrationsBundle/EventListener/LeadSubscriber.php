@@ -7,12 +7,11 @@ namespace Mautic\IntegrationsBundle\EventListener;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
-use Mautic\IntegrationsBundle\Event\InternalCompanyEvent;
-use Mautic\IntegrationsBundle\Event\InternalContactEvent;
+use Mautic\IntegrationsBundle\Event\InternalCompanyFieldChangesEvent;
+use Mautic\IntegrationsBundle\Event\InternalContactFieldChangesEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -205,22 +204,18 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     private function dispatchBeforeFieldChangesEvent(string $integrationName, object $object): void
     {
         if ($object instanceof Lead) {
-            if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)) {
-                $this->dispatcher->dispatch(
-                    new InternalContactEvent($integrationName, $object),
-                    IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES
-                );
+            $event = new InternalContactFieldChangesEvent($integrationName, $object);
+            if ($this->dispatcher->hasListeners($event::class)) {
+                $this->dispatcher->dispatch($event);
             }
 
             return;
         }
 
         if ($object instanceof Company) {
-            if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)) {
-                $this->dispatcher->dispatch(
-                    new InternalCompanyEvent($integrationName, $object),
-                    IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES
-                );
+            $event = new InternalCompanyFieldChangesEvent($integrationName, $object);
+            if ($this->dispatcher->hasListeners($event::class)) {
+                $this->dispatcher->dispatch($event);
             }
 
             return;
