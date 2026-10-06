@@ -155,10 +155,7 @@ class CampaignExecutionEvent extends Event
         return $this->getEvent()['properties'];
     }
 
-    /**
-     * @return array
-     */
-    public function getEventDetails()
+    public function getEventDetails(): array
     {
         return $this->eventDetails;
     }
