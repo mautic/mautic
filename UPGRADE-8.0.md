@@ -6,6 +6,14 @@
 
 ## Removed code
 
+- Constants `USER_LOGIN`, `USER_PRE_AUTHENTICATION` and `USER_FORM_AUTHENTICATION` removed from `Mautic\UserBundle\UserEvents`. These events are now dispatched by their own event class (Symfony 4.3+) instead of the string constant. `USER_LOGIN` already had a dedicated `LoginEvent`, so subscribe to `LoginEvent::class`. `AuthenticationEvent` used to be dispatched under both `USER_PRE_AUTHENTICATION` and `USER_FORM_AUTHENTICATION`; it is now `abstract` and each case has a dedicated subclass (both under `Mautic\UserBundle\Event`), so listener type hints keep working.
+
+    | Removed `UserEvents` constant | New event class |
+    |---|---|
+    | `USER_LOGIN` | `LoginEvent` |
+    | `USER_PRE_AUTHENTICATION` | `PreAuthenticationEvent` |
+    | `USER_FORM_AUTHENTICATION` | `FormAuthenticationEvent` |
+- Class `Mautic\UserBundle\Event\AuthenticationEvent` is now `abstract` and can no longer be instantiated directly. Dispatch `PreAuthenticationEvent` or `FormAuthenticationEvent` instead.
 - Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. These events are now dispatched by their own event class (all under `Mautic\SmsBundle\Event`). The lifecycle events used to share one `SmsEvent` object; `SmsEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `SmsPostSaveEvent::class => 'onPostSave'`.
 
     | Removed `SmsEvents` constant | New event class |

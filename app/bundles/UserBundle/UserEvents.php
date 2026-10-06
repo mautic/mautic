@@ -18,28 +18,6 @@ final class UserEvents
     public const string USER_LOGOUT = 'mautic.user_logout';
 
     /**
-     * The mautic.user_login event is dispatched right after a user logs in.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\LoginEvent instance.
-     */
-    public const string USER_LOGIN = 'mautic.user_login';
-
-    /**
-     * The mautic.user_form_authentication event is dispatched when a user logs in so that listeners can authenticate a user, i.e. via a 3rd party service.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\AuthenticationEvent instance.
-     */
-    public const string USER_FORM_AUTHENTICATION = 'mautic.user_form_authentication';
-
-    /**
-     * The mautic.user_pre_authentication event is dispatched when a user browses a page under /s/ except for /login. This allows support for
-     * 3rd party authentication providers outside the login form.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\AuthenticationEvent instance.
-     */
-    public const string USER_PRE_AUTHENTICATION = 'mautic.user_pre_authentication';
-
-    /**
      * The mautic.user_authentication_content event is dispatched to collect HTML from plugins to be injected into the UI to assist with
      * authentication.
      *

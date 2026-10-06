@@ -6,9 +6,8 @@ namespace Mautic\UserBundle\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Event\AuthenticationEvent;
+use Mautic\UserBundle\Event\FormAuthenticationEvent;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
-use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -117,7 +116,7 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
                     null !== $user ? $user->getRoles() : [],
                 );
 
-                $authEvent = new AuthenticationEvent(
+                $authEvent = new FormAuthenticationEvent(
                     $user ?? $userIdentifier,
                     $token,
                     $this->userProvider,
@@ -127,8 +126,8 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
                     $integrations
                 );
 
-                if ($this->dispatcher->hasListeners(UserEvents::USER_FORM_AUTHENTICATION)) {
-                    $authEvent = $this->dispatcher->dispatch($authEvent, UserEvents::USER_FORM_AUTHENTICATION);
+                if ($this->dispatcher->hasListeners(FormAuthenticationEvent::class)) {
+                    $authEvent = $this->dispatcher->dispatch($authEvent);
                 }
 
                 if ($authEvent->isAuthenticated()) {
