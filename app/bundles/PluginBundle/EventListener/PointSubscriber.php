@@ -7,7 +7,6 @@ namespace Mautic\PluginBundle\EventListener;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Mautic\PluginBundle\Helper\EventHelper;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
-use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PointSubscriber implements EventSubscriberInterface
@@ -20,7 +19,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
+            TriggerBuilderEvent::class => ['onTriggerBuild', 0],
         ];
     }
 
