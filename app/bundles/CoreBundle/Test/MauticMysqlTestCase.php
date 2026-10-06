@@ -205,7 +205,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             }
 
             $this->connection->executeQuery($sql);
+        }
 
+        if ($this->isPostgresqlPlatform()) {
             /*
              * POSTGRESQL DOCTRINE WORKAROUND:
              *
@@ -214,14 +216,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
              * Those underlying sequences are frequently not registered in a way that pg_get_serial_sequence() 
              * (and therefore RESTART IDENTITY) can't see.
              */
-            $sequence = DatabasePlatform::getSerialSequence($this->connection, $table);
-            if ($sequence) {
-                $this->connection->executeQuery(sprintf(
-                    "ALTER SEQUENCE %s RESTART WITH 1",
-                    $this->connection->quoteIdentifier($sequence)
-                ));
-            }
+            $this->resetAutoincrement($tables);
         }
+        
         if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
         }
