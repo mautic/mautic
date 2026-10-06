@@ -7,8 +7,8 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Event\PluginIntegrationKeyEncryptEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
-use Mautic\PluginBundle\PluginEvents;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -59,8 +59,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
-                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT
+                new PluginIntegrationKeyEncryptEvent($this->integration, [HubspotIntegration::ACCESS_KEY])
             )
             ->willReturn($event);
 
@@ -79,8 +78,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
-                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT
+                new PluginIntegrationKeyEncryptEvent($this->integration, [HubspotIntegration::ACCESS_KEY])
             )
             ->willReturn($event);
 
@@ -105,8 +103,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
-                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT
+                new PluginIntegrationKeyEncryptEvent($this->integration, [HubspotIntegration::ACCESS_KEY])
             )
             ->willReturn($event);
 
@@ -123,8 +120,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
-                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT
+                new PluginIntegrationKeyEncryptEvent($this->integration, [HubspotIntegration::ACCESS_KEY])
             )
             ->willReturn($event);
 
@@ -141,8 +137,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
-                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT
+                new PluginIntegrationKeyEncryptEvent($this->integration, [HubspotIntegration::ACCESS_KEY])
             )
             ->willReturn($event);
 
@@ -159,8 +154,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
-                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT
+                new PluginIntegrationKeyEncryptEvent($this->integration, [HubspotIntegration::ACCESS_KEY])
             )
             ->willReturn($event);
 

@@ -29,14 +29,16 @@ use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
+use Mautic\PluginBundle\Event\PluginIntegrationKeyDecryptEvent;
+use Mautic\PluginBundle\Event\PluginIntegrationKeyEncryptEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
+use Mautic\PluginBundle\Event\PluginIntegrationKeyMergeEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationResponseEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
-use Mautic\PluginBundle\PluginEvents;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Psr\Http\Message\ResponseInterface;
@@ -380,8 +382,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         if ($return) {
             $this->keys = $this->dispatchIntegrationKeyEvent(
-                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_MERGE,
-                $withKeys
+                new PluginIntegrationKeyMergeEvent($this, $withKeys)
             );
 
             return $this->keys;
@@ -399,8 +400,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function encryptAndSetApiKeys(array $keys, Integration $entity): void
     {
         $keys = $this->dispatchIntegrationKeyEvent(
-            PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT,
-            $keys
+            new PluginIntegrationKeyEncryptEvent($this, $keys)
         );
 
         // Update keys
@@ -440,8 +440,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 $this->em->flush();
             }
             $decryptedKeys[$serialized] = $this->dispatchIntegrationKeyEvent(
-                PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
-                $decrypted
+                new PluginIntegrationKeyDecryptEvent($this, $decrypted)
             );
         }
 
@@ -663,8 +662,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         if (empty($settings['ignore_event_dispatch'])) {
             $event = $this->dispatcher->dispatch(
-                new PluginIntegrationRequestEvent($this, $url, $parameters, $headers, $method, $settings, $authType),
-                PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST
+                new PluginIntegrationRequestEvent($this, $url, $parameters, $headers, $method, $settings, $authType)
             );
 
             $headers    = $event->getHeaders();
@@ -813,8 +811,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
         if (empty($settings['ignore_event_dispatch'])) {
             $this->dispatcher->dispatch(
-                new PluginIntegrationResponseEvent($this, $result),
-                PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE
+                new PluginIntegrationResponseEvent($this, $result)
             );
         }
         if (!empty($settings['return_raw'])) {
@@ -2117,13 +2114,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * @return array<string, mixed>
      */
-    protected function dispatchIntegrationKeyEvent(?string $eventName, array $keys = []): array
+    protected function dispatchIntegrationKeyEvent(PluginIntegrationKeyEvent $event): array
     {
-        /** @var PluginIntegrationKeyEvent $event */
-        $event = $this->dispatcher->dispatch(
-            new PluginIntegrationKeyEvent($this, $keys),
-            $eventName
-        );
+        $this->dispatcher->dispatch($event);
 
         return $event->getKeys();
     }

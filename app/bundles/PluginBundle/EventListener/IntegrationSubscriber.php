@@ -5,7 +5,6 @@ namespace Mautic\PluginBundle\EventListener;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationResponseEvent;
 use Mautic\PluginBundle\Helper\oAuthHelper;
-use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -24,8 +23,8 @@ final readonly class IntegrationSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE => ['onResponse', 0],
-            PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST  => ['onRequest', 0],
+            PluginIntegrationResponseEvent::class => ['onResponse', 0],
+            PluginIntegrationRequestEvent::class  => ['onRequest', 0],
         ];
     }
 

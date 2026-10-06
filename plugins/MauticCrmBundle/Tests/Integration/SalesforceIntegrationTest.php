@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
+use Mautic\PluginBundle\Event\PluginIntegrationKeyDecryptEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
@@ -1038,7 +1039,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                     $args = func_get_args();
 
                     return match ($args[0]) {
-                        default => new PluginIntegrationKeyEvent($sf, $integration->getApiKeys()),
+                        default => new PluginIntegrationKeyDecryptEvent($sf, $integration->getApiKeys()),
                     };
                 }
             );

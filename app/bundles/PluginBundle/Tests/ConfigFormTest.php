@@ -12,10 +12,10 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Event\PluginIntegrationKeyDecryptEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
-use Mautic\PluginBundle\PluginEvents;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -58,7 +58,7 @@ final class ConfigFormTest extends KernelTestCase
     {
         $connectWiseHeader = ['appcookie' => 'rookie'];
         self::getContainer()->get(EventDispatcherInterface::class)->addListener(
-            PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
+            PluginIntegrationKeyDecryptEvent::class,
             function (PluginIntegrationKeyEvent $event) use ($connectWiseHeader): PluginIntegrationKeyEvent {
                 $event->setKeys($connectWiseHeader);
 

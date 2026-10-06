@@ -6,6 +6,15 @@
 
 ## Removed code
 
+- Constants `PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT`, `PLUGIN_ON_INTEGRATION_KEYS_DECRYPT`, `PLUGIN_ON_INTEGRATION_KEYS_MERGE`, `PLUGIN_ON_INTEGRATION_REQUEST` and `PLUGIN_ON_INTEGRATION_RESPONSE` removed from `Mautic\PluginBundle\PluginEvents`. These events are now dispatched by their own event class (Symfony 4.3+) under `Mautic\PluginBundle\Event`. The three key events used to share one `PluginIntegrationKeyEvent` object; `PluginIntegrationKeyEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `PluginIntegrationRequestEvent::class => 'onRequest'`.
+
+    | Removed `PluginEvents` constant | New event class |
+    |---|---|
+    | `PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT` | `PluginIntegrationKeyEncryptEvent` |
+    | `PLUGIN_ON_INTEGRATION_KEYS_DECRYPT` | `PluginIntegrationKeyDecryptEvent` |
+    | `PLUGIN_ON_INTEGRATION_KEYS_MERGE` | `PluginIntegrationKeyMergeEvent` |
+    | `PLUGIN_ON_INTEGRATION_REQUEST` | `PluginIntegrationRequestEvent` |
+    | `PLUGIN_ON_INTEGRATION_RESPONSE` | `PluginIntegrationResponseEvent` |
 - Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. These events are now dispatched by their own event class (all under `Mautic\SmsBundle\Event`). The lifecycle events used to share one `SmsEvent` object; `SmsEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `SmsPostSaveEvent::class => 'onPostSave'`.
 
     | Removed `SmsEvents` constant | New event class |

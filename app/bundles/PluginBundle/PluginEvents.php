@@ -17,41 +17,6 @@ final class PluginEvents
     public const string PLUGIN_ON_INTEGRATION_CONFIG_SAVE = 'mautic.plugin_on_integration_config_save';
 
     /**
-     * The mautic.plugin_on_integration_keys_encrypt event is dispatched prior to encrypting keys to be stored into the database.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationKeyEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT = 'mautic.plugin_on_integration_keys_encrypt';
-
-    /**
-     * The mautic.plugin_on_integration_keys_decrypt event is dispatched after fetching and decrypting keys from the database.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationKeyEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_KEYS_DECRYPT = 'mautic.plugin_on_integration_keys_decrypt';
-
-    /**
-     * The mautic.plugin_on_integration_keys_merge event is dispatched after new keys are merged into existing ones.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationKeyEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_KEYS_MERGE = 'mautic.plugin_on_integration_keys_merge';
-
-    /**
-     * The mautic.plugin_on_integration_request event is dispatched before a request is made.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationRequestEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_REQUEST = 'mautic.plugin_on_integration_request';
-
-    /**
-     * The mautic.plugin_on_integration_response event is dispatched after a request is made.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationResponseEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_RESPONSE = 'mautic.plugin_on_integration_response';
-
-    /**
      * The mautic.plugin_on_integration_auth_redirect event is dispatched when an authorization URL is generated and before the user is redirected to it.
      *
      * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent instance.
