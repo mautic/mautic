@@ -23,11 +23,9 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Event as Events;
-use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Form\Type\WebhookType;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Service\WebhookService;
-use Mautic\WebhookBundle\WebhookEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
@@ -394,8 +392,8 @@ final class WebhookModel extends FormModel
     {
         $webhook->setIsPublished(false);
         $this->saveEntity($webhook);
-        $event = new WebhookEvent($webhook, false, $reason);
-        $this->dispatcher->dispatch($event, WebhookEvents::WEBHOOK_KILL);
+        $event = new Events\WebhookKillEvent($webhook, false, $reason);
+        $this->dispatcher->dispatch($event);
     }
 
     public function markWebhookUnHealthy(Webhook $webhook, string $reason): void
@@ -596,33 +594,21 @@ final class WebhookModel extends FormModel
             throw new MethodNotAllowedHttpException(['Webhook'], 'Entity must be of class Webhook()');
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = WebhookEvents::WEBHOOK_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = WebhookEvents::WEBHOOK_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = WebhookEvents::WEBHOOK_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = WebhookEvents::WEBHOOK_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new Events\WebhookPreSaveEvent($entity, $isNew),
+            'post_save'   => new Events\WebhookPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new Events\WebhookPreDeleteEvent($entity, $isNew),
+            'post_delete' => new Events\WebhookPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof SymfonyEvent) {
-                $event = new WebhookEvent($entity, $isNew);
-            }
-            $this->dispatcher->dispatch($event, $name);
+        $this->dispatcher->dispatch($event);
 
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     /**
