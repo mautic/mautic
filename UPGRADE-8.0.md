@@ -293,6 +293,14 @@
 - Entity `MauticPlugin\MauticTagManagerBundle\Entity\Tag` removed. It mapped the same `lead_tags` table as `Mautic\LeadBundle\Entity\Tag`, declared no fields of its own and existed only to point at the plugin's repository, and ORM 3 rejects a subclass of a mapped entity that declares no inheritance mapping. Use `Mautic\LeadBundle\Entity\Tag`; the plugin's `TagRepository` is a service and is unchanged.
 - Method `Mautic\CoreBundle\Doctrine\Type\GeneratedType::getName()` removed, following DBAL 4's removal of `Doctrine\DBAL\Types\Type::getName()`. A type is identified by the name it is registered under.
 - Method `Mautic\PageBundle\Entity\HitRepository::getHitCountForSource()` removed as dead code. Nothing in Mautic has called it since it was added in 2014. Build the query with `createQueryBuilder()` if you need the count.
+- Constants `DASHBOARD_ON_MODULE_LIST_GENERATE`, `DASHBOARD_ON_MODULE_FORM_GENERATE`, `DASHBOARD_ON_MODULE_DETAIL_GENERATE` and `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` removed from `Mautic\DashboardBundle\DashboardEvents`. These events are now dispatched by their own event class (all under `Mautic\DashboardBundle\Event`). The two detail events used to share one `WidgetDetailEvent` object; `WidgetDetailEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `GenerateWidgetDetailEvent::class => 'onWidgetDetailGenerate'`.
+
+    | Removed `DashboardEvents` constant | New event class |
+    |---|---|
+    | `DASHBOARD_ON_MODULE_LIST_GENERATE` | `WidgetTypeListEvent` |
+    | `DASHBOARD_ON_MODULE_FORM_GENERATE` | `WidgetFormEvent` |
+    | `DASHBOARD_ON_MODULE_DETAIL_GENERATE` | `GenerateWidgetDetailEvent` |
+    | `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` | `PreLoadWidgetDetailEvent` |
 
 ## Changed code
 
