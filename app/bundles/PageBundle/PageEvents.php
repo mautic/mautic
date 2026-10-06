@@ -24,13 +24,6 @@ final class PageEvents
     public const string PAGE_ON_HIT = 'mautic.page_on_hit';
 
     /**
-     * The mautic.page_on_build event is thrown before displaying the page builder form to allow adding of tokens.
-     *
-     * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
-     */
-    public const string PAGE_ON_BUILD = 'mautic.page_on_build';
-
-    /**
      * The mautic.page_on_toggle_publish event is dispatched right before a page is toggle publish.
      *
      * The event listener receives a

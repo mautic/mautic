@@ -745,7 +745,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
+     * Get array of page builder tokens from bundles subscribed to PageBuilderEvent.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
      */
