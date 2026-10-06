@@ -483,10 +483,7 @@ class Stat
         $this->sourceId = (int) $sourceId;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getTokens()
+    public function getTokens(): ?array
     {
         return $this->tokens;
     }
