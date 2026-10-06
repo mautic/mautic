@@ -362,7 +362,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return null|mixed[]
      */
-    public function mergeApiKeys(array $mergeKeys, $withKeys = [], $return = false)
+    public function mergeApiKeys(array $mergeKeys, $withKeys = [], $return = false): ?array
     {
         if (empty($withKeys)) {
             $withKeys = $this->keys;
