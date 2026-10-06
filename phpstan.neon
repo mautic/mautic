@@ -235,7 +235,8 @@ parameters:
         -
             identifier: parameterByRef.type
             path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
-        # @todo move the carried service into the listener; these events only hand it through a getter
+        # these are plugin-facing extension events: the carried service is exposed to third-party
+        # listeners through a public getter, so removing it is a BC break to deprecate separately
         -
             identifier: mautic.noServiceInEventConstructor
             paths:
