@@ -6,7 +6,6 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\PageBundle\Event\PageBuilderEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class PageSubscriber implements EventSubscriberInterface
@@ -14,7 +13,7 @@ final class PageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PageEvents::PAGE_ON_BUILD => ['OnPageBuild', 0],
+            PageBuilderEvent::class => ['OnPageBuild', 0],
         ];
     }
 

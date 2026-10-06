@@ -254,7 +254,6 @@ parameters:
                 - app/bundles/EmailBundle/MonitoredEmail/Fetcher.php
                 - app/bundles/EmailBundle/Tests/Model/EmailModelFunctionalTest.php
                 - app/bundles/FormBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
-                - app/bundles/IntegrationsBundle/Controller/ConfigController.php
                 - app/bundles/IntegrationsBundle/EventListener/LeadSubscriber.php
                 - app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Internal/ReportBuilder/FullObjectReportBuilder.php
                 - app/bundles/IntegrationsBundle/Sync/SyncProcess/SyncProcess.php
@@ -274,7 +273,6 @@ parameters:
                 - app/bundles/LeadBundle/Tests/EventListener/WebhookSubscriberTest.php
                 - app/bundles/LeadBundle/Tracker/ContactTracker.php
                 - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
-                - app/bundles/PageBundle/Model/PageModel.php
                 - app/bundles/PluginBundle/Integration/AbstractIntegration.php
                 - app/bundles/SmsBundle/Helper/ReplyHelper.php
                 - app/bundles/SmsBundle/Model/SmsModel.php

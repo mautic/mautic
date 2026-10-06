@@ -752,7 +752,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = ''): array
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
-        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
+        $this->dispatcher->dispatch($event);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
     }

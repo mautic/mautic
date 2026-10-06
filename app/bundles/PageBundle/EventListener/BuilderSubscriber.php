@@ -74,7 +74,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
     {
         return [
             Events\PageDisplayEvent::class   => ['onPageDisplay', 0],
-            PageEvents::PAGE_ON_BUILD     => ['onPageBuild', 0],
+            Events\PageBuilderEvent::class     => ['onPageBuild', 0],
             EmailOnBuildEvent::class      => ['onEmailBuild', 0],
             EmailSendEvent::class         => ['onEmailGenerate', 0],
             EmailDisplayEvent::class      => ['onEmailGenerate', 0],
