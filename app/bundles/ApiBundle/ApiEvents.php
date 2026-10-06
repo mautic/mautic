@@ -35,13 +35,6 @@ final class ApiEvents
     public const string BUILD_ROUTE = 'mautic.build_api_route';
 
     /**
-     * The mautic.api_on_entity_post_save event is thrown after an entity is saved via API.
-     *
-     * The event listener receives a Mautic\ApiBundle\Event\ApiEntityEvent instance.
-     */
-    public const string API_ON_ENTITY_POST_SAVE = 'mautic.api_on_entity_post_save';
-
-    /**
      * The mautic.api_pre_serialization_context event is dispatched before the serialization context is created for the view.
      *
      * The event listener receives a Mautic\ApiBundle\Event\ApiSerializationContextEvent instance.
