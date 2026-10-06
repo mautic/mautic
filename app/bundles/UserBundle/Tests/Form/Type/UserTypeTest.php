@@ -23,7 +23,7 @@ final class UserTypeTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
 
         /** @var FormFactoryInterface $formFactory */
-        $formFactory = static::getContainer()->get('form.factory');
+        $formFactory = self::getContainer()->get(FormFactoryInterface::class);
 
         $user = new User();
 
@@ -44,7 +44,7 @@ final class UserTypeTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
 
         /** @var FormFactoryInterface $formFactory */
-        $formFactory = static::getContainer()->get('form.factory');
+        $formFactory = self::getContainer()->get(FormFactoryInterface::class);
 
         $user = new User();
 
@@ -65,7 +65,7 @@ final class UserTypeTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
 
         /** @var FormFactoryInterface $formFactory */
-        $formFactory = static::getContainer()->get('form.factory');
+        $formFactory = self::getContainer()->get(FormFactoryInterface::class);
 
         $user = new User();
 
@@ -85,7 +85,7 @@ final class UserTypeTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
 
         /** @var FormFactoryInterface $formFactory */
-        $formFactory = static::getContainer()->get('form.factory');
+        $formFactory = self::getContainer()->get(FormFactoryInterface::class);
 
         $user = new User();
 
@@ -106,7 +106,7 @@ final class UserTypeTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
 
         /** @var FormFactoryInterface $formFactory */
-        $formFactory = static::getContainer()->get('form.factory');
+        $formFactory = self::getContainer()->get(FormFactoryInterface::class);
 
         $user = new User();
 
@@ -127,7 +127,7 @@ final class UserTypeTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
 
         /** @var FormFactoryInterface $formFactory */
-        $formFactory = static::getContainer()->get('form.factory');
+        $formFactory = self::getContainer()->get(FormFactoryInterface::class);
 
         $user = new User();
 

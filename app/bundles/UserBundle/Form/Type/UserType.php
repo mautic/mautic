@@ -38,7 +38,7 @@ final class UserType extends AbstractType
         private readonly UserModel $model,
         private readonly LanguageHelper $languageHelper,
         private readonly Settings $oidcSettings,
-        private readonly SubjectToUserTransformer $subjectToUserTransformer
+        private readonly SubjectToUserTransformer $subjectToUserTransformer,
     ) {
     }
 

@@ -48,7 +48,7 @@ class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\
                 try {
                     $this->userChecker->checkPreAuth($user);
                 } catch (AccountStatusException $e) {
-                    throw new OAuth2AuthenticateException(Response::HTTP_UNAUTHORIZED, OAuth2::TOKEN_TYPE_BEARER, $this->serverService->getVariable(OAuth2::CONFIG_WWW_REALM), 'access_denied', $e->getMessage());
+                    throw new OAuth2AuthenticateException((string) Response::HTTP_UNAUTHORIZED, OAuth2::TOKEN_TYPE_BEARER, $this->serverService->getVariable(OAuth2::CONFIG_WWW_REALM), 'access_denied', $e->getMessage());
                 }
             }
 
