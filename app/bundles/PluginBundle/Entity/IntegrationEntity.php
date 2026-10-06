@@ -238,10 +238,7 @@ class IntegrationEntity extends CommonEntity
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getInternal()
+    public function getInternal(): array
     {
         return $this->internal;
     }
