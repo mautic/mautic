@@ -412,19 +412,18 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
     public function testPreviewDownloadForHtml(): void
     {
-        $lead  = $this->createLead('John');
-        $email        = $this->createEmail();
-        $emailName    = $email->getName();
-        $fileName     = 'John-'.$emailName;
+        $lead  = $this->createLead('O\'Neill');
+        $email = $this->createEmail();
+        $email->setName('Email name!');
         $this->em->flush();
 
         // Test HTML file download without any contact.
         $response = $this->getUrlResponse(sprintf('/email/download/preview/%s/real/html', $email->getId()));
-        $this->assertStringContainsString($emailName.'.html', (string) $response->headers->get('content-disposition'));
+        $this->assertStringContainsString('email-name.html', (string) $response->headers->get('content-disposition'));
 
         // Test HTML file download with contact.
         $response = $this->getUrlResponse(sprintf('/email/download/preview/%s/real/html?contactId=%s', $email->getId(), $lead->getId()));
-        $this->assertStringContainsString($fileName.'.html', (string) $response->headers->get('content-disposition'));
+        $this->assertStringContainsString('o-neill-email-name.html', (string) $response->headers->get('content-disposition'));
     }
 
     public function testPreviewEmailForUnauthorizedContact(): void

@@ -75,7 +75,8 @@ final readonly class EmailPreviewHelper
      */
     public function generateDownloadFileName(array $contact, array $company, string $name, string $fileType): string
     {
-        $fileName = $name ?: 'EmailPreview';
+        $defaultFileName = 'email-preview';
+        $fileName = $name ?: $defaultFileName;
         $prefix   = null;
 
         if ([] !== $company) {
@@ -87,6 +88,11 @@ final readonly class EmailPreviewHelper
         if ($prefix) {
             $fileName = $prefix.'-'.$fileName;
         }
+
+        $fileName = strtolower($fileName);
+        $fileName = preg_replace('/[^a-z0-9]+/', '-', $fileName);
+        $fileName = trim($fileName, '-');
+        $fileName = $fileName ?: $defaultFileName;
 
         return $fileName.'.'.$fileType;
     }

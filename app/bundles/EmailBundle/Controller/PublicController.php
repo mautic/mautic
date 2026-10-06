@@ -36,12 +36,10 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -665,15 +663,10 @@ final class PublicController extends CommonFormController
         $content = $this->generateContent($emailEntity, $assetsHelper, $draftEnabled, $objectType);
         $content = $previewHelper->generatePreviewContent($emailEntity, $contact, $company, $content);
 
-        $emailName     = $emailEntity->getName();
         if ('html' == $downloadType) {
-            $fileName   = $previewHelper->generateDownloadFileName($contact, $company, $emailName, 'html');
-            $filesystem = new Filesystem();
-            $path       = sys_get_temp_dir().'/'.$fileName;
-            $filesystem->dumpFile($path, $content);
-
-            $response = new BinaryFileResponse($path);
-            $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT);
+            $response = new Response($content);
+            $fileName = $previewHelper->generateDownloadFileName($contact, $company, $emailEntity->getName(), 'html');
+            $response->headers->set('Content-Disposition', HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $fileName));
 
             return $response;
         }

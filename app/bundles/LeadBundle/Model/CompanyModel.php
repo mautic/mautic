@@ -591,6 +591,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     }
                 }
 
+                if (!preg_match('/^[a-zA-Z0-9_-]+$/', $column)) {
+                    return [];
+                }
+
                 $expr      = new ExpressionBuilder($this->em->getConnection());
                 $composite = $expr->and($expr->like("comp.{$column}", ':filterVar'));
 
