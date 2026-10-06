@@ -512,7 +512,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array<int, string|null>
      */
-    protected function getSyncTimeframeDates(array $params)
+    protected function getSyncTimeframeDates(array $params): array
     {
         $fromDate = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
             : null;
