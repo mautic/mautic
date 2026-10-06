@@ -239,7 +239,6 @@ parameters:
         -
             identifier: mautic.noServiceInEventConstructor
             paths:
-                - app/bundles/CoreBundle/Doctrine/Common/DataFixtures/Event/PreExecuteEvent.php
                 - app/bundles/LeadBundle/Event/LeadListFilteringEvent.php
                 - app/bundles/LeadBundle/Event/LeadListFiltersChoicesEvent.php
 
