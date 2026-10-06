@@ -119,7 +119,7 @@ class AjaxController extends CommonController
     ): Response|JsonResponse {
         if (method_exists($this, $action.'Action')) {
             return $this->forwardWithPost(
-                static::class.'::'.$action.'Action',
+                $this::class.'::'.$action.'Action',
                 $request->request->all(),
                 [
                     'action'  => $action,
