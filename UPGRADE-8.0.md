@@ -293,7 +293,7 @@
 - Entity `MauticPlugin\MauticTagManagerBundle\Entity\Tag` removed. It mapped the same `lead_tags` table as `Mautic\LeadBundle\Entity\Tag`, declared no fields of its own and existed only to point at the plugin's repository, and ORM 3 rejects a subclass of a mapped entity that declares no inheritance mapping. Use `Mautic\LeadBundle\Entity\Tag`; the plugin's `TagRepository` is a service and is unchanged.
 - Method `Mautic\CoreBundle\Doctrine\Type\GeneratedType::getName()` removed, following DBAL 4's removal of `Doctrine\DBAL\Types\Type::getName()`. A type is identified by the name it is registered under.
 - Method `Mautic\PageBundle\Entity\HitRepository::getHitCountForSource()` removed as dead code. Nothing in Mautic has called it since it was added in 2014. Build the query with `createQueryBuilder()` if you need the count.
-- Constants `CLIENT_POST_SAVE`, `CLIENT_POST_DELETE`, `API_ON_ENTITY_PRE_SAVE` and `API_ON_ENTITY_POST_SAVE` removed from `Mautic\ApiBundle\ApiEvents`. These events are now dispatched by their own event class (all under `Mautic\ApiBundle\Event`). The client events used to share one `ClientEvent` object and the API entity events one `ApiEntityEvent` object; both are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ClientPostSaveEvent::class => 'onClientPostSave'`.
+- Constants `CLIENT_POST_SAVE`, `CLIENT_POST_DELETE`, `API_ON_ENTITY_PRE_SAVE`, `API_ON_ENTITY_POST_SAVE`, `API_PRE_SERIALIZATION_CONTEXT` and `API_POST_SERIALIZATION_CONTEXT` removed from `Mautic\ApiBundle\ApiEvents`. These events are now dispatched by their own event class (all under `Mautic\ApiBundle\Event`). The client events used to share one `ClientEvent` object, the API entity events one `ApiEntityEvent` object, and the serialization-context events one `ApiSerializationContextEvent` object; all three are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ClientPostSaveEvent::class => 'onClientPostSave'`.
 
     | Removed `ApiEvents` constant | New event class |
     |---|---|
@@ -301,7 +301,10 @@
     | `CLIENT_POST_DELETE` | `ClientPostDeleteEvent` |
     | `API_ON_ENTITY_PRE_SAVE` | `PreSaveApiEntityEvent` |
     | `API_ON_ENTITY_POST_SAVE` | `PostSaveApiEntityEvent` |
+    | `API_PRE_SERIALIZATION_CONTEXT` | `PreSerializationContextEvent` |
+    | `API_POST_SERIALIZATION_CONTEXT` | `PostSerializationContextEvent` |
 - Unused constants `CLIENT_PRE_SAVE`, `BUILD_ROUTE` and `API_PLATFORM_PERMISSION_CONTEXT` removed from `Mautic\ApiBundle\ApiEvents`; they had no dispatcher or listener.
+- Class `Mautic\ApiBundle\ApiEvents` removed; it held only the constants listed above and is now empty. Reference the event classes directly.
 
 ## Changed code
 
