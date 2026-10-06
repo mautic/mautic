@@ -13,13 +13,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\Oauth2Authenticator
+class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\Oauth2Authenticator
 {
-    public function supports(Request $request): bool
+    public function supports(Request $request): ?bool
     {
         // needed until the oAuth2 library will not be updated to 4.0.5
         return null !== $this->serverService->getBearerToken($request);
@@ -30,7 +30,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
      * token user's identifier when one is available instead of always using the
      * OAuth client identifier.
      */
-    public function authenticate(Request $request): SelfValidatingPassport
+    public function authenticate(Request $request): Passport
     {
         try {
             $tokenString = $this->serverService->getBearerToken($request);
@@ -48,11 +48,14 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
                 try {
                     $this->userChecker->checkPreAuth($user);
                 } catch (AccountStatusException $e) {
-                    throw new OAuth2AuthenticateException((string) Response::HTTP_UNAUTHORIZED, OAuth2::TOKEN_TYPE_BEARER, $this->serverService->getVariable(OAuth2::CONFIG_WWW_REALM), 'access_denied', $e->getMessage());
+                    throw new OAuth2AuthenticateException(Response::HTTP_UNAUTHORIZED, OAuth2::TOKEN_TYPE_BEARER, $this->serverService->getVariable(OAuth2::CONFIG_WWW_REALM), 'access_denied', $e->getMessage());
                 }
             }
 
-            $roles = (null !== $user) ? $user->getRoles() : [];
+            // For user-bound tokens, use the user's roles.
+            // For client-only tokens (client_credentials), use a placeholder role to mark the badge
+            // as resolved. The actual roles will be set by ApiUserSubscriber from the client's Role.
+            $roles = (null !== $user) ? $user->getRoles() : ['ROLE_API'];
             $scope = $accessToken->getScope();
 
             if (!empty($scope)) {
@@ -65,42 +68,13 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
 
             $accessTokenBadge = new AccessTokenBadge($accessToken, $roles);
 
-            // Provide a custom user loader to avoid the firewall's user provider
-            // trying to load a user by the OAuth client's random ID (which would fail
-            // for client_credentials tokens that have no user).
-            // For user-bound tokens, we return the user directly from the access token.
-            // For client-only tokens, we create a minimal UserInterface wrapper around the client.
-            $userLoader = static function () use ($user, $client, $roles): UserInterface {
-                if (null !== $user) {
-                    return $user;
-                }
-
-                // Create a minimal UserInterface for client_credentials tokens
-                return new class($client->getUserIdentifier(), $roles) implements UserInterface {
-                    public function __construct(
-                        private readonly string $identifier,
-                        private readonly array $roles,
-                    ) {
-                    }
-
-                    public function getRoles(): array
-                    {
-                        return $this->roles ?: ['ROLE_USER'];
-                    }
-
-                    public function eraseCredentials(): void
-                    {
-                    }
-
-                    public function getUserIdentifier(): string
-                    {
-                        return $this->identifier;
-                    }
-                };
-            };
-
+            // Parent uses $client->getUserIdentifier() here, which breaks
+            // user-bound bearer tokens on /api/v2 because the client identifier
+            // is not a Mautic username.
+            // Note: No userLoader is provided here - ApiUserSubscriber will set one
+            // for client-only tokens to create a pseudo-user with proper permissions.
             return new SelfValidatingPassport(
-                new UserBadge($user?->getUserIdentifier() ?? $client->getUserIdentifier(), $userLoader),
+                new UserBadge($user?->getUserIdentifier() ?? $client->getUserIdentifier()),
                 [$accessTokenBadge]
             );
         } catch (OAuth2ServerException $e) {
