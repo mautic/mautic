@@ -308,7 +308,7 @@
     | `DASHBOARD_ON_MODULE_FORM_GENERATE` | `WidgetFormEvent` |
     | `DASHBOARD_ON_MODULE_DETAIL_GENERATE` | `GenerateWidgetDetailEvent` |
     | `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` | `PreLoadWidgetDetailEvent` |
-- Constants `CLIENT_POST_SAVE`, `CLIENT_POST_DELETE`, `API_ON_ENTITY_PRE_SAVE` and `API_ON_ENTITY_POST_SAVE` removed from `Mautic\ApiBundle\ApiEvents`. These events are now dispatched by their own event class (all under `Mautic\ApiBundle\Event`). The client events used to share one `ClientEvent` object and the API entity events one `ApiEntityEvent` object; both are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ClientPostSaveEvent::class => 'onClientPostSave'`.
+- Constants `CLIENT_POST_SAVE`, `CLIENT_POST_DELETE`, `API_ON_ENTITY_PRE_SAVE`, `API_ON_ENTITY_POST_SAVE`, `API_PRE_SERIALIZATION_CONTEXT` and `API_POST_SERIALIZATION_CONTEXT` removed from `Mautic\ApiBundle\ApiEvents`. These events are now dispatched by their own event class (all under `Mautic\ApiBundle\Event`). The client events used to share one `ClientEvent` object, the API entity events one `ApiEntityEvent` object, and the serialization-context events one `ApiSerializationContextEvent` object; all three are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ClientPostSaveEvent::class => 'onClientPostSave'`.
 
     | Removed `ApiEvents` constant | New event class |
     |---|---|
@@ -316,7 +316,10 @@
     | `CLIENT_POST_DELETE` | `ClientPostDeleteEvent` |
     | `API_ON_ENTITY_PRE_SAVE` | `PreSaveApiEntityEvent` |
     | `API_ON_ENTITY_POST_SAVE` | `PostSaveApiEntityEvent` |
+    | `API_PRE_SERIALIZATION_CONTEXT` | `PreSerializationContextEvent` |
+    | `API_POST_SERIALIZATION_CONTEXT` | `PostSerializationContextEvent` |
 - Unused constants `CLIENT_PRE_SAVE`, `BUILD_ROUTE` and `API_PLATFORM_PERMISSION_CONTEXT` removed from `Mautic\ApiBundle\ApiEvents`; they had no dispatcher or listener.
+- Class `Mautic\ApiBundle\ApiEvents` removed; it held only the constants listed above and is now empty. Reference the event classes directly.
 
 ## Changed code
 
