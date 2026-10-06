@@ -308,6 +308,15 @@
     | `DASHBOARD_ON_MODULE_FORM_GENERATE` | `WidgetFormEvent` |
     | `DASHBOARD_ON_MODULE_DETAIL_GENERATE` | `GenerateWidgetDetailEvent` |
     | `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` | `PreLoadWidgetDetailEvent` |
+- Constants `CLIENT_POST_SAVE`, `CLIENT_POST_DELETE`, `API_ON_ENTITY_PRE_SAVE` and `API_ON_ENTITY_POST_SAVE` removed from `Mautic\ApiBundle\ApiEvents`. These events are now dispatched by their own event class (all under `Mautic\ApiBundle\Event`). The client events used to share one `ClientEvent` object and the API entity events one `ApiEntityEvent` object; both are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ClientPostSaveEvent::class => 'onClientPostSave'`.
+
+    | Removed `ApiEvents` constant | New event class |
+    |---|---|
+    | `CLIENT_POST_SAVE` | `ClientPostSaveEvent` |
+    | `CLIENT_POST_DELETE` | `ClientPostDeleteEvent` |
+    | `API_ON_ENTITY_PRE_SAVE` | `PreSaveApiEntityEvent` |
+    | `API_ON_ENTITY_POST_SAVE` | `PostSaveApiEntityEvent` |
+- Unused constants `CLIENT_PRE_SAVE`, `BUILD_ROUTE` and `API_PLATFORM_PERMISSION_CONTEXT` removed from `Mautic\ApiBundle\ApiEvents`; they had no dispatcher or listener.
 
 ## Changed code
 
