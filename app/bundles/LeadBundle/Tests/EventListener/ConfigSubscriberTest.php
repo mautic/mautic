@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\LeadBundle\EventListener\ConfigSubscriber;
 use Mautic\LeadBundle\Form\Type\ConfigCompanyType;
@@ -48,8 +47,8 @@ final class ConfigSubscriberTest extends TestCase
     public function testSubscribedEvents(): void
     {
         $subscribedEvents = ConfigSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey(ConfigEvents::CONFIG_ON_GENERATE, $subscribedEvents);
-        $handlers = ConfigSubscriber::getSubscribedEvents()[ConfigEvents::CONFIG_ON_GENERATE];
+        $this->assertArrayHasKey(ConfigBuilderEvent::class, $subscribedEvents);
+        $handlers = ConfigSubscriber::getSubscribedEvents()[ConfigBuilderEvent::class];
         $this->assertCount(2, $handlers);
     }
 

@@ -19,7 +19,7 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
+            ConfigBuilderEvent::class => ['onConfigGenerate', 0],
             ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigBeforeSave', 0],
         ];
     }
