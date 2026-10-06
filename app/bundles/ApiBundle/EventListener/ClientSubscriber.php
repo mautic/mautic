@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\EventListener;
 
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event as Events;
+use Mautic\ApiBundle\Event\ClientPostDeleteEvent;
+use Mautic\ApiBundle\Event\ClientPostSaveEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -21,8 +22,8 @@ final readonly class ClientSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ApiEvents::CLIENT_POST_SAVE   => ['onClientPostSave', 0],
-            ApiEvents::CLIENT_POST_DELETE => ['onClientDelete', 0],
+            ClientPostSaveEvent::class   => ['onClientPostSave', 0],
+            ClientPostDeleteEvent::class => ['onClientDelete', 0],
         ];
     }
 
