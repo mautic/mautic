@@ -9,7 +9,7 @@ use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\DataTransformerInterface;
 
-final readonly class SubjectToUserTransformer implements DataTransformerInterface
+readonly class SubjectToUserTransformer implements DataTransformerInterface
 {
     public function __construct(private OidcSubjectIdRepository $subjectIdRepository)
     {
