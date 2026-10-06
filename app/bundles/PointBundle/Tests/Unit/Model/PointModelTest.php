@@ -140,7 +140,6 @@ final class PointModelTest extends TestCase
             ->method('dispatch')
             ->willReturnCallback(function (Event $event, ?string $eventName = null) use ($pointActionHelper, $type, $lead, $point): Event {
                 if ($event instanceof PointBuilderEvent) {
-                    $this->assertInstanceOf(PointBuilderEvent::class, $event);
                     $this->assertEquals(new PointBuilderEvent($this->translator), $event);
                     $event->addAction(
                         $type,
