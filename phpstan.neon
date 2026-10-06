@@ -235,6 +235,14 @@ parameters:
         -
             identifier: parameterByRef.type
             path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
+        # @todo move the carried service into the listener; these events only hand it through a getter
+        -
+            identifier: mautic.noServiceInEventConstructor
+            paths:
+                - app/bundles/CoreBundle/Doctrine/Common/DataFixtures/Event/PreExecuteEvent.php
+                - app/bundles/CoreBundle/Event/IconEvent.php
+                - app/bundles/LeadBundle/Event/LeadListFilteringEvent.php
+                - app/bundles/LeadBundle/Event/LeadListFiltersChoicesEvent.php
 
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
@@ -297,6 +305,7 @@ rules:
     - Utils\PHPStan\Rule\MockedMethodReturnMustMatchNativeTypeRule
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
+    - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
     # enable later, might not be needed
     - Symplify\PHPStanRules\Rules\NoDuplicateNonRepeatableAttributeRule
 
