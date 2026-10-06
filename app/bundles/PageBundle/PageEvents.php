@@ -31,13 +31,6 @@ final class PageEvents
     public const string PAGE_ON_BUILD = 'mautic.page_on_build';
 
     /**
-     * The mautic.page_on_display event is thrown before displaying the page content.
-     *
-     * The event listener receives a Mautic\PageBundle\Event\PageDisplayEvent instance.
-     */
-    public const string PAGE_ON_DISPLAY = 'mautic.page_on_display';
-
-    /**
      * The mautic.page_on_toggle_publish event is dispatched right before a page is toggle publish.
      *
      * The event listener receives a
