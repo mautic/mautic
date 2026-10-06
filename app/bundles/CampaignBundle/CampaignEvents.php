@@ -65,22 +65,6 @@ final class CampaignEvents
     public const string CAMPAIGN_ON_TRIGGER = 'mautic.campaign_on_trigger';
 
     /**
-     * The mautic.campaign_on_leadchange event is dispatched when a lead was added or removed from the campaign.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignLeadChangeEvent instance.
-     */
-    public const string CAMPAIGN_ON_LEADCHANGE = 'mautic.campaign_on_leadchange';
-
-    /**
-     * The mautic.campaign_on_leadchange event is dispatched if a batch of leads are changed from CampaignModel::rebuildCampaignLeads().
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignLeadChangeEvent instance.
-     */
-    public const string LEAD_CAMPAIGN_BATCH_CHANGE = 'mautic.lead_campaign_batch_change';
-
-    /**
      * The mautic.campaign_on_event_executed event is dispatched when a campaign event is executed.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\ExecutedEvent instance.
