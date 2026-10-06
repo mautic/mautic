@@ -18,6 +18,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * Bundle Config/config.php must not define services, the autowired Config/services.php next to it is the place for them.
  *
  * @implements Rule<Return_>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoServicesInBundleConfigRuleTest
  */
 final class NoServicesInBundleConfigRule implements Rule
 {

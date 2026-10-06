@@ -26,6 +26,8 @@ use PHPStan\Type\TypeCombinator;
  * Either the property is never null (drop the "?") or the getter is honest ("getFoo(): ?Foo").
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NullablePropertyGetterMustReturnNullableRuleTest
  */
 final class NullablePropertyGetterMustReturnNullableRule implements Rule
 {

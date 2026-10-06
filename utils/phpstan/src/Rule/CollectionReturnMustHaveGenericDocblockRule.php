@@ -23,6 +23,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * Method with "Collection" return type must declare generic docblock, e.g. "@return Collection<int, Entity>".
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\CollectionReturnMustHaveGenericDocblockRuleTest
  */
 final class CollectionReturnMustHaveGenericDocblockRule implements Rule
 {

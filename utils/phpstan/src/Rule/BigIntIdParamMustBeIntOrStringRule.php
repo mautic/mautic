@@ -31,6 +31,8 @@ use PHPStan\Type\TypeCombinator;
  * the param is passed to, e.g. $this->leadModel->getEntity($leadId)).
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\BigIntIdParamMustBeIntOrStringRuleTest
  */
 final readonly class BigIntIdParamMustBeIntOrStringRule implements Rule
 {

@@ -25,6 +25,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * Method parameter typed "Collection" must declare generic docblock, e.g. "@param Collection<int, Entity> $items".
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\CollectionParamMustHaveGenericDocblockRuleTest
  */
 final class CollectionParamMustHaveGenericDocblockRule implements Rule
 {

@@ -23,6 +23,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * Property typed "Collection" must declare generic docblock, e.g. "@var Collection<int, Entity>".
  *
  * @implements Rule<Property>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\CollectionPropertyMustHaveGenericDocblockRuleTest
  */
 final class CollectionPropertyMustHaveGenericDocblockRule implements Rule
 {
