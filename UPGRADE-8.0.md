@@ -300,6 +300,14 @@
     | `PAGE_ON_BUILD` | `PageBuilderEvent` |
     | `PAGE_ON_DISPLAY` | `PageDisplayEvent` |
 - Constant `AGGREGATE_STAT_REQUEST` removed from `Mautic\StatsBundle\StatEvents`. The event is now dispatched by its own event class, `Mautic\StatsBundle\Event\AggregateStatRequestEvent`. Subscribe to the event class instead of the constant, e.g. `AggregateStatRequestEvent::class => 'onStatRequest'`.
+- Constants `DASHBOARD_ON_MODULE_LIST_GENERATE`, `DASHBOARD_ON_MODULE_FORM_GENERATE`, `DASHBOARD_ON_MODULE_DETAIL_GENERATE` and `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` removed from `Mautic\DashboardBundle\DashboardEvents`. These events are now dispatched by their own event class (all under `Mautic\DashboardBundle\Event`). The two detail events used to share one `WidgetDetailEvent` object; `WidgetDetailEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `GenerateWidgetDetailEvent::class => 'onWidgetDetailGenerate'`.
+
+    | Removed `DashboardEvents` constant | New event class |
+    |---|---|
+    | `DASHBOARD_ON_MODULE_LIST_GENERATE` | `WidgetTypeListEvent` |
+    | `DASHBOARD_ON_MODULE_FORM_GENERATE` | `WidgetFormEvent` |
+    | `DASHBOARD_ON_MODULE_DETAIL_GENERATE` | `GenerateWidgetDetailEvent` |
+    | `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` | `PreLoadWidgetDetailEvent` |
 
 ## Changed code
 
