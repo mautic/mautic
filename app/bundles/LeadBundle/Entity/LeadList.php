@@ -282,7 +282,10 @@ class LeadList extends FormEntity implements UuidInterface
         return $this;
     }
 
-    public function getFilters(): array
+    /**
+     * @return array
+     */
+    public function getFilters()
     {
         if (is_array($this->filters)) {
             return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters)); // @phpstan-ignore method.deprecated
@@ -308,13 +311,7 @@ class LeadList extends FormEntity implements UuidInterface
 
     public function hasFilterTypeOf(string $type): bool
     {
-        foreach ($this->getFilters() as $filter) {
-            if ($filter['type'] === $type) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->getFilters(), fn ($filter): bool => $filter['type'] === $type);
     }
 
     /**

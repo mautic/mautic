@@ -175,7 +175,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getApiKeys(): array
+    public function getApiKeys()
     {
         return $this->apiKeys;
     }

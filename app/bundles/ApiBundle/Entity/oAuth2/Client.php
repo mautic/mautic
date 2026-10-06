@@ -100,7 +100,10 @@ class Client extends BaseClient
         }
     }
 
-    public function getChanges(): array
+    /**
+     * @return array
+     */
+    public function getChanges()
     {
         return $this->changes;
     }

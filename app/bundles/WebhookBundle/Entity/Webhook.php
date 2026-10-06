@@ -453,7 +453,10 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    public function getPayload(): array
+    /**
+     * @return array
+     */
+    public function getPayload()
     {
         return $this->payload;
     }
