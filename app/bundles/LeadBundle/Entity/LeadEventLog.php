@@ -232,10 +232,7 @@ class LeadEventLog
         return $this;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getProperties()
+    public function getProperties(): ?array
     {
         return $this->properties;
     }
