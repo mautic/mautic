@@ -16,6 +16,8 @@ use Mautic\SmsBundle\Entity\Sms;
 
 final class LoadClickData extends AbstractFixture implements OrderedFixtureInterface
 {
+    use ManagedLeadTrait;
+
     public function load(ObjectManager $manager): void
     {
         // Create an email for clicks

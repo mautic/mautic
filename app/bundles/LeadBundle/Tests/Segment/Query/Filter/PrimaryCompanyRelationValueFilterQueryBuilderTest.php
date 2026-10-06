@@ -24,7 +24,7 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
     public function testGetServiceId(): void
     {
-        $this->assertSame('mautic.lead.query.builder.complex_relation.primary_company', $this->queryBuilder::getServiceId());
+        $this->assertSame(PrimaryCompanyRelationValueFilterQueryBuilder::class, $this->queryBuilder::getServiceId());
     }
 
     public function testApplyQueryAllowsMissingCompanyForEmptyOperator(): void
@@ -172,6 +172,28 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $this->assertStringContainsString("NOT cmp1.company_name REGEXP 'alpha'", (string) $debugOutput);
         $this->assertStringContainsString("NOT cmp1.company_name REGEXP 'beta'", (string) $debugOutput);
+    }
+
+    public function testApplyQueryHandlesEmptyNegatedMultiselectValue(): void
+    {
+        $queryBuilder = $this->createQueryBuilder();
+
+        $this->randomParameter->method('generateRandomParameterName')->willReturnOnConsecutiveCalls(
+            'rel1',
+            'cmp1',
+            'rel2'
+        );
+
+        $filter                            = $this->createFilter('!multiselect', []);
+        $filter->contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'field'    => 'company_name',
+            'filter'   => [],
+            'operator' => OperatorOptions::EXCLUDING_ANY,
+            'type'     => 'multiselect',
+        ]);
+        $this->queryBuilder->applyQuery($queryBuilder, $filter);
+
+        $this->assertStringContainsString('(1 = 1)', (string) $queryBuilder->getDebugOutput());
     }
 
     public function testApplyQuerySupportsEqualOperator(): void

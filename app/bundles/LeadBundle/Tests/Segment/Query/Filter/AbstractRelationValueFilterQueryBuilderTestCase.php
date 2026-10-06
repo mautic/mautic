@@ -40,7 +40,7 @@ abstract class AbstractRelationValueFilterQueryBuilderTestCase extends TestCase
     }
 
     /**
-     * @param array<mixed> $batch
+     * @param array<string, mixed> $batch
      */
     protected function createFilter(string $operator, mixed $value, array $batch = []): ContactSegmentFilter
     {

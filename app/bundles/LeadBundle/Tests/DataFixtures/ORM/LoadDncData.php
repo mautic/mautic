@@ -13,6 +13,8 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final class LoadDncData extends AbstractFixture implements OrderedFixtureInterface
 {
+    use ManagedLeadTrait;
+
     public function load(ObjectManager $manager): void
     {
         $dnc = new DoNotContact();

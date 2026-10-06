@@ -92,16 +92,6 @@ class ContactSegmentFilterCrate
         return in_array($this->object, [self::COMPANY_OBJECT, self::COMPANY_ALL_OBJECT], true);
     }
 
-    public function isPrimaryCompanyType(): bool
-    {
-        return self::COMPANY_OBJECT === $this->object;
-    }
-
-    public function isCompanyAllType(): bool
-    {
-        return self::COMPANY_ALL_OBJECT === $this->object;
-    }
-
     public function isBehaviorsType(): bool
     {
         return self::BEHAVIORS_OBJECT === $this->object;

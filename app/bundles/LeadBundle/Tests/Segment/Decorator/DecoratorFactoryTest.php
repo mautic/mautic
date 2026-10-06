@@ -15,19 +15,16 @@ use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
+final class DecoratorFactoryTest extends TestCase
 {
-    /**
-     * @var MockObject&EventDispatcherInterface
-     */
-    private MockObject $eventDispatcherMock;
+    private EventDispatcherInterface&MockObject $eventDispatcherMock;
 
-    /**
-     * @var MockObject&DateOptionFactory
-     */
-    private MockObject $dateOptionFactory;
+    private CompanyDecorator&\PHPUnit\Framework\MockObject\Stub $companyDecorator;
+
+    private DateOptionFactory&MockObject $dateOptionFactory;
 
     private CompanyDecorator&\PHPUnit\Framework\MockObject\Stub $companyDecorator;
 

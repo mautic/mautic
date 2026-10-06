@@ -105,7 +105,9 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
         $tokenStorage->setToken(null);
         $this->client->getCookieJar()->clear();
+
         $this->em->clear();
+
     }
 
     private function loginAdminUser(): void
@@ -116,6 +118,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->loginUser($admin);
     }
 
+
     private function findCompanyByReference(string $reference): Company
     {
         /** @var Company $company */
@@ -125,6 +128,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
         return $company;
     }
+
 
     /**
      * @param array<int, array<string, mixed>> $filters
@@ -279,6 +283,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->assertContains($leadWithCompany->getId(), $leadIds);
         $this->assertNotContains($leadWithCompanyMatchingValue->getId(), $leadIds);
         $this->assertNotContains($leadWithoutCompany->getId(), $leadIds);
+
     }
 
     public function testSegmentCanCombineContactAndCompanyTags(): void
@@ -356,6 +361,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->assertContains($leadWithUntaggedCompany->getId(), $leadIds);
         $this->assertNotContains($leadWithoutCompany->getId(), $leadIds);
         $this->assertGreaterThan(1, count($leadIds));
+
     }
 
     public function testSegmentRebuildCommand(): void
