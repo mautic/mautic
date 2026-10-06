@@ -53,7 +53,7 @@ final class StatCollection
     /**
      * @throws \Exception
      */
-    public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count): static
+    public function addStatByDateTimeStringInUTC($dateTimeInUTC, int $count): static
     {
         if (preg_match('/([0-9]{4})\\s([0-9]{2})/', $dateTimeInUTC, $matches)) {    //  Is this a week?
             $dateTimeString = CalculatorHelper::getWeekDateString($matches[1].'-'.$matches[2]);

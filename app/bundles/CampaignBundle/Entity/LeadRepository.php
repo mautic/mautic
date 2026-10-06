@@ -84,7 +84,7 @@ class LeadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, string $toLeadId): void
+    public function updateLead($fromLeadId, $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -101,8 +101,8 @@ class LeadRepository extends CommonRepository
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_leads')
-            ->set('lead_id', $toLeadId)
-            ->where('lead_id = '.$fromLeadId);
+            ->set('lead_id', (int) $toLeadId)
+            ->where('lead_id = '.(int) $fromLeadId);
 
         if ([] !== $campaigns) {
             $q->andWhere(
@@ -114,7 +114,7 @@ class LeadRepository extends CommonRepository
             // Delete remaining leads as the new lead already belongs
             $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'campaign_leads')
-                ->where('lead_id = '.$fromLeadId)
+                ->where('lead_id = '.(int) $fromLeadId)
                 ->executeStatement();
         } else {
             $q->executeStatement();
@@ -270,7 +270,7 @@ class LeadRepository extends CommonRepository
                 )
                 // Order by ID so we can query by greater than X contact ID when batching
                 ->orderBy('l.lead_id')
-                ->setParameter('campaignId', $campaignId);
+                ->setParameter('campaignId', (int) $campaignId);
 
             // Contact IDs
             $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
