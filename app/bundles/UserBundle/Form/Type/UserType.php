@@ -12,6 +12,9 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use Mautic\UserBundle\Security\OIDC\OidcSubjectIdType;
+use Mautic\UserBundle\Security\OIDC\Settings;
+use Mautic\UserBundle\Security\OIDC\SubjectToUserTransformer;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -34,6 +37,8 @@ final class UserType extends AbstractType
         private readonly TranslatorInterface $translator,
         private readonly UserModel $model,
         private readonly LanguageHelper $languageHelper,
+        private readonly Settings $oidcSettings,
+        private readonly SubjectToUserTransformer $subjectToUserTransformer
     ) {
     }
 
@@ -227,6 +232,17 @@ final class UserType extends AbstractType
             );
 
             $builder->add('isPublished', YesNoButtonGroupType::class);
+
+            if ($this->oidcSettings->isEnabled()) {
+                $builder->add($builder->create(
+                    'subjectID',
+                    OidcSubjectIdType::class,
+                    [
+                        'mapped' => false,
+                        'data'   => $options['data'],
+                    ])
+                    ->addModelTransformer($this->subjectToUserTransformer));
+            }
 
             $builder->add('buttons', FormButtonsType::class);
         } else {
