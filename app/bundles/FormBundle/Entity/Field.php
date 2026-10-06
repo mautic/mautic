@@ -132,7 +132,7 @@ class Field implements UuidInterface
     private $properties = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $validation = [];
