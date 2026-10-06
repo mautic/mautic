@@ -111,7 +111,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     private array $removedEvents = [];
 
     /**
-     * @var mixed[]
+     * @var mixed[]|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
     private $payload;
@@ -453,7 +453,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    public function getPayload(): array
+    public function getPayload(): ?array
     {
         return $this->payload;
     }
