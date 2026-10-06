@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Event;
 
-use Mautic\IntegrationsBundle\Event\CompletedSyncIterationEvent;
+use Mautic\IntegrationsBundle\Event\IntegrationToMauticSyncCompletedEvent;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderResultsDAO;
@@ -19,7 +19,7 @@ final class CompletedSyncIterationEventTest extends TestCase
         $iteration     = 1;
         $inputOptions  = new InputOptionsDAO(['integration' => 'foobar']);
 
-        $event = new CompletedSyncIterationEvent($orderResults, $iteration, $inputOptions, $mappingManual);
+        $event = new IntegrationToMauticSyncCompletedEvent($orderResults, $iteration, $inputOptions, $mappingManual);
 
         $this->assertSame($mappingManual->getIntegration(), $event->getIntegration());
         $this->assertSame($orderResults, $event->getOrderResults());

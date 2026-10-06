@@ -6,10 +6,11 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
+use Mautic\IntegrationsBundle\Event\InternalCompanyFieldChangesEvent;
+use Mautic\IntegrationsBundle\Event\InternalContactFieldChangesEvent;
 use Mautic\IntegrationsBundle\EventListener\LeadSubscriber;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
@@ -176,7 +177,7 @@ final class LeadSubscriberTest extends TestCase
 
         $this->eventDispatcherInterfaceMock->expects($this->once())
             ->method('hasListeners')
-            ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
+            ->with(InternalContactFieldChangesEvent::class)
             ->willReturn(true);
 
         $this->subscriber->onLeadPostSave(new LeadEvent($lead));
@@ -211,7 +212,7 @@ final class LeadSubscriberTest extends TestCase
         $this->eventDispatcherInterfaceMock
             ->expects($this->once())
             ->method('hasListeners')
-            ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
+            ->with(InternalContactFieldChangesEvent::class)
             ->willReturn(true);
 
         $this->subscriber->onLeadPostSave(new LeadEvent($lead));
@@ -245,7 +246,7 @@ final class LeadSubscriberTest extends TestCase
 
         $this->eventDispatcherInterfaceMock->expects($this->once())
             ->method('hasListeners')
-            ->with(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)
+            ->with(InternalContactFieldChangesEvent::class)
             ->willReturn(true);
 
         $this->subscriber->onLeadPostSave(new LeadEvent($lead));
@@ -349,7 +350,7 @@ final class LeadSubscriberTest extends TestCase
 
         $this->eventDispatcherInterfaceMock->expects($this->once())
             ->method('hasListeners')
-            ->with(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)
+            ->with(InternalCompanyFieldChangesEvent::class)
             ->willReturn(true);
 
         $this->subscriber->onCompanyPostSave($this->companyEvent);
@@ -387,7 +388,7 @@ final class LeadSubscriberTest extends TestCase
 
         $this->eventDispatcherInterfaceMock->expects($this->once())
             ->method('hasListeners')
-            ->with(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)
+            ->with(InternalCompanyFieldChangesEvent::class)
             ->willReturn(true);
 
         $this->subscriber->onCompanyPostSave($this->companyEvent);
