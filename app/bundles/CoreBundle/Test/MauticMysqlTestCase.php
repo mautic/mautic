@@ -204,6 +204,22 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             }
 
             $this->connection->executeQuery($sql);
+
+            /*
+             * POSTGRESQL DOCTRINE WORKAROUND:
+             *
+             * TRUNCATE … RESTART IDENTITY CASCADE only restarts sequences that PostgreSQL considers owned by / linked to the identity column.
+             * In this Mautic branch Doctrine creates columns as GENERATED … AS IDENTITY. 
+             * Those underlying sequences are frequently not registered in a way that pg_get_serial_sequence() 
+             * (and therefore RESTART IDENTITY) can't see.
+             */
+            $sequence = DatabasePlatform::getSerialSequence($this->connection, $table);
+            if ($sequence) {
+                $this->connection->executeQuery(sprintf(
+                    "ALTER SEQUENCE %s RESTART WITH 1",
+                    $this->connection->quoteIdentifier($sequence)
+                ));
+            }
         }
         if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
