@@ -5,7 +5,6 @@ namespace Mautic\StatsBundle\Aggregate;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 use Mautic\StatsBundle\Event\AggregateStatRequestEvent;
 use Mautic\StatsBundle\Event\Options\FetchOptions;
-use Mautic\StatsBundle\StatEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class Collector
@@ -24,7 +23,7 @@ final readonly class Collector
 
         $event = new AggregateStatRequestEvent($statName, $fromDateTime, $toDateTime, $fetchOptions);
 
-        $this->eventDispatcher->dispatch($event, StatEvents::AGGREGATE_STAT_REQUEST);
+        $this->eventDispatcher->dispatch($event);
 
         return $event->getStatCollection();
     }

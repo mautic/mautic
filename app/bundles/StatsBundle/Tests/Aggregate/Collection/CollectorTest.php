@@ -6,7 +6,6 @@ namespace Mautic\StatsBundle\Tests\Aggregate\Collection;
 
 use Mautic\StatsBundle\Aggregate\Collector;
 use Mautic\StatsBundle\Event\AggregateStatRequestEvent;
-use Mautic\StatsBundle\StatEvents;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -22,7 +21,7 @@ final class CollectorTest extends TestCase
     public function testEventIsDispatched(): void
     {
         $this->eventDispatcher->addListener(
-            StatEvents::AGGREGATE_STAT_REQUEST,
+            AggregateStatRequestEvent::class,
             function (AggregateStatRequestEvent $event): void {
                 $statCollection = $event->getStatCollection();
 

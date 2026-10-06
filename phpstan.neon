@@ -250,7 +250,6 @@ parameters:
                 - app/bundles/ConfigBundle/Controller/ConfigController.php
                 - app/bundles/CoreBundle/EventListener/CoreSubscriber.php
                 - app/bundles/CoreBundle/Twig/Helper/SecurityHelper.php
-                - app/bundles/DashboardBundle/Model/DashboardModel.php
                 - app/bundles/DynamicContentBundle/EventListener/CampaignSubscriber.php
                 - app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
                 - app/bundles/EmailBundle/MonitoredEmail/Fetcher.php
@@ -282,7 +281,6 @@ parameters:
                 - app/bundles/PointBundle/Model/TriggerModel.php
                 - app/bundles/SmsBundle/Helper/ReplyHelper.php
                 - app/bundles/SmsBundle/Model/SmsModel.php
-                - app/bundles/StatsBundle/Aggregate/Collector.php
                 - app/bundles/UserBundle/Security/Authenticator/PluginAuthenticator.php
                 - app/bundles/UserBundle/Security/Authenticator/SsoAuthenticator.php
                 - app/bundles/WebhookBundle/Model/WebhookModel.php

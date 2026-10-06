@@ -8,6 +8,7 @@ use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -34,7 +35,7 @@ final class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
         $this->translator            = $this->createMock(Translator::class);
         $this->widget                = $this->createMock(Widget::class);
 
-        $this->widgetDetailEvent = new WidgetDetailEvent(
+        $this->widgetDetailEvent = new GenerateWidgetDetailEvent(
             $this->translator,
             $this->createStub(CorePermissions::class),
             $this->widget,
