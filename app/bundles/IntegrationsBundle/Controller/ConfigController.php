@@ -6,8 +6,9 @@ namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Twig\Extension\FormExtension;
+use Mautic\IntegrationsBundle\Event\ConfigAfterSaveEvent;
 use Mautic\IntegrationsBundle\Event\ConfigAuthUrlEvent;
-use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
+use Mautic\IntegrationsBundle\Event\ConfigBeforeSaveEvent;
 use Mautic\IntegrationsBundle\Event\FormLoadEvent;
 use Mautic\IntegrationsBundle\Event\KeysSaveEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -24,7 +25,6 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormNotesInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -126,9 +126,7 @@ final class ConfigController extends AbstractFormController
         }
 
         // Dispatch event prior to saving the Integration. Bundles/plugins may need to modify some field values before save
-        $configEvent = new ConfigSaveEvent($this->integrationConfiguration);
-
-        $this->dispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE);
+        $this->dispatcher->dispatch(new ConfigBeforeSaveEvent($this->integrationConfiguration));
 
         // Show the form if there are errors and the plugin is published or the authorized button was clicked
         $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
@@ -141,7 +139,7 @@ final class ConfigController extends AbstractFormController
         $integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
 
         // Dispatch after save event
-        $this->dispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE);
+        $this->dispatcher->dispatch(new ConfigAfterSaveEvent($this->integrationConfiguration));
 
         // Show the form if the apply button was clicked
         if ($this->isFormApplied($form)) {
