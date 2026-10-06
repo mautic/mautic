@@ -216,7 +216,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
              * Those underlying sequences are frequently not registered in a way that pg_get_serial_sequence() 
              * (and therefore RESTART IDENTITY) can't see.
              */
-            $this->resetAutoincrement($tables);
+            //$this->resetAutoincrement($tables);
         }
 
         if ($this->isMysqlPlatform()) {
@@ -430,7 +430,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
             if ($sequence) {
                 $quotedSequence = $this->connection->quoteIdentifier($sequence);
-                //$content .= "ALTER SEQUENCE $quotedSequence RESTART WITH 1;\n";
+                $content .= "ALTER SEQUENCE $quotedSequence RESTART WITH 1;\n";
             }
         }
 
