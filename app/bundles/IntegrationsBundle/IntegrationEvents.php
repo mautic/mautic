@@ -23,20 +23,6 @@ final class IntegrationEvents
     /**
      * The mautic.integration.config_before_save event is dispatched prior to an integration's configuration is saved.
      *
-     * The event listener receives a Mautic\IntegrationsBundle\Event\ConfigSaveEvent instance.
-     */
-    public const string INTEGRATION_CONFIG_BEFORE_SAVE = 'mautic.integration.config_before_save';
-
-    /**
-     * The mautic.integration.config_after_save event is dispatched after an integration's configuration is saved.
-     *
-     * The event listener receives a Mautic\IntegrationsBundle\Event\ConfigSaveEvent instance.
-     */
-    public const string INTEGRATION_CONFIG_AFTER_SAVE = 'mautic.integration.config_after_save';
-
-    /**
-     * The mautic.integration.config_before_save event is dispatched prior to an integration's configuration is saved.
-     *
      * The event listener receives a Mautic\IntegrationsBundle\Event\ConfigAuthUrlEvent instance.
      */
     public const string INTEGRATION_CONFIG_ON_GENERATE_AUTH_URL = 'mautic.integration.INTEGRATION_CONFIG_ON_GENERATE_AUTH_URL';
