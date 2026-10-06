@@ -240,7 +240,6 @@ parameters:
         -
             identifier: mautic.singleArgumentDispatch
             paths:
-                - app/bundles/ApiBundle/Controller/CommonApiController.php
                 - app/bundles/ApiBundle/Controller/FetchCommonApiController.php
                 - app/bundles/CampaignBundle/Executioner/Dispatcher/ConditionDispatcher.php
                 - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
@@ -277,8 +276,6 @@ parameters:
                 - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
                 - app/bundles/PageBundle/Model/PageModel.php
                 - app/bundles/PluginBundle/Integration/AbstractIntegration.php
-                - app/bundles/PointBundle/Model/PointModel.php
-                - app/bundles/PointBundle/Model/TriggerModel.php
                 - app/bundles/SmsBundle/Helper/ReplyHelper.php
                 - app/bundles/SmsBundle/Model/SmsModel.php
                 - app/bundles/UserBundle/Security/Authenticator/PluginAuthenticator.php

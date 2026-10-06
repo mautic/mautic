@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
-use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PointSubscriber implements EventSubscriberInterface
@@ -30,8 +29,8 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PointEvents::POINT_ON_BUILD   => ['onPointBuild', 0],
-            PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
+            PointBuilderEvent::class   => ['onPointBuild', 0],
+            TriggerBuilderEvent::class => ['onTriggerBuild', 0],
             EmailOpenEvent::class         => ['onEmailOpen', 0],
             EmailSendEvent::class         => ['onEmailSend', 0],
         ];

@@ -19,9 +19,9 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Entity\TriggerEventRepository;
 use Mautic\PointBundle\Entity\TriggerRepository;
+use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
-use Mautic\PointBundle\PointEvents;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -85,10 +85,10 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->willReturnCallback(function (object $event, ?string $eventName) use ($dispatchCalls, $contact, $triggerEvent): object {
-                $dispatchCalls->append($eventName);
+            ->willReturnCallback(function (object $event, ?string $eventName = null) use ($dispatchCalls, $contact, $triggerEvent): object {
+                $dispatchCalls->append($eventName ?? $event::class);
 
-                if (PointEvents::TRIGGER_ON_BUILD === $eventName) {
+                if ($event instanceof TriggerBuilderEvent) {
                     // Emulate a subscriber:
                     $event->addEvent(
                         'email.send_to_user',
@@ -116,7 +116,7 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $this->triggerModel->triggerEvent($triggerEvent->convertToArray(), $contact, true);
 
         // Assert both expected events were dispatched
-        $this->assertContains(PointEvents::TRIGGER_ON_BUILD, $dispatchCalls);
+        $this->assertContains(TriggerBuilderEvent::class, $dispatchCalls);
         $this->assertContains(EmailEvents::ON_SENT_EMAIL_TO_USER, $dispatchCalls);
         $this->assertCount(2, $dispatchCalls);
     }

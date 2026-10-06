@@ -28,7 +28,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PointEvents::TRIGGER_ON_BUILD                => ['onTriggerBuild', 0],
+            TriggerBuilderEvent::class                   => ['onTriggerBuild', 0],
             PointEvents::TRIGGER_ON_EVENT_EXECUTE        => ['onTriggerExecute', 0],
             PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE => ['onLeadSegmentsChange', 0],
         ];
