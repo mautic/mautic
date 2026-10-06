@@ -171,8 +171,8 @@ final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRe
 
         $debugOutput = $queryBuilder->getDebugOutput();
 
-        $this->assertStringContainsString("NOT cmp1.company_name REGEXP 'alpha'", (string) $debugOutput);
-        $this->assertStringContainsString("NOT cmp1.company_name REGEXP 'beta'", (string) $debugOutput);
+        $this->assertStringContainsString("cmp1.company_name NOT REGEXP 'alpha'", (string) $debugOutput);
+        $this->assertStringContainsString("cmp1.company_name NOT REGEXP 'beta'", (string) $debugOutput);
     }
 
     public function testApplyQueryHandlesEmptyNegatedMultiselectValue(): void
