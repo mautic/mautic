@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class CampaignLeadChangeEvent extends Event
+abstract class CampaignLeadChangeEvent extends Event
 {
     private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
 

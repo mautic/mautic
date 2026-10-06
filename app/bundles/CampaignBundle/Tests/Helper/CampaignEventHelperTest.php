@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
+use Mautic\CampaignBundle\Event\CampaignBatchLeadChangeEvent;
 use Mautic\CampaignBundle\Helper\CampaignEventHelper;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 
@@ -13,7 +13,7 @@ final class CampaignEventHelperTest extends CampaignTestAbstract
 {
     public function testValidateLeadChangeTriggerWithEmptyCampaigns(): void
     {
-        $eventDetails = new CampaignLeadChangeEvent(new Campaign(), [], 'badaction');
+        $eventDetails = new CampaignBatchLeadChangeEvent(new Campaign(), [], 'badaction');
         $event        = [
             'properties' => [
                 'campaigns' => [],
@@ -29,7 +29,7 @@ final class CampaignEventHelperTest extends CampaignTestAbstract
 
     public function testValidateLeadChangeTriggerWithUnmatchingCampaignsAndInvalidAction(): void
     {
-        $eventDetails = new CampaignLeadChangeEvent(new Campaign(), [], 'badaction');
+        $eventDetails = new CampaignBatchLeadChangeEvent(new Campaign(), [], 'badaction');
         $event        = [
             'properties' => [
                 'campaigns' => [3],
@@ -45,7 +45,7 @@ final class CampaignEventHelperTest extends CampaignTestAbstract
 
     public function testValidateLeadChangeTriggerWithMatchingCampaignsAndInvalidAction(): void
     {
-        $eventDetails = new CampaignLeadChangeEvent(new Campaign(), [], 'removed');
+        $eventDetails = new CampaignBatchLeadChangeEvent(new Campaign(), [], 'removed');
         $event        = [
             'properties' => [
                 'campaigns' => [3],
@@ -69,7 +69,7 @@ final class CampaignEventHelperTest extends CampaignTestAbstract
 
         foreach ($actions as $action => $expectedResult) {
             $campaignId   = 3;
-            $eventDetails = new CampaignLeadChangeEvent(new Campaign(), [], $action);
+            $eventDetails = new CampaignBatchLeadChangeEvent(new Campaign(), [], $action);
             $event        = [
                 'properties' => [
                     'campaigns' => [$campaignId, 8],
