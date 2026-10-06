@@ -320,6 +320,12 @@
     | `API_POST_SERIALIZATION_CONTEXT` | `PostSerializationContextEvent` |
 - Unused constants `CLIENT_PRE_SAVE`, `BUILD_ROUTE` and `API_PLATFORM_PERMISSION_CONTEXT` removed from `Mautic\ApiBundle\ApiEvents`; they had no dispatcher or listener.
 - Class `Mautic\ApiBundle\ApiEvents` removed; it held only the constants listed above and is now empty. Reference the event classes directly.
+- Constants `INTEGRATION_CONFIG_BEFORE_SAVE` and `INTEGRATION_CONFIG_AFTER_SAVE` removed from `Mautic\IntegrationsBundle\IntegrationEvents`. These events are now dispatched by their own event class (all under `Mautic\IntegrationsBundle\Event`). The two events used to share one `ConfigSaveEvent` object; `ConfigSaveEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ConfigAfterSaveEvent::class => 'onConfigAfterSave'`.
+
+    | Removed `IntegrationEvents` constant | New event class |
+    |---|---|
+    | `INTEGRATION_CONFIG_BEFORE_SAVE` | `ConfigBeforeSaveEvent` |
+    | `INTEGRATION_CONFIG_AFTER_SAVE` | `ConfigAfterSaveEvent` |
 
 ## Changed code
 
