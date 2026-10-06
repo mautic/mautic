@@ -156,10 +156,7 @@ class TriggerEvent implements UuidInterface
         }
     }
 
-    /**
-     * @return array|null
-     */
-    public function getChanges()
+    public function getChanges(): ?array
     {
         return $this->changes;
     }
