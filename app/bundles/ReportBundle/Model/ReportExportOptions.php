@@ -47,18 +47,12 @@ final class ReportExportOptions
         return $this->page * $this->batchSize;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateFrom()
+    public function getDateFrom(): ?\DateTimeInterface
     {
         return $this->dateFrom;
     }
 
-    /**
-     * @param \DateTime $dateFrom
-     */
-    public function setDateFrom($dateFrom): void
+    public function setDateFrom(?\DateTimeInterface $dateFrom): void
     {
         $this->dateFrom = $dateFrom;
     }

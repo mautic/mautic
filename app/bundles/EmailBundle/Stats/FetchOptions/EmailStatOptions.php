@@ -35,10 +35,7 @@ final class EmailStatOptions extends FetchOptions
         return $this->ids;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getCompanyId()
+    public function getCompanyId(): ?int
     {
         return $this->companyId;
     }
@@ -68,10 +65,7 @@ final class EmailStatOptions extends FetchOptions
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getSegmentId()
+    public function getSegmentId(): ?int
     {
         return $this->segmentId;
     }
@@ -107,18 +101,12 @@ final class EmailStatOptions extends FetchOptions
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getUnit()
+    public function getUnit(): ?string
     {
         return $this->unit;
     }
 
-    /**
-     * @param string $unit
-     */
-    public function setUnit($unit): static
+    public function setUnit(?string $unit): static
     {
         $this->unit = $unit;
 

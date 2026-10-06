@@ -33,11 +33,9 @@ final class StatCollection
     }
 
     /**
-     * @param int $count
-     *
      * @throws \Exception
      */
-    public function addStatByDateTime(\DateTime $dateTime, $count): static
+    public function addStatByDateTime(\DateTime $dateTime, int $count): static
     {
         $dateTime->setTimezone(new \DateTimeZone('UTC'));
 
