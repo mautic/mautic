@@ -851,13 +851,13 @@
     | Class | Methods |
     | --- | --- |
     | `CoreBundle\Configurator\Step\StepInterface` | `checkRequirements()`, `checkOptionalSettings()`, `update()` |
-    | `CoreBundle\Helper\ThemeHelperInterface` | `getDefaultThemes()`, `getOptionalSettings()` |
+    | `CoreBundle\Helper\ThemeHelperInterface`, `CoreBundle\Helper\ThemeHelper` | `getDefaultThemes()`, `getOptionalSettings()`, `getInstalledThemes()` |
     | `CoreBundle\IpLookup\IpLookupFormInterface` | `getConfigFormThemes()` |
     | `CoreBundle\Model\SearchCommandListInterface` | `getCommandList()` |
     | `StatsBundle\Aggregate\Collection\Stats\StatInterface` | `getStats()` |
     | `CoreBundle\Model\AbstractCommonModel` | `getSupportedSearchCommands()`, `getCommandList()`, `getEntities()` (`iterable`) |
     | `CoreBundle\Controller\AbstractFormController` | `refererPostActionVars()` |
-    | `CoreBundle\Controller\AbstractStandardFormController` | `afterEntityClone()`, `getEntityFormOptions()`, `getUpdateSelectParams()`, `getViewDateRange()` |
+    | `CoreBundle\Controller\AbstractStandardFormController` | `afterEntityClone()`, `getEntityFormOptions()`, `getUpdateSelectParams()`, `getViewDateRange()`, `getIndexItems()` |
     | `CoreBundle\Doctrine\AbstractMauticMigration` | `generateKeys()` |
     | `CoreBundle\Security\Permissions\AbstractPermissions` | `getPermissions()`, `getSynonym()`, `getPermissionRatio()` |
     | `CoreBundle\Helper\AbstractFormFieldHelper` | `parseList()` |
@@ -876,11 +876,18 @@
     | `LeadBundle\Model\LeadModel` | `getEntities()` (`iterable`), `getLeadsByIds()`, `getLeadDetails()`, `getPreferredChannel()` |
     | `PageBundle\Entity\Page` | `getContent()` (`?array`) |
     | `PageBundle\Entity\Hit`, `PageBundle\Entity\VideoHit` | `getBrowserLanguages()`, `getQuery()` |
-    | `ReportBundle\Entity\Report` | `getColumns()`, `getFilters()`, `getTableOrder()`, `getGraphs()`, `getGroupBy()`, `getAggregators()` |
+    | `ReportBundle\Entity\Report` | `getColumns()`, `getFilters()`, `getTableOrder()`, `getGraphs()`, `getGroupBy()`, `getAggregators()`, `getSettings()` (`?array`) |
     | `CampaignBundle\Entity\Campaign` | `getChanges()` |
     | `ChannelBundle\Entity\Channel` | `getProperties()` |
     | `ChannelBundle\Entity\MessageQueue` | `getMetadata()` |
     | `CoreBundle\Entity\AuditLog` | `getDetails()` |
+    | `CampaignBundle\Controller\CampaignController` | `getIndexItems()` |
+    | `CoreBundle\Entity\IpAddress` | `getIpDetails()` (`?array`) |
+    | `ApiBundle\Entity\oAuth2\Client` | `getChanges()` |
+    | `FormBundle\Entity\Action` | `getChanges()` |
+    | `FormBundle\Entity\Field` | `getChanges()` (`?array`) |
+    | `UserBundle\Entity\Role` | `getRawPermissions()` (`?array`) |
+    | `WebhookBundle\Entity\Webhook` | `getPayload()` (`?array`) |
 - Methods in Campaign, Email, Point, Notification, DynamicContent and Sms bundle base classes, entities, events and interfaces that documented `@return array` now declare a native return type. If a plugin class implements one of these interfaces or overrides one of these methods, add a compatible return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with Y::method(): array". The return type is `array` unless noted:
 
     | Class | Methods |
