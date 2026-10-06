@@ -23,6 +23,15 @@
     | `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD` | `InternalCompanyFullReportBuildEvent` |
     | `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` | `IntegrationToMauticSyncCompletedEvent` |
     | `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION` | `MauticToIntegrationSyncCompletedEvent` |
+- Constants `WEBHOOK_PRE_SAVE`, `WEBHOOK_POST_SAVE`, `WEBHOOK_PRE_DELETE`, `WEBHOOK_POST_DELETE` and `WEBHOOK_KILL` removed from `Mautic\WebhookBundle\WebhookEvents`. These events are now dispatched by their own event class (all under `Mautic\WebhookBundle\Event`). They used to share one `WebhookEvent` object; `WebhookEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `WebhookPostSaveEvent::class => 'onWebhookSave'`.
+
+    | Removed `WebhookEvents` constant | New event class |
+    |---|---|
+    | `WEBHOOK_PRE_SAVE` | `WebhookPreSaveEvent` |
+    | `WEBHOOK_POST_SAVE` | `WebhookPostSaveEvent` |
+    | `WEBHOOK_PRE_DELETE` | `WebhookPreDeleteEvent` |
+    | `WEBHOOK_POST_DELETE` | `WebhookPostDeleteEvent` |
+    | `WEBHOOK_KILL` | `WebhookKillEvent` |
 - Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. These events are now dispatched by their own event class (all under `Mautic\SmsBundle\Event`). The lifecycle events used to share one `SmsEvent` object; `SmsEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `SmsPostSaveEvent::class => 'onPostSave'`.
 
     | Removed `SmsEvents` constant | New event class |

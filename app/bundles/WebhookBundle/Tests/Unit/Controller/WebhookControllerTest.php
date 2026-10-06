@@ -28,6 +28,8 @@ use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
+use Mautic\WebhookBundle\Event\WebhookPostSaveEvent;
+use Mautic\WebhookBundle\Event\WebhookPreSaveEvent;
 use Mautic\WebhookBundle\Event\WebhookQueueEvent;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
@@ -218,8 +220,8 @@ final class WebhookControllerTest extends TestCase
             ->method('hasListeners')
             ->willReturnMap([
                 [WebhookQueueEvent::class, false],
-                ['mautic.webhook_pre_save', false],
-                ['mautic.webhook_post_save', false],
+                [WebhookPreSaveEvent::class, false],
+                [WebhookPostSaveEvent::class, false],
             ])
             ->willReturn(false);
 
