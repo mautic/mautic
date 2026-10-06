@@ -26,8 +26,6 @@ final class DecoratorFactoryTest extends TestCase
 
     private DateOptionFactory&MockObject $dateOptionFactory;
 
-    private CompanyDecorator&\PHPUnit\Framework\MockObject\Stub $companyDecorator;
-
     private DecoratorFactory $decoratorFactory;
 
     protected function setUp(): void
