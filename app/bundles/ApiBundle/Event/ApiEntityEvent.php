@@ -7,7 +7,7 @@ namespace Mautic\ApiBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Component\HttpFoundation\Request;
 
-final class ApiEntityEvent extends CommonEvent
+abstract class ApiEntityEvent extends CommonEvent
 {
     /**
      * @param object $entity
