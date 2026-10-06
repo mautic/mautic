@@ -79,6 +79,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
 
         $user = $this->getUser($this->clientServer['PHP_AUTH_USER'] ?? 'admin');
+        self::assertInstanceOf(User::class, $user, 'Admin user missing; install fixtures did not load.');
         $this->loginUser($user); // also creates session
 
         if ($this->useCleanupRollback) {
