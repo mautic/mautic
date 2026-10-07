@@ -61,6 +61,20 @@
     </div>
 </div>
 
+{% if fields.email_columns is defined %}
+    <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.config.tab.email.list.settings'|trans }}</h4>
+    <div class="text-muted small pb-md">{{ 'mautic.core.config.header.email.list.settings.description'|trans }}</div>
+    <div class="row">
+        <div class="panel panel-default mb-md">
+            <div class="panel-body">
+                <div class="col-xs-12">
+                    {{ form_row(fields.email_columns) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 {% if fields.monitored_email is defined %}
     <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.email.config.header.monitored_email'|trans }}</h4>
     <div class="text-muted small pb-md">{{ 'mautic.core.config.header.monitored_email.description'|trans }}</div>
