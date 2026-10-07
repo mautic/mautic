@@ -67,10 +67,9 @@ trait MatchFilterForLeadTrait
                 $groups[$groupNum] = false;
             }
 
-            if ('leadlist' === $data['type']) {
-                $groups[$groupNum] = $this->isContactSegmentRelationshipValid(
-                    (int) $lead['id'], $data['operator'], $data['filter']
-                );
+            if ('leadlist' === $data['type'] && property_exists($this, 'segmentRepository') && $this->segmentRepository instanceof LeadListRepository) {
+                $groups[$groupNum] = $this->isContactSegmentRelationshipValid($this->segmentRepository, (int) $lead['id'], $data['operator'], $data['filter']);
+                continue;
             }
 
             $leadValues = $this->transformFilterDataForLead($data, $lead);
@@ -78,7 +77,6 @@ trait MatchFilterForLeadTrait
             if (null === $leadValues) {
                 continue;
             }
-
             $filterVal = $data['filter'];
             $subgroup  = null;
 
@@ -298,15 +296,15 @@ trait MatchFilterForLeadTrait
      * @param string $operator   empty, !empty, in, !in
      * @param int[]  $segmentIds
      */
-    private function isContactSegmentRelationshipValid(int $contactId, string $operator, ?array $segmentIds = null): bool
+    private function isContactSegmentRelationshipValid(LeadListRepository $segmentRepository, int $contactId, string $operator, ?array $segmentIds = null): bool
     {
         return match ($operator) {
-            OperatorOptions::EMPTY         => $this->segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
-            OperatorOptions::NOT_EMPTY     => $this->segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
-            OperatorOptions::INCLUDING_ANY => $this->segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
-            OperatorOptions::EXCLUDING_ANY => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in some segments provided in $segmentsIds
-            OperatorOptions::INCLUDING_ALL => $this->segmentRepository->isContactInAllSegments($contactId, $segmentIds), // Contact is in all segments provided in $segmentsIds
-            OperatorOptions::EXCLUDING_ALL => $this->segmentRepository->isNotContactInAllSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
+            OperatorOptions::EMPTY         => $segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
+            OperatorOptions::NOT_EMPTY     => $segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
+            OperatorOptions::INCLUDING_ANY => $segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
+            OperatorOptions::EXCLUDING_ANY => $segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in some segments provided in $segmentsIds
+            OperatorOptions::INCLUDING_ALL => $segmentRepository->isContactInAllSegments($contactId, $segmentIds), // Contact is in all segments provided in $segmentsIds
+            OperatorOptions::EXCLUDING_ALL => $segmentRepository->isNotContactInAllSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
             default                        => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
         };
     }
