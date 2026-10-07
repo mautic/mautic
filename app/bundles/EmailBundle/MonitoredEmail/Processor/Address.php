@@ -10,6 +10,7 @@ final class Address
     public static function parseList($addresses): array
     {
         $results         = [];
+        /** @var \stdClass[] $parsedAddresses */
         $parsedAddresses = imap_rfc822_parse_adrlist($addresses, 'default.domain.name');
         foreach ($parsedAddresses as $parsedAddress) {
             if (
