@@ -524,9 +524,8 @@ final class ContactManagementCest
         // Click 'import in browser'
         $I->click(ContactPage::$importInBrowser);
 
-        // Wait for import completion message
-        $I->waitForElement(ContactPage::$importProgressComplete, AcceptanceTester::TIMEOUT);
-        $I->see('Successful import', 'h2');
+        // Wait for the import completion message
+        $I->waitForText('Successful import', AcceptanceTester::TIMEOUT, 'h2');
 
         // Extract the number of contacts created from the progress message
         $expectedContactsAdded = (int) $I->grabTextFrom('#leadImportProgressComplete > div > div:nth-child(2) > div > div.panel-body > div:nth-child(2) > div > span');
