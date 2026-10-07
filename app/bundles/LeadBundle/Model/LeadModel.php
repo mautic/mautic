@@ -1377,7 +1377,7 @@ class LeadModel extends FormModel
                 $lead->addUpdatedField('email', $data[$fields['email']]);
                 if ($doNotEmail) {
                     $event = new DoNotContactAddEvent($lead, 'email', $reason, DNC::MANUAL);
-                    $this->dispatcher->dispatch($event, DoNotContactAddEvent::ADD_DONOT_CONTACT);
+                    $this->dispatcher->dispatch($event);
                 } else {
                     $event = new DoNotContactRemoveEvent($lead, 'email');
                     $this->dispatcher->dispatch($event, DoNotContactRemoveEvent::REMOVE_DONOT_CONTACT);
