@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Exception\MjmlThemeEmptyCustomHtmlException;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -228,6 +229,30 @@ final class EmailApiController extends CommonApiController
             unset($params['publicPreview']);
         }
         parent::prepareParametersFromRequest($form, $params, $entity, $masks, $fields);
+    }
+
+    /**
+     * Validate MJML theme + empty customHtml before the API save so the bad
+     * state is blocked with a 422 rather than a 500 from the model layer.
+     *
+     * @param Email                $entity
+     * @param FormInterface<mixed> $form
+     * @param mixed[]              $parameters
+     * @param string               $action
+     *
+     * @return Response|null
+     */
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+        if ($entity instanceof Email) {
+            try {
+                $this->model->validateMjmlThemeHasCustomHtml($entity);
+            } catch (MjmlThemeEmptyCustomHtmlException $e) {
+                return $this->returnError($e->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        }
+
+        return null;
     }
 
     /**
