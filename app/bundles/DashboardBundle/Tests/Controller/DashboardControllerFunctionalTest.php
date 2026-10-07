@@ -32,10 +32,13 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         ], JSON_THROW_ON_ERROR));
 
         try {
-            $this->client->request(Request::METHOD_GET, '/s/dashboard/import');
+            $crawler = $this->client->request(Request::METHOD_GET, '/s/dashboard/import');
             $this->assertResponseIsSuccessful();
             $this->assertSelectorExists('form[name="dashboard_upload"]');
-            $token = $this->getCsrfToken('dashboard_upload');
+            $tokenField = $crawler->filter('#dashboard_upload__token');
+            $token = $tokenField->count() > 0
+                ? (string) $tokenField->attr('value')
+                : $this->getCsrfToken('dashboard_upload');
             $uploadedFile = new UploadedFile($filePath, 'Automation test dashboard preview.json', 'application/json', null, true);
             $this->client->request(
                 Request::METHOD_POST,
