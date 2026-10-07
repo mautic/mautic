@@ -14,7 +14,9 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Mautic\ReportBundle\Helper\RelativeDateHelper;
 use Mautic\ReportBundle\ReportEvents;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -157,6 +159,128 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame('SELECT `a`.`someField` WHERE a.isPublished = :i0caisPublished', $query->getSql());
+    }
+
+    public function testRelativeDateFiltersAreResolvedWhenParametersAreBound(): void
+    {
+        $report = $this->buildReportWithFilters([
+            $this->buildFilter('a.createdAt', 'gte', '-2 days 12:34:56'),
+            $this->buildFilter('a.publishDate', 'lt', '+1week'),
+            $this->buildFilter('a.updatedAt', 'lte', 'today'),
+            $this->buildFilter('a.name', 'contains', 'today'),
+        ]);
+        $query = $this->buildQueryWithFilters($report, [
+            'a.createdAt'   => $this->buildFilterDefinition('Created at', 'datetime', 'createdAt'),
+            'a.publishDate' => $this->buildFilterDefinition('Publish date', 'date', 'publishDate'),
+            'a.updatedAt'   => $this->buildFilterDefinition('Updated at', 'datetime', 'updatedAt'),
+            'a.name'        => $this->buildFilterDefinition('Name', 'string', 'name'),
+        ]);
+
+        $this->assertSame(
+            RelativeDateHelper::resolveInstant('-2 days 12:34:56', false),
+            $query->getParameters()['i0cacreatedAt']
+        );
+        $this->assertSame(
+            RelativeDateHelper::resolveRange('+1week', true)['start'],
+            $query->getParameters()['i1capublishDate']
+        );
+        $this->assertSame(
+            RelativeDateHelper::resolveRange('today', false)['end'],
+            $query->getParameters()['i2caupdatedAt']
+        );
+        $this->assertSame('%today%', $query->getParameters()['i3caname']);
+    }
+
+    public function testRelativeDatetimeEqualityUsesTheWholePeriod(): void
+    {
+        $report                      = $this->buildReportWithFilters([$this->buildFilter('a.createdAt', 'eq', 'this week')]);
+        $filterDefinition            = $this->buildFilterDefinition('Created at', 'datetime', 'createdAt');
+        $filterDefinition['formula'] = 'DATE(a.createdAt)';
+        $query                       = $this->buildQueryWithFilters($report, [
+            'a.createdAt' => $filterDefinition,
+        ]);
+        $range = RelativeDateHelper::resolveRange('this week', false);
+
+        $this->assertSame(
+            'SELECT `a`.`someField` WHERE (DATE(a.createdAt) >= :i0cacreatedAtStart) AND (DATE(a.createdAt) <= :i0cacreatedAtEnd)',
+            $query->getSQL()
+        );
+        $this->assertSame($range['start'], $query->getParameters()['i0cacreatedAtStart']);
+        $this->assertSame($range['end'], $query->getParameters()['i0cacreatedAtEnd']);
+    }
+
+    public function testRelativeDatetimeInequalityExcludesTheWholePeriod(): void
+    {
+        $report = $this->buildReportWithFilters([$this->buildFilter('a.createdAt', 'neq', 'today')]);
+        $query  = $this->buildQueryWithFilters($report, [
+            'a.createdAt' => $this->buildFilterDefinition('Created at', 'datetime', 'createdAt'),
+        ]);
+
+        $this->assertSame(
+            'SELECT `a`.`someField` WHERE (a.createdAt IS NULL) OR (a.createdAt < :i0cacreatedAtStart) OR (a.createdAt > :i0cacreatedAtEnd)',
+            $query->getSQL()
+        );
+    }
+
+    #[DataProvider('provideAnniversaryOperators')]
+    public function testRelativeAnniversaryPreservesOperator(string $condition, string $sqlOperator): void
+    {
+        $report = $this->buildReportWithFilters([$this->buildFilter('a.createdAt', $condition, 'birthday +2days')]);
+        $query  = $this->buildQueryWithFilters($report, [
+            'a.createdAt' => $this->buildFilterDefinition('Created at', 'datetime', 'createdAt'),
+        ]);
+
+        $this->assertStringContainsString("DATE_FORMAT(a.createdAt, '%m-%d') {$sqlOperator} :i0cacreatedAt", $query->getSQL());
+        $this->assertSame(RelativeDateHelper::resolveAnniversary('birthday +2days'), $query->getParameters()['i0cacreatedAt']);
+        $this->assertMatchesRegularExpression('/^\d{2}-\d{2}$/', $query->getParameters()['i0cacreatedAt']);
+    }
+
+    public static function provideAnniversaryOperators(): \Generator
+    {
+        yield 'equal' => ['eq', '='];
+        yield 'not equal' => ['neq', '<>'];
+        yield 'greater than' => ['gt', '>'];
+        yield 'greater than or equal' => ['gte', '>='];
+        yield 'less than' => ['lt', '<'];
+        yield 'less than or equal' => ['lte', '<='];
+    }
+
+    #[DataProvider('provideEmptyAnniversaryOperators')]
+    public function testEmptyAnniversaryOperatorsUseTheUnderlyingColumn(string $condition, string $sql): void
+    {
+        $report = $this->buildReportWithFilters([$this->buildFilter('a.createdAt', $condition, 'birthday')]);
+        $query  = $this->buildQueryWithFilters($report, [
+            'a.createdAt' => $this->buildFilterDefinition('Created at', 'datetime', 'createdAt'),
+        ]);
+
+        $this->assertSame($sql, $query->getSQL());
+        $this->assertSame([], $query->getParameters());
+    }
+
+    public static function provideEmptyAnniversaryOperators(): \Generator
+    {
+        yield 'empty' => ['empty', 'SELECT `a`.`someField` WHERE a.createdAt IS NULL'];
+        yield 'not empty' => ['notEmpty', 'SELECT `a`.`someField` WHERE a.createdAt IS NOT NULL'];
+    }
+
+    public function testRelativeAnniversaryUsesFilterFormula(): void
+    {
+        $report                      = $this->buildReportWithFilters([$this->buildFilter('a.createdAt', 'eq', 'birthday')]);
+        $filterDefinition            = $this->buildFilterDefinition('Created at', 'datetime', 'createdAt');
+        $filterDefinition['formula'] = 'DATE(a.createdAt)';
+        $query                       = $this->buildQueryWithFilters($report, ['a.createdAt' => $filterDefinition]);
+
+        $this->assertStringContainsString("DATE_FORMAT(DATE(a.createdAt), '%m-%d') = :i0cacreatedAt", $query->getSQL());
+    }
+
+    public function testStringComparisonDoesNotResolveRelativeDatetime(): void
+    {
+        $report = $this->buildReportWithFilters([$this->buildFilter('a.createdAt', 'like', 'today')]);
+        $query  = $this->buildQueryWithFilters($report, [
+            'a.createdAt' => $this->buildFilterDefinition('Created at', 'datetime', 'createdAt'),
+        ]);
+
+        $this->assertSame('%today%', $query->getParameters()['i0cacreatedAt']);
     }
 
     public function testGroupByWithCountOmitsNonGroupedSelectColumns(): void
