@@ -226,6 +226,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     protected function loadEssentialFixtures(): void
     {
+        $this->em->clear();
         $this->installDatabaseFixtures([
             LeadFieldData::class,
             RoleData::class,
@@ -320,6 +321,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
             // PostgreSQL needs essential fixtures reloaded after TRUNCATE
             if ($this->isPostgresqlPlatform()) {
+                $this->em->clear();
                 $this->loadEssentialFixtures();
             }
         } else {
