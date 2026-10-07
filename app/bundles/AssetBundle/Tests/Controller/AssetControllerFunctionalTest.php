@@ -227,6 +227,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     public function testBatchDownloadRequiresViewPermission(): void
     {
         $user = $this->getUser(self::SALES_USER);
+        $this->assertInstanceOf(User::class, $user);
         $this->setPermission($user, ['asset:assets' => []]);
 
         $this->logoutUser();
@@ -240,7 +241,9 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     {
         $assetOwner = $this->getUser(self::ADMIN_USER);
         $downloader = $this->getUser(self::SALES_USER);
+        $this->assertInstanceOf(User::class, $downloader);
         $this->setPermission($downloader, ['asset:assets' => ['viewown']]);
+        $this->assertInstanceOf(User::class, $assetOwner);
         $this->asset->setCreatedBy($assetOwner->getId());
         $this->em->persist($this->asset);
         $this->em->flush();
