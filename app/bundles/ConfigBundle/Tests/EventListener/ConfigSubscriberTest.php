@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\EventListener;
 
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigPostSaveEvent;
 use Mautic\ConfigBundle\EventListener\ConfigSubscriber;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -35,7 +35,7 @@ final class ConfigSubscriberTest extends TestCase
     {
         $this->assertSame(
             [
-                ConfigEvents::CONFIG_POST_SAVE => ['onConfigPostSave', 0],
+                ConfigPostSaveEvent::class => ['onConfigPostSave', 0],
             ],
             $this->subscriber->getSubscribedEvents()
         );

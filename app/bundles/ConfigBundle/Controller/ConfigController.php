@@ -2,9 +2,9 @@
 
 namespace Mautic\ConfigBundle\Controller;
 
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
-use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigPostSaveEvent;
+use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
 use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Configurator\Configurator;
@@ -91,11 +91,11 @@ final class ConfigController extends AbstractFormController
                     $formData = $form->getData();
 
                     // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save
-                    $configEvent = new ConfigEvent($formData, $post);
+                    $configEvent = new ConfigPreSaveEvent($formData, $post);
                     $configEvent
                         ->setOriginalNormData($originalNormData)
                         ->setNormData($form->getNormData());
-                    $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
+                    $this->dispatcher->dispatch($configEvent);
                     $formValues = $configEvent->getConfig();
 
                     $errors      = $configEvent->getErrors();
@@ -141,7 +141,12 @@ final class ConfigController extends AbstractFormController
                             }
 
                             $configurator->write();
-                            $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
+
+                            $postSaveEvent = new ConfigPostSaveEvent($configEvent->getConfig(), $post);
+                            $postSaveEvent
+                                ->setOriginalNormData($originalNormData)
+                                ->setNormData($form->getNormData());
+                            $this->dispatcher->dispatch($postSaveEvent);
 
                             $this->addFlashMessage('mautic.config.config.notice.updated');
 

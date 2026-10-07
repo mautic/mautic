@@ -363,6 +363,12 @@
     |---|---|
     | `INTEGRATION_CONFIG_BEFORE_SAVE` | `ConfigBeforeSaveEvent` |
     | `INTEGRATION_CONFIG_AFTER_SAVE` | `ConfigAfterSaveEvent` |
+- Class `Mautic\ConfigBundle\ConfigEvents` removed with its `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants. These events are now dispatched by their own event class (both under `Mautic\ConfigBundle\Event`). The two events used to share one `ConfigEvent` object; each event now gets a dedicated subclass of `ConfigEvent`, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ConfigPreSaveEvent::class => 'onConfigSave'`.
+
+    | Removed `ConfigEvents` constant | New event class |
+    |---|---|
+    | `CONFIG_PRE_SAVE` | `ConfigPreSaveEvent` |
+    | `CONFIG_POST_SAVE` | `ConfigPostSaveEvent` |
 
 ## Changed code
 
