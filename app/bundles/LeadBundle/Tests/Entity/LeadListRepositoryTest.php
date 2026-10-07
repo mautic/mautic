@@ -9,7 +9,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
-use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\CoreBundle\Tests\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

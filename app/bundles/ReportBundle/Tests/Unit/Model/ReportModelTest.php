@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Unit\Model;
 
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\ReportBundle\Entity\Report;

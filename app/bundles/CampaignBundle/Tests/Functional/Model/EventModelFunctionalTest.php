@@ -7,7 +7,7 @@ namespace Mautic\CampaignBundle\Tests\Functional\Model;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class EventModelFunctionalTest extends MauticMysqlTestCase
 {

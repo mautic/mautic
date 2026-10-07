@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Tests\AbstractMauticTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\MarketplaceBundle\Controller\AjaxController;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticSocialBundle\Tests\Functional\V2API;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use Symfony\Component\HttpFoundation\Response;
 

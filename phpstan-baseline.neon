@@ -1975,25 +1975,25 @@ parameters:
 			path: app/bundles/CoreBundle/Service/FlashBag.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\Test\\AbstractMauticTestCase\:\:\$em \(Doctrine\\ORM\\EntityManager\) does not accept Doctrine\\Persistence\\ObjectManager\.$#'
+			message: '#^Property Mautic\\CoreBundle\\Tests\\AbstractMauticTestCase\:\:\$em \(Doctrine\\ORM\\EntityManager\) does not accept Doctrine\\Persistence\\ObjectManager\.$#'
 			identifier: assign.propertyType
 			count: 1
 			path: app/bundles/CoreBundle/Test/AbstractMauticTestCase.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:getMockResultStatement\(\) has no return type specified\.$#'
+			message: '#^Method Mautic\\CoreBundle\\Tests\\Doctrine\\DBALMocker\:\:getMockResultStatement\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:setQueryResponse\(\) has parameter \$queryResponse with no type specified\.$#'
+			message: '#^Method Mautic\\CoreBundle\\Tests\\Doctrine\\DBALMocker\:\:setQueryResponse\(\) has parameter \$queryResponse with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\Test\\Doctrine\\DBALMocker\:\:\$queryResponse has no type specified\.$#'
+			message: '#^Property Mautic\\CoreBundle\\Tests\\Doctrine\\DBALMocker\:\:\$queryResponse has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/CoreBundle/Test/Doctrine/DBALMocker.php

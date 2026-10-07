@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\EventListener;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;

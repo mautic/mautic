@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Tests\ReflectionHelper;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Exception;

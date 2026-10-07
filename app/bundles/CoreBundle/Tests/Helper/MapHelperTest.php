@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Controller\CampaignMapStatsController;
 use Mautic\CoreBundle\Helper\MapHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class MapHelperTest extends MauticMysqlTestCase
 {

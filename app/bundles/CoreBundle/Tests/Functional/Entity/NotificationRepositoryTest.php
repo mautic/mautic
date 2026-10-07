@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 
 final class NotificationRepositoryTest extends MauticMysqlTestCase

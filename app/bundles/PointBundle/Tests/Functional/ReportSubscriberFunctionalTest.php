@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;

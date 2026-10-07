@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\DynamicContentBundle\Tests\Functional;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Symfony\Component\HttpFoundation\Request;
 

@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Doctrine\Paginator;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 
 final class SimplePaginatorTest extends MauticMysqlTestCase

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase

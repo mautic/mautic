@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
-use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\CoreBundle\Tests\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

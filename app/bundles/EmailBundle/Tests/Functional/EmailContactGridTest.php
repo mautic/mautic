@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\Functional;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\EmailBundle\Entity\Email;

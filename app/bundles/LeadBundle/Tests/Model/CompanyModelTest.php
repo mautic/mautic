@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Tests\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;

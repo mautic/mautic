@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Entity;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Functional;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\SmsBundle\Entity\Sms;

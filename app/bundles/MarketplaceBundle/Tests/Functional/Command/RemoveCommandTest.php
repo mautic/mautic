@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Tests\Functional\Command;
 
 use Mautic\CoreBundle\Helper\ComposerHelper;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Tests\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\RemoveCommand;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Mautic\MarketplaceBundle\DTO\PackageDetail;

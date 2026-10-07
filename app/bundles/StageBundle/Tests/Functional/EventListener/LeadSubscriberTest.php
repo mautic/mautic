@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\StageBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\StageBundle\Entity\LeadStageLog;

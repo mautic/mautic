@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Tests\Functional\Command;
 
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Guzzle\ClientMockTrait;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;

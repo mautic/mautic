@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Functional\Entity;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Entity\UserTokenRepository;

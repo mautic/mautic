@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Functional\Sync\Notification;
 
 use Mautic\CoreBundle\Entity\Notification;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Sync\Notification\BulkNotification;
 
 final class BulkNotificationTest extends MauticMysqlTestCase

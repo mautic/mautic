@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;

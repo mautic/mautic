@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
+use Mautic\CoreBundle\Tests\Doctrine\MockedConnectionTrait;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;

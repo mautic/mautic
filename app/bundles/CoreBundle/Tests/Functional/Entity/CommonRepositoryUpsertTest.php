@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class CommonRepositoryUpsertTest extends MauticMysqlTestCase
 {

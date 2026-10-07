@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Functional;
 
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;

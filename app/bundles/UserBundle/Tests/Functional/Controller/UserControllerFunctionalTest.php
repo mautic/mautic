@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Entity\AuditLog;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;

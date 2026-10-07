@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Controller;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\TriggerEventRepository;
 use Mautic\PointBundle\Model\TriggerModel;
 use Mautic\PointBundle\Tests\Functional\TriggerTrait;

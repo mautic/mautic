@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Form\Type;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\NotificationBundle\Tests\Functional\Controller;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\NotificationBundle\Tests\NotificationTrait;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;

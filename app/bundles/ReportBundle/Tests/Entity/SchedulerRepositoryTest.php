@@ -6,7 +6,7 @@ namespace Mautic\ReportBundle\Tests\Entity;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\CoreBundle\Tests\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

@@ -7,7 +7,7 @@ namespace Mautic\AssetBundle\Tests\Model;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class AssetModelFunctionalTest extends MauticMysqlTestCase

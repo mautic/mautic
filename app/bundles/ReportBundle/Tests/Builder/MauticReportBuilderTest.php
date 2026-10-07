@@ -9,7 +9,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
-use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
+use Mautic\CoreBundle\Tests\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;

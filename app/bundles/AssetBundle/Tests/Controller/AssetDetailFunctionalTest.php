@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 final class AssetDetailFunctionalTest extends MauticMysqlTestCase

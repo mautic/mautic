@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;

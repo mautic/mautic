@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
-use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\CoreBundle\Tests\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

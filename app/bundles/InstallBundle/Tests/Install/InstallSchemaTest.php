@@ -11,7 +11,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Test\EnvLoader;
+use Mautic\CoreBundle\Tests\EnvLoader;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use PHPUnit\Framework\TestCase;
 

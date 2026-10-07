@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Controller\Api;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\UserBundle\Entity\Permission;

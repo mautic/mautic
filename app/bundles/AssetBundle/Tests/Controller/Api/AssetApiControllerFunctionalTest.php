@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Controller\Api;
 
 use Mautic\AssetBundle\Tests\RemoteFileServerTrait;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 

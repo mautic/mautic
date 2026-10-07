@@ -90,7 +90,7 @@ MauticExampleBundle/
 
 ### Testing Base Classes
 - **Unit tests**: Extend `PHPUnit\Framework\TestCase`
-- **Functional tests**: Extend `Mautic\CoreBundle\Test\MauticMysqlTestCase` (provides `$this->em`, `$this->client`, database access)
+- **Functional tests**: Extend `Mautic\CoreBundle\Tests\MauticMysqlTestCase` (provides `$this->em`, `$this->client`, database access)
 
 ## Coding Standards
 

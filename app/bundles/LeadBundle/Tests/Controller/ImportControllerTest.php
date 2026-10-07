@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Model\NotificationModel;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\ImportCommand;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;

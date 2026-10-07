@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Functional\Command;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\DeleteWebhookLogsCommand;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Log;

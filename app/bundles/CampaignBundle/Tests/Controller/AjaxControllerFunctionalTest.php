@@ -7,7 +7,7 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxControllerFunctionalTest extends MauticMysqlTestCase

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Command;
 
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Tests\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Command\ListCommand;
 use Mautic\MarketplaceBundle\Service\PluginCollector;

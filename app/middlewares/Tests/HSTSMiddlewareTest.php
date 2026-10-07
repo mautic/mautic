@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\Middleware\Tests;
 
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Tests\AbstractMauticTestCase;
 use Mautic\Middleware\HSTSMiddleware;
 use PHPUnit\Framework\ExpectationFailedException as PHPUnitException;
 use Symfony\Component\HttpFoundation\Request;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Security;
 
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Tests\AbstractMauticTestCase;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Security\UserTokenSetter;

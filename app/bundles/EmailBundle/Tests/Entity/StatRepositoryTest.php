@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\CoreBundle\Tests\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

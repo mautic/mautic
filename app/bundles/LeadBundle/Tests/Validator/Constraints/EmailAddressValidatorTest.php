@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Validator\Constraints;
 
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Tests\AbstractMauticTestCase;
 use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddress;
 use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddressValidator;
 use PHPUnit\Framework\Attributes\DataProvider;

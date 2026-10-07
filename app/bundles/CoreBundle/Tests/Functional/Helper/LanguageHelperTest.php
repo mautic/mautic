@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Helper;
 
 use Mautic\CoreBundle\Helper\LanguageHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
 final class LanguageHelperTest extends MauticMysqlTestCase

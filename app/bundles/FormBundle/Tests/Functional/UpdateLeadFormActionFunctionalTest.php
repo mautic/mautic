@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Functional;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\DataProvider;

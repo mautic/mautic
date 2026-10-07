@@ -6,8 +6,8 @@ namespace Mautic\EmailBundle\Tests\Controller\Api;
 
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\ReflectionHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;

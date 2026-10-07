@@ -31,7 +31,6 @@
       <directory>./../plugins/*Bundle/Translations</directory>
       <directory>./../plugins/*Bundle/Views</directory>
       <directory>middlewares/Tests</directory>
-      <directory>bundles/CoreBundle/Test</directory>
     </exclude>
   </source>
   <testsuites>
@@ -72,9 +71,9 @@
     <ini name="date.timezone" value="UTC"/>
   </php>
   <extensions>
-    <bootstrap class="\Mautic\CoreBundle\Test\Extensions\SeparateProcess\SeparateProcess" />
-    <bootstrap class="\Mautic\CoreBundle\Test\Extensions\DbPrefix\DbPrefix" />
-    <bootstrap class="\Mautic\CoreBundle\Test\Extensions\SlowTest\SlowTest" />
-<!--    <bootstrap class="\Mautic\CoreBundle\Test\Extensions\Cleanup\Cleanup" />-->
+    <bootstrap class="\Mautic\CoreBundle\Tests\Extensions\SeparateProcess\SeparateProcess" />
+    <bootstrap class="\Mautic\CoreBundle\Tests\Extensions\DbPrefix\DbPrefix" />
+    <bootstrap class="\Mautic\CoreBundle\Tests\Extensions\SlowTest\SlowTest" />
+<!--    <bootstrap class="\Mautic\CoreBundle\Tests\Extensions\Cleanup\Cleanup" />-->
   </extensions>
 </phpunit>

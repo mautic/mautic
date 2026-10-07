@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper\Update\PreUpdateChecks;
 
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion;
 use Mautic\CoreBundle\Release\Metadata;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
 {

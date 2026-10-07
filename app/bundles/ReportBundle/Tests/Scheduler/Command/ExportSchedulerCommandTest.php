@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Scheduler\Command;
 
 use Mautic\CoreBundle\Helper\ExitCode;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;

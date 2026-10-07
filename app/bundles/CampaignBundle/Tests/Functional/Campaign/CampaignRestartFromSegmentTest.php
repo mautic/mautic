@@ -6,7 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Functional\Campaign;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Redirect;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;

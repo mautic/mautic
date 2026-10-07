@@ -7,7 +7,7 @@ namespace Mautic\FormBundle\Tests\Functional\Model;
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;

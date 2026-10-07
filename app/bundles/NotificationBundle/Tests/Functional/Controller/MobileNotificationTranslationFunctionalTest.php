@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\NotificationBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;

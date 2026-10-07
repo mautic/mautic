@@ -7,7 +7,7 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;

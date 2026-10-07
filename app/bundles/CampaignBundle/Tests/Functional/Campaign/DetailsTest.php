@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Functional\Campaign;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 final class DetailsTest extends MauticMysqlTestCase

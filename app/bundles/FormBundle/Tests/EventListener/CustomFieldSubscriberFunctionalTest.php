@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\FormBundle\Collector\FieldCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

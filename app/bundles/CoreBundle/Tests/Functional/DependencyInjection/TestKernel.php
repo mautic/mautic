@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 
-use Mautic\CoreBundle\Test\EnvLoader;
+use Mautic\CoreBundle\Tests\EnvLoader;
 
 /**
  * Minimal kernel to boot the container without the KernelTestCase machinery.

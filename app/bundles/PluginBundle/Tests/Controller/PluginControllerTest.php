@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Tests\Controller;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PluginControllerTest extends MauticMysqlTestCase

@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Command;
 
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
 {

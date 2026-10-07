@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Symfony\Component\HttpFoundation\Request;

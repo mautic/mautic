@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticSocialBundle\Tests\Functional\Controller;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use MauticPlugin\MauticSocialBundle\Entity\Tweet;
 use MauticPlugin\MauticSocialBundle\Entity\TweetRepository;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;

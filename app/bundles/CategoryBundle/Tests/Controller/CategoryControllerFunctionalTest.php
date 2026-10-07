@@ -6,7 +6,7 @@ namespace Mautic\CategoryBundle\Tests\Controller;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;

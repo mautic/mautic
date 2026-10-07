@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\EventListener;
 
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\MauticResourceTranslator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;

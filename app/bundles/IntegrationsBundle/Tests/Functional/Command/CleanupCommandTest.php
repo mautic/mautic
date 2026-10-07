@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Functional\Command;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Command\CleanupCommand;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\LeadBundle\Entity\Lead;

@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Command;
 
 use Mautic\CoreBundle\Command\AnonymizeIpCommand;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class AnonymizeIpCommandTest extends MauticMysqlTestCase
 {

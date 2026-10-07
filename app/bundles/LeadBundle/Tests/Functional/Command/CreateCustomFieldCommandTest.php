@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Functional\Command;
 
 use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;

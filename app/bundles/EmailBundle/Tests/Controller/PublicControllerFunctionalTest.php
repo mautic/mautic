@@ -6,7 +6,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;

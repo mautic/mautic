@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DynamicContentBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentLeadData;
 use Mautic\EmailBundle\Entity\Stat;

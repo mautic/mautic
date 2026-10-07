@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Controller\Api;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PointBundle\Entity\PointInsight;
 use Symfony\Component\HttpFoundation\Request;

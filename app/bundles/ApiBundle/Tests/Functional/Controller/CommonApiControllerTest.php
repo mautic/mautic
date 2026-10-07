@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ApiBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;

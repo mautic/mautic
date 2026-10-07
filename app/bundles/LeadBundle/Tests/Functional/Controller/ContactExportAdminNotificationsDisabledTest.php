@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;

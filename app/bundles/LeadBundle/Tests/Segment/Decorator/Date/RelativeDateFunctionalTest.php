@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
 use Mautic\LeadBundle\Entity\Lead;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\SmsBundle\Integration\TwilioIntegration;
 use Mautic\SmsBundle\Tests\SmsTestHelperTrait;

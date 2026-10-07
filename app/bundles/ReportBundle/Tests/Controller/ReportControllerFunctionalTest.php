@@ -7,7 +7,7 @@ namespace Mautic\ReportBundle\Tests\Controller;
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;

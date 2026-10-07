@@ -6,7 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Functional\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\HttpFoundation\Request;
 

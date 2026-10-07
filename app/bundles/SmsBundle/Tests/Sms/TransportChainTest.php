@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Sms;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Collection\RecipientCollection;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;

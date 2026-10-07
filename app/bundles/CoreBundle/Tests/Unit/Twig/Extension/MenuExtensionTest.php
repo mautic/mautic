@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
 use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Tests\AbstractMauticTestCase;
 use Mautic\CoreBundle\Twig\Extension\MenuExtension;
 
 final class MenuExtensionTest extends AbstractMauticTestCase

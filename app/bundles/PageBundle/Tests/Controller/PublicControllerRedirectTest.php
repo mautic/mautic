@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;

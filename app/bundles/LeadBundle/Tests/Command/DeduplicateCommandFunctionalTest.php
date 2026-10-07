@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Command;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateCommand;
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Mautic\LeadBundle\Entity\Lead;

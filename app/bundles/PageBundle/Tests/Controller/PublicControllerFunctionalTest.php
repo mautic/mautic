@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;

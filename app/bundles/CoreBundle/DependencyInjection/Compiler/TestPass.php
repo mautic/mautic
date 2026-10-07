@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use GuzzleHttp\Handler\MockHandler;
-use Mautic\CoreBundle\Test\Guzzle\ClientFactory;
-use Mautic\CoreBundle\Test\PhpUnitConfigCommand;
+use Mautic\CoreBundle\Tests\Guzzle\ClientFactory;
+use Mautic\CoreBundle\Tests\PhpUnitConfigCommand;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;

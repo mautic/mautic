@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;

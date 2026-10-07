@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Validator;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Validator\SafeRemoteUrl;
 use Mautic\CoreBundle\Validator\SafeRemoteUrlValidator;
 use PHPUnit\Framework\Attributes\DataProvider;

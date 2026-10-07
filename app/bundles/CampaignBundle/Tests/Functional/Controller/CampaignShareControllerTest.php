@@ -7,7 +7,7 @@ namespace Mautic\CampaignBundle\Tests\Functional\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Service\CampaignShareService;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\UserBundle\Entity\User;

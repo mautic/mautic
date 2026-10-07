@@ -6,7 +6,7 @@ namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\DBAL\Schema\Column;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;

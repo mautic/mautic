@@ -6,7 +6,7 @@ namespace Mautic\PointBundle\Tests\Entity;
 
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Helper\IntHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Point;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Form;

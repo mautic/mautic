@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Command;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Command\EntityExportCommand;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class EntityExportCommandTest extends MauticMysqlTestCase
 {

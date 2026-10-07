@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Entity;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class CommonRepositorySimpleListTest extends MauticMysqlTestCase
 {

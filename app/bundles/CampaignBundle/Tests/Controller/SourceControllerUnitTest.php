@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Controller\SourceController;
 use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Tests\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

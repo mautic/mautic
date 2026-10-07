@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Tests\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Mautic\MarketplaceBundle\Service\ResourceInstaller;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

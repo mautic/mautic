@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;

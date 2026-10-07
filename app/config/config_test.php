@@ -2,7 +2,7 @@
 
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
 use Mautic\CoreBundle\Loader\ParameterLoader;
-use Mautic\CoreBundle\Test\EnvLoader;
+use Mautic\CoreBundle\Tests\EnvLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
 /** @var Symfony\Component\DependencyInjection\ContainerBuilder $container */
@@ -137,7 +137,7 @@ $container->register('mautic.install.fixture.lead_field', Mautic\InstallBundle\I
     ->setPublic(true);
 
 if (defined('IS_PHPUNIT')) {
-    $container->register('security.csrf.token_storage', Mautic\CoreBundle\Test\Session\InMemoryTokenStorage::class)->setAutowired(true);
+    $container->register('security.csrf.token_storage', Mautic\CoreBundle\Tests\Session\InMemoryTokenStorage::class)->setAutowired(true);
 }
 
 // Use static namespace for token manager
@@ -153,7 +153,7 @@ $container->register(GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
 $container->register('http_client', Symfony\Component\HttpClient\MockHttpClient::class)
     ->setPublic(true);
 
-$container->register('test.service_container', Mautic\CoreBundle\Test\Container\TestContainer::class)
+$container->register('test.service_container', Mautic\CoreBundle\Tests\Container\TestContainer::class)
     ->setArgument('$kernel', new Reference('kernel'))
     ->setArgument('$privateServicesLocatorId', 'test.private_services_locator')
     ->setPublic(true);

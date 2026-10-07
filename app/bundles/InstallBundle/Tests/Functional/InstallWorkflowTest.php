@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\InstallBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Helper\FileHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
 use PHPUnit\Framework\Assert;

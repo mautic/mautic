@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
+use Mautic\CoreBundle\Tests\Doctrine\MockedConnectionTrait;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;

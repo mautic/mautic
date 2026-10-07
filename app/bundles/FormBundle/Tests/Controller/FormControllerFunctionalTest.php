@@ -7,7 +7,7 @@ namespace Mautic\FormBundle\Tests\Controller;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Helper\LanguageHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;

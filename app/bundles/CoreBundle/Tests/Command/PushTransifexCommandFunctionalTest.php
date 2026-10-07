@@ -6,8 +6,8 @@ namespace Mautic\CoreBundle\Tests\Command;
 
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Command\PushTransifexCommand;
-use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Guzzle\ClientMockTrait;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 

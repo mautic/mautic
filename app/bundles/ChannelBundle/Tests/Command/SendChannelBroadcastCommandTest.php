@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\Tests\Command;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class SendChannelBroadcastCommandTest extends MauticMysqlTestCase
 {

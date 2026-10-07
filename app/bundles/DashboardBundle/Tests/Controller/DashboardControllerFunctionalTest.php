@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\LeadBundle\Entity\Lead;

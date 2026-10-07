@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Entity;
 
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Tests\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 
 final class AssetTest extends TestCase

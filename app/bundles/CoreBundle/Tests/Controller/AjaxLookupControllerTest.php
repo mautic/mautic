@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Controller;
 
 use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Entity\Message;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\SmsBundle\Entity\Sms;

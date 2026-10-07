@@ -6,7 +6,7 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

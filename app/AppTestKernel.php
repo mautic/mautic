@@ -46,7 +46,7 @@ class AppTestKernel extends AppKernel
 
         $this->isTestContainerSet = true;
 
-        /** @var Mautic\CoreBundle\Test\Container\TestContainer $testContainer */
+        /** @var Mautic\CoreBundle\Tests\Container\TestContainer $testContainer */
         $testContainer = $this->container->get('test.service_container');
         $testContainer->setPublicContainer($this->container);
 

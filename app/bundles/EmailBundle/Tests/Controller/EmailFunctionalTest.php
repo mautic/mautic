@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Entity\AuditLog;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;

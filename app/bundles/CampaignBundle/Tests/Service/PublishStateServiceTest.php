@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CampaignBundle\Tests\CampaignAuditLogTrait;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class PublishStateServiceTest extends MauticMysqlTestCase

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\SmsBundle\Tests\EventListener;
 
 use Mautic\ChannelBundle\Model\MessageQueueModel;
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Tests\ReflectionHelper;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Event\DncEvent;

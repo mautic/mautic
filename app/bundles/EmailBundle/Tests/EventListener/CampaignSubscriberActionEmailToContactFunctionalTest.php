@@ -6,7 +6,7 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Contracts\Translation\TranslatorInterface;

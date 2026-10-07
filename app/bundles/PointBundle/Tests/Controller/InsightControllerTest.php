@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Controller;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\PointInsight;
 use Mautic\PointBundle\Model\InsightModel;
 use Symfony\Component\HttpFoundation\Request;

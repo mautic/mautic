@@ -6,7 +6,7 @@ namespace Mautic\EmailBundle\Tests\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Exception\DbalException as DBALException;
-use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\CoreBundle\Tests\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;

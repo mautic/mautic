@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Query;
 
 use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
-use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
+use Mautic\CoreBundle\Tests\Doctrine\MockedConnectionTrait;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

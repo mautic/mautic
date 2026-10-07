@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ApiBundle\Tests\Functional\Controller;
 
 use Mautic\ApiBundle\Entity\oAuth2\Client;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;

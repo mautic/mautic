@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;

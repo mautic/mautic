@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ChannelBundle\Tests\Command;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;

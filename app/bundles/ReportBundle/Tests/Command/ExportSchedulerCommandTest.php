@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Command;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class ExportSchedulerCommandTest extends MauticMysqlTestCase
 {

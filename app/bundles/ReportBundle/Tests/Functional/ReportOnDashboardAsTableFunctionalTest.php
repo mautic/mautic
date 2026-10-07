@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Functional;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\ReportBundle\Entity\Report;

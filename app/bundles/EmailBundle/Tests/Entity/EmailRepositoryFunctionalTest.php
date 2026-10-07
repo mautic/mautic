@@ -6,7 +6,7 @@ namespace Mautic\EmailBundle\Tests\Entity;
 
 use Doctrine\ORM\Exception\ORMException;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;

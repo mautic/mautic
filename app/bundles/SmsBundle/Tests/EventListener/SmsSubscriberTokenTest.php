@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\SmsBundle\Tests\EventListener;
 
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;

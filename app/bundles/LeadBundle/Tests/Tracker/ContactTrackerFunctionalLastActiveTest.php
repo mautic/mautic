@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Tracker;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadGetCurrentEvent;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CategoryBundle\Tests\Controller\Api;
 
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\UserBundle\Entity\Role;

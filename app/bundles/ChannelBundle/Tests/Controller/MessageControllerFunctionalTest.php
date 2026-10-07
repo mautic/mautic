@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ChannelBundle\Tests\Controller;
 
 use Mautic\ChannelBundle\Entity\Message;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use Symfony\Component\HttpFoundation\Request;
 

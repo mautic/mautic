@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\Tests\Functional\Controller;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\ProjectBundle\Entity\Project;

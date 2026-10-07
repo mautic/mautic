@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Functional\Form\Validator\Constraints;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;

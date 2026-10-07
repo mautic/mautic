@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Service;
 use FM\ElfinderBundle\Connector\ElFinderConnector;
 use FM\ElfinderBundle\Loader\ElFinderLoader;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;

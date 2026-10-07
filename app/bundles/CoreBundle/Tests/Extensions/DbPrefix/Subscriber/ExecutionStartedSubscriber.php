@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mautic\CoreBundle\Tests\Extensions\DbPrefix\Subscriber;
+
+use PHPUnit\Event\TestRunner\ExecutionStarted;
+
+final class ExecutionStartedSubscriber extends Subscriber implements \PHPUnit\Event\TestRunner\ExecutionStartedSubscriber
+{
+    public function notify(ExecutionStarted $event): void
+    {
+        $this->dbPrefix()->defineDbPrefix();
+    }
+}

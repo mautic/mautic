@@ -6,7 +6,7 @@ namespace Mautic\AssetBundle\Tests\DataFixtures;
 
 use Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData;
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 
 final class LoadAssetDataTest extends MauticMysqlTestCase
 {

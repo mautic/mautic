@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\Functional\Serializer;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ProjectBundle\Entity\Project;
 use Symfony\Component\HttpFoundation\Request;

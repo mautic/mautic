@@ -11,7 +11,7 @@ use LightSaml\Model\Protocol\Response as LightSamlResponse;
 use LightSaml\Model\Protocol\Status;
 use LightSaml\Model\Protocol\StatusCode;
 use Mautic\CoreBundle\EventListener\ExceptionListener;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\CleanupExportedFilesCommand;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
