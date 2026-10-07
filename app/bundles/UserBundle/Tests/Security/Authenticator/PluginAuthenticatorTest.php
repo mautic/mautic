@@ -265,7 +265,6 @@ final class PluginAuthenticatorTest extends TestCase
             ->method('dispatch')
             ->with(
                 new InteractiveLoginEvent($request, $token),
-                SecurityEvents::INTERACTIVE_LOGIN
             )
             ->willReturnArgument(0);
 
