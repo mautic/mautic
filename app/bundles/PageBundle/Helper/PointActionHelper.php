@@ -100,6 +100,18 @@ class PointActionHelper
             if ($action['properties']['returns_after']) {
                 $changePoints['returns_after'] = $latestHit && $now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after'];
             }
+        } else {
+            // These conditions describe the current visit to the configured URL.
+            // Omitting them lets a satisfied dwell-time condition award points on its own.
+            if (isset($action['properties']['first_time']) && true === $action['properties']['first_time']) {
+                $changePoints['first_time'] = false;
+            }
+            if (!empty($action['properties']['returns_within'])) {
+                $changePoints['returns_within'] = false;
+            }
+            if (!empty($action['properties']['returns_after'])) {
+                $changePoints['returns_after'] = false;
+            }
         }
 
         if ($urlMatches && [] === $changePoints) {
