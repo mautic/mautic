@@ -3,8 +3,8 @@
 namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\ApiBundle\ApiEvents;
-use Mautic\ApiBundle\Event\ApiEntityEvent;
+use Mautic\ApiBundle\Event\PostSaveApiEntityEvent;
+use Mautic\ApiBundle\Event\PreSaveApiEntityEvent;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Model\ApiLockAwareInterface;
 use Mautic\CategoryBundle\Entity\Category;
@@ -551,8 +551,8 @@ class CommonApiController extends FetchCommonApiController
             }
 
             try {
-                if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_PRE_SAVE)) {
-                    $this->dispatcher->dispatch(new ApiEntityEvent($entity, $this->entityRequestParameters, $request), ApiEvents::API_ON_ENTITY_PRE_SAVE);
+                if ($this->dispatcher->hasListeners(PreSaveApiEntityEvent::class)) {
+                    $this->dispatcher->dispatch(new PreSaveApiEntityEvent($entity, $this->entityRequestParameters, $request));
                 }
             } catch (\Exception $e) {
                 return $this->returnError($e->getMessage(), $e->getCode());
@@ -573,8 +573,8 @@ class CommonApiController extends FetchCommonApiController
             }
 
             try {
-                if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_POST_SAVE)) {
-                    $this->dispatcher->dispatch(new ApiEntityEvent($entity, $this->entityRequestParameters, $request), ApiEvents::API_ON_ENTITY_POST_SAVE);
+                if ($this->dispatcher->hasListeners(PostSaveApiEntityEvent::class)) {
+                    $this->dispatcher->dispatch(new PostSaveApiEntityEvent($entity, $this->entityRequestParameters, $request));
                 }
             } catch (\Exception $e) {
                 return $this->returnError($e->getMessage(), $e->getCode());

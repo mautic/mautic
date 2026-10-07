@@ -6,6 +6,43 @@
 
 ## Removed code
 
+- Constants `CAMPAIGN_ON_LEADCHANGE` and `LEAD_CAMPAIGN_BATCH_CHANGE` removed from `Mautic\CampaignBundle\CampaignEvents`. These events are now dispatched by their own event class (under `Mautic\CampaignBundle\Event`). They used to share one `CampaignLeadChangeEvent` object; `CampaignLeadChangeEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `CampaignSingleLeadChangeEvent::class => 'onChange'`.
+
+    | Removed `CampaignEvents` constant | New event class |
+    |---|---|
+    | `CAMPAIGN_ON_LEADCHANGE` | `CampaignSingleLeadChangeEvent` |
+    | `LEAD_CAMPAIGN_BATCH_CHANGE` | `CampaignBatchLeadChangeEvent` |
+- Constant `CONFIG_ON_GENERATE` removed from `Mautic\ConfigBundle\ConfigEvents`. The config-generate event is now dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `Mautic\ConfigBundle\Event\ConfigBuilderEvent::class` instead of the constant, e.g. `ConfigBuilderEvent::class => 'onConfigGenerate'`. The `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants are intentionally kept - they share one mutable `ConfigEvent` object whose state is carried from the pre-save to the post-save dispatch, so they still dispatch by name.
+- Class `Mautic\IntegrationsBundle\IntegrationEvents` removed entirely, along with its constants `INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES`, `INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES`, `INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD`, `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD`, `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` and `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION`. These events are now dispatched by their own event class (all under `Mautic\IntegrationsBundle\Event`). `InternalContactEvent`, `InternalCompanyEvent` and `CompletedSyncIterationEvent` each used to be dispatched under two different constants; they are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `InternalContactFieldChangesEvent::class => 'onContactFieldChanges'`.
+
+    | Removed `IntegrationEvents` constant | New event class |
+    |---|---|
+    | `INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES` | `InternalContactFieldChangesEvent` |
+    | `INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES` | `InternalCompanyFieldChangesEvent` |
+    | `INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD` | `InternalContactFullReportBuildEvent` |
+    | `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD` | `InternalCompanyFullReportBuildEvent` |
+    | `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` | `IntegrationToMauticSyncCompletedEvent` |
+    | `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION` | `MauticToIntegrationSyncCompletedEvent` |
+- Constants `WEBHOOK_PRE_SAVE`, `WEBHOOK_POST_SAVE`, `WEBHOOK_PRE_DELETE`, `WEBHOOK_POST_DELETE` and `WEBHOOK_KILL` removed from `Mautic\WebhookBundle\WebhookEvents`. These events are now dispatched by their own event class (all under `Mautic\WebhookBundle\Event`). They used to share one `WebhookEvent` object; `WebhookEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `WebhookPostSaveEvent::class => 'onWebhookSave'`.
+
+    | Removed `WebhookEvents` constant | New event class |
+    |---|---|
+    | `WEBHOOK_PRE_SAVE` | `WebhookPreSaveEvent` |
+    | `WEBHOOK_POST_SAVE` | `WebhookPostSaveEvent` |
+    | `WEBHOOK_PRE_DELETE` | `WebhookPreDeleteEvent` |
+    | `WEBHOOK_POST_DELETE` | `WebhookPostDeleteEvent` |
+    | `WEBHOOK_KILL` | `WebhookKillEvent` |
+- Class `Mautic\UserBundle\UserEvents` removed entirely. Its events are now dispatched by their own event class (Symfony 4.3+) instead of the string constant, so subscribe to the event class instead of the constant. `AuthenticationEvent` used to be dispatched under both `USER_PRE_AUTHENTICATION` and `USER_FORM_AUTHENTICATION`; it is now `abstract` and each case has a dedicated subclass (both under `Mautic\UserBundle\Event`), so listener type hints keep working. The `USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION` constant was unused (never dispatched) and has been removed with no replacement.
+
+    | Removed `UserEvents` constant | New event class |
+    |---|---|
+    | `USER_LOGIN` | `LoginEvent` |
+    | `USER_PRE_AUTHENTICATION` | `PreAuthenticationEvent` |
+    | `USER_FORM_AUTHENTICATION` | `FormAuthenticationEvent` |
+    | `USER_LOGOUT` | `LogoutEvent` |
+    | `USER_AUTHENTICATION_CONTENT` | `AuthenticationContentEvent` |
+    | `USER_PASSWORD_STRENGTH_VALIDATION` | `PasswordStrengthValidateEvent` |
+- Class `Mautic\UserBundle\Event\AuthenticationEvent` is now `abstract` and can no longer be instantiated directly. Dispatch `PreAuthenticationEvent` or `FormAuthenticationEvent` instead.
 - Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. These events are now dispatched by their own event class (all under `Mautic\SmsBundle\Event`). The lifecycle events used to share one `SmsEvent` object; `SmsEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `SmsPostSaveEvent::class => 'onPostSave'`.
 
     | Removed `SmsEvents` constant | New event class |
@@ -299,6 +336,33 @@
     |---|---|
     | `PAGE_ON_BUILD` | `PageBuilderEvent` |
     | `PAGE_ON_DISPLAY` | `PageDisplayEvent` |
+- Constant `AGGREGATE_STAT_REQUEST` removed from `Mautic\StatsBundle\StatEvents`. The event is now dispatched by its own event class, `Mautic\StatsBundle\Event\AggregateStatRequestEvent`. Subscribe to the event class instead of the constant, e.g. `AggregateStatRequestEvent::class => 'onStatRequest'`.
+- Constants `DASHBOARD_ON_MODULE_LIST_GENERATE`, `DASHBOARD_ON_MODULE_FORM_GENERATE`, `DASHBOARD_ON_MODULE_DETAIL_GENERATE` and `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` removed from `Mautic\DashboardBundle\DashboardEvents`. These events are now dispatched by their own event class (all under `Mautic\DashboardBundle\Event`). The two detail events used to share one `WidgetDetailEvent` object; `WidgetDetailEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `GenerateWidgetDetailEvent::class => 'onWidgetDetailGenerate'`.
+
+    | Removed `DashboardEvents` constant | New event class |
+    |---|---|
+    | `DASHBOARD_ON_MODULE_LIST_GENERATE` | `WidgetTypeListEvent` |
+    | `DASHBOARD_ON_MODULE_FORM_GENERATE` | `WidgetFormEvent` |
+    | `DASHBOARD_ON_MODULE_DETAIL_GENERATE` | `GenerateWidgetDetailEvent` |
+    | `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` | `PreLoadWidgetDetailEvent` |
+- Constants `CLIENT_POST_SAVE`, `CLIENT_POST_DELETE`, `API_ON_ENTITY_PRE_SAVE`, `API_ON_ENTITY_POST_SAVE`, `API_PRE_SERIALIZATION_CONTEXT` and `API_POST_SERIALIZATION_CONTEXT` removed from `Mautic\ApiBundle\ApiEvents`. These events are now dispatched by their own event class (all under `Mautic\ApiBundle\Event`). The client events used to share one `ClientEvent` object, the API entity events one `ApiEntityEvent` object, and the serialization-context events one `ApiSerializationContextEvent` object; all three are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ClientPostSaveEvent::class => 'onClientPostSave'`.
+
+    | Removed `ApiEvents` constant | New event class |
+    |---|---|
+    | `CLIENT_POST_SAVE` | `ClientPostSaveEvent` |
+    | `CLIENT_POST_DELETE` | `ClientPostDeleteEvent` |
+    | `API_ON_ENTITY_PRE_SAVE` | `PreSaveApiEntityEvent` |
+    | `API_ON_ENTITY_POST_SAVE` | `PostSaveApiEntityEvent` |
+    | `API_PRE_SERIALIZATION_CONTEXT` | `PreSerializationContextEvent` |
+    | `API_POST_SERIALIZATION_CONTEXT` | `PostSerializationContextEvent` |
+- Unused constants `CLIENT_PRE_SAVE`, `BUILD_ROUTE` and `API_PLATFORM_PERMISSION_CONTEXT` removed from `Mautic\ApiBundle\ApiEvents`; they had no dispatcher or listener.
+- Class `Mautic\ApiBundle\ApiEvents` removed; it held only the constants listed above and is now empty. Reference the event classes directly.
+- Constants `INTEGRATION_CONFIG_BEFORE_SAVE` and `INTEGRATION_CONFIG_AFTER_SAVE` removed from `Mautic\IntegrationsBundle\IntegrationEvents`. These events are now dispatched by their own event class (all under `Mautic\IntegrationsBundle\Event`). The two events used to share one `ConfigSaveEvent` object; `ConfigSaveEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ConfigAfterSaveEvent::class => 'onConfigAfterSave'`.
+
+    | Removed `IntegrationEvents` constant | New event class |
+    |---|---|
+    | `INTEGRATION_CONFIG_BEFORE_SAVE` | `ConfigBeforeSaveEvent` |
+    | `INTEGRATION_CONFIG_AFTER_SAVE` | `ConfigAfterSaveEvent` |
 
 ## Changed code
 

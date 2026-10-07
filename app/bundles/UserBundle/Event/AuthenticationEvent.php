@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class AuthenticationEvent extends Event
+abstract class AuthenticationEvent extends Event
 {
     private ?\Symfony\Component\HttpFoundation\Response $response = null;
 

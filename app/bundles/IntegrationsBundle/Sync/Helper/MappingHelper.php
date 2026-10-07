@@ -225,7 +225,7 @@ final readonly class MappingHelper
 
         $this->saveObjectMapping($objectMapping);
 
-        // Make the ObjectMapping available to the IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_* events
+        // Make the ObjectMapping available to the IntegrationToMauticSyncCompletedEvent / MauticToIntegrationSyncCompletedEvent events
         $updatedObjectMappingDAO->setObjectMapping($objectMapping);
     }
 }

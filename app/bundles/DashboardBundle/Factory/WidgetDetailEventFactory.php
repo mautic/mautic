@@ -7,7 +7,8 @@ namespace Mautic\DashboardBundle\Factory;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
-use Mautic\DashboardBundle\Event\WidgetDetailEvent;
+use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
+use Mautic\DashboardBundle\Event\PreLoadWidgetDetailEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class WidgetDetailEventFactory
@@ -19,8 +20,13 @@ final readonly class WidgetDetailEventFactory
     ) {
     }
 
-    public function create(Widget $widget): WidgetDetailEvent
+    public function createPreLoad(Widget $widget): PreLoadWidgetDetailEvent
     {
-        return new WidgetDetailEvent($this->translator, $this->corePermissions, $widget, $this->cacheProvider);
+        return new PreLoadWidgetDetailEvent($this->translator, $this->corePermissions, $widget, $this->cacheProvider);
+    }
+
+    public function createGenerate(Widget $widget): GenerateWidgetDetailEvent
+    {
+        return new GenerateWidgetDetailEvent($this->translator, $this->corePermissions, $widget, $this->cacheProvider);
     }
 }

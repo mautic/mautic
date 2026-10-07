@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\LoginEvent;
-use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -84,9 +83,9 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
             }
 
             // dispatch on login events
-            if ($this->dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
+            if ($this->dispatcher->hasListeners(LoginEvent::class)) {
                 $loginEvent = new LoginEvent($this->userHelper->getUser());
-                $this->dispatcher->dispatch($loginEvent, UserEvents::USER_LOGIN);
+                $this->dispatcher->dispatch($loginEvent);
             }
         } else {
             $session->remove('mautic.user');

@@ -6,12 +6,11 @@ namespace Mautic\UserBundle\Security\Authenticator;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Event\AuthenticationEvent;
+use Mautic\UserBundle\Event\PreAuthenticationEvent;
 use Mautic\UserBundle\Security\Authentication\AuthenticationHandler;
 use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PluginBadge;
-use Mautic\UserBundle\UserEvents;
 use OAuth2\OAuth2;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -63,11 +62,11 @@ final class PluginAuthenticator extends AbstractAuthenticator
         $authenticatedToken = null;
 
         // Try authenticating with a plugin
-        if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_AUTHENTICATION)) {
+        if ($this->dispatcher->hasListeners(PreAuthenticationEvent::class)) {
             $integrations = $this->integrationHelper->getIntegrationObjects($authenticatingService, ['sso_service'], false, null, true);
 
             $loginCheck = 'mautic_sso_login_check' === $request->attributes->get('_route');
-            $authEvent  = new AuthenticationEvent(
+            $authEvent  = new PreAuthenticationEvent(
                 null,
                 $token,
                 $this->userProvider,
@@ -76,7 +75,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
                 $authenticatingService,
                 $integrations
             );
-            $authEvent = $this->dispatcher->dispatch($authEvent, UserEvents::USER_PRE_AUTHENTICATION);
+            $authEvent = $this->dispatcher->dispatch($authEvent);
 
             if ($authenticated = $authEvent->isAuthenticated()) {
                 $eventToken            = $authEvent->getToken();

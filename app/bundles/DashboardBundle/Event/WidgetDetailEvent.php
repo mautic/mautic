@@ -9,7 +9,7 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Exception\CouldNotFormatDateTimeException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class WidgetDetailEvent extends CommonEvent
+abstract class WidgetDetailEvent extends CommonEvent
 {
     public const string DASHBOARD_CACHE_TAG = 'dashboard_widget';
 

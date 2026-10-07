@@ -8,12 +8,12 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractSsoServiceIntegration;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationEvent;
+use Mautic\UserBundle\Event\PreAuthenticationEvent;
 use Mautic\UserBundle\Security\Authentication\AuthenticationHandler;
 use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PluginBadge;
 use Mautic\UserBundle\Security\Authenticator\PluginAuthenticator;
-use Mautic\UserBundle\UserEvents;
 use OAuth2\OAuth2;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -53,7 +53,7 @@ final class PluginAuthenticatorTest extends TestCase
             ->with($integration, ['sso_service'], false, null, true)
             ->willReturn([$integrationService]);
 
-        $authEvent = new AuthenticationEvent(
+        $authEvent = new PreAuthenticationEvent(
             null,
             $pluginToken,
             $userProvider,
@@ -76,7 +76,7 @@ final class PluginAuthenticatorTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with(UserEvents::USER_PRE_AUTHENTICATION)
+            ->with(PreAuthenticationEvent::class)
             ->willReturn(true);
         $dispatcher->expects($this->once())
             ->method('dispatch')
@@ -127,7 +127,7 @@ final class PluginAuthenticatorTest extends TestCase
             ->with($integration, ['sso_service'], false, null, true)
             ->willReturn([$integrationService]);
 
-        $authEvent = new AuthenticationEvent(
+        $authEvent = new PreAuthenticationEvent(
             null,
             $pluginToken,
             $userProvider,
@@ -145,7 +145,7 @@ final class PluginAuthenticatorTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with(UserEvents::USER_PRE_AUTHENTICATION)
+            ->with(PreAuthenticationEvent::class)
             ->willReturn(true);
         $dispatcher->expects($this->once())
             ->method('dispatch')

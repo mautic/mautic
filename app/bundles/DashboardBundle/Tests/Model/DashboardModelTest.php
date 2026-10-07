@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Entity\WidgetRepository;
-use Mautic\DashboardBundle\Event\WidgetDetailEvent;
+use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
 use Mautic\DashboardBundle\Factory\WidgetDetailEventFactory;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -90,10 +90,10 @@ final class DashboardModelTest extends TestCase
     {
         $widget    = new Widget();
         $exception = new \RuntimeException('DB connection failed — secret host: db.internal');
-        $event     = $this->createStub(WidgetDetailEvent::class);
+        $event     = $this->createStub(GenerateWidgetDetailEvent::class);
 
         $widgetEventFactory = $this->createMock(WidgetDetailEventFactory::class);
-        $widgetEventFactory->method('create')->willReturn($event);
+        $widgetEventFactory->method('createGenerate')->willReturn($event);
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())

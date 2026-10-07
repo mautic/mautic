@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class InternalContactEvent extends Event
+abstract class InternalContactEvent extends Event
 {
     public function __construct(
         private readonly string $integrationName,

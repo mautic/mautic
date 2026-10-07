@@ -4,7 +4,6 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\StatsBundle\Event\AggregateStatRequestEvent;
-use Mautic\StatsBundle\StatEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class GraphAggregateStatsSubscriber implements EventSubscriberInterface
@@ -17,7 +16,7 @@ final readonly class GraphAggregateStatsSubscriber implements EventSubscriberInt
     public static function getSubscribedEvents(): array
     {
         return [
-            StatEvents::AGGREGATE_STAT_REQUEST => ['onStatRequest', 0],
+            AggregateStatRequestEvent::class => ['onStatRequest', 0],
         ];
     }
 

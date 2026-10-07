@@ -14,7 +14,7 @@ final class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConfigEvents::CONFIG_ON_GENERATE => [
+            ConfigBuilderEvent::class => [
                 ['onConfigGenerate', 0],
                 ['onConfigGenerateTracking', 0],
             ],

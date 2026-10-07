@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\LeadBundle\Form\Type\ConfigCompanyType;
 use Mautic\LeadBundle\Form\Type\ConfigType;
@@ -17,7 +16,7 @@ final class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConfigEvents::CONFIG_ON_GENERATE => [
+            ConfigBuilderEvent::class => [
                 ['onConfigGenerate', 0],
                 ['onConfigCompanyGenerate', 0],
             ],
