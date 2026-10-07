@@ -92,10 +92,13 @@ parameters:
                 - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
                 - app/bundles/CampaignBundle/Model/EventModel.php
                 - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
+                - app/bundles/DynamicContentBundle/EventListener/CampaignSubscriber.php
+                - app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
                 - app/bundles/EmailBundle/MonitoredEmail/Fetcher.php
                 - app/bundles/FormBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
                 - app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
                 - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
+                - app/bundles/SmsBundle/Model/SmsModel.php
                 - plugins/MauticFocusBundle/Model/FocusModel.php
 
         - identifier: missingType.generics
