@@ -146,7 +146,6 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                         $this->assertSame($slot->getContent(), $event->getContent());
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(DynamicContentEvents::TOKEN_REPLACEMENT, $parameters[1]);
                 }
 
                 return $parameters[0];
@@ -238,7 +237,6 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             $this->assertSame($slot->getContent(), $event->getContent());
                         };
                         $callback($parameters[0]);
-                        $this->assertSame(DynamicContentEvents::TOKEN_REPLACEMENT, $parameters[1]);
                     }
 
                     return $parameters[0];

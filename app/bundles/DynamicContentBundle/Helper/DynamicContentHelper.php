@@ -166,7 +166,7 @@ final readonly class DynamicContentHelper
 
         $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
         $tokenEvent->setStat($stat);
-        $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
+        $this->dispatcher->dispatch($tokenEvent);
 
         return $tokenEvent->getContent();
     }
