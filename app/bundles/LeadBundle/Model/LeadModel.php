@@ -1380,7 +1380,7 @@ class LeadModel extends FormModel
                     $this->dispatcher->dispatch($event);
                 } else {
                     $event = new DoNotContactRemoveEvent($lead, 'email');
-                    $this->dispatcher->dispatch($event, DoNotContactRemoveEvent::REMOVE_DONOT_CONTACT);
+                    $this->dispatcher->dispatch($event);
                 }
             }
         }
