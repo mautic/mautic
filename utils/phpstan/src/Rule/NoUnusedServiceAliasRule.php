@@ -29,6 +29,8 @@ use Utils\PHPStan\ServiceNameUsageResolver;
  * Only PHP is analysed, so an alias used by a Twig template, a YAML or an XML file alone looks unused here.
  *
  * @implements Rule<CollectedDataNode>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoUnusedServiceAliasRuleTest
  */
 final readonly class NoUnusedServiceAliasRule implements Rule
 {

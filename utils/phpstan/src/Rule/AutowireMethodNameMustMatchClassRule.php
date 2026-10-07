@@ -24,6 +24,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * its method "autowireCoreAjaxController".
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\AutowireMethodNameMustMatchClassRuleTest
  */
 final class AutowireMethodNameMustMatchClassRule implements Rule
 {

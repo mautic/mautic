@@ -30,6 +30,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * on the parent would lock the children out.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\ControllerMethodMustReturnResponseRuleTest
  */
 final readonly class ControllerMethodMustReturnResponseRule implements Rule
 {

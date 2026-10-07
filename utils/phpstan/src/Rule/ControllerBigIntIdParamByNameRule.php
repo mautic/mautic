@@ -19,6 +19,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * ids used only as query filter values or passed to dynamic method calls.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\ControllerBigIntIdParamByNameRuleTest
  */
 final readonly class ControllerBigIntIdParamByNameRule implements Rule
 {

@@ -25,6 +25,8 @@ use PHPUnit\Framework\MockObject\Stub;
  * Value passed to mocked "->method('x')->willReturn()" must match native return type of "x()".
  *
  * @implements Rule<MethodCall>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\MockedMethodReturnMustMatchNativeTypeRuleTest
  */
 final readonly class MockedMethodReturnMustMatchNativeTypeRule implements Rule
 {
