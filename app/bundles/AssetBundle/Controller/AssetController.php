@@ -4,11 +4,17 @@ namespace Mautic\AssetBundle\Controller;
 
 use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\AssetBundle\Service\ArchiveBuilder;
+use Mautic\AssetBundle\Service\BatchDownloadRequestValidator;
+use Mautic\AssetBundle\Service\BatchDownloadResponder;
+use Mautic\AssetBundle\Service\BatchFileCollector;
+use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,9 +27,8 @@ final class AssetController extends FormController
     private AuditLogModel $auditLogModel;
 
     #[Required]
-    public function autowireAssetController(
-        AuditLogModel $auditLogModel,
-    ): void {
+    public function autowireAssetController(AuditLogModel $auditLogModel): void
+    {
         $this->auditLogModel = $auditLogModel;
     }
 
@@ -646,6 +651,52 @@ final class AssetController extends FormController
             array_merge($postActionVars, [
                 'flashes' => $flashes,
             ])
+        );
+    }
+
+    public function batchDownloadAction(
+        Request $request,
+        BatchDownloadRequestValidator $batchDownloadRequestValidator,
+        BatchFileCollector $batchFileCollector,
+        ArchiveBuilder $archiveBuilder,
+        BatchDownloadResponder $batchDownloadResponder,
+    ): Response {
+        if (!$request->isMethod(Request::METHOD_POST)) {
+            return new Response('', Response::HTTP_METHOD_NOT_ALLOWED, ['Allow' => Request::METHOD_POST]);
+        }
+
+        if (!$batchDownloadRequestValidator->validatePermissions()) {
+            $this->throwAccessDenied();
+        }
+
+        if (!$batchDownloadRequestValidator->hasValidCsrfToken($request)) {
+            $this->throwAccessDenied();
+        }
+
+        try {
+            $ids                = $batchDownloadRequestValidator->validateAndExtractIds($request);
+            $downloadableAssets = $batchFileCollector->collectDownloadableAssets($ids);
+            $zipPath            = $archiveBuilder->buildArchive($downloadableAssets);
+
+            return $batchDownloadResponder->createResponse($zipPath);
+        } catch (BatchDownloadException $e) {
+            return $this->createBatchDownloadErrorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * @param array<string, string|int> $messageVars
+     */
+    private function createBatchDownloadErrorResponse(string $messageKey, array $messageVars = []): JsonResponse
+    {
+        $this->addFlashMessage($messageKey, $messageVars, FlashBag::LEVEL_ERROR);
+
+        return new JsonResponse(
+            [
+                'message' => $this->translator->trans($messageKey, $messageVars, 'flashes'),
+                'flashes' => $this->getFlashContent(),
+            ],
+            Response::HTTP_BAD_REQUEST
         );
     }
 
