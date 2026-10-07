@@ -247,10 +247,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
         $this->rawPermissions = $permissions;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getRawPermissions()
+    public function getRawPermissions(): ?array
     {
         return $this->rawPermissions;
     }

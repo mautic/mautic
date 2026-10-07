@@ -30,7 +30,7 @@ trait TimelineTrait
         array $dateTimeColumns = [],
         $resultsParserCallback = null,
         ?string $secondaryOrdering = null,
-    ) {
+    ): array {
         if (!empty($options['unitCounts'])) {
             [$tablePrefix, $column] = explode('.', $timestampColumn);
 

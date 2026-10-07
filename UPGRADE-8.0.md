@@ -962,3 +962,20 @@
     | `AbstractIntegration` | `encryptApiKeys()`, `decryptApiKeys()`, `getSecretKeys()`, `getRefreshTokenKeys()`, `getRequiredKeyFields()`, `prepareRequest()`, `cleanUpFields()`, `getRequiredFields()`, `populateLeadData()`, `populateCompanyData()`, `populateMauticLeadData()`, `matchUpData()`, `getFormNotes()`, `getFormDisplaySettings()`, `getFormLeadFields()`, `getFormCompanyFields()`, `dispatchIntegrationKeyEvent()`, `formatMatchedFields()` |
     | `CrmAbstractIntegration` | `getFormFieldsByObject()`, `getPriorityFieldsForMautic()`, `getPriorityFieldsForIntegration()`, `getFieldsByPriority()`, `cleanPriorityFields()`, `prepareFieldsForPush()` |
     | `SocialIntegration` | `getFormLeadFields()`, `getFormCompanyFields()`, `getRequiredKeyFields()`, `getFormNotes()` |
+
+- Further methods that documented `@return array` now declare a native `array` (or `?array`) return type. If you extend one of these classes or implement the interface and override the method, add the matching return type to the override, otherwise PHP fails with an incompatible-declaration error:
+
+    | Class or interface | Method | Return type |
+    | --- | --- | --- |
+    | `Mautic\CoreBundle\Helper\ThemeHelperInterface` / `ThemeHelper` | `getInstalledThemes()` | `array` |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `getIndexItems()` | `array` |
+    | `Mautic\PluginBundle\Integration\AbstractIntegration` | `mergeApiKeys()` | `?array` |
+    | `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` | `getSyncTimeframeDates()` | `array` |
+    | `Mautic\CoreBundle\Entity\IpAddress` | `getIpDetails()` | `?array` |
+    | `Mautic\DynamicContentBundle\Entity\DynamicContent` | `getUtmTags()` | `?array` |
+    | `Mautic\EmailBundle\Entity\Stat` | `getTokens()` | `?array` |
+    | `Mautic\LeadBundle\Entity\Import` | `getProperties()` | `?array` |
+    | `Mautic\LeadBundle\Entity\LeadEventLog` | `getProperties()` | `?array` |
+    | `Mautic\PointBundle\Entity\TriggerEvent` | `getChanges()` | `?array` |
+    | `Mautic\ReportBundle\Entity\Report` | `getSettings()` | `?array` |
+    | `Mautic\UserBundle\Entity\Role` | `getRawPermissions()` | `?array` |

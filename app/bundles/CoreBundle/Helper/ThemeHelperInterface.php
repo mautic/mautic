@@ -88,7 +88,7 @@ interface ThemeHelperInterface
      *
      * @return array<string[]>|string[]
      */
-    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true);
+    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true): array;
 
     /**
      * @param string $theme

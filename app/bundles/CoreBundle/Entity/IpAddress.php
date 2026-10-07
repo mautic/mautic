@@ -128,7 +128,7 @@ class IpAddress
     /**
      * @return array<string,string>|null
      */
-    public function getIpDetails()
+    public function getIpDetails(): ?array
     {
         return $this->ipDetails;
     }

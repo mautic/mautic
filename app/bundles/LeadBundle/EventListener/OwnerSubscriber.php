@@ -154,7 +154,7 @@ final class OwnerSubscriber implements EventSubscriberInterface
     /**
      * @return mixed[]|null
      */
-    private function getOwner(int $ownerId)
+    private function getOwner(int $ownerId): ?array
     {
         $this->owners[$ownerId] ??= $this->leadRepository->getLeadOwner($ownerId);
 

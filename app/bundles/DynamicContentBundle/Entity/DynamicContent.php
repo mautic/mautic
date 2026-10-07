@@ -504,10 +504,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getUtmTags()
+    public function getUtmTags(): ?array
     {
         return $this->utmTags;
     }
