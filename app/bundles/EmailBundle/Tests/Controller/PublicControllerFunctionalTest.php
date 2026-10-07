@@ -759,7 +759,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $html = $this->client->getResponse()->getContent();
 
-        $this->assertStringNotContainsString('<?php', $html);
+        $this->assertStringNotContainsString('<?php', (string) $html);
         $this->assertCount(1, $crawler->filter('#frequency_email'));
     }
 
