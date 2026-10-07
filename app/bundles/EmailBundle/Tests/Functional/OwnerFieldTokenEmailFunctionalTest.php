@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Functional;
 
-use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;

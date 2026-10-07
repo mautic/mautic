@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
-use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\EventListener\BroadcastSubscriber;
 use Mautic\LeadBundle\Entity\Lead;

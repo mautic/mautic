@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\PointBundle\Entity\Point;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Model\LeadModel;
 
 final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase

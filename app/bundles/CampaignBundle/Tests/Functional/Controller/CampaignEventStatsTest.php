@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Functional\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 

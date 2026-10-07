@@ -6,8 +6,8 @@ namespace Mautic\LeadBundle\Tests\Functional\Model;
 
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 
 final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase

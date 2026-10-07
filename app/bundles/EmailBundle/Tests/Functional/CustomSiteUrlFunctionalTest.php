@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Functional;
 
-use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\CoreBundle\Tests\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
