@@ -61,10 +61,7 @@ final class DynamicContentRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->or(
-                    $q->expr()->eq('e.language', ":{$unique}"),
-                    $q->expr()->like('e.language', ":{$langUnique}")
-                );
+                $expr            = '('.$q->expr()->eq('e.language', ":{$unique}").' OR '.$q->expr()->like('e.language', ":{$langUnique}").')';
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
