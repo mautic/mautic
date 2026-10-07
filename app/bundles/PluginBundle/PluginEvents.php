@@ -38,13 +38,6 @@ final class PluginEvents
     public const string PLUGIN_ON_INTEGRATION_KEYS_MERGE = 'mautic.plugin_on_integration_keys_merge';
 
     /**
-     * The mautic.plugin_on_integration_request event is dispatched before a request is made.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationRequestEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_REQUEST = 'mautic.plugin_on_integration_request';
-
-    /**
      * The mautic.plugin_on_integration_response event is dispatched after a request is made.
      *
      * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationResponseEvent instance.

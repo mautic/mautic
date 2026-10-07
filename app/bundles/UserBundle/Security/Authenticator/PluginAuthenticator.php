@@ -174,8 +174,9 @@ final class PluginAuthenticator extends AbstractAuthenticator
         $session = $request->getSession();
         $session->remove(SecurityRequestAttributes::AUTHENTICATION_ERROR);
 
-        $loginEvent = new InteractiveLoginEvent($request, $token);
-        $this->dispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
+        $interactiveLoginEvent = new InteractiveLoginEvent($request, $token);
+        $this->dispatcher->dispatch($interactiveLoginEvent);
+
         if (null === $token->getResponse()) {
             return $this->authenticationHandler->onAuthenticationSuccess($request, $token);
         }

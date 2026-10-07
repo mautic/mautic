@@ -303,7 +303,6 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
                         'stat'    => $stat->getTrackingHash(),
                     ]
                 ),
-                SmsEvents::TOKEN_REPLACEMENT
             );
 
             $recipientCollections[$translatedSms->getId()] ??= new RecipientCollection($translatedSms);
