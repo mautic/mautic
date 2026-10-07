@@ -48,10 +48,18 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertSelectorExists('.list-group-item.active');
             $this->assertSelectorTextContains('.list-group-item.active', 'Automation test dashboard preview');
         } finally {
-            $parameters        = self::getContainer()->get(CoreParametersHelper::class);
-            $uploadedDashboard = $parameters->get('dashboard_import_user_dir').'/Automation test dashboard preview.json';
-            if (file_exists($uploadedDashboard)) {
-                unlink($uploadedDashboard);
+            $parameters          = self::getContainer()->get(CoreParametersHelper::class);
+            $dashboardDirectory  = (string) $parameters->get('dashboard_import_user_dir');
+            $uploadedDashboards  = [$dashboardDirectory.'/Automation test dashboard preview.json'];
+            $userUploadedDashboards = glob($dashboardDirectory.'/*/Automation test dashboard preview.json');
+            if (false !== $userUploadedDashboards) {
+                $uploadedDashboards = array_merge($uploadedDashboards, $userUploadedDashboards);
+            }
+
+            foreach ($uploadedDashboards as $uploadedDashboard) {
+                if (file_exists($uploadedDashboard)) {
+                    unlink($uploadedDashboard);
+                }
             }
             if (file_exists($filePath)) {
                 unlink($filePath);
