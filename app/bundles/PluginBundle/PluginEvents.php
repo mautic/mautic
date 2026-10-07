@@ -4,18 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle;
 
-/**
- * Events available for PluginEvents.
- */
 final class PluginEvents
 {
-    /**
-     * The mautic.plugin_on_integration_config_save event is dispatched when an integration's configuration is saved.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_CONFIG_SAVE = 'mautic.plugin_on_integration_config_save';
-
     /**
      * The mautic.plugin_on_integration_keys_encrypt event is dispatched prior to encrypting keys to be stored into the database.
      *
@@ -38,66 +28,10 @@ final class PluginEvents
     public const string PLUGIN_ON_INTEGRATION_KEYS_MERGE = 'mautic.plugin_on_integration_keys_merge';
 
     /**
-     * The mautic.plugin_on_integration_auth_redirect event is dispatched when an authorization URL is generated and before the user is redirected to it.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_AUTH_REDIRECT = 'mautic.plugin_on_integration_auth_redirect';
-
-    /**
      * The mautic.plugin.on_campaign_batch_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\PendingEvent
      */
     public const string ON_CAMPAIGN_BATCH_ACTION = 'mautic.plugin.on_campaign_batch_action';
-
-    /**
-     * The mautic.plugin_on_integration_get_auth_callback_url event is dispatched when generating the redirect/callback URL.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL = 'mautic.plugin_on_integration_get_auth_callback_url';
-
-    /**
-     * The mautic.plugin_on_integration_form_display event is dispatched when fetching display settings for the integration's config form.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_FORM_DISPLAY = 'mautic.plugin_on_integration_form_display';
-
-    /**
-     * The mautic.plugin_on_integration_form_build event is dispatched when building an integration's config form.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_FORM_BUILD = 'mautic.plugin_on_integration_form_build';
-
-    /**
-     * The mautic.plugin.on_form_submit_action_triggered event is dispatched when a plugin related submit action is executed.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent instance.
-     */
-    public const string ON_FORM_SUBMIT_ACTION_TRIGGERED = 'mautic.plugin.on_form_submit_action_triggered';
-
-    /**
-     * The mautic.plugin.on_plugin_update event is dispatched when a plugin is updated.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginUpdateEvent instance.
-     */
-    public const string ON_PLUGIN_UPDATE = 'mautic.plugin.on_plugin_update';
-
-    /**
-     * The mautic.plugin.on_plugin_install event is dispatched when a plugin is installed.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginInstallEvent instance.
-     */
-    public const string ON_PLUGIN_INSTALL = 'mautic.plugin.on_plugin_install';
-
-    /**
-     * The mautic.plugin.is_published_state_changing event is dispatched when a user tries to change the published state of a plugin.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginPublishedEvent instance.
-     */
-    public const string PLUGIN_IS_PUBLISHED_STATE_CHANGING= 'mautic.plugin.is_published_state_changing';
 }
