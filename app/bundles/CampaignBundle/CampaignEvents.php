@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle;
 
-/**
- * Events available for CampaignBundle.
- */
 final class CampaignEvents
 {
     /**
@@ -42,36 +39,6 @@ final class CampaignEvents
     public const string CAMPAIGN_POST_DELETE = 'mautic.campaign_post_delete';
 
     /**
-     * The mautic.on_campaign_delete event is dispatched when a campaign is deleted.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\DeleteCampaign instance.
-     */
-    public const string ON_CAMPAIGN_DELETE = 'mautic.on_campaign_delete';
-
-    /**
-     * The mautic.campaign_on_build event is dispatched before displaying the campaign builder form to allow adding of custom actions.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignBuilderEvent instance.
-     */
-    public const string CAMPAIGN_ON_BUILD = 'mautic.campaign_on_build';
-
-    /**
-     * The mautic.campaign_on_trigger event is dispatched from the mautic:campaign:trigger command.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignTriggerEvent instance.
-     */
-    public const string CAMPAIGN_ON_TRIGGER = 'mautic.campaign_on_trigger';
-
-    /**
-     * The mautic.campaign_on_event_executed event is dispatched when a campaign event is executed.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\ExecutedEvent instance.
-     */
-    public const string ON_EVENT_EXECUTED = 'mautic.campaign_on_event_executed';
-
-    /**
      * The mautic.on_after_events_delete event is dispatched when a campaign events are deleted.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\DeleteEvent instance.
@@ -79,46 +46,11 @@ final class CampaignEvents
     public const string ON_AFTER_EVENTS_DELETE = 'mautic.on_after_events_delete';
 
     /**
-     * The mautic.campaign_on_event_executed_batch event is dispatched when a batch of campaign events are executed.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\ExecutedBatchEvent instance.
-     */
-    public const string ON_EVENT_EXECUTED_BATCH = 'mautic.campaign_on_event_executed_batch';
-
-    /**
-     * The mautic.campaign_on_event_scheduled event is dispatched when a campaign event is scheduled or scheduling is modified.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\ScheduledEvent instance.
-     */
-    public const string ON_EVENT_SCHEDULED = 'mautic.campaign_on_event_scheduled';
-
-    /**
-     * The mautic.campaign_on_event_scheduled_batch event is dispatched when a batch of events are scheduled at once.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\ScheduledBatchEvent instance.
-     */
-    public const string ON_EVENT_SCHEDULED_BATCH = 'mautic.campaign_on_event_scheduled_batch';
-
-    /**
-     * The mautic.campaign_on_event_failed event is dispatched when an event fails for whatever reason.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\FailedEvent instance.
-     */
-    public const string ON_EVENT_FAILED = 'mautic.campaign_on_event_failed';
-
-    /**
      * The mautic.campaign_on_event_decision_evaluation event is dispatched when a campaign decision is to be evaluated.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\DecisionEvent instance.
      */
     public const string ON_EVENT_DECISION_EVALUATION = 'mautic.campaign_on_event_decision_evaluation';
-
-    /**
-     * The mautic.campaign_on_event_decision_evaluation_results event is dispatched when a batch of contacts were evaluted for a decision.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\DecisionBatchEvent instance.
-     */
-    public const string ON_EVENT_DECISION_EVALUATION_RESULTS = 'mautic.campaign_on_event_decision_evaluation_results';
 
     /**
      * The mautic.campaign_on_event_decision_evaluation event is dispatched when a campaign decision is to be evaluated.
@@ -140,18 +72,4 @@ final class CampaignEvents
      * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
      */
     public const string ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP = 'mautic.lead.on_campaign_action_change_membership';
-
-    /**
-     * The mautic.campaign_failure_notify event is dispatched after campaign event is failed for a contact.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\NotifyOfFailureEvent
-     */
-    public const string ON_CAMPAIGN_FAILURE_NOTIFY = 'mautic.campaign_failure_notify';
-
-    /**
-     * The mautic.campaign_unpublish_notify event is dispatched after campaign event is auto unpublished after failures.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent
-     */
-    public const string ON_CAMPAIGN_UNPUBLISH_NOTIFY = 'mautic.campaign_unpublish_notify';
 }
