@@ -34,7 +34,7 @@ class FullContact_Base
 
     protected $_supportedMethods = [];
 
-    public $response_obj;
+    public ?\stdClass $response_obj = null;
 
     public $response_code;
 

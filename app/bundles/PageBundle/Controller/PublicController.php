@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
@@ -225,6 +226,7 @@ final class PublicController extends AbstractFormController
                 }
 
                 // Now show the translation for the page or a/b test - only fetch a translation if a slug was not used
+                /** @var TranslationEntityTrait $entity */
                 if ($entity->isTranslation() && empty($entity->languageSlug)) {
                     [$translationParent, $translatedEntity] = $model->getTranslatedEntity(
                         $entity,

@@ -21,6 +21,7 @@ parameters:
         no_empty_on_object: true
         narrow_return: true
         narrow_param: true
+        no_mixed_property: true
 
     paths:
         - app/bundles
@@ -72,6 +73,13 @@ parameters:
             paths:
                 - app/bundles/CoreBundle/Event/RouteEvent.php
                 - app/bundles/MessengerBundle/Validator/DsnValidator.php
+        -
+            identifier: typePerfect.noMixedPropertyFetcher
+            paths:
+                - plugins/MauticSocialBundle/Integration/FoursquareIntegration.php
+                - plugins/MauticSocialBundle/Integration/TwitterIntegration.php
+                - plugins/MauticSocialBundle/Integration/InstagramIntegration.php
+
         # these services have no class name alias in the container, so only the string name can fetch them
         -
             identifier: mautic.noContainerGet

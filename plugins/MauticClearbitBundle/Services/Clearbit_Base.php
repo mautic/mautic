@@ -21,7 +21,7 @@ class Clearbit_Base
 
     protected $_webhookId;
 
-    public $response_obj;
+    public ?\stdClass $response_obj = null;
 
     public $response_code;
 

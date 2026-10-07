@@ -58,7 +58,10 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        $content     = json_decode($content)->newContent;
+
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);
@@ -108,7 +111,11 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        $content     = json_decode($content)->newContent;
+
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
+
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);

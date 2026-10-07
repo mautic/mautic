@@ -1367,6 +1367,8 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/api/contacts/activity');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
+
+        /** @var \stdClass $responseJson */
         $responseJson = json_decode($clientResponse->getContent());
         $this->assertSame($expectedActivites, $responseJson->total);
     }

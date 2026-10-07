@@ -59,7 +59,11 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $crawler     = $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/forms/field/new?type=captcha&tmpl=field&formId={$formId}&inBuilder=1");
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        $content     = json_decode($content)->newContent;
+
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
+
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form[name=formfield]');
         $this->assertCount(1, $formCrawler, $this->client->getResponse()->getContent());
