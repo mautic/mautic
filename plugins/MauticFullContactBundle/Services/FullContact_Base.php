@@ -105,8 +105,6 @@ class FullContact_Base
      * @param array                $postData
      * @param array<string, mixed> $params
      *
-     * @return object
-     *
      * @throws NoCreditException
      * @throws NotImplementedException
      */
