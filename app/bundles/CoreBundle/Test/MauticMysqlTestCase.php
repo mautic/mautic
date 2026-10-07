@@ -211,10 +211,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             /*
              * POSTGRESQL DOCTRINE WORKAROUND:
              *
-             * TRUNCATE … RESTART IDENTITY CASCADE only restarts sequences that PostgreSQL considers owned by / linked to the identity column.
-             * In this Mautic branch Doctrine creates columns as GENERATED … AS IDENTITY. 
-             * Those underlying sequences are frequently not registered in a way that pg_get_serial_sequence() 
-             * (and therefore RESTART IDENTITY) can't see.
+             * TRUNCATE … RESTART IDENTITY CASCADE only restarts sequences that PostgreSQL considers owned by / linked to the identity column. In this Mautic branch Doctrine creates columns as GENERATED … AS IDENTITY. 
+             * Those underlying sequences are frequently not registered in a way that pg_get_serial_sequence() (and therefore RESTART IDENTITY) can't see.
              */
             $this->resetAutoincrement($tables);
         }
@@ -226,6 +224,8 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     protected function loadEssentialFixtures(): void
     {
+        // Clear identity map before re-loading so Role/User proxies cannot
+        // retain IDs that were truncated on PostgreSQL.
         $this->em->clear();
         $this->installDatabaseFixtures([
             LeadFieldData::class,
@@ -340,6 +340,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                     );
                 }
 
+                $this->em->clear();
                 $this->loadEssentialFixtures();
             }
         }
