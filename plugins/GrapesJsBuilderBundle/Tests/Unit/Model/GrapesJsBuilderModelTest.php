@@ -226,6 +226,201 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(1, $emailRepository->saveEntityCallCount);
     }
 
+    public function testAddOrEditEntityGeneratesCustomHtmlFromMjmlWhenHtmlMissing(): void
+    {
+        $mjml = '<mjml><mj-body><mj-section><mj-column><mj-text>Save</mj-text></mj-column></mj-section></mj-body></mjml>';
+
+        $requestStack = new class($mjml) extends RequestStack {
+            public function __construct(private readonly string $mjml)
+            {
+            }
+
+            public function getCurrentRequest(): Request
+            {
+                return new Request(
+                    [],
+                    [
+                        'grapesjsbuilder' => [
+                            'customMjml' => $this->mjml,
+                        ],
+                        'emailform'       => [
+                            'customHtml' => '',
+                        ],
+                    ]
+                );
+            }
+        };
+
+        $emailRepository = new class() extends EmailRepository {
+            public int $saveEntityCallCount = 0;
+
+            public function __construct()
+            {
+            }
+
+            /**
+             * @param Email $entity
+             */
+            public function saveEntity($entity, $flush = true): void
+            {
+                ++$this->saveEntityCallCount;
+
+                Assert::assertNotNull($entity->getCustomHtml());
+                Assert::assertStringNotContainsString('<mjml>', (string) $entity->getCustomHtml());
+                Assert::assertStringContainsString('Save', (string) $entity->getCustomHtml());
+            }
+        };
+
+        $emailModel = $this->getEmailModel();
+
+        $grapesJsBuilderRepository = new class($mjml) extends GrapesJsBuilderRepository {
+            public int $saveEntityCallCount = 0;
+
+            public function __construct(private readonly string $expectedMjml)
+            {
+            }
+
+            public function findOneBy(array $criteria, ?array $orderBy = null): ?object
+            {
+                return null;
+            }
+
+            /**
+             * @param GrapesJsBuilder $entity
+             */
+            public function saveEntity($entity, $flush = true): void
+            {
+                ++$this->saveEntityCallCount;
+
+                Assert::assertSame($this->expectedMjml, $entity->getCustomMjml());
+            }
+        };
+
+        /** @phpstan-ignore class.extendsFinalByPhpDoc */
+        $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
+            public function __construct(
+                private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
+            ) {
+            }
+
+            public function getRepository($entityName)
+            {
+                Assert::assertSame(GrapesJsBuilder::class, $entityName);
+
+                return $this->grapesJsBuilderRepository; // @phpstan-ignore-line
+            }
+        };
+
+        $email = new Email();
+
+        $grapeJsBuilderModel = new GrapesJsBuilderModel(
+            $entityManager,
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Router::class),
+            $this->getTranslator(),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+        );
+        $grapeJsBuilderModel->autowireGrapesJsBuilderModel(
+            $requestStack,
+            $emailModel,
+            $grapesJsBuilderRepository,
+            $emailRepository,
+        );
+
+        $grapeJsBuilderModel->addOrEditEntity($email);
+
+        $this->assertSame(1, $grapesJsBuilderRepository->saveEntityCallCount);
+        $this->assertSame(1, $emailRepository->saveEntityCallCount);
+    }
+
+    public function testAddOrEditEntityKeepsExistingCustomHtml(): void
+    {
+        $requestStack = new class() extends RequestStack {
+            public function __construct()
+            {
+            }
+
+            public function getCurrentRequest(): Request
+            {
+                return new Request(
+                    [],
+                    [
+                        'grapesjsbuilder' => [
+                            'customMjml' => '<mjml><mj-body><mj-text>Ignored</mj-text></mj-body></mjml>',
+                        ],
+                        'emailform'       => [
+                            'customHtml' => '<html><body>Existing</body></html>',
+                        ],
+                    ]
+                );
+            }
+        };
+
+        $emailRepository = new class() extends EmailRepository {
+            public function __construct()
+            {
+            }
+
+            /**
+             * @param Email $entity
+             */
+            public function saveEntity($entity, $flush = true): void
+            {
+                Assert::assertSame('<html><body>Existing</body></html>', $entity->getCustomHtml());
+            }
+        };
+
+        $grapesJsBuilderRepository = new class() extends GrapesJsBuilderRepository {
+            public function __construct()
+            {
+            }
+
+            public function findOneBy(array $criteria, ?array $orderBy = null): ?object
+            {
+                return null;
+            }
+
+            public function saveEntity($entity, $flush = true): void
+            {
+            }
+        };
+
+        /** @phpstan-ignore class.extendsFinalByPhpDoc */
+        $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
+            public function __construct(
+                private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
+            ) {
+            }
+
+            public function getRepository($entityName)
+            {
+                return $this->grapesJsBuilderRepository; // @phpstan-ignore-line
+            }
+        };
+
+        $grapeJsBuilderModel = new GrapesJsBuilderModel(
+            $entityManager,
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Router::class),
+            $this->getTranslator(),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+        );
+        $grapeJsBuilderModel->autowireGrapesJsBuilderModel(
+            $requestStack,
+            $this->getEmailModel(),
+            $grapesJsBuilderRepository,
+            $emailRepository,
+        );
+
+        $grapeJsBuilderModel->addOrEditEntity(new Email());
+    }
+
     private function getEmailModel(): EmailModel
     {
         return new class() extends EmailModel {
