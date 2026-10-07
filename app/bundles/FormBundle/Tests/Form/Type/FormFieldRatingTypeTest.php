@@ -78,6 +78,7 @@ final class FormFieldRatingTypeTest extends TypeTestCase
         $this->assertSame('★', $symbol->getData());
         $this->assertFalse($symbol->isRequired());
 
+        /** @var \Symfony\Component\Form\ChoiceList\View\ChoiceView[] $choices */
         $choices = $symbol->createView()->vars['choices'];
         $this->assertCount(8, $choices);
         $this->assertSame('★', $choices[0]->value);

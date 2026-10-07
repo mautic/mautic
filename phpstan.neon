@@ -86,25 +86,12 @@ parameters:
                 - app/bundles/CoreBundle/Helper/PRedisConnectionHelper.php
                 - app/bundles/CoreBundle/Helper/SearchStringHelper.php
                 - app/bundles/CoreBundle/IpLookup/AbstractMaxmindLookup.php
-                - app/bundles/CoreBundle/IpLookup/GeoipsLookup.php
-                - app/bundles/CoreBundle/IpLookup/IP2LocationAPILookup.php
                 - app/bundles/CoreBundle/IpLookup/MaxmindDownloadLookup.php
                 - app/bundles/CoreBundle/Tests/Unit/Helper/SearchStringHelperTest.php
                 - app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
-                - app/bundles/FormBundle/Tests/Controller/ActionControllerFunctionalTest.php
-                - app/bundles/FormBundle/Tests/Controller/Api/FormApiControllerFunctionalTest.php
-                - app/bundles/FormBundle/Tests/Controller/AutoFillReadOnlyFormSubmissionTest.php
-                - app/bundles/FormBundle/Tests/Controller/FieldControllerFunctionalTest.php
-                - app/bundles/FormBundle/Tests/Controller/FormControllerFunctionalTest.php
-                - app/bundles/FormBundle/Tests/Form/Type/FieldTypeTest.php
-                - app/bundles/FormBundle/Tests/Form/Type/FormFieldRatingTypeTest.php
-                - app/bundles/LeadBundle/Tests/Controller/Api/LeadApiControllerFunctionalTest.php
-                - app/bundles/LeadBundle/Tests/Form/Type/EmailTypeFunctionalTest.php
-                - app/bundles/LeadBundle/Tests/Functional/Controller/SendEmailToContactTest.php
                 - app/bundles/PluginBundle/Integration/AbstractIntegration.php
                 - app/bundles/ProjectBundle/Controller/ProjectController.php
                 - app/bundles/ReportBundle/Form/Type/DynamicFiltersType.php
-                - app/bundles/ReportBundle/Tests/Controller/ReportControllerFunctionalTest.php
 
         # Loader interface, concrete routing loader provides import()
         -

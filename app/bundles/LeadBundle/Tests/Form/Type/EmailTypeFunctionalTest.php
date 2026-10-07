@@ -29,7 +29,9 @@ final class EmailTypeFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$lead->getId());
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        $content     = json_decode($content)->newContent;
+        /** @var \stdClass $decoded */
+        $decoded     = json_decode($content);
+        $content     = $decoded->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);
