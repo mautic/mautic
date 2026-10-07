@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\UserBundle\Entity\User;
@@ -89,7 +88,6 @@ final class DashboardSubscriberTest extends TestCase
             $this->auditLogModel,
             $this->translator,
             $this->router,
-            $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->modelFactory
         );
@@ -116,7 +114,6 @@ final class DashboardSubscriberTest extends TestCase
             $this->auditLogModel,
             $this->translator,
             $this->router,
-            $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->modelFactory
         );
@@ -266,7 +263,7 @@ final class DashboardSubscriberTest extends TestCase
                 ['mautic_lead_action', ['objectAction' => 'view', 'objectId' => 567], UrlGeneratorInterface::ABSOLUTE_PATH, '/not-anonymous'],
             ]);
 
-        $iconEvent = new IconEvent($this->createStub(CorePermissions::class));
+        $iconEvent = new IconEvent();
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with($iconEvent);
@@ -292,7 +289,6 @@ final class DashboardSubscriberTest extends TestCase
             $this->auditLogModel,
             $this->translator,
             $this->router,
-            $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->modelFactory
         );

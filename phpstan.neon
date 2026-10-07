@@ -235,6 +235,13 @@ parameters:
         -
             identifier: parameterByRef.type
             path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
+        # these are plugin-facing extension events: the carried service is exposed to third-party
+        # listeners through a public getter, so removing it is a BC break to deprecate separately
+        -
+            identifier: mautic.noServiceInEventConstructor
+            paths:
+                - app/bundles/LeadBundle/Event/LeadListFilteringEvent.php
+                - app/bundles/LeadBundle/Event/LeadListFiltersChoicesEvent.php
 
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
@@ -297,6 +304,7 @@ rules:
     - Utils\PHPStan\Rule\MockedMethodReturnMustMatchNativeTypeRule
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
+    - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
     # enable later, might not be needed
     - Symplify\PHPStanRules\Rules\NoDuplicateNonRepeatableAttributeRule
 
