@@ -51,7 +51,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_preferences'] = 0;
         }
 
-        if (in_array($this->name(), ['testContactPreferencesSaveMessage', 'testLandingPageContactPreferencesSaveMessage'])) {
+        if (in_array($this->name(), ['testContactPreferencesSaveMessage', 'testLandingPageContactPreferencesSaveMessage', 'testContactPreferencesFrequencyMarkup'])) {
             $this->configParams['show_contact_segments']           = 1;
             $this->configParams['show_contact_frequency']          = 1;
             $this->configParams['show_contact_pause_dates']        = 1;
@@ -746,6 +746,21 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
                 );
             }
         );
+    }
+
+    public function testContactPreferencesFrequencyMarkup(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+
+        $this->assertResponseIsSuccessful();
+        $html = $this->client->getResponse()->getContent();
+
+        $this->assertStringNotContainsString('<?php', $html);
+        $this->assertCount(1, $crawler->filter('#frequency_email'));
     }
 
     private function createSegment(
