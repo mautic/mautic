@@ -85,30 +85,32 @@ class ChartQuery extends AbstractChart
      */
     public function applyFilters(TrackingQueryBuilder $query, $filters): void
     {
-        foreach ($filters as $column => $value) {
-            $valId = $column.'_val';
+        if ($filters && is_array($filters)) {
+            foreach ($filters as $column => $value) {
+                $valId = $column.'_val';
 
-            // Special case: Lead list filter
-            if ('leadlist_id' === $column) {
-                $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
-                $query->andWhere('lll.leadlist_id = :'.$valId);
-                $query->setParameter($valId, $value['value']);
-            } elseif (isset($value['expression']) && method_exists($query->expr(), $value['expression'])) {
-                $query->andWhere($query->expr()->{$value['expression']}($column));
-                if (isset($value['value'])) {
+                // Special case: Lead list filter
+                if ('leadlist_id' === $column) {
+                    $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
+                    $query->andWhere('lll.leadlist_id = :'.$valId);
                     $query->setParameter($valId, $value['value']);
-                }
-            } elseif (isset($value['subquery'])) {
-                $query->andWhere($value['subquery']);
-            } else {
-                $column = str_replace('t.', '', $column);
-                $valId  = str_replace('t.', '', $valId);
-                if (is_array($value)) {
-                    $query->andWhere($query->expr()->in('t.'.$column, ":{$valId}"));
-                    $query->setParameter($valId, array_map(strval(...), $value), ArrayParameterType::STRING);
+                } elseif (isset($value['expression']) && method_exists($query->expr(), $value['expression'])) {
+                    $query->andWhere($query->expr()->{$value['expression']}($column));
+                    if (isset($value['value'])) {
+                        $query->setParameter($valId, $value['value']);
+                    }
+                } elseif (isset($value['subquery'])) {
+                    $query->andWhere($value['subquery']);
                 } else {
-                    $query->andWhere('t.'.$column.' = :'.$valId);
-                    $query->setParameter($valId, $value);
+                    $column = str_replace('t.', '', $column);
+                    $valId  = str_replace('t.', '', $valId);
+                    if (is_array($value)) {
+                        $query->andWhere($query->expr()->in('t.'.$column, ":{$valId}"));
+                        $query->setParameter($valId, array_map(strval(...), $value), ArrayParameterType::STRING);
+                    } else {
+                        $query->andWhere('t.'.$column.' = :'.$valId);
+                        $query->setParameter($valId, $value);
+                    }
                 }
             }
         }

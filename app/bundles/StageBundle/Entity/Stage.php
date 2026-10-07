@@ -163,7 +163,7 @@ class Stage extends FormEntity implements UuidInterface
 
     public function setWeight($type): self
     {
-        $this->weight = $type;
+        $this->weight = (int) $type;
 
         return $this;
     }
