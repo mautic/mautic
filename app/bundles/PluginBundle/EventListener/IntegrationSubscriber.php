@@ -24,8 +24,8 @@ final readonly class IntegrationSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE => ['onResponse', 0],
             PluginIntegrationRequestEvent::class => ['onRequest', 0],
+            PluginIntegrationResponseEvent::class => ['onResponse', 0],
         ];
     }
 

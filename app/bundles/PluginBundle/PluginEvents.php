@@ -38,13 +38,6 @@ final class PluginEvents
     public const string PLUGIN_ON_INTEGRATION_KEYS_MERGE = 'mautic.plugin_on_integration_keys_merge';
 
     /**
-     * The mautic.plugin_on_integration_response event is dispatched after a request is made.
-     *
-     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationResponseEvent instance.
-     */
-    public const string PLUGIN_ON_INTEGRATION_RESPONSE = 'mautic.plugin_on_integration_response';
-
-    /**
      * The mautic.plugin_on_integration_auth_redirect event is dispatched when an authorization URL is generated and before the user is redirected to it.
      *
      * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent instance.
