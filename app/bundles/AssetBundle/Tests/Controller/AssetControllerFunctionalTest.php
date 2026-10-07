@@ -54,6 +54,9 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         parent::setUp();
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     private function requestBatchDownload(array $parameters = []): void
     {
         $parameters['_token'] = $this->getCsrfToken(BatchDownloadRequestValidator::CSRF_TOKEN_ID);
@@ -222,6 +225,34 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
+    public function testBatchDownloadRequiresViewPermission(): void
+    {
+        $user = $this->getUser(self::SALES_USER);
+        $this->setPermission($user, ['asset:assets' => []]);
+
+        $this->logoutUser();
+        $this->loginUser($user);
+        $this->requestBatchDownload(['ids' => json_encode([$this->asset->getId()], JSON_THROW_ON_ERROR)]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    public function testBatchDownloadRequiresViewOtherPermissionForAnotherUsersAsset(): void
+    {
+        $assetOwner = $this->getUser(self::ADMIN_USER);
+        $downloader = $this->getUser(self::SALES_USER);
+        $this->setPermission($downloader, ['asset:assets' => ['viewown']]);
+        $this->asset->setCreatedBy($assetOwner->getId());
+        $this->em->persist($this->asset);
+        $this->em->flush();
+
+        $this->logoutUser();
+        $this->loginUser($downloader);
+        $this->requestBatchDownload(['ids' => json_encode([$this->asset->getId()], JSON_THROW_ON_ERROR)]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+    }
+
     public function testBatchDownloadWithoutIdsReturnsError(): void
     {
         $this->requestBatchDownload();
@@ -301,7 +332,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->em->persist($this->asset);
         $this->em->flush();
 
-        $ids = json_encode([$this->asset->getId()], JSON_THROW_ON_ERROR);
+        $assetId = $this->asset->getId();
+        $ids     = json_encode([$assetId, $assetId], JSON_THROW_ON_ERROR);
 
         $this->requestBatchDownload(['ids' => $ids]);
 
@@ -419,7 +451,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     }
 
     /**
-     * @param array<string, string[]> $permission
+     * @param list<string> $permission
      */
     #[DataProvider('getValuesProvider')]
     public function testEditWithPermissions(string $route, array $permission, int $expectedStatusCode, string $userCreatorUN): void
@@ -580,7 +612,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     }
 
     /**
-     * @param array<string, array<string, array<string>>> $permissions
+     * @param array<string, list<string>> $permissions
      */
     private function setPermission(User $user, array $permissions): void
     {

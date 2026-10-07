@@ -48,14 +48,14 @@ final readonly class BatchDownloadRequestValidator
      */
     public function validateAndExtractIds(Request $request): array
     {
-        $idsPayload = $request->get('ids', '');
+        $idsPayload = $request->request->get('ids', '');
 
-        if ('' === $idsPayload) {
+        if (!is_string($idsPayload) || '' === $idsPayload) {
             throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
         }
 
         try {
-            $ids = json_decode((string) $idsPayload, true, 512, JSON_THROW_ON_ERROR);
+            $ids = json_decode($idsPayload, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
             throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
         }
@@ -83,6 +83,6 @@ final readonly class BatchDownloadRequestValidator
             $validIds[] = $validId;
         }
 
-        return $validIds;
+        return array_values(array_unique($validIds));
     }
 }

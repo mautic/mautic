@@ -24,29 +24,12 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class AssetController extends FormController
 {
-    private BatchDownloadRequestValidator $batchDownloadRequestValidator;
-
-    private BatchFileCollector $batchFileCollector;
-
-    private ArchiveBuilder $archiveBuilder;
-
-    private BatchDownloadResponder $batchDownloadResponder;
-
     private AuditLogModel $auditLogModel;
 
     #[Required]
-    public function autowireAssetController(
-        BatchDownloadRequestValidator $batchDownloadRequestValidator,
-        BatchFileCollector $batchFileCollector,
-        ArchiveBuilder $archiveBuilder,
-        BatchDownloadResponder $batchDownloadResponder,
-        AuditLogModel $auditLogModel,
-    ): void {
-        $this->batchDownloadRequestValidator = $batchDownloadRequestValidator;
-        $this->batchFileCollector            = $batchFileCollector;
-        $this->archiveBuilder                = $archiveBuilder;
-        $this->batchDownloadResponder        = $batchDownloadResponder;
-        $this->auditLogModel                 = $auditLogModel;
+    public function autowireAssetController(AuditLogModel $auditLogModel): void
+    {
+        $this->auditLogModel = $auditLogModel;
     }
 
     public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, AssetSearchScopeProvider $assetSearchScopeProvider, int $page = 1): Response
@@ -671,26 +654,31 @@ final class AssetController extends FormController
         );
     }
 
-    public function batchDownloadAction(Request $request): Response
-    {
+    public function batchDownloadAction(
+        Request $request,
+        BatchDownloadRequestValidator $batchDownloadRequestValidator,
+        BatchFileCollector $batchFileCollector,
+        ArchiveBuilder $archiveBuilder,
+        BatchDownloadResponder $batchDownloadResponder,
+    ): Response {
         if (!$request->isMethod(Request::METHOD_POST)) {
             return new Response('', Response::HTTP_METHOD_NOT_ALLOWED, ['Allow' => Request::METHOD_POST]);
         }
 
-        if (!$this->batchDownloadRequestValidator->validatePermissions()) {
+        if (!$batchDownloadRequestValidator->validatePermissions()) {
             $this->throwAccessDenied();
         }
 
-        if (!$this->batchDownloadRequestValidator->hasValidCsrfToken($request)) {
+        if (!$batchDownloadRequestValidator->hasValidCsrfToken($request)) {
             $this->throwAccessDenied();
         }
 
         try {
-            $ids                = $this->batchDownloadRequestValidator->validateAndExtractIds($request);
-            $downloadableAssets = $this->batchFileCollector->collectDownloadableAssets($ids);
-            $zipPath            = $this->archiveBuilder->buildArchive($downloadableAssets);
+            $ids                = $batchDownloadRequestValidator->validateAndExtractIds($request);
+            $downloadableAssets = $batchFileCollector->collectDownloadableAssets($ids);
+            $zipPath            = $archiveBuilder->buildArchive($downloadableAssets);
 
-            return $this->batchDownloadResponder->createResponse($zipPath);
+            return $batchDownloadResponder->createResponse($zipPath);
         } catch (BatchDownloadException $e) {
             return $this->createBatchDownloadErrorResponse($e->getMessage());
         }

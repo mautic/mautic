@@ -11,6 +11,7 @@ final class AssetBatchDownloadCest
         $tester->waitForElement('[data-mautic-batch-download]', 30);
         $tester->waitForElement('#assetTable thead [data-toggle="checkall"]', 30);
         $tester->click('#assetTable thead [data-toggle="checkall"]');
+        $tester->click('#core-options');
         $tester->waitForElementVisible('[data-mautic-batch-download]', 30);
         $tester->waitForJS("return typeof Mautic.batchAssetDownload === 'function';", 30);
 
