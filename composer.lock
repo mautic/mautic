@@ -15093,16 +15093,16 @@
         },
         {
             "name": "entropy/entropy",
-            "version": "0.4.23",
+            "version": "0.4.28",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/entropy.git",
-                "reference": "6af0525163f3b0c3a473046e5fa151477d7cd1d1"
+                "reference": "d6f2c8a591133434692e9478a5bba4aebfe820f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/entropy/zipball/6af0525163f3b0c3a473046e5fa151477d7cd1d1",
-                "reference": "6af0525163f3b0c3a473046e5fa151477d7cd1d1",
+                "url": "https://api.github.com/repos/TomasVotruba/entropy/zipball/d6f2c8a591133434692e9478a5bba4aebfe820f1",
+                "reference": "d6f2c8a591133434692e9478a5bba4aebfe820f1",
                 "shasum": ""
             },
             "require": {
@@ -15119,10 +15119,10 @@
                 "rector/rector": "^2.4",
                 "rector/swiss-knife": "^2.4",
                 "shipmonk/composer-dependency-analyser": "^1.8",
+                "shipmonk/dead-code-detector": "^1.4",
                 "symplify/easy-coding-standard": "^13.1",
                 "symplify/phpstan-rules": "^14.10",
                 "tomasvotruba/type-coverage": "^2.2",
-                "tomasvotruba/unused-public": "^2.2",
                 "tracy/tracy": "^2.12"
             },
             "type": "library",
@@ -15138,9 +15138,9 @@
             "description": "Entropy framework",
             "support": {
                 "issues": "https://github.com/TomasVotruba/entropy/issues",
-                "source": "https://github.com/TomasVotruba/entropy/tree/0.4.23"
+                "source": "https://github.com/TomasVotruba/entropy/tree/0.4.28"
             },
-            "time": "2026-10-01T12:27:46+00:00"
+            "time": "2026-10-07T08:43:40+00:00"
         },
         {
             "name": "http-interop/http-factory-guzzle",
@@ -18473,20 +18473,20 @@
         },
         {
             "name": "tomasvotruba/class-leak",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/class-leak.git",
-                "reference": "7d6fb52a232ed8cf7b0ddd62e5d83c805eb0583e"
+                "reference": "9d80db6f88b1b1c78467636b63ac03747af42e6b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/class-leak/zipball/7d6fb52a232ed8cf7b0ddd62e5d83c805eb0583e",
-                "reference": "7d6fb52a232ed8cf7b0ddd62e5d83c805eb0583e",
+                "url": "https://api.github.com/repos/TomasVotruba/class-leak/zipball/9d80db6f88b1b1c78467636b63ac03747af42e6b",
+                "reference": "9d80db6f88b1b1c78467636b63ac03747af42e6b",
                 "shasum": ""
             },
             "require": {
-                "entropy/entropy": "^0.4.16",
+                "entropy/entropy": "^0.4.28",
                 "nikic/php-parser": "^5.9",
                 "php": ">=7.4",
                 "symfony/polyfill-php80": "^1.31"
@@ -18498,15 +18498,14 @@
                 "phpunit/phpunit": "^9.6",
                 "rector/jack": "^1.0",
                 "rector/rector": "^2.4",
+                "shipmonk/dead-code-detector": "^1.4",
                 "symplify/easy-coding-standard": "^13.0",
                 "symplify/phpstan-extensions": "^12",
-                "tomasvotruba/unused-public": "^2.2",
                 "tracy/tracy": "^2.12"
             },
             "bin": [
                 "bin/class-leak",
-                "bin/class-leak.php",
-                "bin/class-leak-go"
+                "bin/class-leak.php"
             ],
             "type": "library",
             "autoload": {
@@ -18521,7 +18520,7 @@
             "description": "Detect leaking classes",
             "support": {
                 "issues": "https://github.com/TomasVotruba/class-leak/issues",
-                "source": "https://github.com/TomasVotruba/class-leak/tree/2.3.0"
+                "source": "https://github.com/TomasVotruba/class-leak/tree/2.3.1"
             },
             "funding": [
                 {
@@ -18533,7 +18532,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-30T10:29:41+00:00"
+            "time": "2026-10-07T08:53:33+00:00"
         },
         {
             "name": "tomasvotruba/type-coverage",
@@ -18608,16 +18607,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "2.4.1",
+            "version": "2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-                "reference": "2ccb7c2e821038c03a3e6e1700c570c158c55f70"
+                "reference": "8a163706bbcac613733dba03f51e13b5eb1bb819"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/2ccb7c2e821038c03a3e6e1700c570c158c55f70",
-                "reference": "2ccb7c2e821038c03a3e6e1700c570c158c55f70",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/8a163706bbcac613733dba03f51e13b5eb1bb819",
+                "reference": "8a163706bbcac613733dba03f51e13b5eb1bb819",
                 "shasum": ""
             },
             "require": {
@@ -18668,9 +18667,9 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-                "source": "https://github.com/webmozarts/assert/tree/2.4.1"
+                "source": "https://github.com/webmozarts/assert/tree/2.5.0"
             },
-            "time": "2026-06-15T15:31:57+00:00"
+            "time": "2026-10-05T23:14:19+00:00"
         }
     ],
     "aliases": [],
