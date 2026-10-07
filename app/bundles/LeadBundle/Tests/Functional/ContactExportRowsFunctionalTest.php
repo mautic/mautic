@@ -63,7 +63,7 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         foreach ([$withCount, $withoutCount] as $rows) {
             $this->assertSame(
                 [$published->getId() => 'Published', $unpublished->getId() => 'Unpublished', $none->getId() => null],
-                array_map(fn (array $row) => $row['stage'], $rows)
+                array_map(fn (array $row): mixed => $row['stage'], $rows)
             );
             foreach ($rows as $row) {
                 $this->assertSame('stage', array_key_last($row));
@@ -113,7 +113,7 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         $header = array_shift($rows);
         $this->assertSame('id', $header[0]);
         $this->assertSame('stage', end($header));
-        $this->assertSame($ids, array_map(fn (array $row) => (int) $row[0], $rows));
+        $this->assertSame($ids, array_map(fn (array $row): int => (int) $row[0], $rows));
     }
 
     public function testInteractiveCsvHasTheSameColumnsAsScheduledExport(): void
@@ -123,13 +123,13 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=csv&ids='.urlencode(json_encode($ids)));
         $this->assertResponseIsSuccessful();
-        $content     = (string) $this->client->getInternalResponse()->getContent();
-        $interactive = array_map('str_getcsv', explode("\n", trim(preg_replace('/^\xEF\xBB\xBF/', '', $content))));
+        $content     = $this->client->getInternalResponse()->getContent();
+        $interactive = array_map(str_getcsv(...), explode("\n", trim(preg_replace('/^\xEF\xBB\xBF/', '', $content))));
 
         $scheduled = $this->readScheduledExport(['limit' => 200, 'fileType' => 'csv'] + $this->argsFor($ids));
 
         $this->assertSame($scheduled[0], $interactive[0]);
-        $this->assertSame(array_reverse($ids), array_map(fn (array $row) => (int) $row[0], array_slice($interactive, 1)));
+        $this->assertSame(array_reverse($ids), array_map(fn (array $row): int => (int) $row[0], array_slice($interactive, 1)));
     }
 
     /**
@@ -162,7 +162,7 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
             ->setData($data);
 
         $model   = self::getContainer()->get(ContactExportSchedulerModel::class);
-        \assert($model instanceof ContactExportSchedulerModel);
+        $this->assertInstanceOf(ContactExportSchedulerModel::class, $model);
         $zipPath = $model->processAndGetExportFilePath($scheduler);
 
         $zip = new \ZipArchive();
@@ -171,7 +171,7 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         $zip->close();
         unlink($zipPath);
 
-        return array_map('str_getcsv', explode("\n", trim($csv)));
+        return array_map(str_getcsv(...), explode("\n", trim($csv)));
     }
 
     /**
@@ -191,7 +191,7 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        return array_map(fn (Lead $contact) => (int) $contact->getId(), $contacts);
+        return array_map(fn (Lead $contact): int => $contact->getId(), $contacts);
     }
 
     private function createContact(string $firstname, ?string $colour, ?Stage $stage): Lead
@@ -231,14 +231,14 @@ final class ContactExportRowsFunctionalTest extends MauticMysqlTestCase
         $field->setProperties(['list' => [['label' => 'Red', 'value' => 'r'], ['label' => 'Blue', 'value' => 'b']]]);
 
         $fieldModel = self::getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $fieldModel->saveEntity($field);
     }
 
     private function getLeadModel(): LeadModel
     {
         $leadModel = self::getContainer()->get(LeadModel::class);
-        \assert($leadModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $leadModel);
 
         return $leadModel;
     }

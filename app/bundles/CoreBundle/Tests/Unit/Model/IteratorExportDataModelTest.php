@@ -48,7 +48,7 @@ final class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->commonModel->expects($this->exactly(3))
             ->method('getEntities')
-            ->willReturnCallback(fn (array $args) => match ($args['start']) {
+            ->willReturnCallback(fn (array $args): array => match ($args['start']) {
                 0       => ['results' => [1 => ['id' => 1], 2 => ['id' => 2]]],
                 2       => ['results' => [3 => ['id' => 3]]],
                 default => ['results' => []],
