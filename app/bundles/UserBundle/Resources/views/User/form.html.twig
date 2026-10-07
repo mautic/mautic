@@ -67,7 +67,19 @@
 								{{ form_errors(form.email) }}
 							</div>
                             {% if isSamlUser is empty %}
-							    {{ form_widget(form.plainPassword, {'attr' : {'placeholder' : form.plainPassword.vars.label }}) }}
+                                {% if userId is not empty %}
+                                    <div class="form-group">
+                                        <label class="control-label mb-xs">{{ 'mautic.core.password'|trans }}</label>
+                                        <div class="text-secondary small mb-xs">{{ 'mautic.user.config.account.password.change.helper'|trans }}</div>
+                                        {% include '@MauticUser/User/change_password_modal.html.twig' with {
+                                            passwordForm: form.plainPassword,
+                                            saveWarningContent: 'mautic.user.user.password.save.warning.content',
+                                            stagedMessage: 'mautic.user.user.password.change.pending',
+                                        } %}
+                                    </div>
+                                {% else %}
+                                    {{ form_widget(form.plainPassword, {'attr' : {'placeholder' : form.plainPassword.vars.label }}) }}
+                                {% endif %}
                             {% endif %}
 						</div>
 					</div>

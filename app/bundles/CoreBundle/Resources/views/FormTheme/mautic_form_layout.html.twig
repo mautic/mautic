@@ -327,7 +327,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
             <span>{{ attr.preaddon_text }}</span>
         </span>
         {% endif %}
-        <input autocomplete="false" type="{{ type is defined ? type|escape : 'text' }}"
+        <input {{ attr.autocomplete is not defined ? 'autocomplete="false" ' : '' }}type="{{ type is defined ? type|escape : 'text' }}"
             {{ block('widget_attributes') }}{% if value is not empty or value is numeric %}
             value="{{ value|escape }}"{% endif %} />
 
