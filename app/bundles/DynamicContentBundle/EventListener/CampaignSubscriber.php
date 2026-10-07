@@ -134,7 +134,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
                 $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
                 $tokenEvent->setStat($stat);
-                $this->dispatcher->dispatch($tokenEvent);
+                $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
                 $content = $tokenEvent->getContent();
                 $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);

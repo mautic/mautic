@@ -10,6 +10,14 @@ namespace Mautic\DynamicContentBundle;
 final class DynamicContentEvents
 {
     /**
+     * The mautic.dwc_token_replacement event is thrown right before the content is returned.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\TokenReplacementEvent instance.
+     */
+    public const string TOKEN_REPLACEMENT = 'mautic.dwc_token_replacement';
+
+    /**
      * The mautic.dwc_pre_save event is thrown right before a asset is persisted.
      *
      * The event listener receives a

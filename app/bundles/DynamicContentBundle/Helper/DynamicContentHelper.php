@@ -4,6 +4,7 @@ namespace Mautic\DynamicContentBundle\Helper;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
@@ -165,7 +166,7 @@ final readonly class DynamicContentHelper
 
         $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
         $tokenEvent->setStat($stat);
-        $this->dispatcher->dispatch($tokenEvent);
+        $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
         return $tokenEvent->getContent();
     }
