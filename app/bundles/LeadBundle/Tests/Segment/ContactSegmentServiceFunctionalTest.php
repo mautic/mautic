@@ -89,7 +89,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 'users',
                 'leads',
                 'lead_lists',
-                'companies'
+                'companies',
             ]
         );
     }

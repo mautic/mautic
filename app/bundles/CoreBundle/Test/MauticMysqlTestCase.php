@@ -211,7 +211,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             /*
              * POSTGRESQL DOCTRINE WORKAROUND:
              *
-             * TRUNCATE … RESTART IDENTITY CASCADE only restarts sequences that PostgreSQL considers owned by / linked to the identity column. In this Mautic branch Doctrine creates columns as GENERATED … AS IDENTITY. 
+             * TRUNCATE ... RESTART IDENTITY CASCADE only restarts sequences that PostgreSQL considers owned by / linked to the identity column. In this Mautic branch Doctrine creates columns as GENERATED ... AS IDENTITY. 
              * Those underlying sequences are frequently not registered in a way that pg_get_serial_sequence() (and therefore RESTART IDENTITY) can't see.
              */
             $this->resetAutoincrement($tables);
@@ -227,12 +227,18 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         // Clear identity map before re-loading so Role/User proxies cannot
         // retain IDs that were truncated on PostgreSQL.
         $this->em->clear();
-        $this->installDatabaseFixtures([
-            LeadFieldData::class,
-            RoleData::class,
-            LoadRoleData::class,
-            LoadUserData::class,
-        ]);
+        // append=false is required: with append=true Liip reuses the ReferenceRepository
+        // from the previous loadFixtures() call. After TRUNCATE those references point at
+        // deleted rows, RoleData/LoadRoleData skip insert (hasReference === true), and
+        // LoadUserData then fails with EntityNotFoundException on Role.
+        $this->installDatabaseFixtures(
+            [
+                LeadFieldData::class,
+                RoleData::class,
+                LoadRoleData::class,
+                LoadUserData::class,
+            ], false
+        );
     }
 
     /**
