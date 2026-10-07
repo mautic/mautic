@@ -72,13 +72,6 @@ final class CampaignEvents
     public const string ON_EVENT_EXECUTED = 'mautic.campaign_on_event_executed';
 
     /**
-     * The mautic.on_event_delete event is dispatched when a campaign events are deleted.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\DeleteEvent instance.
-     */
-    public const string ON_EVENT_DELETE = 'mautic.on_event_delete';
-
-    /**
      * The mautic.on_after_events_delete event is dispatched when a campaign events are deleted.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\DeleteEvent instance.
