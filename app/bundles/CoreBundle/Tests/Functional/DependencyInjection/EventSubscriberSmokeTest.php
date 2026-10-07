@@ -164,7 +164,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
             \Mautic\WebhookBundle\EventListener\ConfigSubscriber::class,
         ],
-        'mautic.config_pre_save' => [
+        \Mautic\ConfigBundle\Event\ConfigPreSaveEvent::class => [
             \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
