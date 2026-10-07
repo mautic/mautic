@@ -78,7 +78,7 @@ class Clearbit_Base
      *
      * @return object
      */
-    protected function _execute(array $params = [])
+    protected function _execute(array $params = []): ?\stdClass
     {
         $this->_wait_for_rate_limit();
 

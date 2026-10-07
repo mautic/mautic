@@ -110,7 +110,7 @@ class FullContact_Base
      * @throws NoCreditException
      * @throws NotImplementedException
      */
-    protected function _execute(array $params = [], $postData = null)
+    protected function _execute(array $params = [], $postData = null): ?\stdClass
     {
         if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
             throw new NotImplementedException(self::class.' does not support the ['.$params['method'].'] method');
