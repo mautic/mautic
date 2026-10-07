@@ -54,7 +54,7 @@ final class MediaMaxAllowedSizeValidator extends ConstraintValidator
                 $path = '/'.$path;
             }
 
-            $filePath = $this->pathsHelper->getSystemPath('local_root').$path;
+            $filePath = $this->pathsHelper->getLocalRoot().$path;
             if (file_exists($filePath)) {
                 $totalMediaSize += filesize($filePath);
             }

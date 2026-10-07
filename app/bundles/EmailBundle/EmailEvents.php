@@ -120,7 +120,7 @@ final class EmailEvents
     public const EMAIL_PRE_DELETE = 'mautic.email_pre_delete';
 
     /**
-     * The mautic.email_post_delete event is dispatched after a email is deleted.
+     * The mautic.email_post_delete event is dispatched after an email is deleted.
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailEvent instance.
