@@ -12,6 +12,8 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
+use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\Exception;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class FormUploaderTest extends \PHPUnit\Framework\TestCase
@@ -22,7 +24,7 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
     private string $uploadDir = __DIR__.'/DummyFiles';
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Uploader uploads files correctly')]
+    #[TestDox('Uploader uploads files correctly')]
     public function testSuccessfulUploadFiles(): void
     {
         $fileUploaderMock         = $this->createMock(FileUploader::class);
@@ -92,7 +94,7 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $fileUploaderMock->expects($matcher)
-            ->method('upload')->willReturnCallback(function (...$parameters) use ($matcher, $path1, $file1Mock, $path2, $file2Mock) {
+            ->method('upload')->willReturnCallback(function (...$parameters) use ($matcher, $path1, $file1Mock, $path2, $file2Mock): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($path1, $parameters[0]);
                     $this->assertSame($file1Mock, $parameters[1]);
@@ -105,6 +107,8 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
                     return 'upload2.txt';
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $formUploader->uploadFiles($filesToUpload, $submission);
@@ -118,7 +122,7 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $submission->getResults());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Uploader delete uploaded file if anz error occures')]
+    #[TestDox('Uploader delete uploaded file if anz error occures')]
     public function testUploadFilesWithError(): void
     {
         $fileUploaderMock         = $this->createMock(FileUploader::class);
@@ -201,18 +205,18 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $this->expectException(FileUploadException::class);
         $this->expectExceptionMessage('file2');
 
-        $formUploader->uploadFiles($filesToUpload, $submission);
+        // file2 fails, so the successful upload is rolled back and the
+        // submission keeps the results it already had.
+        $expected = ['key' => 'value'];
 
-        $expected = [
-            'key'   => 'value',
-            'file1' => 'upload1.jpg',
-            'file2' => 'upload2.txt',
-        ];
-
-        $this->assertSame($expected, $submission->getResults());
+        try {
+            $formUploader->uploadFiles($filesToUpload, $submission);
+        } finally {
+            $this->assertSame($expected, $submission->getResults());
+        }
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Uploader do nothing if no files for upload provided')]
+    #[TestDox('Uploader do nothing if no files for upload provided')]
     public function testNoFilesUploadFiles(): void
     {
         $fileUploaderMock = $this->createMock(FileUploader::class);
@@ -233,7 +237,7 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $formUploader->uploadFiles($filesToUpload, $submission);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Uploader returs correct path for file')]
+    #[TestDox('Uploader returs correct path for file')]
     public function testGetCompleteFilePath(): void
     {
         $fileUploaderMock = $this->createStub(FileUploader::class);
@@ -270,7 +274,7 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->uploadDir.'/1/fieldId1/fileName', $actual);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Uploader delete files correctly')]
+    #[TestDox('Uploader delete files correctly')]
     public function testDeleteAllFilesOfFormField(): void
     {
         $fileUploaderMock = $this->createMock(FileUploader::class);

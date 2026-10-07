@@ -5,17 +5,24 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class FormExtension extends AbstractExtension
+final class FormExtension extends AbstractExtension
 {
+    public function __construct(
+        private readonly FormRendererInterface $formRenderer,
+    ) {
+    }
+
     public function getFunctions()
     {
         return [
             new TwigFunction('formFieldFormatList', $this->formatList(...), ['is_safe' => ['all']]),
             new TwigFunction('formContainsErrors', $this->containsErrors(...), ['is_safe' => ['all']]),
+            new TwigFunction('formRowIfExists', $this->rowIfExists(...), ['is_safe' => ['html']]),
         ];
     }
 
@@ -55,5 +62,17 @@ class FormExtension extends AbstractExtension
         }
 
         return false;
+    }
+
+    /**
+     * @param array<string, mixed> $variables
+     */
+    public function rowIfExists(FormView $form, string $fieldName, array $variables = []): string
+    {
+        if (!isset($form[$fieldName])) {
+            return '';
+        }
+
+        return $this->formRenderer->searchAndRenderBlock($form[$fieldName], 'row', $variables);
     }
 }

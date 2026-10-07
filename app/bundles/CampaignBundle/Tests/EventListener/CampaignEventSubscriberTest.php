@@ -120,8 +120,8 @@ final class CampaignEventSubscriberTest extends TestCase
 
         $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
 
-        self::assertNotNull($campaign->getPublishUp());
-        self::assertSame('00', $campaign->getPublishUp()->format('s'));
+        $this->assertInstanceOf(\DateTimeInterface::class, $campaign->getPublishUp());
+        $this->assertSame('00', $campaign->getPublishUp()->format('s'));
     }
 
     public function testFailedEventGeneratesANotification(): void
@@ -132,7 +132,7 @@ final class CampaignEventSubscriberTest extends TestCase
             ->willReturn(false);
 
         $mockLead     = $this->createMock(Lead::class);
-        $mockLead->expects($this->any())
+        $mockLead
             ->method('getId')
             ->willReturn(42);
         $mockCampaign = $this->createMock(Campaign::class);
@@ -144,7 +144,7 @@ final class CampaignEventSubscriberTest extends TestCase
         $mockEvent->expects($this->once())
             ->method('getCampaign')
             ->willReturn($mockCampaign);
-        $mockEvent->expects($this->any())
+        $mockEvent
             ->method('getId')
             ->willReturn(42);
 
@@ -153,7 +153,7 @@ final class CampaignEventSubscriberTest extends TestCase
             ->method('getEvent')
             ->willReturn($mockEvent);
 
-        $mockEventLog->expects($this->any())
+        $mockEventLog
             ->method('getLead')
             ->willReturn($mockLead);
 
@@ -190,7 +190,7 @@ final class CampaignEventSubscriberTest extends TestCase
             ->willReturn(false);
 
         $mockLead     = $this->createMock(Lead::class);
-        $mockLead->expects($this->any())
+        $mockLead
             ->method('getId')
             ->willReturn(42);
         $mockCampaign = $this->createMock(Campaign::class);
@@ -206,7 +206,7 @@ final class CampaignEventSubscriberTest extends TestCase
         $mockEvent->expects($this->once())
             ->method('getCampaign')
             ->willReturn($mockCampaign);
-        $mockEvent->expects($this->any())
+        $mockEvent
             ->method('getId')
             ->willReturn(42);
 
@@ -215,7 +215,7 @@ final class CampaignEventSubscriberTest extends TestCase
             ->method('getEvent')
             ->willReturn($mockEvent);
 
-        $mockEventLog->expects($this->any())
+        $mockEventLog
             ->method('getLead')
             ->willReturn($mockLead);
 
@@ -261,7 +261,7 @@ final class CampaignEventSubscriberTest extends TestCase
         $lead->setId(42);
 
         $eventMock = $this->createMock(Event::class);
-        $eventMock->expects($this->any())
+        $eventMock
             ->method('getId')
             ->willReturn(42);
 
@@ -269,7 +269,7 @@ final class CampaignEventSubscriberTest extends TestCase
             ->method('getEvent')
             ->willReturn($eventMock);
 
-        $mockEventLog->expects($this->any())
+        $mockEventLog
             ->method('getLead')
             ->willReturn($lead);
 
@@ -300,7 +300,7 @@ final class CampaignEventSubscriberTest extends TestCase
         $lead->deletedId = 10;
 
         $eventMock = $this->createMock(Event::class);
-        $eventMock->expects($this->any())
+        $eventMock
             ->method('getId')
             ->willReturn(1);
 
@@ -343,11 +343,11 @@ final class CampaignEventSubscriberTest extends TestCase
         // Set up campaign mock with isPublished returning false to simulate campaign already unpublished
         $campaignMock = $this->createMock(Campaign::class);
         $campaignMock->expects($this->once())->method('isPublished')->willReturn(false);
-        $eventMock->expects($this->any())->method('getCampaign')->willReturn($campaignMock);
+        $eventMock->method('getCampaign')->willReturn($campaignMock);
 
         // Mock behavior for threshold calculations
-        $leadMock->expects($this->any())->method('getId')->willReturn(1);
-        $eventMock->expects($this->any())->method('getId')->willReturn(1);
+        $leadMock->method('getId')->willReturn(1);
+        $eventMock->method('getId')->willReturn(1);
         $this->eventRepo->expects($this->once())->method('getFailedCountLeadEvent')
             ->with(1, 1)->willReturn(101);
         $this->leadEventLogRepositoryMock->expects($this->once())->method('isLastFailed')

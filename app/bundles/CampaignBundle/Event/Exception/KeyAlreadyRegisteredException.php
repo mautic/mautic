@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Event\Exception;
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;
@@ -7,6 +9,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 /**
  * Extends Symfony\Component\Process\Exception\InvalidArgumentException to keep BC.
  */
-class KeyAlreadyRegisteredException extends InvalidArgumentException
+final class KeyAlreadyRegisteredException extends InvalidArgumentException
 {
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Factory;
 
 use Mautic\CoreBundle\Helper\PageHelperInterface;

@@ -91,7 +91,7 @@ class SendEmailToContact
         array $channel = [],
         array $customHeaders = [],
         array $assetAttachments = [],
-    ): SendEmailToContact {
+    ): self {
         // Flush anything that's pending from a previous email
         $this->flush();
 
@@ -238,7 +238,7 @@ class SendEmailToContact
         throw new FailedToSendToContactException($errorMessages);
     }
 
-    protected function processSendFailures($sendFailures)
+    protected function processSendFailures(array $sendFailures): void
     {
         $failedEmailAddresses = $sendFailures['failures'];
         unset($sendFailures['failures']);
@@ -267,7 +267,7 @@ class SendEmailToContact
     /**
      * Add DNC entries for bad emails to get them out of the queue permanently.
      */
-    protected function processBadEmails()
+    protected function processBadEmails(): void
     {
         // Update bad emails as bounces
         if (count($this->badEmails)) {
@@ -284,7 +284,7 @@ class SendEmailToContact
         }
     }
 
-    protected function createContactStatEntry($email)
+    protected function createContactStatEntry($email): void
     {
         ++$this->statBatchCounter;
 
@@ -300,7 +300,7 @@ class SendEmailToContact
     /**
      * Up sent counter for the given email ID.
      */
-    protected function upEmailSentCount($emailId)
+    protected function upEmailSentCount($emailId): void
     {
         // Up sent counts
         if (!isset($this->emailSentCounts[$emailId])) {
@@ -313,7 +313,7 @@ class SendEmailToContact
     /**
      * Down sent counter for the given email ID.
      */
-    protected function downEmailSentCount($emailId)
+    protected function downEmailSentCount($emailId): void
     {
         --$this->emailSentCounts[$emailId];
     }

@@ -36,7 +36,7 @@ class ComposerHelper
             'packages' => [$packageName],
         ];
 
-        if (true === $dryRun) {
+        if ($dryRun) {
             $input['--dry-run'] = null;
         }
 
@@ -63,7 +63,7 @@ class ComposerHelper
             '--no-update' => null,
         ];
 
-        if (true === $dryRun) {
+        if ($dryRun) {
             $input['--dry-run'] = null;
         }
 
@@ -80,7 +80,7 @@ class ComposerHelper
                 'packages'    => [$packageName],
             ];
 
-            if (true === $dryRun) {
+            if ($dryRun) {
                 $input['--dry-run'] = null;
             }
 
@@ -129,7 +129,7 @@ class ComposerHelper
             $input['packages'] = [$packageName];
         }
 
-        if (true === $dryRun) {
+        if ($dryRun) {
             $input['--dry-run'] = null;
         }
 

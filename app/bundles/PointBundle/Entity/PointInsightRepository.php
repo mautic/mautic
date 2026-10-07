@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<PointInsight>
  */
-class PointInsightRepository extends CommonRepository
+final class PointInsightRepository extends CommonRepository
 {
     public function getEntities(array $args = [])
     {

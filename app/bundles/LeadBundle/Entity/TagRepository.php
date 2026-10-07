@@ -71,14 +71,14 @@ class TagRepository extends CommonRepository
      */
     public function getTagsByName(array $tags): array
     {
-        if (empty($tags)) {
+        if ([] === $tags) {
             return [];
         }
 
         $tags = $this->removeMinusFromTags($tags);
         $qb   = $this->createQueryBuilder('t', 't.tag');
 
-        if ($tags) {
+        if ([] !== $tags) {
             $qb->where(
                 $qb->expr()->in('t.tag', ':tags')
             )
@@ -163,13 +163,13 @@ class TagRepository extends CommonRepository
     {
         $result = [];
 
-        if (empty($leadIds) || empty($tagIds)) {
+        if ([] === $leadIds || [] === $tagIds) {
             return $result;
         }
 
         $tags = $this->getTagById($tagIds);
 
-        if (empty($tags)) {
+        if ([] === $tags) {
             return $result;
         }
 

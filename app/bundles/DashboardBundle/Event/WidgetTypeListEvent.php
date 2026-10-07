@@ -7,22 +7,13 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WidgetTypeListEvent extends CommonEvent
+final class WidgetTypeListEvent extends CommonEvent
 {
-    /**
-     * @var array
-     */
-    protected $widgetTypes = [];
+    private array $widgetTypes = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    private ?TranslatorInterface $translator = null;
 
-    /**
-     * @var CorePermissions
-     */
-    protected $security;
+    private ?CorePermissions $security = null;
 
     /**
      * Adds a new widget type to the widget types list.
@@ -78,10 +69,8 @@ class WidgetTypeListEvent extends CommonEvent
 
     /**
      * Returns the array of widget types.
-     *
-     * @return array
      */
-    public function getTypes()
+    public function getTypes(): array
     {
         return $this->widgetTypes;
     }

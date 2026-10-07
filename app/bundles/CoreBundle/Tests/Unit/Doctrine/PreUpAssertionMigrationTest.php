@@ -7,14 +7,13 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class PreUpAssertionMigrationTest extends TestCase
 {
     public function testPreUpWithoutSkipAssertions(): void
     {
-        $migration = new class extends PreUpAssertionMigration {
+        $migration = new class() extends PreUpAssertionMigration {
             /**
              * @var array<string>
              */
@@ -39,12 +38,12 @@ final class PreUpAssertionMigrationTest extends TestCase
 
         $migration->preUp($this->createStub(Schema::class));
 
-        Assert::assertEmpty($migration->messages);
+        $this->assertEmpty($migration->messages);
     }
 
     public function testPreUpSkipped(): void
     {
-        $migration = new class extends PreUpAssertionMigration {
+        $migration = new class() extends PreUpAssertionMigration {
             /**
              * @var array<string>
              */
@@ -78,8 +77,8 @@ final class PreUpAssertionMigrationTest extends TestCase
         } catch (SkipMigration) {
         }
 
-        Assert::assertCount(3, $migration->messages);
-        Assert::assertSame([
+        $this->assertCount(3, $migration->messages);
+        $this->assertSame([
             '<comment>First exists</comment>',
             '<comment>Second exists</comment>',
             '<comment>Third exists</comment>',
@@ -88,7 +87,7 @@ final class PreUpAssertionMigrationTest extends TestCase
 
     public function testPreUpNotSkipped(): void
     {
-        $migration = new class extends PreUpAssertionMigration {
+        $migration = new class() extends PreUpAssertionMigration {
             /**
              * @var array<string>
              */
@@ -118,8 +117,8 @@ final class PreUpAssertionMigrationTest extends TestCase
 
         $migration->preUp($this->createStub(Schema::class));
 
-        Assert::assertCount(2, $migration->messages);
-        Assert::assertSame([
+        $this->assertCount(2, $migration->messages);
+        $this->assertSame([
             '<comment>First exists</comment>',
             '<comment>Second exists</comment>',
         ], $migration->messages);

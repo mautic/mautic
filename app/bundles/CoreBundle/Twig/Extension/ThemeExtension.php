@@ -9,7 +9,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ThemeExtension extends AbstractExtension
+final class ThemeExtension extends AbstractExtension
 {
     public function __construct(
         private readonly ThemeHelper $themeHelper,

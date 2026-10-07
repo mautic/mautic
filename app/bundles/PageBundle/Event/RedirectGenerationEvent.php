@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\Redirect;
 
-class RedirectGenerationEvent extends CommonEvent
+final class RedirectGenerationEvent extends CommonEvent
 {
     public function __construct(
         private readonly Redirect $redirect,

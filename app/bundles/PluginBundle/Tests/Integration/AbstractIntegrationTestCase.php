@@ -9,12 +9,16 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
+use Mautic\UserBundle\Entity\UserRepository;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -24,7 +28,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AbstractIntegrationTestCase extends TestCase
+abstract class AbstractIntegrationTestCase extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface
@@ -111,6 +115,21 @@ class AbstractIntegrationTestCase extends TestCase
      */
     protected MockObject $fieldsWithUniqueIdentifier;
 
+    /**
+     * @var MockObject&IntegrationEntityRepository
+     */
+    protected MockObject $integrationEntityRepository;
+
+    /**
+     * @var MockObject&LeadRepository
+     */
+    protected MockObject $leadRepository;
+
+    /**
+     * @var MockObject&UserRepository
+     */
+    protected MockObject $userRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -132,5 +151,20 @@ class AbstractIntegrationTestCase extends TestCase
         $this->integrationEntityModel     = $this->createMock(IntegrationEntityModel::class);
         $this->doNotContact               = $this->createMock(DoNotContact::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
+        $this->integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
+        $this->leadRepository              = $this->createMock(LeadRepository::class);
+        $this->userRepository              = $this->createMock(UserRepository::class);
+    }
+
+    /**
+     * Mimics the #[Required] autowiring of repositories that the container does for real services.
+     */
+    protected function autowireIntegrationRepositories(AbstractIntegration $integration): void
+    {
+        $integration->autowireAbstractIntegration(
+            $this->integrationEntityRepository,
+            $this->leadRepository,
+            $this->userRepository
+        );
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -10,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldHTMLType extends AbstractType
+final class FormFieldHTMLType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

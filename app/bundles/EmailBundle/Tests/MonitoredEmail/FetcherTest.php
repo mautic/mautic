@@ -9,15 +9,17 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Fetcher;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Message;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(Fetcher::class)]
+#[CoversClass(Fetcher::class)]
 final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<string, array<string, int|string>>
      */
-    protected array $mailboxes = [
+    private array $mailboxes = [
         'EmailBundle_bounces' => [
             'address'           => 'bounces@test.com',
             'host'              => 'mail.test.com',
@@ -53,7 +55,7 @@ final class FetcherTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the EmailEvents::EMAIL_PARSE event is dispatched from found messages')]
+    #[TestDox('Test that the EmailEvents::EMAIL_PARSE event is dispatched from found messages')]
     public function testMessagesAreFetchedAndEventDispatched(): void
     {
         $mailbox = $this->createMock(Mailbox::class);

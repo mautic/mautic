@@ -14,14 +14,14 @@ final class TokenReplacementEventTest extends TestCase
     {
         $passthrough = ['passthrough'];
         $event       = new TokenReplacementEvent('', null, [], $passthrough);
-        self::assertSame($passthrough, $event->getPassthrough());
+        $this->assertSame($passthrough, $event->getPassthrough());
     }
 
     public function testGetSetContent(): void
     {
         $content = 'content';
         $event   = new TokenReplacementEvent($content);
-        self::assertSame($content, $event->getContent());
+        $this->assertSame($content, $event->getContent());
     }
 
     public function testAddGetTokens(): void
@@ -31,17 +31,14 @@ final class TokenReplacementEventTest extends TestCase
         $token1 = 'token1';
         $value1 = 'value1';
         $event  = new TokenReplacementEvent('');
-        self::assertSame([], $event->getTokens());
+        $this->assertSame([], $event->getTokens());
         $event->addToken($token, $value);
-        self::assertSame([$token => $value], $event->getTokens());
+        $this->assertSame([$token => $value], $event->getTokens());
         $event->addToken($token1, $value1);
-        self::assertSame(
-            [
-                $token  => $value,
-                $token1 => $value1,
-            ],
-            $event->getTokens()
-        );
+        $this->assertSame([
+            $token  => $value,
+            $token1 => $value1,
+        ], $event->getTokens());
     }
 
     public function testGetClickthrough(): void
@@ -50,37 +47,25 @@ final class TokenReplacementEventTest extends TestCase
         $leadEntity['id'] = $leadId;
         $clickthrough     = ['lead' => $leadEntity];
         $event            = new TokenReplacementEvent('', $leadEntity, $clickthrough);
-        self::assertSame(
-            ['lead' => 1],
-            $event->getClickthrough()
-        );
+        $this->assertSame(['lead' => 1], $event->getClickthrough());
 
         $leadEntity   = new Lead();
 
         $clickthrough = ['lead', $leadEntity];
         $event        = new TokenReplacementEvent('', $leadEntity, $clickthrough);
-        self::assertSame(
-            $clickthrough,
-            $event->getClickthrough()
-        );
+        $this->assertSame($clickthrough, $event->getClickthrough());
 
         $leadEntity->setId($leadId);
         $clickthrough = ['lead' => $leadEntity];
         $event        = new TokenReplacementEvent('', $leadEntity, $clickthrough);
-        self::assertSame(
-            ['lead' => 1],
-            $event->getClickthrough()
-        );
+        $this->assertSame(['lead' => 1], $event->getClickthrough());
     }
 
     public function testGetEntity(): void
     {
         $lead  = new Lead();
         $event = new TokenReplacementEvent($lead);
-        self::assertSame(
-            $lead,
-            $event->getEntity()
-        );
+        $this->assertSame($lead, $event->getEntity());
     }
 
     public function testSetClickthrough(): void
@@ -90,17 +75,17 @@ final class TokenReplacementEventTest extends TestCase
         $clickthrough = ['clickthrough'];
         $event->setClickthrough($clickthrough);
 
-        self::assertSame($clickthrough, $event->getClickthrough());
+        $this->assertSame($clickthrough, $event->getClickthrough());
     }
 
     public function testGetLead(): void
     {
         $lead  = null;
         $event = new TokenReplacementEvent('', $lead);
-        self::assertSame($lead, $event->getLead());
+        $this->assertSame($lead, $event->getLead());
         $lead  = new Lead();
         $event = new TokenReplacementEvent('', $lead);
-        self::assertSame($lead, $event->getLead());
+        $this->assertSame($lead, $event->getLead());
     }
 
     public function testSetContent(): void
@@ -108,6 +93,6 @@ final class TokenReplacementEventTest extends TestCase
         $content1 = 'content1';
         $event    = new TokenReplacementEvent('');
         $event->setContent($content1);
-        self::assertSame($content1, $event->getContent());
+        $this->assertSame($content1, $event->getContent());
     }
 }

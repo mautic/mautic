@@ -29,12 +29,11 @@ final class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->translator            = $this->createMock(Translator::class);
-        $security                    = $this->createMock(CorePermissions::class);
         $this->widget                = $this->createMock(Widget::class);
 
         $this->widgetDetailEvent = new WidgetDetailEvent(
             $this->translator,
-            $security,
+            $this->createStub(CorePermissions::class),
             $this->widget
         );
     }

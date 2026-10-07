@@ -26,7 +26,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Asset>
  */
-class AssetType extends AbstractType
+final class AssetType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -133,9 +133,7 @@ class AssetType extends AbstractType
             'required'    => true,
             'constraints' => [
                 new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
+                    message: 'mautic.core.value.required'
                 ),
             ],
         ]);

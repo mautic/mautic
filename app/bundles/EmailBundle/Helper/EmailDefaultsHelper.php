@@ -18,7 +18,7 @@ class EmailDefaultsHelper
     }
 
     /**
-     * Applies config-based defaults (preference center, UTM tags) to an email.
+     * Applies config-based defaults that should be materialized on the email.
      * Preserves the entity's existing changes array so defaults don't appear
      * as user edits in the audit log.
      */
@@ -26,7 +26,6 @@ class EmailDefaultsHelper
     {
         $changesBefore = $email->getChanges();
 
-        $this->applyPreferenceCenterDefault($email);
         $this->applyUtmTagDefaults($email);
 
         // Restore only the changes that existed before defaults were applied,
@@ -34,27 +33,30 @@ class EmailDefaultsHelper
         $email->setChanges($changesBefore);
     }
 
-    private function applyPreferenceCenterDefault(Email $email): void
+    public function resolvePreferenceCenter(Email $email): ?Page
     {
-        if (null !== $email->getPreferenceCenter()) {
-            return;
+        $preferenceCenter = $email->getPreferenceCenter();
+        if ($preferenceCenter instanceof Page && $preferenceCenter->getIsPreferenceCenter()) {
+            return $preferenceCenter;
         }
 
         $defaultId = $this->coreParametersHelper->get('email_default_preference_center_id');
-        if (empty($defaultId)) {
-            return;
+        $page      = null;
+
+        if (!empty($defaultId)) {
+            $candidate = $this->entityManager->find(Page::class, $defaultId);
+            if ($candidate instanceof Page && $candidate->getIsPreferenceCenter() && $candidate->isPublished()) {
+                $page = $candidate;
+            }
         }
 
-        $page = $this->entityManager->find(Page::class, $defaultId);
-        if ($page instanceof Page) {
-            $email->setPreferenceCenter($page);
-        }
+        return $page;
     }
 
     private function applyUtmTagDefaults(Email $email): void
     {
         $existingTags = array_filter($email->getUtmTags(), static fn ($tag): bool => null !== $tag && '' !== $tag);
-        if (!empty($existingTags)) {
+        if ([] !== $existingTags) {
             return;
         }
 
@@ -66,7 +68,7 @@ class EmailDefaultsHelper
         ];
 
         $filtered = array_filter($utmTags, static fn ($tag): bool => null !== $tag && '' !== $tag);
-        if ($filtered) {
+        if ([] !== $filtered) {
             $email->setUtmTags($filtered);
         }
     }

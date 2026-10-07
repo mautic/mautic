@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
 final class CampaignControllerTest extends MauticMysqlTestCase
@@ -78,7 +77,8 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedCampaign = $this->em->find(Campaign::class, $campaign->getId());
-        Assert::assertSame($project->getId(), $savedCampaign->getProjects()->first()->getId());
+        $this->assertInstanceOf(Campaign::class, $savedCampaign);
+        $this->assertSame($project->getId(), $savedCampaign->getProjects()->first()->getId());
     }
 
     /**
@@ -119,9 +119,9 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         // Check that the campaign elements data includes isRedirectTarget
         $content = $clientResponse->getContent();
-        Assert::assertStringContainsString('isRedirectTarget', $content);
+        $this->assertStringContainsString('isRedirectTarget', (string) $content);
 
         // Verify that the target event is marked as a redirect target
-        Assert::assertStringContainsString('"isRedirectTarget": true', $content);
+        $this->assertStringContainsString('"isRedirectTarget": true', (string) $content);
     }
 }

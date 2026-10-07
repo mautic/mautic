@@ -20,9 +20,7 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var VariantEntityInterface|null
-     *
-     * @phpstan-var T|null
+     * @var T|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
@@ -176,7 +174,7 @@ trait VariantEntityTrait
             return null !== $parent;
         }
 
-        return !empty($parent) || count($children);
+        return $parent instanceof VariantEntityInterface || count($children);
     }
 
     public function isParent(): bool
@@ -190,6 +188,15 @@ trait VariantEntityTrait
     public function hasVariants(): int
     {
         return $this->getVariantChildren()->count();
+    }
+
+    /**
+     * Total weight represents a percentage of how many email should be sent as an A/B test.
+     * The rest of the contacts should receive the winner variant. Returning 100% if not defined.
+     */
+    public function getTotalWeight(): int
+    {
+        return (int) ($this->getVariantSettings()['totalWeight'] ?? AbTestSettingsService::DEFAULT_TOTAL_WEIGHT);
     }
 
     public function clearVariants(): void
@@ -207,7 +214,7 @@ trait VariantEntityTrait
     public function getVariants(): array
     {
         $parent = $this->getVariantParent();
-        if (empty($parent)) {
+        if (!$parent instanceof VariantEntityInterface) {
             $parent = $this;
         }
 
@@ -318,7 +325,7 @@ trait VariantEntityTrait
         }
 
         $endDate = clone $startDate;
-        $endDate->modify("+$delayHours hours");
+        $endDate->modify("+{$delayHours} hours");
 
         return $endDate;
     }
@@ -331,7 +338,7 @@ trait VariantEntityTrait
     protected function getAccumulativeVariantCount(string $getter): mixed
     {
         [$parent, $children]     = $this->getVariants();
-        $count                   = $parent->$getter();
+        $count                   = $parent->{$getter}();
 
         if ($checkTranslations = method_exists($parent, 'getAccumulativeTranslationCount')) {
             // Append translations for this variant if applicable
@@ -339,7 +346,7 @@ trait VariantEntityTrait
         }
 
         foreach ($children as $variant) {
-            $count += $variant->$getter();
+            $count += $variant->{$getter}();
 
             if ($checkTranslations) {
                 // Append translations for this variant if applicable

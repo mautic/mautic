@@ -102,7 +102,6 @@ class FullContact_Base
      * @author  Keith Casey <contrib@caseysoftware.com>
      * @author  David Boskovic <me@david.gs> @dboskovic
      *
-     * @param array $params
      * @param array $postData
      *
      * @return object
@@ -110,7 +109,7 @@ class FullContact_Base
      * @throws NoCreditException
      * @throws NotImplementedException
      */
-    protected function _execute($params = [], $postData = null)
+    protected function _execute(array $params = [], $postData = null)
     {
         if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
             throw new NotImplementedException(self::class.' does not support the ['.$params['method'].'] method');

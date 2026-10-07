@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\AjaxController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -28,11 +29,6 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&Session
      */
     private MockObject $sessionMock;
-
-    /**
-     * @var MockObject&ModelFactory
-     */
-    private MockObject $modelFactoryMock;
 
     /**
      * @var MockObject&EmailModel
@@ -54,30 +50,22 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $containerMock          = $this->createMock(Container::class);
         $this->modelMock        = $this->createMock(EmailModel::class);
         $this->emailMock        = $this->createMock(Email::class);
-
-        $managerRegistry        = $this->createMock(ManagerRegistry::class);
-        $this->modelFactoryMock = $this->createMock(ModelFactory::class);
-        $userHelper             = $this->createMock(UserHelper::class);
-        $coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
-        $dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $translator             = $this->createMock(Translator::class);
-        $flashBag               = $this->createMock(FlashBag::class);
         $requestStack           = new RequestStack();
-        $security               = $this->createMock(CorePermissions::class);
 
         $this->controller = new AjaxController(
-            $managerRegistry,
-            $this->modelFactoryMock,
-            $userHelper,
-            $coreParametersHelper,
-            $dispatcher,
-            $translator,
-            $flashBag,
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
             $requestStack,
-            $security
+            $this->createStub(CorePermissions::class)
         );
 
         $this->controller->setContainer($containerMock);
+        $this->controller->autowireEmailAjaxController($this->modelMock);
 
         $parameterBag = $this->createMock(ContainerBagInterface::class);
         $parameterBag->expects($this->once())
@@ -89,7 +77,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
             ->method('has')
             ->with('parameter_bag')
             ->willReturn(true);
-        $containerMock->expects(self::once())
+        $containerMock->expects($this->once())
             ->method('get')
             ->with('parameter_bag')
             ->willReturn($parameterBag);
@@ -97,11 +85,6 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
     public function testSendBatchActionWhenNoIdProvided(): void
     {
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('email')
-            ->willReturn($this->modelMock);
-
         $response = $this->controller->sendBatchAction(new Request([], []));
 
         $this->assertSame('{"success":0}', $response->getContent());
@@ -109,11 +92,6 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
     public function testSendBatchActionWhenIdProvidedButEmailNotPublished(): void
     {
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('email')
-            ->willReturn($this->modelMock);
-
         $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(5)
@@ -124,7 +102,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(3);
 
         $this->sessionMock->expects($matcher)
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher): array|false {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.email.send.progress', $parameters[0]);
 
@@ -140,6 +118,8 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->emailMock->expects($this->once())
@@ -155,11 +135,6 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
     public function testSendBatchActionWhenIdProvidedAndEmailIsPublished(): void
     {
-        $this->modelFactoryMock->expects($this->once())
-            ->method('getModel')
-            ->with('email')
-            ->willReturn($this->modelMock);
-
         $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(5)
@@ -172,7 +147,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(3);
 
         $this->sessionMock->expects($matcher)
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher): array|false {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.email.send.progress', $parameters[0]);
 
@@ -188,6 +163,8 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->emailMock->expects($this->once())

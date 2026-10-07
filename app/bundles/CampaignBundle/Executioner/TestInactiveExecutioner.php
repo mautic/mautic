@@ -9,7 +9,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @internal Used in tests
  */
-class TestInactiveExecutioner extends InactiveExecutioner implements ResetInterface
+final class TestInactiveExecutioner extends InactiveExecutioner implements ResetInterface
 {
     /**
      * @internal Used in tests

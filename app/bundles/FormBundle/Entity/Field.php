@@ -336,8 +336,8 @@ class Field implements UuidInterface
      */
     private function isChanged(string $prop, $val): void
     {
-        if ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        if ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
         }
     }
 
@@ -459,7 +459,7 @@ class Field implements UuidInterface
      */
     public function isRequired()
     {
-        return $this->getIsRequired();
+        return $this->isRequired;
     }
 
     /**
@@ -640,7 +640,7 @@ class Field implements UuidInterface
      */
     public function showLabel()
     {
-        return $this->getShowLabel();
+        return $this->showLabel;
     }
 
     /**
@@ -687,7 +687,7 @@ class Field implements UuidInterface
      */
     public function isCustom()
     {
-        return $this->getIsCustom();
+        return $this->isCustom;
     }
 
     /**
@@ -906,10 +906,10 @@ class Field implements UuidInterface
 
     public function hasChoices(): bool
     {
-        $properties = $this->getProperties();
+        $properties = $this->properties;
 
-        return 'checkboxgrp' === $this->getType()
-            || (key_exists('multiple', $properties) && 1 === $properties['multiple']);
+        return 'checkboxgrp' === $this->type
+            || (array_key_exists('multiple', $properties) && 1 === $properties['multiple']);
     }
 
     /**
@@ -966,13 +966,13 @@ class Field implements UuidInterface
         return $this->parent;
     }
 
-    private function findParentFieldInForm(): ?Field
+    private function findParentFieldInForm(): ?self
     {
         if (!$this->parent) {
             return null;
         }
 
-        $fields = $this->getForm()->getFields();
+        $fields = $this->form->getFields();
         foreach ($fields as $field) {
             if (intval($field->getId()) === intval($this->parent)) {
                 return $field;
@@ -1029,7 +1029,7 @@ class Field implements UuidInterface
         return empty($this->fieldWidth) ? '100%' : $this->fieldWidth;
     }
 
-    public function setFieldWidth(?string $fieldWidth): Field
+    public function setFieldWidth(?string $fieldWidth): self
     {
         $this->isChanged('fieldWidth', $fieldWidth);
         $this->fieldWidth = $fieldWidth;
@@ -1044,6 +1044,6 @@ class Field implements UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getForm()?->getCreatedBy();
+        return $this->form?->getCreatedBy();
     }
 }

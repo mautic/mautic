@@ -24,9 +24,9 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
 
         $translator         = $this->createMock(TranslatorInterface::class);
         $this->relativeDate = $this->createMock(RelativeDate::class);
-        $translator->expects($this->any())
+        $translator
             ->method('trans')
-            ->willReturnCallback(fn ($id, $parameters, $domain, $locale): string => match ($id) {
+            ->willReturnCallback(fn (string $id, array $parameters, ?string $domain, ?string $locale): string => match ($id) {
                 'mautic.lead.list.month_last'  => isset($locale) ? 'last month' : 'letzter Monat',
                 'mautic.lead.list.month_next'  => isset($locale) ? 'next month' : 'nächster Monat',
                 'mautic.lead.list.month_this'  => isset($locale) ? 'this month' : 'dieser Monat',

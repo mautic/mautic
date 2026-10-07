@@ -5,6 +5,7 @@ namespace Mautic\AssetBundle\EventListener;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -19,15 +20,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly AssetModel $assetModel,
-        protected TranslatorInterface $translator,
-        private readonly AnalyticsHelper $analyticsHelper,
-        private readonly AssetsHelper $assetsHelper,
-        private readonly ThemeHelperInterface $themeHelper,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private AssetModel $assetModel,
+        private TranslatorInterface $translator,
+        private AnalyticsHelper $analyticsHelper,
+        private AssetsHelper $assetsHelper,
+        private ThemeHelperInterface $themeHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private AssetRepository $assetRepository,
     ) {
     }
 
@@ -73,7 +75,7 @@ class FormSubscriber implements EventSubscriberInterface
             $asset = $this->assetModel->getEntity($assetId);
         } elseif (null !== $categoryId) {
             try {
-                $asset = $this->assetModel->getRepository()->getLatestAssetForCategory($categoryId);
+                $asset = $this->assetRepository->getLatestAssetForCategory($categoryId);
             } catch (NoResultException|NonUniqueResultException) {
                 $asset = null;
             }

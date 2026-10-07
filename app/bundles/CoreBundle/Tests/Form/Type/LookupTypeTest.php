@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\LookupType;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 final class LookupTypeTest extends TypeTestCase
@@ -13,13 +14,13 @@ final class LookupTypeTest extends TypeTestCase
      * @param array<string, string> $attributes
      * @param array<string, string> $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideLookupAttributes')]
+    #[DataProvider('provideLookupAttributes')]
     public function testCreateViewAddsAttributesWithoutOverride(array $attributes, array $expected): void
     {
         $form = $this->factory->create(LookupType::class, null, ['attr' => $attributes]);
         $view = $form->createView();
 
-        self::assertSame($expected, $view->vars['attr']);
+        $this->assertSame($expected, $view->vars['attr']);
     }
 
     public static function provideLookupAttributes(): \Generator

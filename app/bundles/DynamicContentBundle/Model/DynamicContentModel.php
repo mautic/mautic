@@ -14,6 +14,7 @@ use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Entity\Stat;
+use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\Lead;
@@ -21,6 +22,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<DynamicContent>
@@ -32,6 +34,19 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     use VariantModelTrait;
     use TranslationModelTrait;
 
+    private StatRepository $statRepository;
+
+    private DynamicContentRepository $dynamicContentRepository;
+
+    #[Required]
+    public function autowireDynamicContentModel(
+        DynamicContentRepository $dynamicContentRepository,
+        StatRepository $statRepository,
+    ): void {
+        $this->dynamicContentRepository = $dynamicContentRepository;
+        $this->statRepository = $statRepository;
+    }
+
     /**
      * Retrieve the permissions base.
      */
@@ -40,26 +55,16 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return 'dynamiccontent:dynamiccontents';
     }
 
-    /**
-     * @return DynamicContentRepository
-     */
-    public function getRepository()
+    public function getRepository(): DynamicContentRepository
     {
-        /** @var DynamicContentRepository $repo */
-        $repo = $this->em->getRepository(DynamicContent::class);
+        $this->dynamicContentRepository->setCurrentUser($this->userHelper->getUser());
 
-        $repo->setTranslator($this->translator);
-        $repo->setCurrentUser($this->userHelper->getUser());
-
-        return $repo;
+        return $this->dynamicContentRepository;
     }
 
-    /**
-     * @return \Mautic\DynamicContentBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     /**
@@ -95,7 +100,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
         if (!empty($type)) {
             if (!in_array($typeCondition, ['=', '<>', '!='], true)) {
-                throw new \InvalidArgumentException("Invalid operator '$typeCondition'");
+                throw new \InvalidArgumentException("Invalid operator '{$typeCondition}'");
             }
 
             $qb->andWhere("type {$typeCondition} :type");
@@ -145,12 +150,11 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     /**
-     * @param string     $slot
-     * @param Lead|array $lead
+     * @param Lead|mixed[]|null $lead
      *
      * @return array<string, mixed>|false
      */
-    public function getSlotContentForLead($slot, $lead)
+    public function getSlotContentForLead(string $slot, array|Lead|null $lead)
     {
         if (!$lead) {
             return [];
@@ -202,7 +206,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         $stat->setDynamicContent($dynamicContent);
         $stat->setSource($source);
 
-        $this->getStatRepository()->saveEntity($stat);
+        $this->statRepository->saveEntity($stat);
 
         return $stat;
     }
@@ -262,10 +266,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
      *
      * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param array   $filter
      * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -304,36 +307,29 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     /**
-     * @param string $filter
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $options
+     * @param string|array<int, string> $filter
+     * @param array<string, mixed>      $options
      *
      * @return mixed[]
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
-        switch ($type) {
-            case 'dynamicContent':
-                $entities = $this->getRepository()->getDynamicContentList(
-                    $filter,
-                    $limit,
-                    $start,
-                    $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    $options['top_level'] ?? false,
-                    $options['ignore_ids'] ?? [],
-                    $options['where'] ?? ''
-                );
-
-                foreach ($entities as $entity) {
-                    $results[$entity['language']][$entity['id']] = $entity['name'];
-                }
-
-                // sort by language
-                ksort($results);
-
-                break;
+        if ('dynamicContent' === $type) {
+            $entities = $this->getRepository()->getDynamicContentList(
+                $filter,
+                $limit,
+                $start,
+                $this->security->isGranted($this->getPermissionBase().':viewother'),
+                $options['top_level'] ?? false,
+                $options['ignore_ids'] ?? [],
+                $options['where'] ?? ''
+            );
+            foreach ($entities as $entity) {
+                $results[$entity['language']][$entity['id']] = $entity['name'];
+            }
+            // sort by language
+            ksort($results);
         }
 
         return $results;

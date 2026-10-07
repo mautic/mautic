@@ -7,16 +7,18 @@ namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class TimezoneResolverTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataTimezones')]
+    #[DataProvider('dataTimezones')]
     public function testTimezones(?string $configuredTimezone, string $expectedTimezone): void
     {
         $coreParametersHelper = new class($configuredTimezone) extends CoreParametersHelper {
-            public function __construct(private readonly ?string $configuredTimezone)
-            {
+            public function __construct(
+                private readonly ?string $configuredTimezone,
+            ) {
             }
 
             public function get($name, $default = null): ?string
@@ -28,10 +30,7 @@ final class TimezoneResolverTest extends TestCase
         };
 
         $timezoneResolver = new TimezoneResolver($coreParametersHelper);
-        Assert::assertSame(
-            $expectedTimezone,
-            $timezoneResolver->getDefaultDate(false)->getDateTime()->getTimezone()->getName()
-        );
+        $this->assertSame($expectedTimezone, $timezoneResolver->getDefaultDate(false)->getDateTime()->getTimezone()->getName());
     }
 
     /**

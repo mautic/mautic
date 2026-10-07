@@ -27,7 +27,7 @@ class EntityResultHelper
         }
 
         // solving array/object discrepancy for empty values
-        if ($this->isKeyedById($results) && empty($entities)) {
+        if ($this->isKeyedById($results) && [] === $entities) {
             $entities = new \ArrayObject();
         }
 
@@ -49,11 +49,9 @@ class EntityResultHelper
     }
 
     /**
-     * @param array $array
-     *
-     * @return mixed
+     * @param mixed[] $array
      */
-    private function getDataForArray($array)
+    private function getDataForArray(array $array): mixed
     {
         if (is_object($array[0])) {
             return $this->getDataForObject($array);
@@ -63,18 +61,16 @@ class EntityResultHelper
     }
 
     /**
-     * @param object $object
-     *
-     * @return mixed
+     * @param object[] $object
      */
-    private function getDataForObject($object)
+    private function getDataForObject(array $object): mixed
     {
         foreach ($object as $key => $value) {
             if (0 === $key) {
                 continue;
             }
 
-            $object[0]->$key = $value;
+            $object[0]->{$key} = $value;
         }
 
         return $object[0];

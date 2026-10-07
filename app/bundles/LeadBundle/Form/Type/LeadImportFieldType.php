@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -17,11 +17,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class LeadImportFieldType extends AbstractType
+final class LeadImportFieldType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
-        private readonly EntityManager $entityManager,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -111,6 +111,22 @@ class LeadImportFieldType extends AbstractType
                     'attr'       => ['class' => 'form-control'],
                     'required'   => false,
                     'data'       => false,
+                ]
+            );
+
+            $createNewLabel = 'lead' === $options['object']
+                ? 'mautic.lead.import.create_new'
+                : 'mautic.company.import.create_new';
+
+            $builder->add(
+                'create_new',
+                YesNoButtonGroupType::class,
+                [
+                    'label'      => $createNewLabel,
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => ['class' => 'form-control'],
+                    'required'   => false,
+                    'data'       => true,
                 ]
             );
         }

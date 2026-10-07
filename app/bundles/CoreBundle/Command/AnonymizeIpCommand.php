@@ -17,15 +17,18 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: AnonymizeIpCommand::COMMAND_NAME,
     description: 'Delete all stored ip addresses.'
 )]
-class AnonymizeIpCommand extends Command
+final class AnonymizeIpCommand extends Command
 {
     /**
      * @var string
      */
     public const COMMAND_NAME = 'mautic:anonymize:ip';
 
-    public function __construct(private readonly IpAddressRepository $ipAddressRepository, private readonly CoreParametersHelper $coreParametersHelper, private readonly AuditLogRepository $auditLogRepository)
-    {
+    public function __construct(
+        private readonly IpAddressRepository $ipAddressRepository,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly AuditLogRepository $auditLogRepository,
+    ) {
         parent::__construct();
     }
 

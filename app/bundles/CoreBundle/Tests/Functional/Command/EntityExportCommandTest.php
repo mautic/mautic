@@ -7,7 +7,6 @@ namespace Mautic\CoreBundle\Tests\Functional\Command;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Command\EntityExportCommand;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 
 final class EntityExportCommandTest extends MauticMysqlTestCase
 {
@@ -33,8 +32,8 @@ final class EntityExportCommandTest extends MauticMysqlTestCase
             '--id'     => '',
         ]);
 
-        Assert::assertStringContainsString('You must specify the entity and at least one valid entity ID.', $response->getDisplay());
-        Assert::assertSame(1, $response->getStatusCode());
+        $this->assertStringContainsString('You must specify the entity and at least one valid entity ID.', $response->getDisplay());
+        $this->assertSame(1, $response->getStatusCode());
     }
 
     public function testExecuteDispatchesEvent(): void
@@ -48,8 +47,8 @@ final class EntityExportCommandTest extends MauticMysqlTestCase
             '--json-only' => true,
         ]);
 
-        Assert::assertStringContainsString('"id": '.$entityId, $response->getDisplay());
-        Assert::assertSame(0, $response->getStatusCode());
+        $this->assertStringContainsString('"id": '.$entityId, $response->getDisplay());
+        $this->assertSame(0, $response->getStatusCode());
     }
 
     public function testZipFileOptionCreatesZip(): void
@@ -63,8 +62,8 @@ final class EntityExportCommandTest extends MauticMysqlTestCase
             '--zip-file' => true,
         ]);
 
-        Assert::assertStringContainsString('.zip', $response->getDisplay());
-        Assert::assertSame(0, $response->getStatusCode());
+        $this->assertStringContainsString('.zip', $response->getDisplay());
+        $this->assertSame(0, $response->getStatusCode());
     }
 
     private function getTestCampaignId(): int

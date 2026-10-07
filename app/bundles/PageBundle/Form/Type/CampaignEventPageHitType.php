@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class CampaignEventPageHitType extends AbstractType
+final class CampaignEventPageHitType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

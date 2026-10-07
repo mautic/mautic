@@ -13,10 +13,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * This class can provide useful debugging information for API requests and responses.
  * The information is displayed when a command is executed from the console and the -vv flag is passed to it.
  */
-class IntegrationSubscriber implements EventSubscriberInterface
+final readonly class IntegrationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -46,17 +46,17 @@ class IntegrationSubscriber implements EventSubscriberInterface
             $output->writeln('');
             $output->writeln('<fg=cyan>'.$settings.'</>');
         } else {
-            $this->logger->debug("$name REQUEST URL: ".$event->getMethod().' '.$event->getUrl());
+            $this->logger->debug("{$name} REQUEST URL: ".$event->getMethod().' '.$event->getUrl());
             if ('' !== $headers) {
                 $hashedHeaders  = oAuthHelper::sanitizeHeaderData($event->getHeaders());
                 $headers        = var_export($hashedHeaders, true);
-                $this->logger->debug("$name REQUEST HEADERS: \n".$headers.PHP_EOL);
+                $this->logger->debug("{$name} REQUEST HEADERS: \n".$headers.PHP_EOL);
             }
             if ('' !== $params) {
-                $this->logger->debug("$name REQUEST PARAMS: \n".$params.PHP_EOL);
+                $this->logger->debug("{$name} REQUEST PARAMS: \n".$params.PHP_EOL);
             }
             if ('' !== $settings) {
-                $this->logger->debug("$name REQUEST SETTINGS: \n".$settings.PHP_EOL);
+                $this->logger->debug("{$name} REQUEST SETTINGS: \n".$settings.PHP_EOL);
             }
         }
     }
@@ -93,12 +93,12 @@ class IntegrationSubscriber implements EventSubscriberInterface
                 $output->writeln('<fg=cyan>'.$response->getBody().'</>');
             }
         } else {
-            $this->logger->debug("$name RESPONSE CODE: {$response->getStatusCode()}");
+            $this->logger->debug("{$name} RESPONSE CODE: {$response->getStatusCode()}");
             if ('' !== $headers) {
-                $this->logger->debug("$name RESPONSE HEADERS: \n".$headers.PHP_EOL);
+                $this->logger->debug("{$name} RESPONSE HEADERS: \n".$headers.PHP_EOL);
             }
             if ('' !== $json || '' !== $xml || '' !== $response->getBody()) {
-                $body = "$name RESPONSE BODY: ";
+                $body = "{$name} RESPONSE BODY: ";
                 if ($isJson) {
                     $body .= $json;
                 } elseif ($isXml) {

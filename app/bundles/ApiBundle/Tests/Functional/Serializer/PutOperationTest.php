@@ -7,7 +7,6 @@ namespace Mautic\ApiBundle\Tests\Functional\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ProjectBundle\Entity\Project;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -38,10 +37,10 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
 
-        Assert::assertArrayHasKey('id', $responseData);
-        Assert::assertSame($projectId, $responseData['id']);
-        Assert::assertSame('Test Project', $responseData['name']);
-        Assert::assertSame('Test Description', $responseData['description']);
+        $this->assertArrayHasKey('id', $responseData);
+        $this->assertSame($projectId, $responseData['id']);
+        $this->assertSame('Test Project', $responseData['name']);
+        $this->assertSame('Test Description', $responseData['description']);
     }
 
     /**
@@ -59,7 +58,7 @@ final class PutOperationTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $originalId = $page->getId();
-        Assert::assertNotNull($originalId, 'Page should have an ID after persisting');
+        $this->assertNotNull($originalId, 'Page should have an ID after persisting');
 
         // Update the page via PUT request
         $this->client->request(
@@ -83,10 +82,10 @@ final class PutOperationTest extends MauticMysqlTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
         // The key assertion: ID should remain the same (global fix working)
-        Assert::assertSame($originalId, $response['id'], 'PUT should update the existing page, not create a new one');
-        Assert::assertSame('Updated Page Title', $response['title']);
-        Assert::assertSame('updated-page-alias', $response['alias']);
-        Assert::assertSame('Updated Meta Description', $response['metaDescription']);
+        $this->assertSame($originalId, $response['id'], 'PUT should update the existing page, not create a new one');
+        $this->assertSame('Updated Page Title', $response['title']);
+        $this->assertSame('updated-page-alias', $response['alias']);
+        $this->assertSame('Updated Meta Description', $response['metaDescription']);
     }
 
     /**
@@ -104,7 +103,7 @@ final class PutOperationTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $originalId = $project->getId();
-        Assert::assertNotNull($originalId, 'Project should have an ID after persisting');
+        $this->assertNotNull($originalId, 'Project should have an ID after persisting');
 
         // Update the project via PUT request
         $this->client->request(
@@ -127,17 +126,17 @@ final class PutOperationTest extends MauticMysqlTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
         // The key assertion: ID should remain the same (not creating a new entity)
-        Assert::assertSame($originalId, $response['id'], 'PUT should update the existing entity, not create a new one');
-        Assert::assertSame('Updated Project', $response['name']);
-        Assert::assertSame('Updated Description', $response['description']);
+        $this->assertSame($originalId, $response['id'], 'PUT should update the existing entity, not create a new one');
+        $this->assertSame('Updated Project', $response['name']);
+        $this->assertSame('Updated Description', $response['description']);
 
         // Verify in database that only one project exists with the updated data
         $this->em->clear();
         $projects = $this->em->getRepository(Project::class)->findAll();
-        Assert::assertCount(1, $projects, 'Should only have one project in database after PUT');
-        Assert::assertSame($originalId, $projects[0]->getId());
-        Assert::assertSame('Updated Project', $projects[0]->getName());
-        Assert::assertSame('Updated Description', $projects[0]->getDescription());
+        $this->assertCount(1, $projects, 'Should only have one project in database after PUT');
+        $this->assertSame($originalId, $projects[0]->getId());
+        $this->assertSame('Updated Project', $projects[0]->getName());
+        $this->assertSame('Updated Description', $projects[0]->getDescription());
     }
 
     /**
@@ -189,15 +188,15 @@ final class PutOperationTest extends MauticMysqlTestCase
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
-        Assert::assertIsInt($response['id']);
-        Assert::assertSame('New Project', $response['name']);
-        Assert::assertSame('New Description', $response['description']);
+        $this->assertIsInt($response['id']);
+        $this->assertSame('New Project', $response['name']);
+        $this->assertSame('New Description', $response['description']);
 
         // Verify project was created in database
         $this->em->clear();
         $project = $this->em->getRepository(Project::class)->find($response['id']);
-        Assert::assertNotNull($project);
-        Assert::assertSame('New Project', $project->getName());
+        $this->assertInstanceOf(Project::class, $project);
+        $this->assertSame('New Project', $project->getName());
     }
 
     /**
@@ -215,7 +214,7 @@ final class PutOperationTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $originalId = $project->getId();
-        Assert::assertNotNull($originalId, 'Project should have an ID after persisting');
+        $this->assertNotNull($originalId, 'Project should have an ID after persisting');
 
         // Update the project via PUT request with only name (no description)
         // According to HTTP PUT semantics, this should clear the description
@@ -239,19 +238,19 @@ final class PutOperationTest extends MauticMysqlTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
         // Verify the response shows the field was replaced (cleared)
-        Assert::assertSame($originalId, $response['id'], 'Should update existing project, not create new one');
-        Assert::assertSame('Updated Project Name Only', $response['name']);
+        $this->assertSame($originalId, $response['id'], 'Should update existing project, not create new one');
+        $this->assertSame('Updated Project Name Only', $response['name']);
 
         // The API may not include null fields in the response, so check if key exists
         if (array_key_exists('description', $response)) {
-            Assert::assertNull($response['description'], 'Description should be null since it was not provided in PUT request');
+            $this->assertNull($response['description'], 'Description should be null since it was not provided in PUT request');
         }
 
         // Verify in database that the description was actually cleared
         $this->em->clear();
         $updatedProject = $this->em->getRepository(Project::class)->find($originalId);
-        Assert::assertNotNull($updatedProject);
-        Assert::assertSame('Updated Project Name Only', $updatedProject->getName());
-        Assert::assertNull($updatedProject->getDescription(), 'Description should be cleared in database');
+        $this->assertInstanceOf(Project::class, $updatedProject);
+        $this->assertSame('Updated Project Name Only', $updatedProject->getName());
+        $this->assertNull($updatedProject->getDescription(), 'Description should be cleared in database');
     }
 }

@@ -7,17 +7,25 @@ namespace Mautic\FormBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        $this->configParams['form_field_autofill'] = true;
+
+        parent::setUp();
+    }
+
     /**
      * @param array<string, bool|null> $data
      * @param array<string, string>    $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForReadOnlyConfigurationSetting')]
+    #[DataProvider('dataForReadOnlyConfigurationSetting')]
     public function testFieldConfiguration(array $data, array $expected): void
     {
         // Create a form

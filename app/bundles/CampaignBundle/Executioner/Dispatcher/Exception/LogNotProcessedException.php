@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Executioner\Dispatcher\Exception;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 
-class LogNotProcessedException extends \Exception
+final class LogNotProcessedException extends \Exception
 {
     public function __construct(LeadEventLog $log)
     {

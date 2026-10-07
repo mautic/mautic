@@ -11,8 +11,9 @@ class WebhookNotificationEvent extends Event
 {
     private bool $canSend = true;
 
-    public function __construct(private readonly Webhook $webhook)
-    {
+    public function __construct(
+        private readonly Webhook $webhook,
+    ) {
     }
 
     public function getWebhook(): Webhook

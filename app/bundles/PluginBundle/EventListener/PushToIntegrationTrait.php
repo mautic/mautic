@@ -41,7 +41,7 @@ trait PushToIntegrationTrait
     /**
      * Used because the the Point trigger actions have not be converted to Events yet and thus must leverage a callback.
      */
-    protected static function pushIt($config, $lead, &$errors): bool
+    protected static function pushIt(array $config, $lead, &$errors): bool
     {
         $integration             = (!empty($config['integration'])) ? $config['integration'] : null;
         $integrationCampaign     = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;

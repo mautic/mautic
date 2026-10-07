@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Client>
  */
-class ClientType extends AbstractType
+final class ClientType extends AbstractType
 {
     public function __construct(
         private readonly RequestStack $requestStack,

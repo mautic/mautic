@@ -397,6 +397,6 @@ class Download
 
     public function getPermissionUser(): mixed
     {
-        return $this->getAsset()->getCreatedBy();
+        return $this->asset->getCreatedBy();
     }
 }

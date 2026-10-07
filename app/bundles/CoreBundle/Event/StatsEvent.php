@@ -116,11 +116,11 @@ class StatsEvent extends Event
         $this->repository = $repository;
         $this->setResults(
             $this->repository->getRows(
-                $this->getStart(),
-                $this->getLimit(),
-                $this->getOrder(),
-                $this->getWhere(),
-                $this->getSelect(),
+                $this->start,
+                $this->limit,
+                $this->order,
+                $this->where,
+                $this->select,
                 $permissions
             )
         );

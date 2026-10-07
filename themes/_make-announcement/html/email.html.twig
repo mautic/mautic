@@ -3,6 +3,18 @@
 	<!-- CSS-STYLE -->
 	<mj-style inline="inline"> p, li {margin:0 !important; padding:0; line-height:140%;}
 	</mj-style>
+	<mj-attributes>
+	  <mj-all font-family="Ubuntu, Helvetica, Arial, sans-serif"></mj-all>
+	  <mj-text mj-class="t-body"></mj-text>
+	  <mj-button border-radius="3px" padding="10px 25px"></mj-button>
+	  <mj-section></mj-section>
+
+	  <mj-class name="t-body" font-size="16px"></mj-class>
+	  <mj-class name="t-btn" inner-padding="16px 32px"></mj-class>
+	  <mj-class name="t-btn-primary" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" font-size="16px"></mj-class>
+	  <mj-class name="t-section"></mj-class>
+	  <mj-class name="t-surface-1" background-color="#ffffff"></mj-class>
+	</mj-attributes>
   </mj-head>
   <!-- BODY -->
   <mj-body background-color="#f4f4f4">
@@ -51,7 +63,7 @@
 	</mj-section>
 	<mj-section background-color="#ffffff">
 	  <mj-column width="550px">
-		<mj-text font-size="16px" align="center">
+		<mj-text mj-class="t-body" align="center">
 		  <p>Make your announcements pop with an eye-catching visual, then provide the crucial details for engagement.
 		  </p>
 		  <p>⁠⁠⁠⁠⁠⁠⁠
@@ -68,7 +80,7 @@
 		  <p>Lead with an eye-catching title
 		  </p>
 		</mj-text>
-		<mj-text font-size="16px">
+		<mj-text mj-class="t-body">
 		  <p>Present your news in a brief paragraph. For crucial points, use a bulleted list:
 		  </p>
 		  <ul>
@@ -85,7 +97,7 @@
 		  <p>Be concise to motivate readers to explore your website for the full story.
 		  </p>
 		</mj-text>
-		<mj-button href="https://" background-color="#{{ getBrandPrimaryColor() }}" color="#{{ getTextOnBrandColor() }}" inner-padding="16px 32px" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px" font-size="16px" align="left">Button
+		<mj-button href="#" mj-class="t-btn t-btn-primary" border-radius="{{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px {{ getRoundedCorners('lg') }}px" align="left">Button
 		</mj-button>
 		<mj-spacer align="center">
 		</mj-spacer>
@@ -99,7 +111,7 @@
 		</mj-image>
 		<mj-spacer>
 		</mj-spacer>
-		<mj-text font-family="Ubuntu, Helvetica, Arial, sans-serif" line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="#{{ getTextOnBrandColor() }}">
+		<mj-text line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="#{{ getTextOnBrandColor() }}">
 		  <p>{brand=name}
 			<br/>11111 Beautiful City, 1212 Nice Street
 			<br/>Brazil

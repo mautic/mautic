@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -89,7 +90,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
         $field->setProperties($fieldDetails['properties']);
 
         /** @var FieldModel $fieldModel */
-        $fieldModel = static::getContainer()->get('mautic.lead.model.field');
+        $fieldModel = self::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
     }
 
@@ -121,7 +122,8 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
                         ],
                     ],
                 ]);
-                $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+                /** @var LeadModel $leadModel */
+                $leadModel = self::getContainer()->get(LeadModel::class);
                 $leadModel->setFieldValues($contact, [self::FIELD_NAME => [$cars[$i % 3]]]);
             }
             $contacts[] = $contact;

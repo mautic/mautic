@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class MenuHelper
+final class MenuHelper
 {
     /**
      * Stores items that are assigned to another parent outside it's bundle.
@@ -15,10 +15,10 @@ class MenuHelper
     private array $orphans = [];
 
     public function __construct(
-        protected CorePermissions $security,
-        protected RequestStack $requestStack,
+        private readonly CorePermissions $security,
+        private readonly RequestStack $requestStack,
         private readonly CoreParametersHelper $coreParametersHelper,
-        protected IntegrationHelper $integrationHelper,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
     }
 
@@ -29,10 +29,10 @@ class MenuHelper
      * @param int    $defaultPriority
      * @param string $type
      */
-    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main'): void
+    public function createMenuStructure(array &$items, $depth = 0, $defaultPriority = 9999, $type = 'main'): void
     {
         foreach ($items as $k => &$i) {
-            if (!is_array($i) || empty($i)) {
+            if (!is_array($i) || [] === $i) {
                 continue;
             }
 
@@ -185,7 +185,7 @@ class MenuHelper
 
         uasort(
             $menuItems,
-            function ($a, $b) use ($defaultPriority): int {
+            function (array $a, array $b) use ($defaultPriority): int {
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : $defaultPriority);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : $defaultPriority);
 
@@ -197,7 +197,7 @@ class MenuHelper
     /**
      * @return mixed
      */
-    protected function getParameter($name)
+    private function getParameter($name)
     {
         return $this->coreParametersHelper->get($name, false);
     }
@@ -205,7 +205,7 @@ class MenuHelper
     /**
      * @param string $integrationName
      */
-    protected function handleIntegrationChecks($integrationName, array $config): bool
+    private function handleIntegrationChecks($integrationName, array $config): bool
     {
         $integration = $this->integrationHelper->getIntegrationObject($integrationName);
 
@@ -242,7 +242,7 @@ class MenuHelper
      * @param string $name
      * @param mixed  $value
      */
-    protected function handleParametersChecks($name, $value): bool
+    private function handleParametersChecks($name, $value): bool
     {
         return $this->getParameter($name) == $value;
     }
@@ -251,7 +251,7 @@ class MenuHelper
      * @param string $name
      * @param mixed  $value
      */
-    protected function handleRequestChecks($name, $value): bool
+    private function handleRequestChecks($name, $value): bool
     {
         return $this->requestStack->getCurrentRequest()->get($name) == $value;
     }
@@ -259,7 +259,7 @@ class MenuHelper
     /**
      * @return bool
      */
-    protected function handleAccessCheck($accessLevel)
+    private function handleAccessCheck($accessLevel)
     {
         return match ($accessLevel) {
             'admin' => $this->security->isAdmin(),
@@ -272,7 +272,7 @@ class MenuHelper
      *
      * @return bool Returns false if the item fails the access check or any other checks
      */
-    protected function handleChecks(array $menuItem): bool
+    private function handleChecks(array $menuItem): bool
     {
         if (isset($menuItem['access']) && false === $this->handleAccessCheck($menuItem['access'])) {
             return false;
@@ -287,7 +287,7 @@ class MenuHelper
                 }
 
                 foreach ($checkConfig as $name => $value) {
-                    if (false === $this->$checkMethod($name, $value)) {
+                    if (false === $this->{$checkMethod}($name, $value)) {
                         return false;
                     }
                 }

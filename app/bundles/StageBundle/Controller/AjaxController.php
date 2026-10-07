@@ -5,13 +5,24 @@ namespace Mautic\StageBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\StageBundle\Form\Type\StageActionType;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
+    private StageModel $stageModel;
+
+    #[Required]
+    public function autowireStageAjaxController(
+        StageModel $stageModel,
+    ): void {
+        $this->stageModel = $stageModel;
+    }
+
     public function getActionFormAction(Request $request, FormFactoryInterface $formFactory, Environment $twig): JsonResponse
     {
         $dataArray = [
@@ -21,10 +32,7 @@ class AjaxController extends CommonAjaxController
         $type = InputHelper::clean($request->request->get('actionType'));
 
         if (!empty($type)) {
-            // get the HTML for the form
-            /** @var \Mautic\StageBundle\Model\StageModel $model */
-            $model   = $this->getModel('stage');
-            $actions = $model->getStageActions();
+            $actions = $this->stageModel->getStageActions();
 
             if (isset($actions['actions'][$type])) {
                 $themes = ['MauticStageBundle:FormTheme\Action'];

@@ -16,6 +16,11 @@ final class TypeOperatorsEvent extends Event
      */
     private array $operators = [];
 
+    public function __construct(
+        private readonly string $context = '',
+    ) {
+    }
+
     /**
      * $operators example:
      * [
@@ -36,5 +41,10 @@ final class TypeOperatorsEvent extends Event
     public function getOperatorsForAllFieldTypes(): array
     {
         return $this->operators;
+    }
+
+    public function getContext(): string
+    {
+        return $this->context;
     }
 }

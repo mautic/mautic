@@ -12,8 +12,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SegmentFilterTypeaheadSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadModel $leadModel, private FieldModel $fieldModel, private CompanyModel $companyModel)
-    {
+    public function __construct(
+        private LeadModel $leadModel,
+        private FieldModel $fieldModel,
+        private CompanyModel $companyModel,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

@@ -14,8 +14,8 @@ final readonly class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LeadRepository $leadRepository,
-        private PrimaryCompanyHelper $primaryCompanyHelper)
-    {
+        private PrimaryCompanyHelper $primaryCompanyHelper,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

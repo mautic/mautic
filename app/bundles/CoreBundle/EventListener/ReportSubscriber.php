@@ -13,12 +13,13 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_AUDIT_LOG = 'audit.log';
 
-    public function __construct(private readonly CorePermissions $security)
-    {
+    public function __construct(
+        private CorePermissions $security,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

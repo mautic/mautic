@@ -16,8 +16,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SendSmsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private DoNotContactRepository $dncRepo, private MessageQueueModel $messageQueueModel)
-    {
+    public function __construct(
+        private DoNotContactRepository $dncRepo,
+        private MessageQueueModel $messageQueueModel,
+    ) {
     }
 
     /**
@@ -36,7 +38,7 @@ final readonly class SendSmsSubscriber implements EventSubscriberInterface
     {
         $dnc = $this->dncRepo->getChannelList('sms', array_keys($event->getContacts()));
 
-        if (!$dnc) {
+        if ([] === $dnc) {
             return;
         }
 

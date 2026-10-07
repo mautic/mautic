@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 
 final class ExportSchedulerCommandTest extends MauticMysqlTestCase
 {
@@ -13,7 +12,7 @@ final class ExportSchedulerCommandTest extends MauticMysqlTestCase
     {
         $commandTester = $this->testSymfonyCommand('mautic:reports:scheduler');
 
-        Assert::assertSame(0, $commandTester->getStatusCode());
-        Assert::assertSame("Scheduler has finished\n", $commandTester->getDisplay());
+        $this->assertSame(0, $commandTester->getStatusCode());
+        $this->assertSame("Scheduler has finished\n", $commandTester->getDisplay());
     }
 }

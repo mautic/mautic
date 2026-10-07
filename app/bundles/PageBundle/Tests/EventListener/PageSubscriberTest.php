@@ -77,25 +77,17 @@ EOF,
      */
     protected function getPageSubscriber(): PageSubscriber
     {
-        /** @var Packages&MockObject $packagesMock */
-        $packagesMock = $this->createMock(Packages::class);
-
-        $assetsHelperMock   = new AssetsHelper($packagesMock);
-        $ipLookupHelperMock = $this->createMock(IpLookupHelper::class);
-        $auditLogModelMock  = $this->createMock(AuditLogModel::class);
-        $pageModel          = $this->createMock(PageModel::class);
-        $languageHelper     = $this->createMock(LanguageHelper::class);
-        $pageDraftModel     = $this->createMock(PageDraftModel::class);
+        $assetsHelperMock   = new AssetsHelper($this->createStub(Packages::class));
 
         $assetsHelperMock->addScriptDeclaration("const foo='bar';", 'onPageDisplay_bodyOpen');
 
         return new PageSubscriber(
             $assetsHelperMock,
-            $ipLookupHelperMock,
-            $auditLogModelMock,
-            $languageHelper,
-            $pageModel,
-            $pageDraftModel,
+            $this->createStub(IpLookupHelper::class),
+            $this->createStub(AuditLogModel::class),
+            $this->createStub(LanguageHelper::class),
+            $this->createStub(PageModel::class),
+            $this->createStub(PageDraftModel::class),
         );
     }
 

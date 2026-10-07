@@ -31,8 +31,8 @@ final class GrapesJsControllerTest extends TestCase
         $controller = $this->getControllerForEditorState($this->createStub(CorePermissions::class), null);
         $response   = $controller->editorStateAction('email', 'new123');
 
-        self::assertInstanceOf(JsonResponse::class, $response);
-        self::assertSame('{"editorState":null}', $response->getContent());
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertSame('{"editorState":null}', $response->getContent());
     }
 
     public function testEditorStateActionReturnsEditorStateFromJsonContent(): void
@@ -51,7 +51,7 @@ final class GrapesJsControllerTest extends TestCase
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '15');
 
-        self::assertSame('{"editorState":{"components":[{"type":"text"}]}}', $response->getContent());
+        $this->assertSame('{"editorState":{"components":[{"type":"text"}]}}', $response->getContent());
     }
 
     public function testEditorStateActionReturnsEditorStateFromSerializedContent(): void
@@ -66,7 +66,7 @@ final class GrapesJsControllerTest extends TestCase
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '33');
 
-        self::assertSame('{"editorState":{"pages":[]}}', $response->getContent());
+        $this->assertSame('{"editorState":{"pages":[]}}', $response->getContent());
     }
 
     public function testEditorStateActionReturnsNullWhenEditorStateCannotBeDecoded(): void
@@ -85,7 +85,7 @@ final class GrapesJsControllerTest extends TestCase
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '20');
 
-        self::assertSame('{"editorState":null}', $response->getContent());
+        $this->assertSame('{"editorState":null}', $response->getContent());
     }
 
     private function getControllerForEditorState(CorePermissions $security, ?Email $entity): GrapesJsController

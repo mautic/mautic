@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -71,7 +71,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
         yield ['endsWith', '.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url LIKE '%.com')"];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQuery')]
+    #[DataProvider('dataApplyQuery')]
     public function testApplyQuery(string $operator, string $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
@@ -94,7 +94,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -109,7 +109,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
     /**
      * @param array<string, mixed> $parameterValue
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQueryAdditionalFilters')]
+    #[DataProvider('dataApplyQueryAdditionalFilters')]
     public function testApplyQueryAdditionalFilters(string $operator, array $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
@@ -130,7 +130,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -182,7 +182,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
     /**
      * @param array<string, mixed> $batchLimiters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQueryWithBatchFilters')]
+    #[DataProvider('dataApplyQueryWithBatchFilters')]
     public function testApplyQueryWithBatchFilters(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
@@ -205,7 +205,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**
@@ -223,7 +223,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
      * @param array<string, mixed> $batchLimiters
      * @param array<string, mixed> $parameterValue
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataApplyQueryAdditionalFiltersWithBatchLimiters')]
+    #[DataProvider('dataApplyQueryAdditionalFiltersWithBatchLimiters')]
     public function testApplyQueryAdditionalFiltersWithBatchLimiters(array $batchLimiters, string $operator, array $parameterValue, string $expectedQuery): void
     {
         $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
@@ -244,7 +244,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
 
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
-        Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
+        $this->assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
 
     /**

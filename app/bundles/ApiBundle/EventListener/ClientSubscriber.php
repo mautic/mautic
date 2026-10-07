@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\ApiEvents;
@@ -8,11 +10,11 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ClientSubscriber implements EventSubscriberInterface
+final readonly class ClientSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly IpLookupHelper $ipLookupHelper,
-        private readonly AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private AuditLogModel $auditLogModel,
     ) {
     }
 

@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Recurr\Exception\InvalidArgument;
 use Recurr\Rule;
 
-class SchedulerNowBuilder implements BuilderInterface
+final class SchedulerNowBuilder implements BuilderInterface
 {
     /**
      * @throws InvalidSchedulerException

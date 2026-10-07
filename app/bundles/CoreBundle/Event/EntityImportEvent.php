@@ -36,8 +36,11 @@ final class EntityImportEvent extends Event
     /**
      * @phpstan-ignore-next-line
      */
-    public function __construct(private readonly string $entityName, private readonly array $data, private readonly ?int $userId)
-    {
+    public function __construct(
+        private readonly string $entityName,
+        private readonly array $data,
+        private readonly ?int $userId,
+    ) {
     }
 
     public function getEntityName(): string

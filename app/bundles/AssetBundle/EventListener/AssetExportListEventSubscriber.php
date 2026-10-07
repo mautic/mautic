@@ -11,8 +11,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class AssetExportListEventSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private PathsHelper $pathsHelper)
-    {
+    public function __construct(
+        private PathsHelper $pathsHelper,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -26,7 +27,7 @@ final readonly class AssetExportListEventSubscriber implements EventSubscriberIn
     {
         $data = $event->getEntityData();
 
-        if (empty($data)) {
+        if ([] === $data) {
             return;
         }
 

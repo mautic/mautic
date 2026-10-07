@@ -180,7 +180,7 @@ final class ProjectEntityLoaderService
      */
     private function getEntityTypes(): array
     {
-        if (!empty($this->entityTypesCache)) {
+        if ([] !== $this->entityTypesCache) {
             return $this->entityTypesCache;
         }
 
@@ -277,8 +277,8 @@ final class ProjectEntityLoaderService
     {
         // Try possible translation keys in order
         $keys = [
-            "mautic.project.$entityType",
-            "mautic.$entityType.$entityType",
+            "mautic.project.{$entityType}",
+            "mautic.{$entityType}.{$entityType}",
         ];
 
         foreach ($keys as $key) {

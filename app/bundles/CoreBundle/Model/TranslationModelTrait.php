@@ -91,7 +91,8 @@ trait TranslationModelTrait
                         $matchFound     = $translationList[$core][$language];
                         $chosenLanguage = $language;
                         break;
-                    } elseif (!$preferredCore) {
+                    }
+                    if (!$preferredCore) {
                         // This will be the fallback if no matches are found
                         $preferredCore = $core;
                     }

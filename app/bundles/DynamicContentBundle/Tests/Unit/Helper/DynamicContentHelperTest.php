@@ -13,7 +13,6 @@ use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -39,12 +38,11 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->mockModel           = $this->createMock(DynamicContentModel::class);
-        $realTimeExecutioner       = $this->createMock(RealTimeExecutioner::class);
         $this->mockDispatcher      = $this->createMock(EventDispatcher::class);
         $this->leadModel           = $this->createMock(LeadModel::class);
         $this->helper              = new DynamicContentHelper(
             $this->mockModel,
-            $realTimeExecutioner,
+            $this->createStub(RealTimeExecutioner::class),
             $this->mockDispatcher,
             $this->leadModel,
         );
@@ -127,7 +125,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->mockDispatcher->method('hasListeners')->willReturn(true);
         $matcher = $this->exactly(2);
         $this->mockDispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $contact, $slot) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $contact, $slot): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (ContactFiltersEvaluateEvent $event) use ($contact, $slot): void {
                         $this->assertSame($contact, $event->getContact());
@@ -151,10 +149,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                 return $parameters[0];
             });
 
-        Assert::assertSame(
-            '<p>test</p>',
-            $this->helper->getDynamicContentSlotForLead($slotName, $contact)
-        );
+        $this->assertSame('<p>test</p>', $this->helper->getDynamicContentSlotForLead($slotName, $contact));
     }
 
     public function testGetDynamicContentSlotForLeadWithListenerNotFindingMatch(): void
@@ -185,7 +180,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->mockDispatcher->expects($matcher)
             ->method('dispatch')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher, $contact, $slot) {
+                function (...$parameters) use ($matcher, $contact, $slot): object {
                     if (1 === $matcher->numberOfInvocations()) {
                         $callback = function (ContactFiltersEvaluateEvent $event) use ($contact, $slot): void {
                             $this->assertSame($contact, $event->getContact());
@@ -201,8 +196,9 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        Assert::assertSame(
-            '', // No content returned as the filter did not match anything.
+        $this->assertSame(
+            '',
+            // No content returned as the filter did not match anything.
             $this->helper->getDynamicContentSlotForLead($slotName, $contact)
         );
     }
@@ -234,7 +230,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->mockDispatcher->expects($matcher)
             ->method('dispatch')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher, $contact, $slot) {
+                function (...$parameters) use ($matcher, $contact, $slot): object {
                     if (1 === $matcher->numberOfInvocations()) {
                         $callback = function (TokenReplacementEvent $event) use ($contact, $slot): void {
                             $this->assertSame($contact, $event->getLead());
@@ -248,10 +244,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        Assert::assertSame(
-            '<p>test</p>',
-            $this->helper->getDynamicContentSlotForLead($slotName, $contact)
-        );
+        $this->assertSame('<p>test</p>', $this->helper->getDynamicContentSlotForLead($slotName, $contact));
     }
 
     public function testGetDynamicContentSlotForLeadWithNoListenerWithNotMatchingFilter(): void
@@ -279,9 +272,6 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
         $this->mockDispatcher->method('hasListeners')->willReturn(false);
         $this->mockDispatcher->expects($this->never())->method('dispatch');
 
-        Assert::assertSame(
-            '',
-            $this->helper->getDynamicContentSlotForLead($slotName, $contact)
-        );
+        $this->assertSame('', $this->helper->getDynamicContentSlotForLead($slotName, $contact));
     }
 }

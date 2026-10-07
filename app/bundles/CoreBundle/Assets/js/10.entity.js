@@ -124,12 +124,16 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
     //only submit if the element exists, its a livesearch, or on button click
 
     if (el.length && (e.data.livesearch || mQuery(e.target).prop('tagName') == 'BUTTON' || mQuery(e.target).parent().prop('tagName') == 'BUTTON')) {
-        var value = el.val().trim();
+        const scopeChange = e.data && e.data.scopeChange;
+        const inputBeforeClear = el.val().trim();
+        let value = inputBeforeClear;
+        const scopeSelect = mQuery("select[data-livesearch-scope-for='" + elId + "']");
+        const isClearButton = mQuery(e.target).prop('tagName') === 'BUTTON' || mQuery(e.target).parent().prop('tagName') === 'BUTTON';
         //should the content be cleared?
-        if (!value) {
+        if (!value && !scopeChange) {
             //force action since we have no content
             action = 'clear';
-        } else if (action == 'clear') {
+        } else if (action == 'clear' && !scopeChange) {
             el.val('');
             el.typeahead('val', '');
             value = '';
@@ -157,11 +161,42 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
             }
 
             var btn = "button[data-livesearch-parent='" + elId + "']";
-            if (mQuery(btn).length && !mQuery(btn).hasClass('btn-nospin') && !Mautic.filterButtonClicked) {
-                Mautic.startIconSpinOnEvent(btn);
-            }
+        if (mQuery(btn).length && !mQuery(btn).hasClass('btn-nospin') && !Mautic.filterButtonClicked) {
+            Mautic.startIconSpinOnEvent(btn);
+        }
 
-            var tmpl = mQuery('#' + elId).data('tmpl');
+        if (scopeSelect.length) {
+            if (action === 'clear' && !scopeChange) {
+                if (isClearButton) {
+                    scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
+                    Mautic.refreshSearchScopeChosen(scopeSelect);
+                    value = '';
+                } else {
+                    const command = scopeSelect.val() || '';
+                    value = command ? Mautic.composeScopedSearchValue(command, '') : '';
+                }
+
+                MauticVars.lastSearchStr = value;
+            } else if (scopeChange) {
+                // submitSearchScopeChange already composed the final search string
+                value = MauticVars.lastSearchStr || '';
+            } else {
+                if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
+                    Mautic.initFilterCommands();
+                }
+
+                const filterCommands = Mautic.getActiveFilterCommands(value);
+                let scopedInputValue = Mautic.removeFilterCommands(value);
+                scopedInputValue = Mautic.normalizeSearchScopeInputValue(scopeSelect, scopedInputValue);
+                value = Mautic.composeScopedSearchValue(scopeSelect.val(), scopedInputValue);
+
+                if (filterCommands.length) {
+                    value = (value + ' ' + filterCommands.join(' ')).trim();
+                }
+            }
+        }
+
+        var tmpl = mQuery('#' + elId).data('tmpl');
             if (!tmpl) {
                 tmpl = 'list';
             }
@@ -183,7 +218,16 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                 showLoadingBar: showLoading,
                 url: route,
                 type: "GET",
-                data: searchName + "=" + encodeURIComponent(value) + tmplParam,
+                data: (function () {
+                    let requestData = searchName + "=" + encodeURIComponent(value) + tmplParam;
+                    const filters = el.attr('data-filters');
+
+                    if (filters !== undefined) {
+                        requestData += "&filters=" + encodeURIComponent(filters);
+                    }
+
+                    return requestData;
+                })(),
                 dataType: "json",
                 success: function (response) {
                     //cache the response
@@ -196,15 +240,7 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     response.overlayTarget = overlayTarget;
 
                     //update the buttons class and action
-                    if (mQuery(btn).length) {
-                        if (action == 'clear') {
-                            mQuery(btn).attr('data-livesearch-action', 'search');
-                            mQuery(btn).children('i').first().removeClass('ri-eraser-line').addClass('ri-search-line');
-                        } else {
-                            mQuery(btn).attr('data-livesearch-action', 'clear');
-                            mQuery(btn).children('i').first().removeClass('ri-search-line').addClass('ri-eraser-line');
-                        }
-                    }
+                    Mautic.updateLiveSearchButton(elId, value);
 
                     if (inModal) {
                         Mautic.processModalContent(response);
@@ -218,15 +254,7 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     Mautic.processAjaxError(request, textStatus, errorThrown);
 
                     //update the buttons class and action
-                    if (mQuery(btn).length) {
-                        if (action == 'clear') {
-                            mQuery(btn).attr('data-livesearch-action', 'search');
-                            mQuery(btn).children('i').first().removeClass('ri-eraser-line').addClass('ri-search-line');
-                        } else {
-                            mQuery(btn).attr('data-livesearch-action', 'clear');
-                            mQuery(btn).children('i').first().removeClass('ri-search-line').addClass('ri-eraser-line');
-                        }
-                    }
+                    Mautic.updateLiveSearchButton(elId, value);
                 },
                 complete: function() {
                     delete Mautic.liveSearchXhr;
@@ -254,18 +282,18 @@ Mautic.setSearchFilter = function (el, searchId, string) {
         var current = mQuery('#list-search').typeahead('val') + " " + filter;
     }
 
-    //append the filter
-    mQuery(searchId).typeahead('val', current);
+    var searchEl = mQuery(searchId);
+    Mautic.applySearchScopeState(searchEl, current);
+    MauticVars.lastSearchStr = current;
 
     //submit search
     var e = mQuery.Event("keypress", {which: 13});
-    e.data = {};
-    e.data.livesearch = true;
+    e.data = {livesearch: true, scopeChange: true};
     Mautic.filterList(
         e,
-        'list-search',
-        mQuery(searchId).attr('data-action'),
-        mQuery(searchId).attr('data-target'),
+        searchEl.attr('id'),
+        searchEl.attr('data-action'),
+        searchEl.attr('data-target'),
         'liveCache'
     );
 };

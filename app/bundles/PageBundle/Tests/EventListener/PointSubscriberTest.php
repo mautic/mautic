@@ -9,6 +9,8 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\EventListener\PointSubscriber;
+use Mautic\PageBundle\Form\Type\PointActionPageHitType;
+use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
 use Mautic\PageBundle\Helper\PointActionHelper;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
@@ -18,13 +20,10 @@ final class PointSubscriberTest extends TestCase
 {
     public function testSubscribedEvents(): void
     {
-        self::assertSame(
-            [
-                'mautic.point_on_build' => ['onPointBuild', 0],
-                'mautic.page_on_hit'    => ['onPageHit', 0],
-            ],
-            PointSubscriber::getSubscribedEvents()
-        );
+        $this->assertSame([
+            'mautic.point_on_build' => ['onPointBuild', 0],
+            'mautic.page_on_hit'    => ['onPageHit', 0],
+        ], PointSubscriber::getSubscribedEvents());
     }
 
     public function testPointBuildAddsActions(): void
@@ -32,7 +31,7 @@ final class PointSubscriberTest extends TestCase
         $pointModel        = $this->createStub(PointModel::class);
         $pointBuilderEvent = $this->createMock(PointBuilderEvent::class);
         $pointActionHelper = $this->createStub(PointActionHelper::class);
-        $matcher           = self::exactly(2);
+        $matcher           = $this->exactly(2);
 
         $pointBuilderEvent->expects($matcher)->method('addAction')->willReturnCallback(function (...$parameters) use ($matcher, $pointActionHelper): void {
             if (1 === $matcher->numberOfInvocations()) {
@@ -42,7 +41,7 @@ final class PointSubscriberTest extends TestCase
                     'label'       => 'mautic.page.point.action.pagehit',
                     'description' => 'mautic.page.point.action.pagehit_descr',
                     'callback'    => [PointActionHelper::class, 'validatePageHit'],
-                    'formType'    => \Mautic\PageBundle\Form\Type\PointActionPageHitType::class,
+                    'formType'    => PointActionPageHitType::class,
                 ], $parameters[1]);
             }
             if (2 === $matcher->numberOfInvocations()) {
@@ -52,7 +51,7 @@ final class PointSubscriberTest extends TestCase
                     'label'       => 'mautic.page.point.action.urlhit',
                     'description' => 'mautic.page.point.action.urlhit_descr',
                     'callback'    => [$pointActionHelper, 'validateUrlHit'],
-                    'formType'    => \Mautic\PageBundle\Form\Type\PointActionUrlHitType::class,
+                    'formType'    => PointActionUrlHitType::class,
                     'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
                 ], $parameters[1]);
             }

@@ -13,29 +13,30 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Router;
 
 final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&UserModel
+     * @var MockObject&UserModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $userModel;
+    private MockObject $userModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&NotificationModel
+     * @var MockObject&NotificationModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $notificationModel;
+    private MockObject $notificationModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Translator
+     * @var MockObject&Translator
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
@@ -187,7 +188,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToAuthor(): void
     {
         $event    = new Event();
-        $user     = $this->createStub(User::class);
+        $user     = $this->createMock(User::class);
         $this->prepareCommonMocks($event, $user);
 
         $this->coreParametersHelper
@@ -208,8 +209,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToEmailAddress(): void
     {
         $event = new Event();
-        $user  = $this->createStub(User::class);
-        $this->prepareCommonMocks($event, $user);
+        $this->prepareCommonMocks($event, $this->createMock(User::class));
 
         $emails = 'a@test.co, b@test.co';
         $this->coreParametersHelper->expects($this->exactly(2))
@@ -221,7 +221,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->userModel->expects($this->once())
             ->method('sendMailToEmailAddresses')
-            ->with(array_map('trim', explode(',', $emails)), 'test', 'test');
+            ->with(array_map(trim(...), explode(',', $emails)), 'test', 'test');
 
         $this->userModel->expects($this->never())
             ->method('emailUser');
@@ -229,16 +229,17 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->getNotificationHelper()->notifyOfUnpublish($event);
     }
 
-    private function prepareCommonMocks(Event $event, User $user): void
+    /**
+     * @param MockObject&User $user
+     */
+    private function prepareCommonMocks(Event $event, MockObject $user): void
     {
         $campaign = new Campaign();
         $event->setCampaign($campaign);
         $campaign->setCreatedBy(2);
 
-        $user = $this->createMock(User::class);
-
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->any())
+        $lead
             ->method('getOwner')
             ->willReturn(null);
 
@@ -251,7 +252,6 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($user);
 
         $this->translator
-            ->expects($this->any())
             ->method('trans')
             ->willReturn('test');
     }

@@ -6,11 +6,13 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(Parser::class)]
+#[CoversClass(Parser::class)]
 final class ParserTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that a bounce is found through DsnReport')]
+    #[TestDox('Test that a bounce is found through DsnReport')]
     public function testBouncedEmailIsReturnedFromParsedDsnReport(): void
     {
         $message            = new Message();
@@ -28,7 +30,7 @@ DSN;
         $this->assertSame('sdfgsdfg@seznan.cz', $bounce->getContactEmail());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that a bounce is found through body')]
+    #[TestDox('Test that a bounce is found through body')]
     public function testBouncedEmailIsReturnedFromParsedBody(): void
     {
         $message            = new Message();

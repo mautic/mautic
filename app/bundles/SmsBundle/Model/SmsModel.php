@@ -15,14 +15,15 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Collection\RecipientCollection;
 use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Entity\SmsRepository;
 use Mautic\SmsBundle\Entity\Stat;
+use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Event\DncEvent;
 use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
@@ -64,29 +65,26 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly SmsRepository $smsRepository,
+        private readonly StatRepository $statRepository,
+        private readonly DoNotContactRepository $doNotContactRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\SmsBundle\Entity\SmsRepository
-     */
-    public function getRepository()
+    public function getRepository(): SmsRepository
     {
-        return $this->em->getRepository(Sms::class);
+        return $this->smsRepository;
     }
 
-    /**
-     * @return \Mautic\SmsBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     public function getDoNotContactRepository(): DoNotContactRepository
     {
-        return $this->em->getRepository(DoNotContact::class);
+        return $this->doNotContactRepository;
     }
 
     public function getPermissionBase(): string
@@ -121,7 +119,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                 $event = $this->dispatchEvent('pre_save', $entity, $isNew);
             }
 
-            $this->getRepository()->saveEntity($entity, false);
+            $this->smsRepository->saveEntity($entity, false);
 
             if ($dispatchEvent) {
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
@@ -189,10 +187,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
     /**
      * @param Lead|int|array<Lead>|array<int> $sendTo
-     * @param array                           $options
      * @param array<int, Lead>                $contacts
      */
-    public function sendSms(Sms $sms, $sendTo, $options = [], array &$contacts = []): array
+    public function sendSms(Sms $sms, $sendTo, array $options = [], array &$contacts = []): array
     {
         $channel = $options['channel'] ?? null;
         $listId  = $options['listId'] ?? null;
@@ -211,7 +208,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
 
-        if ($fetchContacts) {
+        if ([] !== $fetchContacts) {
             /** @var Lead[] $foundContacts */
             $foundContacts = $this->leadModel->getEntities(['ids' => $fetchContacts]);
 
@@ -244,7 +241,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $contacts = $dncEvent->getContacts(); // The contacts param is reset here too, no?
 
         // Check if any contacts remain. If not, return early.
-        if (empty($contacts)) {
+        if ([] === $contacts) {
             return $results;
         }
 
@@ -261,7 +258,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $contacts = $queueEvent->getContacts();
 
         // Check if any contacts remain. If not, return early.
-        if (!$contacts) {
+        if ([] === $contacts) {
             return $results;
         }
 
@@ -277,7 +274,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
         $contacts = $filterEvent->getContacts();
 
-        if (!$contacts) {
+        if ([] === $contacts) {
             return $results;
         }
 
@@ -329,7 +326,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             try {
                 // assumption made that the Sms message is same for all contacts
                 $message = $translatedSms->getMessage();
-                if ($media) {
+                if ([] !== $media) {
                     $this->transport->sendMMS($recipientCollection, $media);
                 } else {
                     $this->transport->sendBatchSms($recipientCollection, $message);
@@ -364,22 +361,19 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
 
-        if ($sentCount) {
-            $repo = $this->getRepository();
-            foreach ($sentCount as $id => $count) {
-                $repo->upCount($id, 'sent', $count);
-            }
+        foreach ($sentCount as $id => $count) {
+            $this->smsRepository->upCount($id, 'sent', $count);
         }
 
         if (count($stats)) {
-            $this->getStatRepository()->saveEntities($stats);
+            $this->statRepository->saveEntities($stats);
 
             foreach ($stats as $stat) {
                 if (!$stat->isFailed()) {
                     $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
                 }
 
-                $this->getRepository()->detachEntity($stat);
+                $this->smsRepository->detachEntity($stat);
             }
         }
 
@@ -408,7 +402,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $stat->setTrackingHash(str_replace('.', '', uniqid('', true)));
 
         if ($persist) {
-            $this->getStatRepository()->saveEntity($stat);
+            $this->statRepository->saveEntity($stat);
         }
 
         return $stat;
@@ -469,10 +463,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      *
      * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param array   $filter
      * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -515,7 +508,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      */
     public function getSmsStatus($idHash)
     {
-        return $this->getStatRepository()->getSmsStatus($idHash);
+        return $this->statRepository->getSmsStatus($idHash);
     }
 
     /**
@@ -525,7 +518,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      */
     public function getSmsStatByLeadId($smsId, $leadId)
     {
-        return $this->getStatRepository()->findBy(
+        return $this->statRepository->findBy(
             [
                 'sms'  => (int) $smsId,
                 'lead' => (int) $leadId,
@@ -543,18 +536,16 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     }
 
     /**
-     * @param string $filter
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $options
+     * @param string|array<int, string> $filter
+     * @param array<string, mixed>      $options
      */
-    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = []): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
         $results = [];
         switch ($type) {
             case 'sms':
             case SmsType::class:
-                $entities = $this->getRepository()->getSmsList(
+                $entities = $this->smsRepository->getSmsList(
                     $filter,
                     $limit,
                     $start,

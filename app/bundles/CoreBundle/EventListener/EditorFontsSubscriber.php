@@ -9,12 +9,12 @@ use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class EditorFontsSubscriber implements EventSubscriberInterface
+final readonly class EditorFontsSubscriber implements EventSubscriberInterface
 {
     public const PARAMETER_EDITOR_FONTS = 'editor_fonts';
 
     public function __construct(
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -32,7 +32,7 @@ class EditorFontsSubscriber implements EventSubscriberInterface
 
     private function addEditorFonts(CustomAssetsEvent $customAssetsEvent): void
     {
-        $fonts = (array) $this->coreParametersHelper->get(static::PARAMETER_EDITOR_FONTS, []);
+        $fonts = (array) $this->coreParametersHelper->get(self::PARAMETER_EDITOR_FONTS, []);
         foreach ($fonts as $font) {
             if (empty($font['url'])) {
                 continue;

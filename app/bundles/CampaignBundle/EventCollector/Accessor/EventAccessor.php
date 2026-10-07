@@ -10,7 +10,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Exception\EventNotFoundExcepti
 use Mautic\CampaignBundle\EventCollector\Accessor\Exception\TypeNotFoundException;
 use Mautic\CampaignBundle\EventCollector\Builder\EventBuilder;
 
-class EventAccessor
+final class EventAccessor
 {
     private array $actions = [];
 
@@ -38,7 +38,7 @@ class EventAccessor
             Event::TYPE_ACTION    => $this->getAction($key),
             Event::TYPE_CONDITION => $this->getCondition($key),
             Event::TYPE_DECISION  => $this->getDecision($key),
-            default               => throw new TypeNotFoundException("$type is not a valid event type"),
+            default               => throw new TypeNotFoundException("{$type} is not a valid event type"),
         };
     }
 
@@ -52,7 +52,7 @@ class EventAccessor
     public function getAction($key)
     {
         if (!isset($this->actions[$key])) {
-            throw new EventNotFoundException("Action $key is not valid");
+            throw new EventNotFoundException("Action {$key} is not valid");
         }
 
         return $this->actions[$key];
@@ -73,7 +73,7 @@ class EventAccessor
     public function getCondition($key)
     {
         if (!isset($this->conditions[$key])) {
-            throw new EventNotFoundException("Condition $key is not valid");
+            throw new EventNotFoundException("Condition {$key} is not valid");
         }
 
         return $this->conditions[$key];
@@ -94,7 +94,7 @@ class EventAccessor
     public function getDecision($key)
     {
         if (!isset($this->decisions[$key])) {
-            throw new EventNotFoundException("Decision $key is not valid");
+            throw new EventNotFoundException("Decision {$key} is not valid");
         }
 
         return $this->decisions[$key];

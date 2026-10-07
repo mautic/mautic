@@ -20,7 +20,7 @@ jobs:
       is-prerelease: ${{ steps.is-prerelease.outputs.is-prerelease }}
 
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # Our build script needs access to all previous tags, so we add fetch-depth: 0
       with:
         fetch-depth: 0
@@ -46,6 +46,11 @@ jobs:
           echo "✔ Tag name (${{ steps.get-mautic-version.outputs.version }}) and the version in app/release_metadata.json ($METADATA_VERSION) match. Great!"
         fi
 
+    - name: Setup Node
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: '24'
+
     - name: Install dependencies
       run: |
         composer validate
@@ -63,6 +68,8 @@ jobs:
     - name: Build release files
       run: |
         php build/package_release.php -b=${{ steps.get-mautic-version.outputs.version }}
+        unzip -Z1 build/packages/${{ steps.get-mautic-version.outputs.version }}-update.zip | grep -Fxq 'assets/build/manifest.json'
+        unzip -Z1 build/packages/${{ steps.get-mautic-version.outputs.version }}-update.zip | grep -Fxq 'var/sass/app.output.css'
         echo 'MAUTIC_SHA1_CONTENTS<<EOF' >> $GITHUB_ENV
         cat build/packages/build-sha1-all >> $GITHUB_ENV
         echo 'EOF' >> $GITHUB_ENV
@@ -144,7 +151,7 @@ jobs:
 
     steps:
     # We need this so we can get the local.php override file
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
@@ -191,7 +198,7 @@ jobs:
 
     steps:
       # We need this so we can get the local.php override file
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Get tag name and minimum Mautic version
       run: |
@@ -232,6 +239,8 @@ jobs:
       run: |
         php bin/console mautic:update:apply --force --update-package=${{ needs.release.outputs.mautic-version }}-update.zip
         php bin/console mautic:update:apply --finish
+        test -s assets/build/manifest.json
+        test -s var/sass/app.output.css
 
     - name: Store log artifacts
       if: ${{ always() }}
@@ -248,7 +257,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2

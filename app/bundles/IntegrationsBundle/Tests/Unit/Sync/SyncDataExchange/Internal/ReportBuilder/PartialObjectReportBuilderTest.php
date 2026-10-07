@@ -164,7 +164,7 @@ final class PartialObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(Contact::NAME);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
         $this->assertEquals('Bob', $objects[1]->getField('firstname')->getValue()->getNormalizedValue());
     }
@@ -255,7 +255,7 @@ final class PartialObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(InternalCompany::NAME);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
         $this->assertEquals('Bob and Cat', $objects[1]->getField('companyname')->getValue()->getNormalizedValue());
     }
@@ -393,7 +393,7 @@ final class PartialObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(InternalCompany::NAME);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         // trying to access non-existent object
         $objects[1]->getField('email');
     }

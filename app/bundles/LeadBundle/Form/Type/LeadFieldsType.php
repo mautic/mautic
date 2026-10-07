@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -12,10 +14,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class LeadFieldsType extends AbstractType
+final class LeadFieldsType extends AbstractType
 {
     public function __construct(
-        protected FieldModel $fieldModel,
+        private readonly FieldModel $fieldModel,
     ) {
     }
 
@@ -48,7 +50,7 @@ class LeadFieldsType extends AbstractType
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

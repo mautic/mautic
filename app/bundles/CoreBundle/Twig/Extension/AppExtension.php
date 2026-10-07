@@ -8,12 +8,12 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Twig\TwigTest;
 
-class AppExtension extends AbstractExtension
+final class AppExtension extends AbstractExtension
 {
     /**
      * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('ini_get', fn ($value): string|false => ini_get($value)),

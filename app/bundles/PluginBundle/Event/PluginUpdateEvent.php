@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Entity\Plugin;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class PluginUpdateEvent extends Event
+final class PluginUpdateEvent extends Event
 {
     /**
      * @param array<class-string, ClassMetadata>|null $metadata null value is when the plugin does not have Entities (an Entity directory)

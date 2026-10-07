@@ -207,6 +207,6 @@ class LeadCategory
 
     public function getPermissionUser(): mixed
     {
-        return $this->getLead()?->getPermissionUser();
+        return $this->lead?->getPermissionUser();
     }
 }

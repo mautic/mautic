@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
-use PHPUnit\Framework\Assert;
 
 final class DeleteCompanyLeadsFunctionalTest extends MauticMysqlTestCase
 {
@@ -56,18 +55,18 @@ final class DeleteCompanyLeadsFunctionalTest extends MauticMysqlTestCase
 
         $this->testSymfonyCommand(DeleteCompanyLeads::COMMAND_NAME, ['--company-id' => $company1->getId()]);
 
-        Assert::assertSame(4, $companyLeadRepository->count([]), 'Company lead mapping is deleted for deleted company.');
-        Assert::assertNull($companyRepository->getEntity($company1->getId()), 'Company is deleted from companies permanently.');
-        Assert::assertNull($contactRepository->getEntity($contact2->getId())->getCompany(), 'Company is set to null when no other company is attached.');
-        Assert::assertSame($company2->getName(), $contactRepository->getEntity($contact1->getId())->getCompany(), 'Another company is made primary for the contact.');
+        $this->assertSame(4, $companyLeadRepository->count([]), 'Company lead mapping is deleted for deleted company.');
+        $this->assertNotInstanceOf(Company::class, $companyRepository->getEntity($company1->getId()), 'Company is deleted from companies permanently.');
+        $this->assertNull($contactRepository->getEntity($contact2->getId())->getCompany(), 'Company is set to null when no other company is attached.');
+        $this->assertSame($company2->getName(), $contactRepository->getEntity($contact1->getId())->getCompany(), 'Another company is made primary for the contact.');
 
         $this->softDeleteCompany($company2);
         $this->testSymfonyCommand(DeleteCompanyLeads::COMMAND_NAME);
 
-        Assert::assertSame(1, $companyRepository->count([]), '1 company is not deleted');
-        Assert::assertSame(1, $companyLeadRepository->count([]), 'Company lead mapping is deleted for deleted company.');
-        Assert::assertNull($companyRepository->getEntity($company2->getId()), 'Company is deleted from companies permanently.');
-        Assert::assertNull($contactRepository->getEntity($contact4->getId())->getCompany(), 'Company is set to null when no other company is attached.');
-        Assert::assertSame($company3->getName(), $contactRepository->getEntity($contact3->getId())->getCompany(), 'Another company is made primary for the contact.');
+        $this->assertSame(1, $companyRepository->count([]), '1 company is not deleted');
+        $this->assertSame(1, $companyLeadRepository->count([]), 'Company lead mapping is deleted for deleted company.');
+        $this->assertNotInstanceOf(Company::class, $companyRepository->getEntity($company2->getId()), 'Company is deleted from companies permanently.');
+        $this->assertNull($contactRepository->getEntity($contact4->getId())->getCompany(), 'Company is set to null when no other company is attached.');
+        $this->assertSame($company3->getName(), $contactRepository->getEntity($contact3->getId())->getCompany(), 'Another company is made primary for the contact.');
     }
 }

@@ -8,8 +8,9 @@ use Mautic\CoreBundle\Test\Extensions\SlowTest\SlowTest;
 
 abstract class Subscriber
 {
-    public function __construct(private SlowTest $slowTest)
-    {
+    public function __construct(
+        private readonly SlowTest $slowTest,
+    ) {
     }
 
     public function slowTest(): SlowTest

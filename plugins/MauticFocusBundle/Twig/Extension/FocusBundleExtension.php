@@ -10,7 +10,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigTest;
 
-class FocusBundleExtension extends AbstractExtension
+final class FocusBundleExtension extends AbstractExtension
 {
     /**
      * @return TwigFilter[]

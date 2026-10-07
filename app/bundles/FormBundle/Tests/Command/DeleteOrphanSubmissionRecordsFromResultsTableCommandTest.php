@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Tests\FormTestHelperTrait;
-use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -36,7 +35,7 @@ final class DeleteOrphanSubmissionRecordsFromResultsTableCommandTest extends Mau
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);
 
-        Assert::assertCount($timesFormSubmitted, $submissions);
+        $this->assertCount($timesFormSubmitted, $submissions);
 
         foreach ($submissions as $submission) {
             $submissionRepository->deleteEntity($submission);
@@ -44,7 +43,7 @@ final class DeleteOrphanSubmissionRecordsFromResultsTableCommandTest extends Mau
 
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);
 
-        Assert::assertCount(0, $submissions);
+        $this->assertCount(0, $submissions);
 
         $kernel      = self::$kernel;
         $application = new Application($kernel);

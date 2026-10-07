@@ -18,7 +18,6 @@ use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedExcept
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -93,32 +92,31 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                     if (1 === $matcher->numberOfInvocations()) {
                     }
                     if (2 === $matcher->numberOfInvocations()) {
-                        $this->assertTrue($event instanceof ExecutedEvent);
+                        $this->assertInstanceOf(ExecutedEvent::class, $event);
                         $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED, $eventName);
                     }
                     if (3 === $matcher->numberOfInvocations()) {
-                        $this->assertTrue($event instanceof ExecutedBatchEvent);
+                        $this->assertInstanceOf(ExecutedBatchEvent::class, $event);
                         $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $eventName);
                     }
                     if (4 === $matcher->numberOfInvocations()) {
-                        $this->assertTrue($event instanceof FailedEvent);
+                        $this->assertInstanceOf(FailedEvent::class, $event);
                         $this->assertSame(CampaignEvents::ON_EVENT_FAILED, $eventName);
                     }
                     ++$dispatcCounter;
                     if (1 === $dispatcCounter) {
-                        Assert::assertInstanceOf(PendingEvent::class, $event);
                         $this->assertInstanceOf(PendingEvent::class, $event);
                         $event->pass($logs->get(1));
                         $event->fail($logs->get(2), 'just because');
                     } elseif (2 === $dispatcCounter) {
-                        self::assertInstanceOf(ExecutedEvent::class, $event);
-                        self::assertSame(CampaignEvents::ON_EVENT_EXECUTED, $eventName);
+                        $this->assertInstanceOf(ExecutedEvent::class, $event);
+                        $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED, $eventName);
                     } elseif (3 === $dispatcCounter) {
-                        self::assertInstanceOf(ExecutedBatchEvent::class, $event);
-                        self::assertSame(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $eventName);
+                        $this->assertInstanceOf(ExecutedBatchEvent::class, $event);
+                        $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $eventName);
                     } elseif (4 === $dispatcCounter) {
-                        self::assertInstanceOf(FailedEvent::class, $event);
-                        self::assertSame(CampaignEvents::ON_EVENT_FAILED, $eventName);
+                        $this->assertInstanceOf(FailedEvent::class, $event);
+                        $this->assertSame(CampaignEvents::ON_EVENT_FAILED, $eventName);
                     } else {
                         self::fail('Unknown event called.');
                     }

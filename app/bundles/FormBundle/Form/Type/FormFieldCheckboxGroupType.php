@@ -19,8 +19,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class FormFieldCheckboxGroupType extends AbstractType
 {
-    public function __construct(private readonly TranslatorInterface $translator)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

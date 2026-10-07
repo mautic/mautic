@@ -98,7 +98,7 @@ class MembershipManager
 
             $this->logger->debug(
                 'CAMPAIGN: Contacts: '.count($contacts),
-                array_map(fn ($item) => $item->getId(), $contacts->toArray())
+                array_map(fn (Lead $item): int => $item->getId(), $contacts->toArray())
             );
 
             // is the contact an existing campaign member? update and continue

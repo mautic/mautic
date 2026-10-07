@@ -45,7 +45,7 @@ final class DeleteFormTest extends \PHPUnit\Framework\TestCase
         $contactTracker        = $this->createStub(ContactTracker::class);
         $columnSchemaHelper    = $this->createStub(ColumnSchemaHelper::class);
         $tableSchemaHelper     = $this->createStub(TableSchemaHelper::class);
-        $entityManager         = $this->createMock(EntityManagerInterface::class);
+        $entityManager         = $this->createStub(EntityManagerInterface::class);
         $dispatcher            = $this->createMock(EventDispatcher::class);
         $formRepository        = $this->createMock(FormRepository::class);
         $form                  = $this->createMock(Form::class);
@@ -71,7 +71,8 @@ final class DeleteFormTest extends \PHPUnit\Framework\TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
-            $this->createStub(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class),
+            $formRepository
         );
         $matcher = $this->exactly(2);
 
@@ -86,10 +87,6 @@ final class DeleteFormTest extends \PHPUnit\Framework\TestCase
 
                 return false;
             });
-
-        $entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($formRepository);
 
         $form->expects($this->exactly(2))
             ->method('getId')

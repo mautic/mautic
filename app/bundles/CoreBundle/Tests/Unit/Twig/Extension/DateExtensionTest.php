@@ -19,7 +19,7 @@ final class DateExtensionTest extends TestCase
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')
-            ->willReturnCallback(function ($id, $parameters = []) {
+            ->willReturnCallback(function (string $id, array $parameters = []): string {
                 if (str_starts_with($id, 'mautic.core.date.')) {
                     $unit = str_replace('mautic.core.date.', '', $id);
 
@@ -29,15 +29,13 @@ final class DateExtensionTest extends TestCase
                 return $id;
             });
 
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-
         $dateHelper = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
             'g:i a',
             $translator,
-            $coreParametersHelper
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $this->dateExtension = new DateExtension($dateHelper);

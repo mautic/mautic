@@ -8,7 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
-class OneSignalIntegration extends AbstractIntegration
+final class OneSignalIntegration extends AbstractIntegration
 {
     protected bool $coreIntegration = true;
 

@@ -33,7 +33,7 @@ final class NotifyOfUnpublishSubscriberTest extends TestCase
         $this->notificationHelper->expects($this->once())
             ->method('notifyOfUnpublish')
             ->with(
-                $this->equalTo($event)
+                $event
             );
 
         $this->subscriber->notifyOfUnpublish($notifyEvent);
