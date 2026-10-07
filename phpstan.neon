@@ -24,6 +24,7 @@ parameters:
 
     paths:
         - app/bundles
+        - app/tests
         - app/config
         - app/migrations
         - plugins
@@ -76,14 +77,14 @@ parameters:
         -
             identifier: mautic.noContainerGet
             paths:
-                - app/bundles/ApiBundle/Tests/Functional/OwnershipScopedSecurityMetadataTest.php
-                - app/bundles/CoreBundle/Tests/Functional/DependencyInjection/AbstractContainerSmokeTestCase.php
-                - app/bundles/CoreBundle/Tests/Functional/RouteMapTest.php
-                - app/bundles/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
-                - app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php
-                - app/bundles/LeadBundle/Tests/Model/FieldModelTest.php
-                - app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
-                - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
+                - app/tests/ApiBundle/Tests/Functional/OwnershipScopedSecurityMetadataTest.php
+                - app/tests/CoreBundle/Tests/Functional/DependencyInjection/AbstractContainerSmokeTestCase.php
+                - app/tests/CoreBundle/Tests/Functional/RouteMapTest.php
+                - app/tests/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
+                - app/tests/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php
+                - app/tests/LeadBundle/Tests/Model/FieldModelTest.php
+                - app/tests/PageBundle/Tests/EventListener/PreferencePageTest.php
+                - app/tests/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
 
         - identifier: missingType.generics
         # controllers - group missing parameter types to fix later
@@ -135,8 +136,8 @@ parameters:
         -
             message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
             paths:
-                 - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/ApiKey/HttpFactoryTest.php
-                 - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
+                 - app/tests/IntegrationsBundle/Tests/Unit/Auth/Provider/ApiKey/HttpFactoryTest.php
+                 - app/tests/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
         -
             message: '#Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\AuthCredentialsInterface::#'
             path: app/bundles/IntegrationsBundle/Auth/Provider/Oauth2ThreeLegged/HttpFactory.php
@@ -150,21 +151,21 @@ parameters:
         # deprecation
         -
             identifier: return.deprecatedClass
-            path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
+            path: app/tests/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
 
         -
             identifier: class.extendsDeprecatedClass
-            path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
+            path: app/tests/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
         # false positive, reflection reference method call
         -
             identifier: method.impossibleType
             paths:
-                - app/bundles/LeadBundle/Tests/Entity/LeadRepositoryTest.php
-                - app/bundles/NotificationBundle/Tests/Unit/Api/OneSignalApiTest.php
+                - app/tests/LeadBundle/Tests/Entity/LeadRepositoryTest.php
+                - app/tests/NotificationBundle/Tests/Unit/Api/OneSignalApiTest.php
         -
             identifier: method.alreadyNarrowedType
             paths:
-                - app/bundles/LeadBundle/Tests/Entity/LeadRepositoryTest.php
+                - app/tests/LeadBundle/Tests/Entity/LeadRepositoryTest.php
         # exception handler as both handler and standalone method
         -
             identifier: argument.type

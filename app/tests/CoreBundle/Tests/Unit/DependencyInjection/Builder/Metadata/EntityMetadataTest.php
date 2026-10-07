@@ -19,7 +19,7 @@ final class EntityMetadataTest extends TestCase
             'base'              => 'Core',
             'bundle'            => 'CoreBundle',
             'relative'          => 'app/bundles/MauticCoreBundle',
-            'directory'         => __DIR__.'/../../../../../',
+            'directory'         => __DIR__.'/../../../../../../../bundles/CoreBundle/',
             'namespace'         => 'Mautic\\CoreBundle',
             'symfonyBundleName' => 'MauticCoreBundle',
             'bundleClass'       => '\\Mautic\\CoreBundle',

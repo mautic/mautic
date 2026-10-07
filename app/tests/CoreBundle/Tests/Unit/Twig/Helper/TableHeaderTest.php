@@ -16,7 +16,7 @@ final class TableHeaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $loader     = new FilesystemLoader(__DIR__.'/../../../../Resources/views/Helper');
+        $loader     = new FilesystemLoader(__DIR__.'/../../../../../../bundles/CoreBundle/Resources/views/Helper');
         $this->twig = new Environment($loader);
         $this->twig->addExtension(new TranslationExtension());
 

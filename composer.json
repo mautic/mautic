@@ -115,6 +115,7 @@
   },
   "autoload-dev": {
     "psr-4": {
+      "Mautic\\": "app/tests/",
       "Utils\\Rector\\": "utils/rector/src/",
       "Utils\\Rector\\Tests\\": "utils/rector/tests/",
       "Utils\\PHPStan\\": "utils/phpstan/src/",

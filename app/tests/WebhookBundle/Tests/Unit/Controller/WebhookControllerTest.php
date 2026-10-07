@@ -59,7 +59,7 @@ final class WebhookControllerTest extends TestCase
         $webhookId      = 9274365435;
         $disableLimit   = 50;
 
-        $mauticBundlesPath = realpath(__DIR__.'/../../../../');
+        $mauticBundlesPath = realpath(__DIR__.'/../../../../../bundles');
         $this->assertNotFalse($mauticBundlesPath);
 
         if ($isNew) {
@@ -126,7 +126,7 @@ final class WebhookControllerTest extends TestCase
             });
 
         $pathsHelper = $this->createMock(PathsHelper::class);
-        $pathsHelper->expects($this->once())->method('getSystemPath')->willReturn(realpath(dirname(__DIR__, 4)));
+        $pathsHelper->expects($this->once())->method('getSystemPath')->willReturn(realpath(dirname(__DIR__, 5).'/bundles'));
 
         // Send test action.
         $testResponse = $controller->sendHookTestAction($request, $client, $pathsHelper);
