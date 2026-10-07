@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\HttpFoundation\Request;
 
 final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
@@ -24,10 +24,13 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testUploadedDashboardIsPreviewed(): void
     {
-        $filePath = tempnam(sys_get_temp_dir(), 'mautic-dashboard-');
-        $this->assertNotFalse($filePath);
+        $dashboardName       = 'Automation test dashboard preview';
+        $dashboardFileName   = $dashboardName.'.json';
+        $temporaryDirectory  = sys_get_temp_dir().'/mautic-dashboard-'.bin2hex(random_bytes(6));
+        $this->assertTrue(mkdir($temporaryDirectory));
+        $filePath = $temporaryDirectory.'/'.$dashboardFileName;
         file_put_contents($filePath, json_encode([
-            'name'    => 'Automation test dashboard preview',
+            'name'    => $dashboardName,
             'widgets' => [],
         ], JSON_THROW_ON_ERROR));
 
@@ -35,26 +38,20 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
             $crawler = $this->client->request(Request::METHOD_GET, '/s/dashboard/import');
             $this->assertResponseIsSuccessful();
             $this->assertSelectorExists('form[name="dashboard_upload"]');
-            $tokenField = $crawler->filter('#dashboard_upload__token');
-            $token = $tokenField->count() > 0
-                ? (string) $tokenField->attr('value')
-                : $this->getCsrfToken('dashboard_upload');
-            $uploadedFile = new UploadedFile($filePath, 'Automation test dashboard preview.json', 'application/json', null, true);
-            $this->client->request(
-                Request::METHOD_POST,
-                '/s/dashboard/import',
-                ['dashboard_upload' => ['start' => 'Upload', '_token' => $token]],
-                ['dashboard_upload' => ['file' => $uploadedFile]]
-            );
+            $form = $crawler->selectButton('Upload')->form();
+            $fileField = $form['dashboard_upload[file]'];
+            $this->assertInstanceOf(FileFormField::class, $fileField);
+            $fileField->upload($filePath);
+            $this->client->submit($form);
 
             $this->assertResponseIsSuccessful();
             $this->assertSelectorExists('.list-group-item.active');
-            $this->assertSelectorTextContains('.list-group-item.active', 'Automation test dashboard preview');
+            $this->assertSelectorTextContains('.list-group-item.active', $dashboardName);
         } finally {
-            $parameters          = self::getContainer()->get(CoreParametersHelper::class);
-            $dashboardDirectory  = (string) $parameters->get('dashboard_import_user_dir');
-            $uploadedDashboards  = [$dashboardDirectory.'/Automation test dashboard preview.json'];
-            $userUploadedDashboards = glob($dashboardDirectory.'/*/Automation test dashboard preview.json');
+            $parameters             = self::getContainer()->get(CoreParametersHelper::class);
+            $dashboardDirectory     = (string) $parameters->get('dashboard_import_user_dir');
+            $uploadedDashboards     = [$dashboardDirectory.'/'.$dashboardFileName];
+            $userUploadedDashboards = glob($dashboardDirectory.'/*/'.$dashboardFileName);
             if (false !== $userUploadedDashboards) {
                 $uploadedDashboards = array_merge($uploadedDashboards, $userUploadedDashboards);
             }
@@ -66,6 +63,9 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
             }
             if (file_exists($filePath)) {
                 unlink($filePath);
+            }
+            if (is_dir($temporaryDirectory)) {
+                rmdir($temporaryDirectory);
             }
         }
     }
