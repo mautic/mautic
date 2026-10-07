@@ -6,6 +6,7 @@ namespace Mautic\MarketplaceBundle\Controller\Package;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\MarketplaceBundle\Enum\PackageType;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
@@ -45,12 +46,18 @@ final class ListController extends CommonController
         $this->setListFilters();
 
         $request = $this->getCurrentRequest();
-        $search  = InputHelper::clean($request->get('search', ''));
-
         $session = $request->getSession();
+
+        $search = InputHelper::clean($request->get('search', $session->get('mautic.marketplace.filter', '')));
+        $session->set('mautic.marketplace.filter', $search);
+
         if (empty($page)) {
             $page = $session->get('mautic.marketplace.package.page', 1);
         }
+
+        // Parse type filter and remove it from search string
+        $type        = $this->parseTypeFromSearch($search);
+        $searchQuery = $this->removeTypeCommandFromSearch($search);
 
         // set limits
         $limit   = $session->get('mautic.marketplace.package.limit', $this->coreParametersHelper->get('default_pagelimit'));
@@ -61,12 +68,13 @@ final class ListController extends CommonController
                 'returnUrl'      => $route,
                 'viewParameters' => [
                     'searchValue'       => $search,
-                    'items'             => $this->pluginCollector->collectPackages($page, $limit, $search),
+                    'items'             => $this->pluginCollector->collectPackages($page, $limit, $searchQuery, $type),
                     'count'             => $this->pluginCollector->getTotal(),
                     'page'              => $page,
                     'limit'             => $limit,
                     'tmpl'              => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'isComposerEnabled' => $this->config->isComposerEnabled(),
+                    'currentType'       => $type,
                 ],
                 'contentTemplate' => '@Marketplace/Package/list.html.twig',
                 'passthroughVars' => [
@@ -75,5 +83,21 @@ final class ListController extends CommonController
                 ],
             ]
         );
+    }
+
+    private function parseTypeFromSearch(string $search): ?string
+    {
+        foreach (PackageType::getSearchCommandMap() as $searchCommand => $packageType) {
+            if (str_contains(strtolower($search), $searchCommand)) {
+                return $packageType;
+            }
+        }
+
+        return null;
+    }
+
+    private function removeTypeCommandFromSearch(string $search): string
+    {
+        return trim(preg_replace(PackageType::getTypeCommandPattern(), '', $search));
     }
 }

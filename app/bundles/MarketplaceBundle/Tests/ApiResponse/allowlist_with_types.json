@@ -1,0 +1,25 @@
+{
+    "allowlist": [
+        {
+            "package": "koco/mautic-recaptcha-bundle",
+            "display_name": "KocoCaptcha",
+            "minimum_mautic_version": "4.1.0",
+            "maximum_mautic_version": null,
+            "type": "mautic-plugin"
+        },
+        {
+            "package": "maatoo/mautic-referrals-bundle",
+            "display_name": "Mautic Referrals Bundle",
+            "minimum_mautic_version": "4.1.0",
+            "maximum_mautic_version": null,
+            "type": "mautic-theme"
+        },
+        {
+            "package": "acme/welcome-campaign",
+            "display_name": "Welcome Campaign",
+            "minimum_mautic_version": "5.0.0",
+            "maximum_mautic_version": null,
+            "type": "mautic-campaign"
+        }
+    ]
+}
