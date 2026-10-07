@@ -42,38 +42,6 @@ final class DynamicContentEvents
     public const string POST_DELETE = 'mautic.dwc_post_delete';
 
     /**
-     * The mautic.category_pre_save event is thrown right before a category is persisted.
-     *
-     * The event listener receives a
-     * Mautic\CategoryBundle\Event\CategoryEvent instance.
-     */
-    public const string CATEGORY_PRE_SAVE = 'mautic.category_pre_save';
-
-    /**
-     * The mautic.category_post_save event is thrown right after a category is persisted.
-     *
-     * The event listener receives a
-     * Mautic\CategoryBundle\Event\CategoryEvent instance.
-     */
-    public const string CATEGORY_POST_SAVE = 'mautic.category_post_save';
-
-    /**
-     * The mautic.category_pre_delete event is thrown prior to when a category is deleted.
-     *
-     * The event listener receives a
-     * Mautic\CategoryBundle\Event\CategoryEvent instance.
-     */
-    public const string CATEGORY_PRE_DELETE = 'mautic.category_pre_delete';
-
-    /**
-     * The mautic.category_post_delete event is thrown after a category is deleted.
-     *
-     * The event listener receives a
-     * Mautic\CategoryBundle\Event\CategoryEvent instance.
-     */
-    public const string CATEGORY_POST_DELETE = 'mautic.category_post_delete';
-
-    /**
      * The mautic.asset.on_campaign_trigger_decision event is fired when the campaign decision triggers.
      *
      * The event listener receives a
@@ -88,13 +56,4 @@ final class DynamicContentEvents
      * Mautic\CampaignBundle\Event\PendingEvent
      */
     public const string ON_CAMPAIGN_BATCH_ACTION = 'mautic.dwc.on_campaign_batch_action';
-
-    /**
-     * The mautic.dwc.on_contact_filters_evaluate event is fired when dynamic content's decision's
-     * filters need to be evaluated.
-     *
-     * The event listener receives a
-     * Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent
-     */
-    public const string ON_CONTACTS_FILTER_EVALUATE = 'mautic.dwc.on_contact_filters_evaluate';
 }

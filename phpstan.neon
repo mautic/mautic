@@ -6,7 +6,7 @@ parameters:
     tmpDir: ./var/phpstan-cache
     level: 6
 
-    # reportUnmatchedIgnoredErrors: false
+    reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
 
     # see https://github.com/tomasVotruba/type-coverage
@@ -56,7 +56,7 @@ parameters:
                 - method.unresolvableReturnType
             paths:
                 - */Tests/*
-#                - */Test/*
+                - */Test/*
 
         -
             identifier: argument.type
@@ -84,6 +84,20 @@ parameters:
                 - app/bundles/LeadBundle/Tests/Model/FieldModelTest.php
                 - app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
                 - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
+
+        # shared pre/post events, Campaign same-string collisions and TOKEN_REPLACEMENT reuse block single-argument dispatch here
+        -
+            identifier: mautic.singleArgumentDispatch
+            paths:
+                - app/bundles/CampaignBundle/Executioner/Dispatcher/ConditionDispatcher.php
+                - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
+                - app/bundles/CampaignBundle/Model/EventModel.php
+                - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
+                - app/bundles/EmailBundle/MonitoredEmail/Fetcher.php
+                - app/bundles/FormBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
+                - app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
+                - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
+                - plugins/MauticFocusBundle/Model/FocusModel.php
 
         - identifier: missingType.generics
         # controllers - group missing parameter types to fix later
