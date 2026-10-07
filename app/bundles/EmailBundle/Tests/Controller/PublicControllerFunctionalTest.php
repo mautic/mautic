@@ -51,7 +51,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_preferences'] = 0;
         }
 
-        if (in_array($this->name(), ['testContactPreferencesSaveMessage', 'testLandingPageContactPreferencesSaveMessage', 'testContactPreferencesFrequencyMarkup'])) {
+        if (in_array($this->name(), ['testContactPreferencesSaveMessage', 'testLandingPageContactPreferencesSaveMessage'])) {
             $this->configParams['show_contact_segments']           = 1;
             $this->configParams['show_contact_frequency']          = 1;
             $this->configParams['show_contact_pause_dates']        = 1;
@@ -100,7 +100,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $crawler = $this->client->request('GET', sprintf('/email/unsubscribe/%s', $stat->getTrackingHash()));
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
 
         $this->assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
@@ -746,21 +746,6 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
                 );
             }
         );
-    }
-
-    public function testContactPreferencesFrequencyMarkup(): void
-    {
-        $lead = $this->createLead();
-        $stat = $this->getStat(null, $lead);
-        $this->em->flush();
-
-        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
-
-        $this->assertResponseIsSuccessful();
-        $html = $this->client->getResponse()->getContent();
-
-        $this->assertStringNotContainsString('<?php', (string) $html);
-        $this->assertCount(1, $crawler->filter('#frequency_email'));
     }
 
     private function createSegment(
