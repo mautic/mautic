@@ -171,9 +171,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->run($input, $output);
     }
 
-    protected function installDatabaseFixtures(array $classNames = []): void
+    protected function installDatabaseFixtures(array $classNames = [], bool $append = true): void
     {
-        $this->loadFixtures($classNames);
+        $this->loadFixtures($classNames, $append);
     }
 
     public function setCsrfHeader(string $intention = 'mautic_ajax_post'): void
