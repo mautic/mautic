@@ -60,6 +60,11 @@ class ReportRepository extends CommonRepository
             case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
                 $expr = $q->expr()->eq('IDENTITY(r.createdBy)', $this->currentUser->getId());
                 break;
+            case $this->translator->trans('mautic.report.report.searchcommand.isscheduled'):
+            case $this->translator->trans('mautic.report.report.searchcommand.isscheduled', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('r.isScheduled', ":{$unique}");
+                $forceParameters = [$unique => true];
+                break;
         }
 
         if ($expr && $filter->not) {
@@ -82,6 +87,7 @@ class ReportRepository extends CommonRepository
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.ismine',
+            'mautic.report.report.searchcommand.isscheduled',
         ];
 
         return array_merge($commands, parent::getSearchCommands());
