@@ -53,7 +53,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             .':'.urlencode($data['password'])
             .'@'.urlencode($data['host'])
             .':'.$data['port']
-            .'/'.urlencode($data['path'])
+            .'/'.implode('/', array_map(rawurlencode(...), explode('/', $data['path'])))
             .'?type='.urlencode($data['type'])
         ), $configParameters['mailer_dsn']);
 
@@ -65,7 +65,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($data['scheme'], $form['config[emailconfig][mailer_dsn][scheme]']->getValue());
         $this->assertSame($data['host'], $form['config[emailconfig][mailer_dsn][host]']->getValue());
         $this->assertSame($data['port'], $form['config[emailconfig][mailer_dsn][port]']->getValue());
-        $this->assertSame($data['path'], $form['config[emailconfig][mailer_dsn][path]']->getValue());
+        $this->assertSame('pa%2B%40%24%23/%3A%2A%21th', $form['config[emailconfig][mailer_dsn][path]']->getValue());
         $this->assertSame($data['user'], $form['config[emailconfig][mailer_dsn][user]']->getValue());
         $this->assertSame('🔒', $form['config[emailconfig][mailer_dsn][password]']->getValue());
         $this->assertSame($data['type'], $form['config[emailconfig][mailer_dsn][options][list][0][value]']->getValue());
