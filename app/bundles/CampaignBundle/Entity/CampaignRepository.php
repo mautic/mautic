@@ -87,7 +87,7 @@ class CampaignRepository extends CommonRepository
         }
 
         $q->leftJoin('c.lists', 'll')
-            ->where($this->getPublishedByDateExpression($q));
+            ->where($this->getPublishedByDateOrmExpression($q));
 
         if (!$viewOther) {
             $q->andWhere($q->expr()->eq('c.createdBy', ':id'))
@@ -132,7 +132,7 @@ class CampaignRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c');
 
         $q->join('c', MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'll', 'c.id = ll.campaign_id')
-            ->where($this->getPublishedByDateExpression($q));
+            ->where($this->getPublishedByDateDbalExpression($q));
 
         $q->andWhere(
             $q->expr()->in('ll.leadlist_id', ':leadLists')
@@ -350,7 +350,7 @@ class CampaignRepository extends CommonRepository
             ->groupBy('c.id, c.name')
             ->setMaxResults($limit);
 
-        $expr = $this->getPublishedByDateExpression($q, 'c');
+        $expr = $this->getPublishedByDateDbalExpression($q, 'c');
         $q->where($expr);
 
         return $q->executeQuery()->fetchAllAssociative();
@@ -373,21 +373,17 @@ class CampaignRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $q, $limiter, true);
 
         if (count($pendingEvents) > 0) {
-            $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-            $sq->select('null')
-                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
-                ->where(
-                    $sq->expr()->and(
-                        $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
-                        $sq->expr()->eq('e.rotation', 'cl.rotation'),
-                        $sq->expr()->in('e.event_id', ':pendingEvents')
-                    )
-                );
-            $this->updateQueryFromContactLimiter('e', $sq, $limiter, true);
-
-            $q->andWhere(
-                sprintf('NOT EXISTS (%s)', $sq->getSQL())
+            $q->leftJoin(
+                'cl',
+                MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                'e',
+                $q->expr()->and(
+                    $q->expr()->eq('cl.lead_id', 'e.lead_id'),
+                    $q->expr()->eq('e.rotation', 'cl.rotation'),
+                    $q->expr()->in('e.event_id', ':pendingEvents')
+                )
             )
+                ->andWhere($q->expr()->isNull('e.lead_id'))
                 ->setParameter('pendingEvents', $pendingEvents, ArrayParameterType::INTEGER);
         }
 
@@ -729,7 +725,7 @@ class CampaignRepository extends CommonRepository
                 'clr',
                 MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
                 'log',
-                'clr.lead_id = log.lead_id AND clr.campaign_id = :campaign_id  AND clr.manually_removed = 0
+                'clr.lead_id = log.lead_id AND clr.campaign_id = :campaign_id AND clr.manually_removed = 0
                  AND clr.rotation = log.rotation'
             )
             ->innerJoin(
@@ -752,15 +748,18 @@ class CampaignRepository extends CommonRepository
                 MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
                 'executed',
                 'executed.lead_id = log.lead_id AND executed.campaign_id = :campaign_id
-                AND (executed.event_id = ce.id OR executed.is_scheduled = 1)
-                AND executed.rotation = log.rotation'
+                AND ((executed.event_id = ce.id AND executed.version > 1) OR executed.is_scheduled = 1)
+                AND executed.rotation = log.rotation '
             )
             ->andWhere('executed.event_id IS NULL')
             ->andWhere(
                 $query->expr()->or(
                     $query->expr()->and(
-                        // For decision/condition events, check the decision path
+                        // For condition/decision parents, version > 1 means evaluation completed.
+                        // version = 1 means the job was killed after the DB INSERT but before evaluation —
+                        // children must NOT be picked up; the condition/decision itself must be re-executed.
                         $query->expr()->in('parent.event_type', ["'condition'", "'decision'"]),
+                        $query->expr()->gt('log.version', 1),
                         $query->expr()->or(
                             // "No" path taken
                             $query->expr()->and(
@@ -789,12 +788,10 @@ class CampaignRepository extends CommonRepository
             $query->andWhere('clr.lead_id >= :minLeadId')
                 ->setParameter('minLeadId', $minLeadId);
         }
-
         if ($maxLeadId > 0) {
             $query->andWhere('clr.lead_id <= :maxLeadId')
                 ->setParameter('maxLeadId', $maxLeadId);
         }
-
         if ($recordsAfter) {
             $query->andWhere('clr.date_added >= :minDateForUnStuck')
                 ->setParameter('minDateForUnStuck', $recordsAfter);
@@ -854,7 +851,7 @@ class CampaignRepository extends CommonRepository
         )
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
             ->where('c.deleted IS NULL')
-            ->andWhere($this->getPublishedByDateExpression($query))
+            ->andWhere($this->getPublishedByDateDbalExpression($query))
             ->andWhere(
                 sprintf('EXISTS (%s)', $innerQuery->getSQL())
             )

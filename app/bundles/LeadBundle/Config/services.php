@@ -3,7 +3,11 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyRelationValueFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
@@ -204,6 +208,11 @@ return function (ContainerConfigurator $configurator): void {
         ->call('setUniqueIdentifiersOperator', ['%mautic.contact_unique_identifiers_operator%'])
         ->call('setListLeadRepository', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.lead.repository.list_lead')]);
 
+    $services->set(PrimaryCompanyRelationValueFilterQueryBuilder::class)
+        ->args([service('mautic.lead.model.random_parameter_name'), service('event_dispatcher')]);
+    $services->set(AnyCompanyRelationValueFilterQueryBuilder::class)
+        ->args([service('mautic.lead.model.random_parameter_name'), service('event_dispatcher')]);
+
     $services->alias('mautic.lead.model.field', Mautic\LeadBundle\Model\FieldModel::class);
     $services->alias('mautic.lead.model.list', Mautic\LeadBundle\Model\ListModel::class);
     $services->alias('mautic.lead.model.note', Mautic\LeadBundle\Model\NoteModel::class);
@@ -236,5 +245,9 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.field.settings.background_service', Mautic\LeadBundle\Field\BackgroundService::class);
     $services->alias('mautic.lead.report.dnc_report_service', Mautic\LeadBundle\Report\DncReportService::class);
     $services->alias('mautic.helper.segment.count.cache', Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class);
+    $services->alias('mautic.lead.export_scheduled_notification_subscriber', Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\LeadBundle\EventListener\ContactExportSchedulerNotificationSubscriber::class.'" service instead.');
+    $services->alias('mautic.lead.segment.stat.chart.query.factory', Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class.'" service instead.');
     $services->get(Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class)->tag('validator.constraint_validator');
 };

@@ -80,7 +80,6 @@ return [
             'mautic_email_unsubscribe' => [
                 'path'       => '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAction',
-                'defaults'   => ['urlEmail' => null, 'secretHash' => null],
             ],
             'mautic_email_unsubscribe_all' => [
                 'path'       => '/email/dnc/{idHash}/{urlEmail}/{secretHash}',
@@ -88,8 +87,14 @@ return [
                 'defaults'   => ['urlEmail' => null, 'secretHash' => null],
             ],
             'mautic_email_resubscribe' => [
-                'path'       => '/email/resubscribe/{idHash}',
+                'path'       => '/email/resubscribe/{idHash}/{urlEmail}/{secretHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::resubscribeAction',
+                'defaults'   => ['urlEmail' => null, 'secretHash' => null], // @todo make the secretHash required after a few years.
+            ],
+            'mautic_email_validate_email_form' => [
+                'path'       => '/email/validate/{action}/{secretHash}/{idHash}',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::validateEmailAction',
+                'defaults'   => ['idHash' => null],
             ],
             'mautic_mailer_transport_callback' => [
                 'path'       => '/mailer/callback',
@@ -192,6 +197,7 @@ return [
         'show_contact_preferred_channels'                                   => false,
         'show_contact_categories'                                           => false,
         'show_contact_segments'                                             => false,
+        'validate_unsubscribe_emails'                                       => true,
         'disable_trackable_urls'                                            => false,
         'email_draft_enabled'                                               => false,
         'theme_email_default'                                               => 'blank',
