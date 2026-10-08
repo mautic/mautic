@@ -53,7 +53,7 @@ final class CampaignHelper
      */
     private function getPayload(array $config, Lead $contact): array
     {
-        $payload = !empty($config['additional_data']['list']) ? $config['additional_data']['list'] : '';
+        $payload = empty($config['additional_data']['list']) ? '' : $config['additional_data']['list'];
         $payload = array_flip(AbstractFormFieldHelper::parseList($payload));
 
         return $this->getTokenValues($payload, $contact);
@@ -64,7 +64,7 @@ final class CampaignHelper
      */
     private function getHeaders(array $config, Lead $contact): array
     {
-        $headers = !empty($config['headers']['list']) ? $config['headers']['list'] : '';
+        $headers = empty($config['headers']['list']) ? '' : $config['headers']['list'];
         $headers = array_flip(AbstractFormFieldHelper::parseList($headers));
 
         return $this->getTokenValues($headers, $contact);

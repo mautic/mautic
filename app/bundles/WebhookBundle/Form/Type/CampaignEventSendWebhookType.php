@@ -95,7 +95,7 @@ final class CampaignEventSendWebhookType extends AbstractType
                     'class'          => 'form-control',
                     'postaddon_text' => $this->translator->trans('mautic.core.time.seconds'),
                 ],
-                'data' => !empty($options['data']['timeout']) ? $options['data']['timeout'] : 10,
+                'data' => empty($options['data']['timeout']) ? 10 : $options['data']['timeout'],
             ]
         );
     }

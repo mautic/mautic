@@ -148,13 +148,13 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $isNew = !$email;
 
             $email ??= new Email();
-            $unsubscribeForm = !empty($element['unsubscribeform_id'])
-                ? $this->formRepository->find($element['unsubscribeform_id'])
-                : null;
+            $unsubscribeForm = empty($element['unsubscribeform_id'])
+                ? null
+                : $this->formRepository->find($element['unsubscribeform_id']);
 
-            $preferenceCenter = !empty($element['preference_center_id'])
-                ? $this->pageRepository->find($element['preference_center_id'])
-                : null;
+            $preferenceCenter = empty($element['preference_center_id'])
+                ? null
+                : $this->pageRepository->find($element['preference_center_id']);
 
             $email->setUnsubscribeForm($unsubscribeForm);
             $email->setPreferenceCenter($preferenceCenter);

@@ -863,7 +863,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 // Fill in missing devices
                 $listStats = [];
                 foreach ($devices as $device) {
-                    $listStat    = (!isset($stats[$id][$device])) ? 0 : $stats[$id][$device];
+                    $listStat    = $stats[$id][$device] ?? 0;
                     $listStats[] = $listStat;
 
                     if (!isset($combined[$device])) {
@@ -1399,7 +1399,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         if (!$ignoreDNC) {
             $dnc = $this->emailRepository->getDoNotEmailList($leadIds);
 
-            foreach ($dnc as $removeMeId => $removeMeEmail) {
+            foreach (array_keys($dnc) as $removeMeId) {
                 if ($dncAsError) {
                     $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
                 }

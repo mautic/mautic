@@ -58,8 +58,8 @@ final class AjaxController extends CommonAjaxController
                     $themes[] = $actions['actions'][$type]['formTheme'];
                 }
 
-                $formType        = (!empty($actions['actions'][$type]['formType'])) ? $actions['actions'][$type]['formType'] : null;
-                $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : [];
+                $formType        = (empty($actions['actions'][$type]['formType'])) ? null : $actions['actions'][$type]['formType'];
+                $formTypeOptions = (empty($actions['actions'][$type]['formTypeOptions'])) ? [] : $actions['actions'][$type]['formTypeOptions'];
                 $form            = $formFactory->create(PointActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
                 $html            = $this->renderView('@MauticPoint/Point/actionform.html.twig', [
                     'form'       => $form->createView(),

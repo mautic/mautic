@@ -137,7 +137,7 @@ final class FoursquareIntegration extends SocialIntegration
                             break;
                         }
                     }
-                    $contact            = (!empty($t->contact->formattedPhone)) ? $t->contact->formattedPhone : '';
+                    $contact            = (empty($t->contact->formattedPhone)) ? '' : $t->contact->formattedPhone;
                     $activity['tips'][] = [
                         'createdAt'     => $t->createdAt,
                         'tipText'       => $t->text,

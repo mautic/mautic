@@ -487,15 +487,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Remove the names of the remaining scalar function calls (DATE, CONCAT, …)
         // so only their arguments are scanned for column references.
-        $expression = (string) preg_replace('/\b[A-Za-z_][A-Za-z0-9_]*\s*(?=\()/', ' ', $expression);
+        $expression = (string) preg_replace('/\b[A-Za-z_]\w*\s*(?=\()/', ' ', $expression);
 
         // Match optionally qualified, optionally backtick-quoted identifiers.
-        if (!preg_match_all('/`?([A-Za-z_][A-Za-z0-9_]*)`?(?:\.`?([A-Za-z_][A-Za-z0-9_]*)`?)?/', $expression, $matches)) {
+        if (!preg_match_all('/`?([A-Za-z_]\w*)`?(?:\.`?([A-Za-z_]\w*)`?)?/', $expression, $matches)) {
             return [];
         }
 
         $columns = [];
-        foreach ($matches[0] as $index => $match) {
+        foreach (array_keys($matches[0]) as $index) {
             if (in_array(strtoupper($matches[1][$index]), self::SQL_KEYWORD_TOKENS, true)) {
                 continue;
             }
@@ -717,7 +717,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                 switch ($exprFunction) {
                                     case 'like':
                                     case 'notLike':
-                                        $filter['value'] = !str_contains($filter['value'], '%') ? '%'.$filter['value'].'%' : $filter['value'];
+                                        $filter['value'] = str_contains($filter['value'], '%') ? $filter['value'] : '%'.$filter['value'].'%';
                                         break;
                                     case 'startsWith':
                                         $exprFunction    = 'like';

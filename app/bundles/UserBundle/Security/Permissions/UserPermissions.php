@@ -49,7 +49,7 @@ final class UserPermissions extends AbstractPermissions
                     'mautic.user.account.permissions.editall'      => 'full',
                 ],
                 'label'  => 'mautic.user.permissions.profile',
-                'data'   => (!empty($data['profile']) ? $data['profile'] : []),
+                'data'   => (empty($data['profile']) ? [] : $data['profile']),
                 'bundle' => 'user',
                 'level'  => 'profile',
             ]

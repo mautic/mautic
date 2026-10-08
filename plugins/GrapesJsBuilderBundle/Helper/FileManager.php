@@ -267,10 +267,10 @@ final readonly class FileManager
                 $svgAttributes = $svg->attributes();
 
                 // Try to get width and height directly
-                if (isset($svgAttributes->width) && isset($svgAttributes->height)) {
+                if (property_exists($svgAttributes, 'width') && null !== $svgAttributes->width && (property_exists($svgAttributes, 'height') && null !== $svgAttributes->height)) {
                     $info['width']  = (int) $svgAttributes->width;
                     $info['height'] = (int) $svgAttributes->height;
-                } elseif (isset($svgAttributes->viewBox)) {
+                } elseif (property_exists($svgAttributes, 'viewBox') && null !== $svgAttributes->viewBox) {
                     // Parse the viewBox attribute (format: "x y width height")
                     $viewBox = explode(' ', (string) $svgAttributes->viewBox);
                     if (4 === count($viewBox)) {

@@ -862,7 +862,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 foreach ($prateek as $value) {
                     $list       = $this->leadListRepository->findOneByAlias($value);
-                    $imploder[] = ((!empty($list)) ? (int) $list->getId() : 0);
+                    $imploder[] = ((empty($list)) ? 0 : (int) $list->getId());
                 }
 
                 // logic. In query, Sum(manually_removed) should be less than the current)

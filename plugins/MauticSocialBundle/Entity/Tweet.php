@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Table(name: 'tweets')]
 #[ORM\Entity(repositoryClass: TweetRepository::class)]
@@ -51,6 +50,7 @@ class Tweet extends FormEntity
      *
      * @var string
      */
+    #[Assert\Length(max: 280)]
     private $text;
 
     /**
@@ -178,16 +178,6 @@ class Tweet extends FormEntity
                 ]
             )
             ->build();
-    }
-
-    /**
-     * Constraints for required fields.
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('text', new Assert\Length(
-            max: 280
-        ));
     }
 
     /**

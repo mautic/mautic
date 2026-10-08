@@ -225,7 +225,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
         foreach ($sessionEvents as $properties) {
             $isNew = (!empty($properties['id']) && isset($existingEvents[$properties['id']])) ? false : true;
-            $event = !$isNew ? $existingEvents[$properties['id']] : new Event(new \DateTime());
+            $event = $isNew ? new Event(new \DateTime()) : $existingEvents[$properties['id']];
 
             foreach ($properties as $f => $v) {
                 if ('id' == $f && str_starts_with($v, 'new')) {
@@ -287,7 +287,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                 if (isset($connection['anchors']['source'])) {
                     $sourceDecision = $connection['anchors']['source'];
                 } else {
-                    $sourceDecision = (!empty($connection['anchors'][0])) ? $connection['anchors'][0]['endpoint'] : null;
+                    $sourceDecision = (empty($connection['anchors'][0])) ? null : $connection['anchors'][0]['endpoint'];
                 }
 
                 if ('leadsource' == $sourceDecision) {
@@ -303,7 +303,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         // Assign parent/child relationships
-        foreach ($events as $id => $e) {
+        foreach (array_keys($events) as $id) {
             if (isset($relationships[$id])) {
                 // Has a parent
                 $anchor = in_array($relationships[$id]['decision'], ['yes', 'no']) ? $relationships[$id]['decision'] : null;

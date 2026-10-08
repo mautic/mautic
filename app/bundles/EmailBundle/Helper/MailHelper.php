@@ -1920,7 +1920,7 @@ class MailHelper
             'hashIdState' => $this->idHashState,
             'source'      => $this->source,
             'tokens'      => $tokens,
-            'utmTags'     => (!empty($this->email)) ? $this->email->getUtmTags() : [],
+            'utmTags'     => (empty($this->email)) ? [] : $this->email->getUtmTags(),
             'includeDnc'  => !empty($this->email) && $this->email->getSendToDnc(),
         ];
     }

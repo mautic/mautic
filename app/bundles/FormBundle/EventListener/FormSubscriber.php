@@ -215,7 +215,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $key = (!empty($config[$field['alias']])) ? $config[$field['alias']] : $field['alias'];
+            $key = (empty($config[$field['alias']])) ? $field['alias'] : $config[$field['alias']];
 
             // Use the cleaned value by default - but if set to not save result, get from post
             $value               = $results[$field['alias']] ?? $post[$field['alias']];
@@ -412,7 +412,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
      */
     private function getEmailsFromString(?string $emailString): array
     {
-        return (!empty($emailString)) ? array_fill_keys(array_map(trim(...), explode(',', $emailString)), null) : [];
+        return (empty($emailString)) ? [] : array_fill_keys(array_map(trim(...), explode(',', $emailString)), null);
     }
 
     /**

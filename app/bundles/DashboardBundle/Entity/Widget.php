@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Widget extends FormEntity
 {
@@ -40,6 +39,7 @@ class Widget extends FormEntity
     /**
      * @var string
      */
+    #[NotBlank(message: 'mautic.core.type.required')]
     private $type;
 
     /**
@@ -96,11 +96,6 @@ class Widget extends FormEntity
         $builder->addNullableField('cacheTimeout', Types::INTEGER, 'cache_timeout');
         $builder->addNullableField('ordering', Types::INTEGER);
         $builder->addNullableField('params', Types::ARRAY);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('type', new NotBlank(message: 'mautic.core.type.required'));
     }
 
     /**

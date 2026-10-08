@@ -9,7 +9,6 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class PointInsight extends FormEntity
 {
@@ -19,6 +18,7 @@ class PointInsight extends FormEntity
 
     private ?int $id = null;
 
+    #[Assert\NotBlank(message: 'mautic.core.name.required')]
     private string $name = '';
 
     /**
@@ -29,11 +29,13 @@ class PointInsight extends FormEntity
     /**
      * @var string
      */
+    #[Assert\NotBlank(message: 'mautic.point.insight.type.required')]
     private $insightType = self::INSIGHT_TYPE_COMPARE_POINT_GROUPS;
 
     /**
      * @var string
      */
+    #[Assert\NotBlank(message: 'mautic.point.insight.action.required')]
     private $insightAction = self::INSIGHT_ACTION_SET_CUSTOM_FIELD;
 
     /**
@@ -85,15 +87,6 @@ class PointInsight extends FormEntity
             ->build();
 
         $builder->addCategory();
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
-
-        $metadata->addPropertyConstraint('insightType', new Assert\NotBlank(message: 'mautic.point.insight.type.required'));
-
-        $metadata->addPropertyConstraint('insightAction', new Assert\NotBlank(message: 'mautic.point.insight.action.required'));
     }
 
     /**

@@ -79,7 +79,7 @@ final class FocusType extends AbstractType
             [
                 'label'      => 'mautic.focus.form.html_mode',
                 'label_attr' => ['class' => 'control-label'],
-                'data'       => !empty($options['data']->getHtmlMode()) ? $options['data']->getHtmlMode() : 'basic',
+                'data'       => empty($options['data']->getHtmlMode()) ? 'basic' : $options['data']->getHtmlMode(),
                 'attr'       => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.focusUpdatePreview()',

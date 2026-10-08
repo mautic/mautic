@@ -680,8 +680,8 @@ final class LeadApiController extends CommonApiController
         // Batch DNC settings
         if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {
             foreach ($parameters['doNotContact'] as $dnc) {
-                $channel  = !empty($dnc['channel']) ? $dnc['channel'] : 'email';
-                $comments = !empty($dnc['comments']) ? $dnc['comments'] : '';
+                $channel  = empty($dnc['channel']) ? 'email' : $dnc['channel'];
+                $comments = empty($dnc['comments']) ? '' : $dnc['comments'];
 
                 $reason = (int) ArrayHelper::getValue('reason', $dnc, DoNotContact::MANUAL);
 

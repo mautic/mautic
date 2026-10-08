@@ -248,7 +248,7 @@ class PathsHelper
         if (in_array($name, $webrootRelativePaths, true)) {
             $rootPath = $this->localRoot;
         } else {
-            $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
+            $rootPath = (empty($this->paths[$name.'_root'])) ? $this->paths['root'] : $this->paths[$name.'_root'];
         }
 
         if (!str_contains($path, $rootPath)) {

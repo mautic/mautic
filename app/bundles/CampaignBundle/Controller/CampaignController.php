@@ -700,7 +700,7 @@ class CampaignController extends AbstractStandardFormController
                 'route'         => $this->generateUrl(
                     'mautic_campaign_action',
                     [
-                        'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
+                        'objectAction' => (empty($valid) ? 'new' : 'edit'), // valid means a new form was applied
                         'objectId'     => ($campaign) ? $campaign->getId() : 0,
                     ]
                 ),

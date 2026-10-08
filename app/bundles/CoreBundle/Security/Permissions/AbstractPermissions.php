@@ -319,7 +319,7 @@ abstract class AbstractPermissions
         $builder->add("{$bundle}:{$level}", PermissionListType::class, [
             'choices' => $choices,
             'label'   => $label,
-            'data'    => (!empty($data[$level]) ? $data[$level] : []),
+            'data'    => (empty($data[$level]) ? [] : $data[$level]),
             'bundle'  => $bundle,
             'level'   => $level,
         ]);
@@ -384,7 +384,7 @@ abstract class AbstractPermissions
                 'label'             => $label,
                 'bundle'            => $bundle,
                 'level'             => $level,
-                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+                'data'              => (empty($data[$level]) ? [] : $data[$level]),
             ]
         );
     }
@@ -438,7 +438,7 @@ abstract class AbstractPermissions
             [
                 'choices'           => $choices,
                 'label'             => "mautic.{$bundle}.permissions.{$level}",
-                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+                'data'              => (empty($data[$level]) ? [] : $data[$level]),
                 'bundle'            => $bundle,
                 'level'             => $level,
             ]
@@ -511,7 +511,7 @@ abstract class AbstractPermissions
                 'choices'           => $choices,
                 'choices_as_values' => true,
                 'label'             => $this->getLabel($bundle, $level),
-                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+                'data'              => (empty($data[$level]) ? [] : $data[$level]),
                 'bundle'            => $bundle,
                 'level'             => $level,
             ]

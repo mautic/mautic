@@ -43,10 +43,10 @@ trait PushToIntegrationTrait
      */
     protected static function pushIt(array $config, $lead, &$errors): bool
     {
-        $integration             = (!empty($config['integration'])) ? $config['integration'] : null;
-        $integrationCampaign     = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;
-        $integrationMemberStatus = (!empty($config['campaign_member_status']['campaign_member_status']))
-            ? $config['campaign_member_status']['campaign_member_status'] : null;
+        $integration             = (empty($config['integration'])) ? null : $config['integration'];
+        $integrationCampaign     = (empty($config['config']['campaigns'])) ? null : $config['config']['campaigns'];
+        $integrationMemberStatus = (empty($config['campaign_member_status']['campaign_member_status']))
+            ? null : $config['campaign_member_status']['campaign_member_status'];
         $services = static::$integrationHelper->getIntegrationObjects($integration);
         $success  = true;
 

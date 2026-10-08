@@ -275,7 +275,7 @@ class CorePermissions implements ResetInterface
         // Generate all permission objects in case they haven't been already.
         $this->getPermissionObjects();
 
-        $checkPermissions = (!is_array($permission)) ? [$permission] : $permission;
+        $checkPermissions = (is_array($permission)) ? $permission : [$permission];
 
         $result = [];
         foreach ($checkPermissions as $p) {

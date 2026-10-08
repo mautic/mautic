@@ -103,8 +103,8 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
                 $menu = $bundle['config']['menu'][$name];
                 $event->addMenuItems(
                     [
-                        'priority' => !isset($menu['priority']) ? 9999 : $menu['priority'],
-                        'items'    => !isset($menu['items']) ? $menu : $menu['items'],
+                        'priority' => $menu['priority'] ?? 9999,
+                        'items'    => $menu['items'] ?? $menu,
                     ]
                 );
             }
@@ -217,7 +217,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
 
             foreach ($bundles as $bundle) {
                 if (!empty($bundle['config']['menu']['main'])) {
-                    $items = (!isset($bundle['config']['menu']['main']['items']) ? $bundle['config']['menu']['main'] : $bundle['config']['menu']['main']['items']);
+                    $items = ($bundle['config']['menu']['main']['items'] ?? $bundle['config']['menu']['main']);
                 }
 
                 if (!empty($items)) {
@@ -248,7 +248,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
     private function addRouteToCollection(RouteCollection $collection, string $type, string $name, array $details): void
     {
         // Set defaults and controller
-        $defaults = (!empty($details['defaults'])) ? $details['defaults'] : [];
+        $defaults = (empty($details['defaults'])) ? [] : $details['defaults'];
         if (isset($details['controller'])) {
             $defaults['_controller'] = $details['controller'];
         }
@@ -264,7 +264,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
             $method = ['GET'];
         }
         // Set requirements
-        $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
+        $requirements = (empty($details['requirements'])) ? [] : $details['requirements'];
 
         // Set some very commonly used defaults and requirements
         if (str_contains($details['path'], '{page}')) {

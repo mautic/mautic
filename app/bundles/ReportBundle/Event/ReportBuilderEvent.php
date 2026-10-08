@@ -252,7 +252,7 @@ class ReportBuilderEvent extends AbstractReportEvent
 
             $hasFields = array_key_exists('fields', $reportDetails) && is_array($reportDetails['fields']);
 
-            foreach ($channelColumns as $column => $definition) {
+            foreach (array_keys($channelColumns) as $column) {
                 $channelColumnName = $hasFields && array_key_exists($column, $reportDetails['fields'])
                     ? $reportDetails['fields'][$column]
                     : str_replace('channel.', $channel.'.', $column);

@@ -53,6 +53,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[EntityEvent]
+#[MediaMaxAllowedSize]
 /**
  * @use TranslationEntityTrait<Sms>
  * @use VariantEntityTrait<Sms>
@@ -76,6 +78,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      * @var string
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -135,6 +138,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      * @var array<mixed>
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[Count(max: 10, maxMessage: 'mautic.sms.form.max.media.error')]
     private array $media = [];
 
     #[Groups(['sms:read', 'sms:write'])]
@@ -224,16 +228,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint(
-            'name',
-            new NotBlank(message: 'mautic.core.name.required')
-        );
-
-        $metadata->addPropertyConstraint(
-            'media',
-            new Count(max: 10, maxMessage: 'mautic.sms.form.max.media.error')
-        );
-
         $metadata->addConstraint(new Callback(
             function (Sms $sms, ExecutionContextInterface $context): void {
                 $type      = $sms->getSmsType();
@@ -255,9 +249,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
                 }
             },
         ));
-
-        $metadata->addConstraint(new EntityEvent());
-        $metadata->addConstraint(new MediaMaxAllowedSize());
     }
 
     /**

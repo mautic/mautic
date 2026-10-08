@@ -77,7 +77,7 @@ final class TwitterType extends AbstractType
             'no_value'  => 'medium',
             'yes_value' => 'large',
             'label'     => 'mautic.integration.Twitter.share.largesize',
-            'data'      => (!empty($options['data']['size'])) ? $options['data']['size'] : 'medium',
+            'data'      => (empty($options['data']['size'])) ? 'medium' : $options['data']['size'],
         ]);
     }
 

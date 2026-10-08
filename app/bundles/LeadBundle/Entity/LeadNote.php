@@ -9,7 +9,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class LeadNote extends FormEntity
 {
@@ -26,6 +25,7 @@ class LeadNote extends FormEntity
     /**
      * @var string
      */
+    #[NotBlank(message: 'mautic.lead.note.text.notblank')]
     private $text;
 
     /**
@@ -124,16 +124,6 @@ class LeadNote extends FormEntity
     public function getType()
     {
         return $this->type;
-    }
-
-    /**
-     * Form validation rules.
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('text', new NotBlank(
-            message: 'mautic.lead.note.text.notblank'
-        ));
     }
 
     /**
