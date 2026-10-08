@@ -106,6 +106,8 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertSearchResult('segment%3A'.$list->getAlias().'%20!source%3Amanually_added', [$leadOne, $leadThree], [$leadTwo]);
         $this->assertSearchResult('!source%3Amanually_added%20segment%3A'.$list->getAlias(), [$leadOne, $leadThree], [$leadTwo]);
         $this->assertSearchResult('source%3Amanually_added', [], [$leadOne, $leadTwo, $leadThree]);
+        $this->assertSearchResult('!segment%3A'.$list->getAlias().'%20source%3Amanually_added', [], [$leadOne, $leadTwo, $leadThree]);
+        $this->assertSearchResult('source%3Amanually_added%20!segment%3A'.$list->getAlias(), [], [$leadOne, $leadTwo, $leadThree]);
     }
 
     /**

@@ -1584,6 +1584,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if ($filters instanceof \stdClass) {
             if (isset($filters->command, $filters->string) && in_array($filters->command, $listCommands, true)) {
+                if ($filters->not ?? false) {
+                    return;
+                }
+
                 $alias = (string) $filters->string;
                 if (!array_key_exists($alias, $segmentIdsByAlias)) {
                     $segmentIdsByAlias[$alias] = $this->getListIdsByAlias($alias) ?: [0];
