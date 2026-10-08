@@ -51,6 +51,7 @@ final readonly class EmailPreviewHelper
         }
 
         $contact['companies'] = $companies;
+        $contact['email'] ??= '[Email]';
 
         // Generate and replace tokens
         $event = new EmailSendEvent(
