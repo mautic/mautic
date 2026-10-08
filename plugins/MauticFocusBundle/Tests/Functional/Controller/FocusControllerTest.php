@@ -11,6 +11,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 final class FocusControllerTest extends MauticMysqlTestCase
 {
+    private const EDIT_URL = '/s/focus/edit/';
+
+    private const BELOW_ONE_ERROR = 'This value should be 1 or more.';
+
     public function testFocusWithProject(): void
     {
         $focus = new Focus();
@@ -26,7 +30,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/focus/edit/'.$focus->getId());
+        $crawler = $this->client->request('GET', self::EDIT_URL.$focus->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['focus[projects]']->setValue((string) $project->getId());
 
@@ -43,7 +47,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
     {
         $focus = $this->createNoticeFocus();
 
-        $crawler = $this->client->request('GET', '/s/focus/edit/'.$focus->getId());
+        $crawler = $this->client->request('GET', self::EDIT_URL.$focus->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['focus[properties][frequency]']->setValue('days');
         $form['focus[properties][frequency_days]']->setValue('7');
@@ -64,7 +68,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
     {
         $focus = $this->createNoticeFocus();
 
-        $crawler = $this->client->request('GET', '/s/focus/edit/'.$focus->getId());
+        $crawler = $this->client->request('GET', self::EDIT_URL.$focus->getId());
         $form    = $crawler->selectButton('Save')->form();
         $form['focus[properties][frequency]']->setValue('days');
         $form['focus[properties][frequency_days]']->setValue('7');
@@ -87,9 +91,9 @@ final class FocusControllerTest extends MauticMysqlTestCase
     public static function provideInvalidNumbers(): iterable
     {
         yield 'every X days without a number' => ['frequency_days', '', 'Enter after how many days the focus should engage the visitor again.'];
-        yield 'every 0 days' => ['frequency_days', '0', 'This value should be 1 or more.'];
-        yield 'from page view 0' => ['min_page_views', '0', 'This value should be 1 or more.'];
-        yield 'from a negative page view' => ['min_page_views', '-1', 'This value should be 1 or more.'];
+        yield 'every 0 days' => ['frequency_days', '0', self::BELOW_ONE_ERROR];
+        yield 'from page view 0' => ['min_page_views', '0', self::BELOW_ONE_ERROR];
+        yield 'from a negative page view' => ['min_page_views', '-1', self::BELOW_ONE_ERROR];
     }
 
     private function createNoticeFocus(): Focus

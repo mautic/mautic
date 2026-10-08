@@ -156,6 +156,38 @@ final class PropertiesType extends AbstractType
             ]
         );
 
+        $this->addEngagementCountFields($builder);
+
+        $builder->add(
+            'stop_after_conversion',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.focus.form.engage_after_conversion',
+                'data'  => $options['data']['stop_after_conversion'] ?? true,
+                'attr'  => [
+                    'tooltip' => 'mautic.focus.form.engage_after_conversion.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'stop_after_close',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.focus.form.stop_after_close',
+                'data'  => $options['data']['stop_after_close'] ?? false,
+                'attr'  => [
+                    'tooltip' => 'mautic.focus.form.stop_after_close.tooltip',
+                ],
+            ]
+        );
+    }
+
+    /**
+     * The number of days between engagements and the page view to engage from.
+     */
+    private function addEngagementCountFields(FormBuilderInterface $builder): void
+    {
         $builder->add(
             'frequency_days',
             IntegerType::class,
@@ -185,30 +217,6 @@ final class PropertiesType extends AbstractType
                 ],
                 'required'    => false,
                 'constraints' => [new Range(min: 1)],
-            ]
-        );
-
-        $builder->add(
-            'stop_after_conversion',
-            YesNoButtonGroupType::class,
-            [
-                'label' => 'mautic.focus.form.engage_after_conversion',
-                'data'  => $options['data']['stop_after_conversion'] ?? true,
-                'attr'  => [
-                    'tooltip' => 'mautic.focus.form.engage_after_conversion.tooltip',
-                ],
-            ]
-        );
-
-        $builder->add(
-            'stop_after_close',
-            YesNoButtonGroupType::class,
-            [
-                'label' => 'mautic.focus.form.stop_after_close',
-                'data'  => $options['data']['stop_after_close'] ?? false,
-                'attr'  => [
-                    'tooltip' => 'mautic.focus.form.stop_after_close.tooltip',
-                ],
             ]
         );
     }
