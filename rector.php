@@ -8,6 +8,7 @@ use Utils\Rector\UnserializeToSerializerDecodeRector;
 return RectorConfig::configure()
     ->withPaths([
         __DIR__.'/app/bundles',
+        __DIR__.'/app/tests',
         __DIR__.'/plugins',
         // __DIR__.'/utils',
     ])
@@ -72,11 +73,11 @@ return RectorConfig::configure()
 
         // test fixtures
         __DIR__.'/plugins/*/node_modules/*',
-        __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Helper/resource/',
+        __DIR__.'/app/tests/CoreBundle/Tests/Unit/Helper/resource/',
 
         UnserializeToSerializerDecodeRector::class => [
             // tests
-            __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+            __DIR__.'/app/tests/UserBundle/Tests/Entity/UserTest.php',
             // reproduces what DBAL's own ArrayType did before DBAL 4 removed it: the objects
             // have to be unserialized so that convertToPHPValue can drop the ones that would
             // carry null bytes. Serializer::decode() refuses the whole value instead, which
@@ -104,7 +105,7 @@ return RectorConfig::configure()
 
         // test fixture
         Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
+            __DIR__.'/app/tests/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
     ])
     ->reportUnusedSkips();
