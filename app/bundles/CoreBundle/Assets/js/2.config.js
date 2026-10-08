@@ -61,5 +61,6 @@ Mautic.configOnLoad = function(container) {
             }
         });
     });
+    Mautic.observeConfigTabs();
 };
 
