@@ -61,17 +61,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
         ],
 
-        Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
-            // doctrine magic
-            __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
-        ],
-
-        // getEntities() is declared iterable, but callers rely on the countable Paginator it returns
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class => [
-            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
-            __DIR__.'/app/bundles/DynamicContentBundle/Tests/Unit/Helper/DynamicContentHelperTest.php',
-        ],
-
         // test fixtures
         __DIR__.'/plugins/*/node_modules/*',
         __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Helper/resource/',
@@ -101,7 +90,6 @@ return RectorConfig::configure()
 
         // modified with reflection
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
-            __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
         ],
 
