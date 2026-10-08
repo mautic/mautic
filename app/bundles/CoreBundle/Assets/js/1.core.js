@@ -733,8 +733,8 @@ var Mautic = {
         //dismiss modal if activated
         Mautic.dismissConfirmation();
 
-        if (action.indexOf('batchExport') >= 0) {
-            delete Mautic.activeActions[action]
+        if (action.includes('batchExport')) {
+            delete Mautic.activeActions[action];
             Mautic.initiateFileDownload(action);
             return;
         }
