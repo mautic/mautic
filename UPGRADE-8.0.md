@@ -12,7 +12,7 @@
     |---|---|
     | `CAMPAIGN_ON_LEADCHANGE` | `CampaignSingleLeadChangeEvent` |
     | `LEAD_CAMPAIGN_BATCH_CHANGE` | `CampaignBatchLeadChangeEvent` |
-- Constant `CONFIG_ON_GENERATE` removed from `Mautic\ConfigBundle\ConfigEvents`. The config-generate event is now dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `Mautic\ConfigBundle\Event\ConfigBuilderEvent::class` instead of the constant, e.g. `ConfigBuilderEvent::class => 'onConfigGenerate'`. The `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants are intentionally kept - they share one mutable `ConfigEvent` object whose state is carried from the pre-save to the post-save dispatch, so they still dispatch by name.
+- Constant `CONFIG_ON_GENERATE` removed from `Mautic\ConfigBundle\ConfigEvents`. The config-generate event is now dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `Mautic\ConfigBundle\Event\ConfigBuilderEvent::class` instead of the constant, e.g. `ConfigBuilderEvent::class => 'onConfigGenerate'`. The `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants were also removed - see the `ConfigEvents` entry below.
 - Class `Mautic\IntegrationsBundle\IntegrationEvents` removed entirely, along with its constants `INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES`, `INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES`, `INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD`, `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD`, `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` and `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION`. These events are now dispatched by their own event class (all under `Mautic\IntegrationsBundle\Event`). `InternalContactEvent`, `InternalCompanyEvent` and `CompletedSyncIterationEvent` each used to be dispatched under two different constants; they are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `InternalContactFieldChangesEvent::class => 'onContactFieldChanges'`.
 
     | Removed `IntegrationEvents` constant | New event class |
@@ -178,7 +178,7 @@
 - Deprecated class `Mautic\CoreBundle\Helper\EmojiMap\UnicodeToShortEmojiMap` removed with no replacement.
 - Class `Mautic\CoreBundle\Helper\EmojiHelper` removed with no replacement. All emoji conversion calls were dropped; emoji are stored and rendered as UTF-8 (`utf8mb4`) directly.
 - Emoji sprite stylesheet `app/bundles/CoreBundle/Assets/css/libraries/emoji/` (`_emoji.scss` + `emoji.png`) removed together with its `@import` in `_libraries.scss`. It styled the `span.emoji-sizer`/`.emoji-outer`/`.emoji-inner` markup that `EmojiHelper::toHtml()` used to emit, which is no longer produced. Custom themes relying on those classes must ship their own CSS.
-- Deprecated constant `Mautic\CampaignBundle\CampaignEvents::ON_EVENT_EXECUTION` (`mautic.campaign_on_event_execution`) removed. Listen to `CampaignEvents::ON_EVENT_EXECUTED` and `CampaignEvents::ON_EVENT_FAILED` instead.
+- Deprecated constant `Mautic\CampaignBundle\CampaignEvents::ON_EVENT_EXECUTION` (`mautic.campaign_on_event_execution`) removed. Listen to the `Mautic\CampaignBundle\Event\ExecutedEvent` and `FailedEvent` event classes instead.
 - Deprecated constant `Mautic\CampaignBundle\CampaignEvents::ON_EVENT_DECISION_TRIGGER` (`mautic.campaign_on_event_decision_trigger`) removed. Listen to `CampaignEvents::ON_EVENT_DECISION_EVALUATION` instead.
 - Deprecated class `Mautic\CampaignBundle\Event\CampaignDecisionEvent` removed. It was only dispatched with the removed `ON_EVENT_DECISION_TRIGGER` event. Use `Mautic\CampaignBundle\Event\DecisionEvent` instead.
 - Methods `Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher::dispatchExecutionEvents()` and `::dispatchDecisionEvent()` removed, as they only dispatched the removed events.
@@ -363,6 +363,33 @@
     |---|---|
     | `INTEGRATION_CONFIG_BEFORE_SAVE` | `ConfigBeforeSaveEvent` |
     | `INTEGRATION_CONFIG_AFTER_SAVE` | `ConfigAfterSaveEvent` |
+- Class `Mautic\ConfigBundle\ConfigEvents` removed with its `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants. These events are now dispatched by their own event class (both under `Mautic\ConfigBundle\Event`). The two events used to share one `ConfigEvent` object; each event now gets a dedicated subclass of `ConfigEvent`, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ConfigPreSaveEvent::class => 'onConfigSave'`.
+
+    | Removed `ConfigEvents` constant | New event class |
+    |---|---|
+    | `CONFIG_PRE_SAVE` | `ConfigPreSaveEvent` |
+    | `CONFIG_POST_SAVE` | `ConfigPostSaveEvent` |
+- Constants removed from `Mautic\CampaignBundle\CampaignEvents`. These events are dispatched by their own event class (Symfony 4.3+, all under `Mautic\CampaignBundle\Event`), so the constants were only backwards-compatibility shims and are now gone. Subscribe to the event class instead of the constant, e.g. `CampaignBuilderEvent::class => 'onCampaignBuild'`.
+
+    | Removed `CampaignEvents` constant | New event class |
+    |---|---|
+    | `ON_CAMPAIGN_DELETE` | `DeleteCampaign` |
+    | `CAMPAIGN_ON_BUILD` | `CampaignBuilderEvent` |
+    | `CAMPAIGN_ON_TRIGGER` | `CampaignTriggerEvent` |
+    | `ON_EVENT_EXECUTED` | `ExecutedEvent` |
+    | `ON_EVENT_DELETE` | `DeleteEvent` |
+    | `ON_EVENT_EXECUTED_BATCH` | `ExecutedBatchEvent` |
+    | `ON_EVENT_SCHEDULED` | `ScheduledEvent` |
+    | `ON_EVENT_SCHEDULED_BATCH` | `ScheduledBatchEvent` |
+    | `ON_EVENT_FAILED` | `FailedEvent` |
+    | `ON_EVENT_DECISION_EVALUATION_RESULTS` | `DecisionResultsEvent` |
+    | `ON_CAMPAIGN_FAILURE_NOTIFY` | `NotifyOfFailureEvent` |
+    | `ON_CAMPAIGN_UNPUBLISH_NOTIFY` | `NotifyOfUnpublishEvent` |
+- Constants removed from `Mautic\DynamicContentBundle\DynamicContentEvents`:
+    - `ON_CONTACTS_FILTER_EVALUATE` - the event is dispatched by its event class, so subscribe to `Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent::class` instead.
+    - `CATEGORY_PRE_SAVE`, `CATEGORY_POST_SAVE`, `CATEGORY_PRE_DELETE` and `CATEGORY_POST_DELETE` - unused duplicates of the `Mautic\CategoryBundle\CategoryEvents` constants (same string values); key on `CategoryEvents` instead.
+- Constant `PLUGIN_ON_INTEGRATION_REQUEST` removed from `Mautic\PluginBundle\PluginEvents`; it was unused, with no dispatcher or listener.
+- Constants `ADD_DONOT_CONTACT` and `REMOVE_DONOT_CONTACT` removed from `Mautic\LeadBundle\Event\DoNotContactAddEvent` and `DoNotContactRemoveEvent`; they were unused, with no dispatcher or listener.
 
 ## Changed code
 
@@ -382,7 +409,7 @@
      }
     ```
 
-    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, CampaignEvents::CAMPAIGN_ON_BUILD)` becomes `$dispatcher->dispatch($event)`. The `Mautic\CampaignBundle\CampaignEvents` constants are kept for backwards compatibility but are no longer used internally for these events.
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, CampaignEvents::CAMPAIGN_ON_BUILD)` becomes `$dispatcher->dispatch($event)`. The `Mautic\CampaignBundle\CampaignEvents` constants for these events have been removed (see the Removed code section); key on the event class.
 
     Full mapping of old event name to new event class (all in the `Mautic\CampaignBundle\Event` namespace):
 
@@ -472,7 +499,7 @@
      }
     ```
 
-    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL)` becomes `$dispatcher->dispatch($event)`. The `Mautic\PluginBundle\PluginEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class (e.g. the `PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT` / `_KEYS_DECRYPT` / `_KEYS_MERGE` group and the `PLUGIN_ON_INTEGRATION_REQUEST` / `_RESPONSE` pair) are unchanged.
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL)` becomes `$dispatcher->dispatch($event)`. The `Mautic\PluginBundle\PluginEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class (the `PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT` / `_KEYS_DECRYPT` / `_KEYS_MERGE` group) are unchanged. The unused `PLUGIN_ON_INTEGRATION_REQUEST` constant has been removed (see the Removed code section).
 
     Full mapping of the converted constants to their event class (all in the `Mautic\PluginBundle\Event` namespace):
 
@@ -510,7 +537,7 @@
     | `ChannelEvents::MESSAGE_QUEUED` | `MessageQueueEvent` |
     | `ChannelEvents::PROCESS_MESSAGE_QUEUE` | `MessageQueueProcessEvent` |
     | `ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH` | `MessageQueueBatchProcessEvent` |
-- DynamicContentBundle's `ON_CONTACTS_FILTER_EVALUATE` event is now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\DynamicContentBundle\DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE` string constant. Update any subscriber or listener that keys on that constant to key on `Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent::class` instead, e.g. `$dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)` becomes `$dispatcher->dispatch($event)`. The constant is kept for backwards compatibility but is no longer used internally. The `DynamicContentEvent` CRUD group (`PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE`) shares one event class under four names and is unchanged, as are the cross-bundle `CategoryEvent`, `TokenReplacementEvent` and campaign event constants.
+- DynamicContentBundle's `ON_CONTACTS_FILTER_EVALUATE` event is now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\DynamicContentBundle\DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE` string constant. Update any subscriber or listener that keys on that constant to key on `Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent::class` instead, e.g. `$dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)` becomes `$dispatcher->dispatch($event)`. The `ON_CONTACTS_FILTER_EVALUATE` constant has been removed (see the Removed code section), together with the unused `CATEGORY_PRE_SAVE` / `CATEGORY_POST_SAVE` / `CATEGORY_PRE_DELETE` / `CATEGORY_POST_DELETE` constants. The `DynamicContentEvent` CRUD group (`PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE`) shares one event class under four names and is unchanged.
 - WebhookBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\WebhookBundle\WebhookEvents` string constants. Update any subscriber or listener that keys on one of the converted `WebhookEvents::*` constants to key on the event class instead:
 - PageBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\PageBundle\PageEvents` string constants. Update any subscriber or listener that keys on one of the converted `PageEvents::*` constants (or the raw string name such as `mautic.page_on_hit`) to key on the event class instead:
 

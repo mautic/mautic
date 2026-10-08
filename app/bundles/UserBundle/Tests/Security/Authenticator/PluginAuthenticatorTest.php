@@ -28,7 +28,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -265,7 +264,6 @@ final class PluginAuthenticatorTest extends TestCase
             ->method('dispatch')
             ->with(
                 new InteractiveLoginEvent($request, $token),
-                SecurityEvents::INTERACTIVE_LOGIN
             )
             ->willReturnArgument(0);
 

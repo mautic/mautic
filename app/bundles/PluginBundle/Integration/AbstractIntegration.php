@@ -664,7 +664,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (empty($settings['ignore_event_dispatch'])) {
             $event = $this->dispatcher->dispatch(
                 new PluginIntegrationRequestEvent($this, $url, $parameters, $headers, $method, $settings, $authType),
-                PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST
             );
 
             $headers    = $event->getHeaders();
@@ -814,7 +813,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (empty($settings['ignore_event_dispatch'])) {
             $this->dispatcher->dispatch(
                 new PluginIntegrationResponseEvent($this, $result),
-                PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE
             );
         }
         if (!empty($settings['return_raw'])) {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\EventListener;
 
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigPostSaveEvent;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
@@ -25,7 +25,7 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConfigEvents::CONFIG_POST_SAVE => ['onConfigPostSave', 0],
+            ConfigPostSaveEvent::class => ['onConfigPostSave', 0],
         ];
     }
 

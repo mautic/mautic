@@ -31,8 +31,8 @@ final class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertSame(
             [
-                DoNotContactAddEvent::ADD_DONOT_CONTACT       => ['addDncForLead', 0],
-                DoNotContactRemoveEvent::REMOVE_DONOT_CONTACT => ['removeDncForLead', 0],
+                DoNotContactAddEvent::class       => ['addDncForLead', 0],
+                DoNotContactRemoveEvent::class => ['removeDncForLead', 0],
             ],
             $this->doNotContactSubscriber->getSubscribedEvents()
         );

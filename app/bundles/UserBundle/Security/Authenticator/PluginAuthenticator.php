@@ -27,7 +27,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 final class PluginAuthenticator extends AbstractAuthenticator
@@ -174,8 +173,9 @@ final class PluginAuthenticator extends AbstractAuthenticator
         $session = $request->getSession();
         $session->remove(SecurityRequestAttributes::AUTHENTICATION_ERROR);
 
-        $loginEvent = new InteractiveLoginEvent($request, $token);
-        $this->dispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
+        $interactiveLoginEvent = new InteractiveLoginEvent($request, $token);
+        $this->dispatcher->dispatch($interactiveLoginEvent);
+
         if (null === $token->getResponse()) {
             return $this->authenticationHandler->onAuthenticationSuccess($request, $token);
         }

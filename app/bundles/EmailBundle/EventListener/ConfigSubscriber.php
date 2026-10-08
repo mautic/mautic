@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,7 +22,7 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
     {
         return [
             ConfigBuilderEvent::class => ['onConfigGenerate', 0],
-            ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigBeforeSave', 0],
+            ConfigPreSaveEvent::class    => ['onConfigBeforeSave', 0],
         ];
     }
 
