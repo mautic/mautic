@@ -152,9 +152,9 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        /** @var \stdClass $decoded */
-        $decoded     = json_decode($content);
-        $content     = $decoded->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);
@@ -201,9 +201,9 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        /** @var \stdClass $decoded */
-        $decoded     = json_decode($content);
-        $content     = $decoded->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);
@@ -252,9 +252,9 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$lead->getId());
         $this->assertResponseIsSuccessful();
 
-        /** @var \stdClass $decoded */
-        $decoded     = json_decode($this->client->getResponse()->getContent());
-        $content     = $decoded->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($this->client->getResponse()->getContent());
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $form        = $crawler->filter('form')->form();
 

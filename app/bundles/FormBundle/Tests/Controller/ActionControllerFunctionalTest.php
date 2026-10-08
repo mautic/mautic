@@ -33,9 +33,9 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        /** @var \stdClass $decoded */
-        $decoded     = json_decode($content);
-        $content     = $decoded->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);
@@ -58,8 +58,8 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         // Check the content was not changed
         $this->client->xmlHttpRequest(Request::METHOD_GET, $editPage);
         $this->assertResponseIsSuccessful();
-        /** @var \stdClass $decoded */
-        $decoded = json_decode($this->client->getResponse()->getContent());
-        $this->assertStringContainsString('&lt;p style=&quot;font-family: メイリオ&quot;&gt;Test&lt;/p&gt;', (string) $decoded->newContent);
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($this->client->getResponse()->getContent());
+        $this->assertStringContainsString('&lt;p style=&quot;font-family: メイリオ&quot;&gt;Test&lt;/p&gt;', (string) $decodedContent->newContent);
     }
 }

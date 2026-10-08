@@ -102,9 +102,9 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        /** @var \stdClass $decoded */
-        $decoded     = json_decode($content);
-        $content     = $decoded->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
 
         $this->assertSame('Contact', $crawler->filter('select[id="formfield_mappedObject"]')->filter('option[selected]')->text());
@@ -128,9 +128,9 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        /** @var \stdClass $decoded */
-        $decoded     = json_decode($content);
-        $content     = $decoded->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form[name=formfield]');
         $this->assertCount(1, $formCrawler, $this->client->getResponse()->getContent());

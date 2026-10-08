@@ -49,9 +49,9 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $response = $this->client->getResponse();
-        /** @var \stdClass $decoded */
-        $decoded  = json_decode($response->getContent());
-        $content  = $decoded->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($response->getContent());
+        $content  = $decodedContent->newContent;
         $crawler  = new Crawler($content, $this->client->getInternalRequest()->getUri());
 
         $formValues = $crawler->selectButton('Update')->form()->getPhpValues();
