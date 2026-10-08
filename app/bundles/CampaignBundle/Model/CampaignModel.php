@@ -5,7 +5,6 @@ namespace Mautic\CampaignBundle\Model;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
@@ -169,29 +168,24 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
             throw new MethodNotAllowedHttpException(['Campaign']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = CampaignEvents::CAMPAIGN_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = CampaignEvents::CAMPAIGN_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = CampaignEvents::CAMPAIGN_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = CampaignEvents::CAMPAIGN_POST_DELETE;
-                break;
-            default:
-                return null;
+        $eventClass = match ($action) {
+            'pre_save'    => Events\CampaignPreSaveEvent::class,
+            'post_save'   => Events\CampaignPostSaveEvent::class,
+            'pre_delete'  => Events\CampaignPreDeleteEvent::class,
+            'post_delete' => Events\CampaignPostDeleteEvent::class,
+            default       => null,
+        };
+
+        if (null === $eventClass) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
-                $event = new Events\CampaignEvent($entity, $isNew);
+        if ($this->dispatcher->hasListeners($eventClass)) {
+            if (!$event instanceof $eventClass) {
+                $event = new $eventClass($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($event, $name);
+            $this->dispatcher->dispatch($event);
 
             return $event;
         }

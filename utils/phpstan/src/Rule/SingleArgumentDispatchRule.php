@@ -32,6 +32,11 @@ final class SingleArgumentDispatchRule implements Rule
 
     private const string ERROR_MESSAGE = 'Dispatch the event object alone: ->dispatch($event). The event class is the event name (Symfony 4.3+), so drop the %s second argument.';
 
+    // intentionally dual-dispatched under a dynamic per-type name too; the event class cannot replace the fixed name
+    private const array ALLOWED_EVENT_NAMES = [
+        'CampaignEvents::ON_EVENT_CONDITION_EVALUATION',
+    ];
+
     public function getNodeType(): string
     {
         return MethodCall::class;
@@ -68,6 +73,10 @@ final class SingleArgumentDispatchRule implements Rule
 
         $constantName = $secondArg->name instanceof Identifier ? $secondArg->name->toString() : '';
         $eventNameReference = $secondArg->class->getLast().'::'.$constantName;
+
+        if (in_array($eventNameReference, self::ALLOWED_EVENT_NAMES, true)) {
+            return [];
+        }
 
         $ruleError = RuleErrorBuilder::message(sprintf(self::ERROR_MESSAGE, $eventNameReference))
             ->identifier('mautic.singleArgumentDispatch')

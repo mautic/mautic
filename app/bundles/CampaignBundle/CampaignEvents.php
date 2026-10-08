@@ -7,38 +7,6 @@ namespace Mautic\CampaignBundle;
 final class CampaignEvents
 {
     /**
-     * The mautic.campaign_pre_save event is dispatched right before a form is persisted.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignEvent instance.
-     */
-    public const string CAMPAIGN_PRE_SAVE = 'mautic.campaign_pre_save';
-
-    /**
-     * The mautic.campaign_post_save event is dispatched right after a form is persisted.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignEvent instance.
-     */
-    public const string CAMPAIGN_POST_SAVE = 'mautic.campaign_post_save';
-
-    /**
-     * The mautic.campaign_pre_delete event is dispatched before a form is deleted.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignEvent instance.
-     */
-    public const string CAMPAIGN_PRE_DELETE = 'mautic.campaign_pre_delete';
-
-    /**
-     * The mautic.campaign_post_delete event is dispatched after a form is deleted.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignEvent instance.
-     */
-    public const string CAMPAIGN_POST_DELETE = 'mautic.campaign_post_delete';
-
-    /**
      * The mautic.campaign_on_event_decision_evaluation event is dispatched when a campaign decision is to be evaluated.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\DecisionEvent instance.

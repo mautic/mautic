@@ -19,6 +19,14 @@
     |---|---|
     | `CAMPAIGN_ON_LEADCHANGE` | `CampaignSingleLeadChangeEvent` |
     | `LEAD_CAMPAIGN_BATCH_CHANGE` | `CampaignBatchLeadChangeEvent` |
+- Constants `CAMPAIGN_PRE_SAVE`, `CAMPAIGN_POST_SAVE`, `CAMPAIGN_PRE_DELETE` and `CAMPAIGN_POST_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. These lifecycle events are now dispatched by their own event class (all under `Mautic\CampaignBundle\Event`), each extending `CampaignEvent` so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `CampaignPostSaveEvent::class => 'onCampaignPostSave'`.
+
+    | Removed `CampaignEvents` constant | New event class |
+    |---|---|
+    | `CAMPAIGN_PRE_SAVE` | `CampaignPreSaveEvent` |
+    | `CAMPAIGN_POST_SAVE` | `CampaignPostSaveEvent` |
+    | `CAMPAIGN_PRE_DELETE` | `CampaignPreDeleteEvent` |
+    | `CAMPAIGN_POST_DELETE` | `CampaignPostDeleteEvent` |
 - Constant `CONFIG_ON_GENERATE` removed from `Mautic\ConfigBundle\ConfigEvents`. The config-generate event is now dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `Mautic\ConfigBundle\Event\ConfigBuilderEvent::class` instead of the constant, e.g. `ConfigBuilderEvent::class => 'onConfigGenerate'`. The `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants were also removed - see the `ConfigEvents` entry below.
 - Class `Mautic\IntegrationsBundle\IntegrationEvents` removed entirely, along with its constants `INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES`, `INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES`, `INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD`, `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD`, `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` and `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION`. These events are now dispatched by their own event class (all under `Mautic\IntegrationsBundle\Event`). `InternalContactEvent`, `InternalCompanyEvent` and `CompletedSyncIterationEvent` each used to be dispatched under two different constants; they are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `InternalContactFieldChangesEvent::class => 'onContactFieldChanges'`.
 

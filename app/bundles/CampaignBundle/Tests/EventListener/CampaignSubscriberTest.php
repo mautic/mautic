@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Event\CampaignEvent;
+use Mautic\CampaignBundle\Event\CampaignPostDeleteEvent;
+use Mautic\CampaignBundle\Event\CampaignPostSaveEvent;
 use Mautic\CampaignBundle\EventListener\CampaignSubscriber;
 use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -52,15 +52,15 @@ final class CampaignSubscriberTest extends TestCase
     public function testGetSubscribedEvents(): void
     {
         $this->assertSame([
-            CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
-            CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
+            CampaignPostSaveEvent::class   => ['onCampaignPostSave', 0],
+            CampaignPostDeleteEvent::class => ['onCampaignDelete', 0],
         ], CampaignSubscriber::getSubscribedEvents());
     }
 
     public function testOnCampaignPostSaveNothingHappened(): void
     {
         $campaign            = new Campaign();
-        $event               = new CampaignEvent($campaign);
+        $event               = new CampaignPostSaveEvent($campaign);
 
         $this->auditLogModel->expects($this->never())
             ->method('writeToLog');
@@ -78,7 +78,7 @@ final class CampaignSubscriberTest extends TestCase
         $campaign = new Campaign();
         $campaign->setPublishDown($dateTime);
 
-        $event = new CampaignEvent($campaign);
+        $event = new CampaignPostSaveEvent($campaign);
 
         $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
@@ -117,7 +117,7 @@ final class CampaignSubscriberTest extends TestCase
         $campaign->setPublishUp($dateTime);
         $campaign->setName($campaignName);
 
-        $event = new CampaignEvent($campaign);
+        $event = new CampaignPostSaveEvent($campaign);
 
         $this->campaignAuditService->expects($this->once())
             ->method('addWarningForUnpublishedEmails')
@@ -162,7 +162,7 @@ final class CampaignSubscriberTest extends TestCase
         $campaign->deletedId = $deletedId;
         $campaign->setName($campaignName);
 
-        $event = new CampaignEvent($campaign);
+        $event = new CampaignPostDeleteEvent($campaign);
 
         $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddressFromRequest')
