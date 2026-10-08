@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\EmailBundle\Event\ParseEmailEvent;
+use Mautic\EmailBundle\Event\PreFetchEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Fetcher;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Message;
@@ -57,7 +57,7 @@ final class FetcherTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    #[TestDox('Test that the EmailEvents::EMAIL_PARSE event is dispatched from found messages')]
+    #[TestDox('Test that the ParseEmailEvent event is dispatched from found messages')]
     public function testMessagesAreFetchedAndEventDispatched(): void
     {
         $mailbox = $this->createMock(Mailbox::class);
@@ -70,7 +70,7 @@ final class FetcherTest extends \PHPUnit\Framework\TestCase
         $mailbox->method('getMail')
             ->willReturn(new Message());
 
-        $event      = new ParseEmailEvent();
+        $event      = new PreFetchEmailEvent();
         $dispatcher = $this->createMock(EventDispatcher::class);
         $dispatcher->expects($this->exactly(2))
             ->method('dispatch')

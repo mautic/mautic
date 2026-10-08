@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Organizer;
 
-use Mautic\EmailBundle\Event\ParseEmailEvent;
+use Mautic\EmailBundle\Event\PreFetchEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(MailboxOrganizer::class)]
-#[CoversClass(ParseEmailEvent::class)]
+#[CoversClass(PreFetchEmailEvent::class)]
 final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -58,7 +58,7 @@ final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
     public function testMailboxesAreConvertedIntoASingleContainer(): void
     {
         $configs   = $this->getConfigs($this->mailboxes);
-        $event     = new ParseEmailEvent();
+        $event     = new PreFetchEmailEvent();
         $organizer = new MailboxOrganizer($event, $configs);
         $organizer->organize();
 
@@ -109,7 +109,7 @@ final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $configs   = $this->getConfigs($mailboxes);
-        $event     = new ParseEmailEvent();
+        $event     = new PreFetchEmailEvent();
         $organizer = new MailboxOrganizer($event, $configs);
         $organizer->organize();
 
@@ -122,7 +122,7 @@ final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
     public function testMailboxesWithDifferentCriteriaAreAddedToContainer(): void
     {
         $configs = $this->getConfigs($this->mailboxes);
-        $event   = new ParseEmailEvent();
+        $event   = new PreFetchEmailEvent();
         $event->setCriteriaRequest('EmailBundle', 'replies', Mailbox::CRITERIA_UID.' 1234:*');
         $organizer = new MailboxOrganizer($event, $configs);
         $organizer->organize();
@@ -149,7 +149,7 @@ final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
     public function testMailboxesWithDifferentCriteriaWithUnseenFlagMarksContainer(): void
     {
         $configs = $this->getConfigs($this->mailboxes);
-        $event   = new ParseEmailEvent();
+        $event   = new PreFetchEmailEvent();
         $event->setCriteriaRequest('EmailBundle', 'replies', Mailbox::CRITERIA_UID.' 1234:*', true);
         $organizer = new MailboxOrganizer($event, $configs);
         $organizer->organize();

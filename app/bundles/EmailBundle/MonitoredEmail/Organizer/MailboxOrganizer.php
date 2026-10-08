@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Organizer;
 
-use Mautic\EmailBundle\Event\ParseEmailEvent;
+use Mautic\EmailBundle\Event\PreFetchEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 
@@ -14,7 +14,7 @@ final class MailboxOrganizer
     private array $containers = [];
 
     public function __construct(
-        private readonly ParseEmailEvent $event,
+        private readonly PreFetchEmailEvent $event,
         private readonly array $mailboxes,
     ) {
     }

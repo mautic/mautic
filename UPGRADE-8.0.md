@@ -6,6 +6,13 @@
 
 ## Removed code
 
+- Constant `ON_AFTER_EVENTS_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. The after-events-delete event is now dispatched by its own event class `Mautic\CampaignBundle\Event\AfterEventsDeleteEvent`, dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `AfterEventsDeleteEvent::class` instead of the constant. The pre-existing `Mautic\CampaignBundle\Event\DeleteEvent` (dispatched when event logs are deleted) is unchanged.
+- Constants `EMAIL_PARSE` and `EMAIL_PRE_FETCH` removed from `Mautic\EmailBundle\EmailEvents`. These two events used to share one `Mautic\EmailBundle\Event\ParseEmailEvent` object dispatched under both names; the pre-fetch phase (setting search criteria) is now a dedicated `Mautic\EmailBundle\Event\PreFetchEmailEvent` and the parse phase keeps `ParseEmailEvent` (messages only). Both are dispatched by the event object alone (Symfony 4.3+), so their names are the event classes. The criteria methods (`setCriteriaRequest`, `getCriteriaRequests`, `getMarkAsSeenInstructions`) moved from `ParseEmailEvent` to `PreFetchEmailEvent`. Subscribe to the event class instead of the constant.
+
+    | Removed `EmailEvents` constant | New event class |
+    |---|---|
+    | `EMAIL_PRE_FETCH` | `PreFetchEmailEvent` |
+    | `EMAIL_PARSE` | `ParseEmailEvent` |
 - Constants `CAMPAIGN_ON_LEADCHANGE` and `LEAD_CAMPAIGN_BATCH_CHANGE` removed from `Mautic\CampaignBundle\CampaignEvents`. These events are now dispatched by their own event class (under `Mautic\CampaignBundle\Event`). They used to share one `CampaignLeadChangeEvent` object; `CampaignLeadChangeEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `CampaignSingleLeadChangeEvent::class => 'onChange'`.
 
     | Removed `CampaignEvents` constant | New event class |

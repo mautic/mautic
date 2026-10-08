@@ -2,8 +2,8 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail;
 
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
+use Mautic\EmailBundle\Event\PreFetchEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -39,11 +39,11 @@ final class Fetcher
      */
     public function fetch($limit = null): void
     {
-        /** @var ParseEmailEvent $event */
-        $event = $this->dispatcher->dispatch(new ParseEmailEvent(), EmailEvents::EMAIL_PRE_FETCH);
+        /** @var PreFetchEmailEvent $preFetchEvent */
+        $preFetchEvent = $this->dispatcher->dispatch(new PreFetchEmailEvent());
 
         // Get a list of criteria and group by it
-        $organizer = new MailboxOrganizer($event, $this->getConfigs());
+        $organizer = new MailboxOrganizer($preFetchEvent, $this->getConfigs());
         $organizer->organize();
 
         if (!$containers = $organizer->getContainers()) {
@@ -66,9 +66,7 @@ final class Fetcher
                     $processed = count($messages);
 
                     if ([] !== $messages) {
-                        $event->setMessages($messages)
-                            ->setKeys($mailboxes);
-                        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PARSE);
+                        $this->dispatcher->dispatch(new ParseEmailEvent($messages, $mailboxes));
                     }
 
                     $this->log[] = $this->translator->trans(
