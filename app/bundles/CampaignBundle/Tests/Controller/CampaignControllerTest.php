@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use Symfony\Component\HttpFoundation\Response;
@@ -128,9 +129,20 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
     public function testIndexActionWithTypeFilters(): void
     {
+        $category = new Category();
+        $category->setTitle('Campaign category');
+        $category->setAlias('test-category');
+        $category->setBundle('campaign');
+        $this->em->persist($category);
+
         $campaign = new Campaign();
         $campaign->setName('Test Campaign for Filters');
+        $campaign->setCategory($category);
         $this->em->persist($campaign);
+
+        $uncategorizedCampaign = new Campaign();
+        $uncategorizedCampaign->setName('Uncategorized Campaign for Filters');
+        $this->em->persist($uncategorizedCampaign);
         $this->em->flush();
         $this->em->clear();
 
@@ -146,5 +158,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $categoryFilterPrefix = $this->getContainer()->get(TranslatorInterface::class)->trans('mautic.core.searchcommand.category');
         $this->client->request('GET', '/s/campaigns?filters=["'.$categoryFilterPrefix.':test-category"]');
         $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('#campaignTable', $campaign->getName());
+        $this->assertSelectorTextNotContains('#campaignTable', $uncategorizedCampaign->getName());
     }
 }
