@@ -9,6 +9,7 @@ use Mautic\AssetBundle\Service\BatchDownloadRequestValidator;
 use Mautic\AssetBundle\Service\BatchDownloadResponder;
 use Mautic\AssetBundle\Service\BatchFileCollector;
 use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -24,6 +25,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class AssetController extends FormController
 {
+    use CategoryListFiltersTrait;
+
     private AuditLogModel $auditLogModel;
 
     #[Required]
@@ -70,9 +73,20 @@ final class AssetController extends FormController
         $filter = ['string' => $search, 'force' => []];
 
         if (!$permissions['asset:assets:viewother']) {
-            $filter['force'][] =
-                ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+            $filter['force'][] = [
+                'column' => 'a.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->user->getId(),
+            ];
         }
+
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.asset.list_filters',
+            'asset',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $request->getSession()->get('mautic.asset.orderby', 'a.dateModified');
         $orderByDir = $request->getSession()->get('mautic.asset.orderbydir', $this->getDefaultOrderDirection());
@@ -114,15 +128,13 @@ final class AssetController extends FormController
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
-        // retrieve a list of categories
-        $categories = $assetModel->getLookupResults('category', '', 0);
-
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue'     => $search,
-                'searchScopes'    => $assetSearchScopeProvider->getScopes(),
-                'items'           => $assets,
-                'categories'  => $categories,
+                'searchValue'  => $search,
+                'searchScopes' => $assetSearchScopeProvider->getScopes(),
+                'filters'      => $categoryFilters['filters'],
+                'items'        => $assets,
+                'categories'   => $categoryFilters['categories'],
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'model'       => $assetModel,

@@ -1,3 +1,27 @@
+{% macro renderOption(value, label, selectedValues, prefix, translateLabels) %}
+    {% if label is iterable %}
+        {% set optionValue = label.value|default(label.alias|default(label.id)) %}
+        {% set label = label.label|default(label.title|default(label.alias|default(''))) %}
+    {% else %}
+        {% set optionValue = value %}
+        {% set label = label %}
+    {% endif %}
+
+    {% set selected = (selectedValues is defined and optionValue in selectedValues) ? ' selected' : '' %}
+
+    {% if prefix is defined %}
+        {% set optionValue = prefix ~ ':' ~ optionValue %}
+    {% endif %}
+
+    <option value="{{ optionValue|escape('html_attr') }}"{{ selected }}>
+        {% if translateLabels is defined and translateLabels is not empty %}
+            {{ label|trans }}
+        {% else %}
+            {{ label|purify }}
+        {% endif %}
+    </option>
+{% endmacro %}
+
 {% if filters is defined and filters is not empty %}
     <div class="form-group">
         {% for filterName, filter in filters %}
@@ -13,32 +37,14 @@
                 <optgroup label="{{ groupLabel|trans }}"{% if groupFilter.prefix is defined %} data-prefix="{{ groupFilter.prefix }}"{% endif %}>
                     {% if groupFilter.options is defined %}
                     {% for value, label in groupFilter.options %}
-                        {% if label is iterable %}
-                            {% set value = label.value|default(label.alias) %}
-                            {% set label = label.label|default(label.title|default(label.name)) %}
-                        {% endif %}
-
-                        {% set selected = (groupFilter.values is defined and value in groupFilter.values) ? ' selected' : '' %}
-
-                        {% if groupFilter.prefix is defined %}
-                            {% set value = groupFilter.prefix ~ ':' ~ value %}
-                        {% endif %}
-                    <option value="{{ value|escape('html_attr') }}"{{ selected }}>{{ label }}</option>
+                        {{ _self.renderOption(value, label, groupFilter.values|default([]), groupFilter.prefix|default(null), null) }}
                     {% endfor %}
                     {% endif %}
                 </optgroup>
             {% endfor %}
         {% elseif filter.options is defined %}
             {% for value, label in filter.options %}
-                {% if label is iterable %}
-                    {% set value = label.value|default(label.id) %}
-                    {% set label = label.label|default(label.title|default(label.name)) %}
-                {% endif %}
-
-                {% set selected = (filter.values is defined and value in filter.values) ? ' selected' : '' %}
-                <option value="{{ value|escape('html_attr') }}"{{ selected }}>
-                    {{ (filter.translateLabels is not defined or filter.translateLabels is empty) ? label|purify : label|trans }}
-                </option>
+                {{ _self.renderOption(value, label, filter.values|default([]), null, filter.translateLabels|default(null)) }}
             {% endfor %}
         {% endif %}
         </select>
