@@ -142,7 +142,12 @@ final class DynamicContentController extends FormController
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
-        $form         = $this->dynamicContentModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+
+        if (isset($dwc['slotName'])) {
+            $entity->setSlotName($dwc['slotName']);
+        }
+
+        $form = $this->dynamicContentModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         if (Request::METHOD_POST === $method) {
             $valid = false;
@@ -282,6 +287,9 @@ final class DynamicContentController extends FormController
             ? ($dwc['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 
+        if (!empty($dwc)) {
+            $entity->setSlotName($dwc['slotName'] ?? '');
+        }
         $form = $this->dynamicContentModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
@@ -344,6 +352,7 @@ final class DynamicContentController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
+        $model = $this->getModel(DynamicContentModel::class);
         $security = $this->security;
         $entity   = $this->dynamicContentModel->getEntity($objectId);
 
@@ -400,6 +409,26 @@ final class DynamicContentController extends FormController
         );
         $trackables = $this->trackableModel->getTrackableList('dynamicContent', $entity->getId());
 
+        // Get all variations with the same slot name including current entity
+        $variations = [];
+        if (!$entity->getIsCampaignBased() && $entity->getSlotName()) {
+            // Setup filter to get all variations with same slot name (including current entity)
+            $filter = [
+                'force' => [
+                    ['column' => 'e.slotName', 'expr' => 'eq', 'value' => $entity->getSlotName()],
+                    ['column' => 'e.variantParent', 'expr' => 'isNull'],
+                    ['column' => 'e.translationParent', 'expr' => 'isNull'],
+                ],
+            ];
+
+            // Get variations with fixed sort order by display order descending
+            $variations = $model->getEntities([
+                'filter'     => $filter,
+                'orderBy'    => 'e.displayOrder',
+                'orderByDir' => 'DESC',
+            ]);
+        }
+
         return $this->delegateView(
             [
                 'returnUrl'       => $action,
@@ -420,6 +449,7 @@ final class DynamicContentController extends FormController
                     'trackables'    => $trackables,
                     'entityViews'   => $entityViews,
                     'dateRangeForm' => $dateRangeForm->createView(),
+                    'variations'    => $variations,
                 ],
             ]
         );
@@ -430,6 +460,7 @@ final class DynamicContentController extends FormController
         $entity = $this->dynamicContentModel->getEntity($objectId);
 
         if (null != $entity) {
+            $entity->setDisplayOrder(0);
             if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')
                 || !$this->security->hasEntityAccess(
                     'dynamiccontent:dynamiccontents:viewown',

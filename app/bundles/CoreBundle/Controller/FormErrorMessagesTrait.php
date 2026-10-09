@@ -46,7 +46,7 @@ trait FormErrorMessagesTrait
         $errors = [];
 
         foreach ($form->getErrors(true) as $error) {
-            if (isset($errors[$error->getOrigin()->getName()])) {
+            if (!isset($errors[$error->getOrigin()->getName()])) {
                 $errors[$error->getOrigin()->getName()] = [$error->getMessage()];
             } else {
                 $errors[$error->getOrigin()->getName()][] = $error->getMessage();
