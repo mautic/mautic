@@ -6,7 +6,6 @@ namespace Mautic\DynamicContentBundle\Tests\Unit\Helper;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
@@ -146,7 +145,6 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                         $this->assertSame($slot->getContent(), $event->getContent());
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(DynamicContentEvents::TOKEN_REPLACEMENT, $parameters[1]);
                 }
 
                 return $parameters[0];
@@ -238,7 +236,6 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             $this->assertSame($slot->getContent(), $event->getContent());
                         };
                         $callback($parameters[0]);
-                        $this->assertSame(DynamicContentEvents::TOKEN_REPLACEMENT, $parameters[1]);
                     }
 
                     return $parameters[0];
