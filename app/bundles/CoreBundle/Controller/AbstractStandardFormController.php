@@ -239,7 +239,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             if ($arguments = $this->afterEntityClone($newEntity, $entity)) {
                 array_unshift($arguments, $request);
 
-                return call_user_func_array([$this, 'editAction'], $arguments);
+                return call_user_func_array($this->editAction(...), $arguments);
             }
 
             return $this->editAction($request, $newEntity, true);
@@ -1030,9 +1030,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * @param string|null $name
      */
-    protected function setListFilters($name = null): array
+    protected function setListFilters($name = null): void
     {
-        return parent::setListFilters($name ?: $this->getSessionBase());
+        parent::setListFilters($name ?: $this->getSessionBase());
     }
 
     /**
