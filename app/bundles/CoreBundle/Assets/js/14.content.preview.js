@@ -3,9 +3,11 @@
  */
 Mautic.contentPreviewUrlGenerator = {
 
-    urlBase : 'email/preview',
+    urlBase : 'email/download/preview',
+    urlBaseFinal : 'email/preview',
     lastUsedObjectId : false,
     contactId: false,
+    companyId: false,
     previewFrameBaseWidth : 640,
     previewFrameMinZoom : 0.35,
     previewFrameMaxZoom : 0.75,
@@ -103,15 +105,39 @@ Mautic.contentPreviewUrlGenerator = {
             } else {
                 this.contactId = value;
             }
-            newValue = this.lastUsedObjectId;
         } else if (value !== false) {
-            this.lastUsedObjectId = newValue = value;
+            this.lastUsedObjectId = value;
         }
 
-        let previewUrl = mauticBaseUrl + this.urlBase + '/' + newValue;
+        if (elementId === 'content_preview_settings_company_id') {
+            if (newValue === '') {
+                this.companyId = false;
+            } else {
+                this.companyId = value;
+            }
+        } else if (value !== false) {
+            this.lastUsedObjectId = value;
+        }
 
-        if (this.contactId !== false) {
-            previewUrl = previewUrl + '?contactId=' + this.contactId;
+        const mauticBaseUrl = window.location.origin;
+        const emailId       = window.location.pathname.split('/').pop();
+        let previewUrl = mauticBaseUrl + '/' + this.urlBase + '/' + emailId;
+        let draftUrl  = previewUrl + '/draft';
+
+        const parameters = {
+            contactId: this.contactId,
+            companyId: this.companyId
+        };
+
+        mQuery.each( parameters, function( key, value ) {
+            if (!value) {
+                delete parameters[key];
+            }
+        });
+
+        if (!mQuery.isEmptyObject(parameters)) {
+            previewUrl += '?' + mQuery.param(parameters);
+            draftUrl   += '?' + mQuery.param(parameters);
         }
 
         // Update url in preview input
@@ -120,49 +146,67 @@ Mautic.contentPreviewUrlGenerator = {
         mQuery('#content_preview_url_button').attr('onClick', "window.open('" + previewUrl + "', '_blank');");
         const previewFrame = mQuery('#content_preview_frame');
         if (previewFrame.length) {
-            previewFrame.attr('src', previewUrl);
+            previewFrame.attr('src', previewUrl.replace(this.urlBase, this.urlBaseFinal));
             this.resizePreviewFrame();
+        }
+
+        if (mQuery('#content_draft_preview_url').length > 0)
+        {
+            mQuery('#content_draft_preview_url').val(draftUrl);
+            mQuery('#content_draft_preview_url_button').attr('onClick', "window.open('" + draftUrl + "', '_blank');");
         }
     }
 }
 
-/**
- * Used in data-lookup-callback attr of form field in ContentPreviewSettingsType
- */
 Mautic.updatePreviewContactLookupListFilter = function(field, item) {
-    if (item && item.id) {
-        mQuery('#content_preview_settings_contact_id').val(item.id);
-        mQuery(field).val(item.value);
-        Mautic.contentPreviewUrlGenerator.regenerateUrl(
-            item.id,
-            mQuery('#content_preview_settings_contact_id')
-        );
-    }
+    Mautic.updateLookupFieldListFilter(field, item, '#content_preview_settings_contact_id');
+};
+
+Mautic.updatePreviewCompanyLookupListFilter = function(field, item) {
+    Mautic.updateLookupFieldListFilter(field, item, '#content_preview_settings_company_id');
+};
+
+Mautic.activatePreviewContactLookupField = function (fieldOptions, filterId) {
+    Mautic.activateLookupField (fieldOptions, filterId, 'content_preview_settings_contact', '#content_preview_settings_contact_id', 'lead.lead');
+};
+
+Mautic.activatePreviewCompanyLookupField = function (fieldOptions, filterId) {
+    Mautic.activateLookupField (fieldOptions, filterId, 'content_preview_settings_company', '#content_preview_settings_company_id', 'lead.company');
 };
 
 /**
  * Used in data-lookup-callback attr of form field in ContentPreviewSettingsType
  * Take a look at https://github.com/twitter/typeahead.js/
  */
-Mautic.activatePreviewContactLookupField = function(fieldOptions, filterId) {
-
-    const lookupElementId = 'content_preview_settings_contact';
-    const action          = mQuery('#' + lookupElementId).attr('data-chosen-lookup');
+Mautic.activateLookupField = function (fieldOptions, filterId, lookupElementId, elemId, searchKey) {
+    const action = mQuery('#' + lookupElementId).attr('data-chosen-lookup');
 
     const options = {
         limit: 20,
-        'searchKey': 'lead.lead',
+        'searchKey': searchKey,
     };
 
     Mautic.activateFieldTypeahead(lookupElementId, filterId, options, action);
     Mautic.contentPreviewUrlGenerator.init();
 
-    mQuery('#content_preview_settings_contact').on('change',function(event) {
+    mQuery('#' + lookupElementId).on('change', function (event) {
         if (event.target.value === '') {
-            // Delete selected contact ID from URL and hidden input
-            Mautic.contentPreviewUrlGenerator.regenerateUrl('', mQuery('#content_preview_settings_contact_id'));
-            mQuery('#content_preview_settings_contact_id').val('');
+            Mautic.contentPreviewUrlGenerator.regenerateUrl('', mQuery(elemId));
+            mQuery(elemId).val('');
         }
     });
+};
 
+/**
+ * Used in data-lookup-callback attr of form field in ContentPreviewSettingsType
+ */
+Mautic.updateLookupFieldListFilter = function(field, item, elemId) {
+    if (item && item.id) {
+        mQuery(elemId).val(item.id);
+        mQuery(field).val(item.value);
+        Mautic.contentPreviewUrlGenerator.regenerateUrl(
+            item.id,
+            mQuery(elemId)
+        );
+    }
 };
