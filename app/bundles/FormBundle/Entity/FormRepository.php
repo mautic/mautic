@@ -59,15 +59,17 @@ class FormRepository extends CommonRepository
      * @param int         $start
      * @param bool        $viewOther
      * @param string|null $formType  @deprecated since Mautic 7.1, this parameter is ignored and will be removed in 8.0
+     * @param bool|string $topLevel
+     * @param array<int>  $ignoreIds
      */
-    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null): array
+    public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null, $topLevel = false, array $ignoreIds = []): array
     {
         if (null !== $formType) {
             trigger_deprecation('mautic/mautic', '7.1', 'The $formType parameter in FormRepository::getFormList() is deprecated and will be removed in 8.0.');
         }
 
         $q = $this->createQueryBuilder('f');
-        $q->select('partial f.{id, name, alias}');
+        $q->select('partial f.{id, name, alias, language}');
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('f.name', ':search'))
@@ -79,10 +81,13 @@ class FormRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if (!empty($formType)) {
-            $q->andWhere(
-                $q->expr()->eq('f.formType', ':type')
-            )->setParameter('type', $formType);
+        if ($topLevel && (true === $topLevel || 'translation' === $topLevel)) {
+            $q->andWhere($q->expr()->isNull('f.translationParent'));
+        }
+
+        if ([] !== $ignoreIds) {
+            $q->andWhere($q->expr()->notIn('f.id', ':formIds'))
+                ->setParameter('formIds', $ignoreIds);
         }
 
         $q->orderBy('f.name');

@@ -259,6 +259,14 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
+        $translations = $activeForm->getTranslations();
+        if (is_array($translations)) {
+            [$translationParent, $translationChildren] = $translations;
+        } else {
+            $translationParent   = $activeForm;
+            $translationChildren = [];
+        }
+
         $submissionCounts = $this->submissionRepository->getSubmissionCounts($activeForm);
 
         return $this->delegateView(
@@ -278,6 +286,10 @@ class FormController extends CommonFormController
                     'formScript'        => htmlspecialchars($this->formModel->getFormScript($activeForm), ENT_QUOTES, 'UTF-8'),
                     'formContent'       => htmlspecialchars($this->formModel->getContent($activeForm, false), ENT_QUOTES, 'UTF-8'),
                     'availableActions'  => $customComponents['actions'],
+                    'translations'      => [
+                        'parent'   => $translationParent,
+                        'children' => $translationChildren,
+                    ],
                 ],
                 'contentTemplate' => '@MauticForm/Form/details.html.twig',
                 'passthroughVars' => [

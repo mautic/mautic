@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
@@ -49,6 +50,8 @@ use Twig\Environment;
  */
 class FormModel extends CommonFormModel implements GlobalSearchInterface
 {
+    use TranslationModelTrait;
+
     public function __construct(
         protected RequestStack $requestStack,
         protected Environment $twig,
@@ -110,7 +113,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     public function getEntity($id = null): ?Form
     {
         if (null === $id) {
-            return new Form();
+            $entity = new Form();
+            $entity->setLanguage($this->coreParametersHelper->get('locale'));
+
+            return $entity;
         }
 
         $entity = parent::getEntity($id);
@@ -320,6 +326,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     {
         $isNew = !(bool) $entity->getId();
 
+        if (!$entity->getLanguage()) {
+            $entity->setLanguage($this->coreParametersHelper->get('locale'));
+        }
+
         if ($isNew && !$entity->getAlias()) {
             $alias = $this->cleanAlias($entity->getName(), '', 10);
             $entity->setAlias($alias);
@@ -329,6 +339,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         // save the form so that the ID is available for the form html
         parent::saveEntity($entity, $unlock);
+
+        $this->postTranslationEntitySave($entity);
 
         // now build the form table
         if ($entity->getId()) {
