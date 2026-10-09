@@ -557,7 +557,7 @@ final class EmailType extends AbstractType
                 'attr'  => [
                     'class'   => 'btn btn-tertiary btn-dnd btn-nospin text-interactive btn-builder',
                     'icon'    => 'ri-layout-line',
-                    'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
+                    'onclick' => "return Mautic.launchEmailBuilder('{$this->getBlockPrefix()}');",
                 ],
             ],
         ];
