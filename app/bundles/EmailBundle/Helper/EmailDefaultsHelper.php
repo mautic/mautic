@@ -7,13 +7,17 @@ namespace Mautic\EmailBundle\Helper;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\HttpFoundation\Request;
 
 class EmailDefaultsHelper
 {
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly EntityManagerInterface $entityManager,
+        private readonly PageModel $pageModel,
     ) {
     }
 
@@ -33,11 +37,11 @@ class EmailDefaultsHelper
         $email->setChanges($changesBefore);
     }
 
-    public function resolvePreferenceCenter(Email $email): ?Page
+    public function resolvePreferenceCenter(Email $email, ?Lead $lead = null, ?Request $request = null): ?Page
     {
         $preferenceCenter = $email->getPreferenceCenter();
         if ($preferenceCenter instanceof Page && $preferenceCenter->getIsPreferenceCenter()) {
-            return $preferenceCenter;
+            return $this->resolveTranslation($preferenceCenter, $lead, $request);
         }
 
         $defaultId = $this->coreParametersHelper->get('email_default_preference_center_id');
@@ -50,7 +54,14 @@ class EmailDefaultsHelper
             }
         }
 
-        return $page;
+        return $page !== null ? $this->resolveTranslation($page, $lead, $request) : null;
+    }
+
+    private function resolveTranslation(Page $page, ?Lead $lead, ?Request $request): Page
+    {
+        [, $translated] = $this->pageModel->getTranslatedEntity($page, $lead, $request);
+
+        return $translated instanceof Page ? $translated : $page;
     }
 
     private function applyUtmTagDefaults(Email $email): void

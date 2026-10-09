@@ -381,7 +381,7 @@ final class PublicController extends CommonFormController
      */
     private function getPreferenceCenterHtml(Request $request, Lead $lead, ?Email $email, FormView $formView, array $viewParameters, ?string $language, string $successSessionName, EmailDefaultsHelper $emailDefaultsHelper, PageModel $pageModel): ?string
     {
-        $prefCenter = $email instanceof Email ? $emailDefaultsHelper->resolvePreferenceCenter($email) : null;
+        $prefCenter = $email instanceof Email ? $emailDefaultsHelper->resolvePreferenceCenter($email, $lead, $request) : null;
         if (!$prefCenter instanceof Page) {
             return null;
         }
