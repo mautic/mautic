@@ -758,4 +758,95 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         // Send should trigger the FailedToSendToContactException
         $model->setContact($this->contacts[0])->send();
     }
+
+    #[TestDox('Test that flush calls getErrors even when flushQueue returns true')]
+    public function testFlushCallsGetErrorsWhenFlushQueueReturnsTrue(): void
+    {
+        $emailMock = $this->createMock(Email::class);
+        $emailMock->method('getId')->willReturn(1);
+
+        $this->mailHelper->method('setEmail')
+            ->willReturn(true);
+
+        // flushQueue returns true (no fatal error)
+        $this->mailHelper->method('flushQueue')
+            ->willReturn(true);
+
+        // getErrors should be called even though flushQueue returned true
+        // This is the key behavior change - previously getErrors was only called when flushQueue returned false
+        $this->mailHelper->expects($this->once())
+            ->method('getErrors')
+            ->willReturn([]);
+
+        $model = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->dncModel, $this->translator);
+        $model->setEmail($emailMock);
+
+        // Flush should call getErrors regardless of flushQueue's return value
+        $model->flush();
+    }
+
+    #[TestDox('Test that flush processes failures even when flushQueue returns true')]
+    public function testFlushProcessesFailuresWhenFlushQueueReturnsTrue(): void
+    {
+        $emailMock = $this->createMock(Email::class);
+        $emailMock->method('getId')->willReturn(1);
+
+        $this->mailHelper->method('setEmail')
+            ->willReturn(true);
+
+        // Create a stat that will be found by statHelper
+        $stat = new Stat();
+        $stat->setEmail($emailMock);
+        $leadMock = $this->createMock(Lead::class);
+        $leadMock->method('getId')->willReturn(123);
+        $stat->setLead($leadMock);
+
+        // Add the stat to statHelper so it can be found during processSendFailures
+        $this->statHelper->storeStat($stat, 'failed@example.com');
+
+        // flushQueue returns true (no fatal error - some emails succeeded)
+        $this->mailHelper->method('flushQueue')
+            ->willReturn(true);
+
+        // But getErrors still returns failures for emails that failed
+        // This is the critical scenario: partial batch failure
+        $sendFailures = [
+            'failures' => ['failed@example.com'],
+            'Error sending to failed@example.com',
+        ];
+        $this->mailHelper->method('getErrors')
+            ->willReturn($sendFailures);
+
+        $model = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->dncModel, $this->translator);
+        $model->setEmail($emailMock);
+
+        // Initialize the email sent count so downEmailSentCount doesn't trigger warnings
+        $reflection = new \ReflectionClass($model);
+        $property = $reflection->getProperty('emailSentCounts');
+        $property->setValue($model, [1 => 1]); // Email ID 1 has 1 sent
+
+        // Before the fix, this would not process the failure because flushQueue returned true
+        // After the fix, failures are processed regardless of flushQueue's return value
+        $model->flush();
+
+        $failedContacts = $model->getFailedContacts();
+        $this->assertCount(1, $failedContacts);
+        $this->assertEquals('failed@example.com', $failedContacts[123]);
+    }
+
+    #[TestDox('Test that flush skips getErrors when emailEntityId is not set')]
+    public function testFlushSkipsGetErrorsWhenNoEmailEntity(): void
+    {
+        // When emailEntityId is null, flushQueue and getErrors should not be called at all
+        $this->mailHelper->expects($this->never())
+            ->method('flushQueue');
+
+        $this->mailHelper->expects($this->never())
+            ->method('getErrors');
+
+        $model = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->dncModel, $this->translator);
+
+        // Don't set an email entity - emailEntityId will remain null
+        $model->flush();
+    }
 }
