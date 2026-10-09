@@ -121,6 +121,39 @@ export default class BuilderService {
     dc.__mauticMjmlCommentViewPatched = true;
   }
 
+  patchMjmlStyleSerialization(editor) {
+    const dc = editor?.DomComponents;
+    if (!dc || dc.__mauticMjmlStyleSerializationPatched) {
+      return;
+    }
+
+    const textNodeType = dc.getType('textnode');
+    const BaseTextNodeModel = textNodeType?.model;
+
+    if (!BaseTextNodeModel) {
+      return;
+    }
+
+    dc.addType('textnode', {
+      model: BaseTextNodeModel.extend({
+        toHTML() {
+          const parent = typeof this.parent === 'function' ? this.parent() : null;
+          const parentTagName = `${parent?.get?.('tagName') || ''}`.toLowerCase();
+
+          // CSS is raw text in MJML. Escaping child selectors here turns `>` into
+          // `&gt;`, which makes the saved stylesheet invalid when it is reopened.
+          if (parentTagName === 'mj-style') {
+            return this.content;
+          }
+
+          return BaseTextNodeModel.prototype.toHTML.call(this);
+        },
+      }),
+    });
+
+    dc.__mauticMjmlStyleSerializationPatched = true;
+  }
+
   /**
    * Initialize GrapesJsBuilder
    *
@@ -1318,6 +1351,7 @@ export default class BuilderService {
     });
 
     this.patchMjmlCommentViews(this.editor);
+    this.patchMjmlStyleSerialization(this.editor);
     this.unsetComponentVoidTypes(this.editor);
     this.editor.setComponents(components);
 
