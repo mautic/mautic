@@ -15,6 +15,9 @@ use Symfony\Component\DomCrawler\Crawler;
 final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateEntityTrait;
+    private const ADMIN_USER = 'admin';
+
+    public const USER_EDIT_PATH = '/s/users/edit/';
 
     protected function setUp(): void
     {
@@ -26,7 +29,10 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditGetPage(): void
     {
-        $this->client->request('GET', '/s/users/edit/1');
+        $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
         $this->assertResponseIsSuccessful();
     }
 
@@ -40,7 +46,10 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditActionFormSubmissionValid(): void
     {
-        $crawler                 = $this->client->request('GET', '/s/users/edit/1');
+        $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
+
+        $crawler                 = $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
         $buttonCrawlerNode       = $crawler->selectButton('Save & Close');
         $form                    = $buttonCrawlerNode->form();
         $form['user[firstName]'] = 'test';
@@ -53,7 +62,10 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditActionFormSubmissionInvalid(): void
     {
-        $crawler = $this->client->request('GET', '/s/users/edit/1');
+        $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
+
+        $crawler = $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
 
         $form = $crawler->selectButton('Save')->form([
             'user[firstName]'               => '',
@@ -199,7 +211,10 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('dataForEditUserForPasswordField')]
     public function testEditUserForPasswordField(array $data, string $message): void
     {
-        $crawler = $this->client->request('GET', '/s/users/edit/1');
+        $user = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
+
+        $crawler = $this->client->request('GET', self::USER_EDIT_PATH.$user->getId());
 
         $form = $crawler->selectButton('Save')->form($data);
 

@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\EmailBundle\Entity\Stat;
 
@@ -119,35 +120,55 @@ class FrequencyRuleRepository extends CommonRepository
      * @param string $statContactColumn
      * @param string $statSentColumn
      */
-    private function getCustomFrequencyRuleViolations($channel, array $leadIds, $statTable, $statContactColumn, $statSentColumn): array
-    {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+    private function getCustomFrequencyRuleViolations(
+        $channel,
+        array $leadIds,
+        $statTable,
+        $statContactColumn,
+        $statSentColumn,
+    ): array {
+        $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+
+        $q = $connection->createQueryBuilder();
 
         $q->select("ch.{$statContactColumn}, fr.frequency_number, fr.frequency_time")
-            ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
-            ->join('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.{$statContactColumn} = fr.lead_id");
+          ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
+          ->join('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.{$statContactColumn} = fr.lead_id");
 
         if (Stat::TABLE_NAME === $statTable) {
             $q->join('ch', MAUTIC_TABLE_PREFIX.'emails', 'e', 'ch.email_id = e.id')
                 ->andWhere('e.send_to_dnc = 0');
         }
 
-        if ($channel) {
+        if (null !== $channel && '' !== $channel) {
             $q->andWhere('fr.channel = :channel')
-                ->setParameter('channel', $channel);
+              ->setParameter('channel', $channel);
         }
 
         // Preferred channel is stored in this table so they may not have a frequency rule defined but just a preference so exclude them
         $q->andWhere('fr.frequency_time IS NOT NULL AND fr.frequency_number IS NOT NULL');
 
+        // Build time-based conditions (always at least one)
+        $timeConditions = [];
+        $intervals      = [
+            'DAY'   => 'DAY',
+            'WEEK'  => 'WEEK',
+            'MONTH' => 'MONTH',
+        ];
+
         // Calculate the rule timeframe
-        $q->andWhere(
-            '(ch.'.$statSentColumn.' >= case fr.frequency_time
-                 when \'MONTH\' then DATE_SUB(NOW(),INTERVAL 1 MONTH)
-                 when \'DAY\' then DATE_SUB(NOW(),INTERVAL 1 DAY)
-                 when \'WEEK\' then DATE_SUB(NOW(),INTERVAL 1 WEEK)
-                end)'
-        );
+        foreach ($intervals as $freq => $intervalUnit) {
+            $dateSubExpr = DatabasePlatform::getDateSubExpression($platform, $intervalUnit);
+
+            $timeConditions[] = $q->expr()->and(
+                $q->expr()->eq('fr.frequency_time', $connection->quote($freq)),
+                $q->expr()->gte("ch.$statSentColumn", "($dateSubExpr)")
+            );
+        }
+
+        // Since $timeConditions is never empty, we can safely use or(...)
+        $q->andWhere($q->expr()->or(...$timeConditions));
 
         $q->andWhere(
             $q->expr()->in("ch.{$statContactColumn}", ':ids')

@@ -446,30 +446,44 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             return [];
         }
 
+        // Extract all requested IDs (including invalid ones for error reporting)
+        $requestedIds = $idHelper->getIds(); // associative: original_key => id_value
+
+        // Filter only valid positive integer IDs for the query
+        $validIds = [];
+        foreach ($requestedIds as $key => $id) {
+            if (is_numeric($id) && (int) $id > 0 && (string) (int) $id === (string) $id) {
+                $validIds[$key] = (int) $id;
+            }
+        }
+
         /** @var AbstractCommonModel<object> $model */
-        $model    = $model ?: $this->model;
-        $entities = $model->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => $model->getRepository()->getTableAlias().'.id',
-                            'expr'   => 'in',
-                            'value'  => $idHelper->getIds(),
+        $model = $model ?: $this->model;
+
+        $entities = [];
+        if ([] !== $validIds) {
+            $entities = $model->getEntities(
+                [
+                    'filter' => [
+                        'force' => [
+                            [
+                                'column' => $model->getRepository()->getTableAlias().'.id',
+                                'expr'   => 'in',
+                                'value'  => array_values($validIds),
+                            ],
                         ],
                     ],
-                ],
-                'ignore_paginator' => true,
-            ]
-        );
+                    'ignore_paginator' => true,
+                ]
+            );
+        }
+
         // It must be associative because the order of entities has changed
         $idHelper->setIsAssociative(true);
 
-        [$entities, $total] = $prepareForSerialization
-            ?
-            $this->prepareEntitiesForView($entities)
-            :
-            $this->prepareEntityResultsToArray($entities);
+        [$entities] = $prepareForSerialization
+            ? $this->prepareEntitiesForView($entities)
+            : $this->prepareEntityResultsToArray($entities);
 
         // Set errors
         if ($idHelper->hasErrors()) {

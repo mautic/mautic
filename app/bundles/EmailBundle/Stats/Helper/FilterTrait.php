@@ -43,7 +43,7 @@ trait FilterTrait
     protected function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't'): void
     {
         if (null !== $campaignId && intval($campaignId)) {
-            $q->innerJoin($fromAlias, '(SELECT DISTINCT event_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId)', 'clel', $fromAlias.'.source_id = clel.event_id AND '.$fromAlias.'.source = "campaign.event" AND '.$fromAlias.'.lead_id = clel.lead_id')
+            $q->innerJoin($fromAlias, '(SELECT DISTINCT event_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId)', 'clel', $fromAlias.'.source_id = clel.event_id AND '.$fromAlias.".source = 'campaign.event' AND ".$fromAlias.'.lead_id = clel.lead_id')
                 ->setParameter('campaignId', $campaignId);
         }
     }
@@ -55,7 +55,7 @@ trait FilterTrait
     protected function addCampaignFilterForEmailSource(QueryBuilder $q, $campaignId = null, $fromAlias = 't'): void
     {
         if (null !== $campaignId && intval($campaignId)) {
-            $q->innerJoin($fromAlias, '(SELECT DISTINCT channel_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId AND channel = "email")', 'clel', $fromAlias.'.source_id = clel.channel_id AND '.$fromAlias.'.source = "email" AND '.$fromAlias.'.lead_id = clel.lead_id')
+            $q->innerJoin($fromAlias, '(SELECT DISTINCT channel_id, lead_id FROM '.MAUTIC_TABLE_PREFIX."campaign_lead_event_log WHERE campaign_id = :campaignId AND channel = 'email')", 'clel', $fromAlias.'.source_id = clel.channel_id AND '.$fromAlias.".source = 'email' AND ".$fromAlias.'.lead_id = clel.lead_id')
                 ->setParameter('campaignId', $campaignId);
         }
     }
@@ -75,7 +75,7 @@ trait FilterTrait
                     $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', $fromAlias.'.lead_id'),
-                        $sb->expr()->eq('lll.manually_removed', 0)
+                        $sb->expr()->eq('lll.manually_removed', 'FALSE')
                     )
                 );
 

@@ -24,8 +24,11 @@ final class BroadcastQuery
 
     public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter): array
     {
+        $connection       = $this->entityManager->getConnection();
+        $databasePlatform = $connection->getDatabasePlatform();
+
         $query = $this->getBasicQuery($sms);
-        $query->select('DISTINCT l.id, ll.id as listId');
+        $query->select('DISTINCT l.id, ll.id as '.$databasePlatform->quoteIdentifier('listId'));
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
 
         return $query->executeQuery()->fetchAllAssociative();

@@ -75,7 +75,7 @@ final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(1, $logsPhase1[0]['rotation'], 'Phase 1: Log at rotation=1');
 
         $db->executeStatement(
-            'UPDATE '.MAUTIC_TABLE_PREFIX.'campaign_leads SET manually_removed = 1, date_last_exited = NOW() WHERE campaign_id = ? AND lead_id = ?',
+            'UPDATE '.MAUTIC_TABLE_PREFIX.'campaign_leads SET manually_removed = TRUE, date_last_exited = NOW() WHERE campaign_id = ? AND lead_id = ?',
             [$campaignId, $contactId]
         );
         $this->em->clear();

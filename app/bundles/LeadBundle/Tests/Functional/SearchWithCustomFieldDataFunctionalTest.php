@@ -11,6 +11,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
 {
+    private const COMPANY_CUSTOM_FIELD     = 'client_id_company';
+
+    private const CONTACT_CUSTOM_FIELD     = 'client_id_contact';
+
     protected $useCleanupRollback = false;
 
     #[DataProvider('dataTestCreatingCustomFieldIndexableAndSearchable')]
@@ -51,8 +55,7 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
     public function testGlobalSearchForContactsUsingCustomFieldsData(): void
     {
         // Create a custom field for Contact
-        $customFieldAlias = 'client_id';
-        $this->createSearchableField($customFieldAlias, 'lead');
+        $this->createSearchableField(self::CONTACT_CUSTOM_FIELD, 'lead');
 
         // Create three contacts, one without custom field data.
         $contactData = [
@@ -61,14 +64,14 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
                 'lastname'      => 'One',
                 'email'         => 'c@one.com',
                 'company'       => 'One',
-                'customFields'  => [$customFieldAlias => 'client_1'],
+                'customFields'  => [self::CONTACT_CUSTOM_FIELD => 'client_1'],
             ],
             [
                 'firstname'     => 'Contact',
                 'lastname'      => 'Two',
                 'email'         => 'c@two.com',
                 'company'       => 'Two',
-                'customFields'  => [$customFieldAlias => 'client_2'],
+                'customFields'  => [self::CONTACT_CUSTOM_FIELD => 'client_2'],
             ],
             [
                 'firstname' => 'Contact',
@@ -100,14 +103,13 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
     public function testSearchCompaniesWithCustomFields(): void
     {
         // Create a custom field for Company
-        $customFieldAlias = 'client_id';
-        $this->createSearchableField($customFieldAlias, 'company');
+        $this->createSearchableField(self::COMPANY_CUSTOM_FIELD, 'company');
 
         // Create companies
         $this->createCompany([
             'name'          => 'ABC',
             'email'         => 'hello@abcexample.com',
-            'customFields'  => [$customFieldAlias => 'client_id'],
+            'customFields'  => [self::COMPANY_CUSTOM_FIELD => 'client_3'],
         ]);
 
         $this->createCompany([

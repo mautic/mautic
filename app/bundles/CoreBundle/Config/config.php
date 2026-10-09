@@ -268,6 +268,7 @@ return [
         'db_name'                         => '',
         'db_user'                         => '',
         'db_password'                     => '',
+        'db_charset'                      => 'utf8mb4',
         'db_table_prefix'                 => '',
         'db_host_ro'                      => null,
         'locale'                          => 'en_US',

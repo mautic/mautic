@@ -26,15 +26,22 @@ final readonly class GeneratedColumnSubscriber implements EventSubscriberInterfa
 
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
-        if (!$this->versionProvider->isMySql()) {
-            return;
+        /*
+         * Currently only MySQL support generated columns.
+         *
+         * We disable it on postgresql by default as the expressions we try to use are not immutable
+         * ERROR:  generation expression is not immutable
+         *
+         * As workaround for postgresql in future we should probably use
+         * standard column + trigger on update/edit which will fill the data.
+         */
+        if ($this->versionProvider->isMySql()) {
+            $event->addGeneratedColumn($this->buildGeneratedColumn('hour', 'DATETIME', '%Y-%m-%d %H:00', 'H'));
+            $event->addGeneratedColumn($this->buildGeneratedColumn('day', 'DATE', '%Y-%m-%d', 'd', true));
+            $event->addGeneratedColumn($this->buildGeneratedColumn('week', 'CHAR(7)', '%Y %U', 'W'));
+            $event->addGeneratedColumn($this->buildGeneratedColumn('month', 'CHAR(7)', '%Y-%m', 'm'));
+            $event->addGeneratedColumn($this->buildGeneratedColumn('year', 'YEAR', '%Y', 'Y'));
         }
-
-        $event->addGeneratedColumn($this->buildGeneratedColumn('hour', 'DATETIME', '%Y-%m-%d %H:00', 'H'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('day', 'DATE', '%Y-%m-%d', 'd', true));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('week', 'CHAR(7)', '%Y %U', 'W'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('month', 'CHAR(7)', '%Y-%m', 'm'));
-        $event->addGeneratedColumn($this->buildGeneratedColumn('year', 'YEAR', '%Y', 'Y'));
     }
 
     private function buildGeneratedColumn(string $name, string $type, string $format, string $unit, bool $filterDateColumn = false): GeneratedColumn

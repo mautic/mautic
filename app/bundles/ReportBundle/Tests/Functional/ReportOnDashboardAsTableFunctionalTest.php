@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
 {
@@ -74,7 +75,26 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($expected, $columns);
 
         $link = $crawler->filter('.pull-right a')->attr('href');
-        $this->assertSame('/s/reports/view/'.$report->getId(), $link);
+        $this->assertNotNull($link);
+
+        $parts = parse_url($link);
+        $this->assertSame('/s/reports/view/'.$report->getId(), $parts['path'] ?? null);
+
+        $query = [];
+        parse_str($parts['query'] ?? '', $query);
+
+        $this->assertArrayHasKey('daterange', $query);
+        $this->assertNotEmpty($query['daterange']['date_from'] ?? null);
+        $this->assertNotEmpty($query['daterange']['date_to'] ?? null);
+
+        /** @var string $expectedLink */
+        $expectedLink = self::getContainer()->get(UrlGeneratorInterface::class)->generate('mautic_report_action', [
+            'objectId'     => $report->getId(),
+            'objectAction' => 'view',
+            'daterange'    => $query['daterange'],
+        ]);
+
+        $this->assertSame($expectedLink, $link);
     }
 
     private function createReport(): Report

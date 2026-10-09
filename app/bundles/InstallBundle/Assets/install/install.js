@@ -22,5 +22,14 @@ var MauticInstaller = {
         } else {
         mQuery('#backupPrefix').removeClass('hide');
         }
+    },
+    autoCompletePortAndCharset: function() {
+        if (mQuery('#install_doctrine_step_driver').val() == 'pdo_pgsql') {
+            mQuery('#install_doctrine_step_port').prop('value', '5432');
+            mQuery('#install_doctrine_step_charset').prop('value', 'UTF8');
+        } else {
+            mQuery('#install_doctrine_step_port').prop('value', '3306');
+            mQuery('#install_doctrine_step_charset').prop('value', 'utf8mb4');
+        }
     }
 };

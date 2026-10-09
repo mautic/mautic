@@ -13,7 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected $useCleanupRollback = false;
+    protected function setUp(): void
+    {
+        // we keep it on if non PSQL
+        if ('pdo_pgsql' != $this->configParams['db_driver']) {
+            $this->useCleanupRollback = false;
+        }
+        parent::setUp();
+    }
 
     public function testNewEmailFieldFormIsPreMapped(): void
     {

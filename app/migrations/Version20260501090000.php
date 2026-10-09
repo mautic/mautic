@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 
 final class Version20260501090000 extends AbstractMauticMigration
 {
@@ -14,7 +17,6 @@ final class Version20260501090000 extends AbstractMauticMigration
     public function up(Schema $schema): void
     {
         $rolesTable       = $this->getPrefixedTableName();
-        $permissionsTable = $this->prefix.'permissions';
 
         $rows = $this->connection->executeQuery(
             sprintf('SELECT id, readable_permissions FROM %s WHERE is_admin != 1', $rolesTable)
@@ -43,7 +45,7 @@ final class Version20260501090000 extends AbstractMauticMigration
                 ['id'                   => $roleId]
             );
 
-            $this->upsertNotesPermission($permissionsTable, $roleId, $this->getBitwise($mappedPerms));
+            $this->upsertNotesPermission($roleId, $this->getBitwise($mappedPerms));
             ++$updatedRoles;
         }
 
@@ -109,35 +111,39 @@ final class Version20260501090000 extends AbstractMauticMigration
         return $bitwise;
     }
 
-    private function upsertNotesPermission(string $permissionsTable, int $roleId, int $bitwise): void
+    private function upsertNotesPermission(int $roleId, int $bitwise): void
     {
-        $exists = $this->connection->fetchOne(
-            sprintf('SELECT id FROM %s WHERE role_id = :roleId AND bundle = :bundle AND name = :name', $permissionsTable),
-            [
-                'roleId' => $roleId,
-                'bundle' => 'lead',
-                'name'   => 'notes',
-            ]
-        );
+        /** @var EntityManagerInterface $em */
+        $em = $this->container->get('doctrine.orm.entity_manager');
 
-        if (false !== $exists) {
-            $this->connection->update(
-                $permissionsTable,
-                ['bitwise' => $bitwise],
-                ['id'      => (int) $exists]
-            );
-
+        $role = $em->find(Role::class, $roleId);
+        if (null === $role) {
             return;
         }
 
-        $this->connection->insert(
-            $permissionsTable,
-            [
-                'role_id' => $roleId,
-                'bundle'  => 'lead',
-                'name'    => 'notes',
-                'bitwise' => $bitwise,
-            ]
-        );
+        $existing = $em->createQueryBuilder()
+            ->select('p')
+            ->from(Permission::class, 'p')
+            ->where('p.role = :role')
+            ->andWhere('p.bundle = :bundle')
+            ->andWhere('p.name = :name')
+            ->setParameter('role', $role)
+            ->setParameter('bundle', 'lead')
+            ->setParameter('name', 'notes')
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($existing instanceof Permission) {
+            $existing->setBitwise($bitwise);
+        } else {
+            $permission = new Permission();
+            $permission->setRole($role);
+            $permission->setBundle('lead');
+            $permission->setName('notes');
+            $permission->setBitwise($bitwise);
+            $em->persist($permission);
+        }
+
+        $em->flush();
     }
 }

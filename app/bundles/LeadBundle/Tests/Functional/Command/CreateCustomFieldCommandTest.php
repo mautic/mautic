@@ -10,35 +10,43 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->useCleanupRollback = false;
+        if ($this->isMysqlPlatform()) {
+            $this->useCleanupRollback = false;
+        }
     }
 
     public function testWithIdAndUserArgs(): void
     {
+        $userCreator = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $userCreator);
+
         $leadField = new LeadField();
         $leadField->setLabel('Custom Field 1');
         $leadField->setAlias('custom_field_1');
         $leadField->setObject('lead');
         $leadField->setColumnIsNotCreated();
         $leadField->setDateAdded(new \DateTime());
-        $leadField->setCreatedBy(1);
+        $leadField->setCreatedBy($userCreator->getId());
         $this->em->persist($leadField);
         $this->em->flush();
 
         $kernel = self::getContainer()->get(KernelInterface::class);
         $this->assertInstanceOf(KernelInterface::class, $kernel);
 
-        $expectedUserId          = 1;
+        $expectedUserId          = $userCreator->getId();
         $customFieldNotification = $this->createMock(CustomFieldNotification::class);
         $customFieldNotification
             ->expects($this->once())
@@ -51,7 +59,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $command       = $application->find(CreateCustomFieldCommand::COMMAND_NAME);
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            '--user' => 1,
+            '--user' => $userCreator->getId(),
             '--id'   => $leadField->getId(),
         ]);
 
@@ -69,13 +77,16 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 
     public function testWithNoArgs(): void
     {
+        $userCreator = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $userCreator);
+
         $leadField1 = new LeadField();
         $leadField1->setLabel('Custom Field 1');
         $leadField1->setAlias('custom_field_1');
         $leadField1->setObject('lead');
         $leadField1->setColumnIsNotCreated();
         $leadField1->setDateAdded(new \DateTime());
-        $leadField1->setCreatedBy(1);
+        $leadField1->setCreatedBy($userCreator->getId());
 
         $leadField2 = new LeadField();
         $leadField2->setLabel('Custom Field 2');
@@ -83,7 +94,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $leadField2->setObject('lead');
         $leadField2->setColumnIsNotCreated();
         $leadField2->setDateAdded(new \DateTime());
-        $leadField2->setCreatedBy(1);
+        $leadField2->setCreatedBy($userCreator->getId());
 
         $this->em->persist($leadField1);
         $this->em->persist($leadField2);
@@ -92,7 +103,7 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $kernel = self::getContainer()->get(KernelInterface::class);
         $this->assertInstanceOf(KernelInterface::class, $kernel);
 
-        $expectedUserId          = 1;
+        $expectedUserId          = $userCreator->getId();
         $customFieldNotification = $this->createMock(CustomFieldNotification::class);
         $customFieldNotification
             ->expects($this->exactly(2))

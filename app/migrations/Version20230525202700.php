@@ -11,7 +11,10 @@ final class Version20230525202700 extends AbstractMauticMigration
 {
     public function up(Schema $schema): void
     {
-        $oldAndNewValues = [
+        $tableName  = $this->getPrefixedTableName('leads');
+        $columnName = $this->connection->quoteIdentifier('state');
+
+        $stateUpdates = [
             'Niederosterreich'   => 'Niederösterreich',
             'Oberosterreich'     => 'Oberösterreich',
             'Geneva'             => 'Genève',
@@ -23,8 +26,18 @@ final class Version20230525202700 extends AbstractMauticMigration
             'Thueringen'         => 'Thüringen',
         ];
 
-        foreach ($oldAndNewValues as $old => $new) {
-            $this->addSql("UPDATE `{$this->prefix}leads` SET `state` = '{$new}' WHERE `state` = '{$old}'");
+        foreach ($stateUpdates as $old => $new) {
+            $oldQuoted = $this->connection->quote($old);
+            $newQuoted = $this->connection->quote($new);
+
+            $this->addSql(sprintf(
+                'UPDATE %s SET %s = %s WHERE %s = %s',
+                $tableName,
+                $columnName,
+                $newQuoted,
+                $columnName,
+                $oldQuoted
+            ));
         }
     }
 }

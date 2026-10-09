@@ -2,7 +2,10 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Expression;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder as BaseExpressionBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 
@@ -15,6 +18,14 @@ class ExpressionBuilder extends BaseExpressionBuilder
     private const IN_LAST = 'inLast';
 
     private const IN_NEXT = 'inNext';
+
+    private readonly AbstractPlatform $platform;
+
+    public function __construct(Connection $connection)
+    {
+        $this->platform = $connection->getDatabasePlatform();
+        parent::__construct($connection);
+    }
 
     /**
      * Creates a between comparison expression.
@@ -57,14 +68,12 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
      *
-     * @param mixed $x the left expression
-     * @param mixed $y the right expression
-     *
-     * @return string
+     * @param string $x the left expression
+     * @param string $y the right expression
      */
-    public function regexp($x, $y)
+    public function regexp(string $x, string $y): string
     {
-        return $this->comparison($x, self::REGEXP, $y);
+        return DatabasePlatform::getRegexpExpression($this->platform, $x, $y);
     }
 
     /**
@@ -77,12 +86,12 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
      *
-     * @param mixed $x the left expression
-     * @param mixed $y the right expression
+     * @param string $x the left expression
+     * @param string $y the right expression
      */
-    public function notRegexp($x, $y): string
+    public function notRegexp(string $x, string $y): string
     {
-        return 'NOT '.$this->comparison($x, self::REGEXP, $y);
+        return DatabasePlatform::getRegexpExpression($this->platform, $x, $y, true);
     }
 
     /**

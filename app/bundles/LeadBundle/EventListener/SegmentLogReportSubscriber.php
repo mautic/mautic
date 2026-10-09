@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -14,6 +15,7 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
 
     public function __construct(
         private FieldsBuilder $fieldsBuilder,
+        private Connection $connection,
     ) {
     }
 
@@ -108,6 +110,9 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
 
     private function generateLeftJoinCondition(string $alias, string $action): string
     {
-        return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
+        // Fetch the proper platform-specific quote (e.g., "action" for PostgreSQL, `action` for MySQL)
+        $actionField = $this->connection->quoteIdentifier('action');
+
+        return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.'.$actionField.' =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
     }
 }

@@ -13,25 +13,51 @@ final class Version20250909202247 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME = Project::TABLE_NAME;
 
-    protected function preUpAssertions(): void
+    private function getTableName(): string
     {
-        $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->hasIndex($this->getIndexName());
-        }, sprintf('Index %s already exists', $this->getIndexName()));
+        return $this->prefix.self::TABLE_NAME;
     }
 
+    private function getNewIndexName(): string
+    {
+        return $this->prefix.'unique_project_name';
+    }
+
+    private function getOldIndexName(): string
+    {
+        return $this->prefix.'project_name';
+    }
+
+    protected function preUpAssertions(): void
+    {
+        $tableName = $this->getTableName();
+
+        $this->skipAssertion(
+            fn (Schema $schema) => $this->indexExists($tableName, $this->getNewIndexName()),
+            sprintf('Index %s already exists', $this->getNewIndexName())
+        );
+    }
+
+    /**
+     * @throws SchemaException
+     */
     public function up(Schema $schema): void
     {
-        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+        $tableName = $this->getTableName();
         $table     = $schema->getTable($tableName);
 
-        $oldIndexName = $this->prefix.'project_name';
+        $oldIndexName = $this->getOldIndexName();
+        $newIndexName = $this->getNewIndexName();
 
-        if ($table->hasIndex($oldIndexName)) {
-            $this->addSql("ALTER TABLE {$tableName} DROP INDEX {$oldIndexName};");
+        // Drop old non-unique index if it exists
+        if ($this->indexExists($tableName, $oldIndexName)) {
+            $table->dropIndex($oldIndexName);
         }
 
-        $table->addUniqueIndex(['name'], $this->getIndexName());
+        // Add new unique index (idempotent)
+        if (!$this->indexExists($tableName, $newIndexName)) {
+            $table->addUniqueIndex(['name'], $newIndexName);
+        }
     }
 
     /**
@@ -39,14 +65,20 @@ final class Version20250909202247 extends PreUpAssertionMigration
      */
     public function down(Schema $schema): void
     {
-        $table = $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME));
+        $tableName = $this->getTableName();
+        $table     = $schema->getTable($tableName);
 
-        $table->dropIndex($this->getIndexName());
-        $table->addIndex(['name'], $this->prefix.'project_name');
-    }
+        $oldIndexName = $this->getOldIndexName();
+        $newIndexName = $this->getNewIndexName();
 
-    private function getIndexName(): string
-    {
-        return $this->prefix.'unique_project_name';
+        // Drop new unique index if it exists
+        if ($this->indexExists($tableName, $newIndexName)) {
+            $table->dropIndex($newIndexName);
+        }
+
+        // Add back old non-unique index (idempotent)
+        if (!$this->indexExists($tableName, $oldIndexName)) {
+            $table->addIndex(['name'], $oldIndexName);
+        }
     }
 }
