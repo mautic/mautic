@@ -4,11 +4,18 @@ namespace Mautic\AssetBundle\Controller;
 
 use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\AssetBundle\Service\ArchiveBuilder;
+use Mautic\AssetBundle\Service\BatchDownloadRequestValidator;
+use Mautic\AssetBundle\Service\BatchDownloadResponder;
+use Mautic\AssetBundle\Service\BatchFileCollector;
+use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,12 +25,13 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class AssetController extends FormController
 {
+    use CategoryListFiltersTrait;
+
     private AuditLogModel $auditLogModel;
 
     #[Required]
-    public function autowireAssetController(
-        AuditLogModel $auditLogModel,
-    ): void {
+    public function autowireAssetController(AuditLogModel $auditLogModel): void
+    {
         $this->auditLogModel = $auditLogModel;
     }
 
@@ -65,9 +73,20 @@ final class AssetController extends FormController
         $filter = ['string' => $search, 'force' => []];
 
         if (!$permissions['asset:assets:viewother']) {
-            $filter['force'][] =
-                ['column' => 'a.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+            $filter['force'][] = [
+                'column' => 'a.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->user->getId(),
+            ];
         }
+
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.asset.list_filters',
+            'asset',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $request->getSession()->get('mautic.asset.orderby', 'a.dateModified');
         $orderByDir = $request->getSession()->get('mautic.asset.orderbydir', $this->getDefaultOrderDirection());
@@ -109,15 +128,13 @@ final class AssetController extends FormController
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
-        // retrieve a list of categories
-        $categories = $assetModel->getLookupResults('category', '', 0);
-
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue'     => $search,
-                'searchScopes'    => $assetSearchScopeProvider->getScopes(),
-                'items'           => $assets,
-                'categories'  => $categories,
+                'searchValue'  => $search,
+                'searchScopes' => $assetSearchScopeProvider->getScopes(),
+                'filters'      => $categoryFilters['filters'],
+                'items'        => $assets,
+                'categories'   => $categoryFilters['categories'],
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'model'       => $assetModel,
@@ -646,6 +663,52 @@ final class AssetController extends FormController
             array_merge($postActionVars, [
                 'flashes' => $flashes,
             ])
+        );
+    }
+
+    public function batchDownloadAction(
+        Request $request,
+        BatchDownloadRequestValidator $batchDownloadRequestValidator,
+        BatchFileCollector $batchFileCollector,
+        ArchiveBuilder $archiveBuilder,
+        BatchDownloadResponder $batchDownloadResponder,
+    ): Response {
+        if (!$request->isMethod(Request::METHOD_POST)) {
+            return new Response('', Response::HTTP_METHOD_NOT_ALLOWED, ['Allow' => Request::METHOD_POST]);
+        }
+
+        if (!$batchDownloadRequestValidator->validatePermissions()) {
+            $this->throwAccessDenied();
+        }
+
+        if (!$batchDownloadRequestValidator->hasValidCsrfToken($request)) {
+            $this->throwAccessDenied();
+        }
+
+        try {
+            $ids                = $batchDownloadRequestValidator->validateAndExtractIds($request);
+            $downloadableAssets = $batchFileCollector->collectDownloadableAssets($ids);
+            $zipPath            = $archiveBuilder->buildArchive($downloadableAssets);
+
+            return $batchDownloadResponder->createResponse($zipPath);
+        } catch (BatchDownloadException $e) {
+            return $this->createBatchDownloadErrorResponse($e->getMessage());
+        }
+    }
+
+    /**
+     * @param array<string, string|int> $messageVars
+     */
+    private function createBatchDownloadErrorResponse(string $messageKey, array $messageVars = []): JsonResponse
+    {
+        $this->addFlashMessage($messageKey, $messageVars, FlashBag::LEVEL_ERROR);
+
+        return new JsonResponse(
+            [
+                'message' => $this->translator->trans($messageKey, $messageVars, 'flashes'),
+                'flashes' => $this->getFlashContent(),
+            ],
+            Response::HTTP_BAD_REQUEST
         );
     }
 

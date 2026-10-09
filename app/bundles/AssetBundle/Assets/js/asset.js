@@ -11,6 +11,45 @@ Mautic.assetOnUnload = function(id) {
     }
 };
 
+Mautic.batchAssetDownload = function (action, el) {
+    const items     = Mautic.getCheckedListIds(el, true);
+    const csrfToken = mQuery(el).data('csrf-token');
+
+    Mautic.initiateFileDownload(action, {
+        ids: items,
+        _token: csrfToken
+    });
+};
+
+mQuery(document).on('click', '[data-mautic-batch-download]', function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    const trigger = mQuery(this);
+    const action  = trigger.data('mautic-batch-download');
+
+    if (!action) {
+        return;
+    }
+
+    const targetSelector = trigger.data('target') || '';
+    const selectedCount  = Mautic.batchActionPrecheck(targetSelector);
+
+    if (!selectedCount) {
+        const message = Mautic.translate('mautic.asset.asset.batch_download.error.no_selection');
+        const flash   = Mautic.addErrorFlashMessage(message);
+        Mautic.setFlashes(flash);
+
+        return;
+    }
+
+    Mautic.batchAssetDownload(action, this);
+
+    mQuery('[data-toggle="cancel-checkall"]').trigger('click');
+    trigger.blur();
+});
+
 Mautic.updateRemoteBrowser = function(provider, path) {
     path = typeof path !== 'undefined' ? path : '';
 
