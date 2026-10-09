@@ -1,0 +1,106 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+reviews:
+  auto_review:
+    enabled: true
+    # By default CodeRabbit only reviews PRs targeting the default branch.
+    # Also review PRs targeting any other branch (e.g. 8.x, 7.2, 6.x, 5.x).
+    base_branches:
+      - ".*"
+    # Skip PRs labelled as not ready for review.
+    labels:
+      - "!WIP"
+    # Skip PRs opened by bots (dependency updates, contributor list updates).
+    ignore_usernames:
+      - "dependabot[bot]"
+      - "allcontributors[bot]"
+  path_instructions:
+    - path: "**/*.php"
+      instructions: |
+        Check for:
+        - Backward compatibility: public/protected methods, constructor
+          signatures, events, services and config keys can be used by
+          third-party plugins. Breaking changes are only accepted on the next
+          major branch and need an entry in that branch's UPGRADE-*.md file;
+          otherwise ask for a deprecation instead (`@deprecated` stating the
+          version it will be removed in and the replacement).
+        - Constructor dependency injection instead of pulling services from
+          the container; no new static or global state.
+        - Database: avoid N+1 queries and unbounded queries on large tables
+          (leads, email_stats, page_hits, campaign_lead_event_log); bind
+          parameters, never concatenate user input into DQL/SQL; prefix table
+          names in DBAL queries with MAUTIC_TABLE_PREFIX.
+        - Security: permission checks via CorePermissions
+          (`$this->security->isGranted()` / `hasEntityAccess()`) on controller
+          actions, safe handling of uploaded files and user-supplied URLs.
+        - User-facing strings must go through the translator, not be hardcoded.
+        Do not comment on code style that php-cs-fixer/ECS, Rector or PHPStan
+        already enforce in CI.
+    - path: "**/Tests/**"
+      instructions: |
+        Prefer functional tests (MauticMysqlTestCase) for behavior that touches
+        the database and unit tests for isolated logic. Flag tests that only
+        assert mocks were called without checking an outcome, and tests that
+        depend on execution order or wall-clock time.
+    - path: "app/migrations/*.php"
+      instructions: |
+        New migrations should follow app/migrations/Migration.template: extend
+        `Mautic\CoreBundle\Doctrine\PreUpAssertionMigration` and add a
+        `skipAssertion()` for every change made in up(), so re-running on an
+        already-migrated database is a no-op. Use the table prefix
+        (`getPrefixedTableName()` / `$this->prefix`), never hardcoded table
+        names. Migrations run on large production databases: avoid long table
+        locks where possible and batch data migrations. Only flag a missing
+        down() when the change is easy to undo.
+    - path: "**/Translations/**"
+      instructions: |
+        Only en_US belongs in this repository; it is the source language for
+        Transifex, which manages all other locales. Flag files added for any
+        other locale. In en_US *.ini files, check that new keys follow the
+        naming pattern of the surrounding keys, values are double-quoted, and
+        that changed wording of an existing key is intentional (it invalidates
+        existing translations).
+    - path: "**/*.html.twig"
+      instructions: |
+        Check escaping of user-controlled data: use `|purify` for user-provided
+        HTML instead of `|raw`, and `|e('html_attr')` / `|e('js')` in attributes
+        and inline scripts. Visible text must go through the translator. Check
+        accessibility basics (labels, alt text, button semantics).
+    - path: "**/Assets/**/*.js"
+      instructions: |
+        Mautic JS uses `mQuery` (Mautic's jQuery alias) and the global `Mautic.*`
+        namespace. Check for XSS when inserting HTML and for event handlers
+        leaking on AJAX-reloaded content. AJAX POSTs made with `mQuery.ajax` get
+        the CSRF header automatically; requests made any other way (e.g.
+        `fetch`) must send `X-Requested-With: XMLHttpRequest` and
+        `X-CSRF-Token: mauticAjaxCsrf`, otherwise CSRF validation is skipped.
+    - path: ".github/workflows/**"
+      instructions: |
+        Check for untrusted input in run: steps (e.g. PR titles, branch names),
+        pull_request_target misuse, overly broad permissions, and actions that
+        are not pinned to a full commit SHA.
+    - path: "UPGRADE-*.md"
+      instructions: |
+        Each entry must name the exact fully-qualified class, interface, trait,
+        constant, method, config key or JS function affected, and either give
+        the replacement ("Use `X` instead") or state it was "removed with no
+        replacement". Place it under the matching existing section (Platform
+        requirements, Removed features, Removed code, Removed Composer
+        dependencies, BC breaks in the code > PHP / Javascript, Notes). When
+        several old names map to new ones, use an old → new table.
+        BC breaks are only accepted on the next major branch; flag new entries
+        added to the upgrade file of an already released major version.
+  tools:
+    # PHPStan, the coding standard check (php-cs-fixer or ECS, depending on
+    # the branch) and Rector already run in Mautic's CI with the project's own
+    # config and baseline; running them again here only produces duplicate or
+    # conflicting comments.
+    phpstan:
+      enabled: false
+    phpcs:
+      enabled: false
+    phpmd:
+      enabled: false
+knowledge_base:
+  # Uses guideline files in the repo (such as AGENTS.md) as review context.
+  code_guidelines:
+    enabled: true
