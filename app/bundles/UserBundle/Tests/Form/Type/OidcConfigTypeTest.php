@@ -10,8 +10,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\ConfigType;
 use Mautic\UserBundle\Security\OIDC\ClientCredentials;
-use Mautic\UserBundle\Security\OIDC\Settings;
-use Mautic\UserBundle\Tests\Security\OIDC\Builder\DTO\ParametersBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Event\PostSubmitEvent;
@@ -90,7 +88,7 @@ final class OidcConfigTypeTest extends TestCase
     public function testBuildFormAddsFieldsWhenOpenIdIsDisabled(): void
     {
         $builder = $this->createFormBuilder();
-        $this->createConfigForm(null, (new ParametersBuilder())->withIsEnabled(false)->build())->buildForm($builder, []);
+        $this->createConfigForm()->buildForm($builder, []);
         $this->assertOpenIdFieldsExist($builder);
     }
 
@@ -116,7 +114,7 @@ final class OidcConfigTypeTest extends TestCase
         $this->assertTrue($builder->has('open_id_mapping_field'));
     }
 
-    private function createConfigForm(?OidcSubjectIdRepository $subjectIdRepository = null, ?Settings $settings = null): ConfigType
+    private function createConfigForm(?OidcSubjectIdRepository $subjectIdRepository = null): ConfigType
     {
         $coreParameterHelper = $this->createStub(CoreParametersHelper::class);
 
@@ -125,7 +123,6 @@ final class OidcConfigTypeTest extends TestCase
         return new ConfigType(
             $coreParameterHelper,
             $this->createStub(TranslatorInterface::class),
-            $settings ?? (new ParametersBuilder())->build(),
             new ClientCredentials('https://example.com', 'client_id', 'client_secret', 'sub'),
             $subjectIdRepository ?? $this->createStub(OidcSubjectIdRepository::class),
         );
