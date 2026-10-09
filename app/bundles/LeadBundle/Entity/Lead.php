@@ -277,6 +277,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $channelRules = [];
 
+    /**
+     * @var string[]
+     */
+    private array $primaryIdentifierOrder = ['name', 'company', 'email', 'social', 'ip'];
+
     public function __construct()
     {
         $this->ipAddresses      = new ArrayCollection();
@@ -743,23 +748,41 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getPrimaryIdentifier($lastFirst = false)
     {
-        if ($name = $this->getName($lastFirst)) {
-            return $name;
-        }
-        if ($this->company) {
-            return $this->company;
-        }
-        if ($this->email) {
-            return $this->email;
-        }
-        if ($socialIdentity = $this->getFirstSocialIdentity()) {
-            return $socialIdentity;
-        }
-        if (count($ips = $this->ipAddresses)) {
-            return $ips->first()->getIpAddress();
+        foreach ($this->primaryIdentifierOrder as $identifier) {
+            $value = match ($identifier) {
+                'name'    => $this->getName($lastFirst),
+                'company' => $this->company,
+                'email'   => $this->email,
+                'social'  => $this->getFirstSocialIdentity(),
+                'ip'      => count($this->ipAddresses) ? $this->ipAddresses->first()->getIpAddress() : null,
+                default   => $this->getCustomFieldIdentifier($identifier),
+            };
+
+            if ($value) {
+                return $value;
+            }
         }
 
         return 'mautic.lead.lead.anonymous';
+    }
+
+    /**
+     * @param string[] $order Any of 'name', 'company', 'email', 'social', 'ip' or a field alias
+     */
+    public function setPrimaryIdentifierOrder(array $order): void
+    {
+        $this->primaryIdentifierOrder = $order;
+    }
+
+    private function getCustomFieldIdentifier(string $alias): ?string
+    {
+        try {
+            $value = $this->getFieldValue($alias);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return is_string($value) || is_int($value) || is_float($value) ? (string) $value : null;
     }
 
     /**
