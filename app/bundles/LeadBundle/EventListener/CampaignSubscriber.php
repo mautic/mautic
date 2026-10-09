@@ -527,7 +527,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             'lead.attached', 'lead.campaigns', 'lead.field_value', 'lead.dnc', 'lead.pageHit', 'lead.points',
         ];
 
-        $matches = array_filter($handledConditions, fn (string $type): bool => $event->checkContext($type));
+        $matches = array_filter($handledConditions, $event->checkContext(...));
         if ([] === $matches) {
             return;
         }

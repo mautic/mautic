@@ -7,7 +7,6 @@ namespace Mautic\CampaignBundle\Tests\Executioner\Dispatcher;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ConditionEvent;
-use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -21,16 +20,10 @@ final class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $dispatcher;
 
-    /**
-     * @var MockObject&ConditionAccessor
-     */
-    private MockObject $config;
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->config     = $this->createMock(ConditionAccessor::class);
     }
 
     public function testConditionEventIsDispatched(): void
@@ -51,6 +44,6 @@ final class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
                 return $event;
             });
 
-        new ConditionDispatcher($this->dispatcher)->dispatchEvent($this->config, new LeadEventLog());
+        new ConditionDispatcher($this->dispatcher)->dispatchEvent($this->createStub(\Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor::class), new LeadEventLog());
     }
 }
