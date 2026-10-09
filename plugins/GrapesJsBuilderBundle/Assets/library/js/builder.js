@@ -11,6 +11,33 @@ import './grapesjs-custom.css';
  * @param formName
  */
 function launchBuilderGrapesjs(formName) {
+  const form = mQuery(`form[name="${formName}"]`);
+  const sessionId = form.find('input[name$="[sessionId]"]').val();
+
+  // A cloned email is shown in the edit form before it has been persisted. The
+  // builder cannot save against its temporary session id, so persist the clone
+  // first and let the normal inBuilder response reopen the builder with the
+  // newly assigned entity id.
+  if (formName === 'emailform' && typeof sessionId === 'string' && sessionId && window.location.pathname.includes('/emails/clone/')) {
+    const saveButton = form.find('button.btn-save').first();
+
+    if (!saveButton.length) {
+      console.error('Unable to save the cloned email before opening the builder.');
+      return;
+    }
+
+    form.find('input[name="inBuilder"]').remove();
+    form.append(mQuery('<input type="hidden" name="inBuilder" value="1" />'));
+    form.one('submit:success', function (event, action, response) {
+      if (response.validationError) {
+        mQuery(this).find('input[name="inBuilder"]').remove();
+      }
+    });
+    saveButton.trigger('click');
+
+    return;
+  }
+
   if (useBuilderForCodeMode() === false) {
     return;
   }
