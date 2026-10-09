@@ -137,10 +137,22 @@ final class SMSControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($savedSms->getIsMms());
     }
 
+    public function testListPageCanFilterByLanguage(): void
+    {
+        $this->createSms('German sms', self::DEFAULT_SMS_MESSAGE, false, null, 'de_DE');
+        $this->createSms('English sms', self::DEFAULT_SMS_MESSAGE, false, null, 'en_US');
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/sms?search=lang%3Ade');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('.sms-list tbody tr'));
+        $this->assertStringContainsString('German sms', $crawler->filter('.sms-list tbody')->text());
+    }
+
     /**
      * @param array<mixed> $media
      */
-    private function createSms(string $name = 'sms', string $message = self::DEFAULT_SMS_MESSAGE, bool $isMms = false, ?array $media = null): Sms
+    private function createSms(string $name = 'sms', string $message = self::DEFAULT_SMS_MESSAGE, bool $isMms = false, ?array $media = null, ?string $language = null): Sms
     {
         $sms = new Sms();
         $sms->setName($name);
@@ -150,6 +162,7 @@ final class SMSControllerFunctionalTest extends MauticMysqlTestCase
         }
         $sms->setIsMms($isMms);
         $sms->setSmsType('template');
+        $sms->setLanguage($language);
         $this->em->persist($sms);
         $this->em->flush();
 
