@@ -21,6 +21,11 @@ final readonly class ReloadHelper
 
     /**
      * Disables plugins that are in the database but are missing in the filesystem.
+     *
+     * @param array<string, mixed>  $allPlugins
+     * @param array<string, Plugin> $installedPlugins
+     *
+     * @return array<string, Plugin>
      */
     public function disableMissingPlugins(array $allPlugins, array $installedPlugins): array
     {
@@ -40,6 +45,11 @@ final readonly class ReloadHelper
     /**
      * Re-enables plugins that were disabled because they were missing in the filesystem
      * but appeared in it again.
+     *
+     * @param array<string, mixed>  $allPlugins
+     * @param array<string, Plugin> $installedPlugins
+     *
+     * @return array<string, Plugin>
      */
     public function enableFoundPlugins(array $allPlugins, array $installedPlugins): array
     {
@@ -63,6 +73,8 @@ final readonly class ReloadHelper
      * @param array<string, Plugin>                             $installedPlugins
      * @param array<string, Schema>                             $installedPluginsSchemas
      * @param array<string, mixed>                              $allPlugins
+     *
+     * @return array<string, Plugin>
      */
     public function updatePlugins(array $allPlugins, array $installedPlugins, array $pluginMetadata, array $installedPluginsSchemas): array
     {
@@ -98,6 +110,9 @@ final readonly class ReloadHelper
      * Installs plugins that does not exist in the database yet.
      *
      * @param array<string, array<class-string, ClassMetadata>> $pluginMetadata
+     * @param array<string, Schema>                             $installedPluginsSchemas
+     *
+     * @return array<string, Plugin>
      */
     public function installPlugins(array $allPlugins, array $existingPlugins, array $pluginMetadata, array $installedPluginsSchemas): array
     {

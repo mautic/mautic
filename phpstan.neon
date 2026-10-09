@@ -22,6 +22,7 @@ parameters:
         narrow_return: true
         narrow_param: true
         no_mixed_property: true
+        no_mixed_caller: true
 
     paths:
         - app/bundles
@@ -46,6 +47,10 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     ignoreErrors:
+        # type-perfect no_mixed_caller: rule enabled, violations typed incrementally; ignored wholesale for now
+        -
+            identifier: typePerfect.noMixedMethodCaller
+
         # final classes mocked in tests make the Class&MockObject intersection unresolvable, the mock works via dg/bypass-finals
         -
             identifiers:
