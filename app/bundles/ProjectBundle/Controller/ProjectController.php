@@ -98,6 +98,7 @@ final class ProjectController extends AbstractFormController
         // Calculate entity counts for each project
         $entityTypes = $entityLoader->getEntityTypesWithViewPermissions();
         foreach ($items as $project) {
+            /** @var Project $project */
             $projectEntities = $entityLoader->getProjectEntities($project, $entityTypes);
             $totalCount      = 0;
             foreach ($projectEntities as $entityData) {
