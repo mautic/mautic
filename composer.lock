@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06136d9d8bced6a20e92a4ef1be9d908",
+    "content-hash": "71b614068e718151a9c88a87edd27a86",
     "packages": [
         {
             "name": "api-platform/core",
@@ -15867,11 +15867,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b1f9890d9af53a25c58129e78f0aadd31f90d7f4",
-                "reference": "b1f9890d9af53a25c58129e78f0aadd31f90d7f4",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/6155239b488e95d26d1ebd95c6b4bb294d7f09db",
+                "reference": "6155239b488e95d26d1ebd95c6b4bb294d7f09db",
                 "shasum": ""
             },
             "require": {
@@ -15927,7 +15927,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-06T06:15:36+00:00"
+            "time": "2026-10-08T21:09:11+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -18347,16 +18347,16 @@
         },
         {
             "name": "symplify/phpstan-rules",
-            "version": "14.15.3",
+            "version": "14.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symplify/phpstan-rules.git",
-                "reference": "65bed212dcbcbc0450c79dd779ddc5ecdf962faf"
+                "reference": "c6a60f14fa95d5e615cafd121a8a70f739b6d3e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/65bed212dcbcbc0450c79dd779ddc5ecdf962faf",
-                "reference": "65bed212dcbcbc0450c79dd779ddc5ecdf962faf",
+                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/c6a60f14fa95d5e615cafd121a8a70f739b6d3e4",
+                "reference": "c6a60f14fa95d5e615cafd121a8a70f739b6d3e4",
                 "shasum": ""
             },
             "require": {
@@ -18386,6 +18386,14 @@
                 "phpstan": {
                     "includes": [
                         "config/services/services.neon",
+                        "config/naming-rules.neon",
+                        "config/code-complexity-rules.neon",
+                        "config/configurable-rules.neon",
+                        "config/static-rules.neon",
+                        "config/symfony-rules.neon",
+                        "config/symfony-config-rules.neon",
+                        "config/doctrine-rules.neon",
+                        "config/phpunit-rules.neon",
                         "config/ctor-rules.neon",
                         "config/mock-rules.neon",
                         "config/phpstan-extensions.neon"
@@ -18407,7 +18415,7 @@
             "description": "Set of Symplify rules, type extensions and error formatter for PHPStan",
             "support": {
                 "issues": "https://github.com/symplify/phpstan-rules/issues",
-                "source": "https://github.com/symplify/phpstan-rules/tree/14.15.3"
+                "source": "https://github.com/symplify/phpstan-rules/tree/14.17.0"
             },
             "funding": [
                 {
@@ -18419,7 +18427,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-22T09:30:12+00:00"
+            "time": "2026-09-24T21:33:45+00:00"
         },
         {
             "name": "theseer/tokenizer",
