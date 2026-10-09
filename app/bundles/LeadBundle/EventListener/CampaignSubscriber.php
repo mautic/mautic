@@ -522,6 +522,16 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
+        $handledConditions = [
+            'lead.device', 'lead.tags', 'lead.segments', 'lead.stages', 'lead.owner',
+            'lead.attached', 'lead.campaigns', 'lead.field_value', 'lead.dnc', 'lead.pageHit', 'lead.points',
+        ];
+
+        $matches = array_filter($handledConditions, fn (string $type): bool => $event->checkContext($type));
+        if ([] === $matches) {
+            return;
+        }
+
         $lead   = $event->getLead();
         $result = false;
 

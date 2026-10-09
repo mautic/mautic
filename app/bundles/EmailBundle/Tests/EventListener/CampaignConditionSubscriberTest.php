@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
@@ -48,8 +49,12 @@ final class CampaignConditionSubscriberTest extends TestCase
             ->willThrowException(new UnexpectedValueException(null, 'string'));
 
         // Prepare the ConditionEvent with the lead
+        $campaignEvent = new Event();
+        $campaignEvent->setType('email.validate.address');
+
         $log = $this->createStub(LeadEventLog::class);
         $log->method('getLead')->willReturn($lead);
+        $log->method('getEvent')->willReturn($campaignEvent);
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
@@ -73,8 +78,12 @@ final class CampaignConditionSubscriberTest extends TestCase
             ->willThrowException(new InvalidEmailException($lead->getEmail(), 'Invalid email format'));
 
         // Prepare the ConditionEvent with the lead
+        $campaignEvent = new Event();
+        $campaignEvent->setType('email.validate.address');
+
         $log = $this->createStub(LeadEventLog::class);
         $log->method('getLead')->willReturn($lead);
+        $log->method('getEvent')->willReturn($campaignEvent);
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
@@ -100,8 +109,12 @@ final class CampaignConditionSubscriberTest extends TestCase
             });
 
         // Prepare the ConditionEvent with the lead
+        $campaignEvent = new Event();
+        $campaignEvent->setType('email.validate.address');
+
         $log = $this->createStub(LeadEventLog::class);
         $log->method('getLead')->willReturn($lead);
+        $log->method('getEvent')->willReturn($campaignEvent);
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 

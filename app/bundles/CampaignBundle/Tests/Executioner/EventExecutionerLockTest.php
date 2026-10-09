@@ -12,7 +12,6 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\LeadEvents;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
@@ -190,13 +189,13 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
             $event->failAll('Forced failure for test.');
             $event->stopPropagation();
         };
-        $this->eventDispatcher->addListener(LeadEvents::ON_CAMPAIGN_BATCH_ACTION, $listener, 9999);
+        $this->eventDispatcher->addListener(PendingEvent::class, $listener, 9999);
 
         return $listener;
     }
 
     private function makeEventExecutionPass(callable $listener): void
     {
-        $this->eventDispatcher->removeListener(LeadEvents::ON_CAMPAIGN_BATCH_ACTION, $listener);
+        $this->eventDispatcher->removeListener(PendingEvent::class, $listener);
     }
 }

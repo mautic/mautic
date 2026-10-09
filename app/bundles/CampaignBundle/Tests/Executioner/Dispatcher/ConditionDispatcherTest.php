@@ -9,9 +9,11 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 final class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -33,19 +35,16 @@ final class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testConditionEventIsDispatched(): void
     {
-        $this->config->expects($this->once())
-            ->method('getEventName')
-            ->willReturn('something');
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
+            ->method('dispatch')->willReturnCallback(function (object $event, ?string $eventName = null) use ($matcher): object {
+                $this->assertInstanceOf(ConditionEvent::class, $event);
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(ConditionEvent::class, $event);
-                    $this->assertSame('something', $eventName);
+                    // dispatched by event class alone
+                    $this->assertNull($eventName);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(ConditionEvent::class, $event);
                     $this->assertSame(CampaignEvents::ON_EVENT_CONDITION_EVALUATION, $eventName);
                 }
 

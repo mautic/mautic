@@ -181,7 +181,7 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function (PendingEvent $pendingEvent, string $eventName) use ($logs): PendingEvent {
+                function (PendingEvent $pendingEvent) use ($logs): PendingEvent {
                     $pendingEvent->pass($logs->get(1));
 
                     return $pendingEvent;
@@ -243,7 +243,7 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function (PendingEvent $pendingEvent, string $eventName) use ($logs): PendingEvent {
+                function (PendingEvent $pendingEvent) use ($logs): PendingEvent {
                     $pendingEvent->fail($logs->get(2), 'something');
 
                     return $pendingEvent;

@@ -35,13 +35,9 @@ final class DecisionDispatcherTest extends TestCase
 
     public function testDecisionEventIsDispatched(): void
     {
-        $this->config->expects($this->once())
-            ->method('getEventName')
-            ->willReturn('something');
-
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(DecisionEvent::class), 'something');
+            ->with($this->isInstanceOf(DecisionEvent::class));
 
         $this->decisionDispatcher->dispatchRealTimeEvent($this->config, new LeadEventLog(), null);
     }

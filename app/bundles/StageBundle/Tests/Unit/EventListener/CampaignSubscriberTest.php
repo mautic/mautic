@@ -36,6 +36,7 @@ final class CampaignSubscriberTest extends TestCase
         $logs         = new ArrayCollection([$log]);
         $pendingEvent = new PendingEvent($config, $event, $logs);
 
+        $event->setType('stage.change');
         $event->setProperties(['stage' => 123]);
 
         $contactModel = new class() extends LeadModel {
@@ -85,6 +86,7 @@ final class CampaignSubscriberTest extends TestCase
         $logs         = new ArrayCollection([$log]);
         $pendingEvent = new PendingEvent($config, $event, $logs);
 
+        $event->setType('stage.change');
         $event->setProperties(['stage' => 123]);
 
         $contactModel = new class() extends LeadModel {
@@ -147,6 +149,7 @@ final class CampaignSubscriberTest extends TestCase
         $logs         = new ArrayCollection([$log]);
         $pendingEvent = new PendingEvent($config, $event, $logs);
 
+        $event->setType('stage.change');
         $event->setProperties(['stage' => 123]);
 
         $contactModel = new class() extends LeadModel {
@@ -223,6 +226,7 @@ final class CampaignSubscriberTest extends TestCase
         $logs         = new ArrayCollection([$log]);
         $pendingEvent = new PendingEvent($config, $event, $logs);
 
+        $event->setType('stage.change');
         $event->setProperties(['stage' => 123]);
 
         $contactModel = new class() extends LeadModel {
@@ -306,6 +310,7 @@ final class CampaignSubscriberTest extends TestCase
         $logs         = new ArrayCollection([$log]);
         $pendingEvent = new PendingEvent($config, $event, $logs);
 
+        $event->setType('stage.change');
         $event->setProperties(['stage' => 123]);
 
         $contactModel = new class() extends LeadModel {
@@ -390,6 +395,7 @@ final class CampaignSubscriberTest extends TestCase
         $logs         = new ArrayCollection([$log]);
         $pendingEvent = new PendingEvent($config, $event, $logs);
 
+        $event->setType('stage.change');
         $event->setProperties(['stage' => 123]);
 
         $contactModel = new class() extends LeadModel {

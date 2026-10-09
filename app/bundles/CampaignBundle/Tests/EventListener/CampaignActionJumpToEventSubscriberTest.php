@@ -117,6 +117,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             $eventScheduler
         );
 
+        $event->setType('campaign.jump_to_event');
         $event->setProperties(['jumpToEvent' => 123]);
         $event->setCampaign($campaign);
 
@@ -258,6 +259,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             $eventScheduler
         );
 
+        $event->setType('campaign.jump_to_event');
         $event->setProperties(['jumpToEvent' => 123]);
         $event->setCampaign($campaign);
 
