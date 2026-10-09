@@ -225,7 +225,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.open_id.config.is_required',
-                'data'  => $this->config->isRequired(),
                 'attr'  => [
                     'data-disable-on' => self::DISABLED_IF,
                     'tooltip'         => 'mautic.open_id.config.is_required.tooltip',
@@ -243,7 +242,6 @@ final class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.open_id.config.mapping_field',
                 'label_attr' => ['class' => 'control-label'],
-                'data'       => $this->clientCredentials->getMappingField(),
                 'attr'       => [
                     'class'           => 'form-control',
                     'data-disable-on' => self::DISABLED_IF,
@@ -261,7 +259,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.open_id.config.is_user_registration_allowed',
-                'data'  => $this->config->isUserRegistrationAllowed(),
                 'attr'  => [
                     'data-disable-on' => self::DISABLED_IF,
                     'tooltip'         => 'mautic.open_id.config.is_user_registration_allowed.tooltip',
@@ -278,7 +275,6 @@ final class ConfigType extends AbstractType
             RoleListType::class,
             [
                 'label'      => 'mautic.open_id.config.registered_user_default_role',
-                'data'       => $this->config->getRegisteredUserRoleId() ?? 0,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'           => 'form-control',
@@ -303,7 +299,6 @@ final class ConfigType extends AbstractType
                 'label'            => 'mautic.open_id.config.client_url',
                 'label_attr'       => ['class' => 'control-label'],
                 'default_protocol' => null,
-                'data'             => $this->clientCredentials->getClientUrl(),
                 'attr'             => [
                     'class'        => 'form-control',
                     'data-disable-on' => self::DISABLED_IF,
@@ -321,7 +316,6 @@ final class ConfigType extends AbstractType
             [
                 'label'      => 'mautic.open_id.config.client_id',
                 'label_attr' => ['class' => 'control-label'],
-                'data'       => $this->clientCredentials->getClientId(),
                 'attr'       => [
                     'class'           => 'form-control',
                     'data-disable-on' => self::DISABLED_IF,
