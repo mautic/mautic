@@ -347,16 +347,21 @@ class IntegrationHelper
         if ($find) {
             // regex to find a match
             return [
-                'twitter'  => "/twitter.com\/(.*?)($|\/)/",
+                'twitter' => [
+                    "/x.com\/(.*?)($|\/)/",
+                    "/twitter.com\/(.*?)($|\/)/",
+                ],
                 'facebook' => [
                     "/facebook.com\/(.*?)($|\/)/",
                     "/fb.me\/(.*?)($|\/)/",
                 ],
                 'linkedin'  => "/linkedin.com\/in\/(.*?)($|\/)/",
                 'instagram' => "/instagram.com\/(.*?)($|\/)/",
+                'tiktok'    => "/tiktok.com\/@(.*?)($|\/)/",
                 'pinterest' => "/pinterest.com\/(.*?)($|\/)/",
                 'klout'     => "/klout.com\/(.*?)($|\/)/",
                 'youtube'   => [
+                    "/youtube.com\/@(.*?)($|\/)/",
                     "/youtube.com\/user\/(.*?)($|\/)/",
                     "/youtu.be\/user\/(.*?)($|\/)/",
                 ],
@@ -367,13 +372,14 @@ class IntegrationHelper
 
         // populate placeholder
         return [
-            'twitter'    => 'https://twitter.com/%handle%',
+            'twitter'    => 'https://x.com/%handle%',
             'facebook'   => 'https://facebook.com/%handle%',
             'linkedin'   => 'https://linkedin.com/in/%handle%',
             'instagram'  => 'https://instagram.com/%handle%',
+            'tiktok'     => 'https://tiktok.com/@%handle%',
             'pinterest'  => 'https://pinterest.com/%handle%',
             'klout'      => 'https://klout.com/%handle%',
-            'youtube'    => 'https://youtube.com/user/%handle%',
+            'youtube'    => 'https://youtube.com/@%handle%',
             'flickr'     => 'https://flickr.com/photos/%handle%',
             'skype'      => 'skype:%handle%?call',
         ];
