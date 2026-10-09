@@ -357,11 +357,6 @@ final class ImportController extends FormController
 
                                 // Workaround for PHP8.6+ backward incompatibility
                                 // PHP 8.6+ counts a trailing newline as an extra empty line
-                                // Below workaround for PHPStan phpVersion.max:
-                                // Error: Comparison operation ">=" between int<50207, 80599> and 80600 is always false.
-                                // Error: Result of && is always false.
-                                // Remove below line once PHP8.6 is released
-                                // @phpstan-ignore-next-line
                                 if (\PHP_VERSION_ID >= 80600 && $linecount > 0) {
                                     $file->seek($linecount);
                                     $last = $file->current();
@@ -557,7 +552,7 @@ final class ImportController extends FormController
         return !$browserImportLimit && $this->getFormButton($form, ['buttons', 'save'])->isClicked();
     }
 
-    protected function getLineCountLimit()
+    protected function getLineCountLimit(): int
     {
         return $this->coreParametersHelper->get('background_import_if_more_rows_than', 0);
     }
