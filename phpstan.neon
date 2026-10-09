@@ -84,8 +84,6 @@ parameters:
                 - app/bundles/CoreBundle/Helper/PRedisConnectionHelper.php
                 - app/bundles/CoreBundle/Helper/SearchStringHelper.php
                 - app/bundles/CoreBundle/IpLookup/AbstractMaxmindLookup.php
-                - app/bundles/CoreBundle/IpLookup/GeoipsLookup.php
-                - app/bundles/CoreBundle/IpLookup/MaxmindDownloadLookup.php
                 - app/bundles/CoreBundle/Tests/Unit/Helper/SearchStringHelperTest.php
                 - app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
                 - app/bundles/PluginBundle/Integration/AbstractIntegration.php
