@@ -122,7 +122,6 @@ parameters:
         -
             identifier: mautic.singleArgumentDispatch
             paths:
-                - app/bundles/CampaignBundle/Executioner/Dispatcher/ConditionDispatcher.php
                 - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
                 - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
                 - app/bundles/DynamicContentBundle/EventListener/CampaignSubscriber.php

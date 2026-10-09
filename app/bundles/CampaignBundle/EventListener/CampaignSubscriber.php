@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -21,15 +20,15 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
-            CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
+            Events\CampaignPostSaveEvent::class    => ['onCampaignPostSave', 0],
+            Events\CampaignPostDeleteEvent::class  => ['onCampaignDelete', 0],
         ];
     }
 
     /**
      * Add an entry to the audit log.
      */
-    public function onCampaignPostSave(Events\CampaignEvent $event): void
+    public function onCampaignPostSave(Events\CampaignPostSaveEvent $event): void
     {
         $campaign = $event->getCampaign();
         $details  = $event->getChanges();
@@ -57,7 +56,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onCampaignDelete(Events\CampaignEvent $event): void
+    public function onCampaignDelete(Events\CampaignPostDeleteEvent $event): void
     {
         $campaign = $event->getCampaign();
         $log      = [

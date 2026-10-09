@@ -6,10 +6,9 @@ use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\TransactionRequiredException;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\Event\CampaignEvent;
+use Mautic\CampaignBundle\Event\CampaignPreSaveEvent;
 use Mautic\CampaignBundle\Event\EventPreview;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
@@ -48,7 +47,7 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_PRE_SAVE        => ['onCampaignPreSave', 0],
+            CampaignPreSaveEvent::class              => ['onCampaignPreSave', 0],
             FailedEvent::class                       => ['onEventFailed', 0],
             ExecutedEvent::class                     => ['onEventExecuted', 0],
             EventPreview::class                      => ['onEventPreviewRequest', 0],
@@ -59,7 +58,7 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
      * Reset all campaign event failed_count's
      * to 0 when the campaign is published.
      */
-    public function onCampaignPreSave(CampaignEvent $event): void
+    public function onCampaignPreSave(CampaignPreSaveEvent $event): void
     {
         $campaign = $event->getCampaign();
         $changes  = $campaign->getChanges();
