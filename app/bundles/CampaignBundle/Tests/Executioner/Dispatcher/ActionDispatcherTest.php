@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
+use Mautic\CampaignBundle\Event\OnCampaignActionChangeMembershipEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
@@ -267,6 +268,29 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch');
 
         $this->getEventDispatcher()->dispatchEvent($config, $event, new ArrayCollection());
+    }
+
+    public function testBatchEventNameAsPendingEventSubclassDispatchesThatSubclass(): void
+    {
+        $event  = new Event();
+        $config = $this->createMock(ActionAccessor::class);
+        $config->expects($this->once())
+            ->method('getBatchEventName')
+            ->willReturn(OnCampaignActionChangeMembershipEvent::class);
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->willReturnCallback(
+                function (PendingEvent $pendingEvent, string $eventName): PendingEvent {
+                    $this->assertInstanceOf(OnCampaignActionChangeMembershipEvent::class, $pendingEvent);
+                    $this->assertSame(OnCampaignActionChangeMembershipEvent::class, $eventName);
+
+                    return $pendingEvent;
+                }
+            );
+
+        $pendingEvent = $this->getEventDispatcher()->dispatchEvent($config, $event, new ArrayCollection());
+        $this->assertInstanceOf(OnCampaignActionChangeMembershipEvent::class, $pendingEvent);
     }
 
     private function getEventDispatcher(): ActionDispatcher

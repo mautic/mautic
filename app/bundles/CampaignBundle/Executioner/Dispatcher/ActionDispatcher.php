@@ -33,11 +33,17 @@ final readonly class ActionDispatcher
      */
     public function dispatchEvent(ActionAccessor $config, Event $event, Collection $logs, ?PendingEvent $pendingEvent = null): PendingEvent
     {
+        $batchEventName = $config->getBatchEventName();
+
         if (!$pendingEvent) {
-            $pendingEvent = new PendingEvent($config, $event, $logs);
+            // a batch event name may point to a dedicated PendingEvent subclass, dispatched under its own class name
+            $pendingEventClass = is_string($batchEventName) && is_a($batchEventName, PendingEvent::class, true)
+                ? $batchEventName
+                : PendingEvent::class;
+            $pendingEvent      = new $pendingEventClass($config, $event, $logs);
         }
 
-        if ($batchEventName = $config->getBatchEventName()) {
+        if ($batchEventName) {
             $this->dispatcher->dispatch($pendingEvent, $batchEventName);
 
             $success = $pendingEvent->getSuccessful();

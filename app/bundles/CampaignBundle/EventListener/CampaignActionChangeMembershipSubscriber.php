@@ -2,11 +2,10 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\Event\OnCampaignActionChangeMembershipEvent;
 use Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType;
 use Mautic\CampaignBundle\Form\Validator\Constraints\InfiniteLoopValidator;
 use Mautic\CampaignBundle\Membership\MembershipManager;
@@ -26,9 +25,9 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignBuilderEvent::class                          => ['addAction', 0],
-            CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP => ['changeMembership', 0],
-            EntityValidateEvent::class                           => ['validateInfiniteLoop', 0],
+            CampaignBuilderEvent::class                       => ['addAction', 0],
+            OnCampaignActionChangeMembershipEvent::class      => ['changeMembership', 0],
+            EntityValidateEvent::class                        => ['validateInfiniteLoop', 0],
         ];
     }
 
@@ -46,12 +45,12 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
                 'formTypeOptions' => [
                     'include_this' => true,
                 ],
-                'batchEventName'  => CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP,
+                'batchEventName'  => OnCampaignActionChangeMembershipEvent::class,
             ]
         );
     }
 
-    public function changeMembership(PendingEvent $event): void
+    public function changeMembership(OnCampaignActionChangeMembershipEvent $event): void
     {
         $properties          = $event->getEvent()->getProperties();
         $contacts            = $event->getContactsKeyedById();
