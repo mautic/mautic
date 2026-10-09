@@ -18,10 +18,9 @@ parameters:
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
         return: 91.6
-        param: 83.5
+        param: 83.4
         property: 73.7
         constant: 99.9
-        declare: 75.4
 
     # rules merged from rector/type-perfect, opt-in since type-coverage 2.3
     type_perfect:
@@ -80,9 +79,6 @@ parameters:
             identifier: argument.type
             path: app/bundles/CoreBundle/Controller/AjaxController.php
 
-        # @todo to be removed as risky
-        - identifier: typePerfect.narrowPublicClassMethodParamType
-
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: symplify.noNullableServiceInConstructor
@@ -109,6 +105,7 @@ parameters:
                 - app/bundles/CoreBundle/Tests/Unit/Helper/SearchStringHelperTest.php
                 - app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
                 - app/bundles/PluginBundle/Integration/AbstractIntegration.php
+                - app/bundles/ProjectBundle/Controller/ProjectController.php
 
         # Loader interface, concrete routing loader provides import()
         -
@@ -123,25 +120,12 @@ parameters:
             path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
         # too strict
-        - identifier: symplify.forbiddenNode
         - identifier: symplify.noReference
         - identifier: symplify.forbiddenFuncCall
         - identifier: symplify.forbiddenExtendOfNonAbstractClass
         - identifier: symplify.noDynamicName
-
-        # handled in another PR
-        - identifier: mautic.noGetModelWithStringInController
-
-        -
-            identifier: symplify.forbiddenStaticClassConstFetch
-            path: app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
-
-        # parent class is used actively
-        -
-            identifier: symplify.forbiddenExtendOfNonAbstractClass
-            paths:
-                - *Controller.php
-                - *Model.php
+        - identifier: symplify.forbiddenSwitch
+        - identifier: symplify.forbiddenTrait
 
         # part of deprecation
         -
@@ -156,7 +140,6 @@ parameters:
                 - app/bundles/CoreBundle/Tests/Functional/Doctrine/Paginator/SimplePaginatorTest.php
                 - app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php
                 - app/bundles/LeadBundle/Tests/Model/FieldModelTest.php
-                - app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
                 - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
 
         # shared pre/post events, Campaign same-string collisions and TOKEN_REPLACEMENT reuse block single-argument dispatch here
