@@ -5,17 +5,19 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
+use Mautic\EmailBundle\Form\Type\EmailPreviewOptionsType;
 use Mautic\EmailBundle\Form\Type\ValidateEmailType;
 use Mautic\EmailBundle\Helper\EmailAddressLinkMatcher;
 use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
+use Mautic\EmailBundle\Helper\EmailPreviewHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -24,7 +26,6 @@ use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\MessengerBundle\Message\EmailHitNotification;
@@ -36,9 +37,11 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
@@ -545,11 +548,10 @@ final class PublicController extends CommonFormController
         EmailConfig $emailConfig,
         EmailModel $model,
         Request $request,
-        FakeContactHelper $fakeLeadHelper,
+        EmailPreviewHelper $previewHelper,
         string $objectId,
         ?string $objectType = null,
     ): Response {
-        $contactId   = (int) $request->query->get('contactId');
         $emailEntity = $model->getEntity($objectId);
 
         if (null === $emailEntity) {
@@ -563,7 +565,7 @@ final class PublicController extends CommonFormController
         }
 
         if (
-            ($this->security->isAnonymous() && !$publicPreview)
+            ($this->security->isAnonymous() && (!$emailEntity->getIsPublished() || !$publicPreview))
             || (!$this->security->isAnonymous()
                 && !$this->security->hasEntityAccess(
                     'email:emails:viewown',
@@ -574,78 +576,132 @@ final class PublicController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        // bogus ID
-        if ($contactId && (
-            !$this->security->isAdmin()
-            && !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
-        )
-        ) {
-            // disallow displaying contact information
-            $contactId = null;
-        }
-
-        // bogus ID
-        $idHash = 'xxxxxxxxxxxxxx';
-
-        $content = $emailEntity->getCustomHtml();
-
-        if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
-            $content = $emailEntity->getDraftContent();
-        }
-
-        if (empty($content) && $emailEntity->getTemplate()) {
-            $template = $emailEntity->getTemplate();
-
-            $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
-
-            $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
-
-            $content = $this->themeHelper->renderThemeTemplate(
-                $logicalName,
-                [
-                    'inBrowser' => true,
-                    'content'   => $emailEntity->getContent(),
-                    'email'     => $emailEntity,
-                    'lead'      => null,
-                    'template'  => $template,
-                ]
-            );
-        }
-
-        // Override tracking_pixel
-        $tokens = ['{tracking_pixel}' => ''];
-
-        // Prepare contact
+        $contactId     = $request->query->getInt('contactId');
+        $companyId     = $request->query->getInt('companyId');
+        $contact       = [];
         if ($contactId) {
-            // We have one from request parameter
-            $contact = $this->leadRepository->getLead($contactId);
-            $contact = $model->enrichedContactWithCompanies($contact);
-        } else {
-            // Make fake contact.
-            /** @var FakeContactHelper $fakeLeadHelper */
-            $contact = $fakeLeadHelper->prepareFakeContactWithPrimaryCompany();
+            $contact = $previewHelper->getContactEntity($contactId);
+            if (!$this->security->isAdmin()
+                && !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $contact['owner_id'] ?? 0)
+            ) {
+                // disallow displaying contact information
+                $contact = [];
+            }
         }
-        // Generate and replace tokens
-        $event = new EmailSendEvent(
-            null,
-            [
-                'content'      => $content,
-                'email'        => $emailEntity,
-                'idHash'       => $idHash,
-                'tokens'       => $tokens,
-                'internalSend' => true,
-                'lead'         => $contact,
-            ]
-        );
-        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
 
-        $content = $event->getContent(true);
+        $content = $this->generateContent($emailEntity, $assetsHelper, $draftEnabled, $objectType);
+        $company = $previewHelper->getCompanyEntity($companyId);
+        $content = $previewHelper->generatePreviewContent($emailEntity, $contact, $company, $content);
 
         if ($this->security->isAnonymous()) {
             $content = $analyticsHelper->addCode($content);
         }
 
         return new Response($content);
+    }
+
+    public function downloadAction(
+        AssetsHelper $assetsHelper,
+        EmailConfig $emailConfig,
+        EmailModel $model,
+        EmailPreviewHelper $previewHelper,
+        Request $request,
+        string $objectId,
+        string $objectType = 'real',
+        ?string $downloadType = null,
+    ): Response {
+        $emailEntity = $model->getEntity($objectId);
+
+        if (null === $emailEntity) {
+            return $this->notFound();
+        }
+
+        $publicPreview = $emailEntity->isPublicPreview();
+        $draftEnabled = $emailConfig->isDraftEnabled();
+        if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
+            $publicPreview = $emailEntity->getDraft()->isPublicPreview();
+        }
+
+        if (
+            ($this->security->isAnonymous() && (!$emailEntity->getIsPublished() || !$publicPreview))
+            || (!$this->security->isAnonymous()
+                && !$this->security->hasEntityAccess(
+                    'email:emails:viewown',
+                    'email:emails:viewother',
+                    $emailEntity->getCreatedBy()
+                ))
+        ) {
+            $this->throwAccessDenied();
+        }
+
+        $contactId     = $request->query->getInt('contactId');
+        $companyId     = $request->query->getInt('companyId');
+        $contact       = [];
+        if ($contactId) {
+            $contact = $previewHelper->getContactEntity($contactId);
+            if (!$this->security->isAdmin()
+                && !$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $contact['owner_id'] ?? 0)
+            ) {
+                // disallow displaying contact information
+                $contactId = 0;
+                $contact   = [];
+                $this->addFlash(FlashBag::LEVEL_ERROR, $this->translator->trans('mautic.email.preview.contact.access.denied', [], 'flashes'));
+            }
+        }
+
+        $company = $previewHelper->getCompanyEntity($companyId);
+
+        $previewPageUrl = $this->generateUrl('mautic_email_preview', [
+            'objectId'   => $objectId,
+            'objectType' => $objectType,
+            'contactId'  => $contactId,
+            'companyId'  => $companyId,
+        ],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $content = $this->generateContent($emailEntity, $assetsHelper, $draftEnabled, $objectType);
+        $content = $previewHelper->generatePreviewContent($emailEntity, $contact, $company, $content);
+
+        if ('html' == $downloadType) {
+            $response = new Response($content);
+            $fileName = $previewHelper->generateDownloadFileName($contact, $company, $emailEntity->getName(), 'html');
+            $response->headers->set('Content-Disposition', HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $fileName));
+
+            return $response;
+        }
+
+        $contactName = '';
+        if ([] !== $contact) {
+            $contactNameArr   = [];
+            $contactNameArr[] = $contact['firstname'] ?? '';
+            $contactNameArr[] = $contact['lastname'] ?? '';
+            $contactName      = trim(implode(' ', $contactNameArr));
+        }
+
+        $companyName = '';
+        if ([] !== $company) {
+            $companyName = $company[0]['companyname'] ?? '';
+        }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'objectId'           => $objectId,
+                'contactId'          => $contactId,
+                'companyId'          => $companyId,
+                'objectType'         => $objectType,
+                'previewPageUrl'     => $previewPageUrl,
+                'previewOptionsForm' => $this->createForm(
+                    EmailPreviewOptionsType::class,
+                    [],
+                    [
+                        'contactName' => $contactName,
+                        'companyName' => $companyName,
+                    ]
+                )->createView(),
+            ],
+            'contentTemplate' => '@MauticEmail/Email/preview.html.twig',
+        ]);
     }
 
     /**
@@ -978,5 +1034,37 @@ final class PublicController extends CommonFormController
                 ]
             )
         )->getContent();
+    }
+
+    private function generateContent(
+        Email $emailEntity,
+        AssetsHelper $assetsHelper,
+        bool $draftEnabled,
+        ?string $objectType = null,
+    ): string {
+        $content = $emailEntity->getCustomHtml();
+
+        if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
+            $content = $emailEntity->getDraftContent();
+        }
+
+        if (!$content && ($template = $emailEntity->getTemplate())) {
+            $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
+
+            $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
+
+            $content = $this->themeHelper->renderThemeTemplate(
+                $logicalName,
+                [
+                    'inBrowser' => true,
+                    'content'   => $emailEntity->getContent(),
+                    'email'     => $emailEntity,
+                    'lead'      => null,
+                    'template'  => $template,
+                ]
+            );
+        }
+
+        return $content;
     }
 }
