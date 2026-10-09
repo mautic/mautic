@@ -1,13 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\UserBundle\Form\Type\ConfigType;
+use Mautic\UserBundle\Security\OIDC\ClientCredentials;
+use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -19,6 +25,13 @@ final class ConfigSubscriber implements EventSubscriberInterface
         'saml_idp_own_certificate',
         'saml_idp_own_private_key',
     ];
+
+    public function __construct(
+        private readonly ClientFactoryInterface $clientFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly LoggerInterface $logger,
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -43,6 +56,33 @@ final class ConfigSubscriber implements EventSubscriberInterface
     }
 
     public function onConfigSave(ConfigEvent $event): void
+    {
+        $this->validateOidcConnection($event);
+        $this->processSamlConfig($event);
+    }
+
+    private function validateOidcConnection(ConfigEvent $event): void
+    {
+        if (1 !== $event->getConfig()['userconfig']['open_id_is_enabled']) {
+            return;
+        }
+
+        $credentials = new ClientCredentials(
+            $event->getConfig()['userconfig']['open_id_client_url'],
+            $event->getConfig()['userconfig']['open_id_client_id'],
+            $event->getConfig()['userconfig']['open_id_client_secret'],
+            $event->getConfig()['userconfig']['open_id_mapping_field']
+        );
+        $client = $this->clientFactory->create($credentials);
+
+        if ($error = $client->testConnection()) {
+            $message = $this->translator->trans('mautic.open_id.config.exception.test_connection_failed');
+            $this->logger->debug($message, ['error' => $error]);
+            $event->setError($message, [], 'userconfig', 'open_id_is_enabled');
+        }
+    }
+
+    private function processSamlConfig(ConfigEvent $event): void
     {
         // Preserve existing value
         $event->unsetIfEmpty('saml_idp_own_password');

@@ -25,7 +25,7 @@ final class ApiUserSubscriberTest extends TestCase
     public function testSubscribedEvents(): void
     {
         $this->assertSame([
-            CheckPassportEvent::class              => ['onCheckPassport', 2048],
+            CheckPassportEvent::class              => ['onCheckPassport', 2560],
             AuthenticationTokenCreatedEvent::class => 'onTokenCreated',
         ], ApiUserSubscriber::getSubscribedEvents());
     }

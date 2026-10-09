@@ -98,7 +98,6 @@ class UserProvider implements UserProviderInterface
             }
         }
 
-        // Validation for User objects returned by a plugin
         if (!$user->getRole()) {
             throw new AuthenticationException('mautic.integration.sso.error.no_role');
         }
