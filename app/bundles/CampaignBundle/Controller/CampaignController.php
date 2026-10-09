@@ -35,12 +35,10 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -109,8 +107,6 @@ final class CampaignController extends AbstractStandardFormController
     private ?array $indexSearchScopes = null;
 
     public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
         private readonly EventCollector $eventCollector,
         private readonly DateHelper $dateHelper,
         ManagerRegistry $managerRegistry,
@@ -132,7 +128,7 @@ final class CampaignController extends AbstractStandardFormController
         private readonly EventRepository $eventRepository,
         private readonly LeadRepository $campaignLeadRepository,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     protected function getPermissions(): array
@@ -168,7 +164,7 @@ final class CampaignController extends AbstractStandardFormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    public function batchDeleteAction(Request $request): JsonResponse|RedirectResponse
+    public function batchDeleteAction(Request $request): JsonResponse|RedirectResponse|Response
     {
         return $this->batchDeleteStandard($request);
     }
@@ -602,7 +598,7 @@ final class CampaignController extends AbstractStandardFormController
         );
     }
 
-    public function deleteAction(Request $request, $objectId): JsonResponse|RedirectResponse
+    public function deleteAction(Request $request, $objectId): JsonResponse|RedirectResponse|Response
     {
         return $this->deleteStandard($request, $objectId);
     }
