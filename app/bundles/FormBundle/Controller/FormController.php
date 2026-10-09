@@ -23,13 +23,11 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Exception\ValidationException;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormSearchScopeProvider;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,8 +36,6 @@ use Symfony\Component\Routing\Attribute\Route;
 class FormController extends CommonFormController
 {
     public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
         private readonly AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
         private readonly MappedObjectCollector $mappedObjectCollector,
         ManagerRegistry $doctrine,
@@ -57,7 +53,7 @@ class FormController extends CommonFormController
         private readonly SubmissionRepository $submissionRepository,
         private readonly FormRepository $formRepository,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     #[Route(

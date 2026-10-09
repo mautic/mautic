@@ -7261,12 +7261,6 @@ parameters:
 			path: plugins/GrapesJsBuilderBundle/Helper/FileManager.php
 
 		-
-			message: '#^Method MauticPlugin\\GrapesJsBuilderBundle\\Helper\\FileManager\:\:uploadFiles\(\) has parameter \$request with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/GrapesJsBuilderBundle/Helper/FileManager.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Helper\\LookupHelper\:\:getCache\(\) has parameter \$notify with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7321,28 +7315,10 @@ parameters:
 			path: plugins/MauticClearbitBundle/Services/Clearbit_Base.php
 
 		-
-			message: '#^Property MauticPlugin\\MauticClearbitBundle\\Services\\Clearbit_Base\:\:\$response_obj has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: plugins/MauticClearbitBundle/Services/Clearbit_Base.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Services\\Clearbit_Company\:\:lookupByDomain\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticClearbitBundle/Services/Clearbit_Company.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Services\\Clearbit_Company\:\:lookupByDomain\(\) has parameter \$search with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticClearbitBundle/Services/Clearbit_Company.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Services\\Clearbit_Person\:\:lookupByEmail\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticClearbitBundle/Services/Clearbit_Person.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Services\\Clearbit_Person\:\:lookupByEmail\(\) has parameter \$search with no type specified\.$#'
@@ -8869,28 +8845,10 @@ parameters:
 			path: plugins/MauticFullContactBundle/Services/FullContact_Base.php
 
 		-
-			message: '#^Property MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Base\:\:\$response_obj has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Base.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Batch\:\:sendRequests\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Batch.php
-
-		-
 			message: '#^Property MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Batch\:\:\$_resourceUri has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Batch.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Company\:\:lookupByDomain\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Company.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Company\:\:lookupByDomain\(\) has parameter \$search with no type specified\.$#'
@@ -8905,12 +8863,6 @@ parameters:
 			path: plugins/MauticFullContactBundle/Services/FullContact_Company.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Icon\:\:available\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Icon.php
-
-		-
 			message: '#^Property MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Icon\:\:\$_resourceUri has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -8921,12 +8873,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Icon.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Location\:\:enrichment\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Location.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Location\:\:enrichment\(\) has parameter \$casing with no type specified\.$#'
@@ -8971,12 +8917,6 @@ parameters:
 			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:parser\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:parser\(\) has parameter \$casing with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8985,12 +8925,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:parser\(\) has parameter \$name with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:stats\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
 
@@ -9019,20 +8953,8 @@ parameters:
 			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Person\:\:lookupByEmail\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Person.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Person\:\:lookupByEmail\(\) has parameter \$search with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Person.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Person\:\:lookupByEmailMD5\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Person.php
 
@@ -9043,20 +8965,8 @@ parameters:
 			path: plugins/MauticFullContactBundle/Services/FullContact_Person.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Person\:\:lookupByPhone\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Person.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Person\:\:lookupByPhone\(\) has parameter \$search with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Person.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Person\:\:lookupByTwitter\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Person.php
 

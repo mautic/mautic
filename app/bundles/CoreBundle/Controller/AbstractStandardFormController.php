@@ -2,60 +2,45 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
+/**
+ * @method Response editAction(Request $request, mixed $objectId = null, bool $ignorePost = false)
+ * @method Response newAction(Request $request)
+ */
 abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
 
     private AuditLogModel $auditLogModel;
 
+    protected FormFactoryInterface $formFactory;
+
+    protected FormFieldHelper $fieldHelper;
+
     #[Required]
     public function autowireAbstractStandardFormController(
         AuditLogModel $auditLogModel,
+        FormFactoryInterface $formFactory,
+        FormFieldHelper $fieldHelper,
     ): void {
         $this->auditLogModel = $auditLogModel;
-    }
-
-    public function __construct(
-        protected FormFactoryInterface $formFactory,
-        protected FormFieldHelper $fieldHelper,
-        ManagerRegistry $managerRegistry,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        $this->formFactory   = $formFactory;
+        $this->fieldHelper   = $fieldHelper;
     }
 
     /**
@@ -68,10 +53,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
-        if (false === $route) {
-            return false;
-        }
-
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
@@ -88,21 +69,21 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
      */
-    protected function afterEntitySave($entity, Form $form, $action, $pass = null): void
+    protected function afterEntitySave($entity, FormInterface $form, $action, $pass = null): void
     {
     }
 
     /**
      * Called after the form is validated on POST.
      */
-    protected function afterFormProcessed($isValid, $entity, Form $form, $action, bool $isClone = false): void
+    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, bool $isClone = false): void
     {
     }
 
     /**
      * Deletes a group of entities.
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     protected function batchDeleteStandard(Request $request)
     {
@@ -120,7 +101,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            $model     = $this->getModel($this->getModelName());
+            $model = $this->getModel($this->getModelName());
+            if (!$model instanceof FormModel) {
+                throw new \Exception($model::class.' must extend '.FormModel::class);
+            }
+
             $ids       = json_decode($request->query->get('ids', ''));
             $deleteIds = [];
 
@@ -172,10 +157,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Modify entity prior to persisting or perform custom validation on the form.
-     *
-     * @return mixed Whatever is returned will be passed into afterEntitySave; pass false to fail validation
+     * Return false to fail validation.
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, bool $isClone = false): bool
+    protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, bool $isClone = false): bool
     {
         return true;
     }
@@ -183,7 +167,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Do anything necessary before the form is checked for POST and processed.
      */
-    protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, bool $isClone = false): void
+    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, bool $isClone = false): void
     {
     }
 
@@ -201,11 +185,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
         if ($entity) {
             return match ($action) {
                 'new' => $this->security->isGranted($this->getPermissionBase().':create'),
-                'view', 'index' => ($entity) ? $this->security->hasEntityAccess(
+                'view', 'index' => $this->security->hasEntityAccess(
                     $this->getPermissionBase().':viewown',
                     $this->getPermissionBase().':viewother',
                     $permissionUser
-                ) : $this->security->isGranted($this->getPermissionBase().':view'),
+                ),
                 'clone' => $this->security->isGranted($this->getPermissionBase().':create')
                 && $this->security->hasEntityAccess(
                     $this->getPermissionBase().':viewown',
@@ -238,7 +222,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Clone an entity.
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     protected function cloneStandard(Request $request, $objectId)
     {
@@ -269,7 +253,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     protected function deleteStandard(Request $request, $objectId)
     {
@@ -277,7 +261,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $returnUrl = $this->generateUrl($this->getIndexRoute(), ['page' => $page]);
         $flashes   = [];
         $model     = $this->getModel($this->getModelName());
-        $entity    = $model->getEntity($objectId);
+        if (!$model instanceof FormModel) {
+            throw new \Exception($model::class.' must extend '.FormModel::class);
+        }
+
+        $entity = $model->getEntity($objectId);
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
@@ -524,20 +512,20 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * @param bool $isClone
      */
-    protected function getFormEntity($action, &$objectId = null, &$isClone = false)
+    protected function getFormEntity($action, &$objectId = null, &$isClone = false): ?object
     {
-        $model = $this->getModel($this->getModelName());
+        $model  = $this->getModel($this->getModelName());
+        $entity = null;
 
         switch ($action) {
             case 'new':
                 $entity = $model->getEntity();
                 break;
             case 'edit':
-                /** @var FormEntity $entity */
                 if (is_object($objectId)) {
                     $entity   = $objectId;
                     $isClone  = true;
-                    $objectId = (!empty($this->sessionId)) ? $this->sessionId : 'mautic_'.sha1(uniqid(mt_rand(), true));
+                    $objectId = (!empty($this->sessionId)) ? $this->sessionId : 'mautic_'.sha1(uniqid((string) mt_rand(), true));
                 } elseif (str_contains($objectId, 'mautic_')) {
                     $isClone = true;
                     $entity  = $model->getEntity();
@@ -684,7 +672,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         ];
 
         foreach ($namespaces as $namespace) {
-            if ($this->container->get('twig')->getLoader()->exists($namespace.'/'.$file)) {
+            if ($this->twig->getLoader()->exists($namespace.'/'.$file)) {
                 return $namespace.'/'.$file;
             }
         }
@@ -1042,7 +1030,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * @param string|null $name
      */
-    protected function setListFilters($name = null)
+    protected function setListFilters($name = null): array
     {
         return parent::setListFilters($name ?: $this->getSessionBase());
     }
@@ -1197,7 +1185,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         return true;
     }
 
-    public function returnOptimizedResponse(Request $request, FormInterface $form, string $link, string $content, string $route, array $data = []): ?JsonResponse
+    protected function returnOptimizedResponse(Request $request, FormInterface $form, string $link, string $content, string $route, array $data = []): ?JsonResponse
     {
         if ($request->request->get('is_optimized_response', false)) {
             return new JsonResponse(

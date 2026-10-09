@@ -38,8 +38,6 @@ parameters:
         - plugins/*/vendor/*
         - */Fixture/*
         - */Source/*
-        # @todo handle once the other PRs are merged
-        - app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
     dynamicConstantNames:
         - MAUTIC_ENV
         - MAUTIC_TABLE_PREFIX
@@ -62,6 +60,10 @@ parameters:
                 - method.unresolvableReturnType
             paths:
                 - */Tests/*
+        -
+            identifiers:
+                - method.unresolvableReturnType
+            paths:
                 - */Test/*
 
         -
