@@ -22,7 +22,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\Tag;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -265,10 +264,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
             $event      = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
             $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-            $dispatcher->dispatch(
-                $event,
-                LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
-            );
+            $dispatcher->dispatch($event);
 
             $this->assertTrue($event->wasConditionSatisfied());
         }
@@ -1051,7 +1047,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $eventAccessor   = new ActionAccessor([]);
         $event           = new PendingEvent($eventAccessor, $campaignEvent, new ArrayCollection([$log]));
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-        $eventDispatcher->dispatch($event, LeadEvents::ON_CAMPAIGN_BATCH_ACTION);
+        $eventDispatcher->dispatch($event);
 
         $leadManipulator = $lead->getManipulator();
         $this->assertInstanceOf(LeadManipulator::class, $leadManipulator);
@@ -1109,7 +1105,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
 
         // The test passes if no exception is thrown and the result is as expected
-        $dispatcher->dispatch($event, LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
+        $dispatcher->dispatch($event);
 
         $this->assertSame($expectedResult, $event->wasConditionSatisfied(), 'Regex operator should not cause exception and should match as expected.');
 

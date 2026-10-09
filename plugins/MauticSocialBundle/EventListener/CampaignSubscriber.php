@@ -24,7 +24,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            SocialEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignAction', 0],
+            PendingEvent::class => ['onCampaignAction', 0],
         ];
     }
 
@@ -48,6 +48,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignAction(PendingEvent $event): void
     {
+        if (!$event->checkContext('twitter.tweet')) {
+            return;
+        }
+
         $event->setChannel('social.twitter');
         $campaignEvent = $event->getEvent();
 

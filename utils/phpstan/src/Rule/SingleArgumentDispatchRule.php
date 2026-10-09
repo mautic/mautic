@@ -35,6 +35,7 @@ final class SingleArgumentDispatchRule implements Rule
     // intentionally dual-dispatched under a dynamic per-type name too; the event class cannot replace the fixed name
     private const array ALLOWED_EVENT_NAMES = [
         'CampaignEvents::ON_EVENT_CONDITION_EVALUATION',
+        'CampaignEvents::ON_EVENT_DECISION_EVALUATION',
     ];
 
     public function getNodeType(): string

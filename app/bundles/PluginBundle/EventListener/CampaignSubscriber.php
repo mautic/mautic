@@ -16,7 +16,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            PluginEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
+            PendingEvent::class => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -35,6 +35,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
+        if (!$event->checkContext('plugin.leadpush')) {
+            return;
+        }
+
         $campaignEvent = $event->getEvent();
 
         foreach ($event->getPending() as $log) {

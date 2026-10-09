@@ -26,7 +26,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            StageEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerStageChange', 0],
+            PendingEvent::class => ['onCampaignTriggerStageChange', 0],
         ];
     }
 
@@ -44,6 +44,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerStageChange(PendingEvent $event): void
     {
+        if (!$event->checkContext('stage.change')) {
+            return;
+        }
+
         $logs    = $event->getPending();
         $config  = $event->getEvent()->getProperties();
         $stageId = (int) $config['stage'];

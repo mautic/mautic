@@ -21,7 +21,7 @@ final readonly class CampaignActionDeleteContactSubscriber implements EventSubsc
     {
         return [
             CampaignBuilderEvent::class => ['configureAction', 0],
-            LeadEvents::ON_CAMPAIGN_ACTION_DELETE_CONTACT => ['deleteContacts', 0],
+            PendingEvent::class => ['deleteContacts', 0],
         ];
     }
 
@@ -46,6 +46,10 @@ final readonly class CampaignActionDeleteContactSubscriber implements EventSubsc
 
     public function deleteContacts(PendingEvent $event): void
     {
+        if (!$event->checkContext('lead.deletecontact')) {
+            return;
+        }
+
         $contactIds = $event->getContactIds();
 
         $this->removedContactTracker->addRemovedContacts(

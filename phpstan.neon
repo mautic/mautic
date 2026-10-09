@@ -114,16 +114,12 @@ parameters:
                 - app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
                 - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
 
-        # shared pre/post events, Campaign same-string collisions and TOKEN_REPLACEMENT reuse block single-argument dispatch here
+        # shared TokenReplacementEvent dispatched under per-channel names blocks single-argument dispatch here
         -
             identifier: mautic.singleArgumentDispatch
             paths:
-                - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
-                - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
                 - app/bundles/DynamicContentBundle/EventListener/CampaignSubscriber.php
                 - app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
-                - app/bundles/FormBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
-                - app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
                 - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
                 - app/bundles/SmsBundle/Model/SmsModel.php
                 - plugins/MauticFocusBundle/Model/FocusModel.php

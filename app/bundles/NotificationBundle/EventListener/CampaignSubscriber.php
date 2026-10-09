@@ -49,7 +49,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignBatchAction', 0],
+            PendingEvent::class => ['onCampaignBatchAction', 0],
         ];
     }
 

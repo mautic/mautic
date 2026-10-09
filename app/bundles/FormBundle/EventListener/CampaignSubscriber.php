@@ -34,8 +34,8 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             SubmissionEvent::class                    => ['onFormSubmit', 0],
-            FormEvents::ON_CAMPAIGN_TRIGGER_DECISION  => ['onCampaignTriggerDecision', 0],
-            FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
+            DecisionEvent::class  => ['onCampaignTriggerDecision', 0],
+            ConditionEvent::class => ['onCampaignTriggerCondition', 0],
         ];
     }
 
@@ -73,6 +73,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
+        if (!$event->checkContext('form.submit')) {
+            return;
+        }
+
         $eventDetails = $event->getEventDetails();
 
         if (null === $eventDetails) {
@@ -97,6 +101,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
+        if (!$event->checkContext('form.field_value')) {
+            return;
+        }
+
         $lead = $event->getLead();
 
         if (!$lead || !$lead->getId()) {

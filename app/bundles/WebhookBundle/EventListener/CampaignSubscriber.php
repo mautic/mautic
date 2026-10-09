@@ -20,7 +20,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class             => ['onCampaignBuild', 0],
-            WebhookEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
+            PendingEvent::class => ['onCampaignTriggerAction', 0],
         ];
     }
 

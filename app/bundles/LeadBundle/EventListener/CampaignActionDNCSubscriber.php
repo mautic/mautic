@@ -24,8 +24,10 @@ final readonly class CampaignActionDNCSubscriber implements EventSubscriberInter
     {
         return [
             CampaignBuilderEvent::class => ['configureAction', 0],
-            LeadEvents::ON_CAMPAIGN_ACTION_ADD_DONOTCONTACT    => ['addDoNotContact', 0],
-            LeadEvents::ON_CAMPAIGN_ACTION_REMOVE_DONOTCONTACT => ['removeDoNotContact', 0],
+            PendingEvent::class => [
+                ['addDoNotContact', 0],
+                ['removeDoNotContact', 0],
+            ],
         ];
     }
 
@@ -54,6 +56,10 @@ final readonly class CampaignActionDNCSubscriber implements EventSubscriberInter
 
     public function addDoNotContact(PendingEvent $event): void
     {
+        if (!$event->checkContext('lead.adddnc')) {
+            return;
+        }
+
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);
         $reason          = ArrayHelper::getValue('reason', $config, '');
@@ -79,6 +85,10 @@ final readonly class CampaignActionDNCSubscriber implements EventSubscriberInter
 
     public function removeDoNotContact(PendingEvent $event): void
     {
+        if (!$event->checkContext('lead.removednc')) {
+            return;
+        }
+
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);
         $persistEntities = [];

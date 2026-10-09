@@ -24,7 +24,7 @@ final readonly class DecisionDispatcher
     public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough): DecisionEvent
     {
         $event = new DecisionEvent($config, $log, $passthrough);
-        $this->dispatcher->dispatch($event, $config->getEventName());
+        $this->dispatcher->dispatch($event);
 
         return $event;
     }

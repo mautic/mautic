@@ -14,7 +14,7 @@ final class CampaignConditionSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerHasActiveCondition', 0],
+            ConditionEvent::class => ['onCampaignTriggerHasActiveCondition', 0],
         ];
     }
 

@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -116,7 +115,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
 
-        $dispatcher->dispatch($event, FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION);
+        $dispatcher->dispatch($event);
 
         $this->assertSame('form', $event->getChannel());
         $this->assertSame($result, $event->wasConditionSatisfied());

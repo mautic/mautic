@@ -33,7 +33,7 @@ final readonly class CampaignActionJumpToEventSubscriber implements EventSubscri
         return [
             CampaignPostSaveEvent::class           => ['processCampaignEventsAfterSave', 1],
             CampaignBuilderEvent::class            => ['onCampaignBuild', 0],
-            CampaignEvents::ON_EVENT_JUMP_TO_EVENT => ['onJumpToEvent', 0],
+            PendingEvent::class                    => ['onJumpToEvent', 0],
         ];
     }
 
@@ -69,6 +69,10 @@ final readonly class CampaignActionJumpToEventSubscriber implements EventSubscri
      */
     public function onJumpToEvent(PendingEvent $campaignEvent): void
     {
+        if (!$campaignEvent->checkContext(self::EVENT_NAME)) {
+            return;
+        }
+
         $event      = $campaignEvent->getEvent();
         $jumpTarget = $this->getJumpTargetForEvent($event, 'e.id');
 

@@ -88,7 +88,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            LeadEvents::ON_CAMPAIGN_BATCH_ACTION => [
+            PendingEvent::class => [
                 ['onCampaignTriggerActionUpdateLead', 0],
                 ['onCampaignTriggerActionChangePoints', 0],
                 ['onCampaignTriggerActionChangeLists', 1],
@@ -99,7 +99,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
                 ['onCampaignTriggerActionUpdateCompany', 8],
                 ['onCampaignTriggerActionSetManipulator', 100],
             ],
-            LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => [
+            ConditionEvent::class => [
                 ['onCampaignTriggerCondition', 0],
             ],
         ];

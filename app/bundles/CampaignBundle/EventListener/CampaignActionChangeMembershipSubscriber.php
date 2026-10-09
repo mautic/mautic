@@ -27,7 +27,7 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
     {
         return [
             CampaignBuilderEvent::class                          => ['addAction', 0],
-            CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP => ['changeMembership', 0],
+            PendingEvent::class                                  => ['changeMembership', 0],
             EntityValidateEvent::class                           => ['validateInfiniteLoop', 0],
         ];
     }
@@ -53,6 +53,10 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
 
     public function changeMembership(PendingEvent $event): void
     {
+        if (!$event->checkContext('campaign.addremovelead')) {
+            return;
+        }
+
         $properties          = $event->getEvent()->getProperties();
         $contacts            = $event->getContactsKeyedById();
         $executingCampaign   = $event->getEvent()->getCampaign();

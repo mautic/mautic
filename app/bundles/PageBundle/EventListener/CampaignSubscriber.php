@@ -32,11 +32,11 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             PageHitEvent::class                  => ['onPageHit', 0],
-            PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => [
+            DecisionEvent::class => [
                 ['onCampaignTriggerDecision', 0],
                 ['onCampaignTriggerDecisionDeviceHit', 1],
             ],
-            PageEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
+            PendingEvent::class => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -224,6 +224,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
+        if (!$event->checkContext('tracking.pixel.send')) {
+            return;
+        }
+
         $config = $event->getEvent()->getProperties();
 
         if (empty($config['services'])) {

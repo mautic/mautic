@@ -37,8 +37,8 @@ final readonly class ActionDispatcher
             $pendingEvent = new PendingEvent($config, $event, $logs);
         }
 
-        if ($batchEventName = $config->getBatchEventName()) {
-            $this->dispatcher->dispatch($pendingEvent, $batchEventName);
+        if ($config->getBatchEventName()) {
+            $this->dispatcher->dispatch($pendingEvent);
 
             $success = $pendingEvent->getSuccessful();
             $failed  = $pendingEvent->getFailures();

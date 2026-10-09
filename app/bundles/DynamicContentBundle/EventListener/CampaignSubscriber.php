@@ -31,8 +31,8 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
-            DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION     => ['onCampaignTriggerAction', 0],
+            DecisionEvent::class => ['onCampaignTriggerDecision', 0],
+            PendingEvent::class  => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -84,6 +84,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
      */
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
+        if (!$event->checkContext('dwc.decision')) {
+            return;
+        }
+
         $eventConfig  = $event->getConfig();
         $eventDetails = $event->getEventDetails();
         $lead         = $event->getLead();
@@ -111,6 +115,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
+        if (!$event->checkContext('dwc.push_content')) {
+            return;
+        }
+
         $eventConfig = $event->getEvent()->getProperties();
 
         foreach ($event->getPending() as $log) {

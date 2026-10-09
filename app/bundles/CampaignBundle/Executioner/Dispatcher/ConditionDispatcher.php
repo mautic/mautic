@@ -18,7 +18,7 @@ final readonly class ConditionDispatcher
     public function dispatchEvent(ConditionAccessor $config, LeadEventLog $log): ConditionEvent
     {
         $event = new ConditionEvent($config, $log);
-        $this->dispatcher->dispatch($event, $config->getEventName());
+        $this->dispatcher->dispatch($event);
         $this->dispatcher->dispatch($event, CampaignEvents::ON_EVENT_CONDITION_EVALUATION);
 
         return $event;

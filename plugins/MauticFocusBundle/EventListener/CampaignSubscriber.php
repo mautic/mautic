@@ -25,7 +25,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            FocusEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
+            PendingEvent::class => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -54,6 +54,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
+        if (!$event->checkContext('focus.show')) {
+            return;
+        }
+
         $focusId = (int) $event->getEvent()->getProperties()['focus'];
 
         foreach ($event->getPending() as $log) {

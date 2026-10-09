@@ -45,7 +45,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            ChannelEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
+            PendingEvent::class => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -86,6 +86,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
      */
     public function onCampaignTriggerAction(PendingEvent $pendingEvent): void
     {
+        if (!$pendingEvent->checkContext('message.send')) {
+            return;
+        }
+
         $this->pseudoEvent = clone $pendingEvent->getEvent();
         $this->pseudoEvent->setCampaign($pendingEvent->getEvent()->getCampaign());
 

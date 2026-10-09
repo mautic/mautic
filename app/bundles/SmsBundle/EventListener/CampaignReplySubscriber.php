@@ -26,7 +26,7 @@ final readonly class CampaignReplySubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            SmsEvents::ON_CAMPAIGN_REPLY      => ['onCampaignReply', 0],
+            DecisionEvent::class              => ['onCampaignReply', 0],
             ReplyEvent::class                 => ['onReply', 0],
         ];
     }
@@ -50,6 +50,10 @@ final readonly class CampaignReplySubscriber implements EventSubscriberInterface
 
     public function onCampaignReply(DecisionEvent $decisionEvent): void
     {
+        if (!$decisionEvent->checkContext(self::TYPE)) {
+            return;
+        }
+
         /** @var ReplyEvent $replyEvent */
         $replyEvent = $decisionEvent->getPassthrough();
         $pattern    = $decisionEvent->getLog()->getEvent()->getProperties()['pattern'];

@@ -21,7 +21,7 @@ final readonly class CampaignConditionSubscriber implements EventSubscriberInter
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            EmailEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
+            ConditionEvent::class => ['onCampaignTriggerCondition', 0],
         ];
     }
 
@@ -39,6 +39,10 @@ final readonly class CampaignConditionSubscriber implements EventSubscriberInter
 
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
+        if (!$event->checkContext('email.validate.address')) {
+            return;
+        }
+
         try {
             $this->validator->validate($event->getLead()->getEmail(), true);
         } catch (UnexpectedValueException|InvalidEmailException) {

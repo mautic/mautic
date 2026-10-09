@@ -25,7 +25,7 @@ final readonly class CampaignSendSubscriber implements EventSubscriberInterface
     {
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION => ['onCampaignTriggerBatchAction', 0],
+            PendingEvent::class => ['onCampaignTriggerBatchAction', 0],
         ];
     }
 
@@ -50,6 +50,10 @@ final readonly class CampaignSendSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerBatchAction(PendingEvent $event): void
     {
+        if (!$event->checkContext('sms.send_text_sms')) {
+            return;
+        }
+
         $smsId = (int) $event->getEvent()->getProperties()['sms'];
         $sms   = $smsId ? $this->smsModel->getEntity($smsId) : null;
 

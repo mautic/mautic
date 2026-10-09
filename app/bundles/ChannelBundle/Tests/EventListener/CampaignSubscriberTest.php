@@ -140,8 +140,8 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->dispatcher->addSubscriber($campaignSubscriber);
-        $this->dispatcher->addListener(EmailEvents::ON_CAMPAIGN_BATCH_ACTION, $this->sendMarketingMessageEmail(...));
-        $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION, $this->sendMarketingMessageSms(...));
+        $this->dispatcher->addListener(PendingEvent::class, $this->sendMarketingMessageEmail(...));
+        $this->dispatcher->addListener(PendingEvent::class, $this->sendMarketingMessageSms(...));
     }
 
     public function testCorrectChannelIsUsed(): void
@@ -176,7 +176,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $pendingEvent = new PendingEvent($config, $event, $logs);
 
-        $this->dispatcher->dispatch($pendingEvent, ChannelEvents::ON_CAMPAIGN_BATCH_ACTION);
+        $this->dispatcher->dispatch($pendingEvent);
 
         $this->assertCount(0, $pendingEvent->getFailures());
 
@@ -191,6 +191,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function sendMarketingMessageEmail(PendingEvent $event): void
     {
+        if (!$event->checkContext('email.send')) {
+            return;
+        }
+
         $contacts = $event->getContacts();
         $logs     = $event->getPending();
         $this->assertCount(1, $logs);
@@ -212,6 +216,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function sendMarketingMessageSms(PendingEvent $event): void
     {
+        if (!$event->checkContext('sms.send_text_sms')) {
+            return;
+        }
+
         foreach ($event->getPending() as $log) {
             if (1 === $log->getLead()->getId()) {
                 $event->pass($log);

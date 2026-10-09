@@ -23,7 +23,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         return [
             CampaignBuilderEvent::class => ['onCampaignBuild', 0],
             AssetLoadEvent::class                     => ['onAssetDownload', 0],
-            AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
+            DecisionEvent::class => ['onCampaignTriggerDecision', 0],
         ];
     }
 
@@ -55,6 +55,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
+        if (!$event->checkContext('asset.download')) {
+            return;
+        }
+
         $eventDetails = $event->getEventDetails();
 
         if (null == $eventDetails) {
