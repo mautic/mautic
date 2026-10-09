@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
@@ -104,6 +105,8 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
         $tokenStorage->setToken(null);
         $this->client->getCookieJar()->clear();
+
+        $this->em->clear();
     }
 
     private function loginAdminUser(): void
@@ -112,6 +115,16 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $admin);
 
         $this->loginUser($admin);
+    }
+
+    private function findCompanyByReference(string $reference): Company
+    {
+        /** @var Company $company */
+        $company = $this->getReference($reference);
+        $company = $this->em->getRepository(Company::class)->find($company->getId());
+        $this->assertInstanceOf(Company::class, $company);
+
+        return $company;
     }
 
     /**
@@ -267,6 +280,83 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->assertContains($leadWithCompany->getId(), $leadIds);
         $this->assertNotContains($leadWithCompanyMatchingValue->getId(), $leadIds);
         $this->assertNotContains($leadWithoutCompany->getId(), $leadIds);
+    }
+
+    public function testSegmentCanCombineContactAndCompanyTags(): void
+    {
+        $leadWithBothTags       = $this->findLeadByReference('lead-1');
+        $leadWithoutCompanyTag  = $this->findLeadByReference('lead-3');
+        $leadWithoutAnyCompany  = $this->findLeadByReference('lead-5');
+        $companyWithEnterprise  = $this->findCompanyByReference('company-1');
+
+        $vipTag        = new Tag('VIP');
+        $enterpriseTag = new Tag('Enterprise');
+
+        $leadWithBothTags->addTag($vipTag);
+        $leadWithoutCompanyTag->addTag($vipTag);
+        $companyWithEnterprise->addTag($enterpriseTag);
+
+        $this->em->persist($leadWithBothTags);
+        $this->em->persist($leadWithoutCompanyTag);
+        $this->em->persist($companyWithEnterprise);
+        $this->em->flush();
+
+        $segment = $this->createSegment([
+            [
+                'glue'     => 'and',
+                'type'     => 'tags',
+                'object'   => ContactSegmentFilterCrate::CONTACT_OBJECT,
+                'field'    => 'tags',
+                'operator' => 'in',
+                'filter'   => [$vipTag->getId()],
+                'display'  => '',
+            ],
+            [
+                'glue'     => 'and',
+                'type'     => 'tags',
+                'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                'field'    => 'company_tags',
+                'operator' => 'in',
+                'filter'   => [$enterpriseTag->getId()],
+                'display'  => '',
+            ],
+        ], 'Segment Contact and Company Tags', 'segment-contact-company-tags');
+        $leadIds = $this->getSegmentLeadIds($segment);
+
+        $this->assertContains($leadWithBothTags->getId(), $leadIds);
+        $this->assertNotContains($leadWithoutCompanyTag->getId(), $leadIds);
+        $this->assertNotContains($leadWithoutAnyCompany->getId(), $leadIds);
+    }
+
+    public function testCompanyTagsEmptyFilterExcludesContactsWithoutCompanies(): void
+    {
+        $leadWithTaggedCompany   = $this->findLeadByReference('lead-1');
+        $leadWithUntaggedCompany = $this->findLeadByReference('lead-3');
+        $leadWithoutCompany      = $this->findLeadByReference('lead-5');
+        $companyWithTag          = $this->findCompanyByReference('company-1');
+
+        $enterpriseTag = new Tag('Enterprise');
+        $companyWithTag->addTag($enterpriseTag);
+        $this->em->persist($companyWithTag);
+        $this->em->flush();
+
+        $segment = $this->createSegment([
+            [
+                'glue'     => 'and',
+                'type'     => 'tags',
+                'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                'field'    => 'company_tags',
+                'operator' => 'empty',
+                'filter'   => '',
+                'display'  => '',
+            ],
+        ], 'Segment Company Tags Empty', 'segment-company-tags-empty');
+        $leadIds = $this->getSegmentLeadIds($segment);
+
+        $this->assertNotContains($leadWithTaggedCompany->getId(), $leadIds);
+        $this->assertContains($leadWithUntaggedCompany->getId(), $leadIds);
+        $this->assertNotContains($leadWithoutCompany->getId(), $leadIds);
+        $this->assertGreaterThan(1, count($leadIds));
     }
 
     public function testSegmentRebuildCommand(): void
