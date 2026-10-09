@@ -112,7 +112,6 @@ return [
     'parameters' => [
         'notification_enabled'                        => false,
         'notification_landing_page_enabled'           => true,
-        'notification_tracking_page_enabled'          => false,
         'notification_app_id'                         => null,
         'notification_rest_api_key'                   => null,
         'notification_safari_web_id'                  => null,
