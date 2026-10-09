@@ -81,9 +81,11 @@ parameters:
                 - plugins/MauticSocialBundle/Integration/InstagramIntegration.php
                 - plugins/MauticClearbitBundle/Services/Clearbit_Base.php
                 - app/bundles/CoreBundle/Entity/CommonRepository.php
+                - app/bundles/CoreBundle/Event/AbstractCustomRequestEvent.php
                 - app/bundles/CoreBundle/Helper/PRedisConnectionHelper.php
                 - app/bundles/CoreBundle/Helper/SearchStringHelper.php
                 - app/bundles/CoreBundle/IpLookup/AbstractMaxmindLookup.php
+                - app/bundles/CoreBundle/IpLookup/GeoipsLookup.php
                 - app/bundles/CoreBundle/Tests/Unit/Helper/SearchStringHelperTest.php
                 - app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
                 - app/bundles/PluginBundle/Integration/AbstractIntegration.php

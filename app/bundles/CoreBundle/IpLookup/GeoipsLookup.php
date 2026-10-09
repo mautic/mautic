@@ -28,10 +28,8 @@ final class GeoipsLookup extends AbstractRemoteDataLookup
     {
         $data = json_decode($response);
 
-        if ($data instanceof \stdClass && $data->response instanceof \stdClass && !empty($data->response->location)) {
-            /** @var \stdClass $responseData */
-            $responseData = $data->response;
-            foreach ($responseData->location as $key => $value) {
+        if ($data && !empty($data->response->location)) {
+            foreach ($data->response->location as $key => $value) {
                 switch ($key) {
                     case 'city_name':
                         $key = 'city';
