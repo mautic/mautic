@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping\Builder\FieldBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -226,13 +227,12 @@ final class ClassMetadataBuilder extends OrmClassMetadataBuilder
 
     /**
      * Added dateAdded column.
-     *
-     * @param bool|false $nullable
      */
-    public function addDateAdded($nullable = false): static
+    public function addDateAdded(bool $nullable = false, int $precision = 0): static
     {
-        $dateAdded = $this->createField('dateAdded', Types::DATETIME_MUTABLE)
-            ->columnName('date_added');
+        $dateAdded = $this->createField('dateAdded', $precision > 0 ? UTCDateTimeMicrosecondType::NAME : Types::DATETIME_MUTABLE)
+            ->columnName('date_added')
+            ->precision($precision);
 
         if ($nullable) {
             $dateAdded->nullable();
