@@ -592,6 +592,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     }
                 }
 
+                if (!preg_match('/^[a-zA-Z0-9_-]+$/', $column)) {
+                    return [];
+                }
+
                 $param        = 'filterVar';
                 $expr         = new ExpressionBuilder($this->em->getConnection());
                 $platform     = $this->em->getConnection()->getDatabasePlatform();
@@ -601,7 +605,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
                 // Validate owner permissions
                 if (!$this->security->isGranted('lead:leads:viewother')) {
-                    $composite->with(
+                    $composite = $composite->with(
                         $expr->or(
                             $expr->and(
                                 $expr->isNull('comp.owner_id'),
