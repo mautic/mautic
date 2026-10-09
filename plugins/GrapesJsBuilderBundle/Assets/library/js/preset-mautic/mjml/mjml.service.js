@@ -49,21 +49,17 @@ export default class MjmlService {
   static mjmlToHtml(mjml, endpoint = '') {
     let html = '';
 
-    try {
-      if (typeof mjml !== 'string' || !mjml.includes('<mjml>')) {
-        throw new Error('No valid MJML provided');
-      }
+    if (typeof mjml !== 'string' || !mjml.includes('<mjml>')) {
+      throw new Error('No valid MJML provided');
+    }
 
-      if (endpoint !== '') {
-        html = MjmlService.mjmlToHtmlViaEndpoint(mjml, endpoint);
-      } else {
-        // html needs to be beautified for the click tracking to work.
-        // strict mode not working with e.g. id="" and data-type parameters that
-        // are e.g. used for Dynamic Content
-        html = mjml2html(mjml, { beautify: true });
-      }
-    } catch (error) {
-      console.warn(error);
+    if (endpoint !== '') {
+      html = MjmlService.mjmlToHtmlViaEndpoint(mjml, endpoint);
+    } else {
+      // html needs to be beautified for the click tracking to work.
+      // strict mode not working with e.g. id="" and data-type parameters that
+      // are e.g. used for Dynamic Content
+      html = mjml2html(mjml, { beautify: true });
     }
 
     return html;
