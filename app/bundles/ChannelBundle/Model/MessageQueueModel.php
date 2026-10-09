@@ -189,6 +189,9 @@ final class MessageQueueModel extends FormModel
         return $counter;
     }
 
+    /**
+     * @param array<int, MessageQueue>|MessageQueue $queue
+     */
     public function processMessageQueue(array|MessageQueue $queue): int
     {
         if (!is_array($queue)) {
