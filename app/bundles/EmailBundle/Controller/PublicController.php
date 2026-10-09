@@ -208,9 +208,12 @@ final class PublicController extends CommonFormController
         $stat                   = $model->getEmailStatus($idHash);
         $hasStat                = $stat instanceof Stat;
         $message                = '';
+        $defaultPreferenceCenter = false;
         $email                  = null;
         $lead                   = null;
         $template               = null;
+        $formTemplate            = null;
+        $formContent             = null;
         $session                = $request->getSession();
         $isOneClickUnsubscribe  = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
         $isUnsubscribeAll       = $request->get('unsubscribe_all');
@@ -346,7 +349,8 @@ final class PublicController extends CommonFormController
                 );
 
                 if (empty($html)) {
-                    $html = $this->getHtml($formView, $lead, $viewParameters);
+                    $html                    = $this->getHtml($formView, $lead, $viewParameters);
+                    $defaultPreferenceCenter = true;
                 }
                 $message = $html;
             }
@@ -356,20 +360,72 @@ final class PublicController extends CommonFormController
 
         $config = $theme->getConfig();
 
+        $messageType = $this->getUnsubscribeMessageType(
+            $isCorrectHash,
+            $hasStat || $lead instanceof Lead,
+            $lead instanceof Lead,
+            (bool) $showContactPreferences,
+            (bool) $isUnsubscribeAll,
+        );
+
         $viewParams = [
-            'email'    => $email,
-            'lead'     => $lead,
-            'template' => $template,
-            'message'  => $message,
+            'email'                    => $email,
+            'lead'                     => $lead,
+            'template'                 => $template,
+            'message'                  => $message,
+            'message_type'             => $messageType,
+            'default_preference_center' => $defaultPreferenceCenter,
         ];
 
-        if (!empty($formContent)) {
+        return $this->renderUnsubscribeResponse(
+            $contentTemplate,
+            $viewParams,
+            $message,
+            $formContent,
+            $template,
+            $config
+        );
+    }
+
+    private function getUnsubscribeMessageType(
+        bool $isCorrectHash,
+        bool $hasContact,
+        bool $hasLead,
+        bool $showContactPreferences,
+        bool $isUnsubscribeAll,
+    ): string {
+        if (!$isCorrectHash || !$hasContact) {
+            return '';
+        }
+
+        if ($showContactPreferences && !$isUnsubscribeAll && $hasLead) {
+            return 'preference_center';
+        }
+
+        return 'unsubscribed';
+    }
+
+    /**
+     * @param array<string, mixed> $viewParams
+     * @param array<string, mixed> $config
+     */
+    private function renderUnsubscribeResponse(
+        string $contentTemplate,
+        array $viewParams,
+        string $message,
+        ?string $formContent,
+        string $template,
+        array $config,
+    ): Response {
+        if (null !== $formContent && '' !== $formContent) {
             $viewParams['content'] = $formContent;
-            if (in_array('form', $config['features'])) {
+            if (in_array('form', $config['features'], true)) {
                 $contentTemplate = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
             } else {
-                $viewParams['content'] = '';
-                $viewParams['message'] = $message.$formContent;
+                $viewParams['content']       = '';
+                $viewParams['message']       = $message.$formContent;
+                $viewParams['statusMessage'] = $message;
+                $viewParams['formContent']   = $formContent;
             }
         }
 
@@ -522,11 +578,12 @@ final class PublicController extends CommonFormController
         return new Response($this->themeHelper->renderThemeTemplate(
             $logicalName,
             [
-                'message'  => $message,
-                'type'     => 'notice',
-                'email'    => $email,
-                'lead'     => $lead,
-                'template' => $template,
+                'message'      => $message,
+                'type'         => 'notice',
+                'message_type' => $isCorrectHash ? 'resubscribed' : '',
+                'email'        => $email,
+                'lead'         => $lead,
+                'template'     => $template,
             ]
         ));
     }
