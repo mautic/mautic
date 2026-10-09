@@ -21,6 +21,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * dependency visible.
  *
  * @implements Rule<MethodCall>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoGetModelWithStringInControllerRuleTest
  */
 final class NoGetModelWithStringInControllerRule implements Rule
 {
@@ -72,7 +74,6 @@ final class NoGetModelWithStringInControllerRule implements Rule
             $firstArg->value->value
         ))
             ->identifier('mautic.noGetModelWithStringInController')
-            ->nonIgnorable()
             ->build();
 
         return [$ruleError];
