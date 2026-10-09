@@ -1880,6 +1880,10 @@ final class EmailController extends FormController
         $clonedEmail->setVariantReadCount($cloningEmail->getVariantReadCount());
         $clonedEmail->setVariantStartDate($cloningEmail->getVariantStartDate());
         $clonedEmail->setEmailType($cloningEmail->getEmailType());
+        $clonedEmail->setPlainText($cloningEmail->getPlainText());
+        $clonedEmail->setPublishUp($cloningEmail->getPublishUp());
+        $clonedEmail->setPublishDown($cloningEmail->getPublishDown());
+        $clonedEmail->setContinueSending($cloningEmail->getContinueSending());
         $clonedEmail->setDraft($cloningEmail->getDraft());
     }
 
