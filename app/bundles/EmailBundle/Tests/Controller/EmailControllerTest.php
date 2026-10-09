@@ -112,8 +112,6 @@ final class EmailControllerTest extends TestCase
             ->willReturn(new User(false));
 
         $this->controller = new EmailController(
-            $this->formFactoryMock,
-            $this->createStub(FormFieldHelper::class),
             $this->createStub(ManagerRegistry::class),
             $this->createStub(ModelFactory::class),
             $helperUserMock,
@@ -125,6 +123,12 @@ final class EmailControllerTest extends TestCase
             $this->corePermissionsMock
         );
         $this->controller->setContainer($this->containerMock);
+
+        $this->controller->autowireAbstractStandardFormController(
+            $this->createStub(AuditLogModel::class),
+            $this->formFactoryMock,
+            $this->createStub(FormFieldHelper::class)
+        );
 
         $this->controller->autowireEmailController(
             $this->createStub(ListModel::class),
