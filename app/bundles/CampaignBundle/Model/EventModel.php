@@ -2,12 +2,12 @@
 
 namespace Mautic\CampaignBundle\Model;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Event\AfterEventsDeleteEvent;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -101,7 +101,7 @@ final class EventModel extends FormModel
     {
         $deletedData = array_map(fn (string $id): array => ['id' => (int) $id, 'redirectEvent' => null], $eventIds);
         $this->eventRepository->setEventsAsDeletedWithRedirect($deletedData);
-        $this->dispatcher->dispatch(new DeleteEvent($eventIds), CampaignEvents::ON_AFTER_EVENTS_DELETE);
+        $this->dispatcher->dispatch(new AfterEventsDeleteEvent($eventIds));
     }
 
     /**
