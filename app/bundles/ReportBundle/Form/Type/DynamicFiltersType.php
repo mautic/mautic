@@ -26,10 +26,13 @@ final class DynamicFiltersType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var \stdClass $filterDefinitions */
+        $filterDefinitions = $options['filterDefinitions'];
+
         foreach ($options['report']->getFilters() as $filter) {
             if (isset($filter['dynamic']) && 1 === $filter['dynamic']) {
                 $column     = $filter['column'];
-                $definition = $options['filterDefinitions']->definitions[$column];
+                $definition = $filterDefinitions->definitions[$column];
 
                 $operatorGroup = $definition['operatorGroup'] ?? $definition['type'];
 

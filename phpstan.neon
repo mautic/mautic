@@ -78,7 +78,6 @@ parameters:
             identifier: typePerfect.noMixedPropertyFetcher
             paths:
                 - plugins/MauticSocialBundle/Integration/FoursquareIntegration.php
-                - plugins/MauticSocialBundle/Integration/TwitterIntegration.php
                 - plugins/MauticSocialBundle/Integration/InstagramIntegration.php
                 - plugins/MauticClearbitBundle/Services/Clearbit_Base.php
                 - app/bundles/CoreBundle/Entity/CommonRepository.php
@@ -87,12 +86,9 @@ parameters:
                 - app/bundles/CoreBundle/Helper/SearchStringHelper.php
                 - app/bundles/CoreBundle/IpLookup/AbstractMaxmindLookup.php
                 - app/bundles/CoreBundle/IpLookup/GeoipsLookup.php
-                - app/bundles/CoreBundle/IpLookup/MaxmindDownloadLookup.php
                 - app/bundles/CoreBundle/Tests/Unit/Helper/SearchStringHelperTest.php
                 - app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
                 - app/bundles/PluginBundle/Integration/AbstractIntegration.php
-                - app/bundles/ProjectBundle/Controller/ProjectController.php
-                - app/bundles/ReportBundle/Form/Type/DynamicFiltersType.php
 
         # Loader interface, concrete routing loader provides import()
         -
