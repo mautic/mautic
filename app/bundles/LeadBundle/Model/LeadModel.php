@@ -341,6 +341,17 @@ class LeadModel extends FormModel
                         continue;
                     }
 
+                    if (!empty($args['fieldValuesOnly'])) {
+                        // Same row shape as the rest of the results
+                        $mergedRows = $this->getRepository()->getEntities([
+                            'filter'          => ['force' => [['column' => 'l.id', 'expr' => 'eq', 'value' => $entity->getId()]]],
+                            'fieldValuesOnly' => true,
+                            'withStage'       => !empty($args['withStage']),
+                        ]);
+                        $entities = array_slice($entities, $i, 0, true) + $mergedRows + $entities;
+                        continue;
+                    }
+
                     // Hydrate fields with custom field data
                     $fields = $this->getRepository()->getFieldValues($entity->getId());
                     $entity->setFields($fields);
