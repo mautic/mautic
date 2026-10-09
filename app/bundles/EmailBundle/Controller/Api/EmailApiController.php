@@ -14,11 +14,14 @@ use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\FakeContactHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -160,21 +163,10 @@ final class EmailApiController extends CommonApiController
             return $lead;
         }
 
-        $post       = $request->request->all();
-        $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
-        $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
-        $response   = ['success' => false];
-
-        $cleanTokens = [];
-
-        foreach ($tokens as $token => $value) {
-            $value = InputHelper::html($value);
-            if (!preg_match('/^{.*?}$/', $token)) {
-                $token = '{'.$token.'}';
-            }
-
-            $cleanTokens[$token] = $value;
-        }
+        $post        = $request->request->all();
+        $assetsIds   = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
+        $response    = ['success' => false];
+        $cleanTokens = $this->cleanTokens((!empty($post['tokens'])) ? $post['tokens'] : []);
 
         $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
         // Set owner_id to support the "Owner is mailer" feature
@@ -219,6 +211,161 @@ final class EmailApiController extends CommonApiController
         return $this->handleView(
             $this->view(['success' => true], Response::HTTP_CREATED)
         );
+    }
+
+    /**
+     * Sends an example (proof) copy of the email to arbitrary addresses, mirroring the UI
+     * "Send example" action (EmailController::sendExampleAction). No stats are recorded and
+     * the stored email is not modified; works on unpublished emails.
+     *
+     * Request body:
+     *  - recipients      array of email addresses (required)
+     *  - contactId       int, fill tokens from this contact instead of fake data (optional)
+     *  - tokens          object of token => value overrides (optional)
+     *  - noSubjectPrefix bool, skip the "[TEST]" subject prefix (optional)
+     *
+     * @param int $id Email ID
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function sendExampleAction(Request $request, $id, LeadModel $leadModel, FakeContactHelper $fakeContactHelper): Response
+    {
+        $entity     = $this->model->getEntity($id);
+        $post       = $request->request->all();
+        $recipients = array_filter(array_map('trim', (array) ($post['recipients'] ?? [])));
+
+        $validation = $this->validateExampleRequest($entity, $recipients);
+        if ($validation instanceof Response) {
+            return $validation;
+        }
+        \assert($entity instanceof Email);
+
+        $fields = $this->resolveExampleContactFields($post, $leadModel, $fakeContactHelper);
+        if ($fields instanceof Response) {
+            return $fields;
+        }
+
+        $result = $this->sendExampleToRecipients(
+            $entity,
+            $recipients,
+            $fields,
+            $this->cleanTokens((array) ($post['tokens'] ?? [])),
+            empty($post['noSubjectPrefix'])
+        );
+
+        return $this->handleView($this->view($result, Response::HTTP_OK));
+    }
+
+    /**
+     * @param string[] $recipients
+     */
+    private function validateExampleRequest(?Email $entity, array $recipients): ?Response
+    {
+        if (null === $entity) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity)) {
+            return $this->accessDenied();
+        }
+
+        return empty($recipients)
+            ? $this->badRequest('recipients is required and must be a non-empty array of email addresses')
+            : null;
+    }
+
+    /**
+     * Returns the contact field data used to fill tokens: a real contact's data when a
+     * valid contactId is supplied, otherwise fake placeholder data. Returns a Response if
+     * access to the requested contact is denied.
+     *
+     * @param array<string, mixed> $post
+     *
+     * @return array<int|string, mixed>|Response
+     */
+    private function resolveExampleContactFields(array $post, LeadModel $leadModel, FakeContactHelper $fakeContactHelper): Response|array
+    {
+        if (empty($post['contactId'])) {
+            return $fakeContactHelper->prepareFakeContactWithPrimaryCompany();
+        }
+
+        $lead = $this->checkLeadAccess((int) $post['contactId'], 'view');
+        if ($lead instanceof Response) {
+            return $lead;
+        }
+        \assert($lead instanceof Lead);
+
+        return $this->model->enrichedContactWithCompanies($leadModel->getRepository()->getLead($lead->getId()));
+    }
+
+    /**
+     * @param string[]                 $recipients
+     * @param array<int|string, mixed> $fields
+     * @param array<string, mixed>     $tokens
+     *
+     * @return array{success: bool, sent: string[], errors: string[]}
+     */
+    private function sendExampleToRecipients(Email $entity, array $recipients, array $fields, array $tokens, bool $applyPrefix): array
+    {
+        // Prefix the subject with [TEST] like the UI action, capturing the original first so
+        // it can be restored afterwards — an example send must never mutate (and risk
+        // persisting a change to) the stored email.
+        $originalSubject = $entity->getSubject();
+        if ($applyPrefix) {
+            $entity->setSubject(sprintf('%s %s', EmailController::EXAMPLE_EMAIL_SUBJECT_PREFIX, $originalSubject));
+        }
+
+        $sent   = [];
+        $errors = [];
+        foreach ($recipients as $recipient) {
+            $users = [
+                [
+                    // Setting id, firstname and lastname to empty as this is an unknown user
+                    'id'        => '',
+                    'firstname' => '',
+                    'lastname'  => '',
+                    'email'     => $recipient,
+                ],
+            ];
+
+            $error = $this->model->sendSampleEmailToUser($entity, $users, $fields, $tokens, [], false);
+            if (is_array($error) && !empty($error)) {
+                $errors[] = $error[0];
+            } else {
+                $sent[] = $recipient;
+            }
+        }
+
+        // Restore the original subject so the prefix is never persisted to the entity.
+        $entity->setSubject($originalSubject);
+
+        return [
+            'success' => empty($errors),
+            'sent'    => $sent,
+            'errors'  => $errors,
+        ];
+    }
+
+    /**
+     * Normalises a token map: HTML-cleans values and wraps bare token names in braces.
+     *
+     * @param array<int|string, mixed> $tokens
+     *
+     * @return array<string, mixed>
+     */
+    private function cleanTokens(array $tokens): array
+    {
+        $cleanTokens = [];
+        foreach ($tokens as $token => $value) {
+            $value = InputHelper::html($value);
+            if (!preg_match('/^{.*?}$/', (string) $token)) {
+                $token = '{'.$token.'}';
+            }
+
+            $cleanTokens[$token] = $value;
+        }
+
+        return $cleanTokens;
     }
 
     protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void
