@@ -22,6 +22,7 @@ parameters:
         narrow_return: true
         narrow_param: true
         no_mixed_property: true
+        no_mixed_caller: true
 
     paths:
         - app/bundles
