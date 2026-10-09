@@ -61,6 +61,7 @@ class ContactMerger
             ->mergeIpAddressHistory($winner, $loser)
             ->mergeFieldData($winner, $loser)
             ->mergeOwners($winner, $loser)
+            ->mergeStages($winner, $loser)
             ->mergePoints($winner, $loser)
             ->mergeTags($winner, $loser)
             ->mergeCompanies($winner, $loser);
@@ -183,6 +184,20 @@ class ContactMerger
             $winner->setOwner($newOwner);
 
             $this->logger->debug("CONTACT: New owner of {$winner->getId()} is {$newOwner->getId()}");
+        }
+
+        return $this;
+    }
+
+    public function mergeStages(Lead $winner, Lead $loser): static
+    {
+        $oldStage = $winner->getStage();
+        $newStage = $loser->getStage();
+
+        if (null === $oldStage && null !== $newStage) {
+            $winner->setStage($newStage);
+
+            $this->logger->debug("CONTACT: New stage of {$winner->getId()} is {$newStage->getId()}");
         }
 
         return $this;

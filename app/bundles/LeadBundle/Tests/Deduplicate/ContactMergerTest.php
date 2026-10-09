@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -563,6 +564,39 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($loserOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
     }
 
+    public function testMergeStages(): void
+    {
+        $winner = new Lead();
+        $loser  = new Lead();
+
+        $winnerStage = new Stage();
+        $winnerStage->setName('contacted');
+        $winner->setStage($winnerStage);
+
+        $loserStage = new Stage();
+        $loserStage->setName('qualified');
+        $loser->setStage($loserStage);
+
+        // Should not have been merged due to winner already having one
+        $this->getMerger()->mergeStages($winner, $loser);
+        $this->assertSame($winnerStage, $winner->getStage());
+
+        $winner->setStage();
+        $this->getMerger()->mergeStages($winner, $loser);
+
+        // Should be set to loser stage since winner stage was null
+        $this->assertSame($loserStage, $winner->getStage());
+    }
+
+    public function testMergeStagesWhenNeitherContactHasOne(): void
+    {
+        $winner = new Lead();
+        $loser  = new Lead();
+
+        $this->getMerger()->mergeStages($winner, $loser);
+        $this->assertNotInstanceOf(Stage::class, $winner->getStage());
+    }
+
     public function testMergePoints(): void
     {
         $winner = new Lead();
@@ -685,6 +719,10 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         // mergeOwners
         $winner->expects($this->never())
             ->method('setOwner');
+
+        // mergeStages
+        $winner->expects($this->never())
+            ->method('setStage');
 
         // mergePoints
         $loser->expects($this->once())
