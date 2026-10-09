@@ -13,9 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -56,18 +54,23 @@ class Channel extends CommonEntity implements UuidInterface
      * @var int
      */
     #[Groups(['channel:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['channel:read', 'channel:write', 'message:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
     /**
      * @var int|null
      */
     #[Groups(['channel:read', 'channel:write'])]
+    #[ORM\Column(name: 'channel_id', type: 'integer', nullable: true)]
     private $channelId;
 
     /**
@@ -88,27 +91,15 @@ class Channel extends CommonEntity implements UuidInterface
      * @var array
      */
     #[Groups(['channel:read', 'channel:write'])]
+    #[ORM\Column(type: Types::JSON)]
     private $properties = [];
 
     /**
      * @var bool
      */
     #[Groups(['channel:read', 'channel:write', 'message:read'])]
+    #[ORM\Column(name: 'is_enabled', type: 'boolean')]
     private $isEnabled = false;
-
-    public static function loadMetadata(ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addId()
-            ->addField('channel', 'string')
-            ->addNamedField('channelId', 'integer', 'channel_id', true)
-            ->addField('properties', Types::JSON)
-            ->createField('isEnabled', 'boolean')
-                ->columnName('is_enabled')
-                ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.

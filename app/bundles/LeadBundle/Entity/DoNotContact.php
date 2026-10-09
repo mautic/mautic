@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 
 #[ORM\Entity(repositoryClass: DoNotContactRepository::class)]
@@ -40,6 +39,9 @@ class DoNotContact
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -52,6 +54,7 @@ class DoNotContact
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
@@ -72,18 +75,8 @@ class DoNotContact
     #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
+    #[ORM\Column(name: 'channel_id', type: 'integer', nullable: true)]
     private $channelId;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addDateAdded();
-
-        $builder->addNamedField('channelId', 'integer', 'channel_id', true);
-    }
 
     /**
      * Prepares the metadata for API usage.

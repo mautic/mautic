@@ -6,7 +6,6 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: SummaryRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
@@ -19,31 +18,39 @@ class Summary
     /**
      * @var int|null
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var \DateTimeImmutable|null
      */
+    #[ORM\Column(name: 'date_triggered', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private \DateTimeImmutable|\DateTimeInterface|null $dateTriggered = null;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'scheduled_count', type: Types::INTEGER)]
     private $scheduledCount = 0;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'triggered_count', type: Types::INTEGER)]
     private $triggeredCount = 0;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'non_action_path_taken_count', type: Types::INTEGER)]
     private $nonActionPathTakenCount = 0;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'failed_count', type: Types::INTEGER)]
     private $failedCount = 0;
 
     /**
@@ -60,21 +67,8 @@ class Summary
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'log_counts_processed', type: Types::INTEGER, nullable: true)]
     private $logCountsProcessed = 0;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addNullableField('dateTriggered', Types::DATETIME_IMMUTABLE, 'date_triggered');
-        $builder->addNamedField('scheduledCount', Types::INTEGER, 'scheduled_count');
-        $builder->addNamedField('triggeredCount', Types::INTEGER, 'triggered_count');
-        $builder->addNamedField('nonActionPathTakenCount', Types::INTEGER, 'non_action_path_taken_count');
-        $builder->addNamedField('failedCount', Types::INTEGER, 'failed_count');
-        $builder->addNamedField('logCountsProcessed', Types::INTEGER, 'log_counts_processed', true);
-    }
 
     public function getScheduledCount(): ?int
     {

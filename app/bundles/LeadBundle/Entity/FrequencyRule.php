@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 #[ORM\Entity(repositoryClass: FrequencyRuleRepository::class)]
@@ -25,6 +24,9 @@ class FrequencyRule extends CommonEntity
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -37,11 +39,13 @@ class FrequencyRule extends CommonEntity
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'frequency_number', type: 'smallint', nullable: true)]
     private $frequencyNumber;
 
     /**
@@ -70,17 +74,6 @@ class FrequencyRule extends CommonEntity
      */
     #[ORM\Column(name: 'pause_to_date', type: 'datetime', nullable: true)]
     private $pauseToDate;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addDateAdded();
-
-        $builder->addNamedField('frequencyNumber', 'smallint', 'frequency_number', true);
-    }
 
     /**
      * Prepares the metadata for API usage.
