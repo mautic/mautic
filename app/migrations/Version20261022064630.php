@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\UserBundle\Entity\OidcSubjectId;
 
-final class Version20221122064630 extends PreUpAssertionMigration
+final class Version20261022064630 extends PreUpAssertionMigration
 {
     public function getDescription(): string
     {

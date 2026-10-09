@@ -30,7 +30,7 @@ final readonly class UserCredentialsFactory implements UserCredentialsFactoryInt
 
         try {
             $userInfo = $client->requestUserInfo($claims);
-        } catch (OidcAuthorizationException $e) {
+        } catch (OidcAuthorizationException) {
         }
 
         try {

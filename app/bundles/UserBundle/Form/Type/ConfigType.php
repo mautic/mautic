@@ -213,7 +213,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'       => 'mautic.open_id.config.is_enabled',
-                'data'        => $this->config->isEnabled(),
                 'constraints' => [
                     new NotBlank(message: 'mautic.core.value.required'),
                     new Choice(choices: [0, 1]),
@@ -355,10 +354,6 @@ final class ConfigType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $this->onPreSubmit(...));
         $builder->addEventListener(FormEvents::POST_SUBMIT, $this->onPostSubmit(...));
-
-        if (!empty($options['action'])) {
-            $builder->setAction($options['action']);
-        }
     }
 
     public function onPreSubmit(PreSubmitEvent $event): void

@@ -10,7 +10,7 @@ class PluginToken extends AbstractToken
 {
     private ?string $providerKey;
 
-    private string $isSupportUser;
+    private bool $isSupportUser;
 
     /**
      * @param UserInterface|string|null $user
@@ -40,7 +40,7 @@ class PluginToken extends AbstractToken
         }
 
         $this->providerKey = $providerKey;
-        $this->isSupportUser = $isSupportUser ? 'yes' : 'no';
+        $this->isSupportUser = $isSupportUser;
     }
 
     public function getCredentials(): string
@@ -55,7 +55,7 @@ class PluginToken extends AbstractToken
 
     public function isSupportUser(): bool
     {
-        return 'yes' === $this->isSupportUser;
+        return $this->isSupportUser;
     }
 
     public function getAuthenticatingService(): ?string
@@ -81,7 +81,13 @@ class PluginToken extends AbstractToken
      */
     public function __unserialize(array $data): void
     {
-        [$this->authenticatingService, $this->credentials, $this->providerKey, $this->isSupportUser, $parentArray] = $data;
+        if (4 === count($data)) {
+            [$this->authenticatingService, $this->credentials, $this->providerKey, $parentArray] = $data;
+            $this->isSupportUser = false;
+        } else {
+            [$this->authenticatingService, $this->credentials, $this->providerKey, $this->isSupportUser, $parentArray] = $data;
+        }
+
         parent::__unserialize($parentArray);
     }
 }

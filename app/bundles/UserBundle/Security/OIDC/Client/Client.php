@@ -46,7 +46,7 @@ final class Client implements ClientInterface
             }
 
             $url    = $this->client->getAuthorizationUrl();
-            $client = new \GuzzleHttp\Client(['cookies' => true, 'verify' => false]);
+            $client = new \GuzzleHttp\Client(['cookies' => true]);
             $client->request('GET', $url);
         } catch (ClientException|OidcAuthorizationException $e) {
             return $e->getMessage();

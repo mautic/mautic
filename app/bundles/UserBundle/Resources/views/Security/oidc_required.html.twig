@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block mainContent %}
-    <h2 class="mb-md">{{ 'mautic.open_id.required.current_user'|trans({'%username%': app.user.username})|raw }}</h2>
+    <h2 class="mb-md">{{ 'mautic.open_id.required.current_user'|trans({'%username%': app.user.username|e})|raw }}</h2>
 
     <h3 class="mb-md">{{ 'mautic.open_id.required.title'|trans({'%provider%': 'OpenID Connect'})|raw }}</h3>
 

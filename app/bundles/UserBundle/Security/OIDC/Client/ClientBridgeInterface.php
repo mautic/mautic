@@ -14,11 +14,9 @@ interface ClientBridgeInterface
     public function getAuthorizationUrl(): ?string;
 
     /**
-     * @return bool
-     *
      * @throws OidcAuthorizationException
      */
-    public function authenticate();
+    public function authenticate(): bool;
 
     /**
      * @return mixed

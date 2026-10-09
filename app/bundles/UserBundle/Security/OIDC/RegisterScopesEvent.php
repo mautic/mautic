@@ -9,7 +9,7 @@ final class RegisterScopesEvent
     /**
      * @var string[]
      */
-    public array $scopes = [];
+    private array $scopes = [];
 
     /**
      * @return string[]
