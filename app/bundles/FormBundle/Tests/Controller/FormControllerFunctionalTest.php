@@ -245,7 +245,9 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertJson($response->getContent());
 
-        $content = json_decode($response->getContent())->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($response->getContent());
+        $content = $decodedContent->newContent;
         $crawler = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $options = $crawler->filterXPath('//select[@name="formfield[mappedField]"]')->html();
         $this->assertStringContainsString('<option value="email">Email</option>', $options, 'Email option should not be pre-selected.');
@@ -310,7 +312,9 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        $content     = json_decode($content)->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);
@@ -372,7 +376,9 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $content     = $this->client->getResponse()->getContent();
-        $content     = json_decode($content)->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);

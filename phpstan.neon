@@ -21,6 +21,7 @@ parameters:
         no_empty_on_object: true
         narrow_return: true
         narrow_param: true
+        no_mixed_property: true
 
     paths:
         - app/bundles
@@ -72,6 +73,39 @@ parameters:
             paths:
                 - app/bundles/CoreBundle/Event/RouteEvent.php
                 - app/bundles/MessengerBundle/Validator/DsnValidator.php
+        # dynamic stdClass data (json_decode, imap, maxmind, search-filter trees) - mixed property fetch is inherent
+        -
+            identifier: typePerfect.noMixedPropertyFetcher
+            paths:
+                - plugins/MauticSocialBundle/Integration/FoursquareIntegration.php
+                - plugins/MauticSocialBundle/Integration/TwitterIntegration.php
+                - plugins/MauticSocialBundle/Integration/InstagramIntegration.php
+                - plugins/MauticClearbitBundle/Services/Clearbit_Base.php
+                - app/bundles/CoreBundle/Entity/CommonRepository.php
+                - app/bundles/CoreBundle/Event/AbstractCustomRequestEvent.php
+                - app/bundles/CoreBundle/Helper/PRedisConnectionHelper.php
+                - app/bundles/CoreBundle/Helper/SearchStringHelper.php
+                - app/bundles/CoreBundle/IpLookup/AbstractMaxmindLookup.php
+                - app/bundles/CoreBundle/IpLookup/GeoipsLookup.php
+                - app/bundles/CoreBundle/IpLookup/MaxmindDownloadLookup.php
+                - app/bundles/CoreBundle/Tests/Unit/Helper/SearchStringHelperTest.php
+                - app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
+                - app/bundles/PluginBundle/Integration/AbstractIntegration.php
+                - app/bundles/ProjectBundle/Controller/ProjectController.php
+                - app/bundles/ReportBundle/Form/Type/DynamicFiltersType.php
+
+        # Loader interface, concrete routing loader provides import()
+        -
+            identifier: method.notFound
+            path: app/bundles/CoreBundle/Event/RouteEvent.php
+
+        # stdClass search-filter tree built by SearchStringHelper
+        -
+            identifiers:
+                - function.impossibleType
+                - isset.offset
+            path: app/bundles/CoreBundle/Entity/CommonRepository.php
+
         # these services have no class name alias in the container, so only the string name can fetch them
         -
             identifier: mautic.noContainerGet

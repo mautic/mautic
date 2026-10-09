@@ -115,6 +115,7 @@ final class FieldTypeTest extends TypeTestCase
         $choices    = $fieldWidth->vars['choices'];
 
         $this->assertCount(count($expectedChoices), $choices);
+        /** @var \Symfony\Component\Form\ChoiceList\View\ChoiceView $choice */
         foreach ($choices as $choice) {
             $this->assertArrayHasKey($choice->value, $expectedChoices);
             $this->assertEquals($expectedChoices[$choice->value], $choice->label);

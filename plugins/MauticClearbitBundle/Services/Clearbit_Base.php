@@ -21,7 +21,7 @@ class Clearbit_Base
 
     protected $_webhookId;
 
-    public $response_obj;
+    public ?\stdClass $response_obj = null;
 
     public $response_code;
 
@@ -75,10 +75,8 @@ class Clearbit_Base
 
     /**
      * @param array<string, mixed> $params
-     *
-     * @return object
      */
-    protected function _execute(array $params = [])
+    protected function _execute(array $params = []): ?object
     {
         $this->_wait_for_rate_limit();
 
