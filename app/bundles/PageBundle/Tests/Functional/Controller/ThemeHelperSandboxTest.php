@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Functional\Controller;
 
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Twig\Error\RuntimeError;
 
 /**
  * Functional test ensuring that malicious Twig constructs in theme templates
@@ -21,6 +23,69 @@ use Symfony\Component\HttpFoundation\Request;
 final class ThemeHelperSandboxTest extends MauticMysqlTestCase
 {
     private string $themesDir;
+
+    private static int $callbackInvocations = 0;
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function safeCollectionFiltersProvider(): iterable
+    {
+        yield 'sort without callback' => ['[3, 1, 2]|sort|join', '123'];
+        yield 'sort with arrow function' => ['[3, 1, 2]|sort((a, b) => a <=> b)|join', '123'];
+        yield 'map' => ['[1, 2, 3]|map(x => x * 2)|join', '246'];
+        yield 'filter' => ['[1, 2, 3]|filter(x => x > 1)|join', '23'];
+        yield 'reduce' => ['[1, 2, 3]|reduce((carry, x) => carry + x, 0)', '6'];
+        yield 'find' => ['[1, 2, 3]|find(x => x > 1)', '2'];
+    }
+
+    #[DataProvider('safeCollectionFiltersProvider')]
+    public function testSafeCollectionFiltersRenderOnPagePreview(string $expression, string $expected): void
+    {
+        $themeName = $this->createMaliciousTheme('{% block content %}<p id="collection-result">{{ '.$expression.' }}</p>{% endblock %}');
+        $page      = $this->createPage($themeName);
+
+        $this->client->request(Request::METHOD_GET, '/page/preview/'.$page->getId());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextSame('#collection-result', $expected);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function callbackFiltersProvider(): iterable
+    {
+        foreach (['map', 'filter', 'reduce', 'sort', 'find'] as $filter) {
+            yield $filter => [$filter];
+        }
+    }
+
+    #[DataProvider('callbackFiltersProvider')]
+    public function testPhpCallbacksAreRejectedBeforeExecution(string $filter): void
+    {
+        self::$callbackInvocations = 0;
+        $this->assertIsCallable(self::class.'::recordCallbackInvocation');
+        $callback    = json_encode(self::class.'::recordCallbackInvocation', JSON_THROW_ON_ERROR);
+        $themeName   = $this->createMaliciousTheme('{% block content %}{{ [1, 2]|'.$filter.'('.$callback.') }}{% endblock %}');
+        $themeHelper = self::getContainer()->get(ThemeHelper::class);
+
+        try {
+            $themeHelper->renderThemeTemplate('@themes/'.$themeName.'/html/page.html.twig', []);
+            $this->fail('A PHP callable must be rejected by the theme sandbox.');
+        } catch (RuntimeError $exception) {
+            $this->assertStringContainsString('must be a Closure in sandbox mode', $exception->getMessage());
+        } finally {
+            $this->assertSame(0, self::$callbackInvocations, 'The callback must never execute, even if rendering subsequently fails.');
+        }
+    }
+
+    public static function recordCallbackInvocation(mixed ...$arguments): int
+    {
+        ++self::$callbackInvocations;
+
+        return 1;
+    }
 
     protected function setUp(): void
     {
@@ -47,6 +112,14 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
 
         yield 'RCE via reduce with system callback' => [
             "{% block content %}<pre>{{ ['id']|reduce('system') }}</pre>{% endblock %}",
+        ];
+
+        yield 'RCE via sort with system callback' => [
+            "{% block content %}<pre>{{ ['id', 0]|sort('system')|join }}</pre>{% endblock %}",
+        ];
+
+        yield 'RCE via find with system callback' => [
+            "{% block content %}<pre>{{ ['id', 0]|find('system') }}</pre>{% endblock %}",
         ];
 
         yield 'credential leak via configGetParameter db_password' => [
