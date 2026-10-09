@@ -21,28 +21,28 @@ final class FullContact_Person extends FullContact_Base
 
     protected $_resourceUri      = '/person.json';
 
-    public function lookupByEmail($search)
+    public function lookupByEmail($search): ?\stdClass
     {
         $this->_execute(['email' => $search, 'method' => 'email']);
 
         return $this->response_obj;
     }
 
-    public function lookupByEmailMD5($search)
+    public function lookupByEmailMD5($search): ?\stdClass
     {
         $this->_execute(['emailMD5' => $search, 'method' => 'email']);
 
         return $this->response_obj;
     }
 
-    public function lookupByPhone($search)
+    public function lookupByPhone($search): ?\stdClass
     {
         $this->_execute(['phone' => $search, 'method' => 'phone']);
 
         return $this->response_obj;
     }
 
-    public function lookupByTwitter($search)
+    public function lookupByTwitter($search): ?\stdClass
     {
         $this->_execute(['twitter' => $search, 'method' => 'twitter']);
 

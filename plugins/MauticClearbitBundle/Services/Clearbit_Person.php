@@ -13,7 +13,7 @@ final class Clearbit_Person extends Clearbit_Base
 
     protected $_baseUri     = 'https://person.clearbit.com/';
 
-    public function lookupByEmail($search)
+    public function lookupByEmail($search): ?\stdClass
     {
         $this->_execute(['email' => $search]);
 
