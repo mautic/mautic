@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Security\OIDC\ClientCredentials;
-use Mautic\UserBundle\Security\OIDC\Settings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\Event\PreSubmitEvent;
@@ -39,7 +38,6 @@ final class ConfigType extends AbstractType
     public function __construct(
         private readonly CoreParametersHelper $parameters,
         private readonly TranslatorInterface $translator,
-        private readonly Settings $config,
         private readonly ClientCredentials $clientCredentials,
         private readonly OidcSubjectIdRepository $subjectIdRepository,
     ) {
