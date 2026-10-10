@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
-use PHPUnit\Framework\Assert;
 
 final class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
 {
@@ -59,8 +58,8 @@ final class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
 
     public function testStripCidr(): void
     {
-        Assert::assertSame('1.2.3.4', MaxMindDoNotSellList::stripCidr('1.2.3.4'));
-        Assert::assertSame('1.2.3.4', MaxMindDoNotSellList::stripCidr('1.2.3.4/32'));
+        $this->assertSame('1.2.3.4', MaxMindDoNotSellList::stripCidr('1.2.3.4'));
+        $this->assertSame('1.2.3.4', MaxMindDoNotSellList::stripCidr('1.2.3.4/32'));
     }
 
     /**
@@ -126,9 +125,9 @@ final class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
         $goodData = json_decode($this->goodData, true)['exclusions'];
         $this->assertEquals($goodData, $doNotSellList->getList());
 
-        Assert::assertTrue($doNotSellList->valid());
-        Assert::assertSame(0, $doNotSellList->key());
+        $this->assertTrue($doNotSellList->valid());
+        $this->assertSame(0, $doNotSellList->key());
         $doNotSellList->next();
-        Assert::assertFalse($doNotSellList->valid());
+        $this->assertFalse($doNotSellList->valid());
     }
 }

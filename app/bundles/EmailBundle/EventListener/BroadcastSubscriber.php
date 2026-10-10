@@ -2,21 +2,23 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BroadcastSubscriber implements EventSubscriberInterface
+final readonly class BroadcastSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EmailModel $model,
-        private readonly EntityManager $em,
-        private readonly TranslatorInterface $translator,
+        private EmailModel $model,
+        private EntityManagerInterface $em,
+        private TranslatorInterface $translator,
+        private EmailRepository $emailRepository,
     ) {
     }
 
@@ -33,8 +35,14 @@ class BroadcastSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $allowNullForPublishedUp = false;
+        if ($event->isAbTestWinner() && $event->getId() > 0) {
+            // PublishedUp can be null for a winner variant
+            $allowNullForPublishedUp = true;
+        }
+
         // Get list of published broadcasts or broadcast if there is only a single ID
-        $emails = $this->model->getRepository()->getPublishedBroadcastsIterable($event->getId());
+        $emails = $this->emailRepository->getPublishedBroadcastsIterable($event->getId(), $allowNullForPublishedUp);
 
         foreach ($emails as $email) {
             // Reset per-email variables from event defaults
@@ -95,7 +103,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
                 if ($isNotParallelSending && !$totalPendingCount && !$sentCount) {
                     $emailEntity->setIsPublished(false);
                     $this->model->saveEntity($emailEntity);
-                    $event->getOutput()->writeln('Email "'.$emailEntity->getName().'" has been unpublished as there are no more pending contacts to send to.');
+                    $event->getOutput()?->writeln('Email "'.$emailEntity->getName().'" has been unpublished as there are no more pending contacts to send to.');
                 }
             }
 
@@ -113,7 +121,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
     {
         if (!$emailEntity->getVariantSentCount(true)) {
             $dateTimeHelper = new DateTimeHelper();
-            $this->model->getRepository()->resetVariants(
+            $this->emailRepository->resetVariants(
                 $emailEntity->getRelatedEntityIds(),
                 $dateTimeHelper->toUtcString()
             );

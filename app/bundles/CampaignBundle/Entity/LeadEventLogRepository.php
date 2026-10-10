@@ -9,8 +9,10 @@ use Doctrine\DBAL\Types\Types;
 use Mautic\CampaignBundle\DTO\EventLogStatsDto;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
  * @extends CommonRepository<LeadEventLog>
@@ -84,6 +86,7 @@ class LeadEventLogRepository extends CommonRepository
                     ll.channel,
                     ll.channel_id as channel_id,
                     ll.lead_id,
+                    ll.non_action_path_taken as nonActionPathTaken,
                     fl.reason as fail_reason,
                     e.deleted AS event_deleted_timestamp,
                     e.redirect_event_id,
@@ -145,7 +148,7 @@ class LeadEventLogRepository extends CommonRepository
     {
         $leadIps = [];
 
-        $query = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($this->_em->getConnection());
+        $query = new QueryBuilder($this->_em->getConnection());
 
         $joinCondition = 'e.id = ll.event_id';
         if (isset($options['type'])) {
@@ -234,7 +237,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
-        $q->$join(
+        $q->{$join}(
             'o',
             MAUTIC_TABLE_PREFIX.'campaign_leads',
             'l',
@@ -352,7 +355,7 @@ class LeadEventLogRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($exists)) {
+        if ([] !== $exists) {
             $q->andWhere(
                 $q->expr()->notIn('event_id', ':ids')
             )
@@ -429,12 +432,14 @@ class LeadEventLogRepository extends CommonRepository
                     $q->expr()->eq('IDENTITY(o.event)', ':eventId'),
                     $q->expr()->eq('o.isScheduled', ':true'),
                     $q->expr()->lte('o.triggerDate', ':now'),
+                    $q->expr()->eq('o.version', ':initialVersion'),
                     $q->expr()->eq('c.isPublished', 1)
                 )
             )
             ->setParameter('eventId', (int) $eventId)
             ->setParameter('now', $now)
-            ->setParameter('true', true, Types::BOOLEAN);
+            ->setParameter('true', true, Types::BOOLEAN)
+            ->setParameter('initialVersion', OptimisticLockInterface::INITIAL_VERSION);
 
         $this->updateOrmQueryFromContactLimiter('o', $q, $limiter);
 
@@ -677,7 +682,7 @@ SQL;
      */
     public function markEventLogsQueued(array $ids): void
     {
-        if (!$ids) {
+        if ([] === $ids) {
             return;
         }
 

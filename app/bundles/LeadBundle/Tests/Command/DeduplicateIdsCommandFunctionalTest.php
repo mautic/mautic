@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateIdsCommand;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class DeduplicateIdsCommandFunctionalTest extends MauticMysqlTestCase
 {
@@ -15,7 +14,7 @@ final class DeduplicateIdsCommandFunctionalTest extends MauticMysqlTestCase
     {
         $contactRepository = $this->em->getRepository(Lead::class);
 
-        Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
+        $this->assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
         $contact1 = $this->saveContact('john@doe.email');
         $this->saveContact('john@doe.email');
@@ -26,11 +25,11 @@ final class DeduplicateIdsCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        Assert::assertSame(6, $contactRepository->count([]));
+        $this->assertSame(6, $contactRepository->count([]));
 
         $this->testSymfonyCommand(DeduplicateIdsCommand::NAME, ['--contact-ids' => "{$contact1->getId()},{$contact2->getId()},{$contact3->getId()}"]);
 
-        Assert::assertSame(3, $contactRepository->count([]));
+        $this->assertSame(3, $contactRepository->count([]));
     }
 
     private function saveContact(string $email): Lead

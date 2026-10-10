@@ -13,7 +13,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DashboardSubscriber extends MainDashboardSubscriber
+final class DashboardSubscriber extends MainDashboardSubscriber
 {
     public const TYPE_RECENT_ACTIVITY = 'recent.activity';
 
@@ -42,7 +42,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         private readonly RouterInterface $router,
         private readonly CorePermissions $security,
         private readonly EventDispatcherInterface $dispatcher,
-        protected ModelFactory $modelFactory,
+        private readonly ModelFactory $modelFactory,
     ) {
     }
 

@@ -136,7 +136,6 @@ final class SourceControllerUnitTest extends TestCase
 
         $response = $controller->deleteAction($request, 1);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $payload = json_decode((string) $response->getContent(), true);
         $this->assertSame(1, $payload['success']);
         $this->assertSame(1, $payload['deleted']);
@@ -158,7 +157,6 @@ final class SourceControllerUnitTest extends TestCase
 
         $response = $controller->deleteAction($request, 1);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
         $payload = json_decode((string) $response->getContent(), true);
         $this->assertSame(['success' => 0], $payload);
     }
@@ -174,9 +172,8 @@ final class SourceControllerUnitTest extends TestCase
             ->onlyMethods(['getModel', 'generateUrl', 'isFormCancelled', 'isFormValid', 'renderView'])
             ->getMock();
 
-        $controller->method('getModel')
-            ->with('campaign')
-            ->willReturn($campaignModel);
+        $controller->autowireSourceController($campaignModel);
+
         $controller->method('isFormCancelled')
             ->willReturn(false);
         $controller->method('isFormValid')

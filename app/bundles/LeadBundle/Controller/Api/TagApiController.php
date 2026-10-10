@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\TagModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -20,13 +21,23 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Tag>
  */
-class TagApiController extends CommonApiController
+final class TagApiController extends CommonApiController
 {
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $leadTagModel = $modelFactory->getModel('lead.tag');
-        \assert($leadTagModel instanceof TagModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        TagModel $leadTagModel,
+        private readonly TagRepository $tagRepository,
+    ) {
         $this->model           = $leadTagModel;
         $this->entityClass     = Tag::class;
         $this->entityNameOne   = 'tag';
@@ -51,6 +62,6 @@ class TagApiController extends CommonApiController
         $tagModel = $this->model;
         \assert($tagModel instanceof TagModel);
 
-        return $tagModel->getRepository()->getTagByNameOrCreateNewOne($params[$this->entityNameOne]);
+        return $this->tagRepository->getTagByNameOrCreateNewOne($params[$this->entityNameOne]);
     }
 }

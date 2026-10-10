@@ -6,31 +6,40 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
-use PHPUnit\Framework\Assert;
+use Mautic\LeadBundle\Segment\OperatorOptions;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected ListModel $listModel;
+    private ListModel $listModel;
 
     private string $prefix;
 
     private TranslatorInterface $translator;
 
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->listModel  = static::getContainer()->get('mautic.lead.model.list');
-        $this->prefix     = static::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->translator = static::getContainer()->get('translator');
+        $this->listModel  = self::getContainer()->get(ListModel::class);
+        $this->prefix     = self::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->translator = self::getContainer()->get(TranslatorInterface::class);
     }
 
     protected function beforeBeginTransaction(): void
@@ -65,7 +74,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('regexOperatorProvider')]
+    #[DataProvider('regexOperatorProvider')]
     public function testRegexOperatorValidation(string $operator, string $regex, int $expectedResponseCode, ?string $expectedErrorMessage): void
     {
         $this->client->request(
@@ -89,11 +98,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame($expectedResponseCode);
 
         if ($expectedErrorMessage) {
-            Assert::assertStringContainsString(
-                $expectedErrorMessage,
-                json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'],
-                $this->client->getResponse()->getContent()
-            );
+            $this->assertStringContainsString($expectedErrorMessage, (string) json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'], $this->client->getResponse()->getContent());
         }
     }
 
@@ -399,7 +404,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
-        Assert::assertArrayHasKey('errors', $response);
+        $this->assertArrayHasKey('errors', $response);
         $errorMessage = $this->translator->trans(
             'mautic.lead.lists.used_in_campaigns.unpublish',
             [
@@ -409,7 +414,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
             'validators'
         );
-        Assert::assertStringContainsString($errorMessage, $response['errors'][0]['message']);
+        $this->assertStringContainsString($errorMessage, (string) $response['errors'][0]['message']);
     }
 
     public function testWeGet200ResponseCodeIfSegmentIsNotUsedInCampaignsAndWeUnpublishIt(): void
@@ -432,7 +437,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         self::assertResponseIsSuccessful();
-        Assert::assertArrayNotHasKey('errors', $response);
+        $this->assertArrayNotHasKey('errors', $response);
     }
 
     public function testUnpublishUsedSingleSegment(): void
@@ -539,7 +544,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
-        Assert::assertArrayHasKey('errors', $response);
+        $this->assertArrayHasKey('errors', $response);
 
         $expectedErrorMessage = sprintf(
             'isPublished: The segment %s is used in %s, please go back and check segments before unpublishing',
@@ -547,7 +552,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             $list2->getName()
         );
 
-        Assert::assertSame($expectedErrorMessage, $response['errors'][0]['message']);
+        $this->assertSame($expectedErrorMessage, $response['errors'][0]['message']);
     }
 
     public function testSegmentWithCategory(): void
@@ -637,7 +642,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
-        $segmentCountCacheHelper = self::getContainer()->get('mautic.helper.segment.count.cache');
+        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
         $segmentCountCacheHelper->setSegmentContactCount($segment->getId(), 2);
 
         $this->client->request(Request::METHOD_GET, '/api/segments');
@@ -645,27 +650,19 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         self::assertResponseIsSuccessful();
-        Assert::assertArrayHasKey('lists', $response);
-        Assert::assertArrayHasKey($segment->getId(), $response['lists']);
-        Assert::assertArrayNotHasKey(
-            'contactCount',
-            $response['lists'][$segment->getId()],
-            'contactCount should not be present without withCounts parameter'
-        );
+        $this->assertArrayHasKey('lists', $response);
+        $this->assertArrayHasKey($segment->getId(), $response['lists']);
+        $this->assertArrayNotHasKey('contactCount', $response['lists'][$segment->getId()], 'contactCount should not be present without withCounts parameter');
 
         $this->client->request(Request::METHOD_GET, '/api/segments?withCounts');
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
         self::assertResponseIsSuccessful();
-        Assert::assertArrayHasKey('lists', $response);
-        Assert::assertArrayHasKey($segment->getId(), $response['lists']);
-        Assert::assertArrayHasKey(
-            'contactCount',
-            $response['lists'][$segment->getId()],
-            'contactCount should be present with withCounts parameter'
-        );
-        Assert::assertSame(2, $response['lists'][$segment->getId()]['contactCount']);
+        $this->assertArrayHasKey('lists', $response);
+        $this->assertArrayHasKey($segment->getId(), $response['lists']);
+        $this->assertArrayHasKey('contactCount', $response['lists'][$segment->getId()], 'contactCount should be present with withCounts parameter');
+        $this->assertSame(2, $response['lists'][$segment->getId()]['contactCount']);
 
         $contact3 = new Lead();
         $contact3->setEmail('test3@example.com');
@@ -683,11 +680,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         self::assertResponseIsSuccessful();
-        Assert::assertSame(
-            2,
-            $response['lists'][$segment->getId()]['contactCount'],
-            'Count should remain cached at 2 even after adding third contact'
-        );
+        $this->assertSame(2, $response['lists'][$segment->getId()]['contactCount'], 'Count should remain cached at 2 even after adding third contact');
     }
 
     public function testDeleteUsedInCampaignSegment(): void
@@ -713,7 +706,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         self::assertResponseStatusCodeSame(Response::HTTP_CONFLICT);
-        Assert::assertArrayHasKey('errors', $response);
+        $this->assertArrayHasKey('errors', $response);
 
         $expectedErrorMessage = $this->translator->trans(
             'mautic.api.dependent.entity.delete.error',
@@ -723,7 +716,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['message']);
+        $this->assertStringContainsString($expectedErrorMessage, (string) $response['errors'][0]['message']);
 
         $expectedErrorMessage = $this->translator->trans(
             'mautic.lead.lists.used_in_campaigns.delete',
@@ -735,7 +728,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['details'][0]);
+        $this->assertStringContainsString($expectedErrorMessage, (string) $response['errors'][0]['details'][0]);
     }
 
     public function testBatchDeleteUsedInCampaignSegment(): void
@@ -766,7 +759,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         self::assertResponseIsSuccessful($clientResponse->getContent());
-        Assert::assertArrayHasKey('errors', $response);
+        $this->assertArrayHasKey('errors', $response);
 
         $expectedErrorMessage1 = $this->translator->trans(
             'mautic.api.dependent.entity.delete.error',
@@ -805,12 +798,138 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $allErrors = implode(' ', array_column($response['errors'], 'message'));
-        Assert::assertStringContainsString($expectedErrorMessage1, $allErrors);
-        Assert::assertStringContainsString($expectedErrorMessage2, $allErrors);
+        $this->assertStringContainsString($expectedErrorMessage1, $allErrors);
+        $this->assertStringContainsString($expectedErrorMessage2, $allErrors);
 
         $allDetails = implode(' ', array_column(array_column($response['errors'], 'details'), 0));
-        Assert::assertStringContainsString($expectedDetailMessage1, $allDetails);
-        Assert::assertStringContainsString($expectedDetailMessage2, $allDetails);
+        $this->assertStringContainsString($expectedDetailMessage1, $allDetails);
+        $this->assertStringContainsString($expectedDetailMessage2, $allDetails);
+    }
+
+    #[DataProvider('operatorProvider')]
+    public function testInTheLastAndInTheNextFilter(string $operator, int $expected): void
+    {
+        $filters = [
+            [
+                'glue'        => 'and',
+                'field'       => 'date_modified',
+                'object'      => 'lead',
+                'type'        => 'datetime',
+                'operator'    => $operator,
+                'properties'  => [
+                    'filter' => [
+                        'interval' => '1',
+                        'unit'     => 'day',
+                    ],
+                ],
+            ],
+        ];
+
+        $segment = $this->createSegment($filters);
+
+        $contactA = new Lead();
+        $contactA->setDateModified(new \DateTime('-1 hour'));
+
+        $contactB = new Lead();
+        $contactB->setDateModified((new \DateTime())->modify('+1 day'));
+
+        $contactC = new Lead();
+        $contactC->setDateModified((new \DateTime())->modify('-1 day'));
+
+        $contactD = new Lead();
+        $contactD->setDateModified((new \DateTime())->modify('-2 day'));
+
+        $contactE = new Lead();
+        $contactE->setDateModified((new \DateTime())->modify('+2 day'));
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+        $this->em->persist($contactD);
+        $this->em->persist($contactE);
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segment->getId()]);
+
+        $this->assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()]);
+
+        $this->assertCount($expected, $members);
+
+        $expectedMembersForOperator = [
+            OperatorOptions::IN_LAST => [$contactA->getId(), $contactC->getId()],
+            OperatorOptions::IN_NEXT => [$contactA->getId(), $contactB->getId()],
+        ];
+
+        $expectedMembers = $expectedMembersForOperator[$operator];
+
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        $this->assertSame($expectedMembers, $actualMembers);
+    }
+
+    #[DataProvider('operatorProvider')]
+    public function testInLastAndInNextFilterForCompanyCustomField(string $operator, int $expectedCount): void
+    {
+        $company = $this->createCompanyWithDateCustomField('CompanyABC', $operator);
+
+        $filters = [
+            [
+                'glue'        => 'and',
+                'field'       => 'company_created_at',
+                'object'      => 'company',
+                'type'        => 'datetime',
+                'operator'    => $operator,
+                'properties'  => [
+                    'filter' => [
+                        'interval' => '1',
+                        'unit'     => 'day',
+                    ],
+                ],
+            ],
+        ];
+        $segment = $this->createSegment($filters);
+
+        $contactA = new Lead();
+        $contactA->setDateModified(new \DateTime('-1 hour'));
+
+        $contactB = new Lead();
+        $contactB->setDateModified((new \DateTime())->modify('+1 day'));
+
+        $contactC = new Lead();
+        $contactC->setDateModified((new \DateTime())->modify('-1 day'));
+
+        $this->em->persist($contactA);
+        $this->em->persist($contactB);
+        $this->em->persist($contactC);
+
+        $this->createCompanyLeadRelation($company, $contactB);
+        $this->createCompanyLeadRelation($company, $contactC);
+
+        $this->em->flush();
+
+        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => $segment->getId()]);
+
+        $this->assertSame(0, $commandTester->getStatusCode());
+
+        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()]);
+
+        $this->assertCount($expectedCount, $members);
+
+        $expectedMembers = [$contactB->getId(), $contactC->getId()];
+
+        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        sort($expectedMembers);
+        sort($actualMembers);
+        $this->assertSame($expectedMembers, $actualMembers);
+    }
+
+    public static function operatorProvider(): \Generator
+    {
+        yield [OperatorOptions::IN_LAST, 2];
+        yield [OperatorOptions::IN_NEXT, 2];
     }
 
     /**
@@ -821,6 +940,62 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $segment ??= new LeadList();
         $segment->setName($name)->setPublicName($name)->setAlias($alias)->setFilters($filters);
         $this->listModel->saveEntity($segment);
+
+        return $segment;
+    }
+
+    private function createCompanyWithDateCustomField(string $name, ?string $operator = null): Company
+    {
+        // create datetime company field
+        $field = new LeadField();
+        $field->setType('datetime');
+        $field->setObject('company');
+        $field->setGroup('core');
+        $field->setLabel('Company Created At');
+        $field->setAlias('company_created_at');
+
+        /** @var FieldModel $fieldModel */
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
+        $fieldModel->saveEntity($field);
+
+        $timeStamp = new \DateTime();
+        if (OperatorOptions::IN_LAST === $operator) {
+            $timeStamp->modify('-1 day');
+        } elseif (OperatorOptions::IN_NEXT === $operator) {
+            $timeStamp->modify('+1 day');
+        }
+
+        /** @var CompanyRepository $companyRepo */
+        $companyRepo = $this->em->getRepository(Company::class);
+        $company     = new Company();
+        $company->setName($name);
+        $company->addUpdatedField('company_created_at', $timeStamp->format('Y-m-d H:i:s'));
+        $companyRepo->saveEntity($company);
+
+        return $company;
+    }
+
+    private function createCompanyLeadRelation(Company $company, Lead $lead): void
+    {
+        $companyLead = new CompanyLead();
+        $companyLead->setCompany($company);
+        $companyLead->setLead($lead);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary(true);
+        $this->em->persist($companyLead);
+    }
+
+    /**
+     * @param array<mixed> $filter
+     */
+    private function createSegment(array $filter): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName('Segment A');
+        $segment->setPublicName($segment->getName());
+        $segment->setAlias('segment-a');
+        $segment->setFilters($filter);
+        $this->em->persist($segment);
 
         return $segment;
     }

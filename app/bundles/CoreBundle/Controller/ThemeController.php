@@ -8,17 +8,18 @@ use Mautic\CoreBundle\Form\Type\ThemeUploadType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Helper\ThemeSearchFilter;
+use Mautic\CoreBundle\Helper\ThemeSearchScopeProvider;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ThemeController extends FormController
+final class ThemeController extends FormController
 {
-    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper): Response
+    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper, ThemeSearchScopeProvider $themeSearchScopeProvider, ThemeSearchFilter $themeSearchFilter): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -32,6 +33,13 @@ class ThemeController extends FormController
             $this->throwAccessDenied();
         }
 
+        $this->setListFilters();
+
+        $session = $request->getSession();
+        $search  = $request->get('search', $session->get('mautic.theme.filter', ''));
+        $session->set('mautic.theme.filter', $search);
+
+        $tmpl   = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
         $dir    = $pathsHelper->getSystemPath('themes', true);
         $action = $this->generateUrl('mautic_themes_index');
         $form   = $this->formFactory->create(ThemeUploadType::class, [], ['action' => $action]);
@@ -79,16 +87,29 @@ class ThemeController extends FormController
             }
         }
 
+        $searchScopes    = $themeSearchScopeProvider->getScopes();
+        $scopeCommands   = array_column($searchScopes, 'command');
+        $items           = $themeHelper->getInstalledThemes('all', true, true);
+        $items           = $themeSearchFilter->filter($items, $search, $scopeCommands, $this->translator);
+
+        $contentTemplate = ('list' === $tmpl)
+            ? '@MauticCore/Theme/list_results.html.twig'
+            : '@MauticCore/Theme/list.html.twig';
+
         return $this->delegateView([
             'viewParameters' => [
-                'items'         => $themeHelper->getInstalledThemes('all', true, true),
-                'builders'      => $builderIntegrationsHelper->getBuilderNames(),
-                'defaultThemes' => $themeHelper->getDefaultThemes(),
-                'form'          => $form->createView(),
-                'permissions'   => $permissions,
-                'security'      => $this->security,
+                'items'           => $items,
+                'builders'        => $builderIntegrationsHelper->getBuilderNames(),
+                'defaultThemes'   => $themeHelper->getDefaultThemes(),
+                'form'            => $form->createView(),
+                'permissions'     => $permissions,
+                'security'        => $this->security,
+                'searchValue'     => $search,
+                'searchScopes'    => $searchScopes,
+                'tmpl'            => $tmpl,
+                'currentRoute'    => $action,
             ],
-            'contentTemplate' => '@MauticCore/Theme/list.html.twig',
+            'contentTemplate' => $contentTemplate,
             'passthroughVars' => [
                 'activeLink'    => '#mautic_themes_index',
                 'mauticContent' => 'theme',
@@ -99,10 +120,8 @@ class ThemeController extends FormController
 
     /**
      * Download a theme.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId)
+    public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId): Response
     {
         $flashes = [];
         $error   = false;
@@ -215,7 +234,7 @@ class ThemeController extends FormController
                 ];
             }
 
-            if ($error) {
+            if ([] !== $error) {
                 $flashes = array_merge($flashes, $error);
             }
         }
@@ -227,9 +246,6 @@ class ThemeController extends FormController
         );
     }
 
-    /**
-     * Deletes a theme.
-     */
     public function deleteTheme(ThemeHelperInterface $themeHelper, $themeName): array
     {
         $flashes = [];

@@ -9,11 +9,13 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(BodyParser::class)]
+#[CoversClass(BodyParser::class)]
 final class BodyParserTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that a BouncedEmail is returned from a bounce detected in the body')]
+    #[TestDox('Test that a BouncedEmail is returned from a bounce detected in the body')]
     public function testBouncedEmailIsReturnedFromParsedBody(): void
     {
         $message            = new Message();
@@ -43,7 +45,7 @@ BODY;
         $this->assertTrue($bounce->isFinal());
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that an exception is thrown if a bounce cannot be found in the body')]
+    #[TestDox('Test that an exception is thrown if a bounce cannot be found in the body')]
     public function testBounceNotFoundFromBadDsnReport(): void
     {
         $this->expectException(BounceNotFound::class);

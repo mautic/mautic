@@ -14,7 +14,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 
 final class EmailVariantInCampaignFunctionalTest extends MauticMysqlTestCase
 {
@@ -38,7 +37,7 @@ final class EmailVariantInCampaignFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
-        Assert::assertStringContainsString('2 total events(s) to be processed in batches', $commandResult->getDisplay());
+        $this->assertStringContainsString('2 total events(s) to be processed in batches', $commandResult->getDisplay());
 
         /** @var StatRepository $emailStatRepository */
         $emailStatRepository = $this->em->getRepository(Stat::class);

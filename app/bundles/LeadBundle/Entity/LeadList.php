@@ -183,7 +183,7 @@ class LeadList extends FormEntity implements UuidInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            ['message' => 'mautic.core.name.required']
+            message: 'mautic.core.name.required'
         ));
 
         $metadata->addConstraint(new UniqueUserAlias([
@@ -274,7 +274,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->description;
     }
 
-    public function setCategory(?Category $category = null): LeadList
+    public function setCategory(?Category $category = null): self
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -334,11 +334,11 @@ class LeadList extends FormEntity implements UuidInterface
         }
 
         // A segment with filters requires rebuild if it was changed since the last build date, or was never built
-        if (null === $this->getLastBuiltDate()) {
+        if (null === $this->lastBuiltDate) {
             return true;
         }
 
-        return null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->getLastBuiltDate()->getTimestamp();
+        return null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->lastBuiltDate->getTimestamp();
     }
 
     public function hasFilterTypeOf(string $type): bool
@@ -378,7 +378,7 @@ class LeadList extends FormEntity implements UuidInterface
      */
     public function isGlobal()
     {
-        return $this->getIsGlobal();
+        return $this->isGlobal;
     }
 
     /**
@@ -520,6 +520,6 @@ class LeadList extends FormEntity implements UuidInterface
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 }

@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class EventType extends AbstractType
+final class EventType extends AbstractType
 {
     use PropertiesTrait;
 
@@ -326,33 +326,38 @@ class EventType extends AbstractType
         }
 
         if (is_array($data[$name]) && array_key_exists('date', $data[$name])) {
-            return $this->parseTimeValue($data[$name]['date']);
-        } elseif (is_string($data[$name])) {
+            $timezone = !empty($data[$name]['timezone'])
+                ? new \DateTimeZone($data[$name]['timezone'])
+                : null;
+
+            return $this->parseTimeValue($data[$name]['date'], $timezone);
+        }
+        if (is_string($data[$name])) {
             return $this->parseTimeValue($data[$name]);
         }
 
         return null;
     }
 
-    private function parseTimeValue(string $value): \DateTime
+    private function parseTimeValue(string $value, ?\DateTimeZone $timezone = null): \DateTime
     {
         $trimmedValue = trim($value);
 
         if (preg_match('/^\d{1,2}$/', $trimmedValue)) {
-            $parsed = \DateTime::createFromFormat('!H', $trimmedValue);
+            $parsed = \DateTime::createFromFormat('!H', $trimmedValue, $timezone);
             if (false !== $parsed) {
                 return $parsed;
             }
         }
 
         if (preg_match('/^\d{1,2}:\d{2}$/', $trimmedValue)) {
-            $parsed = \DateTime::createFromFormat('!H:i', $trimmedValue);
+            $parsed = \DateTime::createFromFormat('!H:i', $trimmedValue, $timezone);
             if (false !== $parsed) {
                 return $parsed;
             }
         }
 
-        return new \DateTime($trimmedValue);
+        return new \DateTime($trimmedValue, $timezone);
     }
 
     public function getBlockPrefix(): string

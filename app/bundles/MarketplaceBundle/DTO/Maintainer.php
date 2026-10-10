@@ -12,7 +12,7 @@ final class Maintainer
     ) {
     }
 
-    public static function fromArray(array $array): Maintainer
+    public static function fromArray(array $array): self
     {
         return new self(
             $array['name'],

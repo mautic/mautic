@@ -7,7 +7,6 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailDraft;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailDraftFunctionalTest extends MauticMysqlTestCase
@@ -23,9 +22,9 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
     {
         $email   = $this->createNewEmail();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
-        Assert::assertCount(0, $crawler->selectButton('Save as Draft'));
-        Assert::assertCount(0, $crawler->selectButton('Apply Draft'));
-        Assert::assertCount(0, $crawler->selectButton('Discard Draft'));
+        $this->assertCount(0, $crawler->selectButton('Save as Draft'));
+        $this->assertCount(0, $crawler->selectButton('Apply Draft'));
+        $this->assertCount(0, $crawler->selectButton('Discard Draft'));
     }
 
     public function testEmailDraftConfigured(): void
@@ -33,9 +32,9 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $email   = $this->createNewEmail();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
 
-        Assert::assertCount(1, $crawler->selectButton('Save as Draft'));
-        Assert::assertCount(0, $crawler->selectButton('Apply Draft'));
-        Assert::assertCount(0, $crawler->selectButton('Discard Draft'));
+        $this->assertCount(1, $crawler->selectButton('Save as Draft'));
+        $this->assertCount(0, $crawler->selectButton('Apply Draft'));
+        $this->assertCount(0, $crawler->selectButton('Discard Draft'));
     }
 
     public function testCheckDraftInList(): void
@@ -77,7 +76,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $this->saveDraft($email);
         $this->client->request(Request::METHOD_POST, "/s/emails/delete/{$email->getId()}");
         $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
-        Assert::assertNull($emailDraft);
+        $this->assertNotInstanceOf(EmailDraft::class, $emailDraft);
     }
 
     private function applyDraft(Email $email): void
@@ -90,8 +89,8 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
 
         $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
 
-        Assert::assertNull($emailDraft);
-        Assert::assertSame('Test html Draft', $email->getCustomHtml());
+        $this->assertNotInstanceOf(EmailDraft::class, $emailDraft);
+        $this->assertSame('Test html Draft', $email->getCustomHtml());
     }
 
     private function discardDraft(Email $email): void
@@ -104,8 +103,8 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
 
         $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
 
-        Assert::assertNull($emailDraft);
-        Assert::assertSame('Test html', $email->getCustomHtml());
+        $this->assertNotInstanceOf(EmailDraft::class, $emailDraft);
+        $this->assertSame('Test html', $email->getCustomHtml());
     }
 
     private function saveDraft(Email $email): void
@@ -118,8 +117,9 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
-        Assert::assertEquals('Test html Draft', $emailDraft->getHtml());
-        Assert::assertSame('Test html', $email->getCustomHtml());
+        $this->assertInstanceOf(EmailDraft::class, $emailDraft);
+        $this->assertSame('Test html Draft', $emailDraft->getHtml());
+        $this->assertSame('Test html', $email->getCustomHtml());
     }
 
     private function createNewEmail(string $templateName = 'blank', string $templateContent = 'Test html'): Email

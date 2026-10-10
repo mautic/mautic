@@ -67,7 +67,7 @@ final class FieldChoicesProvider implements FieldChoicesProviderInterface
 
     private function lookForFieldChoices(string $search = ''): void
     {
-        if (empty($this->cachedTypeChoices)) {
+        if ([] === $this->cachedTypeChoices) {
             $event = new ListFieldChoicesEvent();
             $event->setSearchTerm($search);
             $this->dispatcher->dispatch($event, LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE);

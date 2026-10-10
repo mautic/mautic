@@ -26,7 +26,7 @@ final readonly class AbTestResultService
         [$parent, $children] = $parentVariant->getVariants();
 
         $abTestResults = [];
-        if ($criteria) {
+        if ([] !== $criteria) {
             $testSettings = $criteria;
             $args         = [
                 'email'    => $parentVariant,

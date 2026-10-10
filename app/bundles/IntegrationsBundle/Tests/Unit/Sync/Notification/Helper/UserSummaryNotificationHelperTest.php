@@ -10,6 +10,7 @@ use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -66,7 +67,7 @@ final class UserSummaryNotificationHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->ownerProvider->expects($matcher)
-            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Contact::NAME, $parameters[0]);
                     $this->assertSame([1 => 1], $parameters[1]);
@@ -79,6 +80,8 @@ final class UserSummaryNotificationHelperTest extends TestCase
 
                     return [['owner_id' => 2, 'id' => 2]];
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->userHelper->expects($this->never())
@@ -119,7 +122,7 @@ final class UserSummaryNotificationHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->ownerProvider->expects($matcher)
-            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Contact::NAME, $parameters[0]);
                     $this->assertSame([1 => 1], $parameters[1]);
@@ -132,6 +135,8 @@ final class UserSummaryNotificationHelperTest extends TestCase
 
                     return [];
                 }
+
+                throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->userHelper->expects($this->exactly(2))
@@ -188,7 +193,7 @@ final class UserSummaryNotificationHelperTest extends TestCase
         $this->translator->expects($this->exactly(2))
             ->method('trans')
             ->willReturnCallback(
-                function ($string, $params) {
+                function (string $string, array $params): string {
                     $expectedStrings = [
                         'mautic.integration.sync.user_notification.header',
                         'mautic.integration.sync.user_notification.count_message',

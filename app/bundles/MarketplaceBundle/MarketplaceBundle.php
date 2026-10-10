@@ -6,6 +6,6 @@ namespace Mautic\MarketplaceBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
-class MarketplaceBundle extends PluginBundleBase
+final class MarketplaceBundle extends PluginBundleBase
 {
 }

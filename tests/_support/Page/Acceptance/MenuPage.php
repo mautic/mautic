@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Page\Acceptance;
 
-class MenuPage
+final class MenuPage
 {
     public static $ADMIN_USER       = 'admin';
     public static $ADMIN_PASSWORD   = 'Maut1cR0cks!';

@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper\Language;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
-class Installer
+final class Installer
 {
     private ?string $sourceDirectory = null;
 

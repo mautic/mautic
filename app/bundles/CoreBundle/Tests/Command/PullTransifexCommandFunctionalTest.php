@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Command\PullTransifexCommand;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
@@ -26,13 +25,13 @@ final class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->filesystem = static::getContainer()->get('mautic.filesystem');
+        $this->filesystem = self::getContainer()->get(Filesystem::class);
         $this->filesystem->mkdir(self::FAKE_TRANSLATION_DIR);
     }
 
     public function testPullCommand(): void
     {
-        Assert::assertFalse($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs'), 'Translations directory already exist');
+        $this->assertFalse($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs'), 'Translations directory already exist');
 
         // Using the same translation for both file as we don't know which response will be processed first.
         $someTranslation = 'some.translation="Some translation"';
@@ -55,12 +54,12 @@ final class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         $commandTester = $this->testSymfonyCommand(PullTransifexCommand::NAME, ['--bundle' => 'WebhookBundle', '--language' => 'cs', '--path' => realpath(self::FAKE_TRANSLATION_DIR)]);
 
-        Assert::assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
-        Assert::assertTrue($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs'));
-        Assert::assertTrue($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/messages.ini'));
-        Assert::assertTrue($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/flashes.ini'));
-        Assert::assertSame($someTranslation, $this->filesystem->readFile(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/messages.ini'));
-        Assert::assertSame($someTranslation, $this->filesystem->readFile(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/flashes.ini'));
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
+        $this->assertTrue($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs'));
+        $this->assertTrue($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/messages.ini'));
+        $this->assertTrue($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/flashes.ini'));
+        $this->assertSame($someTranslation, $this->filesystem->readFile(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/messages.ini'));
+        $this->assertSame($someTranslation, $this->filesystem->readFile(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/flashes.ini'));
     }
 
     protected function beforeTearDown(): void

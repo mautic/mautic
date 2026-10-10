@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Event;
 
 use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
+use Mautic\AssetBundle\Helper\PointActionHelper;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Translation\Translator;
@@ -106,7 +107,7 @@ final class CampaignBuilderEventTest extends CampaignTestAbstract
             'group'       => 'mautic.asset.actions',
             'label'       => 'mautic.asset.point.action.download',
             'description' => 'mautic.asset.point.action.download_descr',
-            'callback'    => [\Mautic\AssetBundle\Helper\PointActionHelper::class, 'validateAssetDownload'],
+            'callback'    => [PointActionHelper::class, 'validateAssetDownload'],
             'formType'    => PointActionAssetDownloadType::class,
         ];
         $event = $this->initEvent();
@@ -133,9 +134,9 @@ final class CampaignBuilderEventTest extends CampaignTestAbstract
     {
         $translator = $this->createMock(Translator::class);
 
-        $translator->expects($this->any())
+        $translator
             ->method('trans')
-            ->willReturnCallback(function () {
+            ->willReturnCallback(function (): string {
                 $args = func_get_args();
 
                 return $args[0];

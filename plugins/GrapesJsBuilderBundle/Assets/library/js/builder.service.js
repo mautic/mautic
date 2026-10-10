@@ -82,6 +82,45 @@ export default class BuilderService {
     MjmlService.__gjsBuilderListStylesPatched = true;
   }
 
+  patchMjmlCommentViews(editor) {
+    const dc = editor?.DomComponents;
+    if (!dc || dc.__mauticMjmlCommentViewPatched) {
+      return;
+    }
+
+    const commentType = dc.getType('comment');
+    const BaseCommentModel = commentType?.model;
+    const BaseCommentView = commentType?.view;
+
+    if (!BaseCommentModel || !BaseCommentView) {
+      return;
+    }
+
+    dc.addType('comment', {
+      model: BaseCommentModel,
+      view: BaseCommentView.extend({
+        _createElement() {
+          const parent = typeof this.model?.parent === 'function' ? this.model.parent() : null;
+          const parentTagName = `${parent?.get?.('tagName') || ''}`.toLowerCase();
+
+          if (parentTagName !== 'mj-body') {
+            return document.createComment(this.model.content || '');
+          }
+
+          const marker = document.createElement('div');
+          marker.setAttribute('aria-hidden', 'true');
+          marker.setAttribute('data-gjs-comment-marker', 'true');
+          marker.style.cssText =
+            'display:block;width:100%;height:1px;min-height:1px;margin:0;padding:0;border:0;opacity:0;overflow:hidden;pointer-events:none;';
+
+          return marker;
+        },
+      }),
+    });
+
+    dc.__mauticMjmlCommentViewPatched = true;
+  }
+
   /**
    * Initialize GrapesJsBuilder
    *
@@ -1198,6 +1237,18 @@ export default class BuilderService {
     const inlineElements = BuilderService.getInlineElements();
     const emailCkEditorOptions = BuilderService.getCkeConf('email:getBuilderTokens');
     const emailInlineOptions = BuilderService.buildInlineCkeConf(emailCkEditorOptions);
+    const allowedTextInnerChildTags = [
+      'a',
+      'b',
+      'em',
+      'i',
+      'small',
+      'span',
+      'strong',
+      'sub',
+      'sup',
+      'u',
+    ];
 
     this.editor = grapesjs.init({
       selectorManager: {
@@ -1212,8 +1263,18 @@ export default class BuilderService {
         styles,
       },
       domComponents: {
-        // disable all except link components
-        disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
+        // Keep inline phrasing content inside paragraph text components. If
+        // spans are disallowed here, GrapesJS reparses them as siblings of the
+        // paragraph and MJML renders extra line breaks.
+        disableTextInnerChilds: (child) => {
+          if (child.is('link')) {
+            return false;
+          }
+
+          const tagName = `${child.get('tagName') || ''}`.toLowerCase();
+
+          return !allowedTextInnerChildTags.includes(tagName);
+        },
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
@@ -1235,6 +1296,7 @@ export default class BuilderService {
 
         [grapesjsMjmlThemeTokens]: {
           headContent: mjHeadContent,
+          mjmlParser: headInjectingParser,
         },
 
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
@@ -1255,6 +1317,7 @@ export default class BuilderService {
       },
     });
 
+    this.patchMjmlCommentViews(this.editor);
     this.unsetComponentVoidTypes(this.editor);
     this.editor.setComponents(components);
 

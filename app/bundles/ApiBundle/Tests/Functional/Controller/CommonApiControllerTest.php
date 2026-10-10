@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Security\UserTokenSetter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -24,7 +25,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
         $this->createAndAuthenticateApiUser('api_user', 'api@example.com');
 
-        $this->assertNotNull($email->getCheckedOut());
+        $this->assertInstanceOf(\DateTimeInterface::class, $email->getCheckedOut());
         $this->assertEquals('Admin User', $email->getCheckedOutByUser());
 
         $this->client->request('PATCH', '/api/emails/'.$email->getId().'/edit', [
@@ -39,11 +40,11 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_CONFLICT, $error['code']);
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');
         $timeFormat = $coreParametersHelper->get('date_format_timeonly');
@@ -112,11 +113,11 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_CONFLICT, $error['code']);
 
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');
         $timeFormat = $coreParametersHelper->get('date_format_timeonly');
@@ -143,6 +144,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
     private function createAndAuthenticateApiUser(string $username, string $email): void
     {
         $role = $this->em->getRepository(Role::class)->find(1);
+        $this->assertInstanceOf(Role::class, $role);
 
         $user = (new User())
             ->setFirstName('API')
@@ -155,6 +157,6 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         $this->em->persist($user);
         $this->em->flush();
 
-        static::getContainer()->get('mautic.security.user_token_setter')->setUser($user->getId());
+        self::getContainer()->get(UserTokenSetter::class)->setUser($user->getId());
     }
 }

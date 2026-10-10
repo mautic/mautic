@@ -1,4 +1,5 @@
 {
+  "$schema": "https://fundingjson.org/schema/v1.1.0.json",
   "id": 0,
   "guid": "",
   "url": "",
@@ -8,8 +9,8 @@
   "crawl_errors": 0,
   "crawl_message": null,
   "created_at": "0001-01-01T00:00:00Z",
-  "updated_at": "2025-08-12T00:00:00Z",
-  "version": "v1.0.1",
+  "updated_at": "2026-08-03T00:00:00Z",
+  "version": "v1.1.0",
   "entity": {
     "type": "organisation",
     "role": "steward",
@@ -48,7 +49,7 @@
     {
       "guid": "mautic-privacy-project",
       "name": "Mautic project: The Mautic Privacy Project",
-      "description": "Mautic's product vision is to be the most privacy-focused, accessible and extendable marketing automation product on the market, giving everyone the power to understand, manage and grow their business or organization while respecting and safeguarding the privacy of their end users. When it comes to truly respecting privacy, there are very few marketing tools that can afford true digital sovereignty, guaranteeing ownership of data to avoid vendor lock-in, and offering granular controls over the level and types of tracking used. Mautic stands at the intersection of these needs, offering a powerful solution which can be self-hosted, with features that align with our commitment to being the most privacy-focused marketing automation solution on the market. The vision for this project is to address some issues in our product, enabling better compliance with GDPR and related legislation, and to enable the marketer to easily turn on the tracking features that they wish to use through a central, clear user interface. This will allow Mautic to ship in no-tracking mode, and also educate marketers further on the impact of each form of tracking at the point they turn it on.",
+      "description": "This project is provisionally funded, subject to final confirmation. We will update this manifest once the funding is confirmed.\n\nMautic's product vision is to be the most privacy-focused, accessible and extendable marketing automation product on the market, giving everyone the power to understand, manage and grow their business or organization while respecting and safeguarding the privacy of their end users. When it comes to truly respecting privacy, there are very few marketing tools that can afford true digital sovereignty, guaranteeing ownership of data to avoid vendor lock-in, and offering granular controls over the level and types of tracking used. Mautic stands at the intersection of these needs, offering a powerful solution which can be self-hosted, with features that align with our commitment to being the most privacy-focused marketing automation solution on the market. The vision for this project is to address some issues in our product, enabling better compliance with GDPR and related legislation, and to enable the marketer to easily turn on the tracking features that they wish to use through a central, clear user interface. This will allow Mautic to ship in no-tracking mode, and also educate marketers further on the impact of each form of tracking at the point they turn it on.",
       "webpageUrl": {
         "url": "https://community.mautic.org/processes/roadmap/f/4/proposals/16",
         "wellKnown": "https://community.mautic.org/.well-known/funding-manifest-urls"
@@ -61,6 +62,7 @@
         "spdx:GPL-3.0"
       ],
       "tags": [
+        "provisionally-funded",
         "programming",
         "core-development",
         "core",
@@ -267,12 +269,20 @@
     ],
     "history": [
       {
+        "year": 2025,
+        "income": 168456.11,
+        "expenses": 174125.11,
+        "taxes": 0,
+        "currency": "USD",
+        "description": "The financial report can be found at https://community.mautic.org/assemblies/general-assembly/f/25/proposals/213 and was accepted in 2026's General Assembly.\n\nMore detailed metrics are available in our Open Startup reporting at https://mautic.org/tag/openstartup/"
+      },
+      {
         "year": 2024,
         "income": 131354.07,
         "expenses": 164543.95,
         "taxes": 0,
         "currency": "USD",
-        "description": "The financial report can be found here: https://community.mautic.org/assemblies/council/f/55/proposals/91 which will be proposed for formal acceptance in 2025's General Assembly.\n\nMore detailed metrics are available in our Open Startup Reporting: https://docs.google.com/spreadsheets/d/1UE1R762hsHIqYUd1kJRyuEp_6DQ5kriwIKaHB7kSh9Y/edit?usp=sharing"
+        "description": "The financial report can be found at https://community.mautic.org/assemblies/general-assembly/f/25/proposals/177 and was accepted in 2025's General Assembly.\n\nMore detailed metrics are available in our Open Startup reporting at https://mautic.org/tag/openstartup/"
       },
       {
         "year": 2023,
@@ -280,7 +290,7 @@
         "expenses": 122047.34,
         "taxes": 0,
         "currency": "USD",
-        "description": "The financial report can be found here: https://community.mautic.org/assemblies/general-assembly/f/25/proposals/46 which was accepted in 2024's General Assembly.\n\nMore detailed metrics are available in our Open Startup Reporting: https://docs.google.com/spreadsheets/d/1UE1R762hsHIqYUd1kJRyuEp_6DQ5kriwIKaHB7kSh9Y/edit?usp=sharing"
+        "description": "The financial report can be found at https://community.mautic.org/assemblies/general-assembly/f/25/proposals/46 and was accepted in 2024's General Assembly.\n\nMore detailed metrics are available in our Open Startup reporting at https://mautic.org/tag/openstartup/"
       },
       {
         "year": 2022,
@@ -288,7 +298,7 @@
         "expenses": 47578.75,
         "taxes": 0,
         "currency": "USD",
-        "description": "More detailed metrics are available in our Open Startup Reporting: https://docs.google.com/spreadsheets/d/1UE1R762hsHIqYUd1kJRyuEp_6DQ5kriwIKaHB7kSh9Y/edit?usp=sharing"
+        "description": "More detailed metrics are available in our Open Startup reporting at https://mautic.org/tag/openstartup/"
       },
       {
         "year": 2021,
@@ -296,7 +306,7 @@
         "expenses": 32537.79,
         "taxes": 0,
         "currency": "USD",
-        "description": "More detailed metrics are available in our Open Startup Reporting: https://docs.google.com/spreadsheets/d/1UE1R762hsHIqYUd1kJRyuEp_6DQ5kriwIKaHB7kSh9Y/edit?usp=sharing"
+        "description": "More detailed metrics are available in our Open Startup reporting at https://mautic.org/tag/openstartup/"
       }
     ]
   }

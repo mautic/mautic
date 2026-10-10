@@ -18,10 +18,10 @@ final class EmailModelBuildUrlTest extends MauticMysqlTestCase
     public function testSiteUrlAlwaysTakesPrecedenceWhenBuildingUrls(): void
     {
         /** @var EmailModel $emailModel */
-        $emailModel = static::getContainer()->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get(EmailModel::class);
         $idHash     = uniqid();
-        $url        = $emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
+        $url        = $emailModel->buildUrl('mautic_email_validate_email_form', ['action' => 'unsubscribe', 'secretHash' => 'somehash', 'idHash' => $idHash]);
 
-        self::assertSame('https://foo.bar.com/email/unsubscribe/'.$idHash, $url);
+        $this->assertSame('https://foo.bar.com/email/validate/unsubscribe/somehash/'.$idHash, $url);
     }
 }

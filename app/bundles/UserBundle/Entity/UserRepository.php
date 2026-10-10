@@ -230,20 +230,24 @@ class UserRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
             case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('u.isPublished', ":$unique");
+                $expr            = $q->expr()->eq('u.isPublished', ":{$unique}");
                 $forceParameters = [$unique => true];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
             case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('u.isPublished', ":$unique");
+                $expr            = $q->expr()->eq('u.isPublished', ":{$unique}");
                 $forceParameters = [$unique => false];
 
                 break;
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
             case $this->translator->trans('mautic.user.user.searchcommand.isadmin', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('r.isAdmin', ":$unique");
+                $expr            = $q->expr()->eq('r.isAdmin', ":{$unique}");
                 $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.user.user.searchcommand.neverloggedin'):
+            case $this->translator->trans('mautic.user.user.searchcommand.neverloggedin', [], null, 'en_US'):
+                $expr = $q->expr()->isNull('u.lastLogin');
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
             case $this->translator->trans('mautic.core.searchcommand.email', [], null, 'en_US'):
@@ -287,7 +291,7 @@ class UserRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
@@ -303,6 +307,7 @@ class UserRepository extends CommonRepository
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.user.user.searchcommand.isadmin',
+            'mautic.user.user.searchcommand.neverloggedin',
             'mautic.core.searchcommand.name',
             'mautic.user.user.searchcommand.position',
             'mautic.user.user.searchcommand.role',

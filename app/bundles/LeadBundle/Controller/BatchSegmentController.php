@@ -2,38 +2,28 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class BatchSegmentController extends AbstractFormController
+final class BatchSegmentController extends AbstractFormController
 {
-    public function __construct(
-        private readonly SegmentActionModel $segmentActionModel,
-        private readonly ListModel $segmentModel,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private SegmentActionModel $segmentActionModel;
+
+    private ListModel $segmentModel;
+
+    #[Required]
+    public function autowireBatchSegmentController(
+        SegmentActionModel $segmentActionModel,
+        ListModel $segmentModel,
+    ): void {
+        $this->segmentActionModel = $segmentActionModel;
+        $this->segmentModel       = $segmentModel;
     }
 
     /**
@@ -72,7 +62,7 @@ class BatchSegmentController extends AbstractFormController
     /**
      * View for batch action.
      */
-    public function indexAction(): \Symfony\Component\HttpFoundation\Response
+    public function indexAction(): Response
     {
         $route = $this->generateUrl('mautic_segment_batch_contact_set');
         $lists = $this->segmentModel->getUserLists();

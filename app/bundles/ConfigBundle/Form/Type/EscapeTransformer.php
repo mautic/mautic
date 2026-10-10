@@ -9,12 +9,12 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<array<string|int|float|array<string|int|float>>|string|int|float, array<string|int|float|array<string|int|float>>|string|int|float>
  */
-class EscapeTransformer implements DataTransformerInterface
+final readonly class EscapeTransformer implements DataTransformerInterface
 {
     /**
      * @var string[]
      */
-    private readonly array $allowedParameters;
+    private array $allowedParameters;
 
     public function __construct(array $allowedParameters)
     {

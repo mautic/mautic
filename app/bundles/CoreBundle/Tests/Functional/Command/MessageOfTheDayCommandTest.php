@@ -51,7 +51,7 @@ final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
     #[DataProvider('provideCachedMotdPayloads')]
     public function testItReadsAndRendersCachedMotd(array $payload, bool $expectMessage, string $expectedCategory, string $expectedContent): void
     {
-        $json = (string) json_encode($payload, JSON_THROW_ON_ERROR);
+        $json = json_encode($payload, JSON_THROW_ON_ERROR);
 
         file_put_contents($this->cachePath, $json);
 
@@ -182,8 +182,8 @@ final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
         file_put_contents($this->cachePath, 'stale-cache');
         touch($this->cachePath, time() - 7200);
 
-        $httpClient = static::getContainer()->get(HttpClientInterface::class);
-        self::assertInstanceOf(MockHttpClient::class, $httpClient);
+        $httpClient = self::getContainer()->get(HttpClientInterface::class);
+        $this->assertInstanceOf(MockHttpClient::class, $httpClient);
         $httpClient->setResponseFactory([
             new MockResponse('', ['http_code' => 500]),
         ]);

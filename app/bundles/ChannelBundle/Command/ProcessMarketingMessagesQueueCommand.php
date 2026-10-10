@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
         'mautic:campaigns:messages',
     ]
 )]
-class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
+final class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -31,7 +32,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -70,7 +71,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         $key        = $channel.$channelId.$messageId;
 
         if (!$this->checkRunStatus($input, $output, $key)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $output->writeln('<info>'.$this->translator->trans('mautic.campaign.command.process.messages').'</info>');
@@ -94,6 +95,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 }

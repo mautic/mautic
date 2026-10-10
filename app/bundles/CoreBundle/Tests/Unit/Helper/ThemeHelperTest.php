@@ -14,6 +14,7 @@ use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
@@ -101,7 +102,7 @@ final class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('config.json', $parameters['%files%']);
+                    $this->assertStringContainsString('config.json', (string) $parameters['%files%']);
                 }
             );
 
@@ -121,7 +122,7 @@ final class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('message.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('message.html.twig', (string) $parameters['%files%']);
                 }
             );
 
@@ -141,7 +142,7 @@ final class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('page.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('page.html.twig', (string) $parameters['%files%']);
                 }
             );
 
@@ -162,6 +163,119 @@ final class ThemeHelperTest extends TestCase
         $this->assertFileExists(__DIR__.'/resource/themes/good-tmp');
 
         $fs->remove(__DIR__.'/resource/themes/good-tmp');
+    }
+
+    public function testThemeIsInstalledFromSingleTopLevelFolder(): void
+    {
+        $themeRoot = sys_get_temp_dir().'/theme_install_'.uniqid();
+        $this->pathsHelper->method('getSystemPath')
+            ->with('themes', true)
+            ->willReturn($themeRoot);
+
+        $zipPath = sys_get_temp_dir().'/theme_install_'.uniqid().'.zip';
+        $zipName = basename($zipPath, '.zip');
+
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        $zip->addFromString('my-theme/config.json', json_encode(['features' => []], JSON_THROW_ON_ERROR));
+        $zip->addFromString('my-theme/html/message.html.twig', '<p>Message</p>');
+        $zip->addFromString('my-theme/html/page.html.twig', '<p>Page</p>');
+        $zip->close();
+
+        try {
+            $this->themeHelper->install($zipPath);
+
+            $this->assertFileExists($themeRoot.'/'.$zipName.'/config.json');
+            $this->assertFileExists($themeRoot.'/'.$zipName.'/html/message.html.twig');
+            $this->assertFileExists($themeRoot.'/'.$zipName.'/html/page.html.twig');
+        } finally {
+            $filesystem = new Filesystem();
+            $filesystem->remove([$themeRoot, $zipPath]);
+        }
+    }
+
+    /**
+     * @param list<array{0: string, 1: string}> $zipEntries
+     * @param list<string>                      $escapedPaths absolute paths that must not be written
+     */
+    #[DataProvider('zipSlipThemeInstallProvider')]
+    public function testThemeInstallRejectsZipSlipEntries(array $zipEntries, array $escapedPaths): void
+    {
+        $themeRoot = sys_get_temp_dir().'/theme_install_'.uniqid();
+        $this->pathsHelper->method('getSystemPath')
+            ->with('themes', true)
+            ->willReturn($themeRoot);
+
+        $zipPath = sys_get_temp_dir().'/theme_install_'.uniqid().'.zip';
+        $zipName = basename($zipPath, '.zip');
+
+        $zip = new \ZipArchive();
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        foreach ($zipEntries as [$name, $contents]) {
+            $zip->addFromString($name, $contents);
+        }
+        $zip->close();
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('mautic.core.update.error_extracting_package')
+            ->willReturn('some translation');
+
+        $thrown = false;
+
+        try {
+            $this->themeHelper->install($zipPath);
+        } catch (\Exception $exception) {
+            $thrown = true;
+            $this->assertSame('some translation', $exception->getMessage());
+        } finally {
+            $filesystem = new Filesystem();
+            foreach ($escapedPaths as $escapedPath) {
+                $this->assertFileDoesNotExist(str_replace('{themeRoot}', $themeRoot, $escapedPath));
+            }
+            $this->assertDirectoryDoesNotExist($themeRoot.'/'.$zipName);
+            $filesystem->remove([$themeRoot, $zipPath]);
+        }
+
+        $this->assertTrue($thrown);
+    }
+
+    /**
+     * @return \Generator<string, array{0: list<array{0: string, 1: string}>, 1: list<string>}>
+     */
+    public static function zipSlipThemeInstallProvider(): \Generator
+    {
+        $config  = json_encode(['features' => []], JSON_THROW_ON_ERROR);
+        $message = '<p>Message</p>';
+        $page    = '<p>Page</p>';
+
+        yield 'parent directory entry' => [
+            [
+                ['config.json', $config],
+                ['html/message.html.twig', $message],
+                ['../outside.txt', 'zip-slip'],
+            ],
+            ['{themeRoot}/outside.txt'],
+        ];
+
+        yield 'absolute path entry' => [
+            [
+                ['config.json', $config],
+                ['html/message.html.twig', $message],
+                ['/tmp/absolute-theme-slip.txt', 'zip-slip'],
+            ],
+            ['/tmp/absolute-theme-slip.txt'],
+        ];
+
+        yield 'wrapped parent directory entry' => [
+            [
+                ['my-theme/config.json', $config],
+                ['my-theme/html/message.html.twig', $message],
+                ['my-theme/html/page.html.twig', $page],
+                ['my-theme/../../outside.txt', 'zip-slip'],
+            ],
+            ['{themeRoot}/outside.txt'],
+        ];
     }
 
     public function testThemeFallbackToDefaultIfTemplateIsMissing(): void
@@ -235,7 +349,7 @@ final class ThemeHelperTest extends TestCase
     public function testCopyWithNoNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class extends PathsHelper {
+            new class() extends PathsHelper {
                 public function __construct()
                 {
                 }
@@ -248,21 +362,18 @@ final class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class extends Translator {
+            new class() extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class extends CoreParametersHelper {
+            new class() extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class extends Filesystem {
-                /**
-                 * @param string $files
-                 */
-                public function exists($files): bool
+            new class() extends Filesystem {
+                public function exists(string|iterable $files): bool
                 {
                     return '/path/to/themes/new-theme-name' !== $files;
                 }
@@ -290,7 +401,7 @@ final class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class extends Finder {
+            new class() extends Finder {
                 /**
                  * @var SplFileInfo[]
                  */
@@ -300,7 +411,7 @@ final class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function in($dirs): static
+                public function in(string|array $dirs): static
                 {
                     $this->dirs = [
                         new SplFileInfo('origin-template-dir', 'origin-template-dir', 'origin-template-dir'),
@@ -323,7 +434,7 @@ final class ThemeHelperTest extends TestCase
     public function testCopyWithNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class extends PathsHelper {
+            new class() extends PathsHelper {
                 public function __construct()
                 {
                 }
@@ -336,21 +447,18 @@ final class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class extends Translator {
+            new class() extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class extends CoreParametersHelper {
+            new class() extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class extends Filesystem {
-                /**
-                 * @param string $files
-                 */
-                public function exists($files): bool
+            new class() extends Filesystem {
+                public function exists(string|iterable $files): bool
                 {
                     return '/path/to/themes/requested-theme-dir' !== $files;
                 }
@@ -378,7 +486,7 @@ final class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class extends Finder {
+            new class() extends Finder {
                 /**
                  * @var SplFileInfo[]
                  */
@@ -388,7 +496,7 @@ final class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function in($dirs): static
+                public function in(string|array $dirs): static
                 {
                     $this->dirs = [
                         new SplFileInfo('origin-template-dir', 'origin-template-dir', 'origin-template-dir'),
@@ -417,13 +525,13 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('email');
-        Assert::assertCount(2, $themes);
-        Assert::assertArrayHasKey('theme-legacy-email', $themes);
-        Assert::assertArrayHasKey('theme-legacy-all', $themes);
+        $this->assertCount(2, $themes);
+        $this->assertArrayHasKey('theme-legacy-email', $themes);
+        $this->assertArrayHasKey('theme-legacy-all', $themes);
 
         $themes = $this->themeHelper->getInstalledThemes('page');
-        Assert::assertCount(1, $themes);
-        Assert::assertArrayHasKey('theme-legacy-all', $themes);
+        $this->assertCount(1, $themes);
+        $this->assertArrayHasKey('theme-legacy-all', $themes);
     }
 
     public function testCustomThemesAreReturnedForFeatureIfCustomBuilderIsEnabled(): void
@@ -444,13 +552,13 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('page');
-        Assert::assertCount(2, $themes);
-        Assert::assertArrayHasKey('theme-custom-builder-all', $themes);
-        Assert::assertArrayHasKey('theme-custom-builder-page', $themes);
+        $this->assertCount(2, $themes);
+        $this->assertArrayHasKey('theme-custom-builder-all', $themes);
+        $this->assertArrayHasKey('theme-custom-builder-page', $themes);
 
         $themes = $this->themeHelper->getInstalledThemes('email');
-        Assert::assertCount(1, $themes);
-        Assert::assertArrayHasKey('theme-custom-builder-all', $themes);
+        $this->assertCount(1, $themes);
+        $this->assertArrayHasKey('theme-custom-builder-all', $themes);
     }
 
     public function testAllThemesAreReturned(): void
@@ -459,12 +567,12 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes();
-        Assert::assertCount(4, $themes);
+        $this->assertCount(4, $themes);
 
         // Test that a list of themes are returned by default
         $themeKeys   = array_keys($themes);
         $themeValues = array_values($themes);
-        Assert::assertSame($themeKeys, $themeValues);
+        $this->assertSame($themeKeys, $themeValues);
     }
 
     public function testExtendedThemeDetailsAreReturned(): void
@@ -473,9 +581,9 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('all', true);
-        Assert::assertCount(4, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-email']);
-        Assert::assertArrayHasKey('dir', $themes['theme-legacy-email']);
+        $this->assertCount(4, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-email']);
+        $this->assertArrayHasKey('dir', $themes['theme-legacy-email']);
     }
 
     public function testExtendedThemeDetailsWithoutDirectoriesAreReturned(): void
@@ -484,9 +592,9 @@ final class ThemeHelperTest extends TestCase
             ->willReturn(__DIR__.'/resource/themes');
 
         $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
-        Assert::assertCount(4, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-email']);
-        Assert::assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
+        $this->assertCount(4, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-email']);
+        $this->assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
     }
 
     public function testCachedThemesReturnAsExpected(): void
@@ -511,25 +619,25 @@ final class ThemeHelperTest extends TestCase
             });
 
         $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
-        Assert::assertCount(4, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-email']);
-        Assert::assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
+        $this->assertCount(4, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-email']);
+        $this->assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
 
         // this should return cached results
         $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
-        Assert::assertCount(4, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-email']);
-        Assert::assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
+        $this->assertCount(4, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-email']);
+        $this->assertArrayNotHasKey('dir', $themes['theme-legacy-email']);
 
         $themes = $this->themeHelper->getInstalledThemes('page', true, false, false);
-        Assert::assertCount(1, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-all']);
-        Assert::assertArrayNotHasKey('dir', $themes['theme-legacy-all']);
+        $this->assertCount(1, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-all']);
+        $this->assertArrayNotHasKey('dir', $themes['theme-legacy-all']);
 
         $themes = $this->themeHelper->getInstalledThemes('page', true, false, true);
-        Assert::assertCount(1, $themes);
-        Assert::assertArrayHasKey('name', $themes['theme-legacy-all']);
-        Assert::assertArrayHasKey('dir', $themes['theme-legacy-all']);
+        $this->assertCount(1, $themes);
+        $this->assertArrayHasKey('name', $themes['theme-legacy-all']);
+        $this->assertArrayHasKey('dir', $themes['theme-legacy-all']);
     }
 
     public function testGetCurrentThemeWillReturnCodeModeIfTheThemeIsCodeMode(): void
@@ -537,7 +645,7 @@ final class ThemeHelperTest extends TestCase
         $this->pathsHelper->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
-        Assert::assertTrue($this->themeHelper->exists('theme-legacy-email'));
+        $this->assertTrue($this->themeHelper->exists('theme-legacy-email'));
     }
 
     public function testExistsReturnsFalseIfThemeDoesNotExist(): void
@@ -545,7 +653,7 @@ final class ThemeHelperTest extends TestCase
         $this->pathsHelper->method('getSystemPath')
             ->willReturn(__DIR__.'/resource/themes');
 
-        Assert::assertFalse($this->themeHelper->exists('theme-legacy-email-foo'));
+        $this->assertFalse($this->themeHelper->exists('theme-legacy-email-foo'));
     }
 
     public function testDefaultThemeNotShouldNotGetRemoved(): void
@@ -555,8 +663,7 @@ final class ThemeHelperTest extends TestCase
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->exactly(5))
-            ->method('exists')
-            ->willReturnOnConsecutiveCalls(true, true, true, true, true);
+            ->method('exists')->willReturn(true);
 
         $filesystem->method('readFile')->willReturn('{"name": "Test Theme"}');
 
@@ -572,7 +679,7 @@ final class ThemeHelperTest extends TestCase
 
         // custom theme name - theme-legacy-email
         $themeHelper->delete('theme-legacy-email');
-        Assert::assertTrue($themeHelper->exists('theme-legacy-email'));
+        $this->assertTrue($themeHelper->exists('theme-legacy-email'));
     }
 
     public function testDeleteThemeThrowsExceptionIfThemeDoesNotExist(): void
@@ -606,7 +713,7 @@ final class ThemeHelperTest extends TestCase
 
         $rendered = $themeHelper->renderThemeTemplate('@themes/test/html/page.html.twig', ['value' => 'runtime ok']);
 
-        Assert::assertSame('runtime ok [runtime]', $rendered);
+        $this->assertSame('runtime ok [runtime]', $rendered);
     }
 }
 

@@ -16,7 +16,7 @@ use Predis\Connection\Replication\SentinelReplication;
 /**
  * Helper functions for simpler operations with arrays.
  */
-class PRedisConnectionHelper
+final class PRedisConnectionHelper
 {
     /**
      * Transform the redis url config key into an array if needed

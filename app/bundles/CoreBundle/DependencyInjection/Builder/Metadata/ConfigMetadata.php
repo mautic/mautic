@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\DependencyInjection\Builder\Metadata;
 use Illuminate\Support\Collection;
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 
-class ConfigMetadata
+final class ConfigMetadata
 {
     private array $ipLookupServices = [];
 
@@ -80,7 +80,7 @@ class ConfigMetadata
                 );
 
                 $filtered->transform(
-                    fn ($serviceDefinition) => $this->encodeParameters($serviceDefinition)
+                    fn ($serviceDefinition): mixed => $this->encodeParameters($serviceDefinition)
                 );
 
                 return $filtered->toArray();
@@ -93,7 +93,7 @@ class ConfigMetadata
     private function prepareParameters(Collection $parameters): array
     {
         $parameters->transform(
-            fn ($parameterValue) => $this->encodeParameters($parameterValue)
+            fn ($parameterValue): mixed => $this->encodeParameters($parameterValue)
         );
 
         return $parameters->toArray();
@@ -102,7 +102,7 @@ class ConfigMetadata
     /**
      *  Encodes percent signs so they are not compiled in the container.
      */
-    private function encodeParameters($valueToEncode)
+    private function encodeParameters(mixed $valueToEncode): mixed
     {
         if (is_array($valueToEncode)) {
             foreach ($valueToEncode as $key => $value) {

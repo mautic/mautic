@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment\Exception;
 
-class SegmentNotFoundException extends \Exception
+final class SegmentNotFoundException extends \Exception
 {
 }

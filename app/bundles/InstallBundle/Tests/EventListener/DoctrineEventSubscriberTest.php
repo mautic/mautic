@@ -13,16 +13,10 @@ use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\InstallBundle\EventListener\DoctrineEventSubscriber;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class DoctrineEventSubscriberTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testSubscriberWillAddCorrectIndexes(): void
     {
         $idColumn   = new Column('id', new BigIntType());
@@ -34,10 +28,10 @@ final class DoctrineEventSubscriberTest extends TestCase
         $subscriber = new DoctrineEventSubscriber();
         $subscriber->postGenerateSchema($args);
 
-        Assert::assertTrue($schema->hasTable(MAUTIC_TABLE_PREFIX.'leads'));
+        $this->assertTrue($schema->hasTable(MAUTIC_TABLE_PREFIX.'leads'));
         $contactsTable = $schema->getTable(MAUTIC_TABLE_PREFIX.'leads');
-        Assert::assertTrue($contactsTable->hasIndex('contact_attribution'));
-        Assert::assertTrue($contactsTable->hasIndex('date_added_country_index'));
+        $this->assertTrue($contactsTable->hasIndex('contact_attribution'));
+        $this->assertTrue($contactsTable->hasIndex('date_added_country_index'));
     }
 
     public function testSubscriberWillNotFailWithTablesFromAPlugin(): void
@@ -48,7 +42,7 @@ final class DoctrineEventSubscriberTest extends TestCase
         $subscriber = new DoctrineEventSubscriber();
         $subscriber->postGenerateSchema($args);
 
-        Assert::assertTrue($schema->hasTable(MAUTIC_TABLE_PREFIX.'some_plugin_table'));
-        Assert::assertFalse($schema->hasTable(MAUTIC_TABLE_PREFIX.'leads'));
+        $this->assertTrue($schema->hasTable(MAUTIC_TABLE_PREFIX.'some_plugin_table'));
+        $this->assertFalse($schema->hasTable(MAUTIC_TABLE_PREFIX.'leads'));
     }
 }

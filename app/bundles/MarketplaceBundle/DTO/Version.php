@@ -21,13 +21,13 @@ final class Version
     ) {
     }
 
-    public static function fromArray(array $array): Version
+    public static function fromArray(array $array): self
     {
         return new self(
             $array['version'],
-            $array['license'],
-            new \DateTimeImmutable($array['time']),
-            $array['homepage'],
+            $array['license'] ?? [],
+            new \DateTimeImmutable($array['time'] ?? 'now'),
+            $array['homepage'] ?? '',
             $array['support']['issues'] ?? '',
             $array['support']['wiki'] ?? '',
             $array['require'] ?? [],

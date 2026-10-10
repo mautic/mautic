@@ -6,7 +6,6 @@ namespace Mautic\ApiBundle\Tests\Helper;
 
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class BatchIdToEntityHelperTest extends TestCase
@@ -234,7 +233,7 @@ final class BatchIdToEntityHelperTest extends TestCase
         $orderedEntities = $helper->orderByOriginalKey($entities);
         $this->assertSame([0, 1, 2, 3], array_keys($orderedEntities));
         foreach ($parameters as $key => $contact) {
-            Assert::assertEquals($orderedEntities[$key]->getId(), $entities[$key]->getId());
+            $this->assertEquals($orderedEntities[$key]->getId(), $entities[$key]->getId());
         }
 
         $parameters = [

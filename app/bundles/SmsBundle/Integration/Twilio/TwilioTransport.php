@@ -112,7 +112,7 @@ class TwilioTransport implements TransportInterface, MMSTransportInterface
             'body'                => $content,
         ];
 
-        if ($media) {
+        if ([] !== $media) {
             $payload['mediaUrl'] = $media;
         }
 

@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Command\DeduplicateCommand;
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
-use PHPUnit\Framework\Assert;
 
 final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 {
@@ -30,9 +29,9 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         $contactRepository = $this->em->getRepository(Lead::class);
 
         /** @var ContactDeduper $contactDeduper */
-        $contactDeduper = static::getContainer()->get('mautic.lead.deduper');
+        $contactDeduper = self::getContainer()->get(ContactDeduper::class);
 
-        Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
+        $this->assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
         $this->saveContact('john@doe.email'); // 1
         $this->saveContact('john@doe.email'); // 1
@@ -44,17 +43,13 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        Assert::assertSame(7, $contactRepository->count([]));
+        $this->assertSame(7, $contactRepository->count([]));
 
-        Assert::assertSame(
-            2,
-            $contactDeduper->countDuplicatedContacts(array_keys($contactDeduper->getUniqueFields('lead'))),
-            'The deduper should see and process only 2 duplicated contacts. The third is unique.'
-        );
+        $this->assertSame(2, $contactDeduper->countDuplicatedContacts(array_keys($contactDeduper->getUniqueFields('lead'))), 'The deduper should see and process only 2 duplicated contacts. The third is unique.');
 
         $output = $this->testSymfonyCommand(DeduplicateCommand::NAME);
 
-        Assert::assertSame(3, $contactRepository->count([]), $output->getDisplay());
+        $this->assertSame(3, $contactRepository->count([]), $output->getDisplay());
     }
 
     public function testDeduplicateCommandWithAnotherUniqueFieldAndAnd(): void
@@ -63,7 +58,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
         $fieldRepository = $this->em->getRepository(LeadField::class);
 
-        Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
+        $this->assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
         $this->saveContact('john@doe.email', '111111111'); // 1
         $this->saveContact('john@doe.email', '111111111'); // 1
@@ -82,11 +77,11 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        Assert::assertSame(8, $contactRepository->count([]));
+        $this->assertSame(8, $contactRepository->count([]));
 
         $output = $this->testSymfonyCommand(DeduplicateCommand::NAME);
 
-        Assert::assertSame(5, $contactRepository->count([]), $output->getDisplay());
+        $this->assertSame(5, $contactRepository->count([]), $output->getDisplay());
     }
 
     public function testDeduplicateCommandWithAnotherUniqueFieldAndOr(): void
@@ -95,7 +90,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
         $fieldRepository = $this->em->getRepository(LeadField::class);
 
-        Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
+        $this->assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
         $this->saveContact('john@doe.email', '111111111'); // 1
         $this->saveContact('john@doe.email', '111111111'); // 1
@@ -114,11 +109,11 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        Assert::assertSame(8, $contactRepository->count([]));
+        $this->assertSame(8, $contactRepository->count([]));
 
         $output = $this->testSymfonyCommand(DeduplicateCommand::NAME);
 
-        Assert::assertSame(3, $contactRepository->count([]), $output->getDisplay());
+        $this->assertSame(3, $contactRepository->count([]), $output->getDisplay());
     }
 
     private function saveContact(string $email, ?string $phone = null): Lead

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticSocialBundle\Tests\Integration;
 
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(FoursquareIntegration::class)]
+#[CoversClass(FoursquareIntegration::class)]
 final class FoursquareIntegrationTest extends AbstractIntegrationTestCase
 {
     private FoursquareIntegration $integration;
@@ -32,10 +32,9 @@ final class FoursquareIntegrationTest extends AbstractIntegrationTestCase
             $this->pathsHelper,
             $this->notificationModel,
             $this->fieldModel,
-            $this->fieldsWithUniqueIdentifier,
             $this->integrationEntityModel,
             $this->doNotContact,
-            $this->createStub(IntegrationHelper::class),
+            $this->fieldsWithUniqueIdentifier,
         );
     }
 

@@ -145,8 +145,8 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         $downloads = $data['member'];
-        self::assertCount(1, $downloads, 'Expected exactly 1 download (only the one for the owned asset)');
-        self::assertSame($ownDownload->getId(), $downloads[0]['id']);
+        $this->assertCount(1, $downloads, 'Expected exactly 1 download (only the one for the owned asset)');
+        $this->assertSame($ownDownload->getId(), $downloads[0]['id']);
     }
 
     public function testViewOwnCollectionReportsOwnedTotalAcrossPagesOnApiV2(): void
@@ -222,9 +222,9 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
 
         $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertArrayHasKey('member', $page1Data);
-        self::assertArrayHasKey('totalItems', $page1Data);
-        self::assertSame(4, $page1Data['totalItems'], 'Should report totalItems 4 owned downloads');
-        self::assertCount(4, $page1Data['member'], 'Should return all 4 owned downloads on single page');
+        $this->assertArrayHasKey('member', $page1Data);
+        $this->assertArrayHasKey('totalItems', $page1Data);
+        $this->assertSame(4, $page1Data['totalItems'], 'Should report totalItems 4 owned downloads');
+        $this->assertCount(4, $page1Data['member'], 'Should return all 4 owned downloads on single page');
     }
 }

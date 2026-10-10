@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Exception;
 
-class UnauthorizedException extends \Exception
+final class UnauthorizedException extends \Exception
 {
 }

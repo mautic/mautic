@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\PageEvents;
@@ -38,7 +39,7 @@ final class RedirectModelTest extends PageTestAbstract
         $redirectModel = $this->getRedirectModel();
         $url           = $redirectModel->generateRedirectUrl($redirect);
 
-        $this->assertStringContainsString('http://some-url.com', $url);
+        $this->assertStringContainsString('http://some-url.com', (string) $url);
     }
 
     public function testRedirectGenerationEvent(): void
@@ -64,7 +65,10 @@ final class RedirectModelTest extends PageTestAbstract
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
-            $shortener
+        );
+        $model->autowireRedirectModel(
+            $shortener,
+            $this->createStub(RedirectRepository::class)
         );
 
         $redirect = new Redirect();

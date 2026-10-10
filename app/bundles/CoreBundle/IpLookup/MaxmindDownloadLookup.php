@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use GeoIp2\Database\Reader;
 
-class MaxmindDownloadLookup extends AbstractLocalDataLookup
+final class MaxmindDownloadLookup extends AbstractLocalDataLookup
 {
     public function getAttribution(): string
     {
@@ -50,7 +50,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
     /**
      * Extract the IP from the local database.
      */
-    protected function lookup()
+    protected function lookup(): void
     {
         try {
             $reader = new Reader($this->getLocalDataStoreFilepath());

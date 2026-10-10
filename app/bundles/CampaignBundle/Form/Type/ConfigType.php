@@ -16,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -113,10 +113,7 @@ class ConfigType extends AbstractType
                 ],
                 'data'        => $options['data']['peak_interaction_timer_best_default_hour_start'] ?? 9,
                 'constraints' => [
-                    new Range([
-                        'min' => 0,
-                        'max' => 23,
-                    ]),
+                    new Range(min: 0, max: 23),
                 ],
             ]
         );
@@ -133,10 +130,7 @@ class ConfigType extends AbstractType
                 ],
                 'data'        => $options['data']['peak_interaction_timer_best_default_hour_end'] ?? 12,
                 'constraints' => [
-                    new Range([
-                        'min' => 0,
-                        'max' => 23,
-                    ]),
+                    new Range(min: 0, max: 23),
                     new Callback(
                         function ($hourEnd, ExecutionContextInterface $context): void {
                             $data      = $context->getRoot()->getData();
@@ -193,9 +187,7 @@ class ConfigType extends AbstractType
                 ],
                 'data'        => $options['data']['peak_interaction_timer_cache_timeout'] ?? 43800,
                 'constraints' => [
-                    new GreaterThanOrEqual([
-                        'value' => 0,
-                    ]),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ]
         );
@@ -231,9 +223,7 @@ class ConfigType extends AbstractType
                 ],
                 'data'        => $options['data']['peak_interaction_timer_fetch_limit'] ?? 50,
                 'constraints' => [
-                    new GreaterThanOrEqual([
-                        'value' => 10,
-                    ]),
+                    new GreaterThanOrEqual(value: 10),
                 ],
             ]
         );

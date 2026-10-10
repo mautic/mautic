@@ -36,9 +36,7 @@ final class ScheduleSendType extends AbstractType
                 'required'    => false,
                 'html5'       => false,
                 'constraints' => new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
+                    message: 'mautic.core.value.required'
                 ),
             ]
         );

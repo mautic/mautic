@@ -23,7 +23,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
             'https://mautic.org#anchor'        => 'https://mautic.org?'.$appendQueryString.'#anchor',
         ];
         foreach ($urls as $url=>$expectedUrl) {
-            $this->assertEquals(UrlHelper::appendQueryToUrl($url, $appendQueryString), $expectedUrl);
+            $this->assertSame(UrlHelper::appendQueryToUrl($url, $appendQueryString), $expectedUrl);
         }
     }
 
@@ -111,7 +111,7 @@ final class UrlHelperTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('provideUrlsForSanitizeQueryParameters')]
     public function testSanitizeQueryParameters(string $url, string $expected): void
     {
-        self::assertSame($expected, UrlHelper::sanitizeAbsoluteUrl($url));
+        $this->assertSame($expected, UrlHelper::sanitizeAbsoluteUrl($url));
     }
 
     public static function provideUrlsForSanitizeQueryParameters(): \Generator

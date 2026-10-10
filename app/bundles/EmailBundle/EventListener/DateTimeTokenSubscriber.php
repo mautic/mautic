@@ -9,11 +9,11 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateTimeTokenSubscriber implements EventSubscriberInterface
+final readonly class DateTimeTokenSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
-        private readonly DateTimeToken $dateTokenHelper,
+        private TranslatorInterface $translator,
+        private DateTimeToken $dateTokenHelper,
     ) {
     }
 

@@ -23,7 +23,7 @@ final class CampaignSubscriberTest extends TestCase
 {
     public function testOnCampaignTriggerStageChangeWhenStageNotFound(): void
     {
-        $contact = new class extends Lead {
+        $contact = new class() extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -38,13 +38,13 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class extends LeadModel {
+        $contactModel = new class() extends LeadModel {
             public function __construct()
             {
             }
         };
 
-        $stageModel = new class extends StageModel {
+        $stageModel = new class() extends StageModel {
             public function __construct()
             {
             }
@@ -61,21 +61,18 @@ final class CampaignSubscriberTest extends TestCase
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
-        Assert::assertCount(0, $pendingEvent->getFailures());
-        Assert::assertCount(1, $pendingEvent->getPending());
-        Assert::assertCount(1, $pendingEvent->getSuccessful());
-        Assert::assertSame(
-            [
-                'failed' => 1,
-                'reason' => '[trans]mautic.stage.campaign.event.stage_missing[/trans]',
-            ],
-            $log->getMetadata()
-        );
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getPending());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame([
+            'failed' => 1,
+            'reason' => '[trans]mautic.stage.campaign.event.stage_missing[/trans]',
+        ], $log->getMetadata());
     }
 
     public function testOnCampaignTriggerStageChangeWhenStageUnpublished(): void
     {
-        $contact = new class extends Lead {
+        $contact = new class() extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -90,13 +87,13 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class extends LeadModel {
+        $contactModel = new class() extends LeadModel {
             public function __construct()
             {
             }
         };
 
-        $stageModel = new class extends StageModel {
+        $stageModel = new class() extends StageModel {
             public function __construct()
             {
             }
@@ -105,7 +102,7 @@ final class CampaignSubscriberTest extends TestCase
             {
                 Assert::assertSame(123, $id);
 
-                $stage = new class extends Stage {
+                $stage = new class() extends Stage {
                     public function getId(): int
                     {
                         return 123;
@@ -122,21 +119,18 @@ final class CampaignSubscriberTest extends TestCase
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
-        Assert::assertCount(0, $pendingEvent->getFailures());
-        Assert::assertCount(1, $pendingEvent->getPending());
-        Assert::assertCount(1, $pendingEvent->getSuccessful());
-        Assert::assertSame(
-            [
-                'failed' => 1,
-                'reason' => '[trans]mautic.stage.campaign.event.stage_missing[/trans]',
-            ],
-            $log->getMetadata()
-        );
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getPending());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame([
+            'failed' => 1,
+            'reason' => '[trans]mautic.stage.campaign.event.stage_missing[/trans]',
+        ], $log->getMetadata());
     }
 
     public function testOnCampaignTriggerStageChangeWhenContactHasNoStage(): void
     {
-        $contact = new class extends Lead {
+        $contact = new class() extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -155,17 +149,18 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class extends LeadModel {
+        $contactModel = new class() extends LeadModel {
             public function __construct()
             {
             }
 
-            public function saveEntity($entity, $unlock = true): void
+            public function changeStage(Lead $lead, Stage $stage, string $origin): void
             {
+                $lead->setStage($stage);
             }
         };
 
-        $stageModel = new class extends StageModel {
+        $stageModel = new class() extends StageModel {
             public function __construct()
             {
             }
@@ -174,7 +169,7 @@ final class CampaignSubscriberTest extends TestCase
             {
                 Assert::assertSame(123, $id);
 
-                $stage = new class extends Stage {
+                $stage = new class() extends Stage {
                     public function getId(): int
                     {
                         return 123;
@@ -191,17 +186,17 @@ final class CampaignSubscriberTest extends TestCase
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
-        Assert::assertCount(0, $pendingEvent->getFailures());
-        Assert::assertCount(1, $pendingEvent->getPending());
-        Assert::assertCount(1, $pendingEvent->getSuccessful());
-        Assert::assertSame([], $log->getMetadata());
-        Assert::assertSame(123, $contact->getStage()->getId());
-        Assert::assertSame(['stage' => [null, 123]], $contact->getChanges());
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getPending());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame([], $log->getMetadata());
+        $this->assertSame(123, $contact->getStage()->getId());
+        $this->assertSame(['stage' => [null, 123]], $contact->getChanges());
     }
 
     public function testOnCampaignTriggerStageChangeWhenContactHasTheSameStage(): void
     {
-        $contact = new class extends Lead {
+        $contact = new class() extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -209,7 +204,7 @@ final class CampaignSubscriberTest extends TestCase
 
             public function getStage(): Stage
             {
-                return new class extends Stage {
+                return new class() extends Stage {
                     public function getId(): int
                     {
                         return 123;
@@ -230,13 +225,18 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class extends LeadModel {
+        $contactModel = new class() extends LeadModel {
             public function __construct()
             {
             }
+
+            public function changeStage(Lead $lead, Stage $stage, string $origin): void
+            {
+                throw new \UnexpectedValueException('[trans]mautic.stage.campaign.event.already_in_stage[/trans]');
+            }
         };
 
-        $stageModel = new class extends StageModel {
+        $stageModel = new class() extends StageModel {
             public function __construct()
             {
             }
@@ -245,7 +245,7 @@ final class CampaignSubscriberTest extends TestCase
             {
                 Assert::assertSame(123, $id);
 
-                $stage = new class extends Stage {
+                $stage = new class() extends Stage {
                     public function getId(): int
                     {
                         return 123;
@@ -262,23 +262,20 @@ final class CampaignSubscriberTest extends TestCase
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
-        Assert::assertCount(0, $pendingEvent->getFailures());
-        Assert::assertCount(1, $pendingEvent->getPending());
-        Assert::assertCount(1, $pendingEvent->getSuccessful());
-        Assert::assertSame(
-            [
-                'failed' => 1,
-                'reason' => '[trans]mautic.stage.campaign.event.already_in_stage[/trans]',
-            ],
-            $log->getMetadata()
-        );
-        Assert::assertSame(123, $contact->getStage()->getId());
-        Assert::assertSame([], $contact->getChanges());
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getPending());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame([
+            'failed' => 1,
+            'reason' => '[trans]mautic.stage.campaign.event.already_in_stage[/trans]',
+        ], $log->getMetadata());
+        $this->assertSame(123, $contact->getStage()->getId());
+        $this->assertSame([], $contact->getChanges());
     }
 
     public function testOnCampaignTriggerStageChangeWhenContactHasStageWithGreaterWeight(): void
     {
-        $contact = new class extends Lead {
+        $contact = new class() extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -286,7 +283,7 @@ final class CampaignSubscriberTest extends TestCase
 
             public function getStage(): Stage
             {
-                $stage = new class extends Stage {
+                $stage = new class() extends Stage {
                     public function getId(): int
                     {
                         return 444;
@@ -311,13 +308,18 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class extends LeadModel {
+        $contactModel = new class() extends LeadModel {
             public function __construct()
             {
             }
+
+            public function changeStage(Lead $lead, Stage $stage, string $origin): void
+            {
+                throw new \UnexpectedValueException('[trans]mautic.stage.campaign.event.stage_invalid[/trans]');
+            }
         };
 
-        $stageModel = new class extends StageModel {
+        $stageModel = new class() extends StageModel {
             public function __construct()
             {
             }
@@ -326,7 +328,7 @@ final class CampaignSubscriberTest extends TestCase
             {
                 Assert::assertSame(123, $id);
 
-                $stage = new class extends Stage {
+                $stage = new class() extends Stage {
                     public function getId(): int
                     {
                         return 123;
@@ -344,23 +346,20 @@ final class CampaignSubscriberTest extends TestCase
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
-        Assert::assertCount(0, $pendingEvent->getFailures());
-        Assert::assertCount(1, $pendingEvent->getPending());
-        Assert::assertCount(1, $pendingEvent->getSuccessful());
-        Assert::assertSame(
-            [
-                'failed' => 1,
-                'reason' => '[trans]mautic.stage.campaign.event.stage_invalid[/trans]',
-            ],
-            $log->getMetadata()
-        );
-        Assert::assertSame(444, $contact->getStage()->getId());
-        Assert::assertSame([], $contact->getChanges());
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getPending());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame([
+            'failed' => 1,
+            'reason' => '[trans]mautic.stage.campaign.event.stage_invalid[/trans]',
+        ], $log->getMetadata());
+        $this->assertSame(444, $contact->getStage()->getId());
+        $this->assertSame([], $contact->getChanges());
     }
 
     public function testOnCampaignTriggerStageChangeWhenContactHasStageWithLowerWeight(): void
     {
-        $contact = new class extends Lead {
+        $contact = new class() extends Lead {
             public function getId(): int
             {
                 return 333;
@@ -368,7 +367,7 @@ final class CampaignSubscriberTest extends TestCase
 
             public function getStage(): Stage
             {
-                $stage = new class extends Stage {
+                $stage = new class() extends Stage {
                     public function getId(): int
                     {
                         return 444;
@@ -393,17 +392,18 @@ final class CampaignSubscriberTest extends TestCase
 
         $event->setProperties(['stage' => 123]);
 
-        $contactModel = new class extends LeadModel {
+        $contactModel = new class() extends LeadModel {
             public function __construct()
             {
             }
 
-            public function saveEntity($entity, $unlock = true): void
+            public function changeStage(Lead $lead, Stage $stage, string $origin): void
             {
+                $lead->setStage($stage);
             }
         };
 
-        $stageModel = new class extends StageModel {
+        $stageModel = new class() extends StageModel {
             public function __construct()
             {
             }
@@ -412,7 +412,7 @@ final class CampaignSubscriberTest extends TestCase
             {
                 Assert::assertSame(123, $id);
 
-                $stage = new class extends Stage {
+                $stage = new class() extends Stage {
                     public function getId(): int
                     {
                         return 123;
@@ -430,21 +430,21 @@ final class CampaignSubscriberTest extends TestCase
 
         $subscriber->onCampaignTriggerStageChange($pendingEvent);
 
-        Assert::assertCount(0, $pendingEvent->getFailures());
-        Assert::assertCount(1, $pendingEvent->getPending());
-        Assert::assertCount(1, $pendingEvent->getSuccessful());
-        Assert::assertSame([], $log->getMetadata());
-        Assert::assertSame(444, $contact->getStage()->getId());
-        Assert::assertSame(['stage' => [444, 123]], $contact->getChanges());
+        $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertCount(1, $pendingEvent->getPending());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertSame([], $log->getMetadata());
+        $this->assertSame(444, $contact->getStage()->getId());
+        $this->assertSame(['stage' => [444, 123]], $contact->getChanges());
     }
 
     private function createTranslatorMock(): TranslatorInterface
     {
-        return new class implements TranslatorInterface {
+        return new class() implements TranslatorInterface {
             /**
              * @param array<string, mixed> $parameters
              */
-            public function trans($id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+            public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
             }

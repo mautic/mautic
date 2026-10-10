@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
-use PHPUnit\Framework\Assert;
+use Mautic\UserBundle\Security\UserTokenSetter;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -49,21 +49,18 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
 
         $display = $output->getDisplay();
 
-        Assert::assertStringContainsString(
-            '4 lines were processed, 2 items created, 0 items updated, 2 items ignored',
-            $display
-        );
+        $this->assertStringContainsString('4 lines were processed, 2 items created, 0 items updated, 2 items ignored', $display);
 
         $leadRepository = $this->em->getRepository(Lead::class);
 
-        Assert::assertNotNull($leadRepository->findOneBy(['email' => 'ok1@a.com']));
-        Assert::assertNotNull($leadRepository->findOneBy(['email' => 'ok2@a.com']));
-        Assert::assertNull($leadRepository->findOneBy(['email' => 'bad@a.com']));
+        $this->assertInstanceOf(Lead::class, $leadRepository->findOneBy(['email' => 'ok1@a.com']));
+        $this->assertInstanceOf(Lead::class, $leadRepository->findOneBy(['email' => 'ok2@a.com']));
+        $this->assertNotInstanceOf(Lead::class, $leadRepository->findOneBy(['email' => 'bad@a.com']));
 
         $this->em->refresh($import);
 
-        Assert::assertSame(2, $import->getIgnoredCount());
-        Assert::assertSame(2, $import->getInsertedCount());
+        $this->assertSame(2, $import->getIgnoredCount());
+        $this->assertSame(2, $import->getInsertedCount());
     }
 
     private function generateCSV(): void
@@ -133,10 +130,10 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
         ];
 
         $import->setProperties($properties);
-        self::getContainer()->get('mautic.security.user_token_setter')->setUser($import->getCreatedBy());
+        self::getContainer()->get(UserTokenSetter::class)->setUser($import->getCreatedBy());
 
         /** @var ImportModel $importModel */
-        $importModel = self::getContainer()->get('mautic.lead.model.import');
+        $importModel = self::getContainer()->get(ImportModel::class);
         $importModel->saveEntity($import);
 
         return $import;
@@ -161,10 +158,7 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
 
         $html = $this->client->submit($form);
 
-        Assert::assertStringContainsString(
-            "Match the columns from the imported file to Mautic's contact fields",
-            $html->text()
-        );
+        $this->assertStringContainsString("Match the columns from the imported file to Mautic's contact fields", $html->text());
 
         // Run import command
         return $this->testSymfonyCommand('mautic:import', [

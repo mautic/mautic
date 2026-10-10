@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<LeadDevice>
  */
-class DeviceType extends AbstractType
+final class DeviceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

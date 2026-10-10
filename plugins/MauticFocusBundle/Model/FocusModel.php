@@ -22,13 +22,16 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -55,6 +58,8 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly FocusRepository $focusRepository,
+        private readonly StatRepository $statRepository,
     ) {
         $this->dispatcher     = $dispatcher;
 
@@ -78,7 +83,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
@@ -91,14 +96,14 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         return $formFactory->create(FocusType::class, $entity, $options);
     }
 
-    public function getRepository(): \MauticPlugin\MauticFocusBundle\Entity\FocusRepository
+    public function getRepository(): FocusRepository
     {
-        return $this->em->getRepository(Focus::class);
+        return $this->focusRepository;
     }
 
-    public function getStatRepository(): \MauticPlugin\MauticFocusBundle\Entity\StatRepository
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     /**
@@ -305,7 +310,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             ->setTypeId($typeId)
             ->setLead($lead);
 
-        $this->getStatRepository()->saveEntity($stat);
+        $this->statRepository->saveEntity($stat);
 
         return $stat;
     }
@@ -398,17 +403,17 @@ class FocusModel extends FormModel implements GlobalSearchInterface
 
     public function getViewsCount(Focus $focus): int
     {
-        return $this->getStatRepository()->getViewsCount($focus->getId());
+        return $this->statRepository->getViewsCount($focus->getId());
     }
 
     public function getUniqueViewsCount(Focus $focus): int
     {
-        return $this->getStatRepository()->getUniqueViewsCount($focus->getId());
+        return $this->statRepository->getUniqueViewsCount($focus->getId());
     }
 
     public function getClickThroughCount(Focus $focus): int
     {
-        return $this->getStatRepository()->getClickThroughCount($focus->getId());
+        return $this->statRepository->getClickThroughCount($focus->getId());
     }
 
     private function generateTrackableUrl(Focus $focus, ?Lead $lead = null): ?string

@@ -23,7 +23,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignEventSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventSubscriber implements EventSubscriberInterface
 {
     public const LOOPS_TO_FAIL = 100;
 
@@ -32,11 +32,11 @@ class CampaignEventSubscriber implements EventSubscriberInterface
     private const DISABLE_CAMPAIGN_THRESHOLD   = 0.35;
 
     public function __construct(
-        private readonly EventRepository $eventRepository,
-        private readonly CampaignModel $campaignModel,
-        private readonly LeadEventLogRepository $leadEventLogRepository,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly DateHelper $dateHelper,
+        private EventRepository $eventRepository,
+        private CampaignModel $campaignModel,
+        private LeadEventLogRepository $leadEventLogRepository,
+        private EventDispatcherInterface $eventDispatcher,
+        private DateHelper $dateHelper,
     ) {
     }
 

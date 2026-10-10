@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\LeadBundle\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Form\FieldAliasToFqcnMap;
 use Mautic\LeadBundle\Form\Type\HtmlType;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -29,7 +30,7 @@ use Symfony\Component\Form\Extension\Core\Type\UrlType;
 
 final class FieldAliasToFqcnMapTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('aliasFqcnProvider')]
+    #[DataProvider('aliasFqcnProvider')]
     public function testGetFqcn(string $alias, string $fcqn): void
     {
         $this->assertSame(FieldAliasToFqcnMap::getFqcn($alias), $fcqn);
@@ -44,30 +45,28 @@ final class FieldAliasToFqcnMapTest extends TestCase
     }
 
     /**
-     * @return mixed[]
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function aliasFqcnProvider(): array
+    public static function aliasFqcnProvider(): \Iterator
     {
-        return [
-            ['boolean', BooleanType::class],
-            ['country', CountryType::class],
-            ['date', DateType::class],
-            ['datetime', DateTimeType::class],
-            ['email', EmailType::class],
-            ['hidden', HiddenType::class],
-            ['locale', LocaleType::class],
-            ['lookup', LookupType::class],
-            ['multiselect', MultiselectType::class],
-            ['number', NumberType::class],
-            ['region', RegionType::class],
-            ['select', SelectType::class],
-            ['tel', TelType::class],
-            ['text', TextType::class],
-            ['textarea', TextareaType::class],
-            ['time', TimeType::class],
-            ['timezone', TimezoneType::class],
-            ['url', UrlType::class],
-            ['html', HtmlType::class],
-        ];
+        yield ['boolean', BooleanType::class];
+        yield ['country', CountryType::class];
+        yield ['date', DateType::class];
+        yield ['datetime', DateTimeType::class];
+        yield ['email', EmailType::class];
+        yield ['hidden', HiddenType::class];
+        yield ['locale', LocaleType::class];
+        yield ['lookup', LookupType::class];
+        yield ['multiselect', MultiselectType::class];
+        yield ['number', NumberType::class];
+        yield ['region', RegionType::class];
+        yield ['select', SelectType::class];
+        yield ['tel', TelType::class];
+        yield ['text', TextType::class];
+        yield ['textarea', TextareaType::class];
+        yield ['time', TimeType::class];
+        yield ['timezone', TimezoneType::class];
+        yield ['url', UrlType::class];
+        yield ['html', HtmlType::class];
     }
 }

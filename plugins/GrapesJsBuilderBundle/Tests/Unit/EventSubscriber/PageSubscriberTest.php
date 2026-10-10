@@ -36,7 +36,7 @@ final class PageSubscriberTest extends TestCase
     public function testOnPagePostSaveSkipsWhenPluginNotPublished(): void
     {
         $this->config->method('isPublished')->willReturn(false);
-        $this->model->expects(self::never())->method('addOrEditPageEntity');
+        $this->model->expects($this->never())->method('addOrEditPageEntity');
 
         $this->subscriber->onPagePostSave(new PageEvent(new Page()));
     }

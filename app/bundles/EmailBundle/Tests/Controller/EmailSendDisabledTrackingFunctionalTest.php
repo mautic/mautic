@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\Entity\LeadList;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailSendDisabledTrackingFunctionalTest extends MauticMysqlTestCase
@@ -67,10 +66,7 @@ final class EmailSendDisabledTrackingFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful($response->getContent());
-        Assert::assertSame(
-            '{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}',
-            $response->getContent()
-        );
+        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $response->getContent());
 
         $messages = [
             self::getMailerMessagesByToAddress('contact-flood-1@doe.com')[0],
@@ -81,19 +77,19 @@ final class EmailSendDisabledTrackingFunctionalTest extends MauticMysqlTestCase
             $this->assertInstanceOf(MauticMessage::class, $message);
             $body = quoted_printable_decode($message->getBody()->bodyToString());
             preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $body, $match);
-            Assert::assertArrayHasKey(1, $match, $body);
+            $this->assertArrayHasKey(1, $match, $body);
             $urlQuery = parse_url($match[1], PHP_URL_QUERY);
-            Assert::assertIsString($urlQuery, $body);
+            $this->assertIsString($urlQuery, $body);
             $queryParams = [];
             parse_str($urlQuery, $queryParams);
-            Assert::assertCount(4, $queryParams, json_encode($queryParams, JSON_THROW_ON_ERROR));
-            Assert::assertSame($utmParameters['utmSource'], $queryParams['utm_source']);
-            Assert::assertSame($utmParameters['utmMedium'], $queryParams['utm_medium']);
-            Assert::assertSame($utmParameters['utmCampaign'], $queryParams['utm_campaign']);
-            Assert::assertSame($utmParameters['utmContent'], $queryParams['utm_content']);
+            $this->assertCount(4, $queryParams, json_encode($queryParams, JSON_THROW_ON_ERROR));
+            $this->assertSame($utmParameters['utmSource'], $queryParams['utm_source']);
+            $this->assertSame($utmParameters['utmMedium'], $queryParams['utm_medium']);
+            $this->assertSame($utmParameters['utmCampaign'], $queryParams['utm_campaign']);
+            $this->assertSame($utmParameters['utmContent'], $queryParams['utm_content']);
             $toList = array_values($message->getTo());
-            Assert::assertNotEmpty($toList);
-            Assert::assertArrayHasKey($toList[0]->toString(), $leads);
+            $this->assertNotEmpty($toList);
+            $this->assertArrayHasKey($toList[0]->toString(), $leads);
         }
     }
 

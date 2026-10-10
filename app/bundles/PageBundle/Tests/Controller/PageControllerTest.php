@@ -6,7 +6,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
-use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
 use Mautic\PageBundle\Entity\Page;
@@ -28,7 +28,7 @@ final class PageControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $pageData = [
             'title'    => 'Test Page',
@@ -36,7 +36,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         ];
 
         /** @var PageModel $model */
-        $model = static::getContainer()->get('mautic.page.model.page');
+        $model = self::getContainer()->get(PageModel::class);
         $page  = new Page();
         $page->setTitle($pageData['title'])
             ->setTemplate($pageData['template']);
@@ -82,7 +82,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
-        if (!empty($leadIdsBeforeTest)) {
+        if ([] !== $leadIdsBeforeTest) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
         $newLeads = $this->connection->fetchAllAssociative($sql);
@@ -120,7 +120,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertResponseIsSuccessful();
         $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
-        if (!empty($leadIdsBeforeTest)) {
+        if ([] !== $leadIdsBeforeTest) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
         $newLeadsAfterFirstVisit = $this->connection->fetchAllAssociative($sql);
@@ -160,7 +160,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $allUtmTags = $this->em->getRepository(UtmTag::class)->getEntities();
+        $allUtmTags = self::getContainer()->get(UtmTagRepository::class)->getEntities();
         $this->assertNotCount(0, $allUtmTags);
 
         foreach ($allUtmTags as $utmTag) {
@@ -203,10 +203,11 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         /** @var PageModel $model */
-        $model                  = static::getContainer()->get('mautic.page.model.page');
+        $model                  = self::getContainer()->get(PageModel::class);
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
+        $this->assertInstanceOf(Page::class, $page);
+        $this->assertStringContainsString($page->getTitle(), (string) $clientResponseContent, 'The return must contain the title of page');
     }
 
     /**
@@ -240,7 +241,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals('text/csv; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
+        $this->assertSame('text/csv; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
     }
 
     /**
@@ -255,7 +256,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
+        $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
     }
 
     /**
@@ -270,13 +271,13 @@ final class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals('text/html; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
+        $this->assertSame('text/html; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
     }
 
     public function testSavePageAliasWithUnderscores(): void
     {
         /** @var PageModel $pageModel */
-        $pageModel = static::getContainer()->get('mautic.page.model.page');
+        $pageModel = self::getContainer()->get(PageModel::class);
 
         $parentPage = new Page();
         $parentPage->setTitle('This is My Page');

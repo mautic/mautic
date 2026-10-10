@@ -20,7 +20,7 @@ final readonly class MauticWriteSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::VIEW => ['addData', EventPriorities::PRE_WRITE],

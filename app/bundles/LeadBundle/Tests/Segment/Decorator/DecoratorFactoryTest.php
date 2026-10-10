@@ -15,19 +15,16 @@ use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
+final class DecoratorFactoryTest extends TestCase
 {
-    /**
-     * @var MockObject&EventDispatcherInterface
-     */
-    private MockObject $eventDispatcherMock;
+    private EventDispatcherInterface&MockObject $eventDispatcherMock;
 
-    /**
-     * @var MockObject&DateOptionFactory
-     */
-    private MockObject $dateOptionFactory;
+    private CompanyDecorator&\PHPUnit\Framework\MockObject\Stub $companyDecorator;
+
+    private DateOptionFactory&MockObject $dateOptionFactory;
 
     private DecoratorFactory $decoratorFactory;
 
@@ -37,16 +34,14 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcherMock            = $this->createMock(EventDispatcherInterface::class);
         $contactSegmentFilterDictionary       = new ContactSegmentFilterDictionary($this->eventDispatcherMock);
-        $baseDecorator                        = $this->createMock(BaseDecorator::class);
-        $customMappedDecorator                = $this->createMock(CustomMappedDecorator::class);
-        $companyDecorator                     = $this->createMock(CompanyDecorator::class);
+        $this->companyDecorator               = $this->createStub(CompanyDecorator::class);
         $this->dateOptionFactory              = $this->createMock(DateOptionFactory::class);
         $this->decoratorFactory               = new DecoratorFactory(
             $contactSegmentFilterDictionary,
-            $baseDecorator,
-            $customMappedDecorator,
+            $this->createStub(BaseDecorator::class),
+            $this->createStub(CustomMappedDecorator::class),
             $this->dateOptionFactory,
-            $companyDecorator,
+            $this->companyDecorator,
             $this->eventDispatcherMock);
     }
 
@@ -76,6 +71,34 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testPrimaryCompanyDecorator(): void
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'object' => ContactSegmentFilterCrate::COMPANY_OBJECT,
+            'field'  => 'companycity',
+            'type'   => 'text',
+        ]);
+
+        $this->assertSame(
+            $this->companyDecorator,
+            $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
+        );
+    }
+
+    public function testCompanyAllDecorator(): void
+    {
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'object' => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+            'field'  => 'companycity',
+            'type'   => 'text',
+        ]);
+
+        $this->assertSame(
+            $this->companyDecorator,
+            $this->decoratorFactory->getDecoratorForFilter($contactSegmentFilterCrate)
+        );
+    }
+
     public function testDateDecoratorWhenNoSubscriberProvidesDecorator(): void
     {
         $filterDecoratorInterface  = $this->createStub(FilterDecoratorInterface::class);
@@ -91,7 +114,7 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
             ->with(
                 $this->callback(
                     function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate): true {
-                        $this->assertNull($event->getDecorator());
+                        $this->assertNotInstanceOf(FilterDecoratorInterface::class, $event->getDecorator());
                         $this->assertSame($contactSegmentFilterCrate, $event->getCrate());
 
                         return true;
@@ -119,7 +142,7 @@ final class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
             ->with(
                 $this->callback(
                     function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate, $filterDecoratorInterface): true {
-                        $this->assertNull($event->getDecorator());
+                        $this->assertNotInstanceOf(FilterDecoratorInterface::class, $event->getDecorator());
                         $this->assertSame($contactSegmentFilterCrate, $event->getCrate());
 
                         $event->setDecorator($filterDecoratorInterface);

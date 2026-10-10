@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 
-class MailchimpIntegration extends EmailAbstractIntegration
+final class MailchimpIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {
@@ -127,9 +127,11 @@ class MailchimpIntegration extends EmailAbstractIntegration
 
         if (empty($mappedData)) {
             return false;
-        } elseif (empty($mappedData['EMAIL'])) {
+        }
+        if (empty($mappedData['EMAIL'])) {
             return false;
-        } elseif (!isset($config['list_settings'])) {
+        }
+        if (!isset($config['list_settings'])) {
             return false;
         }
 

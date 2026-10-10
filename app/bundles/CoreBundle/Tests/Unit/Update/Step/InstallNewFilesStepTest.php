@@ -67,7 +67,7 @@ final class InstallNewFilesStepTest extends AbstractStepTestCase
             ->method('getRootPath')
             ->willReturn($resourcePath);
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -103,7 +103,7 @@ final class InstallNewFilesStepTest extends AbstractStepTestCase
             ->with('update-package')
             ->willReturn($resourcePath.'/update-test.zip');
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -148,7 +148,7 @@ final class InstallNewFilesStepTest extends AbstractStepTestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 

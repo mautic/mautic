@@ -8,9 +8,14 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DomCrawler\Crawler;
 
 final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateEntityTrait;
+
     protected function setUp(): void
     {
         $this->configParams += [
@@ -43,7 +48,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('has been updated!', $response->getContent());
+        $this->assertStringContainsString('has been updated!', (string) $response->getContent());
     }
 
     public function testEditActionFormSubmissionInvalid(): void
@@ -60,7 +65,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('The email entered is invalid.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('The email entered is invalid.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testIndexIncludesInviteForm(): void
@@ -69,6 +74,48 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
+    }
+
+    #[DataProvider('neverLoggedInSearchProvider')]
+    public function testNeverLoggedInQuickFilterShowsUsersWithoutLastLogin(string $query): void
+    {
+        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $admin);
+        $adminRole = $admin->getRole();
+        $this->assertInstanceOf(Role::class, $adminRole);
+        $loggedInUser = $this->createUser($adminRole, 'alreadyloggedin@example.com');
+        $loggedInUser->setLastLogin(new \DateTime('2024-02-22 10:30:00'));
+        $neverLoggedInUser = $this->createUser($adminRole, 'neverloggedinfilter@example.com');
+        $this->em->flush();
+        $this->em->refresh($loggedInUser);
+        $this->assertInstanceOf(\DateTimeInterface::class, $loggedInUser->getLastLogin());
+
+        $crawler = $this->client->request('GET', '/s/users?'.$query);
+
+        $this->assertResponseIsSuccessful();
+        $usernames = $crawler->filter('#userTable tbody tr td:nth-child(4)')->each(
+            static fn (Crawler $cell): string => $cell->text()
+        );
+
+        $this->assertContains($neverLoggedInUser->getUsername(), $usernames);
+        $this->assertNotContains($loggedInUser->getUsername(), $usernames);
+
+        $crawler = $this->client->request('GET', '/s/users?search=');
+        $this->assertResponseIsSuccessful();
+        $usernames = $crawler->filter('#userTable tbody tr td:nth-child(4)')->each(
+            static fn (Crawler $cell): string => $cell->text()
+        );
+        $this->assertContains($neverLoggedInUser->getUsername(), $usernames);
+        $this->assertContains($loggedInUser->getUsername(), $usernames);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function neverLoggedInSearchProvider(): iterable
+    {
+        yield 'full page' => ['search=is%3Anever_logged_in'];
+        yield 'list fragment' => ['search=is%3Anever_logged_in&tmpl=list'];
     }
 
     public function testInviteActionShowsForm(): void
@@ -84,13 +131,13 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/s/users/invite');
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('name="user_invite"', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('name="user_invite"', (string) $this->client->getResponse()->getContent());
     }
 
     /**
      * @param array<string, string> $data
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataNewUserForPasswordField')]
+    #[DataProvider('dataNewUserForPasswordField')]
     public function testNewUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/new');
@@ -106,7 +153,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($message, (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -149,7 +196,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, string> $data
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForEditUserForPasswordField')]
+    #[DataProvider('dataForEditUserForPasswordField')]
     public function testEditUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/edit/1');
@@ -159,7 +206,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($message, (string) $this->client->getResponse()->getContent());
     }
 
     /**

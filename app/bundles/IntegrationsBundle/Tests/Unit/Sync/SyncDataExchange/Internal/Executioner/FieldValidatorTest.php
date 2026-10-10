@@ -10,7 +10,6 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\Notification\BulkNotification;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\FieldValidator;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -118,13 +117,13 @@ final class FieldValidatorTest extends TestCase
 
         $this->fieldValidator->validateFields('lead', $changedObjects);
 
-        Assert::assertNull($firstChangedObject->getField('company'));
-        Assert::assertInstanceOf(FieldDAO::class, $firstChangedObject->getField('email'));
-        Assert::assertInstanceOf(FieldDAO::class, $firstChangedObject->getField('unknown'));
-        Assert::assertInstanceOf(FieldDAO::class, $secondChangedObject->getField('date'));
-        Assert::assertNull($secondChangedObject->getField('time'));
-        Assert::assertNull($secondChangedObject->getField('number'));
-        Assert::assertInstanceOf(FieldDAO::class, $secondChangedObject->getField('bool'));
+        $this->assertNotInstanceOf(FieldDAO::class, $firstChangedObject->getField('company'));
+        $this->assertInstanceOf(FieldDAO::class, $firstChangedObject->getField('email'));
+        $this->assertInstanceOf(FieldDAO::class, $firstChangedObject->getField('unknown'));
+        $this->assertInstanceOf(FieldDAO::class, $secondChangedObject->getField('date'));
+        $this->assertNotInstanceOf(FieldDAO::class, $secondChangedObject->getField('time'));
+        $this->assertNotInstanceOf(FieldDAO::class, $secondChangedObject->getField('number'));
+        $this->assertInstanceOf(FieldDAO::class, $secondChangedObject->getField('bool'));
     }
 
     /**
@@ -132,12 +131,12 @@ final class FieldValidatorTest extends TestCase
      */
     private function getNotificationAssertion(array $parameters, string $message, ObjectChangeDAO $changedObject, string $fieldName, string $type): void
     {
-        Assert::assertSame($parameters[0], $changedObject->getIntegration().'-'.$changedObject->getObject().'-'.$fieldName.'-'.$type);
-        Assert::assertSame($parameters[1], $message);
-        Assert::assertSame($parameters[2], $changedObject->getIntegration());
-        Assert::assertSame($parameters[3], sprintf('%s %s', $changedObject->getMappedObjectId(), $changedObject->getObject()));
-        Assert::assertSame($parameters[4], $changedObject->getObject());
-        Assert::assertSame(0, $parameters[5]);
-        Assert::assertSame($parameters[6], sprintf('%s %s %s', $changedObject->getIntegration(), $changedObject->getObject(), $changedObject->getMappedObjectId()));
+        $this->assertSame($parameters[0], $changedObject->getIntegration().'-'.$changedObject->getObject().'-'.$fieldName.'-'.$type);
+        $this->assertSame($parameters[1], $message);
+        $this->assertSame($parameters[2], $changedObject->getIntegration());
+        $this->assertSame($parameters[3], sprintf('%s %s', $changedObject->getMappedObjectId(), $changedObject->getObject()));
+        $this->assertSame($parameters[4], $changedObject->getObject());
+        $this->assertSame(0, $parameters[5]);
+        $this->assertSame($parameters[6], sprintf('%s %s %s', $changedObject->getIntegration(), $changedObject->getObject(), $changedObject->getMappedObjectId()));
     }
 }

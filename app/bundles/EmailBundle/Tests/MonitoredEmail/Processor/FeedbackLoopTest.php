@@ -14,12 +14,14 @@ use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(FeedbackLoop::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(Result::class)]
+#[CoversClass(FeedbackLoop::class)]
+#[CoversClass(Result::class)]
 final class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
+    #[TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessage(): void
     {
         $contactFinder = $this->createMock(ContactFinder::class);

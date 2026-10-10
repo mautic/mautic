@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 
 final class NotificationRepositoryTest extends MauticMysqlTestCase
 {
@@ -31,7 +30,7 @@ final class NotificationRepositoryTest extends MauticMysqlTestCase
         $notificationRepository = $this->em->getRepository(Notification::class);
         $isDuplicate            = $notificationRepository->isDuplicate($userId, md5($deduplicate), $from);
 
-        Assert::assertSame($expectedIsDuplicate, $isDuplicate);
+        $this->assertSame($expectedIsDuplicate, $isDuplicate);
     }
 
     private function createNotification(int $userId, string $deduplicate, \DateTime $datetime): Notification

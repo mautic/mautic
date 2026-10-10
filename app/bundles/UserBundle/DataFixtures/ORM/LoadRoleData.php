@@ -9,7 +9,7 @@ use Doctrine\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Model\RoleModel;
 
-class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public static function getGroups(): array
     {
@@ -51,7 +51,7 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, F
         $this->addReference('sales-role', $role);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 1;
     }

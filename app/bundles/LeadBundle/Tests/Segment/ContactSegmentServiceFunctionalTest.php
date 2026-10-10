@@ -11,7 +11,11 @@ use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData;
@@ -22,13 +26,16 @@ use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
-use PHPUnit\Framework\Assert;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * These tests cover same tests like \Mautic\LeadBundle\Tests\Model\ListModelFunctionalTest.
  */
 final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     private ReferenceRepository $fixtures;
 
     private ContactSegmentService $contactSegmentService;
@@ -37,8 +44,15 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
+        $this->clearLoggedInUser();
+        if (!$this->useCleanupRollback) {
+            $this->resetSegmentFixtureAutoincrement();
+        }
+
         $this->fixtures = $this->loadFixtures(
             [
+                LoadRoleData::class,
+                LoadUserData::class,
                 LoadCompanyData::class,
                 LoadLeadListData::class,
                 LoadLeadData::class,
@@ -46,8 +60,6 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 LoadPageHitData::class,
                 LoadSegmentsData::class,
                 LoadPageCategoryData::class,
-                LoadRoleData::class,
-                LoadUserData::class,
                 LoadDncData::class,
                 LoadClickData::class,
                 LoadTagData::class,
@@ -55,10 +67,17 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             false
         )->getReferenceRepository();
 
-        $this->contactSegmentService = static::getContainer()->get('mautic.lead.model.lead_segment_service');
+        $this->loginAdminUser();
+
+        $this->contactSegmentService = self::getContainer()->get(ContactSegmentService::class);
     }
 
     protected function beforeBeginTransaction(): void
+    {
+        $this->resetSegmentFixtureAutoincrement();
+    }
+
+    private function resetSegmentFixtureAutoincrement(): void
     {
         $this->resetAutoincrement(
             [
@@ -66,6 +85,59 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 'lead_lists',
             ]
         );
+    }
+
+    private function findLeadByReference(string $reference): Lead
+    {
+        /** @var Lead $lead */
+        $lead = $this->getReference($reference);
+        $lead = $this->em->getRepository(Lead::class)->find($lead->getId());
+        $this->assertInstanceOf(Lead::class, $lead);
+
+        return $lead;
+    }
+
+    private function clearLoggedInUser(): void
+    {
+        $tokenStorage = self::getContainer()->get(TokenStorageInterface::class);
+        $this->assertInstanceOf(TokenStorageInterface::class, $tokenStorage);
+
+        $tokenStorage->setToken(null);
+        $this->client->getCookieJar()->clear();
+    }
+
+    private function loginAdminUser(): void
+    {
+        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $admin);
+
+        $this->loginUser($admin);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     */
+    private function createSegment(array $filters, string $name, string $alias): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name)
+            ->setPublicName($name)
+            ->setAlias($alias)
+            ->setFilters($filters);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        return $segment;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function getSegmentLeadIds(LeadList $segment): array
+    {
+        $results = $this->contactSegmentService->getNewLeadListLeads($segment, []);
+
+        return array_map(intval(...), array_column($results[$segment->getId()], 'id'));
     }
 
     public function testSegmentCountIsCorrect(): void
@@ -76,11 +148,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         foreach ($this->provideSegments() as $segmentAlias => $expectedCount) {
             $reference       = $this->getReference($segmentAlias);
             $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($reference);
-            Assert::assertEquals(
-                $expectedCount,
-                $segmentContacts[$reference->getId()]['count'],
-                sprintf('There should be %d in segment %s.', $expectedCount, $segmentAlias)
-            );
+            $this->assertEquals($expectedCount, $segmentContacts[$reference->getId()]['count'], sprintf('There should be %d in segment %s.', $expectedCount, $segmentAlias));
         }
     }
 
@@ -111,6 +179,8 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'segment-membership-regexp'                                          => 11,
             'segment-company-only-fields'                                        => 6,
             'segment-including-segment-with-company-only-fields'                 => 14,
+            'segment-test-with-in-the-last-filter'                               => 54,
+            'segment-test-with-in-the-next-filter'                               => 54,
             'name-is-not-equal-not-null-test'                                    => 54,
             'manually-unsubscribed-sms-test'                                     => 1,
             'clicked-link-in-any-email'                                          => 2,
@@ -126,12 +196,85 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    public function testSegmentMatchesSecondaryCompanyFields(): void
+    {
+        $lead = $this->findLeadByReference('lead-1');
+
+        $company = new Company();
+        $company->setDateAdded(new \DateTime());
+        $company->setName('Secondary Co');
+        $company->addUpdatedField('companycity', 'Codexville');
+        $this->em->persist($company);
+        $this->em->flush();
+
+        $companyLead = new CompanyLead();
+        $companyLead->setLead($lead);
+        $companyLead->setCompany($company);
+        $companyLead->setDateAdded(new \DateTime());
+        $companyLead->setPrimary(false);
+        $this->em->getRepository(CompanyLead::class)->saveEntity($companyLead);
+
+        $segment = $this->createSegment([
+            [
+                'glue'     => 'and',
+                'type'     => 'text',
+                'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                'field'    => 'companycity',
+                'operator' => '=',
+                'filter'   => 'Codexville',
+                'display'  => '',
+            ],
+        ], 'Segment Secondary Company', 'segment-secondary-company');
+        $leadIds = $this->getSegmentLeadIds($segment);
+
+        $this->assertContains($lead->getId(), $leadIds);
+
+        $primarySegment = $this->createSegment([
+            [
+                'glue'     => 'and',
+                'type'     => 'text',
+                'object'   => ContactSegmentFilterCrate::COMPANY_OBJECT,
+                'field'    => 'companycity',
+                'operator' => '=',
+                'filter'   => 'Codexville',
+                'display'  => '',
+            ],
+        ], 'Segment Primary Company', 'segment-primary-company');
+        $primaryLeadIds = $this->getSegmentLeadIds($primarySegment);
+
+        $this->assertNotContains($lead->getId(), $primaryLeadIds);
+    }
+
+    public function testCompanyAllNegativeOperatorsExcludeContactsWithoutCompanies(): void
+    {
+        $leadWithCompany              = $this->findLeadByReference('lead-1');
+        $leadWithCompanyMatchingValue = $this->findLeadByReference('lead-0');
+        $leadWithoutCompany           = $this->findLeadByReference('lead-5');
+
+        $segment = $this->createSegment([
+            [
+                'glue'     => 'and',
+                'type'     => 'text',
+                'object'   => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+                'field'    => 'companycity',
+                'operator' => 'notLike',
+                'filter'   => 'Boston',
+                'display'  => '',
+            ],
+        ], 'Segment Company All Not Like', 'segment-company-all-not-like');
+        $leadIds = $this->getSegmentLeadIds($segment);
+
+        $this->assertContains($leadWithCompany->getId(), $leadIds);
+        $this->assertNotContains($leadWithCompanyMatchingValue->getId(), $leadIds);
+        $this->assertNotContains($leadWithoutCompany->getId(), $leadIds);
+    }
+
     public function testSegmentRebuildCommand(): void
     {
         // exclude the segment
         $segmentTest3Ref = $this->getReference('segment-test-3');
         $lastRebuiltDate = $segmentTest3Ref->getLastBuiltDate();
-        self::assertNull($lastRebuiltDate);
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $lastRebuiltDate);
 
         $this->testSymfonyCommand(
             UpdateLeadListsCommand::NAME,
@@ -141,7 +284,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        self::assertSame($lastRebuiltDate, $segmentTest3Ref->getLastBuiltDate(), 'Make sure the segment was not executed, if excluded.');
+        $this->assertSame($lastRebuiltDate, $segmentTest3Ref->getLastBuiltDate(), 'Make sure the segment was not executed, if excluded.');
 
         $this->testSymfonyCommand(
             'mautic:segments:update',
@@ -159,7 +302,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'There should be 24 contacts in the segment-test-3 segment after rebuilding from the command line.'
         );
 
-        self::assertNotSame($lastRebuiltDate, $segmentTest3Ref->getLastBuiltDate(), 'Make sure the segment was executed, if not excluded.');
+        $this->assertNotSame($lastRebuiltDate, $segmentTest3Ref->getLastBuiltDate(), 'Make sure the segment was executed, if not excluded.');
 
         // Remove the title from all contacts, rebuild the list, and check that list is updated
         $this->em->getConnection()->executeQuery(sprintf('UPDATE %sleads SET title = NULL;', MAUTIC_TABLE_PREFIX));
@@ -233,12 +376,9 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
     }
 
-    private function getReference(string $name): LeadList
+    private function getReference(string $name): object
     {
-        /** @var LeadList $reference */
-        $reference = $this->fixtures->getReference($name);
-
-        return $reference;
+        return $this->fixtures->getReference($name);
     }
 
     public function testSegmentRebuildCommandFailsOnMissingTable(): void
@@ -258,12 +398,12 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         $this->connection->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads', ['leadlist_id' => $segment->getId()]);
 
         $leads = $this->contactSegmentService->getNewLeadListLeads($segment, []);
-        Assert::assertArrayHasKey($segment->getId(), $leads);
-        Assert::assertCount(50, $leads[$segment->getId()]);
+        $this->assertArrayHasKey($segment->getId(), $leads);
+        $this->assertCount(50, $leads[$segment->getId()]);
 
         $leadsSubset = array_column(array_slice($leads[$segment->getId()], 0, 15), 'id');
         $leads       = $this->contactSegmentService->getNewLeadListLeads($segment, ['ids' => $leadsSubset]);
-        Assert::assertArrayHasKey($segment->getId(), $leads);
-        Assert::assertEqualsCanonicalizing($leadsSubset, array_column($leads[$segment->getId()], 'id'));
+        $this->assertArrayHasKey($segment->getId(), $leads);
+        $this->assertEqualsCanonicalizing($leadsSubset, array_column($leads[$segment->getId()], 'id'));
     }
 }

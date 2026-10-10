@@ -283,7 +283,7 @@ final class ButtonHelper
             // Prepare attributes for the `<a>` tag
             $attr = $this->menuLink;
             foreach ($button['attr'] as $k => $v) {
-                $attr .= " $k=".'"'.$v.'"';
+                $attr .= " {$k}=".'"'.$v.'"';
             }
 
             // Add aria-label if btnText is set
@@ -407,7 +407,7 @@ final class ButtonHelper
         $btnTextAttr = '';
         if (isset($button['btnTextAttr'])) {
             foreach ($button['btnTextAttr'] as $k => $v) {
-                $btnTextAttr .= " $k=".'"'.$v.'"';
+                $btnTextAttr .= " {$k}=".'"'.$v.'"';
             }
         }
 
@@ -432,7 +432,7 @@ final class ButtonHelper
                     if ('title' == $k) {
                         $v = $this->translator->trans($v);
                     }
-                    $tooltip .= " $k=".'"'.$v.'"';
+                    $tooltip .= " {$k}=".'"'.$v.'"';
                 }
             } else {
                 $tooltip .= ' title="'.$this->translator->trans($button['tooltip']).'" data-placement="left"';

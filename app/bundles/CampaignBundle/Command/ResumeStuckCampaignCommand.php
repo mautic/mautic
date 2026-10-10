@@ -294,7 +294,7 @@ final class ResumeStuckCampaignCommand extends Command
             }
         }
 
-        if (empty($contacts)) {
+        if ([] === $contacts) {
             return;
         }
 

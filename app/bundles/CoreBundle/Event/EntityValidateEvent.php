@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Validator\EntityEvent;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EntityValidateEvent extends Event
+final class EntityValidateEvent extends Event
 {
     public function __construct(
         private readonly object $entity,

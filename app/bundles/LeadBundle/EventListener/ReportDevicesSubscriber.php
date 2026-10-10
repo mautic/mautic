@@ -12,13 +12,13 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportDevicesSubscriber implements EventSubscriberInterface
+final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
 {
     public const DEVICES = 'contact.devices';
 
     public function __construct(
-        private readonly FieldsBuilder $fieldsBuilder,
-        private readonly CompanyReportData $companyReportData,
+        private FieldsBuilder $fieldsBuilder,
+        private CompanyReportData $companyReportData,
     ) {
     }
 

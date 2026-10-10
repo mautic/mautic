@@ -15,7 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: CleanupCommand::NAME,
     description: 'Delete records from field changes which are invalid'
 )]
-class CleanupCommand extends Command
+final class CleanupCommand extends Command
 {
     public const NAME = 'mautic:integrations:cleanup';
 
@@ -30,7 +30,7 @@ class CleanupCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $numberOfRecordsDeleted = $this->fieldChangeRepository->deleteOrphanLeadChanges();
-        $io->success("$numberOfRecordsDeleted records deleted.");
+        $io->success("{$numberOfRecordsDeleted} records deleted.");
         $io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
 
         return Command::SUCCESS;

@@ -1,6 +1,15 @@
 <mjml>
     <mj-head>
       <mj-attributes>
+        <mj-all font-family="Ubuntu, Helvetica, Arial, sans-serif"></mj-all>
+        <mj-button border-radius="3px" padding="10px 25px"></mj-button>
+        <mj-section></mj-section>
+
+        <mj-class name="t-body" font-size="14px"></mj-class>
+        <mj-class name="t-btn" inner-padding="10px 25px"></mj-class>
+        <mj-class name="t-btn-primary" background-color="#000000" color="#ffffff" font-size="14px"></mj-class>
+        <mj-class name="t-section"></mj-class>
+        <mj-class name="t-surface-1" background-color="#ffffff"></mj-class>
       </mj-attributes>
       <!-- CSS-STYLE -->
       <mj-style inline="inline"> p, li {margin:0 !important; padding:0; line-height:140%; font-family:'Open Sans', Helvetica, Arial, sans-serif;}
@@ -8,7 +17,7 @@
     </mj-head>
     <!-- BODY -->
     <mj-body>
-      <mj-section background-color="#ffffff">
+      <mj-section mj-class="t-surface-1">
         <mj-column width="550px">
             <mj-spacer>
             </mj-spacer>
@@ -18,7 +27,7 @@
             <p>Hello World!
             </p>
           </mj-text>
-          <mj-text font-size="14px">
+          <mj-text mj-class="t-body">
             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid officia consequatur placeat reprehenderit excepturi, tempore, id quos quaerat ab fuga.
             </p>
             <p>

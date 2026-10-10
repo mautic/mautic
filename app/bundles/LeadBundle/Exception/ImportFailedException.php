@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Exception;
 
-class ImportFailedException extends \Exception
+final class ImportFailedException extends \Exception
 {
 }

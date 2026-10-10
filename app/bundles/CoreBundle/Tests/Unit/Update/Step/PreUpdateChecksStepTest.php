@@ -46,7 +46,7 @@ final class PreUpdateChecksStepTest extends AbstractStepTestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('Dummy');
 
@@ -65,7 +65,7 @@ final class PreUpdateChecksStepTest extends AbstractStepTestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('Dummy');
 

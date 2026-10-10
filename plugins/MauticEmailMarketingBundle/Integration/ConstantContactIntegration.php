@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType;
 
-class ConstantContactIntegration extends EmailAbstractIntegration
+final class ConstantContactIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {
@@ -55,7 +55,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
     /**
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];
@@ -110,9 +110,11 @@ class ConstantContactIntegration extends EmailAbstractIntegration
 
         if (empty($mappedData)) {
             return false;
-        } elseif (empty($mappedData['email'])) {
+        }
+        if (empty($mappedData['email'])) {
             return false;
-        } elseif (!isset($config['list_settings'])) {
+        }
+        if (!isset($config['list_settings'])) {
             return false;
         }
 
@@ -137,12 +139,12 @@ class ConstantContactIntegration extends EmailAbstractIntegration
                     }
                 }
 
-                if (!empty($addresses)) {
+                if ([] !== $addresses) {
                     $addresses['address_type'] = 'PERSONAL';
                     $mappedData['addresses']   = $addresses;
                 }
 
-                if (!empty($customfields)) {
+                if ([] !== $customfields) {
                     $mappedData['custom_fields'] = $customfields;
                 }
 

@@ -41,7 +41,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorsIncluding(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorPovider
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
@@ -64,7 +64,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorsExcluding(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorPovider
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
@@ -87,7 +87,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorsForFieldType(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorPovider
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
@@ -135,7 +135,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperatorsForSpecificField(): void
     {
-        $this->filterOperatorPovider->expects($this->any())
+        $this->filterOperatorPovider
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
@@ -157,7 +157,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (TypeOperatorsEvent $event): void {
                         // Emulate a subscriber.

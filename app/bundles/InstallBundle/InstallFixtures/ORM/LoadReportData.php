@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\ReportBundle\Entity\Report;
 
-class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
+final class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public static function getGroups(): array
     {
@@ -29,7 +29,7 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
                     if (in_array($col, ['columns', 'filters', 'graphs', 'tableOrder'])) {
                         $val = Serializer::decode(stripslashes($val));
                     }
-                    $report->$setter($val);
+                    $report->{$setter}($val);
                 }
             }
 
@@ -40,7 +40,7 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
         $manager->flush();
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 5;
     }

@@ -8,6 +8,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -16,6 +19,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -41,10 +46,6 @@ final class CampaignModelTransactionalTest extends TestCase
         $entityManagerMock->method('getConnection')
             ->willReturn($this->createStub(Connection::class));
 
-        $entityManagerMock->method('getRepository')
-            ->with(Campaign::class)
-            ->willReturn($this->campaignRepositoryMock);
-
         $userHelperMock = $this->createMock(UserHelper::class);
 
         $this->campaignModel = $this->getMockBuilder(CampaignModel::class)
@@ -63,6 +64,12 @@ final class CampaignModelTransactionalTest extends TestCase
                 $userHelperMock,
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(CoreParametersHelper::class),
+                $this->campaignRepositoryMock,
+                $this->createStub(EventRepository::class),
+                $this->createStub(LeadRepository::class),
+                $this->createStub(LeadEventLogRepository::class),
+                $this->createStub(StatRepository::class),
+                $this->createStub(FormRepository::class),
             ])
             ->onlyMethods(['saveEntity'])
             ->getMock();

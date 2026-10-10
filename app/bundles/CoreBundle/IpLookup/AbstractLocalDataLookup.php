@@ -27,10 +27,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
     /**
      * Return the URL to manually download.
-     *
-     * @return string
      */
-    abstract public function getRemoteDateStoreDownloadUrl();
+    abstract public function getRemoteDateStoreDownloadUrl(): string;
 
     /**
      * @return string
@@ -223,22 +221,16 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     protected function sizeInByte($size)
     {
         $data = (int) substr($size, 0, -1);
-        switch (strtoupper(substr($size, -1))) {
-            case 'K':
-                return $data * 1024;
-            case 'M':
-                return $data * 1024 * 1024;
-            case 'G':
-                return $data * 1024 * 1024 * 1024;
-        }
+
+        return match (strtoupper(substr($size, -1))) {
+            'K' => $data * 1024,
+            'M' => $data * 1024 * 1024,
+            'G' => $data * 1024 * 1024 * 1024,
+            default => null,
+        };
     }
 
-    /**
-     * Get if the string ends with.
-     *
-     * @param string $haystack
-     */
-    private function endsWith($haystack, string $needle): bool
+    private function endsWith(string $haystack, string $needle): bool
     {
         return str_ends_with($haystack, $needle);
     }

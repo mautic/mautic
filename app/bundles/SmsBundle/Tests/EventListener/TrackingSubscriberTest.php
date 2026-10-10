@@ -71,7 +71,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->getSubscriber()->onIdentifyContact($event);
 
-        $this->assertNull($event->getIdentifiedContact());
+        $this->assertNotInstanceOf(Lead::class, $event->getIdentifiedContact());
     }
 
     public function testChannelIdMismatchDoesNotIdentify(): void
@@ -105,7 +105,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->getSubscriber()->onIdentifyContact($event);
 
-        $this->assertNull($event->getIdentifiedContact());
+        $this->assertNotInstanceOf(Lead::class, $event->getIdentifiedContact());
     }
 
     public function testStatEmptyLeadDoesNotIdentify(): void
@@ -134,7 +134,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->getSubscriber()->onIdentifyContact($event);
 
-        $this->assertNull($event->getIdentifiedContact());
+        $this->assertNotInstanceOf(Lead::class, $event->getIdentifiedContact());
     }
 
     private function getSubscriber(): TrackingSubscriber
