@@ -19,8 +19,8 @@ final readonly class DoNotContactSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            DoNotContactAddEvent::ADD_DONOT_CONTACT       => ['addDncForLead', 0],
-            DoNotContactRemoveEvent::REMOVE_DONOT_CONTACT => ['removeDncForLead', 0],
+            DoNotContactAddEvent::class       => ['addDncForLead', 0],
+            DoNotContactRemoveEvent::class => ['removeDncForLead', 0],
         ];
     }
 

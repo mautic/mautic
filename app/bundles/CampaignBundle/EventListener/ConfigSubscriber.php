@@ -3,9 +3,9 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Form\Type\ConfigType;
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ConfigSubscriber implements EventSubscriberInterface
@@ -13,8 +13,8 @@ final class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
-            ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigSave', 0],
+            ConfigBuilderEvent::class => ['onConfigGenerate', 0],
+            ConfigPreSaveEvent::class    => ['onConfigSave', 0],
         ];
     }
 
@@ -33,7 +33,6 @@ final class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigSave(ConfigEvent $event): void
     {
-        /** @var array $values */
         $values = $event->getConfig();
 
         // Manipulate the values

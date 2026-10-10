@@ -745,14 +745,14 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
+     * Get array of page builder tokens from bundles subscribed to PageBuilderEvent.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
      */
     public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = ''): array
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
-        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
+        $this->dispatcher->dispatch($event);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
     }

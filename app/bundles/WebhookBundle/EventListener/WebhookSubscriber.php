@@ -5,8 +5,10 @@ namespace Mautic\WebhookBundle\EventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\WebhookBundle\Event\WebhookEvent;
+use Mautic\WebhookBundle\Event\WebhookKillEvent;
+use Mautic\WebhookBundle\Event\WebhookPostDeleteEvent;
+use Mautic\WebhookBundle\Event\WebhookPostSaveEvent;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
-use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class WebhookSubscriber implements EventSubscriberInterface
@@ -21,9 +23,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            WebhookEvents::WEBHOOK_POST_SAVE   => ['onWebhookSave', 0],
-            WebhookEvents::WEBHOOK_POST_DELETE => ['onWebhookDelete', 0],
-            WebhookEvents::WEBHOOK_KILL        => ['onWebhookKill', 0],
+            WebhookPostSaveEvent::class   => ['onWebhookSave', 0],
+            WebhookPostDeleteEvent::class => ['onWebhookDelete', 0],
+            WebhookKillEvent::class       => ['onWebhookKill', 0],
         ];
     }
 

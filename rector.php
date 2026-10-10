@@ -45,6 +45,7 @@ return RectorConfig::configure()
         Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
         Utils\Rector\TestGetRepositoryToContainerGetRector::class,
+        Utils\Rector\RouteRequirementParamTypeRector::class,
     ])
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
@@ -58,11 +59,6 @@ return RectorConfig::configure()
         // Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
-        ],
-
-        Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
-            // doctrine magic
-            __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
         ],
 
         // test fixtures
@@ -94,7 +90,6 @@ return RectorConfig::configure()
 
         // modified with reflection
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
-            __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
         ],
 

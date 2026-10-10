@@ -5,8 +5,13 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
+use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
+use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -28,15 +33,15 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     {
         return [
             WebhookBuilderEvent::class               => ['onWebhookBuild', 0],
-            LeadEvents::LEAD_POST_SAVE               => ['onLeadNewUpdate', 0],
-            LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
-            LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
+            LeadPostSaveEvent::class               => ['onLeadNewUpdate', 0],
+            PointsChangeEvent::class           => ['onLeadPointChange', 0],
+            LeadPostDeleteEvent::class             => ['onLeadDelete', 0],
             ChannelSubscriptionChange::class => ['onChannelSubscriptionChange', 0],
-            LeadEvents::LEAD_COMPANY_CHANGE          => ['onLeadCompanyChange', 0],
-            LeadEvents::COMPANY_POST_SAVE            => ['onCompanySave', 0],
-            LeadEvents::COMPANY_POST_DELETE          => ['onCompanyDelete', 0],
-            LeadEvents::LEAD_LIST_CHANGE             => ['onSegmentChange', 0],
-            LeadEvents::LEAD_LIST_BATCH_CHANGE       => ['onSegmentBatchChange', 0],
+            LeadChangeCompanyEvent::class          => ['onLeadCompanyChange', 0],
+            CompanyPostSaveEvent::class            => ['onCompanySave', 0],
+            CompanyPostDeleteEvent::class          => ['onCompanyDelete', 0],
+            ListChangeEvent::class             => ['onSegmentChange', 0],
+            ListBatchChangeEvent::class       => ['onSegmentBatchChange', 0],
         ];
     }
 

@@ -227,10 +227,7 @@ class EmailSendEvent extends CommonEvent
         return (null !== $this->helper) ? $this->helper->getIdHash() : $this->idHash;
     }
 
-    /**
-     * @return array
-     */
-    public function getSource()
+    public function getSource(): array
     {
         return (null !== $this->helper) ? $this->helper->getSource() : $this->source;
     }

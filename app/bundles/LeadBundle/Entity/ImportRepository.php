@@ -70,7 +70,7 @@ final class ImportRepository extends CommonRepository
         return $this->countImportsWithStatuses([Import::IN_PROGRESS]);
     }
 
-    public function getQueryForStatuses($statuses): \Doctrine\ORM\QueryBuilder
+    public function getQueryForStatuses(array $statuses): \Doctrine\ORM\QueryBuilder
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
 

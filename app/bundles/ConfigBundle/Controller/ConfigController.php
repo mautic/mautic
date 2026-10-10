@@ -2,13 +2,13 @@
 
 namespace Mautic\ConfigBundle\Controller;
 
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
-use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigPostSaveEvent;
+use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
 use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Configurator\Configurator;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ConfigController extends FormController
+final class ConfigController extends AbstractFormController
 {
     private TokenStorageInterface $tokenStorage;
 
@@ -55,7 +55,7 @@ final class ConfigController extends FormController
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event);
         $fileFields = $event->getFileFields();
         $formThemes = $event->getFormThemes();
 
@@ -91,11 +91,11 @@ final class ConfigController extends FormController
                     $formData = $form->getData();
 
                     // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save
-                    $configEvent = new ConfigEvent($formData, $post);
+                    $configEvent = new ConfigPreSaveEvent($formData, $post);
                     $configEvent
                         ->setOriginalNormData($originalNormData)
                         ->setNormData($form->getNormData());
-                    $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
+                    $this->dispatcher->dispatch($configEvent);
                     $formValues = $configEvent->getConfig();
 
                     $errors      = $configEvent->getErrors();
@@ -141,7 +141,12 @@ final class ConfigController extends FormController
                             }
 
                             $configurator->write();
-                            $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
+
+                            $postSaveEvent = new ConfigPostSaveEvent($configEvent->getConfig(), $post);
+                            $postSaveEvent
+                                ->setOriginalNormData($originalNormData)
+                                ->setNormData($form->getNormData());
+                            $this->dispatcher->dispatch($postSaveEvent);
 
                             $this->addFlashMessage('mautic.config.config.notice.updated');
 
@@ -210,7 +215,7 @@ final class ConfigController extends FormController
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
@@ -246,7 +251,7 @@ final class ConfigController extends FormController
 
         $success    = 0;
         $event      = new ConfigBuilderEvent($bundleHelper);
-        $this->dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
+        $this->dispatcher->dispatch($event);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();

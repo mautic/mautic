@@ -1007,11 +1007,9 @@ abstract class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \stdClass|mixed[] $filters
-     *
      * @return array<int, mixed>
      */
-    protected function addAdvancedSearchWhereClause(QueryBuilder|DbalQueryBuilder $qb, $filters): array
+    protected function addAdvancedSearchWhereClause(QueryBuilder|DbalQueryBuilder $qb, \stdClass $filters): array
     {
         $parseFilters = [];
         if (isset($filters->root[0])) {

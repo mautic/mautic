@@ -69,10 +69,8 @@ final class StagesChangeLogRepository extends CommonRepository
 
     /**
      * Get the current stage assigned to a lead.
-     *
-     * @param int $leadId
      */
-    public function getCurrentLeadStage($leadId): ?int
+    public function getCurrentLeadStage(int $leadId): ?int
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

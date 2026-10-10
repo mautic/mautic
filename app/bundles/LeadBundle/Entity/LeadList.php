@@ -311,13 +311,7 @@ class LeadList extends FormEntity implements UuidInterface
 
     public function hasFilterTypeOf(string $type): bool
     {
-        foreach ($this->getFilters() as $filter) {
-            if ($filter['type'] === $type) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->getFilters(), fn ($filter): bool => $filter['type'] === $type);
     }
 
     /**
@@ -368,6 +362,9 @@ class LeadList extends FormEntity implements UuidInterface
         return $this->alias;
     }
 
+    /**
+     * @return Collection<int, ListLead>
+     */
     public function getLeads(): Collection
     {
         return $this->leads;

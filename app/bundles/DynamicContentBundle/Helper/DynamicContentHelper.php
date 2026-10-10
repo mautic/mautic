@@ -37,7 +37,7 @@ final readonly class DynamicContentHelper
     {
         // Attempt campaign slots first
         $dwcActionResponse = $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getActionResponses('dwc.push_content');
-        if (!empty($dwcActionResponse)) {
+        if ($dwcActionResponse !== []) {
             return array_shift($dwcActionResponse);
         }
 

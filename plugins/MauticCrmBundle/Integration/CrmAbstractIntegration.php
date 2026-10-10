@@ -342,7 +342,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data, $config);
 
-        if (empty($matchedFields)) {
+        if ($matchedFields === []) {
             return null;
         }
 
@@ -389,7 +389,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
             // Use only prioirty fields if updating
             $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
-            if (empty($fieldsToUpdateInMautic)) {
+            if ($fieldsToUpdateInMautic === []) {
                 $this->logger->debug('getMauticLead: No fields to update in Mautic', ['config' => $config, 'object' => $object]);
 
                 return null;
@@ -449,10 +449,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param array<string, mixed> $settings
-     *
-     * @return array|mixed
      */
-    protected function getFormFieldsByObject($object, array $settings = [])
+    protected function getFormFieldsByObject($object, array $settings = []): array
     {
         $settings['feature_settings']['objects'] = [$object => $object];
 
@@ -463,10 +461,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return array
      */
-    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, $priorityObject = 'mautic'): array
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 1),
@@ -476,10 +472,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return array
      */
-    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, $priorityObject = 'mautic'): array
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 0),
@@ -490,10 +484,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param string               $priorityObject
      * @param array<string, mixed> $config
-     *
-     * @return array
      */
-    protected function getFieldsByPriority(array $config, $priorityObject, $direction)
+    protected function getFieldsByPriority(array $config, $priorityObject, $direction): array
     {
         return isset($config['update_'.$priorityObject]) ? array_keys($config['update_'.$priorityObject], $direction) : array_keys($config['leadFields'] ?? []);
     }
@@ -520,7 +512,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array<int, string|null>
      */
-    protected function getSyncTimeframeDates(array $params)
+    protected function getSyncTimeframeDates(array $params): array
     {
         $fromDate = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
             : null;
@@ -570,10 +562,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $fields;
     }
 
-    /**
-     * @return array
-     */
-    protected function prepareFieldsForPush($fields)
+    protected function prepareFieldsForPush($fields): array
     {
         $fieldMappings = [];
         $required      = [];
@@ -595,10 +584,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param array<string, mixed> $matchedFields
-     *
-     * @return array
      */
-    private function hydrateCompanyName(array $matchedFields)
+    private function hydrateCompanyName(array $matchedFields): array
     {
         if (!empty($matchedFields['companyname'])) {
             return $matchedFields;

@@ -7,7 +7,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignEvent;
+use Mautic\CampaignBundle\Event\CampaignPostSaveEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
@@ -31,7 +31,7 @@ final readonly class CampaignActionJumpToEventSubscriber implements EventSubscri
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_POST_SAVE     => ['processCampaignEventsAfterSave', 1],
+            CampaignPostSaveEvent::class           => ['processCampaignEventsAfterSave', 1],
             CampaignBuilderEvent::class            => ['onCampaignBuild', 0],
             CampaignEvents::ON_EVENT_JUMP_TO_EVENT => ['onJumpToEvent', 0],
         ];
@@ -112,7 +112,7 @@ final readonly class CampaignActionJumpToEventSubscriber implements EventSubscri
      * to ensure that it has the actual ID and not the temp_id as the
      * target for the jump.
      */
-    public function processCampaignEventsAfterSave(CampaignEvent $campaignEvent): void
+    public function processCampaignEventsAfterSave(CampaignPostSaveEvent $campaignEvent): void
     {
         $campaign = $campaignEvent->getCampaign();
         $events   = $campaign->getEvents();

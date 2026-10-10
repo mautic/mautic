@@ -447,7 +447,7 @@ final class Mailbox
      *
      * @return array listing the folders
      */
-    public function getListingFolders()
+    public function getListingFolders(): array
     {
         if (!$this->isConfigured()) {
             throw new NotConfiguredException('mautic.email.config.monitored_email.not_configured');
@@ -519,6 +519,7 @@ final class Mailbox
     {
         if (preg_match('/'.self::CRITERIA_UID.' ((\d+):(\d+|\*))/', $criteria, $matches)) {
             // PHP imap_search does not support UID n:* so use imap_fetch_overview instead
+            /** @var \stdClass[] $messages */
             $messages = imap_fetch_overview($this->getImapStream(), $matches[1], FT_UID);
 
             $mailIds = [];

@@ -27,6 +27,7 @@ use Mautic\EmailBundle\EventListener\TokenSubscriber;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\EventListener\FormValidationSubscriber;
 use Mautic\IntegrationsBundle\EventListener\ControllerSubscriber;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber;
 use Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
@@ -145,7 +146,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\PageBundle\EventListener\ReportSubscriber::class,
             \Mautic\PointBundle\EventListener\ReportSubscriber::class,
         ],
-        'mautic.config_on_generate' => [
+        \Mautic\ConfigBundle\Event\ConfigBuilderEvent::class => [
             \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
@@ -163,7 +164,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
             \Mautic\WebhookBundle\EventListener\ConfigSubscriber::class,
         ],
-        'mautic.config_pre_save' => [
+        \Mautic\ConfigBundle\Event\ConfigPreSaveEvent::class => [
             \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
@@ -195,7 +196,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\LeadBundle\EventListener\FormSubscriber::class,
             \Mautic\PluginBundle\EventListener\FormSubscriber::class,
         ],
-        'mautic.lead_post_save' => [
+        LeadPostSaveEvent::class => [
             \Mautic\IntegrationsBundle\EventListener\LeadSubscriber::class,
             \Mautic\LeadBundle\EventListener\LeadSubscriber::class,
             \Mautic\LeadBundle\EventListener\WebhookSubscriber::class,

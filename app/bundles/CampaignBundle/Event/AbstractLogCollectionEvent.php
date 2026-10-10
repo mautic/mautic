@@ -74,10 +74,8 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
 
     /**
      * Get the IDs of all contacts affected by this event.
-     *
-     * @return array
      */
-    public function getContactIds()
+    public function getContactIds(): array
     {
         $contactIds = array_keys($this->logContactXref);
 

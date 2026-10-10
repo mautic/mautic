@@ -23,7 +23,7 @@ final class FullContact_Batch extends FullContact_Base
      * @throws NoCreditException
      * @throws NotImplementedException
      */
-    public function sendRequests($requests)
+    public function sendRequests($requests): ?\stdClass
     {
         $this->_execute([], ['requests' => $requests]);
 

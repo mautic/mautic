@@ -3,7 +3,6 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
@@ -21,8 +20,8 @@ final readonly class ProcessUnsubscribeSubscriber implements EventSubscriberInte
     {
         return [
             MonitoredEmailEvent::class => ['onEmailConfig', 0],
-            EmailEvents::EMAIL_PARSE            => ['onEmailParse', 0],
-            EmailSendEvent::class               => ['onEmailSend', 0],
+            ParseEmailEvent::class     => ['onEmailParse', 0],
+            EmailSendEvent::class      => ['onEmailSend', 0],
         ];
     }
 

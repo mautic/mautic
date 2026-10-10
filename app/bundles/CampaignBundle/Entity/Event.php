@@ -480,10 +480,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -563,6 +560,9 @@ class Event implements ChannelInterface, UuidInterface
         $this->log->removeElement($log);
     }
 
+    /**
+     * @return Collection<int, LeadEventLog>
+     */
     public function getLog(): Collection
     {
         return $this->log;

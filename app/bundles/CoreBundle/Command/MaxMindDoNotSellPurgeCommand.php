@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -122,7 +123,7 @@ final class MaxMindDoNotSellPurgeCommand extends Command
     {
         /** @var Lead $lead */
         $lead       = $this->leadRepository->findOneBy(['id' => $contactId]);
-        $matchedIps = array_filter($lead->getIpAddresses()->getValues(), fn ($item): bool => $item->getIpAddress() == $ip);
+        $matchedIps = array_filter($lead->getIpAddresses()->getValues(), fn (IpAddress $item): bool => $item->getIpAddress() == $ip);
 
         if ([] === $matchedIps) {
             return;

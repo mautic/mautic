@@ -15,6 +15,9 @@ final class PreferenceBuilder
      */
     private array $channels = [];
 
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
     public function __construct(
         Collection $logs,
         private readonly Event $event,
@@ -79,6 +82,9 @@ final class PreferenceBuilder
         return $this->channels[$channel];
     }
 
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
     private function buildRules(Collection $logs, array $channels): void
     {
         /** @var LeadEventLog $log */

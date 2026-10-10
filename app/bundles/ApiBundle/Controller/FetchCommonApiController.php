@@ -8,9 +8,9 @@ use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiInitializeEvent;
-use Mautic\ApiBundle\Event\ApiSerializationContextEvent;
+use Mautic\ApiBundle\Event\PostSerializationContextEvent;
+use Mautic\ApiBundle\Event\PreSerializationContextEvent;
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
@@ -645,9 +645,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         $context = $view->getContext();
 
-        if ($this->dispatcher->hasListeners(ApiEvents::API_PRE_SERIALIZATION_CONTEXT)) {
-            $apiSerializationContextEvent = new ApiSerializationContextEvent($context, $this->getCurrentRequest());
-            $this->dispatcher->dispatch($apiSerializationContextEvent, ApiEvents::API_PRE_SERIALIZATION_CONTEXT);
+        if ($this->dispatcher->hasListeners(PreSerializationContextEvent::class)) {
+            $apiSerializationContextEvent = new PreSerializationContextEvent($context, $this->getCurrentRequest());
+            $this->dispatcher->dispatch($apiSerializationContextEvent);
             $context = $apiSerializationContextEvent->getContext();
         }
 
@@ -677,9 +677,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $context->setSerializeNull(true);
         }
 
-        if ($this->dispatcher->hasListeners(ApiEvents::API_POST_SERIALIZATION_CONTEXT)) {
-            $apiSerializationContextEvent = new ApiSerializationContextEvent($context, $this->getCurrentRequest());
-            $this->dispatcher->dispatch($apiSerializationContextEvent, ApiEvents::API_POST_SERIALIZATION_CONTEXT);
+        if ($this->dispatcher->hasListeners(PostSerializationContextEvent::class)) {
+            $apiSerializationContextEvent = new PostSerializationContextEvent($context, $this->getCurrentRequest());
+            $this->dispatcher->dispatch($apiSerializationContextEvent);
             $context = $apiSerializationContextEvent->getContext();
         }
 

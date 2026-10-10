@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
@@ -18,7 +17,7 @@ final readonly class ProcessBounceSubscriber implements EventSubscriberInterface
     {
         return [
             MonitoredEmailEvent::class => ['onEmailConfig', 0],
-            EmailEvents::EMAIL_PARSE            => ['onEmailParse', 0],
+            ParseEmailEvent::class     => ['onEmailParse', 0],
         ];
     }
 

@@ -50,6 +50,9 @@ class EventScheduler
         $this->schedule($event, $executionDate, $contacts);
     }
 
+    /**
+     * @param Collection<int, Lead> $contacts
+     */
     public function schedule(Event $event, \DateTimeInterface $executionDate, Collection $contacts, bool $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
@@ -96,6 +99,9 @@ class EventScheduler
         $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
     }
 
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
     public function rescheduleFailures(Collection $logs): void
     {
         if (!$logs->count()) {
@@ -293,6 +299,7 @@ class EventScheduler
 
     /**
      * @throws NotSchedulableException
+     * @param Collection<int, Lead> $contacts
      */
     public function validateAndScheduleEventForContacts(Event $event, \DateTimeInterface $executionDateTime, Collection $contacts, \DateTimeInterface $comparedFromDateTime): void
     {
@@ -334,6 +341,9 @@ class EventScheduler
         );
     }
 
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
     private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, Collection $logs, bool $isReschedule = false): void
     {
         if (!$logs->count()) {
@@ -345,6 +355,9 @@ class EventScheduler
         );
     }
 
+    /**
+     * @param Collection<int, Lead> $contacts
+     */
     private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, Collection $contacts, bool $isInactiveEvent = false): void
     {
         foreach ($contacts as $contact) {

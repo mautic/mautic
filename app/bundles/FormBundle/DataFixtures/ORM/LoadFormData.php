@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\DataFixtures\ORM;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CoreBundle\Doctrine\Common\DataFixtures\Event\PreExecuteEvent;
 use Mautic\CoreBundle\Helper\CsvHelper;
@@ -42,6 +43,7 @@ final class LoadFormData extends Fixture implements OrderedFixtureInterface
         private readonly FormRepository $formRepository,
         private readonly FieldRepository $fieldRepository,
         private readonly ActionRepository $actionRepository,
+        private readonly EntityManagerInterface $entityManager,
     ) {
         // this will load the data before fixtures are loaded
         $eventDispatcher->addListener(PreExecuteEvent::class, function (PreExecuteEvent $event): void {
@@ -79,7 +81,7 @@ final class LoadFormData extends Fixture implements OrderedFixtureInterface
             // because form table data will be deleted we must have same autoincrement as before the insertion
             // to have the form_results table to match the form id in table name e.g. form_results_69_kaleidosco
             $formTableName = $this->formRepository->getTableName();
-            $event->getEntityManager()->getConnection()->executeStatement(
+            $this->entityManager->getConnection()->executeStatement(
                 'ALTER TABLE '.$formTableName.' AUTO_INCREMENT='.$firstId
             );
         });

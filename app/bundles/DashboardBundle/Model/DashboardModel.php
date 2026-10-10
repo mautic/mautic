@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Entity\WidgetRepository;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
@@ -80,10 +79,8 @@ final class DashboardModel extends FormModel
 
     /**
      * Load widgets for the current user from database.
-     *
-     * @return array
      */
-    public function getWidgets(bool $ignorePaginator = false)
+    public function getWidgets(bool $ignorePaginator = false): iterable
     {
         return $this->getEntities([
             'orderBy' => 'w.ordering',
@@ -197,9 +194,9 @@ final class DashboardModel extends FormModel
 
     public function populateWidgetPreview(Widget $widget): void
     {
-        $event = $this->widgetEventFactory->create($widget);
+        $event = $this->widgetEventFactory->createPreLoad($widget);
 
-        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD);
+        $this->dispatcher->dispatch($event);
     }
 
     /**
@@ -240,8 +237,7 @@ final class DashboardModel extends FormModel
 
         try {
             $this->dispatcher->dispatch(
-                $this->widgetEventFactory->create($widget),
-                DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
+                $this->widgetEventFactory->createGenerate($widget)
             );
         } catch (\Throwable $e) {
             $this->logger->error(

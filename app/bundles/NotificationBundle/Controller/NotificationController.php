@@ -43,16 +43,13 @@ final class NotificationController extends AbstractFormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/notifications/{page}',
         name: 'mautic_notification_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -724,9 +721,6 @@ final class NotificationController extends AbstractFormController
         );
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/notifications/view/{objectId}/contact/{page}',
         name: 'mautic_notification_contacts',
@@ -737,7 +731,7 @@ final class NotificationController extends AbstractFormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1,
+        int $page = 1,
     ): Response {
         return $this->generateContactsGrid(
             $request,

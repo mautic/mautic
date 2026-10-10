@@ -6,7 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
@@ -32,7 +33,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\ContactExportEvent;
-use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
+use Mautic\LeadBundle\Event\ContactExportScheduledEvent;
 use Mautic\LeadBundle\Field\CustomFieldFindReplace;
 use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
 use Mautic\LeadBundle\Form\Type\BatchType;
@@ -43,7 +44,6 @@ use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\Helper\LeadSearchScopeProvider;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
@@ -70,8 +70,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class LeadController extends FormController
+final class LeadController extends AbstractFormController
 {
+    use FormErrorMessagesTrait;
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
@@ -159,9 +160,6 @@ final class LeadController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/contacts/{page}',
         name: 'mautic_contact_index',
@@ -172,7 +170,7 @@ final class LeadController extends FormController
         Request $request,
         ContactColumnsDictionary $contactColumnsDictionary,
         LeadSearchScopeProvider $leadSearchScopeProvider,
-        $page = 1,
+        int $page = 1,
     ): Response {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -737,7 +735,7 @@ final class LeadController extends FormController
     /**
      * Generates edit form.
      */
-    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, bool $ignorePost = false): Response
+    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, int|string $objectId, bool $ignorePost = false): Response
     {
         $lead  = $this->leadModel->getEntity($objectId);
 
@@ -2292,8 +2290,7 @@ final class LeadController extends FormController
         $details['args']  = $iterator->getArgs();
 
         $this->dispatcher->dispatch(
-            new ContactExportEvent($details, 'ContactExports'),
-            LeadEvents::POST_CONTACT_EXPORT
+            new ContactExportEvent($details, 'ContactExports')
         );
 
         return $response;
@@ -2304,7 +2301,7 @@ final class LeadController extends FormController
         name: 'mautic_contact_export_action',
         requirements: ['contactId' => '\d+'],
     )]
-    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, int|string $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -2343,8 +2340,7 @@ final class LeadController extends FormController
         }
 
         $dispatcher->dispatch(
-            new ContactExportEvent($args, 'ContactExport'),
-            LeadEvents::POST_CONTACT_EXPORT
+            new ContactExportEvent($args, 'ContactExport')
         );
 
         return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']), $exportHelper);
@@ -2379,8 +2375,7 @@ final class LeadController extends FormController
         $contactExportScheduler = $this->contactExportSchedulerModel->saveEntity($data);
 
         $this->dispatcher->dispatch(
-            new ContactExportSchedulerEvent($contactExportScheduler),
-            LeadEvents::POST_CONTACT_EXPORT_SCHEDULED
+            new ContactExportScheduledEvent($contactExportScheduler)
         );
 
         $this->addFlashMessage('mautic.lead.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
@@ -2400,7 +2395,7 @@ final class LeadController extends FormController
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
-    public function contactStatsAction(int $objectId): Response
+    public function contactStatsAction(int|string $objectId): Response
     {
         /** @var Lead $lead */
         $lead = $this->leadModel->getEntity($objectId);

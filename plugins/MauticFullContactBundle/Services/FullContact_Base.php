@@ -34,7 +34,7 @@ class FullContact_Base
 
     protected $_supportedMethods = [];
 
-    public $response_obj;
+    public ?\stdClass $response_obj = null;
 
     public $response_code;
 
@@ -105,12 +105,10 @@ class FullContact_Base
      * @param array                $postData
      * @param array<string, mixed> $params
      *
-     * @return object
-     *
      * @throws NoCreditException
      * @throws NotImplementedException
      */
-    protected function _execute(array $params = [], $postData = null)
+    protected function _execute(array $params = [], $postData = null): ?object
     {
         if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
             throw new NotImplementedException(self::class.' does not support the ['.$params['method'].'] method');

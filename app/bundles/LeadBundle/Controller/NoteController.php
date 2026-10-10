@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Model\NoteModel;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class NoteController extends FormController
+final class NoteController extends AbstractFormController
 {
     use LeadAccessTrait;
 
@@ -34,7 +34,7 @@ final class NoteController extends FormController
         requirements: ['leadId' => '\d+', 'page' => '\d+'],
         defaults: ['leadId' => 0, 'page' => 0],
     )]
-    public function indexAction(Request $request, NoteModel $model, int $leadId = 0, int $page = 1): Response
+    public function indexAction(Request $request, NoteModel $model, int|string $leadId = 0, int $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -370,7 +370,6 @@ final class NoteController extends FormController
      * Executes an action defined in route.
      *
      * @param int $objectId
-     * @param int $leadId
      */
     #[Route(
         path: '/s/contacts/notes/{leadId}/{objectAction}/{objectId}',
@@ -378,7 +377,7 @@ final class NoteController extends FormController
         requirements: ['leadId' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
     )]
-    public function executeNoteAction(Request $request, $objectAction, $objectId = 0, $leadId = 0): Response
+    public function executeNoteAction(Request $request, $objectAction, $objectId = 0, int|string $leadId = 0): Response
     {
         if (method_exists($this, "{$objectAction}Action")) {
             return $this->{"{$objectAction}Action"}($request, $leadId, $objectId);

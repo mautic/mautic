@@ -629,10 +629,13 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_PUT, '/api/forms/123/edit', $payload);
         $response        = $this->client->getResponse();
+        /** @var \stdClass $responseContent */
         $responseContent = json_decode($response->getContent());
 
         $this->assertNotEmpty($responseContent->errors, 'No errors were returned when trying to save an invalid form');
-        $this->assertSame('Form Field ID 123 not found', $responseContent->errors[0]->message);
+        /** @var \stdClass $firstError */
+        $firstError = $responseContent->errors[0];
+        $this->assertSame('Form Field ID 123 not found', $firstError->message);
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, 'Return code must be 404.');
     }
 

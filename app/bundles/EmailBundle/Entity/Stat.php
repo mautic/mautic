@@ -483,10 +483,7 @@ class Stat
         $this->sourceId = (int) $sourceId;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getTokens()
+    public function getTokens(): ?array
     {
         return $this->tokens;
     }
@@ -553,10 +550,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getOpenDetails()
+    public function getOpenDetails(): array
     {
         return $this->openDetails;
     }

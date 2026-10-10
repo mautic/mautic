@@ -29,6 +29,7 @@ final readonly class ActionDispatcher
     /**
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
+     * @param Collection<int, LeadEventLog> $logs
      */
     public function dispatchEvent(ActionAccessor $config, Event $event, Collection $logs, ?PendingEvent $pendingEvent = null): PendingEvent
     {

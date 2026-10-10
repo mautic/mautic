@@ -2,9 +2,9 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\PageBundle\Form\Type\ConfigTrackingPageType;
 use Mautic\PageBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -14,11 +14,11 @@ final class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConfigEvents::CONFIG_ON_GENERATE => [
+            ConfigBuilderEvent::class => [
                 ['onConfigGenerate', 0],
                 ['onConfigGenerateTracking', 0],
             ],
-            ConfigEvents::CONFIG_PRE_SAVE => ['onConfigSave', 0],
+            ConfigPreSaveEvent::class => ['onConfigSave', 0],
         ];
     }
 

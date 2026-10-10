@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Entity\Tag;
-use Mautic\LeadBundle\Event\TagMergeEvent;
+use Mautic\LeadBundle\Event\TagPostMergeEvent;
 use PHPUnit\Framework\TestCase;
 
 final class TagMergeEventTest extends TestCase
@@ -14,7 +14,7 @@ final class TagMergeEventTest extends TestCase
     {
         $primaryTag   = new Tag();
         $secondaryTag = new Tag();
-        $event        = new TagMergeEvent($primaryTag, $secondaryTag);
+        $event        = new TagPostMergeEvent($primaryTag, $secondaryTag);
 
         $this->assertSame($primaryTag, $event->getPrimaryTag());
         $this->assertSame($secondaryTag, $event->getSecondaryTag());

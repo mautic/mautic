@@ -2,7 +2,7 @@
 
 namespace Mautic\ReportBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\EventListener\ReportSubscriber;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ReportController extends FormController
+final class ReportController extends AbstractFormController
 {
     private ReportModel $reportModel;
 
@@ -542,7 +542,6 @@ final class ReportController extends FormController
      * Shows a report.
      *
      * @param int $objectId   Report ID
-     * @param int $reportPage
      */
     #[Route(
         path: '/s/reports/view/{objectId}/{reportPage}',
@@ -550,7 +549,7 @@ final class ReportController extends FormController
         requirements: ['reportPage' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['reportPage' => 1, 'objectId' => 0],
     )]
-    public function viewAction(Request $request, $objectId, $reportPage = 1): Response
+    public function viewAction(Request $request, $objectId, int $reportPage = 1): Response
     {
         $entity   = $this->reportModel->getEntity($objectId);
 

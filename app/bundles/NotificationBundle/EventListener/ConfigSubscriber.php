@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\NotificationBundle\EventListener;
 
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\NotificationBundle\Form\Type\NotificationConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -14,7 +13,7 @@ final class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
+            ConfigBuilderEvent::class => ['onConfigGenerate', 0],
         ];
     }
 

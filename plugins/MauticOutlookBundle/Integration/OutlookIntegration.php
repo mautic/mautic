@@ -37,7 +37,7 @@ final class OutlookIntegration extends AbstractIntegration
     /**
      * @return array<mixed>
      */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('custom' === $section) {
             return [

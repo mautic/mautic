@@ -156,10 +156,7 @@ class TriggerEvent implements UuidInterface
         }
     }
 
-    /**
-     * @return array|null
-     */
-    public function getChanges()
+    public function getChanges(): ?array
     {
         return $this->changes;
     }
@@ -200,10 +197,7 @@ class TriggerEvent implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -289,6 +283,9 @@ class TriggerEvent implements UuidInterface
         $this->log->removeElement($log);
     }
 
+    /**
+     * @return Collection<int, LeadTriggerLog>
+     */
     public function getLog(): Collection
     {
         return $this->log;

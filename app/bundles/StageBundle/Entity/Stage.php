@@ -181,10 +181,7 @@ class Stage extends FormEntity implements UuidInterface
         return get_object_vars($this);
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription($description): self
+    public function setDescription(?string $description): self
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -231,6 +228,9 @@ class Stage extends FormEntity implements UuidInterface
         $this->log->removeElement($log);
     }
 
+    /**
+     * @return Collection<int, LeadStageLog>
+     */
     public function getLog(): Collection
     {
         return $this->log;
@@ -282,10 +282,7 @@ class Stage extends FormEntity implements UuidInterface
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category): void
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }

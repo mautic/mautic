@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
+use Symfony\Component\HttpFoundation\Response;
+
 final class FoursquareIntegration extends SocialIntegration
 {
     public function getName(): string

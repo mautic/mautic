@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\EventListener\SecuritySubscriber;
-use Mautic\UserBundle\UserEvents;
 
 final class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,7 +20,7 @@ final class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             [
-                UserEvents::USER_LOGIN => ['onSecurityInteractiveLogin', 0],
+                LoginEvent::class => ['onSecurityInteractiveLogin', 0],
             ],
             $subscriber->getSubscribedEvents()
         );

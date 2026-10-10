@@ -10,7 +10,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\Event\CampaignEvent;
+use Mautic\CampaignBundle\Event\CampaignPreSaveEvent;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
 use Mautic\CampaignBundle\Event\NotifyOfFailureEvent;
@@ -87,7 +87,7 @@ final class CampaignEventSubscriberTest extends TestCase
             ->method('resetFailedCountsForEventsInCampaign')
             ->with($campaign);
 
-        $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
+        $this->fixture->onCampaignPreSave(new CampaignPreSaveEvent($campaign));
     }
 
     public function testEventFailedCountsDoesNotGetResetOnCampaignUnPublish(): void
@@ -101,7 +101,7 @@ final class CampaignEventSubscriberTest extends TestCase
         $this->eventRepo->expects($this->never())
             ->method('resetFailedCountsForEventsInCampaign');
 
-        $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
+        $this->fixture->onCampaignPreSave(new CampaignPreSaveEvent($campaign));
     }
 
     public function testEventFailedCountsDoesNotGetResetWhenPublishedStateIsNotChanged(): void
@@ -111,7 +111,7 @@ final class CampaignEventSubscriberTest extends TestCase
         $this->eventRepo->expects($this->never())
             ->method('resetFailedCountsForEventsInCampaign');
 
-        $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
+        $this->fixture->onCampaignPreSave(new CampaignPreSaveEvent($campaign));
     }
 
     public function testNewPublishedCampaignGetsPublishUpWithoutSeconds(): void
@@ -119,7 +119,7 @@ final class CampaignEventSubscriberTest extends TestCase
         $campaign = new Campaign();
         $campaign->setIsPublished(true);
 
-        $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
+        $this->fixture->onCampaignPreSave(new CampaignPreSaveEvent($campaign));
 
         $this->assertInstanceOf(\DateTimeInterface::class, $campaign->getPublishUp());
         $this->assertSame('00', $campaign->getPublishUp()->format('s'));

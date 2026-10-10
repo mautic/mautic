@@ -2,7 +2,7 @@
 
 namespace Mautic\NotificationBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class MobileNotificationController extends FormController
+final class MobileNotificationController extends AbstractFormController
 {
     use EntityContactsTrait;
 
@@ -44,16 +44,13 @@ final class MobileNotificationController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/mobile_notifications/{page}',
         name: 'mautic_mobile_notification_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -737,9 +734,6 @@ final class MobileNotificationController extends FormController
         );
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/mobile_notifications/view/{objectId}/contact/{page}',
         name: 'mautic_mobile_notification_contacts',
@@ -750,7 +744,7 @@ final class MobileNotificationController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1,
+        int $page = 1,
     ): Response {
         return $this->generateContactsGrid(
             $request,

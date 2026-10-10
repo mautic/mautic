@@ -544,7 +544,7 @@ class ChartQuery extends AbstractChart
         return MAUTIC_TABLE_PREFIX.$table;
     }
 
-    private function getDateConstruct(QueryBuilder $query, string $tablePrefix, string $column): string
+    private function getDateConstruct(TrackingQueryBuilder $query, string $tablePrefix, string $column): string
     {
         $generatedColumn = $this->getGeneratedColumnForDateColumn($query, $column, $tablePrefix);
 

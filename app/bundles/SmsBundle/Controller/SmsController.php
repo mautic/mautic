@@ -3,7 +3,7 @@
 namespace Mautic\SmsBundle\Controller;
 
 use Doctrine\Common\Collections\Collection;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class SmsController extends FormController
+final class SmsController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 
@@ -47,16 +47,13 @@ final class SmsController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/sms/{page}',
         name: 'mautic_sms_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, TransportChain $transportChain, $page = 1): Response
+    public function indexAction(Request $request, TransportChain $transportChain, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -736,9 +733,6 @@ final class SmsController extends FormController
         return new Response('', Response::HTTP_NOT_FOUND);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/sms/view/{objectId}/contact/{page}',
         name: 'mautic_sms_contacts',
@@ -749,7 +743,7 @@ final class SmsController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1,
+        int $page = 1,
     ): Response {
         return $this->generateContactsGrid(
             $request,

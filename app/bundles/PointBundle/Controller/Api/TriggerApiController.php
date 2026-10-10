@@ -169,8 +169,6 @@ final class TriggerApiController extends CommonApiController
 
     /**
      * Delete events from a point trigger.
-     *
-     * @param int $triggerId
      */
     #[Route(
         path: '/api/points/triggers/{triggerId}/events/delete',
@@ -179,7 +177,7 @@ final class TriggerApiController extends CommonApiController
         defaults: ['_format' => 'json'],
         methods: ['DELETE']
     )]
-    public function deletePointTriggerEventsAction($triggerId): Response
+    public function deletePointTriggerEventsAction(int $triggerId): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':editown', $this->permissionBase.':editother'], 'MATCH_ONE')) {
             return $this->accessDenied();

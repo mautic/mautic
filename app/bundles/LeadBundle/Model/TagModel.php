@@ -11,10 +11,13 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
-use Mautic\LeadBundle\Event\TagEvent;
-use Mautic\LeadBundle\Event\TagMergeEvent;
+use Mautic\LeadBundle\Event\TagPostDeleteEvent;
+use Mautic\LeadBundle\Event\TagPostMergeEvent;
+use Mautic\LeadBundle\Event\TagPostSaveEvent;
+use Mautic\LeadBundle\Event\TagPreDeleteEvent;
+use Mautic\LeadBundle\Event\TagPreMergeEvent;
+use Mautic\LeadBundle\Event\TagPreSaveEvent;
 use Mautic\LeadBundle\Form\Type\TagEntityType;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Entity\TriggerEventRepository;
 use Mautic\ReportBundle\Entity\Report;
@@ -122,34 +125,21 @@ class TagModel extends FormModel
             throw new MethodNotAllowedHttpException(['Tag']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = LeadEvents::TAG_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = LeadEvents::TAG_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = LeadEvents::TAG_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = LeadEvents::TAG_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new TagPreSaveEvent($entity, $isNew),
+            'post_save'   => new TagPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new TagPreDeleteEvent($entity, $isNew),
+            'post_delete' => new TagPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new TagEvent($entity, $isNew);
-            }
+        $this->dispatcher->dispatch($event);
 
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     public function tagMerge(Tag $primaryTag, Tag $secondaryTag): Tag
@@ -160,16 +150,15 @@ class TagModel extends FormModel
             return $primaryTag;
         }
 
-        $event = new TagMergeEvent($primaryTag, $secondaryTag);
         $this->em->beginTransaction();
 
         try {
-            $this->dispatcher->dispatch($event, LeadEvents::TAG_PRE_MERGE);
+            $this->dispatcher->dispatch(new TagPreMergeEvent($primaryTag, $secondaryTag));
             $this->replaceLeadTagAssociations($primaryTag, $secondaryTag);
             $this->replaceMergedTagReferences($primaryTag, $secondaryTag);
             $this->saveEntity($primaryTag, false);
             $this->deleteEntity($secondaryTag);
-            $this->dispatcher->dispatch($event, LeadEvents::TAG_POST_MERGE);
+            $this->dispatcher->dispatch(new TagPostMergeEvent($primaryTag, $secondaryTag));
             $this->em->commit();
         } catch (\Throwable $exception) {
             $this->em->rollback();

@@ -53,10 +53,8 @@ final class Responses
 
     /**
      * @param string|null $type
-     *
-     * @return array
      */
-    public function getActionResponses($type = null)
+    public function getActionResponses($type = null): array
     {
         if ($type) {
             return $this->actionResponses[$type] ?? [];
@@ -67,10 +65,8 @@ final class Responses
 
     /**
      * @param string|null $type
-     *
-     * @return array
      */
-    public function getConditionResponses($type = null)
+    public function getConditionResponses($type = null): array
     {
         if ($type) {
             return $this->conditionResponses[$type] ?? [];

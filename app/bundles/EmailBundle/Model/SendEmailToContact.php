@@ -23,10 +23,7 @@ final class SendEmailToContact
 
     private array $emailSentCounts = [];
 
-    /**
-     * @var array|null
-     */
-    private $emailEntityErrors;
+    private ?array $emailEntityErrors = null;
 
     /**
      * @var int|null
@@ -210,11 +207,11 @@ final class SendEmailToContact
      *
      * @throws FailedToSendToContactException
      */
-    private function failContact(bool $hasBadEmail = true, $errorMessages = null): void
+    private function failContact(bool $hasBadEmail = true, array|null|string $errorMessages = null): void
     {
         if (null === $errorMessages) {
             // Clear the errors so it doesn't stop the next send
-            $errorMessages = implode('; ', (array) $this->mailer->getErrors());
+            $errorMessages = implode('; ', $this->mailer->getErrors());
         } elseif (is_array($errorMessages)) {
             $errorMessages = implode('; ', $errorMessages);
         }
@@ -332,10 +329,7 @@ final class SendEmailToContact
         return [$queued, $queueErrors];
     }
 
-    /**
-     * @return array
-     */
-    private function sendStandardEmail()
+    private function sendStandardEmail(): array
     {
         // Dispatch the event to generate the tokens
         $this->mailer->dispatchSendEvent();

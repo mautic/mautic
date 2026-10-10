@@ -56,7 +56,7 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
             if ($this->requestStack->getCurrentRequest()->request->has('grapesjsbuilder')) {
                 $data = $this->requestStack->getCurrentRequest()->request->all('grapesjsbuilder');
 
-                if (is_array($data) && isset($data['customMjml'])) {
+                if (isset($data['customMjml'])) {
                     $passParams['customMjml'] = $data['customMjml'];
                 }
             }

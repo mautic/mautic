@@ -293,10 +293,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -442,10 +439,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->smsType;
     }
 
-    /**
-     * @param string $smsType
-     */
-    public function setSmsType($smsType): void
+    public function setSmsType(string $smsType): void
     {
         $this->isChanged('smsType', $smsType);
         $this->smsType = $smsType;

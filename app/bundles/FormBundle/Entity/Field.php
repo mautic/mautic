@@ -132,7 +132,7 @@ class Field implements UuidInterface
     private $properties = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>|null
      */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $validation = [];
@@ -195,10 +195,7 @@ class Field implements UuidInterface
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private string $fieldWidth = '100%';
 
-    /**
-     * @var array
-     */
-    private $changes;
+    private ?array $changes = null;
 
     private $sessionId;
 
@@ -339,10 +336,7 @@ class Field implements UuidInterface
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getChanges()
+    public function getChanges(): ?array
     {
         return $this->changes;
     }

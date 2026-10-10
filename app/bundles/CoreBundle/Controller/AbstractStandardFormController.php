@@ -36,7 +36,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     private AuditLogModel $auditLogModel;
 
     #[Required]
-    public function autowireAbstractFormController(
+    public function autowireAbstractStandardFormController(
         AuditLogModel $auditLogModel,
     ): void {
         $this->auditLogModel = $auditLogModel;
@@ -563,7 +563,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array<int, iterable<object>|\Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator<mixed>|int>
      */
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $items = $this->getModel($this->getModelName())->getEntities(
             array_merge(

@@ -14,7 +14,7 @@ final class Clearbit_Company extends Clearbit_Base
         $this->_resourceUri = '/companies/find';
     }
 
-    public function lookupByDomain($search)
+    public function lookupByDomain($search): ?\stdClass
     {
         $this->_execute(['domain' => $search]);
 

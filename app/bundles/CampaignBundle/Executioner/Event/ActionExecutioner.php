@@ -32,6 +32,7 @@ final readonly class ActionExecutioner implements EventInterface
      * @throws CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @param Collection<int, LeadEventLog> $logs
      */
     public function execute(AbstractEventAccessor $config, Collection $logs): EvaluatedContacts
     {

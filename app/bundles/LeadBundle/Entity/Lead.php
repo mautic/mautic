@@ -569,6 +569,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->ipAddresses->removeElement($ipAddress);
     }
 
+    /**
+     * @return Collection<string, IpAddress>
+     */
     public function getIpAddresses(): Collection
     {
         return $this->ipAddresses;
@@ -839,6 +842,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->pointsChangeLog->removeElement($pointsChangeLog);
     }
 
+    /**
+     * @return Collection<int, PointsChangeLog>
+     */
     public function getPointsChangeLog(): Collection
     {
         return $this->pointsChangeLog;

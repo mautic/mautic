@@ -265,6 +265,9 @@ class Trigger extends FormEntity implements UuidInterface
         $this->events->removeElement($event);
     }
 
+    /**
+     * @return Collection<int, TriggerEvent>
+     */
     public function getEvents(): Collection
     {
         return $this->events;

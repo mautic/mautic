@@ -155,7 +155,7 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
             // build them
             $this->actions = [];
             $event         = new PointBuilderEvent($this->translator);
-            $this->dispatcher->dispatch($event, PointEvents::POINT_ON_BUILD);
+            $this->dispatcher->dispatch($event);
             $this->actions['actions'] = $event->getActions();
             $this->actions['list']    = $event->getActionList();
             $this->actions['choices'] = $event->getActionChoices();

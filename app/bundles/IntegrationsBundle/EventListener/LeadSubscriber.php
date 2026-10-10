@@ -7,12 +7,11 @@ namespace Mautic\IntegrationsBundle\EventListener;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
-use Mautic\IntegrationsBundle\Event\InternalCompanyEvent;
-use Mautic\IntegrationsBundle\Event\InternalContactEvent;
+use Mautic\IntegrationsBundle\Event\InternalCompanyFieldChangesEvent;
+use Mautic\IntegrationsBundle\Event\InternalContactFieldChangesEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -20,7 +19,11 @@ use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInte
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
+use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
+use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
+use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -38,11 +41,11 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
-            LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
-            LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
-            LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
-            LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 128],
+            LeadPostSaveEvent::class      => ['onLeadPostSave', 0],
+            LeadPostDeleteEvent::class    => ['onLeadPostDelete', 255],
+            CompanyPostSaveEvent::class   => ['onCompanyPostSave', 0],
+            CompanyPostDeleteEvent::class => ['onCompanyPostDelete', 255],
+            LeadChangeCompanyEvent::class => ['onLeadCompanyChange', 128],
         ];
     }
 
@@ -201,22 +204,18 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     private function dispatchBeforeFieldChangesEvent(string $integrationName, object $object): void
     {
         if ($object instanceof Lead) {
-            if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES)) {
-                $this->dispatcher->dispatch(
-                    new InternalContactEvent($integrationName, $object),
-                    IntegrationEvents::INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES
-                );
+            $event = new InternalContactFieldChangesEvent($integrationName, $object);
+            if ($this->dispatcher->hasListeners($event::class)) {
+                $this->dispatcher->dispatch($event);
             }
 
             return;
         }
 
         if ($object instanceof Company) {
-            if ($this->dispatcher->hasListeners(IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES)) {
-                $this->dispatcher->dispatch(
-                    new InternalCompanyEvent($integrationName, $object),
-                    IntegrationEvents::INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES
-                );
+            $event = new InternalCompanyFieldChangesEvent($integrationName, $object);
+            if ($this->dispatcher->hasListeners($event::class)) {
+                $this->dispatcher->dispatch($event);
             }
 
             return;

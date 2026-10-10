@@ -216,10 +216,7 @@ class Point extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -298,6 +295,9 @@ class Point extends FormEntity implements UuidInterface
         $this->log->removeElement($log);
     }
 
+    /**
+     * @return Collection<int, LeadPointLog>
+     */
     public function getLog(): Collection
     {
         return $this->log;

@@ -56,7 +56,7 @@ final class SubmissionEvent extends CommonEvent
     private \Symfony\Component\HttpFoundation\Response|array|null $postSubmitResponse = null;
 
     /**
-     * @var array<mixed>
+     * @var array<mixed>|null
      */
     private ?array $postSubmitPayload = null;
 
@@ -257,7 +257,7 @@ final class SubmissionEvent extends CommonEvent
     /**
      * @return mixed[]
      */
-    public function getPostSubmitPayload(): array
+    public function getPostSubmitPayload(): ?array
     {
         return $this->postSubmitPayload;
     }

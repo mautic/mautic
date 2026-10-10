@@ -161,7 +161,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
-                        if (!empty($fieldsToUpdateInMautic)) {
+                        if ($fieldsToUpdateInMautic !== []) {
                             $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], $fieldsToUpdateInMautic);
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
@@ -223,7 +223,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
 
-                        if (!empty($fieldsToUpdateInMautic)) {
+                        if ($fieldsToUpdateInMautic !== []) {
                             $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], $fieldsToUpdateInMautic);
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
@@ -296,7 +296,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
-                        if (!empty($fieldsToUpdateInMautic)) {
+                        if ($fieldsToUpdateInMautic !== []) {
                             $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], $fieldsToUpdateInMautic);
                             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
                         } else {
@@ -669,10 +669,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * Get available company fields for choices in the config UI.
-     *
-     * @return array
      */
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('Accounts', $settings);
     }
@@ -1135,10 +1133,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
         return $failed;
     }
 
-    /**
-     * @param string $searchValue
-     */
-    private function getExistingRecord(string $seachColumn, $searchValue, string $object = 'Leads'): array
+    private function getExistingRecord(string $seachColumn, string $searchValue, string $object = 'Leads'): array
     {
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
         $records         = $this->getApiHelper()->getSearchRecords($seachColumn, $searchValue, $object);
@@ -1221,10 +1216,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
      * @param array $fields
      * @param array $keys
      * @param mixed $object
-     *
-     * @return array
      */
-    public function prepareFieldsForSync($fields, $keys, $object = null)
+    public function prepareFieldsForSync($fields, $keys, $object = null): array
     {
         $leadFields = [];
         $object ??= 'Leads';

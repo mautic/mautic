@@ -65,16 +65,13 @@ final class MessageController extends AbstractStandardFormController
         return $this->editStandard($request, $objectId, $ignorePost);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/messages/{page}',
         name: 'mautic_message_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, MessageSearchScopeProvider $messageSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, MessageSearchScopeProvider $messageSearchScopeProvider, int $page = 1): Response
     {
         $this->indexSearchScopes = $messageSearchScopeProvider->getScopes();
 
@@ -236,9 +233,6 @@ final class MessageController extends AbstractStandardFormController
         return 'mautic.channel.message';
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
         path: '/s/messages/contacts/{objectId}/{channel}/{page}',
         name: 'mautic_message_contacts',
@@ -250,7 +244,7 @@ final class MessageController extends AbstractStandardFormController
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
         $channel,
-        $page = 1,
+        int $page = 1,
     ): Response {
         $filter = [];
         if ('all' !== $channel) {

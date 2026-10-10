@@ -66,6 +66,7 @@ class EventExecutioner
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
+     * @param Collection<int, Event> $events
      */
     public function executeEventsForContact(Collection $events, Lead $contact, ?Responses $responses = null, ?Counter $counter = null): void
     {
@@ -153,6 +154,8 @@ class EventExecutioner
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
+     * @param Collection<int, Lead> $contacts
+     * @param Collection<int, Event> $events
      */
     public function executeEventsForContacts(Collection $events, Collection $contacts, ?Counter $childrenCounter = null, bool $isInactive = false): void
     {
@@ -190,6 +193,9 @@ class EventExecutioner
         }
     }
 
+    /**
+     * @param Collection<int, Lead> $contacts
+     */
     public function recordLogsAsExecutedForEvent(Event $event, Collection $contacts, bool $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
@@ -202,6 +208,9 @@ class EventExecutioner
         }
     }
 
+    /**
+     * @param Collection<int, Lead> $contacts
+     */
     public function recordLogsAsFailedForEvent(Event $event, Collection $contacts, $reason, bool $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
@@ -228,6 +237,8 @@ class EventExecutioner
      * @return Collection<int, Event>
      *
      * @throws Scheduler\Exception\NotSchedulableException
+     * @param Collection<int, Lead> $contacts
+     * @param Collection<int, Event> $events
      */
     private function scheduleEvents(Collection $events, Collection $contacts, ?Counter $childrenCounter = null, bool $isInactive = false): Collection
     {
@@ -264,6 +275,9 @@ class EventExecutioner
         return $events;
     }
 
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
     private function persistLogs(Collection $logs): void
     {
         if ($this->responses) {
@@ -278,6 +292,9 @@ class EventExecutioner
             ->clearCollection($logs);
     }
 
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
     private function checkForRemovedContacts(Collection $logs): void
     {
         /**
@@ -305,6 +322,7 @@ class EventExecutioner
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
+     * @param Collection<int, Lead> $contacts
      */
     private function executeActionEventsForContacts(Event $event, Collection $contacts, ?Counter $counter = null): void
     {
@@ -327,6 +345,7 @@ class EventExecutioner
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
+     * @param Collection<int, Lead> $contacts
      */
     private function executeConditionEventsForContacts(Event $event, Collection $contacts, ?Counter $counter = null): void
     {
@@ -367,6 +386,7 @@ class EventExecutioner
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
+     * @param Collection<int, Lead> $contacts
      */
     private function executePositivePathEventsForContacts(Event $event, Collection $contacts, Counter $counter): void
     {
@@ -387,6 +407,7 @@ class EventExecutioner
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
+     * @param Collection<int, Lead> $contacts
      */
     private function executeNegativePathEventsForContacts(Event $event, Collection $contacts, Counter $counter): void
     {

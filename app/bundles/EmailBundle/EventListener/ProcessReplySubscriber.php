@@ -3,9 +3,9 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
-use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
+use Mautic\EmailBundle\Event\PreFetchEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,8 +22,8 @@ final readonly class ProcessReplySubscriber implements EventSubscriberInterface
     {
         return [
             MonitoredEmailEvent::class => ['onEmailConfig', 0],
-            EmailEvents::EMAIL_PRE_FETCH        => ['onEmailPreFetch', 0],
-            EmailEvents::EMAIL_PARSE            => ['onEmailParse', 1],
+            PreFetchEmailEvent::class  => ['onEmailPreFetch', 0],
+            ParseEmailEvent::class     => ['onEmailParse', 1],
         ];
     }
 
@@ -38,7 +38,7 @@ final readonly class ProcessReplySubscriber implements EventSubscriberInterface
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.reply_folder');
     }
 
-    public function onEmailPreFetch(ParseEmailEvent $event): void
+    public function onEmailPreFetch(PreFetchEmailEvent $event): void
     {
         if (!$lastFetchedUID = $this->cache->getSimpleCache()->get(self::CACHE_KEY)) {
             return;

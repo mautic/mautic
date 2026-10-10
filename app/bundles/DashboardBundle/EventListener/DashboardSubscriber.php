@@ -2,7 +2,8 @@
 
 namespace Mautic\DashboardBundle\EventListener;
 
-use Mautic\DashboardBundle\DashboardEvents;
+use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
+use Mautic\DashboardBundle\Event\PreLoadWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
@@ -36,8 +37,8 @@ class DashboardSubscriber implements EventSubscriberInterface
         return [
             WidgetTypeListEvent::class                           => ['onWidgetListGenerate', 0],
             WidgetFormEvent::class                               => ['onWidgetFormGenerate', 0],
-            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD => ['onWidgetDetailPreLoad', 0],
-            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE => ['onWidgetDetailGenerate', 0],
+            PreLoadWidgetDetailEvent::class                      => ['onWidgetDetailPreLoad', 0],
+            GenerateWidgetDetailEvent::class                     => ['onWidgetDetailGenerate', 0],
         ];
     }
 

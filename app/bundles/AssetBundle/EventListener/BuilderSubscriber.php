@@ -11,8 +11,8 @@ use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class BuilderSubscriber implements EventSubscriberInterface
@@ -33,7 +33,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
             EmailOnBuildEvent::class      => ['onBuilderBuild', 0],
             EmailSendEvent::class         => ['onEmailGenerate', 0],
             EmailDisplayEvent::class      => ['onEmailGenerate', 0],
-            PageEvents::PAGE_ON_BUILD     => ['onBuilderBuild', 0],
+            PageBuilderEvent::class       => ['onBuilderBuild', 0],
             PageDisplayEvent::class   => ['onPageDisplay', 0],
         ];
     }

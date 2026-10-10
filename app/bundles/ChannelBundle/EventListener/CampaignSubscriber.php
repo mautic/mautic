@@ -145,6 +145,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
+     * @param Collection<int, LeadEventLog> $logs
      */
     private function sendChannelMessage(Collection $logs, int|string $channel, array $messageChannel)
     {
@@ -181,6 +182,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
         return $success;
     }
 
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
     private function passExecutedLogs(PendingEvent $pendingEvent, Collection $logs, PreferenceBuilder $channelPreferences): void
     {
         /** @var LeadEventLog $log */

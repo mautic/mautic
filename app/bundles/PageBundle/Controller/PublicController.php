@@ -225,6 +225,7 @@ final class PublicController extends AbstractFormController
                 }
 
                 // Now show the translation for the page or a/b test - only fetch a translation if a slug was not used
+                /** @var Page $entity */
                 if ($entity->isTranslation() && empty($entity->languageSlug)) {
                     [$translationParent, $translatedEntity] = $model->getTranslatedEntity(
                         $entity,

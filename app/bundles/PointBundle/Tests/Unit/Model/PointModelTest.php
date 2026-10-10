@@ -22,7 +22,6 @@ use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\PointBundle\Model\PointModel;
-use Mautic\PointBundle\PointEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -140,8 +139,7 @@ final class PointModelTest extends TestCase
         $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
             ->willReturnCallback(function (Event $event, ?string $eventName = null) use ($pointActionHelper, $type, $lead, $point): Event {
-                if (PointEvents::POINT_ON_BUILD === $eventName) {
-                    $this->assertInstanceOf(PointBuilderEvent::class, $event);
+                if ($event instanceof PointBuilderEvent) {
                     $this->assertEquals(new PointBuilderEvent($this->translator), $event);
                     $event->addAction(
                         $type,

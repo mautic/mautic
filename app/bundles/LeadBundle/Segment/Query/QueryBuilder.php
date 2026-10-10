@@ -96,7 +96,7 @@ final class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    public function replaceJoinCondition($alias, $expr): static
+    public function replaceJoinCondition(string $alias, string $expr): static
     {
         $parts = $this->getQueryPart('join');
         foreach ($parts['l'] as $key => $part) {
@@ -192,10 +192,8 @@ final class QueryBuilder extends BaseQueryBuilder
 
     /**
      * Return aliases of all currently registered tables.
-     *
-     * @return array
      */
-    public function getTableAliases()
+    public function getTableAliases(): array
     {
         $queryParts = $this->getQueryParts();
         $tables     = array_reduce($queryParts['from'], function (array $result, array $item): array {

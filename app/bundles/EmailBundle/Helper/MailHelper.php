@@ -1126,10 +1126,7 @@ final class MailHelper
         return $this->internalSend;
     }
 
-    /**
-     * @return array
-     */
-    public function getSource()
+    public function getSource(): array
     {
         return $this->source;
     }
@@ -1446,10 +1443,8 @@ final class MailHelper
      * Get list of errors.
      *
      * @param bool $reset Resets the error array in preparation for the next mail send or else it'll fail
-     *
-     * @return array
      */
-    public function getErrors(bool $reset = true)
+    public function getErrors(bool $reset = true): array
     {
         $errors = $this->errors;
 

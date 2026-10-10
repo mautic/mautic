@@ -59,6 +59,7 @@ final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $log2->method('getId')
             ->willReturn(2);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$log, $log2]);
 
         $event = new Event();
@@ -124,6 +125,7 @@ final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
         $log->method('getId')
             ->willReturn(1);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$log]);
 
         $event   = new Event();

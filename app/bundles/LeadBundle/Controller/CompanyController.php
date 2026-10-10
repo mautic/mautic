@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
 use Mautic\CoreBundle\Helper\ExportHelper;
@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class CompanyController extends FormController
+final class CompanyController extends AbstractFormController
 {
     use LeadDetailsTrait;
 
@@ -216,7 +216,6 @@ final class CompanyController extends FormController
      * Refresh contacts list in company view with new parameters like order or page.
      *
      * @param int $objectId company id
-     * @param int $page
      */
     #[Route(
         path: '/s/company/{objectId}/contacts/{page}',
@@ -224,7 +223,7 @@ final class CompanyController extends FormController
         requirements: ['objectId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0, 'objectId' => 0],
     )]
-    public function contactsListAction(Request $request, $objectId, $page = 1): Response
+    public function contactsListAction(Request $request, int $objectId, int $page = 1): Response
     {
         if (empty($objectId)) {
             $this->throwAccessDenied();
@@ -403,10 +402,8 @@ final class CompanyController extends FormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @param int $objectId
      */
-    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
+    public function editAction(Request $request, int $objectId, bool $ignorePost = false): Response
     {
         $entity = $this->companyModel->getEntity($objectId);
 
@@ -699,13 +696,11 @@ final class CompanyController extends FormController
     /**
      * Get company's contacts for company view.
      *
-     * @param int        $companyId
-     * @param int        $page
      * @param array<int> $leadIds   filter to get only company's contacts
      *
      * @return array<string, mixed>
      */
-    private function getCompanyContacts(Request $request, $companyId, $page = 0, array $leadIds = []): array
+    private function getCompanyContacts(Request $request, int $companyId, int $page = 0, array $leadIds = []): array
     {
         $this->setListFilters();
         $session = $request->getSession();
@@ -1229,7 +1224,7 @@ final class CompanyController extends FormController
         name: 'mautic_company_export_action',
         requirements: ['companyId' => '\d+'],
     )]
-    public function companyExportAction(Request $request, ExportHelper $exportHelper, $companyId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function companyExportAction(Request $request, ExportHelper $exportHelper, int $companyId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(

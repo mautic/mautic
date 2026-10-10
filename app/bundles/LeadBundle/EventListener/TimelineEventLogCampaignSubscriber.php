@@ -2,9 +2,10 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Event\CampaignBatchLeadChangeEvent;
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
+use Mautic\CampaignBundle\Event\CampaignSingleLeadChangeEvent;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -29,9 +30,9 @@ final class TimelineEventLogCampaignSubscriber implements EventSubscriberInterfa
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_LEADCHANGE     => 'onChange',
-            CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE => 'onBatchChange',
-            LeadTimelineEvent::class           => 'onTimelineGenerate',
+            CampaignSingleLeadChangeEvent::class => 'onChange',
+            CampaignBatchLeadChangeEvent::class  => 'onBatchChange',
+            LeadTimelineEvent::class             => 'onTimelineGenerate',
         ];
     }
 

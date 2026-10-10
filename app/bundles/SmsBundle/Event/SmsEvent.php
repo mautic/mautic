@@ -7,7 +7,7 @@ namespace Mautic\SmsBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\SmsBundle\Entity\Sms;
 
-final class SmsEvent extends CommonEvent
+abstract class SmsEvent extends CommonEvent
 {
     public function __construct(Sms $sms, bool $isNew = false)
     {

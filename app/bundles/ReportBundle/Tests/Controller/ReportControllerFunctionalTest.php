@@ -564,6 +564,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $result = [];
         $dom    = new \DOMDocument('1.0', 'utf-8');
         $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
+        /** @var \DOMElement $tbody */
         $tbody = $dom->getElementById('reportTable')->getElementsByTagName('tbody')[0];
         $rows  = $tbody->getElementsByTagName('tr');
 
