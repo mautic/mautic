@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06136d9d8bced6a20e92a4ef1be9d908",
+    "content-hash": "e115790df8144eccacdd0ea8ff28651a",
     "packages": [
         {
             "name": "api-platform/core",
@@ -15093,16 +15093,16 @@
         },
         {
             "name": "entropy/entropy",
-            "version": "0.4.28",
+            "version": "0.4.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/entropy.git",
-                "reference": "d6f2c8a591133434692e9478a5bba4aebfe820f1"
+                "reference": "733042a17988ba7c2c58f5245e9257cb687b7904"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/entropy/zipball/d6f2c8a591133434692e9478a5bba4aebfe820f1",
-                "reference": "d6f2c8a591133434692e9478a5bba4aebfe820f1",
+                "url": "https://api.github.com/repos/TomasVotruba/entropy/zipball/733042a17988ba7c2c58f5245e9257cb687b7904",
+                "reference": "733042a17988ba7c2c58f5245e9257cb687b7904",
                 "shasum": ""
             },
             "require": {
@@ -15138,9 +15138,9 @@
             "description": "Entropy framework",
             "support": {
                 "issues": "https://github.com/TomasVotruba/entropy/issues",
-                "source": "https://github.com/TomasVotruba/entropy/tree/0.4.28"
+                "source": "https://github.com/TomasVotruba/entropy/tree/0.4.30"
             },
-            "time": "2026-10-07T08:43:40+00:00"
+            "time": "2026-10-10T07:02:38+00:00"
         },
         {
             "name": "http-interop/http-factory-guzzle",
@@ -18473,16 +18473,16 @@
         },
         {
             "name": "tomasvotruba/class-leak",
-            "version": "2.3.1",
+            "version": "2.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/class-leak.git",
-                "reference": "9d80db6f88b1b1c78467636b63ac03747af42e6b"
+                "reference": "ca3097b65d4d9903e86924cc9c0de0a8bd82f432"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/class-leak/zipball/9d80db6f88b1b1c78467636b63ac03747af42e6b",
-                "reference": "9d80db6f88b1b1c78467636b63ac03747af42e6b",
+                "url": "https://api.github.com/repos/TomasVotruba/class-leak/zipball/ca3097b65d4d9903e86924cc9c0de0a8bd82f432",
+                "reference": "ca3097b65d4d9903e86924cc9c0de0a8bd82f432",
                 "shasum": ""
             },
             "require": {
@@ -18520,7 +18520,7 @@
             "description": "Detect leaking classes",
             "support": {
                 "issues": "https://github.com/TomasVotruba/class-leak/issues",
-                "source": "https://github.com/TomasVotruba/class-leak/tree/2.3.1"
+                "source": "https://github.com/TomasVotruba/class-leak/tree/2.3.4"
             },
             "funding": [
                 {
@@ -18532,7 +18532,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-07T08:53:33+00:00"
+            "time": "2026-10-10T13:17:59+00:00"
         },
         {
             "name": "tomasvotruba/type-coverage",
