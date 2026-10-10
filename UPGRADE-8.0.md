@@ -405,7 +405,7 @@
     - `CATEGORY_PRE_SAVE`, `CATEGORY_POST_SAVE`, `CATEGORY_PRE_DELETE` and `CATEGORY_POST_DELETE` - unused duplicates of the `Mautic\CategoryBundle\CategoryEvents` constants (same string values); key on `CategoryEvents` instead.
 - Constant `PLUGIN_ON_INTEGRATION_REQUEST` removed from `Mautic\PluginBundle\PluginEvents`; it was unused, with no dispatcher or listener.
 - Constants `ADD_DONOT_CONTACT` and `REMOVE_DONOT_CONTACT` removed from `Mautic\LeadBundle\Event\DoNotContactAddEvent` and `DoNotContactRemoveEvent`; they were unused, with no dispatcher or listener.
-- Method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeads()` removed as dead code. Nothing in Mautic calls it, and its `$limit` parameter was typed `bool`, so any value passed became `setMaxResults(1)`. `CampaignModel::getCampaignLeads()` is unrelated and unchanged.
+- Method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeads()` removed as dead code. Nothing in Mautic calls it, and its `$limit` parameter was typed `bool`, so any truthy limit (such as `50`) became `setMaxResults(1)`, while `false` or `0` returned every row. `CampaignModel::getCampaignLeads()` is unrelated and unchanged.
 
 ## Changed code
 
