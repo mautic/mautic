@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\Assert;
 
 final class BroadcastTranslationTest extends MauticMysqlTestCase
 {
@@ -30,14 +29,14 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $repository = $this->em->getRepository(Email::class);
-        \assert($repository instanceof EmailRepository);
+        $this->assertInstanceOf(EmailRepository::class, $repository);
 
         $broadcastIds = [];
         foreach ($repository->getPublishedBroadcastsIterable() as $email) {
             $broadcastIds[] = $email->getId();
         }
 
-        Assert::assertSame([$parent->getId()], $broadcastIds);
+        $this->assertSame([$parent->getId()], $broadcastIds);
     }
 
     public function testBroadcastSendsTranslationByPreferredLocale(): void
@@ -63,19 +62,19 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
         // drain the whole segment in one run, which is the scenario where
         // translation children used to be sent as independent broadcasts.
         $commandTester = $this->testSymfonyCommand('mautic:broadcasts:send', ['--limit' => 2]);
-        Assert::assertSame(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
 
         // Reboot the kernel to simulate the next cron run happening in a fresh process.
         $this->setUpSymfony($this->configParams);
 
         $commandTester = $this->testSymfonyCommand('mautic:broadcasts:send', ['--limit' => 2]);
-        Assert::assertSame(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
 
         $stats = $this->em->getConnection()->fetchAllAssociative(
             'SELECT email_address, email_id FROM '.MAUTIC_TABLE_PREFIX.'email_stats'
         );
 
-        Assert::assertCount(4, $stats, 'Every contact must receive exactly one email.');
+        $this->assertCount(4, $stats, 'Every contact must receive exactly one email.');
 
         $sentEmailIdByAddress = [];
         foreach ($stats as $stat) {
@@ -83,16 +82,12 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
         }
         ksort($sentEmailIdByAddress);
 
-        Assert::assertSame(
-            [
-                'en-locale@example.com'   => $parent->getId(),
-                'no-locale-1@example.com' => $parent->getId(),
-                'no-locale-2@example.com' => $parent->getId(),
-                'pt-locale@example.com'   => $child->getId(),
-            ],
-            $sentEmailIdByAddress,
-            'Contacts must receive the translation matching their preferred locale and the parent otherwise.'
-        );
+        $this->assertSame([
+            'en-locale@example.com'   => $parent->getId(),
+            'no-locale-1@example.com' => $parent->getId(),
+            'no-locale-2@example.com' => $parent->getId(),
+            'pt-locale@example.com'   => $child->getId(),
+        ], $sentEmailIdByAddress, 'Contacts must receive the translation matching their preferred locale and the parent otherwise.');
     }
 
     /**
@@ -124,29 +119,22 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
 
         // First run drains both broadcasts, so neither is unpublished yet.
         $commandTester = $this->testSymfonyCommand('mautic:broadcasts:send');
-        Assert::assertSame(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
 
         $this->setUpSymfony($this->configParams);
 
         // Second run has nothing pending for either broadcast, so both auto-unpublish.
         $commandTester = $this->testSymfonyCommand('mautic:broadcasts:send');
-        Assert::assertSame(
-            0,
-            $commandTester->getStatusCode(),
-            'The broadcast run must not abort: '.$commandTester->getDisplay()
-        );
+        $this->assertSame(0, $commandTester->getStatusCode(), 'The broadcast run must not abort: '.$commandTester->getDisplay());
 
         $this->em->clear();
         $repository = $this->em->getRepository(Email::class);
-        \assert($repository instanceof EmailRepository);
+        $this->assertInstanceOf(EmailRepository::class, $repository);
 
         foreach ([$translatedParent->getId(), $secondEmail->getId()] as $emailId) {
             $email = $repository->find($emailId);
-            \assert($email instanceof Email);
-            Assert::assertFalse(
-                $email->isPublished(),
-                sprintf('Email "%s" must be unpublished once it has no pending contacts left.', $email->getName())
-            );
+            $this->assertInstanceOf(Email::class, $email);
+            $this->assertFalse($email->isPublished(), sprintf('Email "%s" must be unpublished once it has no pending contacts left.', $email->getName()));
         }
     }
 
@@ -171,8 +159,8 @@ final class BroadcastTranslationTest extends MauticMysqlTestCase
             $contact->addUpdatedField('preferred_locale', $preferredLocale);
         }
 
-        $contactModel = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($contactModel instanceof LeadModel);
+        $contactModel = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         return $contact;
