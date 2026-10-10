@@ -86,7 +86,7 @@ final class CompanyController extends AbstractFormController
             return new JsonResponse(['closeModal' => true, 'flashes' => $this->getFlashContent()]);
         }
 
-        $users = $this->userRepository->getUserList('', 0);
+        $users = $this->userRepository->getUserList('', null);
         $items = [];
         foreach ($users as $user) {
             $items[$user['firstName'].' '.$user['lastName'].' ('.$user['id'].')'] = $user['id'];
