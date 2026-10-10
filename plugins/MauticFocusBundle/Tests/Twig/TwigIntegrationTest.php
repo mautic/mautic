@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Twig;
 
-use Mautic\CoreBundle\Tests\Twig\TwigIntegrationTestTrait;
 use MauticPlugin\MauticFocusBundle\Twig\Extension\FocusBundleExtension;
 use Twig\Extension\ExtensionInterface;
 
@@ -13,8 +12,6 @@ use Twig\Extension\ExtensionInterface;
  */
 final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
 {
-    use TwigIntegrationTestTrait;
-
     /**
      * @return ExtensionInterface[]
      */
