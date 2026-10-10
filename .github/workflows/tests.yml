@@ -351,7 +351,6 @@ jobs:
             --skip-type "Mautic\CoreBundle\Doctrine\QueryFormatter\MysqlFormatter" \
             --skip-type "Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer" \
             --skip-type "Mautic\CoreBundle\Factory\PageHelperFactory" \
-            --skip-type "Mautic\CoreBundle\Tests\Twig\TwigIntegrationTestTrait" \
             --skip-type "Mautic\IntegrationsBundle\Migrations\Version_0_0_1" \
             --skip-type "Mautic\IntegrationsBundle\Integration\DefaultConfigFormTrait" \
             --skip-type "Mautic\MessengerBundle\DependencyInjection\EnvProcessor\MessengerNullableEnvVarProcessor" \
