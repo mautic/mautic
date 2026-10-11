@@ -100,6 +100,11 @@ reviews:
       enabled: false
     phpmd:
       enabled: false
+  pre_merge_checks:
+    # Mautic relies on native types and keeps DocBlocks minimal, so a docstring
+    # coverage threshold would warn on almost every PHP PR.
+    docstrings:
+      mode: "off"
 knowledge_base:
   # Uses guideline files in the repo (such as AGENTS.md) as review context.
   code_guidelines:
