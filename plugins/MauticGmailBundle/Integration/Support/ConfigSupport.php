@@ -27,14 +27,6 @@ final class ConfigSupport extends GmailIntegration implements ConfigFormInterfac
         return null;
     }
 
-    /**
-     * Use the default.
-     */
-    public function getSyncConfigFormName(): ?string
-    {
-        return null;
-    }
-
     public function getAuthConfigFormName(): string
     {
         return GmailKeysType::class;

@@ -40,13 +40,4 @@ final class ConfigSupport extends ClearbitIntegration implements ConfigFormInter
     {
         return null;
     }
-
-    /**
-     * Use the default.
-     */
-    public function getSyncConfigFormName(): ?string
-    {
-        return null;
-    }
-
 }

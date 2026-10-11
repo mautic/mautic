@@ -407,6 +407,7 @@
 - Constants `ADD_DONOT_CONTACT` and `REMOVE_DONOT_CONTACT` removed from `Mautic\LeadBundle\Event\DoNotContactAddEvent` and `DoNotContactRemoveEvent`; they were unused, with no dispatcher or listener.
 - Class `Mautic\PluginBundle\Integration\AbstractSsoFormIntegration` removed; it was never used. Extend `Mautic\PluginBundle\Integration\AbstractSsoServiceIntegration` instead.
 - Trait `Mautic\CoreBundle\Tests\Twig\TwigIntegrationTestTrait` removed; it was never used.
+- Trait `Mautic\IntegrationsBundle\Integration\DefaultConfigFormTrait` removed; each method only returned `null`. Implement `getConfigFormName()` and `getConfigFormContentTemplate()` directly on your integration (return `null` to keep the default).
 
 ## Changed code
 

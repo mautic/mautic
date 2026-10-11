@@ -24,13 +24,4 @@ final class ConfigSupport extends TagManagerIntegration implements ConfigFormInt
     {
         return null;
     }
-
-    /**
-     * Use the default.
-     */
-    public function getSyncConfigFormName(): ?string
-    {
-        return null;
-    }
-
 }

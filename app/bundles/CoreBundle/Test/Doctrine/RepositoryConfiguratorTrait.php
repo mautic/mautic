@@ -46,7 +46,7 @@ trait RepositoryConfiguratorTrait
     private $result;
 
     /**
-     * @param MockObject&EntityManagerInterface|null $entityManager
+     * @param (MockObject&EntityManagerInterface)|null $entityManager
      */
     private function configureRepository(string $entityClass, ?MockObject $entityManager = null): object
     {

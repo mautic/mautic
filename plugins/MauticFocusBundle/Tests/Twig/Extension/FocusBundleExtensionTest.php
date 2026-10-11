@@ -44,14 +44,14 @@ final class FocusBundleExtensionTest extends TestCase
 
     public function testFiltersAreRegistered(): void
     {
-        $names = array_map(fn ($filter) => $filter->getName(), $this->extension->getFilters());
+        $names = array_map(fn (\Twig\TwigFilter $filter): string => $filter->getName(), $this->extension->getFilters());
 
         $this->assertSame(['less_compile', 'css_minify'], $names);
     }
 
     public function testColorLightTestIsRegistered(): void
     {
-        $names = array_map(fn ($test) => $test->getName(), $this->extension->getTests());
+        $names = array_map(fn (\Twig\TwigTest $test): string => $test->getName(), $this->extension->getTests());
 
         $this->assertSame(['color light'], $names);
     }

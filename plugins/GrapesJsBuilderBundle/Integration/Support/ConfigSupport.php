@@ -9,7 +9,6 @@ use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
 
 final class ConfigSupport extends GrapesJsBuilderIntegration implements ConfigFormInterface
 {
-
     /**
      * Use the default.
      */
@@ -22,14 +21,6 @@ final class ConfigSupport extends GrapesJsBuilderIntegration implements ConfigFo
      * Use the default.
      */
     public function getConfigFormContentTemplate(): ?string
-    {
-        return null;
-    }
-
-    /**
-     * Use the default.
-     */
-    public function getSyncConfigFormName(): ?string
     {
         return null;
     }

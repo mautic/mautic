@@ -263,7 +263,7 @@ jobs:
           bin/console cache:warmup
           vendor/bin/rector --dry-run --ansi
         elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
-          bin/console lint:twig app plugins
+          bin/console lint:twig app bin plugins
         elif [[ "${{ matrix.commands }}" == "Easy Coding Standard" ]]; then
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             if [[ $file == *.php ]]; then
@@ -350,10 +350,8 @@ jobs:
             --skip-type "Mautic\CoreBundle\Doctrine\QueryFormatter\MysqlFormatter" \
             --skip-type "Mautic\CoreBundle\Factory\PageHelperFactory" \
             --skip-type "Mautic\IntegrationsBundle\Migrations\Version_0_0_1" \
-            --skip-type "Mautic\MessengerBundle\DependencyInjection\EnvProcessor\MessengerNullableEnvVarProcessor" \
-            --skip-type "Mautic\MessengerBundle\Transport\NullTransportFactory" \
             --skip-path "plugins/MauticFullContactBundle/Services/" \
-            --skip-path "plugins/MauticEmailMarketingBundle/Api/" \
+            --skip-path "plugins/MauticEmailMarketingBundle/Api/"
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer validate --ansi
         else
