@@ -46,9 +46,9 @@ trait RepositoryConfiguratorTrait
     private $result;
 
     /**
-     * @return object the repository for the entity
+     * @param MockObject&EntityManagerInterface|null $entityManager
      */
-    private function configureRepository(string $entityClass, MockObject|EntityManagerInterface|null $entityManager = null)
+    private function configureRepository(string $entityClass, ?MockObject $entityManager = null): object
     {
         $this->classMetadata   = $this->createMock(ClassMetadata::class);
         $this->entityManager   = $entityManager ?? $this->createMock(EntityManagerInterface::class);

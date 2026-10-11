@@ -138,7 +138,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
      */
-    public function createFromArray($className, array &$data): object
+    public function createFromArray(string $className, array &$data): object
     {
         $entity        = new $className();
         $meta          = $this->getEntityManager()->getClassMetadata($className);

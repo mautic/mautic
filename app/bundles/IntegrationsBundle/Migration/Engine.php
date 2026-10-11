@@ -63,7 +63,7 @@ final readonly class Engine
     /**
      * Get migration classes to proceed.
      *
-     * @return string[]
+     * @return class-string[]
      */
     private function getMigrationClasses(): array
     {
