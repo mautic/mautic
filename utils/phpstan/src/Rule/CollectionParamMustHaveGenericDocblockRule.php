@@ -7,6 +7,7 @@ namespace Utils\PHPStan\Rule;
 use Doctrine\Common\Collections\Collection;
 use PhpParser\Node;
 use PhpParser\Node\Name;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
@@ -59,7 +60,9 @@ final class CollectionParamMustHaveGenericDocblockRule implements Rule
         $ruleErrors = [];
 
         foreach ($node->params as $param) {
-            if (!$param->type instanceof Name || Collection::class !== $param->type->toString()) {
+            $paramType = $param->type instanceof NullableType ? $param->type->type : $param->type;
+
+            if (!$paramType instanceof Name || Collection::class !== $paramType->toString()) {
                 continue;
             }
 

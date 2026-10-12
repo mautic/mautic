@@ -29,6 +29,10 @@ final class CollectionParamMustHaveGenericDocblockRuleTest extends RuleTestCase
                 'Parameter "$items" of method "setDocblockedItems()" is bare "Collection", add generic docblock, e.g. "@param Collection<int, SomeEntity> $items".',
                 18,
             ],
+            [
+                'Parameter "$items" of method "setNullableItems()" is bare "Collection", add generic docblock, e.g. "@param Collection<int, SomeEntity> $items".',
+                22,
+            ],
         ]);
     }
 

@@ -29,6 +29,10 @@ final class CollectionReturnMustHaveGenericDocblockRuleTest extends RuleTestCase
                 'Method "getItems()" returns bare "Collection", add generic docblock, e.g. "@return Collection<int, SomeEntity>".',
                 21,
             ],
+            [
+                'Method "getNullableItems()" returns bare "Collection", add generic docblock, e.g. "@return Collection<int, SomeEntity>".',
+                26,
+            ],
         ]);
     }
 

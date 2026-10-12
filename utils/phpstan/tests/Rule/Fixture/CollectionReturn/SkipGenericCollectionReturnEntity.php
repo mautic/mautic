@@ -27,4 +27,12 @@ class SkipGenericCollectionReturnEntity
     {
         return $this->names;
     }
+
+    /**
+     * @return Collection<int, \stdClass>
+     */
+    public function getNullableItems(): ?Collection
+    {
+        return $this->ipAddresses;
+    }
 }

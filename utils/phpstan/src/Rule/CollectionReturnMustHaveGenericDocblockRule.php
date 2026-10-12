@@ -7,6 +7,7 @@ namespace Utils\PHPStan\Rule;
 use Doctrine\Common\Collections\Collection;
 use PhpParser\Node;
 use PhpParser\Node\Name;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
@@ -52,7 +53,9 @@ final class CollectionReturnMustHaveGenericDocblockRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        if (!$node->returnType instanceof Name || Collection::class !== $node->returnType->toString()) {
+        $returnType = $node->returnType instanceof NullableType ? $node->returnType->type : $node->returnType;
+
+        if (!$returnType instanceof Name || Collection::class !== $returnType->toString()) {
             return [];
         }
 

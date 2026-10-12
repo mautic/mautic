@@ -15,6 +15,13 @@ class SkipGenericCollectionParam
     {
     }
 
+    /**
+     * @param Collection<int, \stdClass> $items
+     */
+    public function setNullableItems(?Collection $items): void
+    {
+    }
+
     public function setName(string $name): void
     {
     }

@@ -12,6 +12,7 @@ use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Return_;
 use PhpParser\NodeFinder;
@@ -42,7 +43,9 @@ final readonly class CollectionGetterMustReturnCollectionRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        if ($node->returnType instanceof Name && Collection::class === $node->returnType->toString()) {
+        $returnType = $node->returnType instanceof NullableType ? $node->returnType->type : $node->returnType;
+
+        if ($returnType instanceof Name && Collection::class === $returnType->toString()) {
             return [];
         }
 
