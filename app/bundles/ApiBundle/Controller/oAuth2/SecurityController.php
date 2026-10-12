@@ -27,11 +27,10 @@ final class SecurityController extends CommonController
             $error = $session->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
             $session->remove(SecurityRequestAttributes::AUTHENTICATION_ERROR);
         }
-        if (!empty($error)) {
+        if ($error instanceof \Throwable) {
             if ($error instanceof Exception\BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } else {
-                \assert($error instanceof \Throwable);
                 $msg = $error->getMessage();
             }
             $this->addFlashMessage($msg, [], 'error', null, false);
