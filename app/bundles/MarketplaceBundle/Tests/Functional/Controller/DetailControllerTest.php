@@ -37,6 +37,35 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($latestVersion, (string) $responseContent);
     }
 
+    public function testRichPackageMetadataAndMarkdown(): void
+    {
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true, 512, JSON_THROW_ON_ERROR);
+        foreach ($payload['package']['versions'] as &$version) {
+            $version['extra'] = [
+                'display_name' => 'Campaign example',
+                'detailed_description' => "## Included features\n\n- **Recovery emails**\n\n<script>alert(1)</script>\n\n[Unsafe](javascript:alert(1))",
+                'expected_outcomes' => 'More **conversions**',
+                'industry' => ['Retail'],
+                'mautic' => ['headline' => 'Bring customers back', 'languages' => ['en'], 'works-with' => ['^7.0']],
+            ];
+            $version['require'] = ['mautic/core-lib' => '^7.0'];
+        }
+        unset($version);
+        $payload['package']['reviews'] = ['no reviews' => ['name' => null, 'rating' => null, 'review' => null]];
+        $this->getClientMockHandler()->append(new Response(200, [], json_encode($payload, JSON_THROW_ON_ERROR)));
+        $crawler = $this->client->request('GET', '/s/marketplace/detail/koco/mautic-recaptcha-bundle');
+        self::assertResponseIsSuccessful();
+        self::assertCount(0, $crawler->filter('blockquote'));
+        self::assertSame('Included features', $crawler->filter('.marketplace-description h2')->text());
+        self::assertSame('Recovery emails', $crawler->filter('.marketplace-description li strong')->text());
+        self::assertCount(0, $crawler->filter('.marketplace-description script'));
+        self::assertCount(0, $crawler->filter('.marketplace-description a[href^="javascript:"]'));
+        self::assertStringContainsString('Campaign example', $crawler->filter('.marketplace-header h1')->text());
+        self::assertStringContainsString('Retail', $crawler->text());
+        self::assertStringContainsString('^7.0', $crawler->text());
+        self::assertStringContainsString('conversions', $crawler->text());
+    }
+
     /**
      * A 404 from the registry API must render Mautic's normal "not found" page rather than
      * leaking the upstream registry URL/response body through an uncaught ApiException.

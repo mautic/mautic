@@ -1,3 +1,16 @@
+{% set description = latestVersion.extra.detailed_description|default(packageDetail.packageBase.description) %}
+{% if description %}
+<div class="panel panel-default mt-sm">
+    <div class="panel-body marketplace-description">{{ description|marketplace_markdown|purify }}</div>
+</div>
+{% endif %}
+{% if latestVersion.extra.expected_outcomes|default('') %}
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">{{ 'marketplace.package.outcomes'|trans }}</h3></div>
+    <div class="panel-body">{{ latestVersion.extra.expected_outcomes|marketplace_markdown|purify }}</div>
+</div>
+{% endif %}
+{% if packageDetail.packageBase.type != 'mautic-resource' %}
 <div class="panel panel-default mt-sm">
     <div class="panel-heading">
         <div class="panel-title">{% trans %}marketplace.package.cli.install{% endtrans %}</div>
@@ -7,3 +20,4 @@
         '%package%' : packageDetail.packageBase.getPackageName(),
     })|purify }}</div>
 </div>
+{% endif %}

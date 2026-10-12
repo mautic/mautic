@@ -6,6 +6,7 @@ namespace Mautic\MarketplaceBundle\Controller\Package;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\MarketplaceBundle\DTO\PackageSearch;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
@@ -42,12 +43,15 @@ final class ListController extends CommonController
             $this->throwAccessDenied();
         }
 
-        $this->setListFilters();
+        $this->setListFilters('marketplace.package');
 
         $request = $this->getCurrentRequest();
-        $search  = InputHelper::clean($request->get('search', ''));
-
         $session = $request->getSession();
+        $search  = InputHelper::clean($request->get('search', $session->get('mautic.marketplace.package.filter', '')));
+        $session->set('mautic.marketplace.package.filter', $search);
+
+        $filter = new PackageSearch($search);
+
         if (empty($page)) {
             $page = $session->get('mautic.marketplace.package.page', 1);
         }
@@ -55,13 +59,18 @@ final class ListController extends CommonController
         // set limits
         $limit   = $session->get('mautic.marketplace.package.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $route   = $this->routeProvider->buildListRoute($page);
+        if ('' !== $search) {
+            $route .= '?'.http_build_query(['search' => $search]);
+        }
 
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
                     'searchValue'       => $search,
-                    'items'             => $this->pluginCollector->collectPackages($page, $limit, $search),
+                    'packageType'       => $filter->type,
+                    'listRoute'         => $this->routeProvider->buildListRoute(),
+                    'items'             => $this->pluginCollector->collectPackages($page, $limit, $filter->query, $filter->type),
                     'count'             => $this->pluginCollector->getTotal(),
                     'page'              => $page,
                     'limit'             => $limit,
