@@ -262,7 +262,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
             // Initialize project tracking on first change
             if (!isset($this->changes['projects']['old'])) {
                 /** @var \Doctrine\Common\Collections\Collection<int, Project> $current */
-                $currentProjects           = array_map(fn ($project) => $project->getName(), iterator_to_array($current));
+                $currentProjects = array_map(fn (Project $project): ?string => $project->getName(), $current->toArray());
                 $this->changes['projects'] = [
                     'old' => $currentProjects,
                     'new' => $currentProjects,

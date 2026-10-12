@@ -231,12 +231,8 @@ final class EventLogApiController extends FetchCommonApiController
                 continue;
             }
 
+            /** @var Event $event */
             $event = $events[$params['eventId']];
-            if (!$event instanceof Event) {
-                $errors[$key] = $this->notFound('mautic.campaign.error.edit_events.request_invalid');
-
-                continue;
-            }
 
             // Ensure contact exists and user has access
             $contact = $this->checkLeadAccess($contacts[$params['contactId']], 'edit');

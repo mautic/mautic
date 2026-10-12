@@ -13,5 +13,10 @@ class SkipGenericCollectionProperty
      */
     private Collection $items;
 
+    /**
+     * @var Collection<int, \stdClass>
+     */
+    private ?Collection $nullableItems;
+
     private string $name;
 }

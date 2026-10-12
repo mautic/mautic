@@ -127,14 +127,11 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private function checkCampaignIsPublished(): void
     {
-        if (!$this->decisions->count()) {
-            throw new NoEventsFoundException();
-        }
-
         $firstDecision = $this->decisions->first();
         if (false === $firstDecision) {
             throw new NoEventsFoundException();
         }
+
         $this->campaign = $firstDecision->getCampaign();
         if (!$this->campaign->isPublished()) {
             throw new NoEventsFoundException();

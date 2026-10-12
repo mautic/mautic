@@ -42,6 +42,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -356,9 +357,10 @@ final class CampaignController extends AbstractStandardFormController
 
         $metadata = $shareService->buildShareMetadata($formData);
 
+        /** @var SubmitButton $publishButton */
         $publishButton = $form->get('publish');
 
-        if ($publishButton instanceof \Symfony\Component\Form\SubmitButton && $publishButton->isClicked()) {
+        if ($publishButton->isClicked()) {
             // The transient ZIP is fetched same-origin by the browser, then forwarded to the
             // marketplace popup via postMessage. The marketplace never sees the Mautic URL,
             // which sidesteps SSRF and firewall concerns of the previous pull-based flow.
@@ -426,12 +428,12 @@ final class CampaignController extends AbstractStandardFormController
             ];
 
             // Query campaigns
-            /** @var array<int, Campaign> $campaigns */
             $campaigns = $this->campaignRepository->getEntities($args);
 
             // Get campaign IDs
-            $objectIds = array_map(fn ($c) => $c->getId(), $campaigns);
+            $objectIds = array_map(fn (Campaign $campaign): int => $campaign->getId(), $campaigns);
         }
+
         $allData = [];
 
         if (empty($objectIds)) {

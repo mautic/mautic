@@ -494,10 +494,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * @return Campaign
-     */
-    public function getCampaign()
+    public function getCampaign(): ?Campaign
     {
         return $this->campaign;
     }
@@ -729,8 +726,8 @@ class Event implements ChannelInterface, UuidInterface
      */
     public function setTriggerHour(array|string|null $triggerHour): static
     {
-        /** @var \DateTime|null $triggerHour */
         $triggerHour = $this->convertToDateTime($triggerHour);
+
         $this->isChanged('triggerHour', $triggerHour ? $triggerHour->format('H:i') : $triggerHour);
         $this->triggerHour = $triggerHour;
 

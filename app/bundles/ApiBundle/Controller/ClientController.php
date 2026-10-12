@@ -132,8 +132,8 @@ final class ClientController extends AbstractStandardFormController
 
     public function authorizedClientsAction(TokenStorageInterface $tokenStorage): Response
     {
-        /** @var User $me */
         $me = $tokenStorage->getToken()->getUser();
+        \assert($me instanceof User);
         $clients = $this->clientModel->getUserClients($me);
 
         return $this->render('@MauticApi/Client/authorized.html.twig', ['clients' => $clients]);
