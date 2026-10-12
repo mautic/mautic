@@ -35,4 +35,12 @@ class SkipGenericCollectionReturnEntity
     {
         return $this->ipAddresses;
     }
+
+    /**
+     * @return Collection<int, \stdClass>|null
+     */
+    public function getNullableUnionItems(): ?Collection
+    {
+        return $this->ipAddresses;
+    }
 }

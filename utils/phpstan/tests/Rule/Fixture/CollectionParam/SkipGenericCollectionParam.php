@@ -22,6 +22,13 @@ class SkipGenericCollectionParam
     {
     }
 
+    /**
+     * @param Collection<int, \stdClass>|null $items
+     */
+    public function setNullableUnionItems(?Collection $items): void
+    {
+    }
+
     public function setName(string $name): void
     {
     }
