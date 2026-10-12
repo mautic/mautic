@@ -116,6 +116,8 @@ final class PublicController extends AbstractFormController
             }
 
             // Check for variants
+            /** @var Page $parentVariant */
+            /** @var Page[] $childrenVariants */
             [$parentVariant, $childrenVariants] = $entity->getVariants();
 
             // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
@@ -232,9 +234,8 @@ final class PublicController extends AbstractFormController
                         $lead,
                         $request
                     );
-                    \assert($translatedEntity instanceof Page);
 
-                    if ($translatedEntity !== $entity) {
+                    if ($translatedEntity instanceof Page && $translatedEntity !== $entity) {
                         if (!($request->attributes->all()['ntrd'] ?? $request->query->all()['ntrd'] ?? $request->request->all()['ntrd'] ?? 0)) {
                             $url = $model->generateUrl($translatedEntity, false);
                             $model->hitPage($entity, $request, 302, $lead, $query);

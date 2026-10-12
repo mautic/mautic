@@ -1265,6 +1265,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return [$totalUpdated, $totalCreated, $totalErrors, $totalIgnored];
     }
 
+    /**
+     * @param Lead $lead
+     */
     public function getSalesforceLeadId($lead): array
     {
         $config                = $this->mergeConfigToFeatureSettings([]);
@@ -1616,6 +1619,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @api protected to allow mocking
      *
      * @param array<string, mixed> $fieldMapping
+     * @param ProgressBar|null      $progress
      *
      * @throws ApiErrorException
      */
@@ -2062,6 +2066,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array<string, mixed> $processedLeads
      * @param array<string, mixed> $trackedContacts
      * @param array<string, mixed> $sfEntityRecords
+     * @param ProgressBar|null      $progress
      */
     private function prepareMauticContactsToUpdate(
         array &$mauticData,
@@ -2800,6 +2805,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array<string, array<string, mixed[]>> $objectFields
      * @param array<string, mixed>                  $sfEntityRecords
+     * @param ProgressBar|null                      $progress
      */
     private function prepareMauticCompaniesToUpdate(
         array &$mauticData,
@@ -2961,6 +2967,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return 0 === $toUpdateCount;
     }
 
+    /**
+     * @param ProgressBar|null $progress
+     */
     private function getMauticEntitesToCreate(
         array &$checkIdsInSF,
         string $mauticCompanyFieldString,
@@ -3055,6 +3064,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return $companyField;
     }
 
+    /**
+     * @param Lead $lead
+     */
     public function getLeadDoNotContactByDate($channel, $matchedFields, $object, $lead, $sfData, $params = [])
     {
         if (isset($matchedFields['mauticContactIsContactableByEmail']) && $this->updateDncByDate()) {

@@ -399,14 +399,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * @param mixed[]                   $parameters
      * @param mixed[]                   $errors
-     * @param bool                      $prepareForSerialization
-     * @param string                    $requestIdColumn
-     * @param MauticModelInterface|null $model
-     * @param bool                      $returnWithOriginalKeys
      *
-     * @return mixed[]
+     * @return array<TEntity|null>
      */
-    protected function getBatchEntities($parameters, array &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true): array
+    protected function getBatchEntities(array $parameters, array &$errors, bool $prepareForSerialization = false, string $requestIdColumn = 'id', ?MauticModelInterface $model = null, bool $returnWithOriginalKeys = true): array
     {
         $idHelper = new BatchIdToEntityHelper($parameters, $requestIdColumn);
 
@@ -433,10 +429,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         // It must be associative because the order of entities has changed
         $idHelper->setIsAssociative(true);
 
-        [$entities, $total] = $prepareForSerialization
-            ?
-            $this->prepareEntitiesForView($entities)
-            :
+        [$entities, $total] = $prepareForSerialization ?
+            $this->prepareEntitiesForView($entities) :
             $this->prepareEntityResultsToArray($entities);
 
         // Set errors
@@ -458,6 +452,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         // Return the response with IDs as keys (default behavior)
         $return = [];
         foreach ($entities as $entity) {
+            /** @var TEntity $entity */
             $return[$entity->getId()] = $entity;
         }
 

@@ -15,6 +15,7 @@ final readonly class PointActionHelper
     }
 
     /**
+     * @param Hit                  $eventDetails
      * @param array<string, mixed> $action
      */
     public static function validatePageHit($eventDetails, array $action): bool
@@ -39,6 +40,7 @@ final readonly class PointActionHelper
     }
 
     /**
+     * @param Hit                  $eventDetails
      * @param array<string, mixed> $action
      */
     public function validateUrlHit($eventDetails, array $action): bool
