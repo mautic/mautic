@@ -7,12 +7,18 @@ namespace Mautic\UserBundle\Twig\Extension;
 use Composer\InstalledVersions;
 use DiceBear\Avatar;
 use DiceBear\Style;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 final class AvatarExtension extends AbstractExtension
 {
     private ?Style $style = null;
+
+    public function __construct(
+        private readonly CoreParametersHelper $coreParametersHelper,
+    ) {
+    }
 
     public function getFunctions(): array
     {
@@ -31,6 +37,8 @@ final class AvatarExtension extends AbstractExtension
             $this->style = Style::fromJson($definition);
         }
 
-        return (new Avatar($this->style, ['seed' => 'user-'.$userId]))->toDataUri();
+        $siteUrl = rtrim((string) $this->coreParametersHelper->get('site_url'), '/');
+
+        return (new Avatar($this->style, ['seed' => $siteUrl.'/user-'.$userId]))->toDataUri();
     }
 }
