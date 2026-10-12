@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 abstract class AbstractTokenReplacementEvent extends CommonEvent
 {
     /**
-     * @var CommonEntity|string|null
+     * @var CommonEntity|null
      */
     protected $entity;
 
