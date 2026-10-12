@@ -4,6 +4,7 @@ namespace Mautic\AssetBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -82,7 +83,7 @@ class PublicController extends CommonFormController
 
                 // Send the original file name also for streamed files, otherwise browsers name the saved file after the URL
                 $filename         = str_replace(['/', '\\'], '_', (string) $entity->getOriginalFileName());
-                $filenameFallback = preg_replace('/[^\x20-\x7e]|%/u', '_', $filename);
+                $filenameFallback = preg_replace('/[^\x20-\x7e]|%/u', '_', (string) InputHelper::transliterate($filename));
                 $response->headers->set(
                     'Content-Disposition',
                     $response->headers->makeDisposition(

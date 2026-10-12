@@ -113,9 +113,12 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
     {
         $filenames = [
             'quotes'          => ['Product "Pro".png', 'filename="Product \\"Pro\\".png"'],
-            'unicode'         => ['Broschüre.png', 'filename=Brosch_re.png; filename*=utf-8\'\'Brosch%C3%BCre.png'],
+            'unicode'         => ['Broschüre.png', 'filename=Broschure.png; filename*=utf-8\'\'Brosch%C3%BCre.png'],
+            'repeated'        => ['Broschüüre.png', 'filename=Broschuure.png; filename*=utf-8\'\'Brosch%C3%BC%C3%BCre.png'],
+            'non-latin'       => ['ąęźżýřšї.png', 'filename=aezzyrsi.png; filename*=utf-8\'\'%C4%85%C4%99%C5%BA%C5%BC%C3%BD%C5%99%C5%A1%D1%97.png'],
             'percent'         => ['100%.png', 'filename=100_.png; filename*=utf-8\'\'100%25.png'],
             'path separators' => ['Product\\Pro/image.png', 'filename=Product_Pro_image.png'],
+            'combined'        => ['Product "ü\\/%here.png', 'filename="Product \\"u___here.png"; filename*=utf-8\'\'Product%20%22%C3%BC__%25here.png'],
         ];
 
         foreach (['inline' => '1', 'attachment' => '0'] as $disposition => $stream) {
