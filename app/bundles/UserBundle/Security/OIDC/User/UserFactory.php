@@ -35,12 +35,12 @@ final readonly class UserFactory implements UserFactoryInterface
         }
 
         if (!$credentials->getEmail()) {
-            $this->logger->error('Could not locate email to register user through Open ID Connect.', ['credentials' => $credentials]);
+            $this->logger->error('Could not locate email to register user through Open ID Connect.');
             throw new OidcException('mautic.open_id.registration.exception.email_required');
         }
 
         if ($this->userRepository->findOneBy(['email' => $credentials->getEmail()])) {
-            $this->logger->debug('Could not register user through Open ID Connect. Email is already taken.', ['credentials' => $credentials]);
+            $this->logger->debug('Could not register user through Open ID Connect. Email is already taken.');
             throw new OidcException('mautic.open_id.registration.exception.email_taken');
         }
 

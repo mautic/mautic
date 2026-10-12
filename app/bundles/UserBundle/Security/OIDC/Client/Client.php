@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\OIDC\Client;
 
-use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use Mautic\UserBundle\Exception\OidcAuthorizationException;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -46,9 +46,9 @@ final class Client implements ClientInterface
             }
 
             $url    = $this->client->getAuthorizationUrl();
-            $client = new \GuzzleHttp\Client(['cookies' => true]);
+            $client = new \GuzzleHttp\Client(['cookies' => true, 'timeout' => 10, 'connect_timeout' => 5]);
             $client->request('GET', $url);
-        } catch (ClientException|OidcAuthorizationException $e) {
+        } catch (GuzzleException|OidcAuthorizationException $e) {
             return $e->getMessage();
         }
 

@@ -39,8 +39,8 @@ final readonly class UserCredentialsFactory implements UserCredentialsFactoryInt
             throw new OidcException('mautic.open_id.login.exception.user_info', $e->getCode(), $e);
         }
 
-        $this->logger->debug('OpenID Connect: User info', $userInfo);
-        $this->logger->debug('OpenID Connect: Token claims', $tokens);
+        $this->logger->debug('OpenID Connect: User info', ['claims' => array_keys($userInfo)]);
+        $this->logger->debug('OpenID Connect: Token claims', ['claims' => array_keys($tokens)]);
 
         // values from the token have precedence over the userinfo endpoint
         $data = array_merge($userInfo, $tokens);
@@ -52,7 +52,7 @@ final readonly class UserCredentialsFactory implements UserCredentialsFactoryInt
         $familyName        = $data['family_name'] ?? null;
 
         if (!$id) {
-            $this->logger->error('Unable to locate identifier field in response', ['mapping_field' => $client->getMappingField(), 'data' => $data]);
+            $this->logger->error('Unable to locate identifier field in response', ['mapping_field' => $client->getMappingField(), 'claims' => array_keys($data)]);
             throw new OidcException('mautic.open_id.login.exception.invalid_mapping_field');
         }
 

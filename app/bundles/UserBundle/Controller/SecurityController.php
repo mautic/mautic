@@ -178,7 +178,9 @@ final class SecurityController extends CommonController implements EventSubscrib
             $logger->error('OpenID Connect: Login action failed', ['exception' => $e, 'message' => $e->getMessage()]);
         }
 
-        throw new Exception\AuthenticationException('OpenID Connect authentication failed.');
+        $this->addFlashMessage('mautic.open_id.login.exception.user_info', [], FlashBag::LEVEL_ERROR);
+
+        return $this->redirectToRoute('login');
     }
 
     /**
