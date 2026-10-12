@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
@@ -230,8 +231,8 @@ class FormEntity extends CommonEntity
                 // check to see if there is a category to check
                 if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
                     $category = $this->getCategory();
-                    \assert(null === $category || $category instanceof \Mautic\CategoryBundle\Entity\Category);
-                    if (null !== $category && !$category->isPublished()) {
+
+                    if ($category instanceof Category && !$category->isPublished()) {
                         return false;
                     }
                 }
