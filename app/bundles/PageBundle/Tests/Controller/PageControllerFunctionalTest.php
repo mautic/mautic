@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -65,7 +66,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $oldParent = $this->em->find(Page::class, $parentId);
         $this->assertInstanceOf(Page::class, $winner);
         $this->assertInstanceOf(Page::class, $oldParent);
-        $this->assertNull($winner->getVariantParent());
+        $this->assertNotInstanceOf(VariantEntityInterface::class, $winner->getVariantParent());
         $this->assertTrue($winner->isPublished());
         $this->assertFalse($oldParent->isPublished());
         $this->assertSame($winner->getId(), $oldParent->getVariantParent()?->getId());

@@ -8,6 +8,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
@@ -109,7 +110,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $oldParent = $this->em->find(Email::class, $parentId);
         $this->assertInstanceOf(Email::class, $winner);
         $this->assertInstanceOf(Email::class, $oldParent);
-        $this->assertNull($winner->getVariantParent());
+        $this->assertNotInstanceOf(VariantEntityInterface::class, $winner->getVariantParent());
         $this->assertTrue($winner->isPublished());
         $this->assertFalse($oldParent->isPublished());
         $this->assertSame($winner->getId(), $oldParent->getVariantParent()?->getId());
