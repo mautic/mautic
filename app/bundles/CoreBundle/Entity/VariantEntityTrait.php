@@ -97,6 +97,9 @@ trait VariantEntityTrait
         return $this->variantChildren;
     }
 
+    /**
+     * @param T|null $parent
+     */
     public function setVariantParent(?VariantEntityInterface $parent = null): static
     {
         if (method_exists($this, 'isChanged')) {

@@ -53,15 +53,21 @@ trait TranslationEntityTrait
             ->build();
     }
 
+    /**
+     * @param T $child
+     */
     public function addTranslationChild(TranslationEntityInterface $child): static
     {
         if (!$this->translationChildren->contains($child)) {
-            $this->translationChildren[] = $child;
+            $this->translationChildren->add($child);
         }
 
         return $this;
     }
 
+    /**
+     * @param T $child
+     */
     public function removeTranslationChild(TranslationEntityInterface $child): void
     {
         $this->translationChildren->removeElement($child);
@@ -75,6 +81,9 @@ trait TranslationEntityTrait
         return $this->translationChildren;
     }
 
+    /**
+     * @param T|null $parent
+     */
     public function setTranslationParent(?TranslationEntityInterface $parent = null): self
     {
         if (method_exists($this, 'isChanged')) {
