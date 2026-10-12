@@ -769,6 +769,7 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
 
         $ids = [];
         foreach ($entities as $entity) {
+            \assert($entity instanceof Campaign);
             $ids[] = $entity->getId();
         }
 

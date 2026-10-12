@@ -17,7 +17,9 @@ final class InfiniteLoopValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, InfiniteLoop::class);
         }
 
-        $data = $this->context->getRoot()->getData();
+        $root = $this->context->getRoot();
+        \assert($root instanceof \Symfony\Component\Form\FormInterface);
+        $data = $root->getData();
 
         $this->validateEvent($this->context, $data['triggerMode'] ?? '', $value, (int) ($data['triggerInterval'] ?? 0), $data['triggerIntervalUnit'] ?? '');
     }

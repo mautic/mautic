@@ -232,6 +232,7 @@ final class EventLogApiController extends FetchCommonApiController
             }
 
             $event = $events[$params['eventId']];
+            \assert($event instanceof Event);
 
             // Ensure contact exists and user has access
             $contact = $this->checkLeadAccess($contacts[$params['contactId']], 'edit');

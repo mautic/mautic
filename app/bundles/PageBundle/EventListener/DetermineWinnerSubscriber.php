@@ -32,6 +32,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
         // find the hits that did not go any further
         $parent    = $event->getParameters()['parent'];
         $children  = $event->getParameters()['children'];
+        \assert($parent instanceof \Mautic\PageBundle\Entity\Page);
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 
@@ -58,6 +59,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
                 }
 
                 foreach ($children as $child) {
+                    \assert($child instanceof \Mautic\PageBundle\Entity\Page);
                     $combined[$child->getId()] = $counts[$child->getId()];
 
                     if ($child->hasTranslations()) {
@@ -117,6 +119,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
     {
         // find the hits that did not go any further
         $parent    = $event->getParameters()['parent'];
+        \assert($parent instanceof \Mautic\PageBundle\Entity\Page);
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 

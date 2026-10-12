@@ -164,6 +164,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->assertNotCount(0, $allUtmTags);
 
         foreach ($allUtmTags as $utmTag) {
+            \assert($utmTag instanceof \Mautic\LeadBundle\Entity\UtmTag);
             $this->assertSame('linkedin', $utmTag->getUtmSource(), 'utm_source does not match');
             $this->assertSame('social', $utmTag->getUtmMedium(), 'utm_medium does not match');
             $this->assertSame('mautic', $utmTag->getUtmCampaign(), 'utm_campaign does not match');

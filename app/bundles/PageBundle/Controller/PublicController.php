@@ -135,6 +135,7 @@ final class PublicController extends AbstractFormController
                     $totalHits     = $entity->getVariantHits();
 
                     foreach ($childrenVariants as $id => $child) {
+                        \assert($child instanceof Page);
                         if ($child->isPublished()) {
                             $variantSettings = $child->getVariantSettings();
                             $variants[$id]   = [

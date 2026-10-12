@@ -128,7 +128,10 @@ class InactiveExecutioner implements ExecutionerInterface
             throw new NoEventsFoundException();
         }
 
-        $this->campaign = $this->decisions->first()->getCampaign();
+        $firstDecision = $this->decisions->first();
+        \assert($firstDecision instanceof Event);
+        $this->campaign = $firstDecision->getCampaign();
+        \assert($this->campaign instanceof Campaign);
         if (!$this->campaign->isPublished()) {
             throw new NoEventsFoundException();
         }

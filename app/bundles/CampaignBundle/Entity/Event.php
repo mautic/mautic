@@ -422,6 +422,8 @@ class Event implements ChannelInterface, UuidInterface
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
         if ('category' === $prop || 'parent' === $prop) {
+            /** @var Event|null $current */
+            /** @var Event|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -727,6 +729,7 @@ class Event implements ChannelInterface, UuidInterface
      */
     public function setTriggerHour(array|string|null $triggerHour): static
     {
+        /** @var \DateTime|null $triggerHour */
         $triggerHour = $this->convertToDateTime($triggerHour);
         $this->isChanged('triggerHour', $triggerHour ? $triggerHour->format('H:i') : $triggerHour);
         $this->triggerHour = $triggerHour;
@@ -896,6 +899,7 @@ class Event implements ChannelInterface, UuidInterface
      */
     public function setTriggerRestrictedStartHour(string|\DateTimeInterface|null $triggerRestrictedStartHour): static
     {
+        /** @var \DateTime|null $triggerRestrictedStartHour */
         $triggerRestrictedStartHour = $this->convertToDateTime($triggerRestrictedStartHour);
 
         $this->isChanged('triggerRestrictedStartHour', $triggerRestrictedStartHour ? $triggerRestrictedStartHour->format('H:i') : $triggerRestrictedStartHour);
@@ -920,6 +924,7 @@ class Event implements ChannelInterface, UuidInterface
      */
     public function setTriggerRestrictedStopHour(string|\DateTime|null $triggerRestrictedStopHour): static
     {
+        /** @var \DateTime|null $triggerRestrictedStopHour */
         $triggerRestrictedStopHour = $this->convertToDateTime($triggerRestrictedStopHour);
 
         $this->isChanged('triggerRestrictedStopHour', $triggerRestrictedStopHour ? $triggerRestrictedStopHour->format('H:i') : $triggerRestrictedStopHour);

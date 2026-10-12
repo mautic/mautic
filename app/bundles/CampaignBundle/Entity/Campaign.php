@@ -251,6 +251,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
         if ('category' == $prop) {
+            /** @var Category|null $current */
+            /** @var Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -259,6 +261,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         } elseif ('projects' === $prop) {
             // Initialize project tracking on first change
             if (!isset($this->changes['projects']['old'])) {
+                /** @var \Doctrine\Common\Collections\Collection<int, Project> $current */
                 $currentProjects           = array_map(fn ($project) => $project->getName(), iterator_to_array($current));
                 $this->changes['projects'] = [
                     'old' => $currentProjects,

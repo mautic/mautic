@@ -82,7 +82,7 @@ class EventScheduler
     }
 
     /**
-     * @param ArrayCollection|LeadEventLog[] $logs
+     * @param ArrayCollection<int, LeadEventLog> $logs
      */
     public function rescheduleLogs(ArrayCollection $logs, \DateTimeInterface $toBeExecutedOn): void
     {

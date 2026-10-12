@@ -111,6 +111,11 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $email    = $entities['email'];
         $dwc      = $entities['dwc'];
         $company  = $entities['company'];
+        \assert($user instanceof User);
+        \assert($segment instanceof LeadList);
+        \assert($email instanceof Email);
+        \assert($dwc instanceof DynamicContent);
+        \assert($company instanceof Company);
 
         $payload = [
             'name'        => 'test',

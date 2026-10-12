@@ -295,6 +295,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
                     $total = 0;
                     foreach ($children as $child) {
+                        \assert($child instanceof self);
                         $settings = $child->getVariantSettings();
                         $total += (int) $settings['weight'];
                     }
@@ -685,6 +686,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $current = $this->{$getter}();
 
         if ('translationParent' == $prop || 'variantParent' == $prop || 'category' == $prop) {
+            /** @var self|Category|null $current */
+            /** @var self|Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

@@ -412,6 +412,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         foreach ($children as $child) {
+            \assert($child instanceof Page);
             $related[$child->getId()] = $this->buildRelatedArrayForPage($child);
         }
 
