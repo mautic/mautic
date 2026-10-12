@@ -97,6 +97,9 @@ trait VariantEntityTrait
         return $this->variantChildren;
     }
 
+    /**
+     * @param TEntity|null $parent
+     */
     public function setVariantParent(?VariantEntityInterface $parent = null): static
     {
         if (method_exists($this, 'isChanged')) {
@@ -108,6 +111,9 @@ trait VariantEntityTrait
         return $this;
     }
 
+    /**
+     * @return TEntity|null
+     */
     public function getVariantParent(): ?VariantEntityInterface
     {
         return $this->variantParent;
@@ -199,7 +205,7 @@ trait VariantEntityTrait
     /**
      * Get the variant parent/children.
      *
-     * @return array{TEntity, array<TEntity>}
+     * @return array{0: TEntity, 1: array<TEntity>}
      */
     public function getVariants(): array
     {
@@ -223,6 +229,8 @@ trait VariantEntityTrait
      */
     public function getRelatedEntityIds(bool $publishedOnly = false): array
     {
+        /** @var TEntity&FormEntity $parent */
+        /** @var array<TEntity&FormEntity> $children */
         [$parent, $children] = $this->getVariants();
 
         // If parent is not published and only published has been requested, no need to proceed

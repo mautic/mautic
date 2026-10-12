@@ -340,7 +340,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
 
             foreach ($recipientCollection as $recipient) {
                 $defaultSendResult['content'] = $recipient->getFinalMessage();
-                if (true !== $recipient->getResult()) {
+                if (!$recipient->getResult()) {
                     $defaultSendResult['sent']   = false;
                     $defaultSendResult['status'] = $recipient->getResult();
                     unset($stats[$recipient->getKey()]);

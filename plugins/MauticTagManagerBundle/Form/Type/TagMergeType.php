@@ -27,7 +27,7 @@ final class TagMergeType extends AbstractType
                 'multiple'        => false,
                 'label'           => 'mautic.tagmanager.to.merge.into',
                 'required'        => true,
-                'query_builder'   => function (EntityRepository $er) use ($options) {
+                'query_builder'   => function (EntityRepository $er) use ($options): \Doctrine\ORM\QueryBuilder {
                     $qb = $er->createQueryBuilder('t')->orderBy('t.tag', Order::Ascending->value);
 
                     if (!empty($options['exclude_ids'])) {

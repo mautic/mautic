@@ -116,15 +116,7 @@ class FormEntity extends CommonEntity
      */
     private $checkedOutByUser;
 
-    /**
-     * @var array
-     */
-    protected $changes = [];
-
-    /**
-     * @var bool
-     */
-    protected $new = false;
+    protected bool $new = false;
 
     /**
      * @var int|null

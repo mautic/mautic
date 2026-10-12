@@ -11,6 +11,8 @@ use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\Property;
 use PHPStan\Analyser\Scope;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -88,8 +90,25 @@ final class CollectionPropertyMustHaveGenericDocblockRule implements Rule
         $phpDocNode = $this->phpDocParser->parse($tokenIterator);
 
         foreach ($phpDocNode->getVarTagValues() as $varTagValue) {
-            if ($varTagValue->type instanceof GenericTypeNode) {
+            if ($this->isGenericType($varTagValue->type)) {
                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isGenericType(TypeNode $type): bool
+    {
+        if ($type instanceof GenericTypeNode) {
+            return true;
+        }
+
+        if ($type instanceof UnionTypeNode) {
+            foreach ($type->types as $innerType) {
+                if ($innerType instanceof GenericTypeNode) {
+                    return true;
+                }
             }
         }
 

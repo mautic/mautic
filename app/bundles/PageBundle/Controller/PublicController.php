@@ -116,6 +116,8 @@ final class PublicController extends AbstractFormController
             }
 
             // Check for variants
+            /** @var Page $parentVariant */
+            /** @var Page[] $childrenVariants */
             [$parentVariant, $childrenVariants] = $entity->getVariants();
 
             // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing

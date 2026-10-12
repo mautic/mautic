@@ -53,6 +53,9 @@ trait TranslationEntityTrait
             ->build();
     }
 
+    /**
+     * @param T $child
+     */
     public function addTranslationChild(TranslationEntityInterface $child): static
     {
         if (!$this->translationChildren->contains($child)) {
@@ -62,19 +65,25 @@ trait TranslationEntityTrait
         return $this;
     }
 
+    /**
+     * @param T $child
+     */
     public function removeTranslationChild(TranslationEntityInterface $child): void
     {
         $this->translationChildren->removeElement($child);
     }
 
     /**
-     * Get translated items.
+     * @return Collection<int, T>|null
      */
     public function getTranslationChildren(): ?Collection
     {
         return $this->translationChildren;
     }
 
+    /**
+     * @param T|null $parent
+     */
     public function setTranslationParent(?TranslationEntityInterface $parent = null): self
     {
         if (method_exists($this, 'isChanged')) {
@@ -86,6 +95,9 @@ trait TranslationEntityTrait
         return $this;
     }
 
+    /**
+     * @return T|null
+     */
     public function getTranslationParent(): ?TranslationEntityInterface
     {
         return $this->translationParent;
@@ -177,13 +189,7 @@ trait TranslationEntityTrait
         return [$parent, $children];
     }
 
-    /**
-     * @param string                      $getter
-     * @param ?TranslationEntityInterface $variantParent
-     *
-     * @return int
-     */
-    protected function getAccumulativeTranslationCount($getter, $variantParent = null)
+    protected function getAccumulativeTranslationCount(string $getter, ?TranslationEntityInterface $variantParent = null): int
     {
         $count = 0;
 

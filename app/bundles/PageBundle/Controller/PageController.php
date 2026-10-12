@@ -232,11 +232,11 @@ final class PageController extends AbstractStandardFormController
         $variantError            = false;
         $weight                  = 0;
         if (count($children)) {
-            foreach ($children as $c) {
-                $variantSettings = $c->getVariantSettings();
+            foreach ($children as $child) {
+                $variantSettings = $child->getVariantSettings();
 
                 if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if ($c->isPublished()) {
+                    if ($child->isPublished()) {
                         $lastCriteria ??= $variantSettings['winnerCriteria'];
 
                         // make sure all the variants are configured with the same criteria
@@ -251,7 +251,7 @@ final class PageController extends AbstractStandardFormController
                     $variantSettings['weight']         = 0;
                 }
 
-                $properties[$c->getId()] = $variantSettings;
+                $properties[$child->getId()] = $variantSettings;
             }
 
             $properties[$parent->getId()]['weight']         = 100 - $weight;
