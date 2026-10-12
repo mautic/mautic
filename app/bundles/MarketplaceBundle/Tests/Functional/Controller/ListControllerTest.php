@@ -83,8 +83,8 @@ final class ListControllerTest extends MauticMysqlTestCase
         self::assertStringContainsString('2 items, 2 pages in total', $crawler->text(null, true));
         $popover = new Crawler($crawler->filter('button[data-toggle="popover"]')->attr('data-content'));
         self::assertSame('type:'.$type, $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
-        self::assertSame(1, $popover->filter('[onclick="Mautic.applyFilters()"]')->count());
-        self::assertSame(1, $popover->filter('[onclick="Mautic.resetFilters()"]')->count());
+        self::assertCount(1, $popover->filter('[onclick="Mautic.applyFilters()"]'));
+        self::assertCount(1, $popover->filter('[onclick="Mautic.resetFilters()"]'));
 
         $pageLink = $crawler->filter('a[href*="/marketplace/2?"]')->first()->attr('href');
         parse_str(parse_url($pageLink, PHP_URL_QUERY), $pageQuery);
