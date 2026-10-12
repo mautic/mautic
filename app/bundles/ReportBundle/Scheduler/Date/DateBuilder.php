@@ -35,6 +35,7 @@ final readonly class DateBuilder
 
         $dates = [];
         foreach ($recurrences as $recurrence) {
+            \assert($recurrence instanceof \Recurr\Recurrence);
             $dates[] = $recurrence->getStart();
         }
 

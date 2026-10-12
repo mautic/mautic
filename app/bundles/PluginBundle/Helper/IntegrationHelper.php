@@ -276,6 +276,8 @@ final class IntegrationHelper
         if (empty($alphabetical)) {
             // Sort by priority
             uasort($returnServices, function ($a, $b): int {
+                \assert($a instanceof AbstractIntegration);
+                \assert($b instanceof AbstractIntegration);
                 $aP = (int) $a->getPriority();
                 $bP = (int) $b->getPriority();
 
@@ -284,6 +286,8 @@ final class IntegrationHelper
         } else {
             // Sort by display name
             uasort($returnServices, function ($a, $b): int {
+                \assert($a instanceof AbstractIntegration);
+                \assert($b instanceof AbstractIntegration);
                 $aName = $a->getDisplayName();
                 $bName = $b->getDisplayName();
 

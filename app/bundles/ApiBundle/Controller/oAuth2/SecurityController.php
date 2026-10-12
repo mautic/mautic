@@ -31,6 +31,7 @@ final class SecurityController extends CommonController
             if ($error instanceof Exception\BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } else {
+                \assert($error instanceof \Throwable);
                 $msg = $error->getMessage();
             }
             $this->addFlashMessage($msg, [], 'error', null, false);

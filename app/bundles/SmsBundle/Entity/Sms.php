@@ -275,6 +275,8 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         $current = $this->{$getter}();
 
         if ('category' == $prop || 'list' == $prop) {
+            \assert(null === $current || $current instanceof Category || $current instanceof LeadList);
+            \assert(null === $val || $val instanceof Category || $val instanceof LeadList);
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

@@ -381,6 +381,7 @@ final class ReportType extends AbstractType
                 FormEvents::PRE_SET_DATA,
                 function (FormEvent $event) use ($formModifier): void {
                     $data = $event->getData();
+                    \assert($data instanceof Report);
                     $formModifier($event->getForm(), $data->getSource(), $data->getColumns(), $data->getGraphs(), $data);
                 }
             );

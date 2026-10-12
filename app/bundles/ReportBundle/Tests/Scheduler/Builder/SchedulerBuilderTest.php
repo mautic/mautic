@@ -45,10 +45,12 @@ final class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDate, $event->getStart());
 
         $event = $events[1];
+        \assert($event instanceof Recurrence);
         $expectedDate->modify('+1 day');
         $this->assertEquals($expectedDate, $event->getStart());
 
         $event = $events[2];
+        \assert($event instanceof Recurrence);
         $expectedDate->modify('+1 day');
         $this->assertEquals($expectedDate, $event->getStart());
     }

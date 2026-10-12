@@ -404,7 +404,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      * @param MauticModelInterface|null $model
      * @param bool                      $returnWithOriginalKeys
      *
-     * @return mixed[]
+     * @return array<TEntity|null>
      */
     protected function getBatchEntities($parameters, array &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true): array
     {
@@ -458,6 +458,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         // Return the response with IDs as keys (default behavior)
         $return = [];
         foreach ($entities as $entity) {
+            /** @var TEntity $entity */
             $return[$entity->getId()] = $entity;
         }
 

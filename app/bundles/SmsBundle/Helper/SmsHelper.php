@@ -53,6 +53,8 @@ final readonly class SmsHelper
             }
         }
 
+        \assert($lead instanceof Lead);
+
         return $this->doNotContact->addDncForContact($lead->getId(), 'sms', DoNotContactEntity::UNSUBSCRIBED);
     }
 

@@ -1699,6 +1699,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
+        \assert($lead instanceof Lead);
         $this->leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         // Update the social cache

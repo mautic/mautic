@@ -155,6 +155,7 @@ final class TransportChainTest extends MauticMysqlTestCase
 
         $sentCount = 0;
         foreach ($recipientCollection as $recipient) {
+            \assert($recipient instanceof SmsRecipientDTO);
             if ($recipient->getResult()) {
                 ++$sentCount;
             }

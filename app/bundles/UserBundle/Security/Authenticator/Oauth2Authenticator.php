@@ -42,6 +42,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
 
             $user   = $accessToken->getUser();
             $client = $accessToken->getClient();
+            \assert($client instanceof \Mautic\ApiBundle\Entity\oAuth2\Client);
 
             if (null !== $user) {
                 try {

@@ -32,6 +32,8 @@ final class FeatureSettingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObject = $options['integration_object'];
+        \assert($integrationObject instanceof \Mautic\PluginBundle\Integration\AbstractIntegration);
+        \assert($builder instanceof \Symfony\Component\Form\FormBuilder);
 
         // add custom feature settings
         $integrationObject->appendToForm($builder, $options['data'], 'features');

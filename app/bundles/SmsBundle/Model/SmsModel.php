@@ -170,6 +170,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
         $entities = parent::getEntities($args);
 
         foreach ($entities as $entity) {
+            \assert($entity instanceof Sms);
             $pending = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'sms', $entity->getId(), 'pending'));
 
             if (null !== $pending) {
@@ -339,6 +340,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
             ];
 
             foreach ($recipientCollection as $recipient) {
+                \assert($recipient instanceof SmsRecipientDTO);
                 $defaultSendResult['content'] = $recipient->getFinalMessage();
                 if (true !== $recipient->getResult()) {
                     $defaultSendResult['sent']   = false;
