@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 trait VariantEntityTrait
 {
     /**
-     * @var Collection<int, T>
+     * @var mixed
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantChildren;
@@ -228,7 +228,7 @@ trait VariantEntityTrait
         \assert($parent instanceof self);
 
         // If parent is not published and only published has been requested, no need to proceed
-        if ($parent && $publishedOnly && !$parent->isPublished()) {
+        if ($publishedOnly && !$parent->isPublished()) {
             return [];
         }
 
