@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -50,6 +51,7 @@ final class ResultController extends CommonFormController
         private readonly FormModel $formModel,
         private readonly SubmissionResultLoader $submissionResultLoader,
         private readonly SubmissionModel $submissionModel,
+        private readonly CacheHelper $cacheHelper,
     ) {
         $this->setStandardParameters(
             'form.submission', // model name
@@ -529,6 +531,7 @@ final class ResultController extends CommonFormController
 
         $configurator->mergeParameters(['do_not_submit_emails' => $mergedDomains]);
         $configurator->write();
+        $this->cacheHelper->refreshConfig();
 
         return true;
     }

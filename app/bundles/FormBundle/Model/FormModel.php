@@ -740,8 +740,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             'SELECT ff.id, ff.form_id, ff.validation
              FROM '.$tableName.' ff
              WHERE ff.type = ?
-             AND (ff.validation IS NULL OR ff.validation = ? OR ff.validation = ?)',
-            ['email', '[]', '{}']
+             AND JSON_CONTAINS_PATH(COALESCE(ff.validation, ?), ?, ?) = 0',
+            ['email', '{}', 'one', '$.donotsubmit']
         )->fetchAllAssociative();
 
         if (empty($fieldsToUpdate)) {
@@ -766,7 +766,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         $connection->executeStatement(
             "UPDATE {$tableName}
-             SET validation = JSON_SET('{}', '$.donotsubmit', true)
+             SET validation = JSON_SET(COALESCE(NULLIF(validation, '[]'), '{}'), '$.donotsubmit', true)
              WHERE id IN ($placeholders)",
             $fieldIds
         );
