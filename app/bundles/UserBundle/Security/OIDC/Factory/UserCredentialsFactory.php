@@ -43,7 +43,8 @@ final readonly class UserCredentialsFactory implements UserCredentialsFactoryInt
         $this->logger->debug('OpenID Connect: Token claims', ['claims' => array_keys($tokens)]);
 
         // values from the token have precedence over the userinfo endpoint
-        $data = array_merge($userInfo, $tokens);
+        // exclude null-valued token claims to preserve userinfo values
+        $data = array_merge($userInfo, array_filter($tokens, fn ($value) => null !== $value));
         // values are not guaranteed to be set
         $id                = $data[$client->getMappingField()] ?? null;
         $email             = $data['email'] ?? null;
