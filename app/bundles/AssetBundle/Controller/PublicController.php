@@ -11,6 +11,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -153,7 +154,7 @@ final class PublicController extends AbstractFormController
 
         // Send the original file name also for streamed files, otherwise browsers name the saved file after the URL
         $filename         = str_replace(['/', '\\'], '_', (string) $entity->getOriginalFileName());
-        $filenameFallback = preg_replace('/[^\x20-\x7e]|%/u', '_', $filename);
+        $filenameFallback = preg_replace('/[^\x20-\x7e]|%/u', '_', (string) InputHelper::transliterate($filename));
         $response->headers->set(
             'Content-Disposition',
             $response->headers->makeDisposition(
