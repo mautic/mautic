@@ -39,8 +39,10 @@ final readonly class CampaignConditionSubscriber implements EventSubscriberInter
 
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
+        $lead = $event->getLead();
+
         try {
-            $this->validator->validate($event->getLead()->getEmail(), true);
+            $this->validator->validate($lead->getEmail(), true);
         } catch (UnexpectedValueException|InvalidEmailException) {
             $event->fail();
 

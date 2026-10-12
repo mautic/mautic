@@ -21,6 +21,11 @@ final class CampaignRepository extends CommonRepository
     use ReplicaConnectionTrait;
     use ProjectRepositoryTrait;
 
+    /**
+     * @param array<string, mixed> $args
+     *
+     * @return iterable<Campaign>
+     */
     public function getEntities(array $args = []): iterable
     {
         $q = $this->createQueryBuilder($this->getTableAlias(), $this->getTableAlias().'.id');

@@ -95,6 +95,8 @@ final class MauticSocialMonitoringCommand extends Command
     }
 
     /**
+     * @param \MauticPlugin\MauticSocialBundle\Entity\Monitoring $listItem
+     *
      * @throws \Exception
      */
     private function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int

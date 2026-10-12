@@ -231,6 +231,7 @@ final class EventLogApiController extends FetchCommonApiController
                 continue;
             }
 
+            /** @var Event $event */
             $event = $events[$params['eventId']];
 
             // Ensure contact exists and user has access

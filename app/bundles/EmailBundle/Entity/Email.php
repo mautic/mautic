@@ -69,17 +69,15 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-/**
- * @use VariantEntityTrait<Email>
- * @use TranslationEntityTrait<Email>
- */
 #[EmailLists]
 #[EntityEvent]
 #[ScheduleDateRange]
 #[ValidEmailLinks]
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface, OptimisticLockInterface
 {
+    /** @use VariantEntityTrait<Email> */
     use VariantEntityTrait;
+    /** @use TranslationEntityTrait<Email> */
     use TranslationEntityTrait;
     use DynamicContentEntityTrait;
     use UuidTrait;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Stats;
 
 use Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException;
@@ -13,6 +15,9 @@ final class StatHelperContainer
      */
     private array $helpers = [];
 
+    /**
+     * @param iterable<StatHelperInterface> $helpersIterator
+     */
     public function __construct(
         #[AutowireIterator(tag: 'mautic.email_stat_helper')]
         iterable $helpersIterator,

@@ -82,9 +82,9 @@ class EventScheduler
     }
 
     /**
-     * @param ArrayCollection|LeadEventLog[] $logs
+     * @param Collection<int, LeadEventLog> $logs
      */
-    public function rescheduleLogs(ArrayCollection $logs, \DateTimeInterface $toBeExecutedOn): void
+    public function rescheduleLogs(Collection $logs, \DateTimeInterface $toBeExecutedOn): void
     {
         foreach ($logs as $log) {
             $log->setTriggerDate($toBeExecutedOn, 'Bulk rescheduling of events');

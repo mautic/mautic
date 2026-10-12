@@ -133,7 +133,8 @@ final class ConfigType extends AbstractType
                     new Range(min: 0, max: 23),
                     new Callback(
                         function ($hourEnd, ExecutionContextInterface $context): void {
-                            $data      = $context->getRoot()->getData();
+                            $root = $context->getRoot();
+                            $data      = $root->getData();
                             $hourStart = $data['campaignconfig']['peak_interaction_timer_best_default_hour_start'] ?? null;
                             if (null !== $hourStart && null !== $hourEnd && $hourStart >= $hourEnd) {
                                 $context->buildViolation('mautic.config.peak_interaction_timer.best_default_hour.validation.range')->addViolation();

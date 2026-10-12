@@ -427,10 +427,10 @@ final class EmailController extends AbstractStandardFormController
                 'criteria'                   => $criteria['criteria'],
                 'winnerCriteria'             => $abTestSettings ? $abTestSettings['winnerCriteria'] : null,
                 'configurationError'         => $abTestSettings ? $abTestSettings['configurationError'] : null,
-                'hoursLeftToDetermineWinner' => $parent ? $model->timeLeftToDetermineWinner(
+                'hoursLeftToDetermineWinner' => $model->timeLeftToDetermineWinner(
                     $parent->getId(),
                     $abTestSettings['sendWinnerDelay'] ?? null
-                ) : null,
+                ),
                 'abTestSettings'             => $abTestSettings ?? [],
             ];
 
@@ -1381,8 +1381,10 @@ final class EmailController extends AbstractStandardFormController
             }
 
             // setting parent here, as the parent will be removed by the code below.
-            $parent = $entity->getVariantParent() ?? $entity;
-            \assert($parent instanceof Email);
+            $parent = $entity->getVariantParent();
+            if (!$parent instanceof Email) {
+                $parent = $entity;
+            }
 
             $this->emailModel->convertWinnerVariant($entity);
 
