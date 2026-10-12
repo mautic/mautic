@@ -11,9 +11,9 @@ parameters:
 
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
-        return: 91.6
-        param: 82.4
-        property: 73.7
+        return: 93.0
+        param: 83.3
+        property: 75.4
         constant: 99.9
     type_perfect:
         no_param_type_removal: true
