@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
- * @template T of VariantEntityInterface
+ * @template TEntity of VariantEntityInterface
  */
 trait VariantEntityTrait
 {
@@ -20,7 +20,7 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var T|null
+     * @var TEntity|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
@@ -97,6 +97,9 @@ trait VariantEntityTrait
         return $this->variantChildren;
     }
 
+    /**
+     * @param TEntity|null $parent
+     */
     public function setVariantParent(?VariantEntityInterface $parent = null): static
     {
         if (method_exists($this, 'isChanged')) {
@@ -108,6 +111,9 @@ trait VariantEntityTrait
         return $this;
     }
 
+    /**
+     * @return TEntity|null
+     */
     public function getVariantParent(): ?VariantEntityInterface
     {
         return $this->variantParent;
@@ -198,9 +204,8 @@ trait VariantEntityTrait
 
     /**
      * Get the variant parent/children.
-     **.
      *
-     * @return array<mixed>
+     * @return array{0: TEntity, 1: array<TEntity>}
      */
     public function getVariants(): array
     {
@@ -224,10 +229,12 @@ trait VariantEntityTrait
      */
     public function getRelatedEntityIds(bool $publishedOnly = false): array
     {
+        /** @var TEntity&FormEntity $parent */
+        /** @var array<TEntity&FormEntity> $children */
         [$parent, $children] = $this->getVariants();
 
         // If parent is not published and only published has been requested, no need to proceed
-        if ($parent && $publishedOnly && !$parent->isPublished()) {
+        if ($publishedOnly && !$parent->isPublished()) {
             return [];
         }
 

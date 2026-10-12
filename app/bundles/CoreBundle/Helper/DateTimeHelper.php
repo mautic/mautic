@@ -196,7 +196,7 @@ final class DateTimeHelper
      *
      * @param string|\DateTime $compare
      *
-     * @return \DateInterval|string
+     * @return ($format is null ? \DateInterval : string)
      */
     public function getDiff($compare = 'now', $format = null, bool $resetTime = false)
     {
@@ -317,7 +317,7 @@ final class DateTimeHelper
     /**
      * Returns today, yesterday, tomorrow or false if before yesterday or after tomorrow.
      */
-    public function getTextDate($interval = null): string|false
+    public function getTextDate(?\DateInterval $interval = null): string|false
     {
         if (null == $interval) {
             $interval = $this->getDiff('now', null, true);

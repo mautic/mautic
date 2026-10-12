@@ -12,12 +12,12 @@ class CommonEntity implements \Stringable
     /**
      * @var mixed[]
      */
-    protected $changes = [];
+    protected array $changes = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    protected $pastChanges = [];
+    protected array $pastChanges = [];
 
     /**
      * Wrapper function for isProperty methods.
@@ -113,7 +113,7 @@ class CommonEntity implements \Stringable
      */
     public function getChanges(bool $includePast = false): array
     {
-        if ($includePast && empty($this->changes) && !empty($this->pastChanges)) {
+        if ($includePast && $this->changes === [] && $this->pastChanges !== []) {
             return $this->pastChanges;
         }
 

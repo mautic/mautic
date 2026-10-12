@@ -25,6 +25,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
 {
     private ?Event $pseudoEvent = null;
 
+    /**
+     * @var Collection<int, LeadEventLog>|null
+     */
     private ?Collection $mmLogs = null;
 
     /**

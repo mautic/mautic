@@ -1602,7 +1602,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     /**
      * @param array $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
      */
-    protected function buildWhereClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses, $expr = null)
+    protected function buildWhereClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses, ?\Doctrine\ORM\Query\Expr\Composite $expr = null)
     {
         $parts = $this->buildWhereClausePartsFromArray($query, $clauses);
 
