@@ -11,6 +11,7 @@ use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -96,15 +97,19 @@ final class CollectionReturnMustHaveGenericDocblockRule implements Rule
         return false;
     }
 
-    private function isGenericType(TypeNode $type): bool
+    private function isGenericType(TypeNode $typeNode): bool
     {
-        if ($type instanceof GenericTypeNode) {
+        if ($typeNode instanceof GenericTypeNode) {
             return true;
         }
 
-        if ($type instanceof UnionTypeNode) {
-            foreach ($type->types as $innerType) {
-                if ($innerType instanceof GenericTypeNode) {
+        if ($typeNode instanceof NullableTypeNode) {
+            return $this->isGenericType($typeNode->type);
+        }
+
+        if ($typeNode instanceof UnionTypeNode) {
+            foreach ($typeNode->types as $innerTypeNode) {
+                if ($this->isGenericType($innerTypeNode)) {
                     return true;
                 }
             }

@@ -91,6 +91,7 @@ final class EventRedirectionHelperTest extends TestCase
         $events = new ArrayCollection([$deletedEvent]);
         ReflectionHelper::setValue($campaign, 'events', $events);
 
+        /** @var ArrayCollection<int, Event> $logs */
         $logs = new ArrayCollection([0 => $deletedEvent]);
 
         $logger = $this->createStub(LoggerInterface::class);

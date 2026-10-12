@@ -13,6 +13,7 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
@@ -120,9 +121,13 @@ final class CollectionParamMustHaveGenericDocblockRule implements Rule
             return true;
         }
 
+        if ($type instanceof NullableTypeNode) {
+            return $this->isGenericType($type->type);
+        }
+
         if ($type instanceof UnionTypeNode) {
             foreach ($type->types as $innerType) {
-                if ($innerType instanceof GenericTypeNode) {
+                if ($this->isGenericType($innerType)) {
                     return true;
                 }
             }
