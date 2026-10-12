@@ -96,6 +96,35 @@ final class TagControllerTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('tag2', (string) $clientResponseContent, 'The return must not contain unrelated tags.');
     }
 
+    /**
+     * Regression test for https://github.com/mautic/mautic/issues/15969: clicking a sortable
+     * column header (or any other ajax list refresh - pagination, per-page limit) re-requests
+     * the index action with tmpl=list. That must return only the table/pagination fragment,
+     * the same way every other entity list in Mautic behaves, not the full page-list-wrapper
+     * with a second copy of the search/filter toolbar nested inside the ajax target.
+     */
+    public function testIndexActionAjaxReorderDoesNotDuplicateToolbar(): void
+    {
+        $this->client->request(
+            'POST',
+            '/s/tags?tmpl=list&name=tags&orderby=lt.tag',
+            [],
+            [],
+            $this->createAjaxHeaders()
+        );
+        $clientResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $json = json_decode((string) $clientResponse->getContent(), true);
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('newContent', $json, 'Response should contain the re-rendered list HTML: '.(string) $clientResponse->getContent());
+
+        $html = (string) $json['newContent'];
+        $this->assertStringContainsString('id="tagsTable"', $html, 'The ajax reorder response must still contain the tags table.');
+        $this->assertStringNotContainsString('toolbar--table-toolbar', $html, 'The ajax reorder response must not re-render the search/filter toolbar.');
+        $this->assertStringNotContainsString('page-list-wrapper', $html, 'The ajax reorder response must not re-render the index-only page wrapper.');
+    }
+
     public function testTagDeletion(): void
     {
         $tagId = $this->tagRepository->findOneBy([])->getId();
