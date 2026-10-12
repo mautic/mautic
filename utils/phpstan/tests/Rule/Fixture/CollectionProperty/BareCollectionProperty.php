@@ -14,4 +14,6 @@ class BareCollectionProperty
      * @var Collection
      */
     private Collection $docblockedItems;
+
+    private ?Collection $nullableItems;
 }

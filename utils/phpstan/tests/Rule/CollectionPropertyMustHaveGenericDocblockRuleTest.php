@@ -29,6 +29,10 @@ final class CollectionPropertyMustHaveGenericDocblockRuleTest extends RuleTestCa
                 'Property "$docblockedItems" is bare "Collection", add generic docblock, e.g. "@var Collection<int, SomeEntity>".',
                 16,
             ],
+            [
+                'Property "$nullableItems" is bare "Collection", add generic docblock, e.g. "@var Collection<int, SomeEntity>".',
+                18,
+            ],
         ]);
     }
 
