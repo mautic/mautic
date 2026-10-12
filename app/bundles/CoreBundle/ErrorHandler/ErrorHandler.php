@@ -50,6 +50,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public static function logDebugEntry($log, $context = 'null', bool $backtrace = false): void
         {
+            \assert(self::$handler instanceof self);
             if ($debugLogger = self::$handler->getDebugLogger()) {
                 if (!is_array($context)) {
                     if (null === $context) {
@@ -81,6 +82,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 $log = str_replace(self::$root, '', $file['file']).':'.$file['line'].' in '.$file['function'].'(): '.$log;
 
+                \assert($debugLogger instanceof \Psr\Log\LoggerInterface);
                 $debugLogger->debug($log, $context);
             }
         }
@@ -376,6 +378,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $message = strip_tags($message);
             if ($this->logger) {
                 if (LogLevel::DEBUG === $logLevel) {
+                    \assert($this->mainLogger instanceof \Psr\Log\LoggerInterface);
                     $this->mainLogger->log($logLevel, $message, $context);
                 } else {
                     $this->logger->log($logLevel, $message, $context);

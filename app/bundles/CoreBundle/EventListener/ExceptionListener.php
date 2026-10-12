@@ -74,6 +74,7 @@ final class ExceptionListener extends ErrorListener
                     && 'urn:oasis:names:tc:SAML:2.0:status:Success' === $message->getStatus()->getStatusCode()->getValue()
                 ) {
                     $session = $event->getRequest()->attributes->get('_session');
+                    \assert(null === $session || $session instanceof \Symfony\Component\HttpFoundation\Session\SessionInterface);
                     if ($session) {
                         $session->clear();
                     }
@@ -86,6 +87,7 @@ final class ExceptionListener extends ErrorListener
         // not keeping elseif statement to prevent prevent inner if condition above
         if ($exception instanceof LightSamlException) {
             $session = $event->getRequest()->attributes->get('_session');
+            \assert(null === $session || $session instanceof \Symfony\Component\HttpFoundation\Session\SessionInterface);
             if ($session) {
                 $session->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
             }

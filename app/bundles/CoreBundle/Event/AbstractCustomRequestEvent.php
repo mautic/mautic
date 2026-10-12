@@ -23,6 +23,7 @@ abstract class AbstractCustomRequestEvent extends Event
     {
         if ($request) {
             $this->request = ($request->isXmlHttpRequest() && $request->attributes->has('request')) ? $request->attributes->get('request') : $request;
+            \assert($this->request instanceof Request);
             if ($this->request->attributes->has('ajaxRoute')) {
                 $ajaxRoute         = $this->request->attributes->get('ajaxRoute');
                 $this->route       = $ajaxRoute['_route'];

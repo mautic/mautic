@@ -21,6 +21,7 @@ trait TranslationModelTrait
     public function getTranslatedEntity(TranslationEntityInterface $entity, Lead|array|null $lead = null, ?Request $request = null): array
     {
         [$translationParent, $translationChildren] = $entity->getTranslations();
+        \assert(null === $translationParent || $translationParent instanceof TranslationEntityInterface);
 
         $leadPreference = $chosenLanguage = null;
 
@@ -34,6 +35,7 @@ trait TranslationModelTrait
             // Generate a list of translations
             $translations = [$translationParent->getId() => $translationParent->getLanguage()];
             foreach ($translationChildren as $c) {
+                \assert($c instanceof TranslationEntityInterface);
                 $translations[$c->getId()] = $c->getLanguage();
             }
 

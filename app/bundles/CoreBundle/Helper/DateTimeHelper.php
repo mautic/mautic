@@ -323,6 +323,7 @@ final class DateTimeHelper
             $interval = $this->getDiff('now', null, true);
         }
 
+        \assert($interval instanceof \DateInterval);
         $diffDays = (int) $interval->format('%R%a');
 
         return match ($diffDays) {

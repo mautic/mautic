@@ -72,6 +72,7 @@ final class ThemeController extends AbstractFormController
                             )
                         );
                     } else {
+                        \assert($fileData instanceof \Symfony\Component\HttpFoundation\File\UploadedFile);
                         $fileName  = InputHelper::filename($fileData->getClientOriginalName());
                         $themeName = basename($fileName, '.zip');
 

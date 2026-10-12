@@ -230,6 +230,7 @@ class FormEntity extends CommonEntity
                 // check to see if there is a category to check
                 if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
                     $category = $this->getCategory();
+                    \assert(null === $category || $category instanceof \Mautic\CategoryBundle\Entity\Category);
                     if (null !== $category && !$category->isPublished()) {
                         return false;
                     }

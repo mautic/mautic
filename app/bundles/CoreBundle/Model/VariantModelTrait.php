@@ -83,6 +83,7 @@ trait VariantModelTrait
                 $relatedIds = $entity->getRelatedEntityIds();
             }
 
+            \assert($entity instanceof VariantEntityInterface);
             if (!in_array($entity->getId(), $relatedIds)) {
                 $relatedIds[] = $entity->getId();
             }

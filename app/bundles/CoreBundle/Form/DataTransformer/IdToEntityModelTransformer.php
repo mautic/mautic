@@ -46,6 +46,7 @@ final class IdToEntityModelTransformer implements DataTransformerInterface
 
         $return = [];
         foreach ($entity as $e) {
+            \assert(is_object($e));
             $return[] = $e->{$func}();
         }
 

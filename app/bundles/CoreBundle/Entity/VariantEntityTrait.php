@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 trait VariantEntityTrait
 {
     /**
-     * @var mixed
+     * @var Collection<int, T>
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantChildren;
@@ -225,6 +225,7 @@ trait VariantEntityTrait
     public function getRelatedEntityIds(bool $publishedOnly = false): array
     {
         [$parent, $children] = $this->getVariants();
+        \assert($parent instanceof self);
 
         // If parent is not published and only published has been requested, no need to proceed
         if ($parent && $publishedOnly && !$parent->isPublished()) {
@@ -238,6 +239,7 @@ trait VariantEntityTrait
         $this->appendTranslationEntityIds($this, $ids, $publishedOnly);
 
         foreach ($children as $variant) {
+            \assert($variant instanceof self);
             if ((!$publishedOnly || $variant->isPublished()) && $id = $variant->getId()) {
                 $ids[] = $id;
 
@@ -327,6 +329,7 @@ trait VariantEntityTrait
     protected function getAccumulativeVariantCount(string $getter): mixed
     {
         [$parent, $children]     = $this->getVariants();
+        \assert($parent instanceof self);
         $count                   = $parent->{$getter}();
 
         if ($checkTranslations = method_exists($parent, 'getAccumulativeTranslationCount')) {
@@ -335,6 +338,7 @@ trait VariantEntityTrait
         }
 
         foreach ($children as $variant) {
+            \assert($variant instanceof self);
             $count += $variant->{$getter}();
 
             if ($checkTranslations) {
@@ -376,6 +380,7 @@ trait VariantEntityTrait
             }
         } else {
             foreach ($childrenTranslations as $translation) {
+                \assert($translation instanceof TranslationEntityInterface);
                 if ($translation->isPublished() && $id = $translation->getId()) {
                     $ids[] = $id;
                 }
