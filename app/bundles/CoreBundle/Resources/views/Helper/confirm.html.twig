@@ -38,9 +38,9 @@
 {%- if confirmCallback is not empty %}
     {%- set attr = attr|merge({'data-confirm-callback': confirmCallback}) %}
 {%- endif %}
-{%- if cancelText is not empty %}
-    {%- set attr = attr|merge({'data-cancel-text': cancelText|escape('js')}) %}
-{%- endif %}
+	{%- if cancelText is not empty %}
+	    {%- set attr = attr|merge({'data-cancel-text': cancelText|escape('html_attr')}) %}
+	{%- endif %}
 {%- if confirmText is not empty %}
     {%- set attr = attr|merge({'data-confirm-text': confirmText}) %}
 {%- endif %}

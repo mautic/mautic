@@ -175,6 +175,14 @@ final class ResultController extends CommonFormController
                     'page'           => $page,
                     'totalCount'     => $count,
                     'limit'          => $limit,
+                    // Must be explicit; otherwise the JS fallback rewrites the trailing URL segment
+                    'baseUrl'        => $this->generateUrl(
+                        'mautic_form_results',
+                        [
+                            'objectId' => $objectId,
+                            'page'     => $page,
+                        ]
+                    ),
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'canDelete'      => $this->security->hasEntityAccess(
                         'form:forms:editown',

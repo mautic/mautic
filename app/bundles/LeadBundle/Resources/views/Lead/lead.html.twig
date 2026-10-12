@@ -19,8 +19,8 @@
 {% set groups = fields|keys %}
 
 {% block headerTitle %}
-    {{ avatar }}<div class="pull-left mt-5"><span class="span-block">{{ leadName|purify }}</span><span class="span-block small ml-sm">
-    {{ lead.secondaryIdentifier|purify }}</span></div>
+    {{ avatar }}<div class="pull-left mt-5"><span class="span-block">{{ htmlEntityDecode(leadName)|purify }}</span><span class="span-block small ml-sm">
+    {{ htmlEntityDecode(lead.secondaryIdentifier)|purify }}</span></div>
     {{ customContent('lead.name.after', _context) }}
 {% endblock %}
 
@@ -609,47 +609,61 @@
             {% endif %}
         </div>
 
-        <div class="pa-sm panel-companies layout--size-0">
-            {% if companies is defined and companies|length > 0 %}
-                {% set companiesList = [] %}
-                {% for key, company in companies %}
-                    {% set companiesList = companiesList|merge([{
-                        'label': company.companyname|purify,
-                        'link': path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}),
-                        'icon': (company.is_primary == 1 ? 'ri-user-star-fill' : ''),
-                        'button': {
-                            'onclick': 'Mautic.setAsPrimaryCompany(' ~ company.id ~ ', ' ~ lead.id ~ ');',
-                            'icon': 'ri-check-line',
-                            'size': 'lg',
-                            'label': 'mautic.lead.company.set.primary'|trans
-                        }
-                    }]) %}
-                {% endfor %}
+        <div class="pa-sm panel-companies">
+            {% set maxVisibleCompaniesCount = 8 %}
+            {% set companyCount = companies is defined ? companies|length : 0 %}
+            {% set companyClasses = ['gray', 'red', 'magenta', 'purple', 'blue', 'cyan', 'teal', 'green'] %}
 
-                {% set tileContent %}
-                <div class="ma-neg-local">
-                    {{ include('@MauticCore/Components/contained-list.html.twig', {
-                        'title': 'mautic.lead.lead.companies'|trans,
-                        'items': companiesList,
-                        'variant': 'interactive-actions'
-                    }) }}
-                </div>
-                {% endset %}
-
-                {{ include('@MauticCore/Components/tile.html.twig', {
-                    'type': 'base',
-                    'content': tileContent
-                }) }}
-            {% else %}
-                {% set content %}
+            {% set companyHeader %}
                 <div class="d-flex jc-space-between">
                     <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.lead.companies'|trans }}</span>
                     <i class="ri-building-line" aria-hidden="true"></i>
                 </div>
-                <p class="text-helper">{{ 'mautic.lead.lead.companies.no_results'|trans }}</p>
-                <div class="clearfix"></div>
+            {% endset %}
+
+            {% if companyCount > 0 %}
+                {% if companyCount <= maxVisibleCompaniesCount %}
+                    {% set content %}
+                        {{ companyHeader }}
+                        <div class="d-flex fw-wrap gap-xs">
+                            {% for company in companies %}
+                                {{ _self.render_company(company, lead.id, cycle(companyClasses, loop.index0)) }}
+                            {% endfor %}
+                        </div>
+                    {% endset %}
+
+                    {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
+                {% else %}
+                    {% set aboveContent %}
+                        {{ companyHeader }}
+                        <div class="d-flex fw-wrap gap-xs">
+                            {% for company in companies|slice(0, maxVisibleCompaniesCount) %}
+                                {{ _self.render_company(company, lead.id, cycle(companyClasses, loop.index0)) }}
+                            {% endfor %}
+                        </div>
+                    {% endset %}
+
+                    {% set belowContent %}
+                        <div class="d-flex fw-wrap gap-xs mt-xs">
+                            {% for company in companies|slice(maxVisibleCompaniesCount) %}
+                                {{ _self.render_company(company, lead.id, cycle(companyClasses, loop.index0 + maxVisibleCompaniesCount)) }}
+                            {% endfor %}
+                        </div>
+                    {% endset %}
+
+                    {% include '@MauticCore/Components/tile.html.twig' with {
+                        'type': 'expandable-interactive',
+                        'aboveFoldContent': aboveContent,
+                        'belowFoldContent': belowContent
+                    } %}
+                {% endif %}
+            {% else %}
+                {% set content %}
+                    {{ companyHeader }}
+                    <p class="text-helper">{{ 'mautic.lead.lead.companies.no_results'|trans }}</p>
+                    <div class="clearfix"></div>
                 {% endset %}
-                
+
                 {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
             {% endif %}
         </div>
@@ -744,6 +758,26 @@
 </div>
 <!--/ end: box layout -->
 {% endblock %}
+
+{% macro render_company(company, leadId, color) %}
+    {% set companyName = htmlEntityDecode(company.companyname) %}
+    <div data-company-id="{{ company.id }}" class="d-flex ai-center gap-xs">
+        <a id="company-{{ company.id }}" class="label label-{{ color }}" href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}) }}" data-toggle="ajax">
+            {% if company.is_primary == 1 %}
+                <i class="ri-user-star-fill company-primary-icon primary" aria-hidden="true" focusable="false"></i>
+            {% endif %}
+            <span>{{ companyName|purify }}</span>
+        </a>
+        {% include '@MauticCore/Helper/button.html.twig' with {'buttons': [{
+            'onclick': 'Mautic.setAsPrimaryCompany(' ~ company.id ~ ', ' ~ leadId ~ ');',
+            'icon': 'ri-check-line',
+            'size': 'sm',
+            'icon_only': true,
+            'variant': 'ghost',
+            'label': 'mautic.lead.company.set.primary'|trans
+        }]} %}
+    </div>
+{% endmacro %}
 
 {% macro render_tag(tag, leadId) %}
     <div id="tagLabel{{ tag.id }}">

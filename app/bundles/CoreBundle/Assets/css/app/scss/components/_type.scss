@@ -399,8 +399,11 @@ code {
 }
 
 pre {
-  min-height: 40px;
   overflow: auto;
+}
+
+.code-snippet--multi pre.code-snippet__code {
+  min-height: 40px;
 }
 
 .code-snippet--multi pre.code-snippet__code:before {
