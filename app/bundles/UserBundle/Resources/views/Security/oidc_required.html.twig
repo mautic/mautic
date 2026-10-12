@@ -1,5 +1,5 @@
 {% extends app.request.xmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticUser/Security/base.html.twig' %}
-{% block headerTitle %}{% trans with {'%provider%': 'OpenID Connect'} %}mautic.open_id.login_required.header{% endtrans %}{% endblock %}
+{% block headerTitle %}{% trans with {'%provider%': 'OpenID Connect'} %}mautic.open_id.required.header{% endtrans %}{% endblock %}
 
 {% block content %}
     {% if app.request.xmlHttpRequest %}
