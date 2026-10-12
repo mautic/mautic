@@ -899,7 +899,6 @@ class Event implements ChannelInterface, UuidInterface
      */
     public function setTriggerRestrictedStartHour(string|\DateTimeInterface|null $triggerRestrictedStartHour): static
     {
-        /** @var \DateTime|null $triggerRestrictedStartHour */
         $triggerRestrictedStartHour = $this->convertToDateTime($triggerRestrictedStartHour);
 
         $this->isChanged('triggerRestrictedStartHour', $triggerRestrictedStartHour ? $triggerRestrictedStartHour->format('H:i') : $triggerRestrictedStartHour);
@@ -924,7 +923,6 @@ class Event implements ChannelInterface, UuidInterface
      */
     public function setTriggerRestrictedStopHour(string|\DateTime|null $triggerRestrictedStopHour): static
     {
-        /** @var \DateTime|null $triggerRestrictedStopHour */
         $triggerRestrictedStopHour = $this->convertToDateTime($triggerRestrictedStopHour);
 
         $this->isChanged('triggerRestrictedStopHour', $triggerRestrictedStopHour ? $triggerRestrictedStopHour->format('H:i') : $triggerRestrictedStopHour);
@@ -982,7 +980,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->failedCount;
     }
 
-    private function convertToDateTime(mixed $triggerDate): mixed
+    private function convertToDateTime(mixed $triggerDate): ?\DateTime
     {
         if (empty($triggerDate)) {
             return null;
