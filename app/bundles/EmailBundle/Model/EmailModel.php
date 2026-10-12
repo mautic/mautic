@@ -254,6 +254,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
             // Force translations for this entity to use the same segments
             if ('list' == $entity->getEmailType() && $entity->hasTranslations()) {
+                /** @var Email[] $translations */
                 $translations                      = $entity->getTranslationChildren()->toArray();
                 $this->updatingTranslationChildren = true;
                 foreach ($translations as $translation) {

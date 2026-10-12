@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
@@ -389,6 +390,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
     {
         $related  = [];
         $parent   = $page->getTranslationParent();
+
+        /** @var Collection<int, Page>|null $children */
         $children = $page->getTranslationChildren();
 
         if (!$parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface && !$children instanceof \Doctrine\Common\Collections\Collection) {
