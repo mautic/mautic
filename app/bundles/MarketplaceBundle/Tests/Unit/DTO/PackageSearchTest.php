@@ -15,8 +15,8 @@ final class PackageSearchTest extends TestCase
     {
         $filter = new PackageSearch($search);
 
-        self::assertSame($query, $filter->query);
-        self::assertSame($type, $filter->type);
+        $this->assertSame($query, $filter->query);
+        $this->assertSame($type, $filter->type);
     }
 
     /**

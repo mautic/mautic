@@ -55,15 +55,15 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $this->getClientMockHandler()->append(new Response(200, [], json_encode($payload, JSON_THROW_ON_ERROR)));
         $crawler = $this->client->request('GET', '/s/marketplace/detail/koco/mautic-recaptcha-bundle');
         self::assertResponseIsSuccessful();
-        self::assertCount(0, $crawler->filter('blockquote'));
-        self::assertSame('Included features', $crawler->filter('.marketplace-description h2')->text());
-        self::assertSame('Recovery emails', $crawler->filter('.marketplace-description li strong')->text());
-        self::assertCount(0, $crawler->filter('.marketplace-description script'));
-        self::assertCount(0, $crawler->filter('.marketplace-description a[href^="javascript:"]'));
-        self::assertStringContainsString('Campaign example', $crawler->filter('.marketplace-header h1')->text());
-        self::assertStringContainsString('Retail', $crawler->text());
-        self::assertStringContainsString('^7.0', $crawler->text());
-        self::assertStringContainsString('conversions', $crawler->text());
+        $this->assertCount(0, $crawler->filter('blockquote'));
+        $this->assertSame('Included features', $crawler->filter('.marketplace-description h2')->text());
+        $this->assertSame('Recovery emails', $crawler->filter('.marketplace-description li strong')->text());
+        $this->assertCount(0, $crawler->filter('.marketplace-description script'));
+        $this->assertCount(0, $crawler->filter('.marketplace-description a[href^="javascript:"]'));
+        $this->assertStringContainsString('Campaign example', $crawler->filter('.marketplace-header h1')->text());
+        $this->assertStringContainsString('Retail', $crawler->text());
+        $this->assertStringContainsString('^7.0', $crawler->text());
+        $this->assertStringContainsString('conversions', $crawler->text());
     }
 
     /**

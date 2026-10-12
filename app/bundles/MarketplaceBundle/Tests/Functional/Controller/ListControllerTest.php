@@ -80,15 +80,15 @@ final class ListControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', '/s/marketplace', ['search' => $search, 'limit' => 1]);
         $this->assertResponseIsSuccessful();
         $this->assertPackageRows($crawler, ['Newsletter '.$label.' One'], [$label]);
-        self::assertStringContainsString('2 items, 2 pages in total', $crawler->text(null, true));
+        $this->assertStringContainsString('2 items, 2 pages in total', $crawler->text(null, true));
         $popover = new Crawler($crawler->filter('button[data-toggle="popover"]')->attr('data-content'));
-        self::assertSame('type:'.$type, $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
-        self::assertCount(1, $popover->filter('[onclick="Mautic.applyFilters()"]'));
-        self::assertCount(1, $popover->filter('[onclick="Mautic.resetFilters()"]'));
+        $this->assertSame('type:'.$type, $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
+        $this->assertCount(1, $popover->filter('[onclick="Mautic.applyFilters()"]'));
+        $this->assertCount(1, $popover->filter('[onclick="Mautic.resetFilters()"]'));
 
         $pageLink = $crawler->filter('a[href*="/marketplace/2?"]')->first()->attr('href');
         parse_str(parse_url($pageLink, PHP_URL_QUERY), $pageQuery);
-        self::assertSame($search, $pageQuery['search']);
+        $this->assertSame($search, $pageQuery['search']);
         $crawler = $this->client->request('GET', $pageLink);
         $this->assertResponseIsSuccessful();
         $this->assertPackageRows($crawler, ['Newsletter '.$label.' Two'], [$label]);
@@ -100,10 +100,10 @@ final class ListControllerTest extends MauticMysqlTestCase
             'Newsletter Theme One', 'Newsletter Theme Two',
             'Newsletter Campaign One', 'Newsletter Campaign Two',
         ], ['Plugin', 'Plugin', 'Theme', 'Theme', 'Campaign', 'Campaign']);
-        self::assertStringContainsString('6 items, 1 page in total', $crawler->text(null, true));
+        $this->assertStringContainsString('6 items, 1 page in total', $crawler->text(null, true));
         $popover = new Crawler($crawler->filter('button[data-toggle="popover"]')->attr('data-content'));
-        self::assertSame('', $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
-        self::assertCount(0, $this->getClientMockHandler());
+        $this->assertSame('', $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
+        $this->assertCount(0, $this->getClientMockHandler());
     }
 
     public function testChangingTypeViaAjaxReplacesTheDisplayedPackages(): void
@@ -119,9 +119,9 @@ final class ListControllerTest extends MauticMysqlTestCase
             $crawler  = new Crawler($response['newContent']);
             $this->assertPackageRows($crawler, ['Newsletter '.$label.' One', 'Newsletter '.$label.' Two'], [$label, $label]);
             $popover = new Crawler($crawler->filter('button[data-toggle="popover"]')->attr('data-content'));
-            self::assertSame('type:mautic-'.$type, $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
+            $this->assertSame('type:mautic-'.$type, $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
         }
-        self::assertCount(0, $this->getClientMockHandler());
+        $this->assertCount(0, $this->getClientMockHandler());
     }
 
     public function testTypeFilterWithNoMatchesCanBeReset(): void
@@ -137,13 +137,13 @@ final class ListControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', '/s/marketplace', ['search' => 'nonexistent type:mautic-theme', 'limit' => 10]);
         $this->assertResponseIsSuccessful();
         $this->assertPackageRows($crawler, [], []);
-        self::assertSame('nonexistent type:mautic-theme', $crawler->filter('#list-search')->attr('value'));
+        $this->assertSame('nonexistent type:mautic-theme', $crawler->filter('#list-search')->attr('value'));
 
         $crawler = $this->client->request('GET', '/s/marketplace', ['search' => '']);
         $this->assertResponseIsSuccessful();
-        self::assertCount(6, $crawler->filter('#marketplace-packages-table .package-name a'));
-        self::assertSame('', $crawler->filter('#list-search')->attr('value'));
-        self::assertCount(0, $this->getClientMockHandler());
+        $this->assertCount(6, $crawler->filter('#marketplace-packages-table .package-name a'));
+        $this->assertSame('', $crawler->filter('#list-search')->attr('value'));
+        $this->assertCount(0, $this->getClientMockHandler());
     }
 
     /**
@@ -167,8 +167,8 @@ final class ListControllerTest extends MauticMysqlTestCase
      */
     private function assertPackageRows(Crawler $crawler, array $names, array $types): void
     {
-        self::assertSame($names, array_map(trim(...), $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])));
-        self::assertSame($types, array_map(trim(...), $crawler->filter('#marketplace-packages-table .package-type')->extract(['_text'])));
+        $this->assertSame($names, array_map(trim(...), $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])));
+        $this->assertSame($types, array_map(trim(...), $crawler->filter('#marketplace-packages-table .package-type')->extract(['_text'])));
     }
 
     public function testFilterSurvivesReturningFromDetailAndCanBeCleared(): void
@@ -192,24 +192,24 @@ final class ListControllerTest extends MauticMysqlTestCase
         $backLink = $crawler->filter('a.btn-back')->attr('href');
         $crawler = $this->client->request('GET', $backLink);
         self::assertResponseIsSuccessful();
-        self::assertSame($search, $crawler->filter('#list-search')->attr('value'));
+        $this->assertSame($search, $crawler->filter('#list-search')->attr('value'));
         $popover = new Crawler($crawler->filter('button[data-toggle="popover"]')->attr('data-content'));
-        self::assertSame('type:mautic-resource', $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
+        $this->assertSame('type:mautic-resource', $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
         parse_str($handler->getLastRequest()->getUri()->getQuery(), $query);
-        self::assertSame('mautic-resource', $query['type']);
-        self::assertSame('newsletter', $query['query']);
+        $this->assertSame('mautic-resource', $query['type']);
+        $this->assertSame('newsletter', $query['query']);
         $this->assertPackageRows($crawler, ['Newsletter Campaign One', 'Newsletter Campaign Two'], ['Campaign', 'Campaign']);
 
         $this->client->request('GET', '/s/marketplace', ['search' => '']);
         self::assertResponseIsSuccessful();
         $crawler = $this->client->request('GET', '/s/marketplace');
         self::assertResponseIsSuccessful();
-        self::assertSame('', $crawler->filter('#list-search')->attr('value'));
+        $this->assertSame('', $crawler->filter('#list-search')->attr('value'));
         parse_str($handler->getLastRequest()->getUri()->getQuery(), $query);
-        self::assertArrayNotHasKey('type', $query);
-        self::assertArrayNotHasKey('query', $query);
-        self::assertCount(6, $crawler->filter('#marketplace-packages-table .package-name a'));
-        self::assertCount(0, $handler);
+        $this->assertArrayNotHasKey('type', $query);
+        $this->assertArrayNotHasKey('query', $query);
+        $this->assertCount(6, $crawler->filter('#marketplace-packages-table .package-name a'));
+        $this->assertCount(0, $handler);
     }
 
     public function testMarketplaceListHandlesEmptyResults(): void
