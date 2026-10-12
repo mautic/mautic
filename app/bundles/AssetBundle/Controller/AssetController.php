@@ -298,6 +298,8 @@ final class AssetController extends AbstractStandardFormController
             $entity = $model->getEntity();
         }
 
+        \assert($entity instanceof \Mautic\AssetBundle\Entity\Asset);
+
         $entity->setMaxSize(FileHelper::convertMegabytesToBytes($this->coreParametersHelper->get('max_size')));
 
         $method  = $request->getMethod();

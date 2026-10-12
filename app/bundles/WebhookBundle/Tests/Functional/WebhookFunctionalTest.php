@@ -138,6 +138,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $webhookQueues = $this->getWebhookQueue($webhook->getId());
         foreach ($webhookQueues as $webhookQueue) {
+            \assert($webhookQueue instanceof \Mautic\WebhookBundle\Entity\WebhookQueue);
             $webhookQueue->setRetries(2);
             $webhookQueue->setDateModified(new \DateTimeImmutable()->modify('-3601 seconds'));
             $this->em->persist($webhookQueue);

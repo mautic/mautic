@@ -114,6 +114,7 @@ final class WidgetType extends AbstractType
                     $params = $data['params'];
                 }
             } else {
+                \assert($data instanceof \Mautic\DashboardBundle\Entity\Widget);
                 $type   = $data->getType();
                 $params = $data->getParams();
             }

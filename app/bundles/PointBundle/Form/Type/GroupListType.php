@@ -38,6 +38,7 @@ final class GroupListType extends AbstractType
                 $groups  = $this->repo->getEntities();
                 $choices = [];
                 foreach ($groups as $l) {
+                    \assert($l instanceof Group);
                     $choices[$l->getName().' ('.$l->getId().')'] = $l->getId();
                 }
 

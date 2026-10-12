@@ -159,6 +159,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $response  = $this->notificationApi->sendNotification($playerIds, $sendNotification);
 
                 foreach ($playerIdsChunk as $log) {
+                    \assert($log instanceof LeadEventLog);
                     if (!isset($processedLogs[$log->getId()])) {
                         $processedLogs[$log->getId()] = $log;
                         $this->processResponse($response, $event, $log, $notification, $sendNotification);

@@ -457,6 +457,7 @@ final class DashboardController extends AbstractFormController
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
                     if (!empty($fileData)) {
+                        \assert($fileData instanceof \Symfony\Component\HttpFoundation\File\UploadedFile);
                         $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);
                         if ('json' === $extension) {
                             $fileData->move($directories['user'], $fileData->getClientOriginalName());
