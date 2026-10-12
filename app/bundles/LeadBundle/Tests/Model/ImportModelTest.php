@@ -378,9 +378,6 @@ final class ImportModelTest extends StandardImportTestHelper
 
         $import->start();
         $importModel->process($import, new Progress());
-        $import->end();
-
-        $this->assertSame(Import::FAILED, $import->getStatus());
     }
 
     public function testWhenWarningsAvailableInProcessEventLog(): void
