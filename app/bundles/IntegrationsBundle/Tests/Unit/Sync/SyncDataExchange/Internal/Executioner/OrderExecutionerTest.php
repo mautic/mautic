@@ -311,6 +311,7 @@ final class OrderExecutionerTest extends TestCase
 
                         $createdObjectMappings = [];
                         foreach ($event->getCreateObjects() as $createObject) {
+                            \assert($createObject instanceof ObjectChangeDAO);
                             $objectMapping = new ObjectMapping();
                             $objectMapping->setIntegration($createObject->getIntegration());
                             $objectMapping->setIntegrationObjectName($createObject->getObject());
@@ -328,6 +329,7 @@ final class OrderExecutionerTest extends TestCase
 
                         $createdObjectMappings = [];
                         foreach ($event->getCreateObjects() as $createObject) {
+                            \assert($createObject instanceof ObjectChangeDAO);
                             $objectMapping = new ObjectMapping();
                             $objectMapping->setIntegration($createObject->getIntegration());
                             $objectMapping->setIntegrationObjectName($createObject->getObject());

@@ -57,18 +57,19 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );
 
-            if ($event->getItem()) {
+            if ($item = $event->getItem()) {
+                \assert($item instanceof \Mautic\LeadBundle\Entity\Lead);
                 $lookupContactButton = [
                     'attr' => [
                         'data-toggle' => 'ajaxmodal',
                         'data-target' => '#MauticSharedModal',
                         'data-header' => $this->translator->trans(
                             'mautic.plugin.fullcontact.lookup.header',
-                            ['%item%' => $event->getItem()->getEmail()]
+                            ['%item%' => $item->getEmail()]
                         ),
                         'href' => $this->router->generate(
                             'mautic_plugin_fullcontact_action',
-                            ['objectId' => $event->getItem()->getId(), 'objectAction' => 'lookupPerson']
+                            ['objectId' => $item->getId(), 'objectAction' => 'lookupPerson']
                         ),
                     ],
                     'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
@@ -111,18 +112,19 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
                     ButtonHelper::LOCATION_BULK_ACTIONS
                 );
 
-                if ($event->getItem()) {
+                if ($item = $event->getItem()) {
+                    \assert($item instanceof \Mautic\LeadBundle\Entity\Company);
                     $lookupCompanyButton = [
                         'attr' => [
                             'data-toggle' => 'ajaxmodal',
                             'data-target' => '#MauticSharedModal',
                             'data-header' => $this->translator->trans(
                                 'mautic.plugin.fullcontact.lookup.header',
-                                ['%item%' => $event->getItem()->getName()]
+                                ['%item%' => $item->getName()]
                             ),
                             'href' => $this->router->generate(
                                 'mautic_plugin_fullcontact_action',
-                                ['objectId' => $event->getItem()->getId(), 'objectAction' => 'lookupCompany']
+                                ['objectId' => $item->getId(), 'objectAction' => 'lookupCompany']
                             ),
                         ],
                         'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),

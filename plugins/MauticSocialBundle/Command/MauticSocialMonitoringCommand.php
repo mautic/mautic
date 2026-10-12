@@ -61,6 +61,7 @@ final class MauticSocialMonitoringCommand extends Command
         $maxPerIterations = ceil((int) $batchSize / count($monitorList));
 
         foreach ($monitorList as $monitor) {
+            \assert($monitor instanceof \MauticPlugin\MauticSocialBundle\Entity\Monitoring);
             $output->writeln('Executing Monitor Item '.$monitor->getId());
             $resultCode = $this->processMonitorListItem($monitor, $maxPerIterations, $input, $output);
             $output->writeln('Result Code: '.$resultCode);
@@ -95,6 +96,8 @@ final class MauticSocialMonitoringCommand extends Command
     }
 
     /**
+     * @param \MauticPlugin\MauticSocialBundle\Entity\Monitoring $listItem
+     *
      * @throws \Exception
      */
     private function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int

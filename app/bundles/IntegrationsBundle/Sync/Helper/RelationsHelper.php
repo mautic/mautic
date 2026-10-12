@@ -98,6 +98,7 @@ final class RelationsHelper
         $relationObject->setRelObjectInternalId($relObjectId);
         $objectDAO      = $syncReport->getObject($relationObject->getObjectName(), $relationObject->getObjectIntegrationId());
         $referenceValue = $objectDAO->getField($relationObject->getRelFieldName())->getValue()->getNormalizedValue();
+        \assert($referenceValue instanceof \Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO);
         $referenceValue->setType($relInternalType);
         $referenceValue->setValue($relObjectId);
     }

@@ -36,7 +36,9 @@ final class IntegrationCampaignsTaskType extends AbstractType
                 'constraints' => [
                     new Callback(
                         function ($validateMe, ExecutionContextInterface $context): void {
-                            $data = $context->getRoot()->getData();
+                            $root = $context->getRoot();
+                            \assert($root instanceof \Symfony\Component\Form\FormInterface);
+                            $data = $root->getData();
                             if (!empty($data['properties']['config']['push_activities']) && empty($validateMe)) {
                                 $context->buildViolation('mautic.core.value.required')->addViolation();
                             }
@@ -67,7 +69,9 @@ final class IntegrationCampaignsTaskType extends AbstractType
                 'constraints'       => [
                     new Callback(
                         function ($validateMe, ExecutionContextInterface $context): void {
-                            $data = $context->getRoot()->getData();
+                            $root = $context->getRoot();
+                            \assert($root instanceof \Symfony\Component\Form\FormInterface);
+                            $data = $root->getData();
                             if (!empty($data['properties']['config']['push_activities']) && empty($validateMe)) {
                                 $context->buildViolation('mautic.core.value.required')->addViolation();
                             }
