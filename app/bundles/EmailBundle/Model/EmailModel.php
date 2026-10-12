@@ -1094,6 +1094,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         foreach ($lists as $list) {
+            \assert($list instanceof \Mautic\LeadBundle\Entity\LeadList);
             if (!$batch && null !== $limit && $limit <= 0) {
                 // Hit the max for this batch
                 break;
@@ -1207,6 +1208,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                     $totalAbWeight = array_sum(array_column($abTestSettings['variants'], 'weight'));
 
                     foreach ($childrenVariant as $child) {
+                        \assert($child instanceof Email);
                         if ($child->isPublished()) {
                             $childWeight = $totalAbWeight > 0
                                 ? $abTestSettings['variants'][$child->getId()]['weight'] / $totalAbWeight
@@ -2151,6 +2153,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $assetAttachments = [],
         bool $saveStat = true,
     ): false|array {
+        \assert($email instanceof Email);
         if (!$emailId = $email->getId()) {
             return false;
         }
@@ -2256,6 +2259,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         $ids = [];
         foreach ($entities as $entity) {
+            \assert($entity instanceof Email);
             $ids[] = $entity->getId();
         }
 
@@ -2340,6 +2344,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     protected function setCachedCount(mixed $entity): void
     {
+        \assert($entity instanceof Email);
         $queued = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
 
         if (null !== $queued) {
@@ -2399,6 +2404,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             // No emails sent yet — fall back to variant_start_date
             $email            = $this->getEntity($emailId);
             [$parent]         = $email->getVariants();
+            \assert($parent instanceof Email);
             $variantStartDate = $parent->getVariantStartDate();
             if ($variantStartDate) {
                 $startDate = clone $variantStartDate;

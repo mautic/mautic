@@ -29,6 +29,7 @@ final readonly class FormUploader
 
         try {
             foreach ($filesToUpload as $fileFieldCrate) {
+                \assert($fileFieldCrate instanceof \Mautic\FormBundle\Crate\FileFieldCrate);
                 $field           = $fileFieldCrate->getField();
                 $alias           = $field->getAlias();
                 $uploadDir       = $this->getUploadDir($field);

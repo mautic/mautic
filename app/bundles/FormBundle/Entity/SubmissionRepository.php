@@ -52,6 +52,7 @@ final class SubmissionRepository extends CommonRepository
     public function getEntities(array $args = []): iterable
     {
         $form = $args['form'];
+        \assert($form instanceof Form);
 
         // DBAL
         $viewOnlyFields = $args['viewOnlyFields'] ?? [];
@@ -216,6 +217,7 @@ final class SubmissionRepository extends CommonRepository
     public function getEntitiesByPage(array $args = []): array
     {
         $activePage = $args['activePage'];
+        \assert($activePage instanceof \Mautic\PageBundle\Entity\Page);
 
         $dq = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $dq->select('count(s.id) as count')

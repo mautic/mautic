@@ -21,6 +21,8 @@ final readonly class PointEventHelper
             return false;
         }
 
+        \assert($eventDetails instanceof \Mautic\EmailBundle\Entity\Email);
+
         $emailId = $eventDetails->getId();
 
         if (isset($action['properties']['emails'])) {

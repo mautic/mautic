@@ -18,6 +18,7 @@ final class StatHelperContainer
         iterable $helpersIterator,
     ) {
         foreach ($helpersIterator as $helper) {
+            \assert($helper instanceof StatHelperInterface);
             $this->helpers[$helper->getName()] = $helper;
         }
     }

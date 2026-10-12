@@ -98,6 +98,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
         $lead = $event->getLead();
+        \assert(null === $lead || $lead instanceof \Mautic\LeadBundle\Entity\Lead);
 
         if (!$lead || !$lead->getId()) {
             $event->fail();

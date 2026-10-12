@@ -470,6 +470,7 @@ final class SubmissionModel extends CommonFormModel
      */
     public function exportResults($format, $form, array $queryArgs): StreamedResponse|Response
     {
+        \assert($form instanceof Form);
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
         $queryArgs['simpleResults']  = true;

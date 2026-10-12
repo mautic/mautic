@@ -289,6 +289,7 @@ class Form extends FormEntity implements UuidInterface
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array
     {
         $data   = $form->getData();
+        \assert($data instanceof self);
         $groups = ['form'];
 
         $postAction = $data->getPostAction();

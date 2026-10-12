@@ -464,6 +464,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
                     $total = 0;
                     foreach ($children as $child) {
+                        \assert($child instanceof Email);
                         $settings = $child->getVariantSettings();
                         $total += (int) $settings['weight'];
                     }

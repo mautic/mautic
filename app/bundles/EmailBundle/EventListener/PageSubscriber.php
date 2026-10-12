@@ -55,6 +55,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
             }
 
             if (!empty($stat)) {
+                \assert($stat instanceof Stat);
                 // Check to see if it has been marked as opened
                 if (!$stat->isRead()) {
                     // Mark it as read

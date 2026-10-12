@@ -65,6 +65,9 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
             return;
         }
 
+        $variantStartDate = $email->getVariantStartDate();
+        \assert(null === $variantStartDate || $variantStartDate instanceof \DateTimeInterface);
+
         $emailData = [
             'id'                   => $email->getId(),
             'translation_parent_id'=> $email->getTranslationParent()?->getId(),
@@ -89,7 +92,7 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
             'revision'             => $email->getRevision(),
             'lang'                 => $email->getLanguage(),
             'variant_settings'     => $email->getVariantSettings(),
-            'variant_start_date'   => $email->getVariantStartDate()?->format(DATE_ATOM),
+            'variant_start_date'   => $variantStartDate?->format(DATE_ATOM),
             'dynamic_content'      => $email->getDynamicContent(),
             'headers'              => $email->getHeaders(),
             'public_preview'       => $email->getPublicPreview(),

@@ -336,6 +336,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
             // Merge stats from variant children
             foreach ($email->getVariantChildren() as $child) {
+                \assert($child instanceof Email);
                 $stats = array_merge(
                     $stats,
                     $this->statRepository->getSentCountForContacts($contactIds, $child->getId())

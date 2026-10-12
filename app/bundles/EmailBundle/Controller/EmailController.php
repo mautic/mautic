@@ -349,6 +349,7 @@ final class EmailController extends AbstractStandardFormController
 
         // get A/B test information
         [$parent, $children] = $email->getVariants();
+        \assert($parent instanceof Email);
 
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
@@ -427,10 +428,10 @@ final class EmailController extends AbstractStandardFormController
                 'criteria'                   => $criteria['criteria'],
                 'winnerCriteria'             => $abTestSettings ? $abTestSettings['winnerCriteria'] : null,
                 'configurationError'         => $abTestSettings ? $abTestSettings['configurationError'] : null,
-                'hoursLeftToDetermineWinner' => $parent ? $model->timeLeftToDetermineWinner(
+                'hoursLeftToDetermineWinner' => $model->timeLeftToDetermineWinner(
                     $parent->getId(),
                     $abTestSettings['sendWinnerDelay'] ?? null
-                ) : null,
+                ),
                 'abTestSettings'             => $abTestSettings ?? [],
             ];
 
