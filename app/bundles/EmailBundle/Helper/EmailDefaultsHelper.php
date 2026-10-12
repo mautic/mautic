@@ -54,7 +54,7 @@ class EmailDefaultsHelper
             }
         }
 
-        return $page !== null ? $this->resolveTranslation($page, $lead, $request) : null;
+        return null !== $page ? $this->resolveTranslation($page, $lead, $request) : null;
     }
 
     private function resolveTranslation(Page $page, ?Lead $lead, ?Request $request): Page
