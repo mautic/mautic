@@ -150,7 +150,7 @@ trait TranslationEntityTrait
     /**
      * Get translation parent/children.
      *
-     * @return array<mixed>
+     * @return array<int, TranslationEntityInterface|array<TranslationEntityInterface>>
      */
     public function getTranslations(bool $onlyChildren = false): array
     {
