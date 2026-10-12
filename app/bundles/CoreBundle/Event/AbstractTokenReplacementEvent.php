@@ -18,9 +18,9 @@ abstract class AbstractTokenReplacementEvent extends CommonEvent
     protected array|string|null $content;
 
     /**
-     * @var array
+     * @var array<string, string>
      */
-    protected $tokens = [];
+    protected array $tokens = [];
 
     private ?Stat $stat = null;
 
@@ -91,11 +91,14 @@ abstract class AbstractTokenReplacementEvent extends CommonEvent
         return $this->entity;
     }
 
-    public function addToken($token, $value): void
+    public function addToken(string $token, string $value): void
     {
         $this->tokens[$token] = $value;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getTokens(): array
     {
         return $this->tokens;
