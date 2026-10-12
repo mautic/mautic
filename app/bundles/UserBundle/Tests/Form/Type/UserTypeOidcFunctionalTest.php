@@ -170,11 +170,40 @@ final class UserTypeOidcFunctionalTest extends MauticMysqlTestCase
 
         // Submit with valid data including OIDC subject ID
         $crawler = $this->client->request('GET', '/s/users/edit/'.$userId);
-        $form    = $crawler->selectButton('Save & Close')->form();
 
+        // Find the first submit button
+        $buttonNode = $crawler->filter('button[type="submit"]')->first();
+        if (0 === $buttonNode->count()) {
+            $this->fail('No submit button found on page');
+        }
+
+        $form = $crawler->selectButton($buttonNode->text())->form();
+
+        // Fill in all required fields explicitly
+        $form['user[firstName]'] = 'Test';
+        $form['user[lastName]'] = 'User';
+        $form['user[username]'] = 'testuser3';
+        $form['user[email]'] = 'test3@example.com';
+        $form['user[role]'] = (string) $role->getId();
+        $form['user[timezone]'] = 'UTC';
+        $form['user[locale]'] = 'en_US';
         $form['user[subjectID][subjectID]'] = 'valid-oidc-id-123';
 
+        // Make sure password is not set (editing existing user)
+        if (isset($form['user[plainPassword][password]'])) {
+            $form['user[plainPassword][password]'] = '';
+            $form['user[plainPassword][confirm]'] = '';
+        }
+
         $this->client->submit($form);
+
+        // Debug: check response
+        $response = $this->client->getResponse();
+        if (!$response->isRedirect()) {
+            // Dump response to see what's wrong
+            file_put_contents('/tmp/form_response.html', $response->getContent());
+            $this->fail('Form submission failed. Response saved to /tmp/form_response.html. Status: '.$response->getStatusCode());
+        }
 
         // Should redirect to users list (success)
         $this->assertResponseIsSuccessful();
