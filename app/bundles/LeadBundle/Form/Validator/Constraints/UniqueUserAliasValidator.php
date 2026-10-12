@@ -24,6 +24,8 @@ final class UniqueUserAliasValidator extends ConstraintValidator
             throw new ConstraintDefinitionException('A field has to be specified.');
         }
 
+        \assert($list instanceof \Mautic\LeadBundle\Entity\LeadList);
+
         if ($list->getAlias()) {
             $lists = $this->segmentRepository->getLists(
                 $this->userHelper->getUser(),

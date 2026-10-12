@@ -288,6 +288,8 @@ final class ListApiController extends CommonApiController
             return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
         }
         if ('delete' == $action) {
+            \assert($entity instanceof \Mautic\LeadBundle\Entity\LeadList);
+
             return $this->security->hasEntityAccess(
                 true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
             );

@@ -503,6 +503,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
                 }
 
                 if (!empty($company)) {
+                    \assert($companyEntity instanceof \Mautic\LeadBundle\Entity\Company);
                     // Save after the lead in for new leads created
                     $this->companyModel->addLeadToCompany($companyEntity, $lead);
                     $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
@@ -530,6 +531,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
             return;
         }
+
+        \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
 
         if ($event->checkContext('lead.device')) {
             $result = $this->validateContactDevice($event, $lead);

@@ -927,6 +927,7 @@ final class LeadController extends AbstractFormController
             mkdir($avatarDir);
         }
 
+        \assert($file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile);
         $file->move($avatarDir, 'avatar'.$lead->getId());
 
         // remove the file from request
@@ -1007,6 +1008,7 @@ final class LeadController extends AbstractFormController
 
         $leadChoices = [];
         foreach ($leads as $l) {
+            \assert($l instanceof \Mautic\LeadBundle\Entity\Lead);
             $leadChoices[$l->getPrimaryIdentifier()] = $l->getId();
         }
 
@@ -1647,6 +1649,7 @@ final class LeadController extends AbstractFormController
             }
 
             foreach ($entities as $key => $lead) {
+                \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
                 if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                     unset($entities[$key]);
                 }
@@ -1765,6 +1768,7 @@ final class LeadController extends AbstractFormController
 
             if ($count) {
                 foreach ($entities as $lead) {
+                    \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
                     if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                         $doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason']);
                     }
@@ -1837,6 +1841,7 @@ final class LeadController extends AbstractFormController
 
             $count = 0;
             foreach ($entities as $lead) {
+                \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
                 if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                     ++$count;
 
@@ -1943,6 +1948,7 @@ final class LeadController extends AbstractFormController
             }
             $count = 0;
             foreach ($entities as $lead) {
+                \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
                 if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                     ++$count;
 
@@ -2440,6 +2446,7 @@ final class LeadController extends AbstractFormController
         $pointGroups = $pointGroupModel->getEntities();
         $fields      = [];
         foreach ($pointGroups as $group) {
+            \assert($group instanceof \Mautic\PointBundle\Entity\Group);
             $fields[] = ContactGroupPointsType::getFieldKey($group->getId());
         }
 
@@ -2462,6 +2469,7 @@ final class LeadController extends AbstractFormController
                     $leadUpdated = false;
                     $postData    = $form->getData();
                     foreach ($pointGroups as $group) {
+                        \assert($group instanceof \Mautic\PointBundle\Entity\Group);
                         $scoreKey = ContactGroupPointsType::getFieldKey($group->getId());
                         $oldScore = $initData[$scoreKey] ?? null;
                         $newScore = $postData[$scoreKey];

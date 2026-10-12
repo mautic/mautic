@@ -429,6 +429,7 @@ class LeadModel extends FormModel
         parent::saveEntity($entity, $unlock);
 
         if (!empty($company)) {
+            \assert($companyEntity instanceof \Mautic\LeadBundle\Entity\Company);
             // Save after the lead in for new leads created through the API and maybe other places
             $this->companyModel->addLeadToCompany($companyEntity, $entity);
             $this->setPrimaryCompany($companyEntity->getId(), $entity->getId());
@@ -1344,6 +1345,8 @@ class LeadModel extends FormModel
             } else {
                 $stage = $stages[$stageName];
             }
+
+            \assert($stage instanceof \Mautic\StageBundle\Entity\Stage);
 
             $lead->setStage($stage);
 

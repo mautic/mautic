@@ -148,6 +148,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
      */
     private function handleValidateOwner(array &$matchedFields): ?int
     {
+        /** @var \Mautic\UserBundle\Entity\User|null $owner */
         $owner = ArrayHelper::pickValue('owner', $matchedFields);
 
         return $owner ? $owner->getId() : null;

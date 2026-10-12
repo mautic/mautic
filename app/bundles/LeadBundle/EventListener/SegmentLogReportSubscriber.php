@@ -87,6 +87,8 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
 
         $dateFrom = $event->getOptions()['dateFrom'] ?? (new \DateTime('-30 days'));
         $dateTo   = $event->getOptions()['dateTo'] ?? (new \DateTime());
+        \assert($dateFrom instanceof \DateTimeInterface);
+        \assert($dateTo instanceof \DateTimeInterface);
 
         $qb->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
         $qb->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));

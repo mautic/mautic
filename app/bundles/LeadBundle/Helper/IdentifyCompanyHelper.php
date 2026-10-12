@@ -36,9 +36,11 @@ final readonly class IdentifyCompanyHelper
 
         if ([] !== $companies) {
             $companyEntity = end($companies);
+            \assert($companyEntity instanceof \Mautic\LeadBundle\Entity\Company);
             $companyData   = $companyEntity->getProfileFields();
 
             if ($lead) {
+                \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
                 $companyLead     = $this->companyLeadRepository->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
                 if ([] !== $companyLead) {
                     $addContactToCompany = false;

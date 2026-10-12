@@ -310,6 +310,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             ]);
 
             foreach ($companyEntities as $company) {
+                \assert($company instanceof \Mautic\LeadBundle\Entity\Company);
                 $companyLeadAdd[$company->getId()] = $company;
             }
         }
@@ -418,6 +419,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 );
 
                 foreach ($companyEntities as $company) {
+                    \assert($company instanceof \Mautic\LeadBundle\Entity\Company);
                     $companyLeadRemove[$company->getId()] = $company;
                 }
             }

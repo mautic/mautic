@@ -122,6 +122,7 @@ final class AjaxController extends CommonAjaxController
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
 
             foreach ($leads as $lead) {
+                \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
                 $fields = $this->leadRepository->getFieldValues($lead->getId());
                 $lead->setFields($fields);
                 $name = $lead->getName();

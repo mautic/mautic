@@ -345,6 +345,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
 
         [$contact, $fields] = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], true, true);
+        \assert($contact instanceof \Mautic\LeadBundle\Entity\Lead);
         $this->assertEquals(['email' => 'Email'], $mockLeadModel->getAvailableLeadFields());
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertNull($contact->getFirstname());

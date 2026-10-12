@@ -75,6 +75,7 @@ final class CompanyController extends AbstractFormController
             ]) : [];
             $count = 0;
             foreach ($companies as $company) {
+                \assert($company instanceof \Mautic\LeadBundle\Entity\Company);
                 if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $company->getPermissionUser())) {
                     $company->setOwner($this->userRepository->find((int) ($data['addowner'] ?? 0)));
                     ++$count;

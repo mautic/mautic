@@ -205,7 +205,11 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            fn ($contact): bool => empty($contact->getFields()) || 'value1' !== $contact->getField(self::FIELD_NAME)['value'],
+            function ($contact): bool {
+                \assert($contact instanceof \Mautic\LeadBundle\Entity\Lead);
+
+                return empty($contact->getFields()) || 'value1' !== $contact->getField(self::FIELD_NAME)['value'];
+            },
         ];
 
         // to test multiple excluding values
@@ -214,8 +218,12 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            fn ($contact): bool => empty($contact->getFields())
-            || !in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']),
+            function ($contact): bool {
+                \assert($contact instanceof \Mautic\LeadBundle\Entity\Lead);
+
+                return empty($contact->getFields())
+                    || !in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']);
+            },
         ];
 
         // to test including filter, should NOT contain blank values
@@ -225,7 +233,11 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            fn ($contact): bool => !empty($contact->getFields()) && 'value1' === $contact->getField(self::FIELD_NAME)['value'],
+            function ($contact): bool {
+                \assert($contact instanceof \Mautic\LeadBundle\Entity\Lead);
+
+                return !empty($contact->getFields()) && 'value1' === $contact->getField(self::FIELD_NAME)['value'];
+            },
         ];
 
         // to test multiple including values
@@ -234,8 +246,12 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            fn ($contact): bool => !empty($contact->getFields())
-            && in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']),
+            function ($contact): bool {
+                \assert($contact instanceof \Mautic\LeadBundle\Entity\Lead);
+
+                return !empty($contact->getFields())
+                    && in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']);
+            },
         ];
     }
 }

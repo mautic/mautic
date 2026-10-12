@@ -45,6 +45,7 @@ class FieldList
         $leadFields = [];
 
         foreach ($fields as $f) {
+            \assert($f instanceof \Mautic\LeadBundle\Entity\LeadField);
             if ($byGroup) {
                 $fieldName                              = $this->translator->trans('mautic.lead.field.group.'.$f->getGroup());
                 $leadFields[$fieldName][$f->getAlias()] = $f->getLabel();

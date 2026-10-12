@@ -979,6 +979,7 @@ class FieldModel extends FormModel
         $leadFields = [];
 
         foreach ($fields as $f) {
+            \assert($f instanceof \Mautic\LeadBundle\Entity\LeadField);
             $leadFields[$f->getAlias()] = $f->getLabel();
         }
 

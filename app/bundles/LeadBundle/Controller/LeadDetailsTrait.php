@@ -76,6 +76,7 @@ trait LeadDetailsTrait
 
         // get events for each contact
         foreach ($leads as $lead) {
+            \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
             //  if (!$lead->getEmail()) continue; // discard contacts without email
 
             $engagements = $this->leadDetailsLeadModel->getEngagements($lead, $filters, $orderBy, $page, $limit);

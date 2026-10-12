@@ -281,8 +281,8 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->{$this->getUniqueIdentifiersWherePart()}("l.{$col} = :".$col)
-                ->setParameter($col, $val);
+            $q->{$this->getUniqueIdentifiersWherePart()}("l.{$col} = :".$col);
+            $q->setParameter($col, $val);
         }
 
         // if we have a lead ID lets use it
@@ -389,6 +389,8 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             return $entity;
         }
 
+        \assert($entity instanceof \Mautic\LeadBundle\Entity\Lead);
+
         if ($entity->getFields()) {
             // Pulled from Doctrine memory so don't make unnecessary queries as this has already happened
             return $entity;
@@ -451,6 +453,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             'lead',
             $args,
             function ($r): void {
+                \assert($r instanceof \Mautic\LeadBundle\Entity\Lead);
                 if ($this->triggerModel instanceof TriggerModel) {
                     $r->setColor($this->triggerModel->getColorForLeadPoints($r->getPoints()));
                 }
