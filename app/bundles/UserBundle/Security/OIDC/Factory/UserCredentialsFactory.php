@@ -44,7 +44,7 @@ final readonly class UserCredentialsFactory implements UserCredentialsFactoryInt
 
         // values from the token have precedence over the userinfo endpoint
         // exclude null-valued token claims to preserve userinfo values
-        $data = array_merge($userInfo, array_filter($tokens, fn ($value) => null !== $value));
+        $data = array_merge($userInfo, array_filter($tokens, fn ($value): bool => null !== $value));
         // values are not guaranteed to be set
         $id                = $data[$client->getMappingField()] ?? null;
         $email             = $data['email'] ?? null;

@@ -44,7 +44,7 @@ final class UserTypeOidcFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $subjectId = $this->em->getRepository(OidcSubjectId::class)->findOneBy(['user' => $userId]);
 
-        $this->assertNull($subjectId, 'Subject ID should NOT be saved when validation fails');
+        $this->assertNotInstanceOf(OidcSubjectId::class, $subjectId, 'Subject ID should NOT be saved when validation fails');
     }
 
     /**
@@ -69,7 +69,7 @@ final class UserTypeOidcFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $subjectId = $this->em->getRepository(OidcSubjectId::class)->findOneBy(['user' => $userId]);
 
-        $this->assertNull($subjectId, 'OIDC subject ID should NOT be saved when form is invalid');
+        $this->assertNotInstanceOf(OidcSubjectId::class, $subjectId, 'OIDC subject ID should NOT be saved when form is invalid');
     }
 
     /**
@@ -93,7 +93,7 @@ final class UserTypeOidcFunctionalTest extends MauticMysqlTestCase
 
         $subjectId = $this->em->getRepository(OidcSubjectId::class)->findOneBy(['user' => $userId]);
 
-        $this->assertNotNull($subjectId, 'OIDC subject ID should be saved when form is valid');
+        $this->assertInstanceOf(OidcSubjectId::class, $subjectId, 'OIDC subject ID should be saved when form is valid');
         $this->assertSame('valid-oidc-id-123', $subjectId->getSubjectID());
     }
 
