@@ -10,7 +10,10 @@ use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 
 trait MockedConnectionTrait
 {
-    public function getMockedConnection(): mixed
+    /**
+     * @return MockObject&Connection
+     */
+    public function getMockedConnection(): MockObject
     {
         $platform = $this->createMock(AbstractPlatform::class);
         // DBAL builds a SELECT through the platform's SQL builder, so the mock has to hand
