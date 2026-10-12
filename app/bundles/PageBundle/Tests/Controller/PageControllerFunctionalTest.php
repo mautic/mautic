@@ -7,12 +7,80 @@ namespace Mautic\PageBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ProjectBundle\Entity\Project;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class PageControllerFunctionalTest extends MauticMysqlTestCase
 {
+    #[DataProvider('manualWinnerProvider')]
+    public function testManualWinnerAction(bool $started, bool $published): void
+    {
+        $parent = $this->createPage();
+        $parent->setTitle('Leading page');
+        $parent->setAlias('leading-page');
+        $variant = $this->createPage();
+        $variant->setTitle('Other page');
+        $variant->setAlias('other-page');
+        $parent->setIsPublished(true);
+        $parent->setVariantSettings(['weight' => 50, 'totalWeight' => 100, 'winnerCriteria' => 'page.dwelltime']);
+        $parent->setVariantStartDate($started ? new \DateTime('2020-01-01', new \DateTimeZone('UTC')) : null);
+        $variant->setIsPublished($published);
+        $variant->setVariantParent($parent);
+        $variant->setVariantSettings(['weight' => 50, 'winnerCriteria' => 'page.dwelltime']);
+        $parent->addVariantChild($variant);
+        foreach ([$parent, $variant] as $item) {
+            $hit = new Hit();
+            $hit->setPage($item);
+            $hit->setCode(200);
+            $hit->setDateHit(new \DateTime('2020-01-02 12:00:00', new \DateTimeZone('UTC')));
+            $hit->setDateLeft(new \DateTime($item === $parent ? '2020-01-02 12:02:00' : '2020-01-02 12:00:10', new \DateTimeZone('UTC')));
+            $hit->setTrackingId('manual-winner-'.$item->getId());
+            $this->em->persist($hit);
+        }
+        $this->em->flush();
+        $parentId = $parent->getId();
+        $variantId = $variant->getId();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/pages/view/'.$parentId);
+        $this->assertResponseIsSuccessful();
+        $action = $crawler->filter('a[href="/s/pages/winner/'.$variantId.'"]');
+        $this->assertCount($started && $published ? 1 : 0, $action);
+        if (!$started || !$published) {
+            return;
+        }
+
+        $this->assertCount(1, $action->filter('.ri-trophy-line'));
+        $this->assertCount(1, $crawler->filter('a[href="/s/pages/winner/'.$parentId.'"] .ri-trophy-fill'));
+        $this->assertSame('confirmation', $action->attr('data-toggle'));
+        $this->assertSame('executeAction', $action->attr('data-confirm-callback'));
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, $action->attr('href'));
+        $this->assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $winner = $this->em->find(Page::class, $variantId);
+        $oldParent = $this->em->find(Page::class, $parentId);
+        $this->assertInstanceOf(Page::class, $winner);
+        $this->assertInstanceOf(Page::class, $oldParent);
+        $this->assertNull($winner->getVariantParent());
+        $this->assertTrue($winner->isPublished());
+        $this->assertFalse($oldParent->isPublished());
+        $this->assertSame($winner->getId(), $oldParent->getVariantParent()?->getId());
+    }
+
+    /**
+     * @return iterable<string, array{bool, bool}>
+     */
+    public static function manualWinnerProvider(): iterable
+    {
+        yield 'published non-leading variant' => [true, true];
+        yield 'test not started' => [false, true];
+        yield 'unpublished variant' => [true, false];
+    }
+
     public function testPagePreview(): void
     {
         $segment = $this->createSegment();

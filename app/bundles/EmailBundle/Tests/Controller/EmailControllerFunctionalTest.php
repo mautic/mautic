@@ -63,6 +63,68 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
+    #[DataProvider('manualWinnerProvider')]
+    public function testManualWinnerAction(bool $started, bool $published): void
+    {
+        $segment = $this->createSegment('Manual winner', 'manual-winner');
+        $parent = $this->createEmail('Leading email', 'Leading email', 'list', 'blank', 'Parent', $segment);
+        $variant = $this->createEmail('Other email', 'Other email', 'list', 'blank', 'Variant', $segment);
+        $parent->setIsPublished(true);
+        $parent->setVariantSettings(['enableAbTest' => true, 'weight' => 50, 'totalWeight' => 100, 'winnerCriteria' => 'email.openrate']);
+        $parent->setVariantStartDate($started ? new \DateTime('2020-01-01', new \DateTimeZone('UTC')) : null);
+        $variant->setIsPublished($published);
+        $variant->setVariantParent($parent);
+        $variant->setVariantSettings(['weight' => 50, 'winnerCriteria' => 'email.openrate']);
+        $parent->addVariantChild($variant);
+        foreach ([$parent, $variant] as $item) {
+            $stat = new Stat();
+            $stat->setEmail($item);
+            $stat->setEmailAddress('abtest@example.com');
+            $stat->setDateSent(new \DateTime('2020-01-02 12:00:00', new \DateTimeZone('UTC')));
+            $stat->setIsRead($item === $parent);
+            $this->em->persist($stat);
+        }
+        $this->em->flush();
+        $parentId = $parent->getId();
+        $variantId = $variant->getId();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/view/'.$parentId);
+        $this->assertResponseIsSuccessful();
+        $action = $crawler->filter('a[href="/s/emails/winner/'.$variantId.'"]');
+        $this->assertCount($started && $published ? 1 : 0, $action);
+        if (!$started || !$published) {
+            return;
+        }
+
+        $this->assertCount(1, $action->filter('.ri-trophy-line'));
+        $this->assertCount(1, $crawler->filter('a[href="/s/emails/winner/'.$parentId.'"] .ri-trophy-fill'));
+        $this->assertSame('confirmation', $action->attr('data-toggle'));
+        $this->assertSame('executeAction', $action->attr('data-confirm-callback'));
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, $action->attr('href'));
+        $this->assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $winner = $this->em->find(Email::class, $variantId);
+        $oldParent = $this->em->find(Email::class, $parentId);
+        $this->assertInstanceOf(Email::class, $winner);
+        $this->assertInstanceOf(Email::class, $oldParent);
+        $this->assertNull($winner->getVariantParent());
+        $this->assertTrue($winner->isPublished());
+        $this->assertFalse($oldParent->isPublished());
+        $this->assertSame($winner->getId(), $oldParent->getVariantParent()?->getId());
+    }
+
+    /**
+     * @return iterable<string, array{bool, bool}>
+     */
+    public static function manualWinnerProvider(): iterable
+    {
+        yield 'published non-leading variant' => [true, true];
+        yield 'test not started' => [false, true];
+        yield 'unpublished variant' => [true, false];
+    }
+
     /**
      * Check if email contains correct values.
      */
