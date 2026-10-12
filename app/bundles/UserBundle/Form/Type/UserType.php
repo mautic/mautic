@@ -19,17 +19,18 @@ use Mautic\UserBundle\Security\OIDC\SubjectToUserTransformer;
 use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -241,9 +242,18 @@ final class UserType extends AbstractType
             $builder->add('isPublished', YesNoButtonGroupType::class);
 
             if ($this->oidcSettings->isEnabled()) {
-                $subjectIdBuilder = $builder->create('subjectID', TextType::class, [
+                // Create the OIDC subject ID field with model transformer
+                // The field structure mimics the original OidcSubjectIdType but is now inline
+                $subjectIdBuilder = $builder->create('subjectID', FormType::class, [
                     'mapped'      => false,
-                    'data'        => $options['data'],
+                    'data_class'  => OidcSubjectId::class,  // This form represents an OidcSubjectId
+                    'data'        => $options['data'],      // But we pass a User...
+                    'validation_groups' => [OidcSubjectId::class, 'subjectID'],
+                ])
+                ->addModelTransformer($this->subjectToUserTransformer); // ...which this transformer converts
+
+                // Add the actual text input field as a child
+                $subjectIdBuilder->add('subjectID', TextType::class, [
                     'label'       => 'mautic.open_id.form.subject_id',
                     'label_attr'  => ['class' => 'control-label'],
                     'attr'        => [
@@ -255,8 +265,7 @@ final class UserType extends AbstractType
                         new Assert\Type(type: 'string', groups: ['subjectID']),
                         new Assert\Length(max: 255, groups: ['subjectID']),
                     ],
-                ])
-                ->addModelTransformer($this->subjectToUserTransformer);
+                ]);
 
                 $builder->add($subjectIdBuilder);
 
