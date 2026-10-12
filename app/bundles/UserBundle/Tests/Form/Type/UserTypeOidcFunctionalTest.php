@@ -6,10 +6,8 @@ namespace Mautic\UserBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\OidcSubjectId;
-use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Functional tests for OIDC subject ID handling in UserType form.
@@ -19,68 +17,32 @@ final class UserTypeOidcFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        $this->configParams['open_id_is_enabled'] = 1;
+        parent::setUp();
+    }
+
     /**
      * Test that OIDC subject ID field enforces max length validation (255 chars).
      * This is a critical fix - previously values > 255 chars caused DB errors instead of validation errors.
      */
     public function testOidcSubjectIdMaxLengthValidationEnforced(): void
     {
-        // Enable OIDC
-        $this->configParams['open_id_is_enabled'] = 1;
-        $this->setUpSymfony($this->configParams);
-
-        // Login as admin (created by setUp)
-        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        $this->loginUser($admin);
-
-        // Create a test user to edit
-        $role = new Role();
-        $role->setName('Test Role');
-        $this->em->persist($role);
-
-        $user = new User();
-        $user->setUsername('testuser');
-        $user->setEmail('test@example.com');
-        $user->setFirstName('Test');
-        $user->setLastName('User');
-        $user->setPassword('password');
-        $user->setRole($role);
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $userId = $user->getId();
-
-        // Attempt to submit with subject ID > 255 characters
-        $longSubjectId = str_repeat('a', 256);
+        $userId = $this->createTestUser('testuser', 'test@example.com');
 
         $crawler = $this->client->request('GET', '/s/users/edit/'.$userId);
+        $form    = $crawler->selectButton('Save & Close')->form();
 
-        // Debug: check if we got to the page
-        $this->assertResponseIsSuccessful('Failed to load user edit page');
-
-        // Find the form - try different button texts
-        $buttonNode = $crawler->filter('button[type="submit"]')->first();
-        $this->assertCount(1, $buttonNode, 'Submit button not found on page');
-
-        $form = $crawler->selectButton($buttonNode->text())->form();
-
-        // Fill in the form including the too-long subject ID
-        $form['user[subjectID][subjectID]'] = $longSubjectId;
+        $form['user[subjectID][subjectID]'] = str_repeat('a', 256);
 
         $this->client->submit($form);
 
-        // Should NOT redirect (form should be invalid and redisplayed)
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('This value is too long', (string) $this->client->getResponse()->getContent());
 
-        // Should show validation error
-        $this->assertSelectorTextContains('.has-error', 'This value is too long');
-
-        // Verify subject ID was NOT saved to database
         $this->em->clear();
-
-        /** @var OidcSubjectIdRepository $subjectIdRepo */
-        $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
-        $subjectId = $subjectIdRepo->findOneBy(['user' => $userId]);
+        $subjectId = $this->em->getRepository(OidcSubjectId::class)->findOneBy(['user' => $userId]);
 
         $this->assertNull($subjectId, 'Subject ID should NOT be saved when validation fails');
     }
@@ -91,49 +53,21 @@ final class UserTypeOidcFunctionalTest extends MauticMysqlTestCase
      */
     public function testOidcLinkingSkippedWhenFormInvalid(): void
     {
-        // Enable OIDC
-        $this->configParams['open_id_is_enabled'] = 1;
-        $this->setUpSymfony($this->configParams);
+        $userId = $this->createTestUser('testuser2', 'test2@example.com');
 
-        // Login as admin (created by setUp)
-        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        $this->loginUser($admin);
-
-        // Create a test user to edit
-        $role = new Role();
-        $role->setName('Test Role');
-        $this->em->persist($role);
-
-        $user = new User();
-        $user->setUsername('testuser2');
-        $user->setEmail('test2@example.com');
-        $user->setFirstName('Test');
-        $user->setLastName('User');
-        $user->setPassword('password');
-        $user->setRole($role);
-        $this->em->persist($user);
-        $this->em->flush();
-
-        $userId = $user->getId();
-
-        // Submit with invalid email but valid OIDC subject ID
         $crawler = $this->client->request('GET', '/s/users/edit/'.$userId);
         $form    = $crawler->selectButton('Save & Close')->form();
 
-        $form['user[email]'] = 'invalid-email'; // Invalid
-        $form['user[subjectID][subjectID]'] = 'should-not-be-saved'; // Valid
+        $form['user[email]']               = 'invalid-email';
+        $form['user[subjectID][subjectID]'] = 'should-not-be-saved';
 
         $this->client->submit($form);
 
-        // Should NOT redirect (form invalid)
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('The email entered is invalid', (string) $this->client->getResponse()->getContent());
 
-        // Verify subject ID was NOT saved because form was invalid
         $this->em->clear();
-
-        /** @var OidcSubjectIdRepository $subjectIdRepo */
-        $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
-        $subjectId = $subjectIdRepo->findOneBy(['user' => $userId]);
+        $subjectId = $this->em->getRepository(OidcSubjectId::class)->findOneBy(['user' => $userId]);
 
         $this->assertNull($subjectId, 'OIDC subject ID should NOT be saved when form is invalid');
     }
@@ -143,22 +77,35 @@ final class UserTypeOidcFunctionalTest extends MauticMysqlTestCase
      */
     public function testOidcSubjectIdSavedWhenFormValid(): void
     {
-        // Enable OIDC
-        $this->configParams['open_id_is_enabled'] = 1;
-        $this->setUpSymfony($this->configParams);
+        $userId = $this->createTestUser('testuser3', 'test3@example.com');
 
-        // Login as admin (created by setUp)
-        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        $this->loginUser($admin);
+        $crawler = $this->client->request('GET', '/s/users/edit/'.$userId);
+        $form    = $crawler->selectButton('Save & Close')->form();
 
-        // Create a test user to edit
+        $form['user[subjectID][subjectID]'] = 'valid-oidc-id-123';
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('has been updated!', (string) $this->client->getResponse()->getContent());
+
+        $this->em->clear();
+
+        $subjectId = $this->em->getRepository(OidcSubjectId::class)->findOneBy(['user' => $userId]);
+
+        $this->assertNotNull($subjectId, 'OIDC subject ID should be saved when form is valid');
+        $this->assertSame('valid-oidc-id-123', $subjectId->getSubjectID());
+    }
+
+    private function createTestUser(string $username, string $email): int
+    {
         $role = new Role();
-        $role->setName('Test Role');
+        $role->setName('Test Role '.$username);
         $this->em->persist($role);
 
         $user = new User();
-        $user->setUsername('testuser3');
-        $user->setEmail('test3@example.com');
+        $user->setUsername($username);
+        $user->setEmail($email);
         $user->setFirstName('Test');
         $user->setLastName('User');
         $user->setPassword('password');
@@ -166,57 +113,6 @@ final class UserTypeOidcFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($user);
         $this->em->flush();
 
-        $userId = $user->getId();
-
-        // Submit with valid data including OIDC subject ID
-        $crawler = $this->client->request('GET', '/s/users/edit/'.$userId);
-
-        // Find the first submit button
-        $buttonNode = $crawler->filter('button[type="submit"]')->first();
-        if (0 === $buttonNode->count()) {
-            $this->fail('No submit button found on page');
-        }
-
-        $form = $crawler->selectButton($buttonNode->text())->form();
-
-        // Fill in all required fields explicitly
-        $form['user[firstName]'] = 'Test';
-        $form['user[lastName]'] = 'User';
-        $form['user[username]'] = 'testuser3';
-        $form['user[email]'] = 'test3@example.com';
-        $form['user[role]'] = (string) $role->getId();
-        $form['user[timezone]'] = 'UTC';
-        $form['user[locale]'] = 'en_US';
-        $form['user[subjectID][subjectID]'] = 'valid-oidc-id-123';
-
-        // Make sure password is not set (editing existing user)
-        if (isset($form['user[plainPassword][password]'])) {
-            $form['user[plainPassword][password]'] = '';
-            $form['user[plainPassword][confirm]'] = '';
-        }
-
-        $this->client->submit($form);
-
-        // Debug: check response
-        $response = $this->client->getResponse();
-        if (!$response->isRedirect()) {
-            // Dump response to see what's wrong
-            file_put_contents('/tmp/form_response.html', $response->getContent());
-            $this->fail('Form submission failed. Response saved to /tmp/form_response.html. Status: '.$response->getStatusCode());
-        }
-
-        // Should redirect to users list (success)
-        $this->assertResponseIsSuccessful();
-        $this->assertResponseRedirects();
-
-        // Verify subject ID was saved
-        $this->em->clear();
-
-        /** @var OidcSubjectIdRepository $subjectIdRepo */
-        $subjectIdRepo = $this->em->getRepository(OidcSubjectId::class);
-        $subjectId = $subjectIdRepo->findOneBy(['user' => $userId]);
-
-        $this->assertNotNull($subjectId, 'OIDC subject ID should be saved when form is valid');
-        $this->assertSame('valid-oidc-id-123', $subjectId->getSubjectID());
+        return $user->getId();
     }
 }

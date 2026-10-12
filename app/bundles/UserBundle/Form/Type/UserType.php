@@ -283,7 +283,8 @@ final class UserType extends AbstractType
                         return;
                     }
 
-                    $subjectId = $form->get('subjectID')->getData();
+                    // Use getNormData() to get the OidcSubjectId before reverse transform converts it to User
+                    $subjectId = $form->get('subjectID')->getNormData();
                     if (!$subjectId instanceof OidcSubjectId) {
                         return;
                     }
