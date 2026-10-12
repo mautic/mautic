@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Event\AbstractTokenReplacementEvent;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
@@ -59,7 +59,7 @@ final class EmailSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onEmailAddressReplacement(AbstractTokenReplacementEvent $event): void
+    public function onEmailAddressReplacement(TokenReplacementEvent $event): void
     {
         $event->setContent(TokenHelper::findLeadTokens($event->getContent(), $event->getLead()->getProfileFields(), true));
     }
