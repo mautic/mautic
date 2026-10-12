@@ -77,8 +77,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 {
     /** @use VariantEntityTrait<Email> */
     use VariantEntityTrait;
+
     /** @use TranslationEntityTrait<Email> */
     use TranslationEntityTrait;
+
     use DynamicContentEntityTrait;
     use UuidTrait;
     use ProjectTrait;

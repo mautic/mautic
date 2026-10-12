@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
- * @template T of VariantEntityInterface
+ * @template TEntity of VariantEntityInterface
  */
 trait VariantEntityTrait
 {
@@ -20,7 +20,7 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var T|null
+     * @var TEntity|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
@@ -98,7 +98,7 @@ trait VariantEntityTrait
     }
 
     /**
-     * @param T|null $parent
+     * @param TEntity|null $parent
      */
     public function setVariantParent(?VariantEntityInterface $parent = null): static
     {

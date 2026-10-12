@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
- * @template T of TranslationEntityInterface
+ * @template TEntity of TranslationEntityInterface
  */
 trait TranslationEntityTrait
 {
@@ -21,13 +21,13 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var Collection<int, T>
+     * @var Collection<int, TEntity>
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private $translationChildren;
 
     /**
-     * @var T|null
+     * @var TEntity|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private $translationParent;
@@ -54,7 +54,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * @param T $child
+     * @param TEntity $child
      */
     public function addTranslationChild(TranslationEntityInterface $child): static
     {
@@ -66,7 +66,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * @param T $child
+     * @param TEntity $child
      */
     public function removeTranslationChild(TranslationEntityInterface $child): void
     {
@@ -82,7 +82,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * @param T|null $parent
+     * @param TEntity|null $parent
      */
     public function setTranslationParent(?TranslationEntityInterface $parent = null): self
     {
@@ -95,6 +95,9 @@ trait TranslationEntityTrait
         return $this;
     }
 
+    /**
+     * @return TEntity|null
+     */
     public function getTranslationParent(): ?TranslationEntityInterface
     {
         return $this->translationParent;
