@@ -14,8 +14,7 @@ final class ImportRepository extends CommonRepository
      * Count how many imports with the status is there.
      *
      * @param int $ghostDelay when is the import ghost? In hours
-     */
-    /**
+     *
      * @return Import[]
      */
     public function getGhostImports(int $ghostDelay = 2, ?int $limit = null): array
