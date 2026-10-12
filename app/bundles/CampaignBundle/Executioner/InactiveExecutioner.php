@@ -38,6 +38,9 @@ class InactiveExecutioner implements ExecutionerInterface
 
     private ?Counter $counter = null;
 
+    /**
+     * @var Collection<int, Event>|null
+     */
     private ?Collection $decisions = null;
 
     protected ?\DateTime $now = null;
