@@ -212,6 +212,23 @@ final class ListControllerTest extends MauticMysqlTestCase
         $this->assertCount(0, $handler);
     }
 
+    public function testArraySearchDoesNotBreakSubsequentVisits(): void
+    {
+        foreach ([['search' => ['type:mautic-theme'], 'limit' => 10], []] as $parameters) {
+            $this->queuePackageResponse(
+                ['page' => '1', 'limit' => '10'],
+                file_get_contents(__DIR__.'/../../ApiResponse/list_all_types.json')
+            );
+
+            $crawler = $this->client->request('GET', '/s/marketplace', $parameters);
+            $this->assertResponseIsSuccessful();
+            $this->assertSame('', $crawler->filter('#list-search')->attr('value'));
+            $this->assertCount(6, $crawler->filter('#marketplace-packages-table .package-name a'));
+        }
+
+        $this->assertCount(0, $this->getClientMockHandler());
+    }
+
     public function testMarketplaceListHandlesEmptyResults(): void
     {
         $handlerStack = $this->getClientMockHandler();

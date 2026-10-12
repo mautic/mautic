@@ -47,7 +47,8 @@ final class ListController extends CommonController
 
         $request = $this->getCurrentRequest();
         $session = $request->getSession();
-        $search  = InputHelper::clean($request->get('search', $session->get('mautic.marketplace.package.filter', '')));
+        $rawSearch = $request->get('search', $session->get('mautic.marketplace.package.filter', ''));
+        $search    = is_string($rawSearch) ? InputHelper::clean($rawSearch) : '';
         $session->set('mautic.marketplace.package.filter', $search);
 
         $filter = new PackageSearch($search);
