@@ -132,7 +132,7 @@ Mautic.launchEmailBuilder = function(formName) {
             }
         }
 
-        if (conflicting) {
+        if (conflicting && !mQuery('#emailform_segmentTranslationParent').val()) {
             group.addClass('has-error');
 
             mQuery('<span class="help-block text-danger email-builder-segment-conflict"></span>')
