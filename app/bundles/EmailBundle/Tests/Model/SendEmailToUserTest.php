@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
-use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Exception\RecordNotPublishedException;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Event\OnEmailAddressTokenReplacementEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -167,7 +167,7 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (TokenReplacementEvent $event) use ($lead): true {
+                    function (OnEmailAddressTokenReplacementEvent $event) use ($lead): true {
                         $this->assertSame('{contactfield=active-field}', $event->getContent());
                         $this->assertSame($lead, $event->getLead());
 

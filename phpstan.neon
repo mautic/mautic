@@ -125,8 +125,6 @@ parameters:
             paths:
                 - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
                 - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
-                - app/bundles/DynamicContentBundle/EventListener/CampaignSubscriber.php
-                - app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
                 - app/bundles/FormBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
                 - app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
                 - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
