@@ -423,10 +423,8 @@ final class FieldController extends CommonFormController
     /**
      * @param int                  $formId
      * @param array<string, mixed> $formField
-     *
-     * @return mixed
      */
-    private function getFieldForm($formId, array $formField)
+    private function getFieldForm($formId, array $formField): \Symfony\Component\Form\FormInterface
     {
         $customComponents = $this->formModel->getCustomComponents();
         $customParams     = $customComponents['fields'][$formField['type']] ?? false;

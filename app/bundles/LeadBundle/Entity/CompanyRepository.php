@@ -494,8 +494,8 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->{$this->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col)
-                ->setParameter($col, $val);
+            $q->{$this->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col);
+            $q->setParameter($col, $val);
         }
 
         // if we have a company ID lets use it

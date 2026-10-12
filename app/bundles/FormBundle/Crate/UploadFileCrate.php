@@ -7,10 +7,13 @@ namespace Mautic\FormBundle\Crate;
 use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * @implements \Iterator<int, FileFieldCrate>
+ */
 final class UploadFileCrate implements \Iterator
 {
     /**
-     * @var array|FileFieldCrate[]
+     * @var array<int, FileFieldCrate>
      */
     private array $fileFieldCrate = [];
 
@@ -26,7 +29,7 @@ final class UploadFileCrate implements \Iterator
         $this->position = 0;
     }
 
-    public function current(): mixed
+    public function current(): FileFieldCrate
     {
         return $this->fileFieldCrate[$this->position];
     }

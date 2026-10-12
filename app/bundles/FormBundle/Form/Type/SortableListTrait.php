@@ -25,7 +25,8 @@ trait SortableListTrait
             'option_required'     => false,
             'constraint_callback' => new Callback(
                 function ($validateMe, ExecutionContextInterface $context) use ($listName): void {
-                    $data = $context->getRoot()->getData();
+                    $root = $context->getRoot();
+                    $data = $root->getData();
                     if ((empty($data['properties']['syncList']) || empty($data['mappedField'])) && !count($data['properties'][$listName]['list'])) {
                         $context->buildViolation('mautic.form.lists.count')->addViolation();
                     }

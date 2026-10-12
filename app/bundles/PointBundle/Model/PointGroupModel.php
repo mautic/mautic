@@ -42,6 +42,16 @@ final class PointGroupModel extends CommonFormModel implements GlobalSearchInter
         return $this->groupRepository;
     }
 
+    /**
+     * @param array<mixed> $args
+     *
+     * @return array<int, Group>|\Doctrine\ORM\Tools\Pagination\Paginator<Group>
+     */
+    public function getEntities(array $args = []): iterable
+    {
+        return parent::getEntities($args);
+    }
+
     public function getPermissionBase(): string
     {
         return 'point:groups';

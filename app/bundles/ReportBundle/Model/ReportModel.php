@@ -796,6 +796,14 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         return (int) $countQb->executeQuery()->fetchOne();
     }
 
+    /**
+     * @return iterable<Report>
+     */
+    public function getEntities(array $args = []): iterable
+    {
+        return parent::getEntities($args);
+    }
+
     public function getReportsIdsWithDependenciesOnSegment(int $segmentId): array
     {
         $search = 'lll.leadlist_id';

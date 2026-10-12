@@ -163,7 +163,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
+     * @return iterable<Sms>
      */
     public function getEntities(array $args = []): iterable
     {
@@ -340,7 +340,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
 
             foreach ($recipientCollection as $recipient) {
                 $defaultSendResult['content'] = $recipient->getFinalMessage();
-                if (true !== $recipient->getResult()) {
+                if (!$recipient->getResult()) {
                     $defaultSendResult['sent']   = false;
                     $defaultSendResult['status'] = $recipient->getResult();
                     unset($stats[$recipient->getKey()]);

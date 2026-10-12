@@ -144,7 +144,7 @@ final class ContactExportSchedulerModel extends AbstractCommonModel
     {
         $data            = $contactExportScheduler->getData();
         $fileType        = $data['fileType'];
-        $resultsCallback = fn ($contact) => $contact->getProfileFields();
+        $resultsCallback = (fn(\Mautic\LeadBundle\Entity\Lead $contact): array => $contact->getProfileFields());
         $iterator        = new IteratorExportDataModel(
             $this->leadModel,
             $contactExportScheduler->getData(),
