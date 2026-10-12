@@ -9,14 +9,19 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Exception\OidcIdTakenException;
 use Mautic\UserBundle\Model\UserModel;
-use Mautic\UserBundle\Security\OIDC\OidcSubjectIdType;
 use Mautic\UserBundle\Security\OIDC\Settings;
 use Mautic\UserBundle\Security\OIDC\SubjectToUserTransformer;
+use Mautic\UserBundle\Security\OIDC\User\LinkerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -26,6 +31,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -39,6 +45,7 @@ final class UserType extends AbstractType
         private readonly LanguageHelper $languageHelper,
         private readonly Settings $oidcSettings,
         private readonly SubjectToUserTransformer $subjectToUserTransformer,
+        private readonly LinkerInterface $linker,
     ) {
     }
 
@@ -234,14 +241,51 @@ final class UserType extends AbstractType
             $builder->add('isPublished', YesNoButtonGroupType::class);
 
             if ($this->oidcSettings->isEnabled()) {
-                $builder->add($builder->create(
-                    'subjectID',
-                    OidcSubjectIdType::class,
-                    [
-                        'mapped' => false,
-                        'data'   => $options['data'],
-                    ])
-                    ->addModelTransformer($this->subjectToUserTransformer));
+                $subjectIdBuilder = $builder->create('subjectID', TextType::class, [
+                    'mapped'      => false,
+                    'data'        => $options['data'],
+                    'label'       => 'mautic.open_id.form.subject_id',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.open_id.form.subject_id.tooltip',
+                    ],
+                    'required'    => false,
+                    'constraints' => [
+                        new Assert\Type(type: 'string', groups: ['subjectID']),
+                        new Assert\Length(max: 255, groups: ['subjectID']),
+                    ],
+                ])
+                ->addModelTransformer($this->subjectToUserTransformer);
+
+                $builder->add($subjectIdBuilder);
+
+                // Add POST_SUBMIT listener at priority -10 to run after validation (priority 0)
+                $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
+                    $form = $event->getForm();
+
+                    // Check if the root form is valid
+                    if (!$form->getRoot()->isValid()) {
+                        return;
+                    }
+
+                    // Check if the subjectID field exists and get its data
+                    if (!$form->has('subjectID')) {
+                        return;
+                    }
+
+                    $subjectId = $form->get('subjectID')->getData();
+                    if (!$subjectId instanceof OidcSubjectId) {
+                        return;
+                    }
+
+                    try {
+                        $this->linker->editLinkToUser($subjectId, $subjectId->getUser());
+                    } catch (OidcIdTakenException $e) {
+                        $error = new FormError($this->translator->trans($e->getMessage()));
+                        $form->get('subjectID')->addError($error);
+                    }
+                }, -10);
             }
 
             $builder->add('buttons', FormButtonsType::class);
