@@ -35,7 +35,6 @@ final class TagEntityModelTransformer implements DataTransformerInterface
 
         $return = [];
         foreach ($entity as $e) {
-            \assert($e instanceof \Mautic\LeadBundle\Entity\Tag);
             $return[] = $e->getTag();
         }
 

@@ -359,7 +359,6 @@ abstract class CommonRepository extends ServiceEntityRepository
             }
         }
 
-        \assert($q instanceof \Doctrine\ORM\QueryBuilder);
         $this->buildClauses($q, $args);
         $query = $q->getQuery();
 
@@ -1603,7 +1602,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     /**
      * @param array $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
      */
-    protected function buildWhereClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses, $expr = null)
+    protected function buildWhereClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses, ?\Doctrine\ORM\Query\Expr\Composite $expr = null)
     {
         $parts = $this->buildWhereClausePartsFromArray($query, $clauses);
 
@@ -1616,7 +1615,6 @@ abstract class CommonRepository extends ServiceEntityRepository
         }
 
         // An ORM composite handed in by a caller. DBAL's is immutable, so it never arrives here.
-        \assert($expr instanceof \Doctrine\ORM\Query\Expr\Composite);
         foreach ($parts as $part) {
             $expr->add($part);
         }

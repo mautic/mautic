@@ -106,6 +106,16 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param array<mixed> $args
+     *
+     * @return array<int, \Mautic\LeadBundle\Entity\LeadList>|\Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\LeadBundle\Entity\LeadList>
+     */
+    public function getEntities(array $args = []): iterable
+    {
+        return parent::getEntities($args);
+    }
+
+    /**
      * Returns the repository for the table that houses the leads associated with a list.
      */
     public function getPermissionBase(): string
@@ -645,7 +655,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 ]);
 
                 foreach ($listEntities as $list) {
-                    \assert($list instanceof \Mautic\LeadBundle\Entity\LeadList);
                     $this->leadChangeLists[$list->getId()] = $list;
                 }
             }
@@ -779,7 +788,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 ]);
 
                 foreach ($listEntities as $list) {
-                    \assert($list instanceof \Mautic\LeadBundle\Entity\LeadList);
                     $this->leadChangeLists[$list->getId()] = $list;
                 }
             }
@@ -1208,7 +1216,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $dependents = [];
         $accessor   = PropertyAccess::createPropertyAccessor();
         foreach ($entities as $entity) {
-            \assert($entity instanceof \Mautic\LeadBundle\Entity\LeadList);
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
                 // BC support for old filters where the field existed outside of properties.
@@ -1250,7 +1257,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
         $dependents = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof \Mautic\LeadBundle\Entity\LeadList);
             foreach ($entity->getFilters() as $entityFilter) {
                 // BC support for old filters where the field existed outside of properties.
                 $filter = $entityFilter['properties']['filter'] ?? $entityFilter['filter'];
@@ -1285,7 +1291,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
         $dependents = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof \Mautic\LeadBundle\Entity\LeadList);
             foreach ($entity->getFilters() as $entityFilter) {
                 // BC support for old filters where the field existed outside of properties.
                 $filter = $entityFilter['properties']['filter'] ?? $entityFilter['filter'];
@@ -1319,7 +1324,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $dependency          = [];
 
         foreach ($entities as $entity) {
-            \assert($entity instanceof \Mautic\LeadBundle\Entity\LeadList);
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
                 if ('leadlist' !== $eachFilter['type']) {

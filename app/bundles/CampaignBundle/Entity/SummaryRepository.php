@@ -66,7 +66,7 @@ final class SummaryRepository extends CommonRepository
     /**
      * Get the oldest triggered time for back-filling historical data.
      */
-    public function getOldestTriggeredDate(): ?\DateTimeInterface
+    public function getOldestTriggeredDate(): ?\DateTime
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cs.date_triggered')

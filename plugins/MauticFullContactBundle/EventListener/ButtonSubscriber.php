@@ -58,7 +58,6 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
             );
 
             if ($item = $event->getItem()) {
-                \assert($item instanceof \Mautic\LeadBundle\Entity\Lead);
                 $lookupContactButton = [
                     'attr' => [
                         'data-toggle' => 'ajaxmodal',
@@ -113,7 +112,6 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
                 );
 
                 if ($item = $event->getItem()) {
-                    \assert($item instanceof \Mautic\LeadBundle\Entity\Company);
                     $lookupCompanyButton = [
                         'attr' => [
                             'data-toggle' => 'ajaxmodal',

@@ -116,7 +116,6 @@ final class EventLogModel extends AbstractCommonModel
         $created = false;
         if (count($logs)) {
             $log = $logs[0];
-            \assert($log instanceof LeadEventLog);
             if ($log->getDateTriggered()) {
                 return $this->translator->trans(
                     'mautic.campaign.error.event_already_executed',

@@ -796,6 +796,14 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         return (int) $countQb->executeQuery()->fetchOne();
     }
 
+    /**
+     * @return iterable<Report>
+     */
+    public function getEntities(array $args = []): iterable
+    {
+        return parent::getEntities($args);
+    }
+
     public function getReportsIdsWithDependenciesOnSegment(int $segmentId): array
     {
         $search = 'lll.leadlist_id';
@@ -811,7 +819,6 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         );
         $dependents = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof Report);
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
                 if ($eachFilter['column'] == $search && $eachFilter['value'] == $segmentId) {
@@ -843,7 +850,6 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
 
         $dependents = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof Report);
             foreach ($entity->getFilters() as $entityFilter) {
                 if ($entityFilter['column'] == $search && $entityFilter['value'] == $emailId) {
                     $dependents[] = $entity->getId();
@@ -873,7 +879,6 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
 
         $dependents = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof Report);
             foreach ($entity->getFilters() as $entityFilter) {
                 if ($entityFilter['column'] == $search && (is_array($entityFilter['value']) && in_array($tagId, $entityFilter['value']))) {
                     $dependents[] = $entity->getId();

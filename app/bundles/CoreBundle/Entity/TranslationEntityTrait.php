@@ -188,13 +188,11 @@ trait TranslationEntityTrait
         $count = 0;
 
         [$parent, $children] = $this->getTranslations();
-        \assert($parent instanceof TranslationEntityInterface);
         if ($variantParent != $parent) {
             $count = $parent->{$getter}();
         }
 
         foreach ($children as $translation) {
-            \assert($translation instanceof TranslationEntityInterface);
             if ($variantParent != $translation) {
                 $count += $translation->{$getter}();
             }

@@ -15,16 +15,15 @@ final readonly class PointActionHelper
     }
 
     /**
+     * @param Hit                  $eventDetails
      * @param array<string, mixed> $action
      */
     public static function validatePageHit($eventDetails, array $action): bool
     {
-        \assert($eventDetails instanceof Hit);
         $pageHit = $eventDetails->getPage();
 
         if ($pageHit instanceof Page) {
             [$parent, $children] = $pageHit->getVariants();
-            \assert($parent instanceof Page);
             // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
@@ -41,11 +40,11 @@ final readonly class PointActionHelper
     }
 
     /**
+     * @param Hit                  $eventDetails
      * @param array<string, mixed> $action
      */
     public function validateUrlHit($eventDetails, array $action): bool
     {
-        \assert($eventDetails instanceof Hit);
         $changePoints = [];
         $url          = $eventDetails->getUrl();
         $limitToUrl   = html_entity_decode(trim($action['properties']['page_url']));
@@ -56,7 +55,6 @@ final readonly class PointActionHelper
         }
 
         $lead          = $eventDetails->getLead();
-        \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
         $urlWithSqlWC  = $this->getSqlLikePattern($limitToUrl);
 
         if (isset($action['properties']['first_time']) && true === $action['properties']['first_time']) {

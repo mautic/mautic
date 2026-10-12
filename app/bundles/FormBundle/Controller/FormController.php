@@ -727,7 +727,6 @@ class FormController extends CommonFormController
 
         foreach ($existingFields as $fieldId => $formField) {
             // Check to see if the field still exists
-            \assert($formField instanceof Field);
 
             if ('button' == $formField->getType()) {
                 // submit button found
@@ -796,7 +795,6 @@ class FormController extends CommonFormController
 
         foreach ($existingActions as $formAction) {
             // Check to see if the action still exists
-            \assert($formAction instanceof \Mautic\FormBundle\Entity\Action);
             if (!isset($customComponents['actions'][$formAction->getType()])) {
                 continue;
             }

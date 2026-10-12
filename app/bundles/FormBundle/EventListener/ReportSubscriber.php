@@ -150,7 +150,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             $forms = $this->formRepository->getEntities($args ?? []);
             foreach ($forms as $form) {
                 $formEntity         = $form[0];
-                \assert($formEntity instanceof Form);
 
                 $formResultsColumns = $this->getFormResultsColumns($formEntity);
                 $mappedFieldValues  = $formEntity->getMappedFieldValues();

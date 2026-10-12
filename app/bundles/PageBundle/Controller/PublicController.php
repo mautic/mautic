@@ -135,7 +135,6 @@ final class PublicController extends AbstractFormController
                     $totalHits     = $entity->getVariantHits();
 
                     foreach ($childrenVariants as $id => $child) {
-                        \assert($child instanceof Page);
                         if ($child->isPublished()) {
                             $variantSettings = $child->getVariantSettings();
                             $variants[$id]   = [
@@ -233,9 +232,8 @@ final class PublicController extends AbstractFormController
                         $lead,
                         $request
                     );
-                    \assert($translatedEntity instanceof Page);
 
-                    if ($translatedEntity !== $entity) {
+                    if ($translatedEntity instanceof Page && $translatedEntity !== $entity) {
                         if (!($request->attributes->all()['ntrd'] ?? $request->query->all()['ntrd'] ?? $request->request->all()['ntrd'] ?? 0)) {
                             $url = $model->generateUrl($translatedEntity, false);
                             $model->hitPage($entity, $request, 302, $lead, $query);

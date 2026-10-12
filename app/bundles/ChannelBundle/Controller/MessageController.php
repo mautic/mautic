@@ -116,7 +116,6 @@ final class MessageController extends AbstractStandardFormController
                 break;
             case 'view':
                 $message = $args['viewParameters']['item'];
-                \assert($message instanceof \Mautic\ChannelBundle\Entity\Message);
 
                 // Init the date range filter form
                 $returnUrl = $this->generateUrl(
@@ -172,7 +171,6 @@ final class MessageController extends AbstractStandardFormController
                     }
                 }
 
-                \assert($dateRangeForm instanceof \Symfony\Component\Form\FormInterface);
                 $viewParameters = [
                     'channels'        => $channels,
                     'channelContents' => $this->messageModel->getMessageChannels($message->getId()),

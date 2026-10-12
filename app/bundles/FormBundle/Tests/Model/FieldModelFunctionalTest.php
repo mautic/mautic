@@ -109,7 +109,6 @@ final class FieldModelFunctionalTest extends MauticMysqlTestCase
 
         $ids = [];
         foreach ($fields as $field) {
-            \assert($field instanceof \Mautic\FormBundle\Entity\Field);
             $ids[] = $field->getId();
         }
 

@@ -67,7 +67,6 @@ trait FormErrorMessagesTrait
 
         foreach ($form->getErrors(true) as $error) {
             $cause              = $error->getCause();
-            \assert($cause instanceof \Symfony\Component\Validator\ConstraintViolationInterface);
             $code               = $cause->getCode();
             $codes[$code ?? ''] = $code;
         }

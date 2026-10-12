@@ -131,7 +131,6 @@ class ImportModel extends FormModel
         }
 
         foreach ($imports as $import) {
-            \assert($import instanceof \Mautic\LeadBundle\Entity\Import);
             $import->setStatus($import::FAILED)
                 ->setStatusInfo($this->translator->trans('mautic.lead.import.ghost.limit.hit', ['%limit%' => $ghostDelay]))
                 ->removeFile();

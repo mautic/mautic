@@ -13,12 +13,14 @@ final class StatHelperContainer
      */
     private array $helpers = [];
 
+    /**
+     * @param iterable<StatHelperInterface> $helpersIterator
+     */
     public function __construct(
         #[AutowireIterator(tag: 'mautic.email_stat_helper')]
         iterable $helpersIterator,
     ) {
         foreach ($helpersIterator as $helper) {
-            \assert($helper instanceof StatHelperInterface);
             $this->helpers[$helper->getName()] = $helper;
         }
     }

@@ -18,7 +18,6 @@ final class FileEncodingValidator extends ConstraintValidator
             and the file path will be an empty string "". If that is the case
             no further checks are required. Just return.
         */
-        \assert(!$field || $field instanceof \Symfony\Component\HttpFoundation\File\File);
         if (!$field || '' === $field->getPathname() || null === $field->getPathname()) {
             return;
         }

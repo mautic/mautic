@@ -690,7 +690,6 @@ final class FieldType extends AbstractType
         }
 
         $root = $context->getRoot();
-        \assert($root instanceof \Symfony\Component\Form\FormInterface);
         /** @var LeadField $field */
         $field = $root->getViewData();
 

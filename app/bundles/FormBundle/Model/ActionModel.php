@@ -85,7 +85,6 @@ final class ActionModel extends CommonFormModel
         );
         $dependents = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof Action);
             $properties = $entity->getProperties();
             foreach ($properties as $property) {
                 if (in_array($segmentId, $property)) {
@@ -114,7 +113,6 @@ final class ActionModel extends CommonFormModel
         );
         $formIds = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof Action);
             $properties = $entity->getProperties();
             if (isset($properties['email']) && (int) $properties['email'] === $emailId) {
                 $formIds[] = $entity->getForm()->getid();
@@ -145,7 +143,6 @@ final class ActionModel extends CommonFormModel
         $dependents = [];
 
         foreach ($entities as $entity) {
-            \assert($entity instanceof Action);
             $properties = $entity->getProperties();
             foreach ($properties as $property) {
                 if (in_array($tagName, $property)) {

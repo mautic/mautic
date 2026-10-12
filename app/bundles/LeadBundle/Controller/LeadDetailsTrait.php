@@ -35,6 +35,9 @@ trait LeadDetailsTrait
         $this->leadDetailsAuditLogModel = $leadDetailsAuditLogModel;
     }
 
+    /**
+     * @param Lead[] $leads
+     */
     protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, int $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
@@ -76,7 +79,6 @@ trait LeadDetailsTrait
 
         // get events for each contact
         foreach ($leads as $lead) {
-            \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
             //  if (!$lead->getEmail()) continue; // discard contacts without email
 
             $engagements = $this->leadDetailsLeadModel->getEngagements($lead, $filters, $orderBy, $page, $limit);

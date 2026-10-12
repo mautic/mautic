@@ -174,7 +174,6 @@ class TagRepository extends CommonRepository
         foreach ($leadIds as $leadId) {
             $lead = $this->getEntityManager()->find(Lead::class, $leadId);
             foreach ($tags as $tag) {
-                \assert($tag instanceof \Mautic\LeadBundle\Entity\Tag);
                 if ('add' === $addOrRemove) {
                     $lead->addTag($tag);
                 } else {
@@ -205,7 +204,7 @@ class TagRepository extends CommonRepository
      *
      * @param array<int>|int $tagIds
      *
-     * @return array<mixed>
+     * @return Tag[]
      */
     public function getTagById(array|int $tagIds): array
     {

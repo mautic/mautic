@@ -357,9 +357,8 @@ final class CampaignController extends AbstractStandardFormController
         $metadata = $shareService->buildShareMetadata($formData);
 
         $publishButton = $form->get('publish');
-        \assert($publishButton instanceof \Symfony\Component\Form\SubmitButton);
 
-        if ($publishButton->isClicked()) {
+        if ($publishButton instanceof \Symfony\Component\Form\SubmitButton && $publishButton->isClicked()) {
             // The transient ZIP is fetched same-origin by the browser, then forwarded to the
             // marketplace popup via postMessage. The marketplace never sees the Mautic URL,
             // which sidesteps SSRF and firewall concerns of the previous pull-based flow.
@@ -857,7 +856,6 @@ final class CampaignController extends AbstractStandardFormController
 
     protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, bool $isClone = false): void
     {
-        \assert($entity instanceof Campaign);
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
             $this->afterEntitySave($entity, $form, $action, false);
@@ -871,7 +869,6 @@ final class CampaignController extends AbstractStandardFormController
      */
     protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, bool $isClone = false): void
     {
-        \assert($entity instanceof Campaign);
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
 
         if ($isPost) {
@@ -1275,13 +1272,11 @@ final class CampaignController extends AbstractStandardFormController
      */
     protected function prepareCampaignEventsForEdit($entity, $objectId, bool $isClone = false): array
     {
-        \assert($entity instanceof Campaign);
         // load existing events into session
         $campaignEvents = [];
 
         $existingEvents = $entity->getEvents()->toArray();
         foreach ($existingEvents as $e) {
-            \assert($e instanceof Event);
             // remove deleted events from existing events
             if (!empty($e->getDeleted())) {
                 continue;

@@ -66,7 +66,6 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
         }
 
         $variantStartDate = $email->getVariantStartDate();
-        \assert(null === $variantStartDate || $variantStartDate instanceof \DateTimeInterface);
 
         $emailData = [
             'id'                   => $email->getId(),

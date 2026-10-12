@@ -508,6 +508,16 @@ class FieldModel extends FormModel
         return $this->leadFieldRepository;
     }
 
+    /**
+     * @param array<mixed> $args
+     *
+     * @return array<int, LeadField>|\Doctrine\ORM\Tools\Pagination\Paginator<LeadField>
+     */
+    public function getEntities(array $args = []): iterable
+    {
+        return parent::getEntities($args);
+    }
+
     public function getPermissionBase(): string
     {
         return 'lead:fields';
@@ -979,7 +989,6 @@ class FieldModel extends FormModel
         $leadFields = [];
 
         foreach ($fields as $f) {
-            \assert($f instanceof \Mautic\LeadBundle\Entity\LeadField);
             $leadFields[$f->getAlias()] = $f->getLabel();
         }
 

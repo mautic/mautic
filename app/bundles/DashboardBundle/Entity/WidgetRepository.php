@@ -25,7 +25,6 @@ final class WidgetRepository extends CommonRepository
         );
 
         foreach ($widgets as &$widget) {
-            \assert($widget instanceof Widget);
             if (isset($ordering[$widget->getId()])) {
                 $widget->setOrdering((int) $ordering[$widget->getId()]);
             }

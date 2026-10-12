@@ -132,7 +132,6 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
                     $recipientMessages = [];
 
                     foreach ($collection as $recipient) {
-                        \assert($recipient instanceof \Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO);
                         $recipientMessages[$recipient->getLead()->getMobile()] = $recipient->getFinalMessage();
                     }
 
@@ -150,7 +149,6 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
             )
             ->willReturnCallback(function (RecipientCollection $collection): RecipientCollection {
                 foreach ($collection as $recipient) {
-                    \assert($recipient instanceof \Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO);
                     $recipient->setResult(true);
                 }
 

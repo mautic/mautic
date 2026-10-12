@@ -74,7 +74,6 @@ final class FileApiController extends CommonApiController
         $response = [$this->entityNameOne => []];
         if ($request->files->count() > 0) {
             foreach ($request->files as $file) {
-                \assert($file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile);
                 $extension = $file->guessExtension() ?: $file->getClientOriginalExtension();
                 if (in_array($extension, $this->allowedExtensions)) {
                     $fileName = md5(uniqid()).'.'.$extension;

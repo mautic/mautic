@@ -26,7 +26,6 @@ trait SortableListTrait
             'constraint_callback' => new Callback(
                 function ($validateMe, ExecutionContextInterface $context) use ($listName): void {
                     $root = $context->getRoot();
-                    \assert($root instanceof \Symfony\Component\Form\FormInterface);
                     $data = $root->getData();
                     if ((empty($data['properties']['syncList']) || empty($data['mappedField'])) && !count($data['properties'][$listName]['list'])) {
                         $context->buildViolation('mautic.form.lists.count')->addViolation();

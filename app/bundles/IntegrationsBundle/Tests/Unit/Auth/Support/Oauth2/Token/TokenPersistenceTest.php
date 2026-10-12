@@ -58,7 +58,6 @@ final class TokenPersistenceTest extends TestCase
             'refresh_token' => $refreshToken,
             'expires_at'    => $expiresAt,
         ]);
-        \assert($tokenFromApi instanceof \kamermans\OAuth2\Token\RawToken);
 
         $integration = $this->createMock(Integration::class);
         $integration->expects($this->once())

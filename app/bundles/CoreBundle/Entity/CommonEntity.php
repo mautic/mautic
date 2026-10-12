@@ -59,8 +59,6 @@ class CommonEntity implements \Stringable
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->{$getter}();
         if ('category' == $prop) {
-            \assert(null === $current || $current instanceof \Mautic\CategoryBundle\Entity\Category);
-            \assert(null === $val || $val instanceof \Mautic\CategoryBundle\Entity\Category);
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

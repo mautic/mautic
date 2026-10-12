@@ -166,7 +166,6 @@ final class TrackableModelTest extends TestCase
 
         // Assert that the URL redirect equals $url
         $redirect = $trackables[$match[0]]->getRedirect();
-        \assert($redirect instanceof Redirect);
         $this->assertEquals(str_replace('&amp;', '&', $url), $redirect->getUrl());
     }
 
@@ -204,7 +203,6 @@ final class TrackableModelTest extends TestCase
 
         // Assert that the URL redirect equals $url
         $redirect = $trackables[$match[0]]->getRedirect();
-        \assert($redirect instanceof Redirect);
         $this->assertEquals($url, $redirect->getUrl());
     }
 

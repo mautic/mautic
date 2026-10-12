@@ -87,7 +87,6 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $eventConfig  = $event->getConfig();
         $eventDetails = $event->getEventDetails();
         $lead         = $event->getLead();
-        \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
 
         // stop
         if ($eventConfig['dwc_slot_name'] !== $eventDetails) {

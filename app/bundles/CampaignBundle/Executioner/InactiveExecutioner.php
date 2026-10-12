@@ -38,6 +38,9 @@ class InactiveExecutioner implements ExecutionerInterface
 
     private ?Counter $counter = null;
 
+    /**
+     * @var Collection<int, Event>|null
+     */
     private ?Collection $decisions = null;
 
     protected ?\DateTime $now = null;
@@ -129,9 +132,10 @@ class InactiveExecutioner implements ExecutionerInterface
         }
 
         $firstDecision = $this->decisions->first();
-        \assert($firstDecision instanceof Event);
+        if (false === $firstDecision) {
+            throw new NoEventsFoundException();
+        }
         $this->campaign = $firstDecision->getCampaign();
-        \assert($this->campaign instanceof Campaign);
         if (!$this->campaign->isPublished()) {
             throw new NoEventsFoundException();
         }

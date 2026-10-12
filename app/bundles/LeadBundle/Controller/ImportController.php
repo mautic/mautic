@@ -323,7 +323,6 @@ final class ImportController extends AbstractStandardFormController
 
                         $fileData = $form['file']->getData();
                         if (!empty($fileData)) {
-                            \assert($fileData instanceof \Symfony\Component\HttpFoundation\File\UploadedFile);
                             $errorMessage    = null;
                             $errorParameters = [];
                             try {

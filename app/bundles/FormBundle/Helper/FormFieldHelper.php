@@ -157,9 +157,8 @@ final class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Search and replace the HTML of the form field with the value.
      */
-    public function populateField($field, $value, $formName, &$formHtml): void
+    public function populateField(Field $field, $value, $formName, &$formHtml): void
     {
-        \assert($field instanceof Field);
         $alias = $field->getAlias();
 
         $inputClosePattern = '(.*?)\/?>';

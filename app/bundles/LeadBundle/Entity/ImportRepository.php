@@ -15,6 +15,9 @@ final class ImportRepository extends CommonRepository
      *
      * @param int $ghostDelay when is the import ghost? In hours
      */
+    /**
+     * @return Import[]
+     */
     public function getGhostImports(int $ghostDelay = 2, ?int $limit = null): array
     {
         $q = $this->getQueryForStatuses([Import::IN_PROGRESS]);

@@ -64,7 +64,6 @@ final class UserListType extends AbstractType
         );
 
         foreach ($users as $user) {
-            \assert($user instanceof \Mautic\UserBundle\Entity\User);
             $this->choices[$user->getName(true).' ('.$user->getId().')'] = $user->getId();
         }
 

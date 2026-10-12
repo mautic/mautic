@@ -228,13 +228,11 @@ final class PageController extends AbstractStandardFormController
 
         // get A/B test information
         [$parent, $children]     = $activePage->getVariants();
-        \assert($parent instanceof Page);
         $properties              = [];
         $variantError            = false;
         $weight                  = 0;
         if (count($children)) {
             foreach ($children as $c) {
-                \assert($c instanceof Page);
                 $variantSettings = $c->getVariantSettings();
 
                 if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {

@@ -333,7 +333,6 @@ final class PageModel extends FormModel implements GlobalSearchInterface
      */
     public function generateSlug($entity): string
     {
-        \assert($entity instanceof Page);
         $pageSlug = $entity->getAlias();
 
         // should the url include the category

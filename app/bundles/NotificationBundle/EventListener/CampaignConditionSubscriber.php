@@ -36,8 +36,7 @@ final class CampaignConditionSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $lead = $event->getLead();
-        \assert($lead instanceof \Mautic\LeadBundle\Entity\Lead);
+        $lead    = $event->getLead();
         $pushIds = $lead->getPushIDs();
         /** @var PushID $pushID */
         foreach ($pushIds as $pushID) {

@@ -178,7 +178,6 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         // Check Landing Pages
         if ($pageHit instanceof Page) {
             [$parent, $children] = $pageHit->getVariants();
-            \assert($parent instanceof Page);
             // use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {

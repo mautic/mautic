@@ -486,7 +486,6 @@ final class CampaignApiController extends CommonApiController
             }
 
             $uploadedFile = array_values($files)[0];
-            \assert($uploadedFile instanceof \Symfony\Component\HttpFoundation\File\UploadedFile);
 
             if (!$uploadedFile->isValid()) {
                 return $this->handleView(

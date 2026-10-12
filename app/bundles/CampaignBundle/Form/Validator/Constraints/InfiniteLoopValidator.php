@@ -18,7 +18,6 @@ final class InfiniteLoopValidator extends ConstraintValidator
         }
 
         $root = $this->context->getRoot();
-        \assert($root instanceof \Symfony\Component\Form\FormInterface);
         $data = $root->getData();
 
         $this->validateEvent($this->context, $data['triggerMode'] ?? '', $value, (int) ($data['triggerInterval'] ?? 0), $data['triggerIntervalUnit'] ?? '');

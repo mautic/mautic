@@ -128,7 +128,6 @@ final class ClientType extends AbstractType
             function (FormEvent $event): void {
                 $form = $event->getForm();
                 $data = $event->getData();
-                \assert($data instanceof Client);
 
                 if ($form->has('redirectUris')) {
                     foreach ($data->getRedirectUris() as $uri) {

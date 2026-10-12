@@ -265,7 +265,6 @@ final class HttpFactoryTest extends TestCase
 
         $reflectedGrantType = new \ReflectionClass($grantType);
         $reauthConfig       = $this->getProperty($reflectedGrantType, $grantType, 'config');
-        \assert($reauthConfig instanceof \kamermans\OAuth2\Utils\Collection);
 
         $expectedConfig = [
             'client_id'     => $credentials->getClientId(),

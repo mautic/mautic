@@ -72,7 +72,6 @@ final class EmailType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('email.email', $options));
 
         $emailEntity =  $options['data'];
-        \assert($emailEntity instanceof Email);
 
         // Apply only defaults that should be persisted on new emails, such as UTM tags.
         // Preference center fallback is resolved dynamically at unsubscribe time.

@@ -163,14 +163,13 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
+     * @return iterable<Sms>
      */
     public function getEntities(array $args = []): iterable
     {
         $entities = parent::getEntities($args);
 
         foreach ($entities as $entity) {
-            \assert($entity instanceof Sms);
             $pending = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'sms', $entity->getId(), 'pending'));
 
             if (null !== $pending) {
@@ -340,7 +339,6 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
             ];
 
             foreach ($recipientCollection as $recipient) {
-                \assert($recipient instanceof SmsRecipientDTO);
                 $defaultSendResult['content'] = $recipient->getFinalMessage();
                 if (true !== $recipient->getResult()) {
                     $defaultSendResult['sent']   = false;

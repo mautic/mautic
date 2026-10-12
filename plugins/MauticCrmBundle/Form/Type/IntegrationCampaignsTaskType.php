@@ -37,7 +37,6 @@ final class IntegrationCampaignsTaskType extends AbstractType
                     new Callback(
                         function ($validateMe, ExecutionContextInterface $context): void {
                             $root = $context->getRoot();
-                            \assert($root instanceof \Symfony\Component\Form\FormInterface);
                             $data = $root->getData();
                             if (!empty($data['properties']['config']['push_activities']) && empty($validateMe)) {
                                 $context->buildViolation('mautic.core.value.required')->addViolation();
@@ -70,7 +69,6 @@ final class IntegrationCampaignsTaskType extends AbstractType
                     new Callback(
                         function ($validateMe, ExecutionContextInterface $context): void {
                             $root = $context->getRoot();
-                            \assert($root instanceof \Symfony\Component\Form\FormInterface);
                             $data = $root->getData();
                             if (!empty($data['properties']['config']['push_activities']) && empty($validateMe)) {
                                 $context->buildViolation('mautic.core.value.required')->addViolation();

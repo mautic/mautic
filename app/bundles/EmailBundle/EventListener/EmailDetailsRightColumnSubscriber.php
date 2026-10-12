@@ -25,7 +25,6 @@ final class EmailDetailsRightColumnSubscriber implements EventSubscriberInterfac
         if ($event->checkContext('@MauticEmail/Email/details.html.twig', 'right.section.start')) {
             $vars  = $event->getVars();
             $email = $vars['email'];
-            \assert($email instanceof \Mautic\EmailBundle\Entity\Email);
 
             $data = [
                 'email'          => $email,

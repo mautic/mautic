@@ -295,7 +295,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
                     $total = 0;
                     foreach ($children as $child) {
-                        \assert($child instanceof self);
                         $settings = $child->getVariantSettings();
                         $total += (int) $settings['weight'];
                     }

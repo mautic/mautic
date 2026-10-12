@@ -26,7 +26,6 @@ final class LeadListAccessValidator extends ConstraintValidator
         if (count($value)) {
             $lists = $this->segmentModel->getUserLists();
             foreach ($value as $l) {
-                \assert($l instanceof \Mautic\LeadBundle\Entity\LeadList);
                 if (!isset($lists[$l->getId()])) {
                     $this->context->addViolation(
                         $constraint->message,

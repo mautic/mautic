@@ -71,6 +71,9 @@ final class UserRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
+    /**
+     * @return iterable<User>
+     */
     public function getEntities(array $args = []): iterable
     {
         $q = $this

@@ -102,7 +102,6 @@ final class SummaryModel extends AbstractCommonModel
 
         // Start with the current hour.
         $start ??= new \DateTime('+1 hour');
-        \assert($start instanceof \DateTime);
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
         $end = $this->leadEventLogRepository->getOldestTriggeredDate();
 

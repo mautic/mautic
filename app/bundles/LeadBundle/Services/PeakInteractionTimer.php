@@ -234,7 +234,6 @@ class PeakInteractionTimer
                 default       => throw new \Exception('Unhandled interaction type: '.$type),
             };
             $interactionDate = $interaction[$dateKey];
-            \assert($interactionDate instanceof \DateTime);
             $interactionDate->setTimezone($dateTimeZone);
 
             $interactionKey = $type.':'.$interactionDate->format('Y-m-d_H');

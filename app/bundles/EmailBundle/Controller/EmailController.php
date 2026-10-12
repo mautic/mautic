@@ -349,7 +349,6 @@ final class EmailController extends AbstractStandardFormController
 
         // get A/B test information
         [$parent, $children] = $email->getVariants();
-        \assert($parent instanceof Email);
 
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
@@ -1382,8 +1381,10 @@ final class EmailController extends AbstractStandardFormController
             }
 
             // setting parent here, as the parent will be removed by the code below.
-            $parent = $entity->getVariantParent() ?? $entity;
-            \assert($parent instanceof Email);
+            $parent = $entity->getVariantParent();
+            if (!$parent instanceof Email) {
+                $parent = $entity;
+            }
 
             $this->emailModel->convertWinnerVariant($entity);
 

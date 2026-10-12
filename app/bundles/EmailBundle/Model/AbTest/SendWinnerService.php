@@ -112,7 +112,6 @@ final class SendWinnerService
     {
         // g et A/B test information
         [$parent, $children] = $email->getVariants();
-        \assert($parent instanceof Email);
 
         if (!array_key_exists('sendWinnerDelay', $abTestSettings) || $abTestSettings['sendWinnerDelay'] < 1) {
             throw new NotReadyToSendWinnerException('Amount of time to send winner email not specified in AB test variant settings.');

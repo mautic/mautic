@@ -771,6 +771,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return \DateTime[]
      */
+    /**
+     * @param-out FormInterface $dateRangeForm
+     */
     protected function getViewDateRange(Request $request, $objectId, $returnUrl, $timezone = 'local', &$dateRangeForm = null): array
     {
         $name            = $this->getSessionBase($objectId).'.view.daterange';

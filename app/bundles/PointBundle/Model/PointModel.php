@@ -353,7 +353,6 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
         );
         $pointActionIds = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof Point);
             $properties = $entity->getProperties();
             if (in_array($emailId, $properties['emails'] ?? [])) {
                 $pointActionIds[] = $entity->getId();

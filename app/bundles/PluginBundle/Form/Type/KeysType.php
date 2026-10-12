@@ -18,7 +18,6 @@ final class KeysType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $object       = $options['integration_object'];
-        \assert($object instanceof \Mautic\PluginBundle\Integration\AbstractIntegration);
         $secretKeys   = $object->getSecretKeys();
         $requiredKeys = $object->getRequiredKeyFields();
 
@@ -61,7 +60,6 @@ final class KeysType extends AbstractType
                 ]
             );
         }
-        \assert($builder instanceof \Symfony\Component\Form\FormBuilder);
         $object->appendToForm($builder, $options['data'], 'keys');
     }
 

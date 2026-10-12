@@ -134,7 +134,6 @@ final class ConfigType extends AbstractType
                     new Callback(
                         function ($hourEnd, ExecutionContextInterface $context): void {
                             $root = $context->getRoot();
-                            \assert($root instanceof \Symfony\Component\Form\FormInterface);
                             $data      = $root->getData();
                             $hourStart = $data['campaignconfig']['peak_interaction_timer_best_default_hour_start'] ?? null;
                             if (null !== $hourStart && null !== $hourEnd && $hourStart >= $hourEnd) {

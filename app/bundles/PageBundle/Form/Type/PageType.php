@@ -192,7 +192,6 @@ final class PageType extends AbstractType
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier): void {
                 $page = $event->getData();
-                \assert($page instanceof Page);
                 $formModifier(
                     $event->getForm(),
                     $page->getVariantParent()

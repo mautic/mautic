@@ -144,7 +144,6 @@ trait FrequencyRuleTrait
         $this->leadLists    = $this->frequencyRuleLeadModel->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
         foreach ($this->leadLists as $leadList) {
-            \assert($leadList instanceof \Mautic\LeadBundle\Entity\LeadList);
             $data['lead_lists'][] = $leadList->getId();
         }
 

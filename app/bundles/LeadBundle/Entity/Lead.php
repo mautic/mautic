@@ -440,18 +440,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $current = $oldValue ?? $this->{$getter}();
         if ('owner' == $prop) {
             if ($current && !$val) {
-                \assert($current instanceof \Mautic\UserBundle\Entity\User);
                 $this->changes['owner'] = [$current->getId(), $val];
             } elseif (!$current && $val) {
-                \assert($val instanceof \Mautic\UserBundle\Entity\User);
                 $this->changes['owner'] = [$current, $val->getId()];
             } elseif ($current && $val && $current->getId() != $val->getId()) {
-                \assert($current instanceof \Mautic\UserBundle\Entity\User);
-                \assert($val instanceof \Mautic\UserBundle\Entity\User);
                 $this->changes['owner'] = [$current->getId(), $val->getId()];
             }
         } elseif ('ipAddresses' == $prop) {
-            \assert($val instanceof \Mautic\CoreBundle\Entity\IpAddress);
             $this->changes['ipAddresses'] = ['', $val->getIpAddress()]; // Kept for BC. Not a good way to track changes on a collection
 
             if (empty($this->changes['ipAddressList'])) {
@@ -495,14 +490,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             }
         } elseif ('stage' == $prop) {
             if ($current && !$val) {
-                \assert($current instanceof \Mautic\StageBundle\Entity\Stage);
                 $this->changes['stage'] = [$current->getId(), $val];
             } elseif (!$current && $val) {
-                \assert($val instanceof \Mautic\StageBundle\Entity\Stage);
                 $this->changes['stage'] = [$current, $val->getId()];
             } elseif ($current && $val && $current->getId() != $val->getId()) {
-                \assert($current instanceof \Mautic\StageBundle\Entity\Stage);
-                \assert($val instanceof \Mautic\StageBundle\Entity\Stage);
                 $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
         } elseif ('points' == $prop && $current != $val) {

@@ -41,6 +41,9 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
      *
      * @return array<string, mixed> Array containing the created entities
      */
+    /**
+     * @return array{user: User|null, segment: LeadList, email: Email, dwc: DynamicContent, company: Company, contact1: Lead, contact2: Lead}
+     */
     private function createTestEntities(): array
     {
         $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
@@ -111,11 +114,6 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $email    = $entities['email'];
         $dwc      = $entities['dwc'];
         $company  = $entities['company'];
-        \assert($user instanceof User);
-        \assert($segment instanceof LeadList);
-        \assert($email instanceof Email);
-        \assert($dwc instanceof DynamicContent);
-        \assert($company instanceof Company);
 
         $payload = [
             'name'        => 'test',

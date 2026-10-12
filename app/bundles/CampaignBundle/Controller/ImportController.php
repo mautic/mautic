@@ -151,7 +151,6 @@ final class ImportController extends AbstractFormController
                     }
 
                     // Move uploaded file
-                    \assert($fileData instanceof \Symfony\Component\HttpFoundation\File\UploadedFile);
                     $fileData->move($importDir, $fileName);
 
                     // Update session with the new file and progress reset

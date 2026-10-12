@@ -81,7 +81,6 @@ final class TriggerEventModel extends CommonFormModel
         );
         $dependents = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof TriggerEvent);
             $retrFilters = $entity->getProperties();
             foreach ($retrFilters as $eachFilter) {
                 if (in_array($segmentId, $eachFilter)) {
@@ -110,7 +109,6 @@ final class TriggerEventModel extends CommonFormModel
         );
         $triggerIds = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof TriggerEvent);
             $properties = $entity->getProperties();
             if (isset($properties['email']) && (int) $properties['email'] === $emailId) {
                 $triggerIds[] = $entity->getTrigger()->getId();
@@ -140,7 +138,6 @@ final class TriggerEventModel extends CommonFormModel
         );
         $triggerIds = [];
         foreach ($entities as $entity) {
-            \assert($entity instanceof TriggerEvent);
             $properties = $entity->getProperties();
             foreach ($properties as $property) {
                 if (in_array($tagName, $property)) {

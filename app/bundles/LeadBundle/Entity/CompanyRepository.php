@@ -67,8 +67,6 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
             return null;
         }
 
-        \assert($entity instanceof \Mautic\LeadBundle\Entity\Company);
-
         if ($entity->getFields()) {
             // Pulled from Doctrine memory so don't make unnecessary queries as this has already happened
             return $entity;

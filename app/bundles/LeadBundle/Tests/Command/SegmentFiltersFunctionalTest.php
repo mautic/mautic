@@ -205,9 +205,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                \assert($contact instanceof \Mautic\LeadBundle\Entity\Lead);
-
+            function (Lead $contact): bool {
                 return empty($contact->getFields()) || 'value1' !== $contact->getField(self::FIELD_NAME)['value'];
             },
         ];
@@ -218,9 +216,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                \assert($contact instanceof \Mautic\LeadBundle\Entity\Lead);
-
+            function (Lead $contact): bool {
                 return empty($contact->getFields())
                     || !in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']);
             },
@@ -233,9 +229,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                \assert($contact instanceof \Mautic\LeadBundle\Entity\Lead);
-
+            function (Lead $contact): bool {
                 return !empty($contact->getFields()) && 'value1' === $contact->getField(self::FIELD_NAME)['value'];
             },
         ];
@@ -246,9 +240,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                \assert($contact instanceof \Mautic\LeadBundle\Entity\Lead);
-
+            function (Lead $contact): bool {
                 return !empty($contact->getFields())
                     && in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']);
             },
