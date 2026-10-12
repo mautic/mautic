@@ -5,12 +5,6 @@
 !.gitkeep
 !.ddev
 !.php-cs-fixer.php
-!.agents
-.agents/*
-!.agents/skills
-!.claude
-.claude/*
-!.claude/skills
 !.github/ci-files/.my.cnf
 .ddev/mautic-preference
 /.ddev/docker-compose.host-docker-internal.yaml

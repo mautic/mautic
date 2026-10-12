@@ -127,6 +127,8 @@ For UI changes, also run `ddev composer run e2e-test`.
 
 ## Agent Skills
 
-Deeper, task-specific guidance lives in `.agents/skills/`, the directory Codex, Cursor, Gemini CLI and Copilot scan. `.claude/skills/` is a symlink to it for Claude Code. Each skill is a `SKILL.md` with optional `references/`, following the [Agent Skills](https://agentskills.io) format, and is loaded on demand by agents that support it. Any agent can read the files directly.
+Deeper, task-specific guidance lives in `.agents/skills/`, the directory Codex, Cursor, Gemini CLI and Copilot scan. Each skill also has a symlink in `.claude/skills/` pointing to it, for Claude Code. Each skill is a `SKILL.md` with optional `references/`, following the [Agent Skills](https://agentskills.io) format, and is loaded on demand by agents that support it. Any agent can read the files directly.
+
+`.gitignore` ignores every directory that starts with a dot, so a new skill and its symlink are added with `git add -f`. Once tracked, Git follows changes to them as usual, and contributors' own skills and agent settings stay ignored.
 
 - `.agents/skills/mautic-dev/`: Mautic-specific pitfalls, how to verify a change before CI does, and links to the developer documentation and to code examples, for core and plugin development.
