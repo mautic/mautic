@@ -14,10 +14,7 @@ abstract class AbstractFormatter
 
     protected string $name;
 
-    /**
-     * @return AbstractFormatter
-     */
-    public static function createFormatter(Connection $db)
+    public static function createFormatter(Connection $db): self
     {
         $name  = DatabasePlatform::getDatabasePlatform($db->getDatabasePlatform());
         $class = '\Mautic\CoreBundle\Doctrine\QueryFormatter\\'.ucfirst($name).'Formatter';

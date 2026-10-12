@@ -263,7 +263,7 @@ jobs:
           bin/console cache:warmup
           vendor/bin/rector --dry-run --ansi
         elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
-          bin/console lint:twig app plugins
+          bin/console lint:twig app bin plugins
         elif [[ "${{ matrix.commands }}" == "Easy Coding Standard" ]]; then
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             if [[ $file == *.php ]]; then
@@ -346,21 +346,12 @@ jobs:
           php .github/scripts/compare-identifiers.php /tmp/identifiers-base.json /tmp/identifiers-head.json
         elif [[ "${{ matrix.commands }}" == "Class Leak" ]]; then
           # skip-type entries are false positives: Symfony autodiscovered services and test helpers class-leak cannot see referenced
-          vendor/bin/class-leak check app \
-            --skip-type "Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput" \
+          vendor/bin/class-leak check app plugins \
             --skip-type "Mautic\CoreBundle\Doctrine\QueryFormatter\MysqlFormatter" \
-            --skip-type "Mautic\CoreBundle\Entity\Transformer\NotificationArrayTransformer" \
             --skip-type "Mautic\CoreBundle\Factory\PageHelperFactory" \
-            --skip-type "Mautic\CoreBundle\Controller\KeepAliveController" \
-            --skip-type "Mautic\CoreBundle\Controller\LockController" \
-            --skip-type "Mautic\CoreBundle\Tests\Twig\TwigIntegrationTestTrait" \
             --skip-type "Mautic\IntegrationsBundle\Migrations\Version_0_0_1" \
-            --skip-type "Mautic\IntegrationsBundle\Tests\Functional\Auth\Provider\Oauth2ThreeLegged\HttpFactory" \
-            --skip-type "Mautic\IntegrationsBundle\Integration\DefaultConfigFormTrait" \
-            --skip-type "Mautic\MessengerBundle\DependencyInjection\EnvProcessor\MessengerNullableEnvVarProcessor" \
-            --skip-type "Mautic\MessengerBundle\Transport\NullTransportFactory" \
-            --skip-type "Mautic\PluginBundle\Integration\AbstractSsoFormIntegration" \
-            --skip-type "Mautic\ReportBundle\Tests\Form\Type\DynamicFiltersTypeIntegrationTest"
+            --skip-path "plugins/MauticFullContactBundle/Services/" \
+            --skip-path "plugins/MauticEmailMarketingBundle/Api/"
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer validate --ansi
         else
