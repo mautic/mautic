@@ -7,6 +7,7 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\ConfigType;
 use Mautic\UserBundle\Security\OIDC\ClientCredentials;
 use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
@@ -30,6 +31,7 @@ final class ConfigSubscriber implements EventSubscriberInterface
         private readonly ClientFactoryInterface $clientFactory,
         private readonly TranslatorInterface $translator,
         private readonly LoggerInterface $logger,
+        private readonly OidcSubjectIdRepository $subjectIdRepository,
     ) {
     }
 
@@ -38,6 +40,7 @@ final class ConfigSubscriber implements EventSubscriberInterface
         return [
             ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
             ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigSave', 0],
+            ConfigEvents::CONFIG_POST_SAVE   => ['onConfigPostSave', 0],
         ];
     }
 
@@ -59,6 +62,11 @@ final class ConfigSubscriber implements EventSubscriberInterface
     {
         $this->validateOidcConnection($event);
         $this->processSamlConfig($event);
+    }
+
+    public function onConfigPostSave(ConfigEvent $event): void
+    {
+        $this->deleteOidcLinksIfMappingFieldChanged($event);
     }
 
     private function validateOidcConnection(ConfigEvent $event): void
@@ -130,6 +138,25 @@ final class ConfigSubscriber implements EventSubscriberInterface
         }
 
         $event->setConfig($data, 'userconfig');
+    }
+
+    private function deleteOidcLinksIfMappingFieldChanged(ConfigEvent $event): void
+    {
+        $originalData = $event->getOriginalNormData();
+        $newData      = $event->getConfig('userconfig');
+
+        $originalMappingField = $originalData['userconfig']['open_id_mapping_field'] ?? null;
+        $newMappingField      = $newData['open_id_mapping_field'] ?? null;
+
+        // Only delete links if:
+        // 1. The new mapping field is not null/empty (OIDC is actually configured)
+        // 2. The mapping field has changed
+        if (!empty($newMappingField) && $newMappingField !== $originalMappingField) {
+            $this->subjectIdRepository->createQueryBuilder('s')
+                ->delete()
+                ->getQuery()
+                ->execute();
+        }
     }
 
     private function validateXml(string $content): bool

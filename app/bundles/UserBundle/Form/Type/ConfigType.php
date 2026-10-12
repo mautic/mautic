@@ -5,10 +5,8 @@ namespace Mautic\UserBundle\Form\Type;
 use Mautic\ConfigBundle\Form\Type\ConfigFileType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Security\OIDC\ClientCredentials;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -39,7 +37,6 @@ final class ConfigType extends AbstractType
         private readonly CoreParametersHelper $parameters,
         private readonly TranslatorInterface $translator,
         private readonly ClientCredentials $clientCredentials,
-        private readonly OidcSubjectIdRepository $subjectIdRepository,
     ) {
     }
 
@@ -345,7 +342,6 @@ final class ConfigType extends AbstractType
         );
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $this->onPreSubmit(...));
-        $builder->addEventListener(FormEvents::POST_SUBMIT, $this->onPostSubmit(...));
     }
 
     public function onPreSubmit(PreSubmitEvent $event): void
@@ -353,17 +349,6 @@ final class ConfigType extends AbstractType
         $data = $event->getData();
         if (empty($data['open_id_client_secret'])) {
             $event->setData(array_merge($data, ['open_id_client_secret' => $this->clientCredentials->getClientSecret()]));
-        }
-    }
-
-    public function onPostSubmit(PostSubmitEvent $event): void
-    {
-        $data = $event->getData();
-        if ($data['open_id_mapping_field'] !== $this->clientCredentials->getMappingField()) {
-            $this->subjectIdRepository->createQueryBuilder('s')
-                ->delete()
-                ->getQuery()
-                ->execute();
         }
     }
 
