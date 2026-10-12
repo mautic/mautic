@@ -68,6 +68,11 @@ parameters:
             identifier: argument.type
             path: app/bundles/CoreBundle/Controller/AjaxController.php
 
+        # page translation entity passed where concrete Page expected in builder tokens
+        -
+            identifier: argument.type
+            path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
+
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: symplify.noNullableServiceInConstructor
@@ -157,13 +162,7 @@ parameters:
             message: '#Property .+::\$translationChildren type mapping mismatch: property can contain .+but database expects#'
             path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
             identifier: doctrine.associationType
-        # getTranslationChildren element type is per-implementor; a generic docblock resolves to the bound interface and breaks concrete callers
-#        -
-#            message: '#Method "getTranslationChildren\(\)" returns bare "Collection"#'
-#            identifier: mautic.collectionReturnMustHaveGenericDocblock
-#            paths:
-#                - app/bundles/CoreBundle/Entity/TranslationEntityInterface.php
-#                - app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+
         -
             message: '#Property .+::\$variantParent type mapping mismatch: property can contain .+VariantEntityInterface\|null but database expects#'
             path: app/bundles/CoreBundle/Entity/VariantEntityTrait.php
