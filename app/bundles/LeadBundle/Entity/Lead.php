@@ -778,7 +778,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     {
         try {
             $value = $this->getFieldValue($alias);
-        } catch (\Throwable) {
+        } catch (\InvalidArgumentException) {
+            // CommonEntity::__call throws for a property alias without getter
             return null;
         }
 
