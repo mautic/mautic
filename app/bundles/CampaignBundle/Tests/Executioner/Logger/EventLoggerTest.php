@@ -50,9 +50,9 @@ final class EventLoggerTest extends TestCase
     {
         $logCollection = new ArrayCollection();
         while ($logCollection->count() < 60) {
-            $log = $this->createMock(LeadEventLog::class);
-            $log->method('getId')
-                ->willReturn($logCollection->count() + 1);
+            $log   = new LeadEventLog();
+            $logId = new \ReflectionProperty($log, 'id');
+            $logId->setValue($log, $logCollection->count() + 1);
 
             $logCollection->add($log);
         }
@@ -91,9 +91,8 @@ final class EventLoggerTest extends TestCase
         $event = new Event();
         $event->setCampaign($campaign);
 
-        /** @var MockObject&Lead $contact */
-        $contact = $this->createMock(Lead::class);
-        $contact->method('getId')->willReturn(1);
+        $contact = new Lead();
+        $contact->setId(1);
 
         // rotation for campaign 1 and contact 1
         $log = $this->getLogger()->buildLogEntry($event, $contact, false);

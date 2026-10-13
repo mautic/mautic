@@ -137,27 +137,17 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
     public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')
-            ->willReturn(1);
+        $campaign = new Campaign();
+        (new \ReflectionProperty($campaign, 'id'))->setValue($campaign, 1);
 
-        $event = $this->createMock(Event::class);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerInterval')
-            ->willReturn(1);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('d');
-        $event->method('getTriggerHour')
-            ->willReturn(
-                new \DateTime('1970-01-01 09:00:00')
-            );
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([]);
-        $event->method('getCampaign')
-            ->willReturn($campaign);
-        $event->method('getId')
-            ->willReturn(1);
+        $event = new Event();
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerInterval(1);
+        $event->setTriggerIntervalUnit('d');
+        $event->setTriggerHour('1970-01-01 09:00:00');
+        $event->setTriggerRestrictedDaysOfWeek([]);
+        $event->setCampaign($campaign);
+        (new \ReflectionProperty($event, 'id'))->setValue($event, 1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00', new \DateTimeZone('America/New_York'));
@@ -168,21 +158,15 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         // Simulate now with a few seconds past trigger date because in reality it won't be exact
         $simulatedNow = new \DateTime('2018-08-31 13:00:15', new \DateTimeZone('America/New_York'));
 
-        $contact = $this->createMock(Lead::class);
-        $contact->method('getId')
-            ->willReturn(1);
-        $contact->method('getTimezone')
-            ->willReturn('America/New_York');
+        $contact = new Lead();
+        $contact->setId(1);
+        $contact->setTimezone('America/New_York');
 
-        $log = $this->createMock(LeadEventLog::class);
-        $log->method('getTriggerDate')
-            ->willReturn($logTriggerDate);
-        $log->method('getDateTriggered')
-            ->willReturn($logDateTriggered);
-        $log->method('getLead')
-            ->willReturn($contact);
-        $log->method('getEvent')
-            ->willReturn($event);
+        $log = new LeadEventLog();
+        $log->setTriggerDate($logTriggerDate);
+        $log->setDateTriggered($logDateTriggered);
+        $log->setLead($contact);
+        $log->setEvent($event);
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
@@ -192,27 +176,17 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
     public function testEventIsRescheduledForRelativeTimeIfAppropriate(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')
-            ->willReturn(1);
+        $campaign = new Campaign();
+        (new \ReflectionProperty($campaign, 'id'))->setValue($campaign, 1);
 
-        $event = $this->createMock(Event::class);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerInterval')
-            ->willReturn(1);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('d');
-        $event->method('getTriggerHour')
-            ->willReturn(
-                new \DateTime('1970-01-01 11:00:00')
-            );
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([]);
-        $event->method('getCampaign')
-            ->willReturn($campaign);
-        $event->method('getId')
-            ->willReturn(1);
+        $event = new Event();
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerInterval(1);
+        $event->setTriggerIntervalUnit('d');
+        $event->setTriggerHour('1970-01-01 11:00:00');
+        $event->setTriggerRestrictedDaysOfWeek([]);
+        $event->setCampaign($campaign);
+        (new \ReflectionProperty($event, 'id'))->setValue($event, 1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00');
@@ -223,21 +197,15 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         // Simulate now with a few seconds past trigger date because in reality it won't be exact
         $simulatedNow = new \DateTime('2018-08-31 13:00:15');
 
-        $contact = $this->createMock(Lead::class);
-        $contact->method('getId')
-            ->willReturn(1);
-        $contact->method('getTimezone')
-            ->willReturn('America/New_York');
+        $contact = new Lead();
+        $contact->setId(1);
+        $contact->setTimezone('America/New_York');
 
-        $log = $this->createMock(LeadEventLog::class);
-        $log->method('getTriggerDate')
-            ->willReturn($logTriggerDate);
-        $log->method('getDateTriggered')
-            ->willReturn($logDateTriggered);
-        $log->method('getLead')
-            ->willReturn($contact);
-        $log->method('getEvent')
-            ->willReturn($event);
+        $log = new LeadEventLog();
+        $log->setTriggerDate($logTriggerDate);
+        $log->setDateTriggered($logDateTriggered);
+        $log->setLead($contact);
+        $log->setEvent($event);
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
@@ -248,9 +216,8 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
     public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')
-            ->willReturn(1);
+        $campaign = new Campaign();
+        (new \ReflectionProperty($campaign, 'id'))->setValue($campaign, 1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00', new \DateTimeZone('America/New_York'));
@@ -263,37 +230,24 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $dow = $simulatedNow->format('w');
 
-        $event = $this->createMock(Event::class);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerRestrictedStartHour')
-            ->willReturn(new \DateTime('1970-01-01 10:00:00'));
-        $event->method('getTriggerRestrictedStopHour')
-            ->willReturn(new \DateTime('1970-01-01 20:00:00'));
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([$dow]);
-        $event->method('getCampaign')
-            ->willReturn($campaign);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('d');
-        $event->method('getId')
-            ->willReturn(1);
+        $event = new Event();
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerRestrictedStartHour(new \DateTime('1970-01-01 10:00:00'));
+        $event->setTriggerRestrictedStopHour(new \DateTime('1970-01-01 20:00:00'));
+        $event->setTriggerRestrictedDaysOfWeek([$dow]);
+        $event->setCampaign($campaign);
+        $event->setTriggerIntervalUnit('d');
+        (new \ReflectionProperty($event, 'id'))->setValue($event, 1);
 
-        $contact = $this->createMock(Lead::class);
-        $contact->method('getId')
-            ->willReturn(1);
-        $contact->method('getTimezone')
-            ->willReturn('America/New_York');
+        $contact = new Lead();
+        $contact->setId(1);
+        $contact->setTimezone('America/New_York');
 
-        $log = $this->createMock(LeadEventLog::class);
-        $log->method('getTriggerDate')
-            ->willReturn($logTriggerDate);
-        $log->method('getDateTriggered')
-            ->willReturn($logDateTriggered);
-        $log->method('getLead')
-            ->willReturn($contact);
-        $log->method('getEvent')
-            ->willReturn($event);
+        $log = new LeadEventLog();
+        $log->setTriggerDate($logTriggerDate);
+        $log->setDateTriggered($logDateTriggered);
+        $log->setLead($contact);
+        $log->setEvent($event);
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
 

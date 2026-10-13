@@ -92,11 +92,9 @@ final class InactiveHelperTest extends TestCase
             ->method('getNonActionPathTaken')
             ->willReturnOnConsecutiveCalls(1, 0, 1);
 
-        /** @var Campaign&MockObject $campaign */
-        $campaign = $this->createMock(Campaign::class);
-        $campaign
-            ->method('getId')
-            ->willReturn(2);
+        $campaign   = new Campaign();
+        $campaignId = new \ReflectionProperty($campaign, 'id');
+        $campaignId->setValue($campaign, 2);
 
         /** @var Event&MockObject $parentEvent */
         $parentEvent = $this->createMock(Event::class);

@@ -121,8 +121,9 @@ final class EventModelTest extends TestCase
             'new1',
         ];
 
-        $redirectEvent = $this->createMock(Event::class);
-        $redirectEvent->method('getId')->willReturn(123);
+        $redirectEvent = new Event();
+        $reflection    = new \ReflectionProperty($redirectEvent, 'id');
+        $reflection->setValue($redirectEvent, 123);
 
         $deletedEvents = [
             ['id' => 'new1', 'redirectEvent' => null],

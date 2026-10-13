@@ -74,8 +74,7 @@ final class EventRedirectionHelperTest extends TestCase
         $campaign = new Campaign();
 
         $deletedEvent     = $this->createEventWithId(1);
-        $nonExistentEvent = $this->createMock(Event::class);
-        $nonExistentEvent->method('getId')->willReturn(null);
+        $nonExistentEvent = new Event();
         $deletedEvent->setRedirectEvent($nonExistentEvent);
         $deletedEvent->setCampaign($campaign);
         $deletedEvent->setDeleted(new \DateTime());

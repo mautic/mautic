@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Executioner\Result;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
@@ -16,50 +17,41 @@ final class ResponsesTest extends \PHPUnit\Framework\TestCase
 {
     public function testExtractingResponsesFromLog(): void
     {
-        $actionEvent = $this->createMock(Event::class);
-        $actionEvent->method('getEventType')
-            ->willReturn(Event::TYPE_ACTION);
-        $actionEvent->method('getType')
-            ->willReturn('actionEvent');
-        $actionEvent->method('getId')
-            ->willReturn(1);
+        $idProperty = new \ReflectionProperty(Event::class, 'id');
+        $campaign   = new Campaign();
+
+        $actionEvent = new Event();
+        $actionEvent->setCampaign($campaign);
+        $actionEvent->setEventType(Event::TYPE_ACTION);
+        $actionEvent->setType('actionEvent');
+        $idProperty->setValue($actionEvent, 1);
 
         // BC should set response as just test
-        $actionLog = $this->createMock(LeadEventLog::class);
-        $actionLog->method('getEvent')
-            ->willReturn($actionEvent);
-        $actionLog->method('getMetadata')
-            ->willReturn(['timeline' => 'test']);
+        $actionLog = new LeadEventLog();
+        $actionLog->setEvent($actionEvent);
+        $actionLog->setMetadata(['timeline' => 'test']);
 
-        $action2Event = $this->createMock(Event::class);
-        $action2Event->method('getEventType')
-            ->willReturn(Event::TYPE_ACTION);
-        $action2Event->method('getType')
-            ->willReturn('action2Event');
-        $action2Event->method('getId')
-            ->willReturn(2);
+        $action2Event = new Event();
+        $action2Event->setCampaign($campaign);
+        $action2Event->setEventType(Event::TYPE_ACTION);
+        $action2Event->setType('action2Event');
+        $idProperty->setValue($action2Event, 2);
 
         // Response should be full array
-        $action2Log = $this->createMock(LeadEventLog::class);
-        $action2Log->method('getEvent')
-            ->willReturn($action2Event);
-        $action2Log->method('getMetadata')
-            ->willReturn(['timeline' => 'test', 'something' => 'else']);
+        $action2Log = new LeadEventLog();
+        $action2Log->setEvent($action2Event);
+        $action2Log->setMetadata(['timeline' => 'test', 'something' => 'else']);
 
         // Response should be full array
-        $conditionEvent = $this->createMock(Event::class);
-        $conditionEvent->method('getEventType')
-            ->willReturn(Event::TYPE_CONDITION);
-        $conditionEvent->method('getType')
-            ->willReturn('conditionEvent');
-        $conditionEvent->method('getId')
-            ->willReturn(3);
+        $conditionEvent = new Event();
+        $conditionEvent->setCampaign($campaign);
+        $conditionEvent->setEventType(Event::TYPE_CONDITION);
+        $conditionEvent->setType('conditionEvent');
+        $idProperty->setValue($conditionEvent, 3);
 
-        $conditionLog = $this->createMock(LeadEventLog::class);
-        $conditionLog->method('getEvent')
-            ->willReturn($conditionEvent);
-        $conditionLog->method('getMetadata')
-            ->willReturn(['something' => 'else']);
+        $conditionLog = new LeadEventLog();
+        $conditionLog->setEvent($conditionEvent);
+        $conditionLog->setMetadata(['something' => 'else']);
 
         /** @var Collection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$actionLog, $action2Log, $conditionLog]);

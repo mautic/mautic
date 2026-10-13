@@ -74,27 +74,23 @@ final class CampaignModelTransactionalTest extends TestCase
     }
 
     /**
-     * Helper function to set up common campaign mock expectations for unpublish tests.
+     * Helper function to build a campaign and the repository data for unpublish tests.
      *
      * @param int  $campaignId  The campaign ID to use
      * @param int  $version     The campaign version to use
      * @param bool $isPublished The current published state
-     *
-     * @return MockObject&Campaign The configured campaign mock
      */
-    private function createCampaignMockForUnpublish(
+    private function createCampaignForUnpublish(
         int $campaignId = 5,
         int $version = 1,
         bool $isPublished = true,
-    ): MockObject&Campaign {
-        /** @var MockObject&Campaign $campaignMock */
-        $campaignMock = $this->createMock(Campaign::class);
+    ): Campaign {
+        $campaign   = new Campaign();
+        $reflection = new \ReflectionProperty($campaign, 'id');
+        $reflection->setValue($campaign, $campaignId);
+        $campaign->setVersion($version);
+        $campaign->setIsPublished($isPublished);
 
-        $campaignMock->expects($this->once())
-            ->method('getId')
-            ->willReturn($campaignId);
-
-        // Mock version data from repository
         $this->campaignRepositoryMock->expects($this->once())
             ->method('getCampaignPublishAndVersionData')
             ->with($campaignId)
@@ -103,24 +99,12 @@ final class CampaignModelTransactionalTest extends TestCase
                 'version'      => $version,
             ]);
 
-        $campaignMock->expects($this->once())
-            ->method('getVersion')
-            ->willReturn($version);
-
-        // Setting published flag
-        $campaignMock->expects($this->once())
-            ->method('setIsPublished')
-            ->with(false);
-
-        $campaignMock->expects($this->once())
-            ->method('markForVersionIncrement');
-
-        return $campaignMock;
+        return $campaign;
     }
 
     public function testTransactionalCampaignUnPublish(): void
     {
-        $campaignMock = $this->createCampaignMockForUnpublish();
+        $campaignMock = $this->createCampaignForUnpublish();
 
         // Saving the entity
         $this->campaignModel->expects($this->once())
@@ -128,6 +112,9 @@ final class CampaignModelTransactionalTest extends TestCase
             ->with($campaignMock);
 
         $this->campaignModel->transactionalCampaignUnPublish($campaignMock);
+
+        $this->assertFalse($campaignMock->getIsPublished());
+        $this->assertTrue($campaignMock->isMarkedForVersionIncrement());
     }
 
     public function testTransactionalCampaignUnPublishWithException(): void
@@ -135,7 +122,7 @@ final class CampaignModelTransactionalTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Database error');
 
-        $campaignMock = $this->createCampaignMockForUnpublish();
+        $campaignMock = $this->createCampaignForUnpublish();
 
         // Saving the entity throws an exception
         $this->campaignModel->expects($this->once())

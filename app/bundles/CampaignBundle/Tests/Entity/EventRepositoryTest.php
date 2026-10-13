@@ -80,10 +80,10 @@ final class EventRepositoryTest extends TestCase
         $this->connection->method('createQueryBuilder')
             ->willReturnCallback(fn (): \PHPUnit\Framework\MockObject\MockObject => $queryBuilderMock);
 
-        $eventMock       = $this->createMock(Event::class);
-        $eventMock->method('getId')
-            ->willReturn(42);
+        $event = new Event();
+        $reflection = new \ReflectionProperty($event, 'id');
+        $reflection->setValue($event, 42);
 
-        $eventRepository->decreaseFailedCount($eventMock);
+        $eventRepository->decreaseFailedCount($event);
     }
 }

@@ -47,7 +47,7 @@ final class CampaignModelTest extends CampaignTestAbstract
     public function testSetLeadSourcesAddsLeadListById(): void
     {
         $model    = $this->initCampaignModel();
-        $campaign = $this->createMock(Campaign::class);
+        $campaign = new Campaign();
         $leadList = $this->createStub(LeadList::class);
 
         $this->entityManager->expects($this->once())
@@ -55,31 +55,29 @@ final class CampaignModelTest extends CampaignTestAbstract
             ->with(LeadList::class, parent::$mockId)
             ->willReturn($leadList);
 
-        $campaign->expects($this->once())
-            ->method('addList')
-            ->with($leadList);
-
         $model->setLeadSources($campaign, ['lists' => [parent::$mockId => parent::$mockName]], []);
+
+        $this->assertTrue($campaign->getLists()->contains($leadList));
     }
 
     public function testSetLeadSourcesIgnoresNonNumericLeadListIdentifier(): void
     {
         $model    = $this->initCampaignModel();
-        $campaign = $this->createMock(Campaign::class);
+        $campaign = new Campaign();
 
         $this->entityManager->expects($this->never())
             ->method('find');
 
-        $campaign->expects($this->never())
-            ->method('addList');
-
         $model->setLeadSources($campaign, ['lists' => ['list-one' => 0]], []);
+
+        $this->assertCount(0, $campaign->getLists());
+        $this->assertSame([], $campaign->getChanges());
     }
 
     public function testSetLeadSourcesAddsFormById(): void
     {
         $model    = $this->initCampaignModel();
-        $campaign = $this->createMock(Campaign::class);
+        $campaign = new Campaign();
         $form     = $this->createStub(Form::class);
 
         $this->entityManager->expects($this->once())
@@ -87,17 +85,15 @@ final class CampaignModelTest extends CampaignTestAbstract
             ->with(Form::class, parent::$mockId)
             ->willReturn($form);
 
-        $campaign->expects($this->once())
-            ->method('addForm')
-            ->with($form);
-
         $model->setLeadSources($campaign, ['forms' => [parent::$mockId => parent::$mockName]], []);
+
+        $this->assertTrue($campaign->getForms()->contains($form));
     }
 
     public function testSetLeadSourcesRemovesLeadListById(): void
     {
         $model    = $this->initCampaignModel();
-        $campaign = $this->createMock(Campaign::class);
+        $campaign = new Campaign();
         $leadList = $this->createStub(LeadList::class);
 
         $this->entityManager->expects($this->once())
@@ -105,17 +101,15 @@ final class CampaignModelTest extends CampaignTestAbstract
             ->with(LeadList::class, parent::$mockId)
             ->willReturn($leadList);
 
-        $campaign->expects($this->once())
-            ->method('removeList')
-            ->with($leadList);
-
         $model->setLeadSources($campaign, [], ['lists' => [parent::$mockId => parent::$mockName]]);
+
+        $this->assertArrayHasKey('removed', $campaign->getChanges()['lists']);
     }
 
     public function testSetLeadSourcesRemovesFormById(): void
     {
         $model    = $this->initCampaignModel();
-        $campaign = $this->createMock(Campaign::class);
+        $campaign = new Campaign();
         $form     = $this->createStub(Form::class);
 
         $this->entityManager->expects($this->once())
@@ -123,31 +117,26 @@ final class CampaignModelTest extends CampaignTestAbstract
             ->with(Form::class, parent::$mockId)
             ->willReturn($form);
 
-        $campaign->expects($this->once())
-            ->method('removeForm')
-            ->with($form);
-
         $model->setLeadSources($campaign, [], ['forms' => [parent::$mockId => parent::$mockName]]);
+
+        $this->assertArrayHasKey('removed', $campaign->getChanges()['forms']);
     }
 
     public function testSetLeadSourcesIgnoresNonNumericFormIdentifier(): void
     {
         $model    = $this->initCampaignModel();
-        $campaign = $this->createMock(Campaign::class);
+        $campaign = new Campaign();
 
         $this->entityManager->expects($this->never())
             ->method('find');
-
-        $campaign->expects($this->never())
-            ->method('addForm');
-
-        $campaign->expects($this->never())
-            ->method('removeForm');
 
         $model->setLeadSources(
             $campaign,
             ['forms' => ['form-one' => 0]],
             ['forms' => ['form-two' => 0]]
         );
+
+        $this->assertCount(0, $campaign->getForms());
+        $this->assertSame([], $campaign->getChanges());
     }
 }

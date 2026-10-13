@@ -201,19 +201,14 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             ->setCampaign($campaign)
             ->setProperties(['jumpToEvent' => 999]);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(1);
+        $lead = new Lead();
+        $lead->setId(1);
 
-        $log = $this->createMock(LeadEventLog::class);
-        $log->method('getLead')
-            ->willReturn($lead);
-        $log->method('setIsScheduled')
-            ->willReturn($log);
-        $log->method('getEvent')
-            ->willReturn($event);
-        $log->method('getId')
-            ->willReturn(1);
+        $log = new LeadEventLog();
+        $log->setLead($lead);
+        $log->setEvent($event);
+        $logId = new \ReflectionProperty($log, 'id');
+        $logId->setValue($log, 1);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
