@@ -144,10 +144,6 @@ return function (ContainerConfigurator $configurator): void {
     $services->set(Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
     $services->set(Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
 
-    $services->get(Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class)
-        ->arg('$logger', \Symfony\Component\DependencyInjection\Loader\Configurator\service('monolog.logger.mautic'))
-        ->tag('doctrine.event_listener', ['event' => 'postGenerateSchema', 'lazy' => true]);
-
     $services->set(Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class)
         ->arg('$fixturesLoader', \Symfony\Component\DependencyInjection\Loader\Configurator\service('doctrine.fixtures.loader'));
 

@@ -77,21 +77,63 @@ parameters:
 
         - identifier: symplify.forbiddenTrait
         - identifier: symplify.forbiddenSwitch
+        # to be skipped
+        - identifier: symfony.formTypeClassName
+        - identifier: phpunit.noAssertFuncCallInTests
+
+        -
+            identifier: doctrine.noGetRepositoryOutsideService
+            paths:
+                - app/bundles/CoreBundle/Model/AbstractCommonModel.php
+
+        # valid calls
+        -
+            identifier: symplify.forbiddenStaticClassConstFetch
+            paths:
+                - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
+                - app/bundles/CoreBundle/Controller/CommonController.php
+                - app/bundles/CoreBundle/Controller/AjaxController.php
+
+        -
+            identifier: symplify.forbiddenFuncCall
+            path: app/bundles/CoreBundle/Helper/UrlHelper.php
+
+        # handle next
+        - identifier:  doctrine.noRepositoryCallInDataFixtures
+        # to be fixed
+        - identifier: doctrine.requireQueryBuilderOnRepository
+
+        -
+            identifier: symfony.noListenerWithoutContract
+            paths:
+                # used manually
+                - app/bundles/CoreBundle/EventListener/ConsoleErrorListener.php
+                - app/bundles/CoreBundle/EventListener/ConsoleTerminateListener.php
+                # seems unused
+                - app/bundles/ApiBundle/ApiPlatform/EventListener/MauticDenyAccessListener.php
+
         # used extensively
         - identifier: symplify.noDynamicName
         - identifier: symplify.noReference
         - identifier: symplify.forbiddenExtendOfNonAbstractClass
+
+        -
+            identifier: symfony.noFindTaggedServiceIdsCall
+            path: app/bundles/CoreBundle/DependencyInjection/Compiler/ConfiguratorPass.php
+
         -
             identifier: symplify.noDynamicName
             path: */Entity/*
         -
             identifier: symplify.noConstructorOverride
-            # allow for deprecations
-            path: */Permissions/*
+            paths:
+                # allow for deprecations
+                - */Permissions/*
+                - app/bundles/CoreBundle/Loader/RouteLoader.php
 
         -
             identifier: symplify.forbiddenFuncCall
-            message: '#Function "method_exists|property_exists|curl_(.*?)" cannot be used#'
+            message: '#Function "(method_exists|property_exists|array_walk|curl_)(.*?)" cannot be used#'
 
         # page translation entity passed where concrete Page expected in builder tokens
         -
@@ -165,17 +207,11 @@ parameters:
                 - app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
                 - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
 
-        # shared pre/post events, Campaign same-string collisions and TOKEN_REPLACEMENT reuse block single-argument dispatch here
-        -
-            identifier: mautic.singleArgumentDispatch
-            paths:
-                - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
-                - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
-                - app/bundles/FormBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
-                - app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
-                - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
-                - app/bundles/SmsBundle/Model/SmsModel.php
-                - plugins/MauticFocusBundle/Model/FocusModel.php
+        # shared pre/post events, Campaign same-string collisions and TOKEN_REPLACEMENT reuse block single-argument dispatch
+        - identifier: symfony.singleArgEventDispatch
+
+        # many such cases
+        - identifier: symplify.foreachCeption
 
         - identifier: missingType.generics
         # controllers - group missing parameter types to fix later
@@ -392,7 +428,12 @@ rules:
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
+<<<<<<< HEAD
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
+=======
+    # enable later, might not be needed
+    - Symplify\PHPStanRules\Rules\NoDuplicateNonRepeatableAttributeRule
+>>>>>>> 8f37c4d6ed (closure)
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver

@@ -18,7 +18,11 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * @method Container getContainer()
+ */
 trait CampaignEntitiesTrait
 {
     /**
@@ -84,8 +88,8 @@ trait CampaignEntitiesTrait
      */
     protected function createLead(string $leadName, array $customField = []): Lead
     {
-        $contactRepo = $this->em->getRepository(Lead::class);
-        $this->assertInstanceOf(LeadRepository::class, $contactRepo);
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+
         $lead        = new Lead();
         $lead->setFirstname($leadName);
         if ([] !== $customField) {
@@ -101,7 +105,7 @@ trait CampaignEntitiesTrait
             $leadModel = self::getContainer()->get(LeadModel::class);
             $leadModel->setFieldValues($lead, [$customField['alias'] => $customField['value']]);
         }
-        $contactRepo->saveEntity($lead);
+        $leadRepository->saveEntity($lead);
 
         return $lead;
     }
@@ -111,8 +115,8 @@ trait CampaignEntitiesTrait
      */
     public function createCompany(string $name, array $customField = []): Company
     {
-        $companyRepo = $this->em->getRepository(Company::class);
-        $this->assertInstanceOf(CompanyRepository::class, $companyRepo);
+        $companyRepository = $this->getContainer()->get(CompanyRepository::class);
+
         $company = new Company();
         $company->setName($name);
         if ([] !== $customField) {
@@ -127,7 +131,7 @@ trait CampaignEntitiesTrait
             $companyModel = self::getContainer()->get(CompanyModel::class);
             $companyModel->setFieldValues($company, [$customField['alias'] => $customField['value']]);
         }
-        $companyRepo->saveEntity($company);
+        $companyRepository->saveEntity($company);
 
         return $company;
     }

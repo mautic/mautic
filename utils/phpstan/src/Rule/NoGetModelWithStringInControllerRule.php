@@ -20,6 +20,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * generic MauticModelInterface. Injecting the model as a typed property gives the exact type and makes the
  * dependency visible.
  *
+ * @see \Utils\PHPStan\Tests\Rule\NoGetModelWithStringInControllerRuleTest
+ *
  * @implements Rule<MethodCall>
  */
 final class NoGetModelWithStringInControllerRule implements Rule

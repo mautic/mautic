@@ -5,10 +5,14 @@
         "This file is @generated automatically"
     ],
 <<<<<<< HEAD
+<<<<<<< HEAD
     "content-hash": "37284453e213c09c9cfe2e6dcc351fcc",
 =======
     "content-hash": "39264c32714d698905b38fe07e7d9e24",
 >>>>>>> 4512d798df (bump ecs, symplify rules and phpunit)
+=======
+    "content-hash": "724196ebd7f97dc1ce5a196858359dd9",
+>>>>>>> 8f37c4d6ed (closure)
     "packages": [
         {
             "name": "api-platform/core",
@@ -15097,16 +15101,16 @@
         },
         {
             "name": "entropy/entropy",
-            "version": "0.4.30",
+            "version": "0.4.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TomasVotruba/entropy.git",
-                "reference": "733042a17988ba7c2c58f5245e9257cb687b7904"
+                "reference": "e31f93b8e987982e8d579c7c7f0cfa8aa7ae7e18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TomasVotruba/entropy/zipball/733042a17988ba7c2c58f5245e9257cb687b7904",
-                "reference": "733042a17988ba7c2c58f5245e9257cb687b7904",
+                "url": "https://api.github.com/repos/TomasVotruba/entropy/zipball/e31f93b8e987982e8d579c7c7f0cfa8aa7ae7e18",
+                "reference": "e31f93b8e987982e8d579c7c7f0cfa8aa7ae7e18",
                 "shasum": ""
             },
             "require": {
@@ -15142,9 +15146,9 @@
             "description": "Entropy framework",
             "support": {
                 "issues": "https://github.com/TomasVotruba/entropy/issues",
-                "source": "https://github.com/TomasVotruba/entropy/tree/0.4.30"
+                "source": "https://github.com/TomasVotruba/entropy/tree/0.4.31"
             },
-            "time": "2026-10-10T07:02:38+00:00"
+            "time": "2026-10-13T12:04:57+00:00"
         },
         {
             "name": "http-interop/http-factory-guzzle",
@@ -18212,16 +18216,16 @@
         },
         {
             "name": "symplify/easy-coding-standard",
-            "version": "13.3.5",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ecsphp/ecs.git",
-                "reference": "c75477d00fb6c14fa5c71a857f5af3d7f45d0094"
+                "reference": "df1ebca913e42b05caf29603d757ace6ca9bcc0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/c75477d00fb6c14fa5c71a857f5af3d7f45d0094",
-                "reference": "c75477d00fb6c14fa5c71a857f5af3d7f45d0094",
+                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/df1ebca913e42b05caf29603d757ace6ca9bcc0e",
+                "reference": "df1ebca913e42b05caf29603d757ace6ca9bcc0e",
                 "shasum": ""
             },
             "require": {
@@ -18232,6 +18236,7 @@
                 "phpcsstandards/php_codesniffer": "<4.0.4",
                 "symplify/coding-standard": "<13.0"
             },
+            "default-branch": true,
             "bin": [
                 "bin/ecs"
             ],
@@ -18254,22 +18259,22 @@
             ],
             "support": {
                 "issues": "https://github.com/ecsphp/ecs/issues",
-                "source": "https://github.com/ecsphp/ecs/tree/13.3.5"
+                "source": "https://github.com/ecsphp/ecs/tree/main"
             },
-            "time": "2026-10-10T13:28:36+00:00"
+            "time": "2026-10-13T09:26:42+00:00"
         },
         {
             "name": "symplify/phpstan-rules",
-            "version": "v14.18.2",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symplify/phpstan-rules.git",
-                "reference": "912bd59d7045887ae6db9d32f9d8c5a3b2d6d389"
+                "reference": "032b8cd3cee654fc576ce53ebeb0c5cdf07c447a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/912bd59d7045887ae6db9d32f9d8c5a3b2d6d389",
-                "reference": "912bd59d7045887ae6db9d32f9d8c5a3b2d6d389",
+                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/032b8cd3cee654fc576ce53ebeb0c5cdf07c447a",
+                "reference": "032b8cd3cee654fc576ce53ebeb0c5cdf07c447a",
                 "shasum": ""
             },
             "require": {
@@ -18293,6 +18298,7 @@
                 "tomasvotruba/class-leak": "^2.3",
                 "tomasvotruba/type-coverage": "^2.5"
             },
+            "default-branch": true,
             "type": "phpstan-extension",
             "extra": {
                 "phpstan": {
@@ -18327,7 +18333,7 @@
             "description": "Set of Symplify rules, type extensions and error formatter for PHPStan",
             "support": {
                 "issues": "https://github.com/symplify/phpstan-rules/issues",
-                "source": "https://github.com/symplify/phpstan-rules/tree/v14.18.2"
+                "source": "https://github.com/symplify/phpstan-rules/tree/main"
             },
             "funding": [
                 {
@@ -18339,7 +18345,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-12T08:44:21+00:00"
+            "time": "2026-10-13T12:02:47+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -18594,7 +18600,10 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "symplify/easy-coding-standard": 20,
+        "symplify/phpstan-rules": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {},

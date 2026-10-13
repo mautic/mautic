@@ -314,7 +314,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
              */
             if (!defined('IS_PHPUNIT')) {
                 // Log PHP fatal errors
-                register_shutdown_function([self::$handler, 'handleFatal']);
+                register_shutdown_function(self::$handler->handleFatal(...));
 
                 // Log general PHP errors
                 set_exception_handler(self::$handler->handleException(...));
