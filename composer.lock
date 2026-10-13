@@ -18269,12 +18269,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symplify/phpstan-rules.git",
-                "reference": "032b8cd3cee654fc576ce53ebeb0c5cdf07c447a"
+                "reference": "461cae9d59647aab7971ee1f83e8be2ff2abe63a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/032b8cd3cee654fc576ce53ebeb0c5cdf07c447a",
-                "reference": "032b8cd3cee654fc576ce53ebeb0c5cdf07c447a",
+                "url": "https://api.github.com/repos/symplify/phpstan-rules/zipball/461cae9d59647aab7971ee1f83e8be2ff2abe63a",
+                "reference": "461cae9d59647aab7971ee1f83e8be2ff2abe63a",
                 "shasum": ""
             },
             "require": {
@@ -18308,6 +18308,7 @@
                         "config/code-complexity-rules.neon",
                         "config/configurable-rules.neon",
                         "config/static-rules.neon",
+                        "config/modern-rules.neon",
                         "config/symfony-rules.neon",
                         "config/symfony-config-rules.neon",
                         "config/doctrine-rules.neon",
@@ -18345,7 +18346,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-13T12:02:47+00:00"
+            "time": "2026-10-13T12:35:07+00:00"
         },
         {
             "name": "theseer/tokenizer",

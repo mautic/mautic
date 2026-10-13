@@ -28,6 +28,7 @@ parameters:
         naming: false
         symfony: true
         complexity: true
+        modern: false
 
     paths:
         - app/bundles
@@ -77,7 +78,6 @@ parameters:
             identifier: argument.type
             path: app/bundles/CoreBundle/Controller/AjaxController.php
 
-        - identifier: symplify.forbiddenTrait
         - identifier: symplify.forbiddenSwitch
         # to be skipped
         - identifier: symfony.formTypeClassName
@@ -114,18 +114,10 @@ parameters:
                 # seems unused
                 - app/bundles/ApiBundle/ApiPlatform/EventListener/MauticDenyAccessListener.php
 
-        # used extensively
-        - identifier: symplify.noDynamicName
-        - identifier: symplify.noReference
-        - identifier: symplify.forbiddenExtendOfNonAbstractClass
-
         -
             identifier: symfony.noFindTaggedServiceIdsCall
             path: app/bundles/CoreBundle/DependencyInjection/Compiler/ConfiguratorPass.php
 
-        -
-            identifier: symplify.noDynamicName
-            path: */Entity/*
         -
             identifier: symplify.noConstructorOverride
             paths:
@@ -211,9 +203,6 @@ parameters:
 
         # shared pre/post events, Campaign same-string collisions and TOKEN_REPLACEMENT reuse block single-argument dispatch
         - identifier: symfony.singleArgEventDispatch
-
-        # many such cases
-        - identifier: symplify.foreachCeption
 
         - identifier: missingType.generics
         # controllers - group missing parameter types to fix later
