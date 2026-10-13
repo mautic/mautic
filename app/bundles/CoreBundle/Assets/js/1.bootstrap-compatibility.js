@@ -775,10 +775,43 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         }
     }
 
+    function mirrorParentAttribute(trigger) {
+        var parent = trigger.getAttribute('data-parent');
+        var targetSelector = trigger.getAttribute('data-target') || trigger.getAttribute('href');
+
+        if (null === targetSelector) {
+            return;
+        }
+
+        targetSelector = targetSelector.replace(/.*(?=#[^\\s]*$)/, '');
+        try {
+            document.querySelectorAll(targetSelector).forEach(function (target) {
+                var owned = mirroredAttributes.get(target) || {};
+                var current = target.getAttribute('data-bs-parent');
+
+                if (null === parent) {
+                    if (owned['data-bs-parent'] === current) {
+                        target.removeAttribute('data-bs-parent');
+                        delete owned['data-bs-parent'];
+                    }
+                } else if (null === current || owned['data-bs-parent'] === current) {
+                    target.setAttribute('data-bs-parent', parent);
+                    owned['data-bs-parent'] = parent;
+                }
+                mirroredAttributes.set(target, owned);
+            });
+        } catch (error) {
+            return;
+        }
+    }
+
     function mirrorBootstrapAttributes(element) {
         dataAttributes.forEach(function (name) {
             mirrorAttribute(element, 'data-' + name, 'data-bs-' + name);
         });
+        if ('collapse' === element.getAttribute('data-toggle')) {
+            mirrorParentAttribute(element);
+        }
         if (element.hasAttribute('data-template')) {
             var pluginName = element.getAttribute('data-toggle');
             if ('tooltip' === pluginName || 'popover' === pluginName) {

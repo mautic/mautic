@@ -644,7 +644,7 @@ $danger: $brand-danger;
 
 $utilities: map-merge($utilities, (
   "color": map-merge(map-get($utilities, "color"), (
-    "values": map-remove(map-get(map-get($utilities, "color"), "values"), "primary", "secondary", "success", "info", "warning", "danger", "muted", "white")
+    "values": map-remove(map-get(map-get($utilities, "color"), "values"), "primary", "success", "info", "warning", "danger", "muted", "white")
   )),
   "background-color": map-merge(map-get($utilities, "background-color"), (
     "values": map-remove(map-get(map-get($utilities, "background-color"), "values"), "primary", "success", "info", "warning", "danger")
