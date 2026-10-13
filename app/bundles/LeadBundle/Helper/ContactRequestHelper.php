@@ -126,11 +126,8 @@ class ContactRequestHelper
                 true
             );
 
-            if ($this->trackedContact && $this->trackedContact->getId() && $foundContact->getId()) {
-                try {
-                    $foundContact = $this->contactMerger->merge($this->trackedContact, $foundContact);
-                } catch (SameContactException) {
-                }
+            if ($foundContact->getId()) {
+                $foundContact = $this->mergeWithTrackedContact($foundContact);
             }
 
             if (null === $this->trackedContact || $foundContact->getId() !== $this->trackedContact->getId()) {
@@ -200,13 +197,16 @@ class ContactRequestHelper
     }
 
     /**
-     * @return Lead
+     * Merge the anonymous visitor tracked by the device cookie into the identified contact.
+     * The tracked contact is not set yet when the request is being identified, so it is looked up by device.
      */
-    private function mergeWithTrackedContact(Lead $foundContact)
+    private function mergeWithTrackedContact(Lead $foundContact): Lead
     {
-        if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
+        $trackedContact = $this->trackedContact ?? $this->contactTracker->getContactByTrackedDevice();
+
+        if ($trackedContact && $trackedContact->getId() && $trackedContact->isAnonymous()) {
             try {
-                return $this->contactMerger->merge($this->trackedContact, $foundContact);
+                return $this->contactMerger->merge($foundContact, $trackedContact);
             } catch (SameContactException) {
             }
         }
