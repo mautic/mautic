@@ -63,6 +63,11 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $deviceTrackingService;
 
+    /**
+     * @var MockObject&LeadRepository
+     */
+    private MockObject $leadRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -74,6 +79,7 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->trackedContact           = $this->createMock(Lead::class);
         $this->contactMerger            = $this->createMock(ContactMerger::class);
         $this->deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
+        $this->leadRepository           = $this->createMock(LeadRepository::class);
 
         $this->trackedContact->method('getId')
             ->willReturn(1);
@@ -256,13 +262,9 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $socialContact = new Lead();
         $socialContact->setId(3);
 
-        $repository = $this->createMock(LeadRepository::class);
-        $repository->method('getFieldValues')
+        $this->leadRepository->method('getFieldValues')
             ->with(3)
             ->willReturn(['social' => ['twitter' => ['alias' => 'twitter', 'value' => 'johndoe']]]);
-
-        $this->leadModel->method('getRepository')
-            ->willReturn($repository);
 
         $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
@@ -274,6 +276,34 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             ->method('merge');
 
         $helper = $this->getContactRequestHelper($this->createRequestStack());
+
+        $this->assertSame($foundContact, $helper->getContactFromQuery(['email' => 'john@example.com']));
+    }
+
+    public function testTrackedContactIsNotMergedWithoutDeviceTrackingService(): void
+    {
+        $foundContact = $this->createContact(2, false);
+
+        $this->leadModel->expects($this->once())
+            ->method('checkForDuplicateContact')
+            ->willReturn([$foundContact, ['email' => 'john@example.com']]);
+
+        $this->contactMerger->expects($this->never())
+            ->method('merge');
+
+        $this->expectUserDeprecationMessageMatches('/Not passing \$deviceTrackingService and \$leadRepository/');
+
+        $helper = new ContactRequestHelper(
+            $this->leadModel,
+            $this->contactTracker,
+            $this->ipLookupHelper,
+            $this->createRequestStack(),
+            $this->createStub(Logger::class),
+            $this->dispatcher,
+            $this->contactMerger,
+            $this->createStub(StatRepository::class),
+            $this->createStub(BotRatioHelper::class)
+        );
 
         $this->assertSame($foundContact, $helper->getContactFromQuery(['email' => 'john@example.com']));
     }
@@ -307,10 +337,7 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 
     private function createRequestStack(): RequestStack
     {
-        $requestStack = new RequestStack();
-        $requestStack->push(new Request());
-
-        return $requestStack;
+        return new RequestStack([new Request()]);
     }
 
     private function getContactRequestHelper(?RequestStack $requestStack = null): ContactRequestHelper
@@ -325,7 +352,8 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             $this->contactMerger,
             $this->createStub(StatRepository::class),
             $this->createStub(BotRatioHelper::class),
-            $this->deviceTrackingService
+            $this->deviceTrackingService,
+            $this->leadRepository
         );
     }
 }
