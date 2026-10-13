@@ -204,9 +204,8 @@ trait VariantEntityTrait
 
     /**
      * Get the variant parent/children.
-     **.
      *
-     * @return array<mixed>
+     * @return array{0: TEntity, 1: array<TEntity>}
      */
     public function getVariants(): array
     {
@@ -229,10 +228,12 @@ trait VariantEntityTrait
      */
     public function getRelatedEntityIds(bool $publishedOnly = false): array
     {
+        /** @var TEntity&FormEntity $parent */
+        /** @var array<TEntity&FormEntity> $children */
         [$parent, $children] = $this->getVariants();
 
         // If parent is not published and only published has been requested, no need to proceed
-        if ($parent && $publishedOnly && !$parent->isPublished()) {
+        if ($publishedOnly && !$parent->isPublished()) {
             return [];
         }
 

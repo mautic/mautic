@@ -162,7 +162,7 @@ trait TranslationEntityTrait
     /**
      * Get translation parent/children.
      *
-     * @return array<mixed>
+     * @return array<int, TranslationEntityInterface|array<TranslationEntityInterface>>
      */
     public function getTranslations(bool $onlyChildren = false): array
     {
@@ -189,13 +189,7 @@ trait TranslationEntityTrait
         return [$parent, $children];
     }
 
-    /**
-     * @param string                      $getter
-     * @param ?TranslationEntityInterface $variantParent
-     *
-     * @return int
-     */
-    protected function getAccumulativeTranslationCount($getter, $variantParent = null)
+    protected function getAccumulativeTranslationCount(string $getter, ?TranslationEntityInterface $variantParent = null): int
     {
         $count = 0;
 
