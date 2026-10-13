@@ -190,8 +190,8 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $trackedDevice = $this->createMock(LeadDevice::class);
-        $trackedDevice->method('getTrackingId')->willReturn('test-tracking-id');
+        $trackedDevice = new LeadDevice();
+        $trackedDevice->setTrackingId('test-tracking-id');
         $this->deviceTrackingService->expects($this->once())
             ->method('getTrackedDevice')
             ->willReturn($trackedDevice);

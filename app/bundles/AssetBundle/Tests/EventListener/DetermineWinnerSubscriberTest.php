@@ -38,10 +38,10 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnDetermineDownloadRateWinner(): void
     {
-        $parentMock    = $this->createMock(Page::class);
-        $childMock     = $this->createMock(Page::class);
-        $children      = [2 => $childMock];
-        $parameters    = ['parent' => $parentMock, 'children' => $children];
+        $parent        = new Page();
+        $child         = new Page();
+        $children      = [2 => $child];
+        $parameters    = ['parent' => $parent, 'children' => $children];
         $event         = new DetermineWinnerEvent($parameters);
         $startDate     = new \DateTime();
 
@@ -66,25 +66,13 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator->method('trans')
             ->willReturnOnConsecutiveCalls($transDownloads, $transHits);
 
-        $parentMock
-            ->method('isPublished')
-            ->willReturn(true);
+        $parentId = new \ReflectionProperty($parent, 'id');
+        $parentId->setValue($parent, 1);
 
-        $childMock
-            ->method('isPublished')
-            ->willReturn(true);
+        $childId = new \ReflectionProperty($child, 'id');
+        $childId->setValue($child, 2);
 
-        $parentMock
-            ->method('getId')
-            ->willReturn(1);
-
-        $childMock
-            ->method('getId')
-            ->willReturn(2);
-
-        $parentMock->expects($this->once())
-            ->method('getVariantStartDate')
-            ->willReturn($startDate);
+        $parent->setVariantStartDate($startDate);
 
         $this->downloadRepository->expects($this->once())
             ->method('getDownloadCountsByPage')
