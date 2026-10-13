@@ -162,12 +162,12 @@ final class CompanyObjectHelperTest extends TestCase
             1 => new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_COMPANY, 1, 'MappedObject', 1, new \DateTime()),
         ];
 
-        $company1 = $this->createMock(Company::class);
-        $company1->expects($this->exactly(2))->method('getId')
-            ->willReturn(0);
-        $company2 = $this->createMock(Company::class);
-        $company2->expects($this->exactly(2))->method('getId')
-            ->willReturn(1);
+        $company1 = new Company();
+        $company1Id = new \ReflectionProperty($company1, 'id');
+        $company1Id->setValue($company1, 0);
+        $company2 = new Company();
+        $company2Id = new \ReflectionProperty($company2, 'id');
+        $company2Id->setValue($company2, 1);
         $this->model->expects($this->once())
             ->method('getEntities')
             ->willReturn(

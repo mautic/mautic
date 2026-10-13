@@ -13,12 +13,9 @@ final class ConfigSaveEventTest extends TestCase
     public function testGetters(): void
     {
         $name        = 'name';
-        $integration = $this->createMock(Integration::class);
+        $integration = new Integration();
+        $integration->setName($name);
         $event       = new ConfigBeforeSaveEvent($integration);
-
-        $integration->expects($this->once())
-            ->method('getName')
-            ->willReturn($name);
 
         $this->assertSame($integration, $event->getIntegrationConfiguration());
         $this->assertSame($name, $event->getIntegration());

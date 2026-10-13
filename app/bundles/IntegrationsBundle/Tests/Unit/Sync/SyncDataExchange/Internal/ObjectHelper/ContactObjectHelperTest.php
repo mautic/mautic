@@ -257,9 +257,8 @@ final class ContactObjectHelperTest extends TestCase
             1 => $objectChangeDAO,
         ];
 
-        $contact1 = $this->createMock(Lead::class);
-        $contact1->expects($this->exactly(3))->method('getId')
-            ->willReturn(1);
+        $contact1 = new Lead();
+        $contact1->setId(1);
 
         $this->model->expects($this->once())
             ->method('getEntities')
@@ -280,9 +279,8 @@ final class ContactObjectHelperTest extends TestCase
             1 => $objectChangeDAO,
         ];
 
-        $contact1 = $this->createMock(Lead::class);
-        $contact1->expects($this->exactly(3))->method('getId')
-            ->willReturn(1);
+        $contact1 = new Lead();
+        $contact1->setId(1);
 
         $this->model->expects($this->once())
             ->method('getEntities')
@@ -303,9 +301,8 @@ final class ContactObjectHelperTest extends TestCase
             1 => $objectChangeDAO,
         ];
 
-        $contact1 = $this->createMock(Lead::class);
-        $contact1->expects($this->exactly(3))->method('getId')
-            ->willReturn(1);
+        $contact1 = new Lead();
+        $contact1->setId(1);
 
         $this->model->expects($this->once())
             ->method('getEntities')
