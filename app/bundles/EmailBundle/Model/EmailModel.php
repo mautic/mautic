@@ -176,7 +176,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $clonedEmails[] = $clonedParent;
 
         foreach ($email->getTranslationChildren() as $translation) {
-            \assert($translation instanceof Email);
+            if (!$translation instanceof Email) {
+                continue;
+            }
 
             $clonedTranslation = $this->cloneEmailForRelatedClone($translation);
             $clonedTranslation->setTranslationParent($clonedParent);
@@ -185,16 +187,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         foreach ($email->getVariantChildren() as $variant) {
-            \assert($variant instanceof Email);
-
             $clonedVariant = $this->cloneEmailForRelatedClone($variant);
             $clonedVariant->setVariantParent($clonedParent);
             $this->saveEntity($clonedVariant);
             $clonedEmails[] = $clonedVariant;
 
             foreach ($variant->getTranslationChildren() as $variantTranslation) {
-                \assert($variantTranslation instanceof Email);
-
                 $clonedVariantTranslation = $this->cloneEmailForRelatedClone($variantTranslation);
                 $clonedVariantTranslation->setTranslationParent($clonedVariant);
                 $this->saveEntity($clonedVariantTranslation);
@@ -219,8 +217,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         // Ensure that list emails are published
         if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
-            if ($translationParent = $entity->getTranslationParent()) {
-                \assert($translationParent instanceof Email);
+            $translationParent = $entity->getTranslationParent();
+            if ($translationParent instanceof Email) {
                 $parentLists = $translationParent->getLists()->toArray();
                 $entity->setLists($parentLists);
             }
@@ -258,6 +256,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 $translations                      = $entity->getTranslationChildren()->toArray();
                 $this->updatingTranslationChildren = true;
                 foreach ($translations as $translation) {
+                    if (!$translation instanceof Email) {
+                        continue;
+                    }
+
                     $this->saveEntity($translation);
                 }
                 $this->updatingTranslationChildren = false;
@@ -643,6 +645,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * Search for an email stat by email and lead IDs.
+     *
+     * @return array<int, \Mautic\EmailBundle\Entity\Stat>
      */
     public function getEmailStati($emailId, $leadId): array
     {
@@ -2145,7 +2149,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function sendSampleEmailToUser(
-        $email,
+        Email $email,
         $users,
         $leadFields = null,
         array $tokens = [],

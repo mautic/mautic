@@ -306,6 +306,9 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /**
+     * @return Paginator<\Mautic\WebhookBundle\Entity\WebhookQueue>
+     */
     private function getWebhookQueue(int $webhookId): Paginator
     {
         return $this->webhookQueueRepository->getEntities([

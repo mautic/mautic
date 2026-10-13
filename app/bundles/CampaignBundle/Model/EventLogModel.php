@@ -198,7 +198,7 @@ final class EventLogModel extends AbstractCommonModel
                     $log->setChannel(InputHelper::clean($value));
                     break;
                 case 'channelId':
-                    $log->setChannel(intval($value));
+                    $log->setChannel((string) intval($value));
                     break;
             }
         }

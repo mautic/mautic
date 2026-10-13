@@ -142,6 +142,7 @@ final class TwitterCommandHelper
             // Key by twitter handle
             $twitterLeads = [];
             foreach ($leads as $lead) {
+                \assert($lead instanceof Lead);
                 $fields                       = $lead->getFields();
                 $twitterHandle                = strtolower($fields[$handleFieldGroup][$this->twitterHandleField]['value']);
                 $twitterLeads[$twitterHandle] = $lead;

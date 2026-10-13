@@ -135,6 +135,9 @@ final class EmailContactGridTest extends MauticMysqlTestCase
      *
      * @throws ORMException
      */
+    /**
+     * @return array{Email, Lead, Lead}
+     */
     private function setupData(): array
     {
         /** @var UserRepository $userRepository */

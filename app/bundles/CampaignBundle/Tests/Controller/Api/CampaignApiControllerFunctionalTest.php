@@ -39,7 +39,15 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * Creates and persists common test entities used across multiple tests.
      *
-     * @return array<string, mixed> Array containing the created entities
+     * @return array{
+     *     user: User|null,
+     *     segment: LeadList,
+     *     email: Email,
+     *     dwc: DynamicContent,
+     *     company: Company,
+     *     contact1: Lead,
+     *     contact2: Lead
+     * }
      */
     private function createTestEntities(): array
     {

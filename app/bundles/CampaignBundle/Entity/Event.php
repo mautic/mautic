@@ -422,6 +422,8 @@ class Event implements ChannelInterface, UuidInterface
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
         if ('category' === $prop || 'parent' === $prop) {
+            /** @var Event|null $current */
+            /** @var Event|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -492,10 +494,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * @return Campaign
-     */
-    public function getCampaign()
+    public function getCampaign(): ?Campaign
     {
         return $this->campaign;
     }
@@ -728,6 +727,7 @@ class Event implements ChannelInterface, UuidInterface
     public function setTriggerHour(array|string|null $triggerHour): static
     {
         $triggerHour = $this->convertToDateTime($triggerHour);
+
         $this->isChanged('triggerHour', $triggerHour ? $triggerHour->format('H:i') : $triggerHour);
         $this->triggerHour = $triggerHour;
 
@@ -977,7 +977,7 @@ class Event implements ChannelInterface, UuidInterface
         return $this->failedCount;
     }
 
-    private function convertToDateTime(mixed $triggerDate): mixed
+    private function convertToDateTime(mixed $triggerDate): ?\DateTime
     {
         if (empty($triggerDate)) {
             return null;
