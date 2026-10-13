@@ -25,11 +25,11 @@ parameters:
         no_mixed_caller: true
 
     symplify:
-        naming: true
+        naming: false
         complexity: true
         configurable: true
         static: true
-        modern: true
+        modern: false
         symfony: true
         symfonyConfig: true
         doctrine: true
