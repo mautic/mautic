@@ -110,7 +110,7 @@ final class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    public function setParametersPairs(array|string $parameters, array|string $filterParameters): static
+    public function setParametersPairs(array|string $parameters, array|string|null $filterParameters): static
     {
         if (!is_array($parameters)) {
             return $this->setParameter($parameters, $filterParameters);
