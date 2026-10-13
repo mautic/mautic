@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\PrivacyBundle\Tests\Functional;
 
+use Mautic\CoreBundle\Configurator\Configurator;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 final class PrivacyConfigTest extends MauticMysqlTestCase
 {
@@ -69,11 +70,7 @@ final class PrivacyConfigTest extends MauticMysqlTestCase
      */
     private function getConfigParameters(): array
     {
-        /** @var \AppKernel $kernel */
-        $kernel     = self::getContainer()->get(KernelInterface::class);
-        $parameters = [];
-        include $kernel->getLocalConfigFile();
-
-        return $parameters;
+        // A new instance reads the local config file again, so the saved values are returned
+        return (new Configurator(self::getContainer()->get(PathsHelper::class)))->getParameters();
     }
 }

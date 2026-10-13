@@ -20,7 +20,8 @@ final class GravatarHelperTest extends TestCase
     {
         $image = $this->createGravatarHelper(true)->getImage('John@Example.com', '100');
 
-        $this->assertStringStartsWith('https://www.gravatar.com/avatar/'.md5('john@example.com').'?s=100', $image);
+        // Gravatar identifies images by the MD5 hash of the trimmed, lowercased email address
+        $this->assertStringStartsWith('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=100', $image);
     }
 
     #[DataProvider('disabledSettings')]
