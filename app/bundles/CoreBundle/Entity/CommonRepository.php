@@ -1795,7 +1795,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     /**
      * @param array<int, mixed>   $expressions
      */
-    protected function parseSearchFilters(\stdClass|array $parseFilters, QueryBuilder|DbalQueryBuilder $qb, array &$expressions, &$parameters)
+    protected function parseSearchFilters(\stdClass|array $parseFilters, QueryBuilder|DbalQueryBuilder $qb, array &$expressions, array &$parameters)
     {
         foreach ($parseFilters as $f) {
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);

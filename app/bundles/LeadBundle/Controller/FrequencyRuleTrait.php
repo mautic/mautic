@@ -47,11 +47,9 @@ trait FrequencyRuleTrait
     }
 
     /**
-     * @param array $viewParameters
-     *
      * @return true|FormInterface
      */
-    protected function getFrequencyRuleForm(Lead $lead, &$viewParameters = [], &$data = null, bool $isPublic = false, $action = null, bool $isPreferenceCenter = false)
+    protected function getFrequencyRuleForm(Lead $lead, array &$viewParameters = [], &$data = null, bool $isPublic = false, $action = null, bool $isPreferenceCenter = false)
     {
 
         $leadChannels = $this->frequencyRuleLeadModel->getContactChannels($lead);

@@ -676,10 +676,7 @@ class Field implements UuidInterface
         return $this->isCustom;
     }
 
-    /**
-     * @param array $customParameters
-     */
-    public function setCustomParameters($customParameters): static
+    public function setCustomParameters(array $customParameters): static
     {
         $this->customParameters = $customParameters;
 

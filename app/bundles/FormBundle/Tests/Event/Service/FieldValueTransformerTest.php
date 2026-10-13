@@ -43,7 +43,7 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function generate(string $name, mixed $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
+            public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
             {
                 Assert::assertSame('mautic_form_file_download', $name);
                 Assert::assertSame([

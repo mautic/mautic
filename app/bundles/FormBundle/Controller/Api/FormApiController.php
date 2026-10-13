@@ -144,7 +144,7 @@ final class FormApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): Response|array|null
+    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit'): Response|array|null
     {
         $method = $this->getCurrentRequest()->getMethod();
         $isNew  = false;
@@ -350,7 +350,7 @@ final class FormApiController extends CommonApiController
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, $entity, ?array $parameters = null, $method = 'PUT')
     {
         $parameters['postAction'] ??= 'return';
 

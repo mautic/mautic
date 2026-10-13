@@ -61,7 +61,7 @@ final class NoteApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
+    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
     {
         if (!empty($parameters['lead'])) {
             $leadAction = 'new' === $action ? 'view' : $action;
