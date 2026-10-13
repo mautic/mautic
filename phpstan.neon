@@ -93,7 +93,6 @@ parameters:
             paths:
                 - plugins/MauticSocialBundle/Integration/FoursquareIntegration.php
                 - plugins/MauticSocialBundle/Integration/InstagramIntegration.php
-                - plugins/MauticClearbitBundle/Services/Clearbit_Base.php
                 - app/bundles/CoreBundle/Entity/CommonRepository.php
                 - app/bundles/CoreBundle/Event/AbstractCustomRequestEvent.php
                 - app/bundles/CoreBundle/Helper/PRedisConnectionHelper.php
