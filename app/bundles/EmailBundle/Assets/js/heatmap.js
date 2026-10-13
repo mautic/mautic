@@ -32,7 +32,7 @@
         render() {
             this.renderModal();
             this.bindEvents();
-            this.$modal.modal('show');
+            this.$modal.each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
         }
 
         fetchHeatmap(callback) {

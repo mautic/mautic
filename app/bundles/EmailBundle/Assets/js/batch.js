@@ -27,7 +27,7 @@ function setCategory(id, newCategory) {
 }
 
 Mautic.emailBatchSubmitCallback = function( response ) {
-    mQuery('#MauticSharedModal').modal('hide');
+    mQuery('#MauticSharedModal').each((index, element) => Mautic.hideModal(element));
     console.log("Received: " + JSON.stringify(response));
     response.affected.forEach( function(id){
         setCategory(id, response.newCategory);

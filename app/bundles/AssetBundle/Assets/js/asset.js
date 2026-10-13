@@ -82,7 +82,7 @@ Mautic.updateRemoteBrowser = function(provider, path) {
 
 Mautic.selectRemoteFile = function(url) {
     mQuery('#asset_remotePath').val(url);
-    mQuery('#RemoteFileModal').modal('hide');
+    mQuery('#RemoteFileModal').each((index, element) => Mautic.hideModal(element));
 };
 
 Mautic.changeAssetStorageLocation = function() {
