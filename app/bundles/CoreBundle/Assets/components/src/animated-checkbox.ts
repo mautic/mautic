@@ -1,5 +1,5 @@
 import { animate } from 'motion';
-import { emit, reducedMotion, register } from './lifecycle';
+import { emit, register } from './lifecycle';
 
 type Checked = boolean | 'indeterminate';
 type Options = { checked?: Checked; disabled?: boolean; onCheckedChange?: (checked: Checked) => void };
@@ -74,7 +74,7 @@ class AnimatedCheckbox {
   private scale(value: number): void {
     if (this.button.disabled) return;
     this.animation?.stop();
-    this.animation = animate(this.button, { scale: value }, reducedMotion() ? { duration: 0 } : { type: 'spring', stiffness: 100, damping: 10 });
+    this.animation = animate(this.button, { scale: value }, { type: 'spring', stiffness: 100, damping: 10 });
   }
 
   destroy(): void {
