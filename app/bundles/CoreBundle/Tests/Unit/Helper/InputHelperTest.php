@@ -58,6 +58,14 @@ final class InputHelperTest extends TestCase
         }
     }
 
+    #[TestDox('The html filter preserves percent-encoded URL characters with Unicode content')]
+    public function testHtmlPreservesPercentEncodedUrlWithUnicodeContent(): void
+    {
+        $html = '<p>Текст https://example.com/?q=a%20b%27c&amp;path=%2Farchive%2F2026</p>';
+
+        $this->assertSame($html, InputHelper::html($html));
+    }
+
     #[TestDox('The email returns value without double period')]
     public function testEmailFilterRemovesDoublePeriods(): void
     {
