@@ -33,11 +33,13 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
     public function testNoNotificationWhenLeadFieldCanNotUpdateForInvalidUser(): void
     {
         $this->notifier->customFieldCannotBeUpdated($this->leadField, -1);
+
         /** @var NotificationRepository $notificationRepo */
         $notificationRepo   = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class);
-        $notifications      = $notificationRepo->getEntities([]);
 
-        $this->assertEquals(0, $notifications->count());
+        $notifications      = $notificationRepo->getEntities();
+
+        $this->assertCount(0,$notifications);
     }
 
     public function testNotificationForLeadFieldCanNotUpdate(): void
