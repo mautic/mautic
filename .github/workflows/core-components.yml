@@ -1,0 +1,29 @@
+name: Core components
+on:
+  pull_request:
+    paths:
+      - 'app/bundles/CoreBundle/Assets/components/**'
+      - 'app/bundles/CoreBundle/Assets/js/99.*.js'
+      - 'app/bundles/CoreBundle/Assets/css/99.*.css'
+      - 'app/bundles/CoreBundle/Resources/views/Components/**'
+      - '.github/workflows/core-components.yml'
+permissions:
+  contents: read
+jobs:
+  browser-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+      - run: mkdir .component-vendor && cd .component-vendor && composer require twig/twig:^3.0 matthiasmullie/minify:^1.3 --no-interaction
+      - run: npm ci && npm run build && npx playwright install --with-deps chromium && npm test
+        working-directory: app/bundles/CoreBundle/Assets/components
+        env:
+          MAUTIC_VENDOR_AUTOLOAD: ${{ github.workspace }}/.component-vendor/vendor/autoload.php
+      - run: git diff --exit-code -- app/bundles/CoreBundle/Assets/js
