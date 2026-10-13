@@ -35,8 +35,12 @@ final class MauticResourceTranslator implements TranslatorInterface, TranslatorB
      */
     private array $registered = [];
 
+    /**
+     * @param list<string> $warmupLocales
+     */
     public function __construct(
         private readonly SymfonyTranslator&WarmableInterface $translator,
+        private readonly array $warmupLocales = [],
     ) {
     }
 
@@ -88,6 +92,12 @@ final class MauticResourceTranslator implements TranslatorInterface, TranslatorB
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
         $this->register(null);
+
+        // Symfony also builds catalogues for configured locales and their fallbacks.
+        // Register every resource before any of those catalogues is cached.
+        foreach (array_merge($this->warmupLocales, $this->translator->getFallbackLocales()) as $locale) {
+            $this->register($locale);
+        }
 
         return $this->translator->warmUp($cacheDir, $buildDir);
     }
