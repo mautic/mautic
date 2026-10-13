@@ -2,6 +2,7 @@ import ContentService from '../content.service';
 import MjmlService from '../mjml/mjml.service';
 import ButtonCloseCommands from './buttonClose.command';
 import ButtonsService from './buttons.service';
+import EditorFontsService from '../editorFonts/editorFonts.service';
 
 export default class ButtonApplyCommand {
   /**
@@ -20,16 +21,25 @@ export default class ButtonApplyCommand {
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
     if (ContentService.isMjmlMode(editor)) {
-      const htmlCode = MjmlService.getEditorHtmlContent(editor);
+      let htmlCode = MjmlService.getEditorHtmlContent(editor);
       const mjmlCode = MjmlService.getEditorMjmlContent(editor);
 
       if (!htmlCode || !mjmlCode) {
-        throw new Error('Could not generate html from MJML');
+        return;
+      }
+
+      if (mauticEditorFonts) {
+        htmlCode = EditorFontsService.addFontLinksToHtml(htmlCode);
       }
 
       ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode);
     } else {
-      const html = ContentService.getEditorHtmlContent(editor);
+      let html = ContentService.getEditorHtmlContent(editor);
+
+      if (mauticEditorFonts) {
+        html = EditorFontsService.addFontLinksToHtml(html);
+      }
+
       ButtonCloseCommands.returnContentToTextarea(editor, html);
     }
 
