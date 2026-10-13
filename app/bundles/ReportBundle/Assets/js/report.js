@@ -23,7 +23,7 @@ Mautic.reportOnLoad = function (container) {
         mQuery('#report-shelves .collapse').on('show.bs.collapse', function (e) {
             var actives = mQuery('#report-shelves').find('.in, .collapsing');
             actives.each(function (index, element) {
-                mQuery(element).collapse('hide');
+                mQuery(element).each((index, element) => bootstrap.Collapse.getInstance(element)?.hide());
                 var id = mQuery(element).attr('id');
                 mQuery('a[aria-controls="' + id + '"]').addClass('collapsed');
             })
@@ -164,7 +164,7 @@ Mautic.addReportRow = function (elId) {
     }
 
     Mautic.activateChosenSelect(mQuery('#' + elId + '_' + index + '_column'));
-    mQuery("#" + elId + " *[data-bs-toggle='tooltip']").tooltip({html: true, container: 'body'});
+    mQuery("#" + elId + " *[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, container: 'body'}));
 
 };
 
@@ -309,8 +309,7 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
 
         inputElement.attr('data-bs-toggle', 'tooltip')
             .attr('data-bs-placement', 'bottom')
-            .attr('title', '...') // Set a placeholder title, to be replaced later
-            .tooltip({ trigger: 'manual' });
+            .attr('title', '...').each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, { trigger: 'manual' }));
 
         inputElement.on('focus', function () {
             const currentOperator = mQuery('#report_filters_' + idParts[2] + '_condition').val();
@@ -322,10 +321,14 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
                 } else {
                     message = Mautic.translate('mautic.report.filter.date_comparison_timezone_tooltip');
                 }
-                mQuery(this).attr('title', message).tooltip('fixTitle').tooltip('show');
+                const tooltip = bootstrap.Tooltip.getInstance(this);
+                this.removeAttribute('title');
+                this.setAttribute('data-bs-title', message);
+                tooltip.setContent({'.tooltip-inner': message});
+                tooltip.show();
             }
         }).on('blur', function () {
-            mQuery(this).tooltip('hide');
+            mQuery(this).each((index, element) => bootstrap.Tooltip.getInstance(element)?.hide());
         });
 
         inputElement.data('utc-tooltip-initialized', true);
@@ -333,7 +336,7 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
 };
 
 Mautic.removeReportRow = function (container) {
-    mQuery("#" + container + " *[data-bs-toggle='tooltip']").tooltip('destroy');
+    mQuery("#" + container + " *[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
     mQuery('#' + container).remove();
 };
 
@@ -478,5 +481,5 @@ Mautic.cloneReportRow = function (containerId) {
     }
 
     // Reinitialize tooltips
-    newContainer.find("*[data-bs-toggle='tooltip']").tooltip({ html: true, container: 'body' });
+    newContainer.find("*[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, { html: true, container: 'body' }));
 };
