@@ -28,15 +28,15 @@
             <div class="col-xs-12">
                 <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
-                        <a href="#details" role="tab" data-toggle="tab" class="{% if formContainsErrors(form, ['filters']) %}text-danger{% endif %}">
+                        <a href="#details" role="tab" data-bs-toggle="tab" class="nav-link {% if formContainsErrors(form, ['filters']) %}text-danger{% endif %}">
                             {{ 'mautic.core.details'|trans }}
                             {% if formContainsErrors(form, ['filters']) %}
                               <i class="ri-alert-line"></i>
                             {% endif %}
                         </a>
                     </li>
-                    <li data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ 'mautic.lead.lead.segment.add.help'|trans }}">
-                        <a href="#filters" role="tab" data-toggle="tab" class="{% if formContainsErrors(form.filters) %}text-danger{% endif %}">
+                    <li data-bs-toggle="tooltip" title="" data-bs-placement="top" data-bs-title="{{ 'mautic.lead.lead.segment.add.help'|trans }}">
+                        <a href="#filters" role="tab" data-bs-toggle="tab" class="nav-link {% if formContainsErrors(form.filters) %}text-danger{% endif %}">
                             {{ 'mautic.core.filters'|trans }}
                             {% if formContainsErrors(form.filters) %}
                                 <i class="ri-alert-line"></i>
@@ -47,7 +47,7 @@
 
                 <!-- start: tab-content -->
                 <div class="tab-content pa-md">
-                    <div class="tab-pane fade in active bdr-w-0" id="details">
+                    <div class="tab-pane fade show active bdr-w-0" id="details">
                         <div class="row">
                             <div class="col-md-6">
                                 {{ form_row(form.name) }}

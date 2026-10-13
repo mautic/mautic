@@ -38,7 +38,7 @@
             {% endif %}
 
             {% if variant is instanceof('\\Mautic\\CoreBundle\\Entity\\TranslationEntityInterface') and variant.isTranslation() %}
-                <span class="ml-2" data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
+                <span class="ml-2" data-bs-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
                     <i class="ri-translate"></i>
                 </span>
             {% endif %}

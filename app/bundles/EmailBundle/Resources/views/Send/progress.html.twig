@@ -29,7 +29,7 @@
                              style="width: {{ percent }}%; height: 50px;"
                              data-batchlimit="{{ batchlimit }}"
                              data-email="{{ email.id }}">
-                            <span class="sr-only">{{ percent }}%</span>
+                            <span class="visually-hidden">{{ percent }}%</span>
                         </div>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                     variant: 'link',
                     icon: 'ri-information-line',
                     attributes: {
-                        'data-toggle': 'popover',
+                        'data-bs-toggle': 'popover',
                         'data-content': 'mautic.email.send.help_subheading_leaving'|trans,
                         'data-placement': 'bottom',
                         'data-container': 'body',

@@ -95,7 +95,7 @@
                             <tr>
                                 <td width="20%"><span class="fw-b textTitle">
                                     {{ 'mautic.campaign.last.publish.date'|trans }}
-                                    <span data-toggle="tooltip"  title="{{ 'mautic.campaign.last.publish.date.tooltip'|trans }}">
+                                    <span data-bs-toggle="tooltip"  title="{{ 'mautic.campaign.last.publish.date.tooltip'|trans }}">
                                         <i class="ri-question-line"></i>
                                     </span>
                                 </td>
@@ -127,9 +127,9 @@
         <div>
             <!-- campaign detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
-                       data-target="#campaign-details"><span
+                <span data-bs-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse"
+                       data-bs-target="#campaign-details"><span
                             class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
                 </span>
             </div>
@@ -160,19 +160,19 @@
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
-                        <a href="#stats-container" role="tab" data-toggle="tab">
+                        <a href="#stats-container" role="tab" data-bs-toggle="tab" class="nav-link">
                             {{ 'mautic.campaign.stats'|trans }}
                         </a>
                     </li>
                     {%  if showEmailStats|default(false) %}
                         <li>
-                            <a href="#campaign-email-stats" role="tab" data-toggle="tab" data-load="campaign-email-stats">
+                            <a href="#campaign-email-stats" role="tab" data-bs-toggle="tab" data-load="campaign-email-stats" class="nav-link">
                                 {{ 'mautic.campaign.email_stats'|trans }}
                             </a>
                         </li>
                     {% endif %}
                     <li>
-                        <a href="#reads-map-container" role="tab" data-toggle="tab" data-load="map">
+                        <a href="#reads-map-container" role="tab" data-bs-toggle="tab" data-load="map" class="nav-link">
                             {{ 'mautic.email.thead.maps'|trans }}
                         </a>
                     </li>
@@ -231,27 +231,27 @@
             <!-- tabs controls -->
             <ul class="nav nav-tabs nav-tabs-contained" id="campaign_nav_header_ul">
                 <li class="active" id="preview_li">
-                    <a href="#preview-container" role="tab" data-toggle="tab">
+                    <a href="#preview-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.campaign.preview.header'|trans }}
                     </a>
                 </li>
                 <li class="" id="decisions_li">
-                    <a href="#decisions-container" role="tab" data-toggle="tab">
+                    <a href="#decisions-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.campaign.event.decisions.header'|trans }}
                     </a>
                 </li>
                 <li class="" id="actions_li">
-                    <a href="#actions-container" role="tab" data-toggle="tab">
+                    <a href="#actions-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.campaign.event.actions.header'|trans }}
                     </a>
                 </li>
                 <li class="" id="conditions_li">
-                    <a href="#conditions-container" role="tab" data-toggle="tab">
+                    <a href="#conditions-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.campaign.event.conditions.header'|trans }}
                     </a>
                 </li>
                 <li class="">
-                    <a href="#leads-container" role="tab" data-toggle="tab">
+                    <a href="#leads-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.lead.leads'|trans }}
                     </a>
                 </li>
