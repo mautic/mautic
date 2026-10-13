@@ -13,9 +13,11 @@ use Mautic\StageBundle\Entity\LeadStageLogRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Event\StageBuilderEvent;
-use Mautic\StageBundle\Event\StageEvent;
+use Mautic\StageBundle\Event\StagePostDeleteEvent;
+use Mautic\StageBundle\Event\StagePostSaveEvent;
+use Mautic\StageBundle\Event\StagePreDeleteEvent;
+use Mautic\StageBundle\Event\StagePreSaveEvent;
 use Mautic\StageBundle\Form\Type\StageType;
-use Mautic\StageBundle\StageEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -95,34 +97,22 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
             throw new MethodNotAllowedHttpException(['Stage']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = StageEvents::STAGE_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = StageEvents::STAGE_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = StageEvents::STAGE_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = StageEvents::STAGE_POST_DELETE;
-                break;
-            default:
-                return null;
+        $eventClass = match ($action) {
+            'pre_save'    => StagePreSaveEvent::class,
+            'post_save'   => StagePostSaveEvent::class,
+            'pre_delete'  => StagePreDeleteEvent::class,
+            'post_delete' => StagePostDeleteEvent::class,
+            default       => null,
+        };
+
+        if (null === $eventClass || !$this->dispatcher->hasListeners($eventClass)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new StageEvent($entity, $isNew);
-            }
+        $event = new $eventClass($entity, $isNew);
+        $this->dispatcher->dispatch($event);
 
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     /**
