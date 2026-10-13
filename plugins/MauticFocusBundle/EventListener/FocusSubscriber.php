@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
-use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -14,6 +13,7 @@ use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
+use MauticPlugin\MauticFocusBundle\Event\FocusTokenReplacementEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -43,7 +43,7 @@ final readonly class FocusSubscriber implements EventSubscriberInterface
             KernelEvents::REQUEST          => ['onKernelRequest', 0],
             FocusEvents::POST_SAVE         => ['onFocusPostSave', 0],
             FocusEvents::POST_DELETE       => ['onFocusDelete', 0],
-            FocusEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
+            FocusTokenReplacementEvent::class => ['onTokenReplacement', 0],
             ReportBuilderEvent::class => ['onReportBuild', -10],
         ];
     }
@@ -121,7 +121,7 @@ final readonly class FocusSubscriber implements EventSubscriberInterface
         $event->addTable('audit.log', $tables['audit.log']);
     }
 
-    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
+    public function onTokenReplacement(FocusTokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();

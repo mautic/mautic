@@ -5,7 +5,6 @@ namespace MauticPlugin\MauticFocusBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use MatthiasMullie\Minify;
-use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -26,6 +25,7 @@ use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
+use MauticPlugin\MauticFocusBundle\Event\FocusTokenReplacementEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Psr\Log\LoggerInterface;
@@ -153,11 +153,11 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
         ];
 
         // Replace tokens to ensure clickthroughs, lead tokens etc. are appropriate
-        $tokenEvent = new TokenReplacementEvent($data['focus'], $lead, ['focus_id' => $focus->getId()]);
+        $tokenEvent = new FocusTokenReplacementEvent($data['focus'], $lead, ['focus_id' => $focus->getId()]);
         if ($trackableUrl) {
             $tokenEvent->addToken($url, $trackableUrl);
         }
-        $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
+        $this->dispatcher->dispatch($tokenEvent);
         $focusContent = $tokenEvent->getContent();
         $focusContent = str_replace('{focus_form}', $data['form'], $focusContent, $formReplaced);
         if (!$formReplaced && !empty($data['form'])) {
