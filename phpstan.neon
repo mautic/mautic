@@ -91,7 +91,7 @@ parameters:
 
         -
             identifier: symplify.forbiddenFuncCall
-            message: '#Function "method_exists|curl_(.*?)" cannot be used#'
+            message: '#Function "method_exists|property_exists|curl_(.*?)" cannot be used#'
 
         # page translation entity passed where concrete Page expected in builder tokens
         -

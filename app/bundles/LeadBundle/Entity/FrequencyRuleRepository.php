@@ -183,7 +183,7 @@ final class FrequencyRuleRepository extends CommonRepository
         };
 
         if (! $since instanceof \DateTime) {
-            return null;
+            return [];
         }
 
         $query->andWhere('ch.'.$statSentColumn.' >= :frequencyTime')

@@ -65,7 +65,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if (in_array('mobile', $features)) {
             $event->addAction(
-                static::EVENT_ACTION_SEND_MOBILE_NOTIFICATION,
+                self::EVENT_ACTION_SEND_MOBILE_NOTIFICATION,
                 [
                     'label'            => 'mautic.notification.campaign.send_mobile_notification',
                     'description'      => 'mautic.notification.campaign.send_mobile_notification.tooltip',
@@ -81,7 +81,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $event->addAction(
-            static::EVENT_ACTION_SEND_NOTIFICATION,
+            self::EVENT_ACTION_SEND_NOTIFICATION,
             [
                 'label'            => 'mautic.notification.campaign.send_notification',
                 'description'      => 'mautic.notification.campaign.send_notification.tooltip',
@@ -98,7 +98,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignBatchAction(PendingEvent $event): void
     {
-        if (!$event->checkContext(static::EVENT_ACTION_SEND_NOTIFICATION) && !$event->checkContext(static::EVENT_ACTION_SEND_MOBILE_NOTIFICATION)) {
+        if (!$event->checkContext(self::EVENT_ACTION_SEND_NOTIFICATION) && !$event->checkContext(self::EVENT_ACTION_SEND_MOBILE_NOTIFICATION)) {
             return;
         }
 
@@ -188,12 +188,12 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         foreach ($log->getLead()->getPushIDs() as $pushID) {
             // Skip non-mobile PushIDs if this is a mobile event
-            if ($event->checkContext(static::EVENT_ACTION_SEND_MOBILE_NOTIFICATION) && !$pushID->isMobile()) {
+            if ($event->checkContext(self::EVENT_ACTION_SEND_MOBILE_NOTIFICATION) && !$pushID->isMobile()) {
                 continue;
             }
 
             // Skip mobile PushIDs if this is a non-mobile event
-            if ($event->checkContext(static::EVENT_ACTION_SEND_NOTIFICATION) && $pushID->isMobile()) {
+            if ($event->checkContext(self::EVENT_ACTION_SEND_NOTIFICATION) && $pushID->isMobile()) {
                 continue;
             }
 
