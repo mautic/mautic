@@ -51,7 +51,7 @@ Mautic.pointTriggerEventOnLoad = function (container, response) {
         }
 
         //initialize tooltips
-        mQuery(eventId).find("*[data-bs-toggle='tooltip'], *[data-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
+        mQuery(eventId + " *[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
 
         //activate new stuff
         mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
