@@ -24,16 +24,8 @@ final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 
         $scheduleIsValidValidator = new ScheduleIsValidValidator($schedulerBuilderMock);
 
-        $report = $this->createMock(Report::class);
-
-        $report->expects($this->once())
-            ->method('isScheduled')
-            ->with()
-            ->willReturn(false);
-
-        $report->expects($this->once())
-            ->method('setAsNotScheduled')
-            ->with();
+        $report = new Report();
+        $report->setIsScheduled(false);
 
         $schedulerBuilderMock->expects($this->never())
             ->method('getNextEvent');

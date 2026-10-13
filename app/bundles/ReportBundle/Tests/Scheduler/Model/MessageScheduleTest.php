@@ -33,11 +33,8 @@ final class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMessageForAttachedFile(): void
     {
-        $report = $this->createMock(Report::class);
-
-        $report->expects($this->once())
-            ->method('getId')
-            ->willReturn(33);
+        $report = new Report();
+        $report->setId(33);
 
         $this->router->expects($this->once())
             ->method('generate')
@@ -54,15 +51,9 @@ final class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMessageForLinkedFile(): void
     {
-        $report = $this->createMock(Report::class);
-
-        $report->expects($this->once())
-            ->method('getId')
-            ->willReturn(33);
-
-        $report->expects($this->once())
-            ->method('getName')
-            ->willReturn('Report ABC');
+        $report = new Report();
+        $report->setId(33);
+        $report->setName('Report ABC');
 
         $this->router->expects($this->once())
             ->method('generate')
@@ -79,11 +70,8 @@ final class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSubject(): void
     {
-        $report = $this->createMock(Report::class);
-
-        $report->expects($this->once())
-            ->method('getName')
-            ->willReturn('Report ABC');
+        $report = new Report();
+        $report->setName('Report ABC');
 
         $this->translatorMock->expects($this->once())
             ->method('trans')
