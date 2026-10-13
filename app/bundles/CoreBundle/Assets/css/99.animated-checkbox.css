@@ -18,4 +18,3 @@
 .dark .acervo-checkbox__button { background: var(--acervo-background, #181816); color: var(--acervo-foreground, #faf7f1); }
 .dark .acervo-checkbox[data-variant="accent"] .acervo-checkbox__button { background: var(--acervo-input, rgb(250 247 241 / 22%)); }
 .dark .acervo-checkbox[data-state="checked"] .acervo-checkbox__button, .dark .acervo-checkbox[data-state="indeterminate"] .acervo-checkbox__button { background: var(--acervo-primary, #aaa35a); color: var(--acervo-primary-foreground, #181816); }
-@media (prefers-reduced-motion: reduce) { .acervo-checkbox * { transition-duration: 0ms !important; transition-delay: 0ms !important; } }
