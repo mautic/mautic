@@ -327,6 +327,14 @@ parameters:
                 - app/bundles/LeadBundle/Event/LeadListFilteringEvent.php
                 - app/bundles/LeadBundle/Event/LeadListFiltersChoicesEvent.php
 
+        # switch statements kept as-is, typed incrementally later
+        -
+            identifier: symplify.forbiddenSwitch
+        # method_exists() is a legitimate runtime check for optional APIs, other forbidden funcs still flagged
+        -
+            identifier: symplify.forbiddenFuncCall
+            message: '#Function "method_exists\(\)" cannot be used#'
+
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
         - vendor/lightsaml2/sp-bundle/src
