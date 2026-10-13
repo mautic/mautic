@@ -26,7 +26,7 @@ final class EmailPendingQueryOptions
     private ?\DateTimeInterface $sendStopDate = null;
     private bool $segmentMembershipViaJoin = false;
 
-    public function __construct(private int $emailId)
+    public function __construct(private readonly int $emailId)
     {
     }
 
