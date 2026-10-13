@@ -27,6 +27,8 @@ use PHPStan\Type\TypeCombinator;
  * Tests do need to fetch services from the container, so there the call is allowed - but only with a class
  * constant, e.g. get(PathsHelper::class), which gives a typed service instead of an untyped object.
  *
+ * @see \Utils\PHPStan\Tests\Rule\NoContainerGetRuleTest
+ *
  * @implements Rule<MethodCall>
  */
 final class NoContainerGetRule implements Rule
