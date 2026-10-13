@@ -338,7 +338,6 @@ class LeadListRepository extends CommonRepository
             'COALESCE(SUM(CASE WHEN l.manually_added = :true THEN 1 ELSE 0 END), 0) AS manually_added_count'
         )
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
-        $queryBuilder = $this->forceUseIndex($queryBuilder, MAUTIC_TABLE_PREFIX.'manually_removed');
 
         if ($includeFilterAdded) {
             $queryBuilder->addSelect('COALESCE(SUM(CASE WHEN l.manually_added = :false THEN 1 ELSE 0 END), 0) AS filter_added_count');
