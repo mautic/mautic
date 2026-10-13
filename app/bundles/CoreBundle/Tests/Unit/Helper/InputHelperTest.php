@@ -58,6 +58,14 @@ final class InputHelperTest extends TestCase
         }
     }
 
+    #[TestDox('The form HTML filter removes nested form tags')]
+    public function testHtmlWithoutFormsRemovesNestedFormTags(): void
+    {
+        $html = '<form action="https://example.com/submit" method="post"><p>Keep this content.</p></form>';
+
+        $this->assertSame('<p>Keep this content.</p>', InputHelper::html_without_forms($html));
+    }
+
     #[TestDox('The email returns value without double period')]
     public function testEmailFilterRemovesDoublePeriods(): void
     {

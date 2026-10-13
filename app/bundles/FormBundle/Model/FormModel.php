@@ -442,6 +442,19 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         // Determine pages
         $fields = $entity->getFields()->toArray();
 
+        foreach ($fields as $field) {
+            if (in_array($field->getType(), ['freetext', 'freehtml'], true)) {
+                $properties = $field->getProperties();
+                if (isset($properties['text'])) {
+                    $cleanText = InputHelper::remove_form_tags($properties['text']);
+                    if ($cleanText !== $properties['text']) {
+                        $properties['text'] = $cleanText;
+                        $field->setProperties($properties);
+                    }
+                }
+            }
+        }
+
         // Ensure the correct order in case this is generated right after a form save with new fields
         uasort($fields, fn (Field $a, Field $b): int => $this->compareFieldOrder($a, $b));
 

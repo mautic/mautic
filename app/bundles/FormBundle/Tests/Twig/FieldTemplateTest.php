@@ -19,6 +19,8 @@ final class FieldTemplateTest extends MauticMysqlTestCase
 
     private const RADIO_GROUP_FIELD_TEMPLATE = '@MauticForm/Field/radiogrp.html.twig';
 
+    private const FREE_HTML_FIELD_TEMPLATE = '@MauticForm/Field/freehtml.html.twig';
+
     public function testFieldTemplateRendersWithCssClasses(): void
     {
         $html = $this->renderTextField($this->createField('50%'));
@@ -98,6 +100,23 @@ final class FieldTemplateTest extends MauticMysqlTestCase
         $this->assertCount(1, $crawler->filter('input[type="radio"][value="0"][checked]'), $crawler->html());
     }
 
+    public function testFreeHtmlFieldTemplateRemovesNestedFormTags(): void
+    {
+        $field = new Field();
+        $field->setType('freehtml');
+        $field->setLabel(self::FIELD_LABEL);
+        $field->setAlias('test_free_html');
+        $field->setOrder(1);
+        $field->setProperties([
+            'text' => '<form action="https://example.com/submit"><p>Keep this content.</p></form>',
+        ]);
+
+        $html = $this->renderFreeHtmlField($field);
+
+        $this->assertStringContainsString('<p>Keep this content.</p>', $html);
+        $this->assertStringNotContainsString('<form action="https://example.com/submit">', $html);
+    }
+
     private function createField(?string $fieldWidth = null): Field
     {
         $field = new Field();
@@ -159,6 +178,21 @@ final class FieldTemplateTest extends MauticMysqlTestCase
             'fields'   => [],
             'id'       => 'test_id',
             'formName' => 'test_form',
+        ]);
+    }
+
+    private function renderFreeHtmlField(Field $field): string
+    {
+        $twig     = $this->getContainer()->get(Environment::class);
+        $template = $twig->load(self::FREE_HTML_FIELD_TEMPLATE);
+
+        return $template->render([
+            'field'     => $field,
+            'fields'    => [],
+            'id'        => 'test_id',
+            'formName'  => 'test_form',
+            'formId'    => 'test_form_id',
+            'inBuilder' => false,
         ]);
     }
 }

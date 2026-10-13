@@ -468,6 +468,42 @@ final class InputHelper
     }
 
     /**
+     * Cleans HTML used inside a Mautic form without allowing nested form tags.
+     *
+     * @return mixed|string
+     */
+    public static function html_without_forms($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as &$val) {
+                $val = self::html_without_forms($val);
+            }
+
+            return $value;
+        }
+
+        return self::remove_form_tags(self::html($value));
+    }
+
+    /**
+     * Removes nested form tags without changing the remaining HTML.
+     *
+     * @return mixed|string
+     */
+    public static function remove_form_tags($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as &$val) {
+                $val = self::remove_form_tags($val);
+            }
+
+            return $value;
+        }
+
+        return preg_replace('/<\/?form\b[^>]*>/i', '', (string) $value);
+    }
+
+    /**
      * Converts UTF8 into Latin.
      */
     public static function transliterate($value): string|false
