@@ -150,7 +150,18 @@ for (const [size, height] of [['sm', 32], ['md', 40], ['lg', 48]]) {
   });
 }
 
-test('values zero and false are preserved; custom labels are escaped', () => {
+for (const variant of ['neutral', 'beam']) {
+  test(`${variant} confirmation retains success colors while hovered`, async ({ page }) => {
+    await load(page, 'hold-to-confirm', { variant, duration: 100, resetDelay: 0 });
+    await press(page);
+    await expect(page.locator('[data-component]')).toHaveAttribute('data-state', 'confirmed');
+    await page.mouse.up();
+    await expect(page.getByRole('button')).toHaveCSS('background-color', 'oklch(0.979 0.021 166.113)');
+    await expect(page.getByRole('button')).toHaveCSS('color', 'oklch(0.596 0.145 163.225)');
+  });
+}
+
+test('values zero and false are preserved; custom labels are escaped' , () => {
   const html = render('hold-to-confirm', { duration: 0, resetDelay: 0, disabled: false, active: false, strength: 0, label: '<script>bad</script>' });
   expect(html).toContain('data-duration="0"');
   expect(html).toContain('data-reset-delay="0"');
