@@ -1,0 +1,20 @@
+<div class="modal fade" id="testModal" tabindex="-1" aria-label="Test modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h2 class="modal-title">Test modal</h2><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button></div>
+      <div class="modal-body"><div class="modal-body-content">Test content</div></div>
+    </div>
+  </div>
+</div>
+<div class="search-scope-wrapper">
+  <select id="scope"><option value="first">First</option><option value="second">Second</option></select>
+  <div class="chosen-container"></div>
+  <button id="scopeTrigger" class="search-scope-mobile-trigger" type="button" title="Initial" data-filtering-by="Filtering by: __LABEL__">Scope</button>
+</div>
+<button class="btn btn-primary" type="button" id="collapseTrigger" data-bs-toggle="collapse" data-bs-target="#testCollapse" aria-expanded="false">Collapse</button>
+<div class="collapse" id="testCollapse">Collapsed content</div>
+<div class="dropdown">
+  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownTrigger" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</button>
+  <ul class="dropdown-menu" id="dropdownMenu"><li><button class="dropdown-item" type="button">Item</button></li></ul>
+</div>
+<button id="outside" class="position-fixed top-0 end-0" type="button">Outside</button>
