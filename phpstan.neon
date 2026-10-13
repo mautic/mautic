@@ -357,8 +357,6 @@ rules:
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
-    # enable later, might not be needed
-    - Symplify\PHPStanRules\Rules\NoDuplicateNonRepeatableAttributeRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
