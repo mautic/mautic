@@ -18,7 +18,7 @@ final class AssetRepository extends CommonRepository
     use ProjectRepositoryTrait;
 
     /**
-     * Get a list of entities.
+     * @return iterable<Asset>
      */
     public function getEntities(array $args = []): iterable
     {

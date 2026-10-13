@@ -31,14 +31,14 @@ use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @template T of object
+ * @template TEntity of object
  *
- * @extends ServiceEntityRepository<T>
+ * @extends ServiceEntityRepository<TEntity>
  */
 abstract class CommonRepository extends ServiceEntityRepository
 {
     /**
-     * @param class-string<T>|null $entityFQCN
+     * @param class-string<TEntity>|null $entityFQCN
      */
     public function __construct(ManagerRegistry $registry, ?string $entityFQCN = null)
     {
@@ -340,7 +340,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      *
      * @param array<string,mixed> $args
      *
-     * @return object[]|array<int,mixed>|iterable<object>|Paginator<object>|SimplePaginator<mixed>
+     * @return iterable<TEntity>
      */
     public function getEntities(array $args = []): iterable
     {
