@@ -74,7 +74,7 @@ trait TranslationEntityTrait
     }
 
     /**
-     * @return Collection<int, T>|null
+     * @return Collection<int, TEntity>|null
      */
     public function getTranslationChildren(): ?Collection
     {
