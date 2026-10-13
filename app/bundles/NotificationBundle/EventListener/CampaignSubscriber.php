@@ -272,7 +272,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array<string,mixed[]>
+     * @return array<string, array{sendNotification: Notification, playerIds: array<string, LeadEventLog>}>
      */
     private function buildBatches(PendingEvent $event, Notification $notification): array
     {
