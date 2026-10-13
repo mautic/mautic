@@ -24,6 +24,23 @@ parameters:
         no_mixed_property: true
         no_mixed_caller: true
 
+    symplify:
+        naming: true
+        complexity: true
+        configurable: true
+        static: true
+        modern: true
+        symfony: true
+        symfonyConfig: true
+        doctrine: true
+        collections: true
+        phpunit: true
+        mocks: true
+        ctor: true
+        symfonyReturnType: true
+        laravelReturnType: true
+        pathStrings: true
+
     paths:
         - app/bundles
         - app/config
@@ -337,7 +354,6 @@ rules:
     - Utils\PHPStan\Rule\NoContainerGetRule
     - Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
-    - Utils\PHPStan\Rule\NoPublicNonActionMethodInControllerRule
 
     - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
     - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
@@ -356,18 +372,10 @@ rules:
     - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\PreferClassServiceReferenceRule
     - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoServiceSetterCallRule
     - Utils\PHPStan\Rule\NoServiceGetterRule
-    - Utils\PHPStan\Rule\NullablePropertyGetterMustReturnNullableRule
     - Symplify\PHPStanRules\Rules\Doctrine\NoReadonlyEntityClassRule
-    - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
     - Symplify\PHPStanRules\Rules\RequireArrayShapeReturnRule
-    - Utils\PHPStan\Rule\RepositoryMethodMustHaveReturnTypeRule
-    - Utils\PHPStan\Rule\CollectionGetterMustReturnCollectionRule
-    - Utils\PHPStan\Rule\CollectionReturnMustHaveGenericDocblockRule
-    - Utils\PHPStan\Rule\CollectionParamMustHaveGenericDocblockRule
-    - Utils\PHPStan\Rule\CollectionPropertyMustHaveGenericDocblockRule
     - Utils\PHPStan\Rule\GenericTraitUseMustHaveGenericDocblockRule
-    - Utils\PHPStan\Rule\MockedMethodReturnMustMatchNativeTypeRule
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
