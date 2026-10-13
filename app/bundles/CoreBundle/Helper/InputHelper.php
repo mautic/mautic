@@ -472,7 +472,7 @@ final class InputHelper
      *
      * @return mixed|string
      */
-    public static function html_without_forms($value): array|string|null
+    public static function html_without_forms(mixed $value): mixed
     {
         if (is_array($value)) {
             foreach ($value as &$val) {
@@ -490,7 +490,7 @@ final class InputHelper
      *
      * @return mixed|string
      */
-    public static function remove_form_tags($value): array|string|null
+    public static function remove_form_tags(mixed $value): mixed
     {
         if (is_array($value)) {
             foreach ($value as &$val) {
@@ -508,7 +508,7 @@ final class InputHelper
      *
      * @return mixed|string
      */
-    public static function remove_script_tags($value): array|string|null
+    public static function remove_script_tags(mixed $value): mixed
     {
         if (is_array($value)) {
             foreach ($value as &$val) {
