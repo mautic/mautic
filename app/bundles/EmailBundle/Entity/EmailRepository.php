@@ -1072,8 +1072,7 @@ class EmailRepository extends CommonRepository
 
         $this->emailPendingSegmentMembershipQueryApplyParameters($subQuery, $listIds, $maxDate, $sendStopDate);
 
-        $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->andWhere(sprintf('l.id IN (%s)', $subQuery->getSQL()));
+        $q->andWhere(sprintf('l.id IN (%s)', $subQuery->getSQL()));
 
         $this->copyParams($subQuery, $q);
     }
