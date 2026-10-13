@@ -1,7 +1,7 @@
 {% for section, shortcut_list in shortcuts %}
     <li class="panel">
-    <a role="button" id="heading{{section}}" class="accordion-heading collapsed" data-toggle="collapse"
-        data-parent="#accordion" href="#collapse{{section}}" aria-expanded="false"
+    <a role="button" id="heading{{section}}" class="accordion-heading collapsed" data-bs-toggle="collapse"
+        data-bs-parent="#accordion" href="#collapse{{section}}" aria-expanded="false"
         aria-controls="collapse{{section}}">
         <i class="ri-arrow-down-s-line accordion-arrow"></i>
         <span class="accordion-title">{{ ('mautic.keyboard.section.' ~ section)|trans }}</span>
@@ -15,7 +15,7 @@
                 <td class="shortcut-description">
                 {{ description | trans }}
                 </td>
-                <td class="shortcut-keys text-right">
+                <td class="shortcut-keys text-end">
                 {% set keys = key|split('+') %}
                 {% for k in keys %}
                     <kbd>{{ k }}</kbd>

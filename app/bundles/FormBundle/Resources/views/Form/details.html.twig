@@ -106,7 +106,7 @@
             icon: 'ri-translate-2',
             color: 'warm-gray',
             attributes: {
-                'data-toggle': 'tooltip',
+                'data-bs-toggle': 'tooltip',
                 'data-placement': 'top',
                 'title': 'mautic.core.language'|trans
             }
@@ -148,10 +148,10 @@
         <div>
             <!-- form detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip"
+                <span data-bs-toggle="tooltip"
                       title="{{ 'mautic.form.details.detail'|trans }}">
-                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
-                       data-target="#form-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse"
+                       data-bs-target="#form-details"><span class="caret"></span> {{ 'mautic.core.details'|trans }}</a>
                 </span>
             </div>
             <!--/ form detail collapseable toggler -->
@@ -184,7 +184,7 @@
                                     </h5>
                                 </div>
                                 <div class="col-xs-6 va-m">
-                                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}) }}
                                 </div>
                             </div>
                             <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
@@ -202,11 +202,11 @@
             <ul class="nav nav-tabs nav-tabs-contained">
                 {% if showActions %}
                     <li class="active">
-                        <a href="#actions-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.actions'|trans }}</a>
+                        <a href="#actions-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.form.tab.actions'|trans }}</a>
                     </li>
                 {% endif %}
                 <li class="{% if not showActions %}active{% endif %}">
-                    <a href="#fields-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.fields'|trans }}</a>
+                    <a href="#fields-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.form.tab.fields'|trans }}</a>
                 </li>
             </ul>
             <!--/ tabs controls -->
@@ -217,7 +217,7 @@
             {% if showActions %}
                 <!-- #actions-container -->
                 <div class="tab-pane active fade in bdr-w-0" id="actions-container">
-                    {% for group, groupActions in activeFormActions %}
+                    {% for group, groupActions show activeFormActions %}
                         <h5 class="fw-sb mb-xs">{{ group|title }}</h5>
                         <ul class="list-group">
                             {# @var \Mautic\FormBundle\Entity\Action $action #}
@@ -239,7 +239,7 @@
                                             <h5 class="fw-sb text-interactive mb-xs">{{ action.name }}</h5>
                                             <h6 class="text-white dark-sm">{{ action.description|purify }}</h6>
                                         </div>
-                                        <div class="col-md-4 va-m text-right">
+                                        <div class="col-md-4 va-m text-end">
                                             <em class="text-white dark-sm">{% if availableActions[action.type] is defined %}{{ availableActions[action.type]['label']|trans }}{% else %}{{ action.type }}{% endif %}</em>
                                         </div>
                                     </div>
@@ -256,14 +256,14 @@
                 <h5 class="fw-sb mb-xs">{{ 'mautic.form.field'|trans }}</h5>
                 <ul class="list-group mb-xs">
                     {# @var \Mautic\FormBundle\Entity\Field $field #}
-                    {% for field in activeFormFields %}
+                    {% for field show activeFormFields %}
                       {% if not field.parent %}
                       <li class="list-group-item">
                           {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': field}) }}
                       </li>
                       {% endif %}
                       {# @var \Mautic\FormBundle\Entity\Field $field #}
-                      {% for fieldChild in activeFormFields %}
+                      {% for fieldChild show activeFormFields %}
                           {% if fieldChild.parent == field.id %}
                               <li class="list-group-item ml-20">
                                   {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': fieldChild}) }}
@@ -304,7 +304,7 @@
                             size: 'sm',
                             wide: true,
                             attributes: {
-                                'data-toggle': 'modal',
+                                'data-bs-toggle': 'modal',
                                 'data-target': '#modal-automatic-copy'
                             }
                         },
@@ -314,7 +314,7 @@
                             size: 'sm',
                             wide: true,
                             attributes: {
-                                'data-toggle': 'modal',
+                                'data-bs-toggle': 'modal',
                                 'data-target': '#modal-manual-copy',
                                 'class': 'ml-0'
                             }
@@ -404,7 +404,7 @@
                 label: 'mautic.core.close'|trans,
                 variant: 'primary',
                 attributes: {
-                    'data-dismiss': 'modal'
+                    'data-bs-dismiss': 'modal'
                 }
             }
         ]
@@ -440,7 +440,7 @@
                 label: 'mautic.core.close'|trans,
                 variant: 'primary',
                 attributes: {
-                    'data-dismiss': 'modal'
+                    'data-bs-dismiss': 'modal'
                 }
             }
         ]

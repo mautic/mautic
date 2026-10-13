@@ -4,12 +4,12 @@
 #}
 {{ form_start(form) }}
 <ul class="nav nav-tabs nav-tabs-contained">
-    <li class="active"><a data-toggle="tab" href="#channels">{{ 'mautic.lead.contact.channels'|trans }}</a></li>
-    <li><a data-toggle="tab" href="#categories">{{ 'mautic.lead.preferred.categories'|trans }}</a></li>
-    <li><a data-toggle="tab" href="#segments">{{ 'mautic.lead.preferred.segments'|trans }}</a></li>
+    <li class="active"><a data-bs-toggle="tab" href="#channels" class="nav-link">{{ 'mautic.lead.contact.channels'|trans }}</a></li>
+    <li><a data-bs-toggle="tab" href="#categories" class="nav-link">{{ 'mautic.lead.preferred.categories'|trans }}</a></li>
+    <li><a data-bs-toggle="tab" href="#segments" class="nav-link">{{ 'mautic.lead.preferred.segments'|trans }}</a></li>
 </ul>
 <div class="tab-content">
-    <div id="channels" class="tab-pane fade in active">
+    <div id="channels" class="tab-pane fade show active">
         <table class="table" width="100%">
             <thead>
             <tr>
@@ -33,7 +33,7 @@
                         <input type="checkbox"
                                id="{{ channel.value }}"
                                name="lead_contact_frequency_rules[lead_channels][subscribed_channels][]"
-                               class="control-label"
+                               class="form-label"
                                onclick="Mautic.togglePreferredChannel(this.value);"
                                value="{{ channel.value|e }}"
                                {% if isChecked %}checked{% endif %}>
@@ -45,9 +45,9 @@
                     </td>
                     <td class="col-md-9" style="vertical-align: top">
                             <div>
-                                <div class="pull-left">
+                                <div class="float-start">
                                     {% set attr = form.lead_channels['frequency_number_' ~ channel.value].vars.attr %}
-                                    {% set attr = attr|merge({'class': attr.class ~ ' pull-left'}) %}
+                                    {% set attr = attr|merge({'class': attr.class ~ ' float-start'}) %}
                                     {{ form_widget(form.lead_channels['frequency_number_' ~ channel.value], {'attr': attr}) }}
                                     {{ form_label(form.lead_channels['frequency_time_' ~ channel.value]) }}
                                     <div class="frequency-select">{{ form_widget(form.lead_channels['frequency_time_' ~ channel.value]) }}</div>

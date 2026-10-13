@@ -15,7 +15,7 @@
 {% endif %}
 
 <div class="input-group input-group-sm">
-    <span class="input-group-addon">
+    <span class="input-group-text">
         <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb{{ id }}" value="{{ id|escape }}"/>
     </span>
 
@@ -30,7 +30,7 @@
                     icon_only: true,
                     spin: false,
                     attributes: {
-                        'data-toggle': 'dropdown',
+                        'data-bs-toggle': 'dropdown',
                         'type': 'button'
                     }
                 }

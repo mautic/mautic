@@ -35,9 +35,9 @@
                             data-conflict-group="ownership"
                         {% endif %}
                         onclick="Mautic.toggleFilter(this)"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        data-original-title="{{ filter.tooltip|trans }}">
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-title="{{ filter.tooltip|trans }}">
                             <i class="{{ filter.icon }}"></i>
                             {{ filter.label|trans }}
                         </a>

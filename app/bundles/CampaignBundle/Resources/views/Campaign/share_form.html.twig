@@ -42,9 +42,9 @@
                         {{ form_label(form.headline) }}
                         {{ form_widget(form.headline) }}
                         {{ form_errors(form.headline) }}
-                        <span class="help-block">
+                        <span class="form-text">
                             {{ 'mautic.campaign.share.headline.help'|trans }}
-                            <span class="pull-right" id="headline-counter">0/60</span>
+                            <span class="float-end" id="headline-counter">0/60</span>
                         </span>
                     </div>
 
@@ -52,13 +52,13 @@
                         {{ form_label(form.description) }}
                         {{ form_widget(form.description) }}
                         {{ form_errors(form.description) }}
-                        <span class="help-block">{{ 'mautic.campaign.share.description.help'|trans }}</span>
+                        <span class="form-text">{{ 'mautic.campaign.share.description.help'|trans }}</span>
                     </div>
 
                     <div class="form-group">
                         {{ form_label(form.keywords) }}
                         {{ form_widget(form.keywords) }}
-                        <span class="help-block">{{ 'mautic.campaign.share.keywords.help'|trans }}</span>
+                        <span class="form-text">{{ 'mautic.campaign.share.keywords.help'|trans }}</span>
                     </div>
                 </div>
             </div>
@@ -75,9 +75,9 @@
                         {{ form_errors(form.bannerImage) }}
                         {{ form_widget(form.bannerImageStash, stashedImages.bannerImageStash is defined ? {'value': stashedImages.bannerImageStash.token} : {}) }}
                         {% if stashedImages.bannerImageStash is defined %}
-                            <span class="help-block"><i class="ri-attachment-2"></i> {{ stashedImages.bannerImageStash.name }}</span>
+                            <span class="form-text"><i class="ri-attachment-2"></i> {{ stashedImages.bannerImageStash.name }}</span>
                         {% endif %}
-                        <span class="help-block">
+                        <span class="form-text">
                             <i class="ri-information-line"></i>
                             {{ 'mautic.campaign.share.banner_image.help'|trans }}
                         </span>
@@ -100,7 +100,7 @@
                                     {{ form_errors(attribute(form, 'galleryImage' ~ i)) }}
                                     {{ form_widget(attribute(form, 'galleryImageStash' ~ i), slotStash ? {'value': slotStash.token} : {}) }}
                                     {% if slotStash %}
-                                        <span class="help-block"><i class="ri-attachment-2"></i> {{ slotStash.name }}</span>
+                                        <span class="form-text"><i class="ri-attachment-2"></i> {{ slotStash.name }}</span>
                                     {% endif %}
                                 </div>
                             </div>
@@ -140,13 +140,13 @@
                             {% endfor %}
                         </div>
                         {{ form_errors(form.worksWithVersions) }}
-                        <span class="help-block">{{ 'mautic.campaign.share.works_with.help'|trans }}</span>
+                        <span class="form-text">{{ 'mautic.campaign.share.works_with.help'|trans }}</span>
                     </div>
 
                     <div class="form-group">
                         {{ form_label(form.languages) }}
                         {{ form_widget(form.languages) }}
-                        <span class="help-block">{{ 'mautic.campaign.share.languages.help'|trans }}</span>
+                        <span class="form-text">{{ 'mautic.campaign.share.languages.help'|trans }}</span>
                     </div>
                 </div>
             </div>
@@ -163,13 +163,13 @@
                         {{ form_errors(form.price) }}
                         {# Paid packages are temporarily disabled; swap back to price.help
                            and the price.notice alert when the field is re-enabled. #}
-                        <span class="help-block">{{ 'mautic.campaign.share.price.coming_soon'|trans }}</span>
+                        <span class="form-text">{{ 'mautic.campaign.share.price.coming_soon'|trans }}</span>
                     </div>
                 </div>
             </div>
 
             {# ── Actions ── #}
-            <div class="text-right">
+            <div class="text-end">
                 <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': campaignId}) }}" class="btn btn-default">
                     {{ 'mautic.core.form.cancel'|trans }}
                 </a>

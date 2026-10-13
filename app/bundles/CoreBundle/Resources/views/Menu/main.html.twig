@@ -37,7 +37,7 @@
                 {% if (showChildren) %}
                     {# Main item #}
                     <a href="javascript:void(0);" data-target="#{{linkAttributes['id']}}_child" data-toggle="submenu" data-parent=".nav" {{parseMenuAttributes(linkAttributes)}}">
-                        <span class="ri-arrow-down-s-line arrow pull-right text-right"></span>
+                        <span class="ri-arrow-down-s-line arrow float-end text-end"></span>
                 {% else %}
                     {# Submenu item #}
                     {% set url = child.getUri() %}
@@ -49,12 +49,12 @@
                 {% endif %}
 
                 {% if (extras.iconClass is defined and extras.iconClass is not empty) %}
-                    <span class="icon pull-left fa {{extras.iconClass}}"></span>
+                    <span class="icon float-start fa {{extras.iconClass}}"></span>
                 {% endif %}
 
                     {% set labelAttributes = child.getLabelAttributes() %}
                     {% set labelClasses = (labelAttributes.class is not defined) ? 'nav-item-name' : labelAttributes.class ~ ' nav-item-name' %}
-                    {% set labelPull = (extras.depth is empty) ? ' pull-left' : '' %}
+                    {% set labelPull = (extras.depth is empty) ? ' float-start' : '' %}
 
                     {% set labelClasses = labelClasses ~ ' text' ~ labelPull %}
                     {% set labelAttributes = labelAttributes|merge({'class': labelClasses|trim }) %}

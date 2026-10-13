@@ -69,7 +69,7 @@
         <div class="d-flex fd-row fw-nowrap gap-sm ai-center jc-space-between">
             {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
             <div class="dropdown">
-                <a href="#" class="btn btn-ghost btn-sm btn-nospin" data-toggle="dropdown" aria-expanded="false">
+                <a href="#" class="btn btn-ghost btn-sm btn-nospin" data-bs-toggle="dropdown" aria-expanded="false">
                   {{ 'mautic.core.quick_filters'|trans }}
                   <i class="ri-arrow-down-s-line"></i>
                 </a>
@@ -99,7 +99,7 @@
       <div class="well well col-md-6 col-md-offset-3 mt-md">
           <div class="row">
               <div class="mautibot-image col-xs-3 text-center">
-                  <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}" />
+                  <img class="img-fluid" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}" />
               </div>
               <div class="col-xs-9">
                   <h4><i class="ri-double-quotes-l"></i> {{ 'mautic.dashboard.nowidgets.tip.header'|trans }} <i class="ri-double-quotes-r"></i></h4>
