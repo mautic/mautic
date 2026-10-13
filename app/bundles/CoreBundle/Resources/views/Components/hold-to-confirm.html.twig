@@ -1,0 +1,23 @@
+{% set size = size|default('md') %}
+{% set dimensions = {'sm': {'icon': 12, 'ring': 20, 'stroke': 2}, 'md': {'icon': 14, 'ring': 24, 'stroke': 2}, 'lg': {'icon': 17, 'ring': 30, 'stroke': 2.5}}[size] %}
+{% set duration = duration is defined ? duration : 1200 %}
+{% set resetDelay = resetDelay is defined ? resetDelay : 1500 %}
+{% set label = label|default('mautic.core.hold_to_confirm.label') %}
+{% set confirmedLabel = confirmedLabel|default('mautic.core.hold_to_confirm.confirmed') %}
+{% set variant = variant|default('destructive') %}
+<span class="acervo-hold-wrapper {{ variant == 'beam' ? beamClassName|default('') : '' }}" data-component="hold-to-confirm" data-size="{{ size }}" data-variant="{{ variant }}" data-duration="{{ duration }}" data-reset-delay="{{ resetDelay }}" data-state="idle" data-instructions="{{ 'mautic.core.hold_to_confirm.instructions'|trans }}" data-theme="{{ theme|default('auto') }}" data-color-variant="{{ colorVariant|default('sunset') }}" data-strength="{{ strength is defined ? strength : 0.65 }}" data-beam-enabled="{{ active is defined and active == false ? 'false' : 'true' }}">
+    <button type="button" class="acervo-hold {{ className|default('') }}" aria-label="{{ 'mautic.core.hold_to_confirm.instructions'|trans({'%label%': label|trans, '%seconds%': (duration / 1000)|number_format(1, '.', '')|trim('0', 'right')|trim('.', 'right')}) }}"{% if id is defined %} id="{{ id }}"{% endif %}{% if disabled|default(false) %} disabled{% endif %}>
+        <span class="acervo-hold__symbol" aria-hidden="true" style="width: {{ dimensions.ring }}px; height: {{ dimensions.ring }}px;">
+            <span class="acervo-hold__icon">
+                {% block icon %}{% if icon is defined %}{{ icon }}{% else %}<svg data-default-icon width="{{ dimensions.icon }}" height="{{ dimensions.icon }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>{% endif %}{% endblock %}
+            </span>
+            <span class="acervo-hold__check"><svg viewBox="0 0 24 24" width="{{ dimensions.icon }}" height="{{ dimensions.icon }}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M20 6 9 17l-5-5"/></svg></span>
+            <svg class="acervo-hold__ring" viewBox="0 0 {{ dimensions.ring }} {{ dimensions.ring }}" width="{{ dimensions.ring }}" height="{{ dimensions.ring }}">
+                <circle cx="{{ dimensions.ring / 2 }}" cy="{{ dimensions.ring / 2 }}" r="{{ (dimensions.ring - dimensions.stroke) / 2 }}" fill="none" stroke="currentColor" stroke-opacity="0.2" stroke-width="{{ dimensions.stroke }}"/>
+                <circle class="acervo-hold__progress" pathLength="1" cx="{{ dimensions.ring / 2 }}" cy="{{ dimensions.ring / 2 }}" r="{{ (dimensions.ring - dimensions.stroke) / 2 }}" fill="none" stroke="currentColor" stroke-width="{{ dimensions.stroke }}" stroke-linecap="round" stroke-dasharray="1" stroke-dashoffset="1"/>
+            </svg>
+        </span>
+        <span class="acervo-hold__label"><span data-idle-label>{{ label|trans }}</span><span data-confirmed-label hidden>{{ confirmedLabel|trans }}</span></span>
+        <span class="acervo-hold__status" role="status" aria-live="polite"></span>
+    </button>
+</span>
