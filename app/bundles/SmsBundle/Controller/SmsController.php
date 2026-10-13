@@ -2,7 +2,6 @@
 
 namespace Mautic\SmsBundle\Controller;
 
-use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -165,10 +164,8 @@ final class SmsController extends AbstractStandardFormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $security = $this->security;
-
-        /** @var Sms $sms */
         $sms = $this->smsModel->getEntity($objectId);
+
         // set the page we came from
         $page = $request->getSession()->get('mautic.sms.page', 1);
 
@@ -218,12 +215,7 @@ final class SmsController extends AbstractStandardFormController
         // Get click through stats
         $trackableLinks = $this->smsModel->getSmsClickStats($sms->getId());
 
-        $translations = $sms->getTranslations();
-        if ($translations instanceof Collection) {
-            $translations = $translations->toArray();
-        }
-
-        [$translationParent, $translationChildren] = $translations;
+        [$translationParent, $translationChildren] = $sms->getTranslations();
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $sms->getId()]),
@@ -232,7 +224,7 @@ final class SmsController extends AbstractStandardFormController
                 'trackables'  => $trackableLinks,
                 'logs'        => $logs,
                 'isEmbedded'  => $request->attributes->all()['isEmbedded'] ?? $request->query->all()['isEmbedded'] ?? $request->request->all()['isEmbedded'] ?? null ?: false,
-                'permissions' => $security->isGranted([
+                'permissions' => $this->security->isGranted([
                     'sms:smses:viewown',
                     'sms:smses:viewother',
                     'sms:smses:create',
@@ -243,7 +235,7 @@ final class SmsController extends AbstractStandardFormController
                     'sms:smses:publishown',
                     'sms:smses:publishother',
                 ], 'RETURN_ARRAY'),
-                'security'    => $security,
+                'security'    => $this->security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
                     'Mautic\SmsBundle\Controller\SmsController::contactsAction',
@@ -269,12 +261,10 @@ final class SmsController extends AbstractStandardFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @param Sms $entity
      */
-    public function newAction(Request $request, $entity = null): Response
+    public function newAction(Request $request, ?Sms $entity = null): Response
     {
-        if (!$entity instanceof Sms) {
+        if (! $entity instanceof Sms) {
             /** @var Sms $entity */
             $entity = $this->smsModel->getEntity();
         }
