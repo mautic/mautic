@@ -6,7 +6,7 @@
     <div class="d-flex ai-center">
         <a class="fg-1" href="{{ url('mautic_company_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
             <span class="fw-sb">{{ item.primaryIdentifier() }}</span>
-            <span size="sm" class="pull-right" data-toggle="tooltip" data-placement="left" title="{{ 'mautic.lead.lead.pointscount'|trans }}">
+            <span size="sm" class="float-end" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ 'mautic.lead.lead.pointscount'|trans }}">
                 <i class="ri-coins-line"></i>
                 {{ item.score }}
             </span>

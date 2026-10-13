@@ -49,12 +49,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% block button_group_widget %}
 {# apply attributes to radios #}
 {% set attr = form.vars.attr %}
-<div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm {{ buttonBlockClass }}" data-toggle="buttons" style="{{ (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) ? 'pointer-events: none;' : '' }}">
+<div class="btn-group list-group d-flex flex-wrap w-100 {{ buttonBlockClass }}"{% if attr.readonly|default(false) %} style="pointer-events: none;"{% endif %}>
     {% for child in form %}
-        {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
-        <label class="btn {{ class }} btn-block mt-0 list-group-item">
-            {{ form_widget(child, {'attr': attr}) }}
-            <span class="list-group-item-heading btn-block text-left">{{ child.vars.label|trans }}</span>
+        {% set childAttr = attr|merge({'class': (attr.class|default('') ~ ' btn-check')|trim}) %}
+        {{ form_widget(child, {'attr': childAttr}) }}
+        <label for="{{ child.vars.id }}" class="btn w-100 mt-0 list-group-item">
+            <span class="list-group-item-heading d-block text-start">{{ child.vars.label|trans }}</span>
         </label>
     {% endfor %}
 </div>
@@ -199,7 +199,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% block form_errors %}
 {% if errors|length > 0 %}
     {% set itemClass = attr.itemClass|default('alert alert-danger') %}
-    <div class="{{ attr.blockClass|default('help-block') }}">
+    <div class="{{ attr.blockClass|default('form-text') }}">
     {% if errors|length > 1 %}
         <ul>
             {% for error in errors %}
@@ -228,7 +228,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% set tooltip = form.vars.attr.tooltip is defined and form.vars.attr.tooltip is not empty ? form.vars.attr.tooltip|trans : false %}
 <label {% for k, v in label_attr %}
     {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
-{% endfor %}{{ tooltip ? 'data-toggle="tooltip" data-container="body" data-placement="top" title="%s"'|format(tooltip)|raw : ''}}>
+{% endfor %}{{ tooltip ? 'data-bs-toggle="tooltip" data-bs-container="body" data-bs-placement="top" title="%s"'|format(tooltip)|raw : ''}}>
 {{ label_html ? label|trans({}, translation_domain)|purify : label|trans({}, translation_domain)|escape }}{{ tooltip ? ' <i class="ri-question-line"></i>' : '' }}</label>
 {% endif %}
 {% endblock form_label %}
@@ -310,14 +310,14 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     or (attr.postaddon_text is defined and attr.postaddon_text is not empty) %}
     <div class="input-group">
         {% if attr.preaddon is defined and attr.preaddon is not empty %}
-        <span class="input-group-addon preaddon" {% for k,v in preaddonAttr %}
+        <span class="input-group-text preaddon" {% for k,v in preaddonAttr %}
             {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
         {% endfor %}>
             <i class="{{ attr.preaddon }}"></i>
         </span>
         {% endif %}
         {% if attr.preaddon_text is defined and attr.preaddon_text is not empty %}
-        <span class="input-group-addon preaddon" {% for k,v in preaddonAttr %}
+        <span class="input-group-text preaddon" {% for k,v in preaddonAttr %}
             {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
         {% endfor %}>
             <span>{{ attr.preaddon_text }}</span>
@@ -328,14 +328,14 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
             value="{{ value|escape }}"{% endif %} />
 
         {% if attr.postaddon is defined and attr.postaddon is not empty %}
-        <span class="input-group-addon postaddon" {% for k,v in postaddonAttr %}
+        <span class="input-group-text postaddon" {% for k,v in postaddonAttr %}
             {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
         {% endfor %}>
             <i class="{{ attr.postaddon }}"></i>
         </span>
         {% endif %}
         {% if attr.postaddon_text is defined and attr.postaddon_text is not empty %}
-        <span class="input-group-addon postaddon" {% for k,v in postaddonAttr %}
+        <span class="input-group-text postaddon" {% for k,v in postaddonAttr %}
             {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
         {% endfor %}>
             <span>{{ attr.postaddon_text }}</span>
@@ -373,7 +373,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% if form.label.vars.value is not iterable and form.value.vars.value is not iterable %}
 <div class="input-group sortable-no-reorder">
     {% if preaddon is not empty %}
-    <span class="input-group-addon preaddon" {% for k,v in preaddonAttr %}
+    <span class="input-group-text preaddon" {% for k,v in preaddonAttr %}
     {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
     {% endfor %}>
     <i class="{{ preaddon }}"></i>
@@ -390,7 +390,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
         </div>
     </div>
     {% if postaddon is not empty %}
-    <span class="input-group-addon postaddon" {% for k,v in postaddonAttr %}
+    <span class="input-group-text postaddon" {% for k,v in postaddonAttr %}
     {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
     {% endfor %}>
         <i class="{{ postaddon }}"></i>
@@ -418,7 +418,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% endfor %}
 
 {% if errorMessages|length > 0 %}
-    <div class="help-block">
+    <div class="form-text">
         {% if errorMessages|length > 1 %}
             <ul>
                 {% for errorMessage in errorMessages %}
@@ -629,7 +629,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 
 {% block form_help -%}
     {%- if help is not empty or form.vars.attr.help_icon is defined -%}
-        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-block')|trim}) -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' form-text')|trim}) -%}
         <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if form.vars.attr.help_icon is defined and form.vars.attr.help_icon is not empty -%}
                 <i class="{{ form.vars.attr.help_icon }} ri-lg mr-xs"></i>

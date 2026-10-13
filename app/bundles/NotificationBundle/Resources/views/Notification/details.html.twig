@@ -66,8 +66,8 @@
 
             <!-- notification detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
-                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#notification-details">
+                <span data-bs-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#notification-details">
                       <span class="caret"></span>
                       {{ 'mautic.core.details'|trans }}
                     </a>
@@ -100,7 +100,7 @@
                                     </h5>
                                 </div>
                                 <div class="col-md-9 va-m">
-                                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}, with_context=false) }}
+                                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}, with_context=false) }}
                                 </div>
                             </div>
                             <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
@@ -117,12 +117,12 @@
             <!-- tabs controls -->
             <ul class="nav nav-tabs nav-tabs-contained">
                 <li class="active">
-                    <a href="#clicks-container" role="tab" data-toggle="tab">
+                    <a href="#clicks-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.trackable.click_counts'|trans }}
                     </a>
                 </li>
                 <li class="">
-                    <a href="#contacts-container" role="tab" data-toggle="tab">
+                    <a href="#contacts-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         {{ 'mautic.lead.leads'|trans }}
                     </a>
                 </li>

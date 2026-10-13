@@ -19,7 +19,7 @@
           class="panel"
           {% if details is not empty %}
             type="button"
-            data-toggle="popover"
+            data-bs-toggle="popover"
             data-container="body"
             data-content="{{ details|escape('html_attr') }}"
             data-placement="left"
@@ -39,7 +39,7 @@
             </div>
           {% endif %}
           <div class="event-timestamp type-label-01 text-secondary mt-xs">
-            <span data-toggle="tooltip" title="{{ dateToFull(event.timestamp)|e('html_attr') }}">{{ dateToHumanized(event.timestamp, 'local') }}</span>
+            <span data-bs-toggle="tooltip" title="{{ dateToFull(event.timestamp)|e('html_attr') }}">{{ dateToHumanized(event.timestamp, 'local') }}</span>
           </div>
         </{{ panelTag }}>
       </li>

@@ -15,7 +15,7 @@
 {% endif %}
 
 <div class="input-group input-group-sm">
-    <span class="input-group-addon">
+    <span class="input-group-text">
         {% include '@MauticCore/Components/checkbox.html.twig' with {
             name: 'cb' ~ id,
             items: [{ value: id, className: 'list-checkbox', attributes: { 'data-target': 'tbody', 'data-toggle': 'selectrow' } }]
@@ -33,7 +33,7 @@
                     icon_only: true,
                     spin: false,
                     attributes: {
-                        'data-toggle': 'dropdown',
+                        'data-bs-toggle': 'dropdown',
                         'type': 'button'
                     }
                 }

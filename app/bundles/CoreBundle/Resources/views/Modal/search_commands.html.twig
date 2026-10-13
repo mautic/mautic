@@ -4,9 +4,7 @@
   <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'mautic.core.btn-close' | trans }}"></button>
         <p class="modal-title" id="searchCommandsModalLabel">
           {{ "mautic.core.help.searchcommands.title" | trans }}
         </p>
@@ -19,8 +17,8 @@
           <ul class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
             <!-- General operators -->
             <li class="panel">
-              <a role="button" id="headingSearchOperators" class="accordion-heading collapsed" data-toggle="collapse"
-                data-parent="#accordion" href="#collapseSearchOperators" aria-expanded="false"
+              <a role="button" id="headingSearchOperators" class="accordion-heading collapsed" data-bs-toggle="collapse"
+                data-bs-parent="#accordion" href="#collapseSearchOperators" aria-expanded="false"
                 aria-controls="collapseSearchOperators">
                 <i class="ri-arrow-down-s-line accordion-arrow"></i>
                 <span class="accordion-title">{{ 'mautic.core.searchcommands.operators'|trans }}</span>
@@ -70,8 +68,8 @@
           {% for section, commands in searchCommands %}
               {% set sectionId = section|replace({'.': '_'})|lower %}
               <li class="panel">
-                  <a role="button" id="heading{{ sectionId|capitalize }}" class="accordion-heading collapsed" data-toggle="collapse"
-                    data-parent="#specificCommandsAccordion" href="#collapse{{ sectionId|capitalize }}" aria-expanded="false" aria-controls="collapse{{ sectionId|capitalize }}">
+                  <a role="button" id="heading{{ sectionId|capitalize }}" class="accordion-heading collapsed" data-bs-toggle="collapse"
+                    data-bs-parent="#specificCommandsAccordion" href="#collapse{{ sectionId|capitalize }}" aria-expanded="false" aria-controls="collapse{{ sectionId|capitalize }}">
                       <i class="ri-arrow-down-s-line accordion-arrow"></i>
                       <span class="accordion-title">{{ section|trans }}</span>
                   </a>
