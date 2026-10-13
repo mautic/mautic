@@ -35,7 +35,7 @@ final class ConfigController extends FormController
     /**
      * Controller action for editing the application configuration.
      */
-    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, mixed $objectId = null): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, ?string $activeTabId = null): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
@@ -52,30 +52,28 @@ final class ConfigController extends FormController
         $this->mergeParamsWithLocal($formConfigs, $pathsHelper);
 
         // Each configuration tab is rendered as its own page so only one tab's fields are loaded at a time
-        $tabs      = array_keys(array_filter($formConfigs, fn (array $config): bool => !empty($config['parameters'])));
-        $activeTab = $objectId ? (string) $objectId : null;
+        $tabs = array_keys(array_filter($formConfigs, fn (array $config): bool => !empty($config['parameters'])));
 
-        if (null === $activeTab && 'POST' !== $request->getMethod()) {
+        if (null === $activeTabId && 'POST' !== $request->getMethod()) {
             // Keep the legacy ?tab= links working, otherwise open the general settings
             $legacyTab  = $request->query->get('tab');
             $defaultTab = in_array('coreconfig', $tabs, true) ? 'coreconfig' : ($tabs[0] ?? 'coreconfig');
 
-            return $this->delegateRedirect($this->generateUrl('mautic_config_action', [
-                'objectAction' => 'edit',
-                'objectId'     => in_array($legacyTab, $tabs, true) ? $legacyTab : $defaultTab,
+            return $this->delegateRedirect($this->generateUrl('mautic_config_edit', [
+                'activeTabId' => in_array($legacyTab, $tabs, true) ? $legacyTab : $defaultTab,
             ]));
         }
 
-        if (null !== $activeTab) {
-            if (!in_array($activeTab, $tabs, true)) {
+        if (null !== $activeTabId) {
+            if (!in_array($activeTabId, $tabs, true)) {
                 return $this->notFound();
             }
 
-            $formConfigs = [$activeTab => $formConfigs[$activeTab]];
+            $formConfigs = [$activeTabId => $formConfigs[$activeTabId]];
         }
 
         // Create the form
-        $action = $this->generateUrl('mautic_config_action', array_filter(['objectAction' => 'edit', 'objectId' => $activeTab]));
+        $action = $this->generateUrl('mautic_config_edit', ['activeTabId' => $activeTabId]);
         $form   = $this->formFactory->create(
             ConfigType::class,
             $formConfigs,
@@ -174,7 +172,7 @@ final class ConfigController extends FormController
             // If the form is saved or cancelled, redirect back to the dashboard
             if ($cancelled || $isValid) {
                 if (!$cancelled && $this->isFormApplied($form)) {
-                    return $this->delegateRedirect($this->generateUrl('mautic_config_action', array_filter(['objectAction' => 'edit', 'objectId' => $activeTab])));
+                    return $this->delegateRedirect($this->generateUrl('mautic_config_edit', ['activeTabId' => $activeTabId]));
                 }
 
                 return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
@@ -193,7 +191,7 @@ final class ConfigController extends FormController
                     'formConfigs' => $formConfigs,
                     'isWritable'  => $isWritable,
                     'tabs'        => $tabs,
-                    'activeTab'   => $activeTab,
+                    'activeTab'   => $activeTabId,
                 ],
                 'contentTemplate' => '@MauticConfig/Config/form.html.twig',
                 'passthroughVars' => [

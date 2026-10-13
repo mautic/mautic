@@ -39,7 +39,7 @@
                          {% set isActive = key == activeTab %}
                          {% set containsErrors = isActive and form[key] is defined and formContainsErrors(form[key]) %}
                          <li class="list-group-item {% if isActive %}in active{% endif %}">
-                             <a href="{{ path('mautic_config_action', {'objectAction': 'edit', 'objectId': key}) }}" data-toggle="ajax" {% if isActive %}aria-current="page"{% endif %} class="list-group-item-text steps {% if containsErrors %}text-danger{% endif %}">
+                             <a href="{{ path('mautic_config_edit', {'activeTabId': key}) }}" data-toggle="ajax" {% if isActive %}aria-current="page"{% endif %} class="list-group-item-text steps {% if containsErrors %}text-danger{% endif %}">
                                  {{ ('mautic.config.tab.' ~ key)|trans }}
                                  {% if containsErrors %}
                                      <i class="ri-alert-line"></i>

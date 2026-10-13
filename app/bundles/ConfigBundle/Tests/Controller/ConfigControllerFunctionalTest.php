@@ -12,6 +12,7 @@ use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
@@ -96,6 +97,16 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // The navigation still links to every configuration page
         $this->assertCount(1, $crawler->filter('.list-group-tabs a[href="/s/config/edit/coreconfig"]'));
         $this->assertCount(1, $crawler->filter('.list-group-tabs a[href="/s/config/edit/emailconfig"]'));
+    }
+
+    public function testGenericActionRouteStillOpensTheConfiguration(): void
+    {
+        // The admin menu and plugins link to the configuration through the generic action route
+        $url = self::getContainer()->get(RouterInterface::class)->generate('mautic_config_action', ['objectAction' => 'edit', 'objectId' => 'emailconfig']);
+
+        $this->client->request(Request::METHOD_GET, $url);
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('/s/config/edit/emailconfig', $this->client->getRequest()->getPathInfo());
     }
 
     public function testLegacyTabQueryRedirectsToThePage(): void
