@@ -116,7 +116,7 @@ Mautic.leadOnLoad = function (container, response) {
     if (mQuery('.lead-avatar-panel').length) {
         mQuery('.lead-avatar-panel .avatar-collapser a.arrow').on('click', function() {
             setTimeout(function() {
-                var status = (mQuery('#lead-avatar-block').hasClass('show') ? 'expanded' : 'collapsed');
+                var status = (mQuery('#lead-avatar-block').hasClass('in') ? 'expanded' : 'collapsed');
                 document.cookie = 'mautic_lead_avatar_panel=' + status + '; path=/; max-age=' + (30 * 24 * 60 * 60) + '; SameSite=Strict';
             }, 500);
         });
@@ -1731,7 +1731,6 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 
 Mautic.listOnLoad = function(container, response) {
     Mautic.loadAndProcessPageContent('#contacts-container');
-    Mautic.loadAndProcessPageContent('#segment-stats');
 
     const segmentDependenciesTab = mQuery('a#segment-dependencies');
     let segmentDependenciesLoaded = false;
@@ -1739,7 +1738,7 @@ Mautic.listOnLoad = function(container, response) {
 
     if (segmentDependenciesTab.length) {
         mQuery(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
-            if (mQuery(e.target).attr('id') !== 'segment-dependencies') {
+            if (!mQuery(e.target).attr('id') === 'segment-dependencies') {
                 return;
             }
 
@@ -1769,7 +1768,7 @@ Mautic.listOnLoad = function(container, response) {
         });
 
         mQuery(document).on('hide.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
-            if (mQuery(e.target).attr('id') === 'segment-dependencies') {
+            if (!mQuery(e.target).attr('id') !== 'segment-dependencies') {
                 Mautic.cleanSegmentDependencies();
             }
         });
