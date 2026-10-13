@@ -11,7 +11,7 @@
 {% set leadName = lead.isAnonymous ? lead.primaryIdentifier|trans : lead.primaryIdentifier %}
 {% set avatar %}
   {% if not isAnonymous %}
-    <span class="pull-left img-wrapper img-rounded mr-10" style="width:33px"><img src="{{ leadGetAvatar(lead) }}" alt="" /></span>
+    <span class="float-start img-wrapper rounded mr-10" style="width:33px"><img src="{{ leadGetAvatar(lead) }}" alt="" /></span>
   {% endif %}
 {% endset %}
 
@@ -19,7 +19,7 @@
 {% set groups = fields|keys %}
 
 {% block headerTitle %}
-    {{ avatar }}<div class="pull-left mt-5"><span class="span-block">{{ htmlEntityDecode(leadName)|purify }}</span><span class="span-block small ml-sm">
+    {{ avatar }}<div class="float-start mt-5"><span class="span-block">{{ htmlEntityDecode(leadName)|purify }}</span><span class="span-block small ml-sm">
     {{ htmlEntityDecode(lead.secondaryIdentifier)|purify }}</span></div>
     {{ customContent('lead.name.after', _context) }}
 {% endblock %}
@@ -163,17 +163,17 @@
                     {% for g in groups %}
                         {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
-                                <a href="#{{ g }}" class="group" data-toggle="tab">
+                                <a href="#{{ g }}" class="nav-link group" data-bs-toggle="tab">
                                     {{ ('mautic.lead.field.group.'~g)|trans }}
                                 </a>
                             </li>
                         {% endif %}
                     {% endfor %}
                         <li>
-                            <a href="#devices" class="group" data-toggle="tab">{{ 'mautic.lead.devices'|trans }}</a>
+                            <a href="#devices" class="nav-link group" data-bs-toggle="tab">{{ 'mautic.lead.devices'|trans }}</a>
                         </li>
                     <li>
-                        <a href="#lead-stats" class="group" data-toggle="tab">{{ 'mautic.lead.stats'|trans }}</a>
+                        <a href="#lead-stats" class="nav-link group" data-bs-toggle="tab">{{ 'mautic.lead.stats'|trans }}</a>
                     </li>
                 </ul>
 
@@ -248,8 +248,8 @@
         <div>
             <!-- lead detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
-                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#lead-details">
+                <span data-bs-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#lead-details">
                        <span class="caret"></span>
                        {{ 'mautic.core.details'|trans }}
                     </a>
@@ -266,7 +266,7 @@
                                     <div class="col-xs-8 align-middle">
                                         <h5 class="text-white dark-md fw-sb mb-xs">{{ 'mautic.lead.field.header.engagements'|trans }}</h5>
                                     </div>
-                                    <div class="col-xs-4 align-top text-right">
+                                    <div class="col-xs-4 align-top text-end">
                                         <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
                                     </div>
                                 </div>
@@ -284,7 +284,7 @@
             <!-- tabs controls -->
             <ul class="nav nav-tabs nav-tabs-contained mt-10">
                 <li class="active">
-                    <a href="#timeline-container" role="tab" data-toggle="tab">
+                    <a href="#timeline-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         <span size="sm" class="label label-primary mr-sm" id="TimelineCount">
                             {{ events.total }}
                         </span>
@@ -292,7 +292,7 @@
                     </a>
                 </li>
                 <li class="">
-                    <a href="#notes-container" role="tab" data-toggle="tab">
+                    <a href="#notes-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         <span size="sm" class="label label-primary mr-sm" id="NoteCount">
                             {{ noteCount }}
                         </span>
@@ -301,7 +301,7 @@
                 </li>
                 {% if not isAnonymous %}
                     <li class="">
-                        <a href="#social-container" role="tab" data-toggle="tab">
+                        <a href="#social-container" role="tab" data-bs-toggle="tab" class="nav-link">
                         <span size="sm" class="label label-primary mr-sm" id="SocialCount">
                             {{ socialProfiles|length }}
                         </span>
@@ -310,7 +310,7 @@
                     </li>
                 {% endif %}
                 <li class="">
-                    <a href="#integration-container" role="tab" data-toggle="tab">
+                    <a href="#integration-container" role="tab" data-bs-toggle="tab" class="nav-link">
                     <span size="sm" class="label label-primary mr-sm" id="IntegrationCount">
                         {{ integrations|length }}
                     </span>
@@ -318,7 +318,7 @@
                     </a>
                 </li>
                 <li class="">
-                    <a href="#auditlog-container" role="tab" data-toggle="tab">
+                    <a href="#auditlog-container" role="tab" data-bs-toggle="tab" class="nav-link">
                     <span size="sm" class="label label-primary mr-sm" id="AuditLogCount">
                         {{ auditlog.total }}
                     </span>
@@ -326,7 +326,7 @@
                     </a>
                 </li>
                     <li class="">
-                        <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
+                        <a href="#place-container" role="tab" data-bs-toggle="tab" id="load-lead-map" class="nav-link">
                         <span size="sm" class="label label-primary mr-sm" id="PlaceCount">
                             {{ places|length }}
                         </span>
@@ -340,7 +340,7 @@
             <!-- start: tab-content -->
             <div class="tab-content pa-md">
                 <!-- #history-container -->
-                <div class="tab-pane fade in active bdr-w-0" id="timeline-container">
+                <div class="tab-pane fade show active bdr-w-0" id="timeline-container">
                     {{ include('@MauticLead/Timeline/list.html.twig', {'events': events, 'lead': lead}) }}
                 </div>
                 <!--/ #history-container -->
@@ -411,13 +411,13 @@
                     <div class="avatar-collapser hr-expand nm">
                         <a href="javascript:void(0)"
                             class="arrow text-secondary text-center {% if 'expanded' != avatarPanelState %}collapsed{% endif %}"
-                            data-toggle="collapse"
-                            data-target="#lead-avatar-block">
+                            data-bs-toggle="collapse"
+                            data-bs-target="#lead-avatar-block">
                             <span class="caret"></span>
                         </a>
                     </div>
                     <div class="collapse {% if 'expanded' == avatarPanelState %}in{% endif %}" id="lead-avatar-block">
-                        <img class="img-responsive" src="{{ leadGetAvatar(lead) }}" alt="{{ leadName|e }}"/>
+                        <img class="img-fluid" src="{{ leadGetAvatar(lead) }}" alt="{{ leadName|e }}"/>
                     </div>
                 </div>
             {% endif %}
@@ -518,7 +518,7 @@
                                     '%link%': '<a href="'~campaignUrl~'" data-toggle="ajax">'~event.campaign_name~'</a>',
                                 })|purify }}
                                 {% if errors is not empty %}
-                                    <i class="ri-alert-line text-danger" data-toggle="tooltip" title="{{ errors|striptags|e('html_attr') }}"></i>
+                                    <i class="ri-alert-line text-danger" data-bs-toggle="tooltip" title="{{ errors|striptags|e('html_attr') }}"></i>
                                 {% endif %}
                             {% endset %}
                             {% set timelineEvent = {

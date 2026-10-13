@@ -66,7 +66,7 @@
                   {% else %}
                       {% set pluginTitle = item.name ~ ' - ' ~ item.display %}
                   {% endif %}
-                  <div class="shuffle shuffle-item grid ma-10 pull-left text-center integration plugin{{ item.plugin }} integration-{{ item.name }} {% if not item.enabled %}integration-disabled{% endif %}">
+                  <div class="shuffle shuffle-item grid ma-10 float-start text-center integration plugin{{ item.plugin }} integration-{{ item.name }} {% if not item.enabled %}integration-disabled{% endif %}">
                       <div class="panel overflow-hidden pa-10">
                           <a href="{{ path((item.isBundle ? 'mautic_plugin_info' : 'mautic_plugin_config'), {'name': item.name}) }}"
                              {% if item.isBundle %}data-footer="false"{% endif %}
@@ -74,9 +74,9 @@
                              data-toggle="ajaxmodal"
                              data-target="#IntegrationEditModal"
                              data-header="{{ item.display }}">
-                              <p><img style="height: 78px;" class="img img-responsive" src="{{ getAssetUrl(item.icon) }}" /></p>
+                              <p><img style="height: 78px;" class="img img-fluid" src="{{ getAssetUrl(item.icon) }}" /></p>
                               <h5 class="mt-20">
-                                  <span class="ellipsis" data-toggle="tooltip" title="{{ pluginTitle }}">{{ item.display }}</span>
+                                  <span class="ellipsis" data-bs-toggle="tooltip" title="{{ pluginTitle }}">{{ item.display }}</span>
                               </h5>
                           </a>
                       </div>

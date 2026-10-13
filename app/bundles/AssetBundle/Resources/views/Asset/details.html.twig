@@ -105,7 +105,7 @@
                 icon: 'ri-translate-2',
                 color: 'warm-gray',
                 attributes: {
-                    'data-toggle': 'tooltip',
+                    'data-bs-toggle': 'tooltip',
                     'data-placement': 'top',
                     'title': 'mautic.core.language'|trans
                 }
@@ -166,9 +166,9 @@
         <div>
             <!-- asset detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse"
-                       data-target="#asset-details"><span class="caret"></span> {% trans %}mautic.core.details{% endtrans %}</a>
+                <span data-bs-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse"
+                       data-bs-target="#asset-details"><span class="caret"></span> {% trans %}mautic.core.details{% endtrans %}</a>
                 </span>
             </div>
             <!--/ asset detail collapseable toggler -->
@@ -202,7 +202,7 @@
                                     </h5>
                                 </div>
                                 <div class="col-md-8 align-middle">
-                                    {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
+                                    {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'float-end'}) -}}
                                 </div>
                             </div>
                             <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">

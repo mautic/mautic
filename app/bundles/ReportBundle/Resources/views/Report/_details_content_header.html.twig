@@ -39,11 +39,11 @@
     <div>
         <!-- report detail collapseable toggler -->
         <div class="hr-expand nm">
-            <a href="#report-details" class="arrow text-secondary collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-details">
+            <a href="#report-details" class="arrow text-secondary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="report-details">
                 <span class="caret"></span> {{ 'mautic.core.details'|trans }}
             </a>
             {% if dynamicFilterFields is not empty %}
-            <a href="#report-filters" class="arrow text-secondary {% if not showDynamicFilters %}collapsed{% endif %}" data-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
+            <a href="#report-filters" class="arrow text-secondary {% if not showDynamicFilters %}collapsed{% endif %}" data-bs-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
                 <span class="caret"></span> {{ 'mautic.core.filters'|trans }}
             </a>
             {% endif %}
