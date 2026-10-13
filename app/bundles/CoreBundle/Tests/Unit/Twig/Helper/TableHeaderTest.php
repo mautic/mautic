@@ -58,7 +58,7 @@ final class TableHeaderTest extends TestCase
             'tooltip' => 'Tooltip',
         ]);
 
-        $this->assertStringContainsString('data-bs-toggle="tooltip"', $html);
+        $this->assertStringContainsString('data-toggle="tooltip"', $html);
         $this->assertStringContainsString('data-original-title="Tooltip"', $html);
     }
 
@@ -68,7 +68,7 @@ final class TableHeaderTest extends TestCase
             'text' => 'Test Column',
         ]);
 
-        $this->assertStringNotContainsString('data-bs-toggle="tooltip"', $html);
+        $this->assertStringNotContainsString('data-toggle="tooltip"', $html);
     }
 
     public function testTooltipIsRenderedOnSortableHeader(): void
@@ -80,7 +80,7 @@ final class TableHeaderTest extends TestCase
             'tooltip'    => 'SortMe',
         ]);
 
-        $this->assertStringContainsString('class="fw-b" data-bs-toggle="tooltip"', $html);
+        $this->assertStringContainsString('class="fw-b" data-toggle="tooltip"', $html);
         $this->assertStringContainsString('data-original-title="SortMe"', $html);
     }
 
@@ -92,7 +92,7 @@ final class TableHeaderTest extends TestCase
             'tooltip'    => 'StaticColumn',
         ]);
 
-        $this->assertStringContainsString('class="pa-md" data-bs-toggle="tooltip"', $html);
+        $this->assertStringContainsString('class="pa-md" data-toggle="tooltip"', $html);
         $this->assertStringContainsString('data-original-title="StaticColumn"', $html);
     }
 
