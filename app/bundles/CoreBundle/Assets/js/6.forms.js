@@ -243,7 +243,7 @@ Mautic.postForm = function (form, callback, extraData = {}) {
 
                 if (data.sessionExpired) {
                     if (!inMain) {
-                        mQuery('#' + modalId).modal('hide');
+                        mQuery('#' + modalId).each((index, element) => Mautic.hideModal(element));
                         mQuery('.modal-backdrop').remove();
                     }
                     Mautic.processPageContent(data);
@@ -538,7 +538,7 @@ Mautic.updateEntitySelect = function (response) {
     if (window.opener) {
         window.close();
     } else {
-        mQueryParent('#MauticSharedModal').modal('hide');
+        mQueryParent('#MauticSharedModal').each((index, element) => Mautic.hideModal(element));
     }
 };
 
