@@ -26,6 +26,8 @@ parameters:
 
     symplify:
         naming: false
+        symfony: true
+        complexity: true
 
     paths:
         - app/bundles
@@ -396,11 +398,7 @@ rules:
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
     - Utils\PHPStan\Rule\NoPublicNonActionMethodInControllerRule
 
-    - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
-    - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
     - Symplify\PHPStanRules\Rules\Symfony\NoNullableServiceInConstructorRule
-    - Symplify\PHPStanRules\Rules\Symfony\PreferInterfaceInConstructorRule
-    - Symplify\PHPStanRules\Rules\Complexity\NoPropertyToPropertyAssignRule
 
     - Utils\PHPStan\Rule\NoServicesInBundleConfigRule
     - Utils\PHPStan\Rule\NoServiceInMethodParameterRule
