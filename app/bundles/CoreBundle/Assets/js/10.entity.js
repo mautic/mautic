@@ -329,7 +329,7 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
     element.removeClass('ri-toggle-fill ri-toggle-line').addClass('ri-spin ri-loader-3-line');
 
     //destroy tooltips so it can be regenerated
-    element.tooltip('destroy');
+    element.each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
     //clear the lookup cache
     MauticVars.liveCache = new Array();
 
@@ -340,7 +340,7 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
     if (extra) {
         extra = '&' + extra;
     }
-    element.tooltip('destroy');
+    element.each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
     mQuery.ajax({
         url: mauticAjaxUrl,
         type: "POST",
@@ -351,7 +351,7 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
                 Mautic.redirectWithBackdrop(window.location);
             } else if (response.statusHtml) {
                 element.replaceWith(response.statusHtml);
-                element.tooltip({html: true, container: 'body'});
+                element.each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, container: 'body'}));
             }
         },
         error: function (request, textStatus, errorThrown) {
