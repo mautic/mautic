@@ -767,11 +767,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param string $timezone
+     * @param-out FormInterface $dateRangeForm
      *
-     * @return \DateTime[]
+     * @return array{0: \DateTime, 1: \DateTime}
      */
-    protected function getViewDateRange(Request $request, $objectId, $returnUrl, $timezone = 'local', &$dateRangeForm = null): array
+    protected function getViewDateRange(Request $request, $objectId, $returnUrl, string $timezone = 'local', ?FormInterface &$dateRangeForm = null): array
     {
         $name            = $this->getSessionBase($objectId).'.view.daterange';
         $method          = ('POST' === $request->getMethod()) ? 'request' : 'query';
@@ -794,10 +794,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         return [$dateFrom, $dateTo];
     }
 
-    /**
-     * @param int $page
-     */
-    protected function indexStandard(Request $request, $page = null): Response
+    protected function indexStandard(Request $request, ?int $page = null): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
