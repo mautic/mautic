@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const core = resolve('..');
@@ -19,5 +19,6 @@ export function render(name, options = {}) {
 
 export async function load(page, name, options = {}, extra = '') {
   await page.setContent(`<style>${readFileSync(resolve(core, `css/99.${name}.css`), 'utf8')}</style>${render(name, options)}${extra}`);
-  await page.addScriptTag({ path: resolve(core, `js/99.${name}.js`) });
+  const script = resolve(core, `js/99.${name}.js`);
+  if (existsSync(script)) await page.addScriptTag({ path: script });
 }
