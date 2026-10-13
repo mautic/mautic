@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\ConfigType;
 use Mautic\UserBundle\Security\OIDC\ClientCredentials;
 use PHPUnit\Framework\TestCase;
@@ -73,10 +72,9 @@ final class OidcConfigTypeTest extends TestCase
         $this->assertTrue($builder->has('open_id_mapping_field'));
     }
 
-    private function createConfigForm(?OidcSubjectIdRepository $subjectIdRepository = null): ConfigType
+    private function createConfigForm(): ConfigType
     {
         $coreParameterHelper = $this->createStub(CoreParametersHelper::class);
-
         $coreParameterHelper->method('get')->willReturn('some_value');
 
         return new ConfigType(
