@@ -8,4 +8,14 @@
 ## Aliases: mariadb-log
 
 logFile="/var/log/db-general.log"
-mysql -u root -proot db -e "SET GLOBAL general_log_file='$logFile';SET GLOBAL general_log=ON;" && tail -f "$logFile"
+
+sql() {
+    mysql -u root -proot db -e "$1";
+}
+
+cleanup() {
+    sql "SET GLOBAL general_log=OFF;" 2>/dev/null;
+}
+
+trap cleanup EXIT
+sql "SET GLOBAL general_log_file='$logFile';SET GLOBAL general_log=ON;" && tail -f "$logFile"
