@@ -340,24 +340,10 @@ final class OwnerSubscriberTest extends TestCase
      */
     private function onSmsTokenReplacementProvider(): array
     {
-        $lead = $this->createMock(Lead::class);
-        $lead
-            ->method('getId')
-            ->willReturn(1);
-        $lead
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 1,
-                ]
-            );
-        $lead
-            ->method('getowner')
-            ->willReturn(
-                $this->getUser()
-            );
-        $user = $this->getUser();
-        $lead->setOwner($user);
+        $lead = new Lead();
+        $lead->setId(1);
+        $lead->setFields(['id' => 1]);
+        $lead->setOwner($this->getUser());
         $validOwner = [
             'Hello {ownerfield=firstname} {ownerfield=lastname}',
             'Hello John Doe',

@@ -194,19 +194,16 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActiononUpdateCompany(): void
     {
-        $companyEntityFrom   = $this->createMock(Company::class);
-        $companyEntityFrom->method('getId')
-            ->willReturn($this->configFrom['id']);
-        $companyEntityFrom->method('getName')
-            ->willReturn($this->configFrom['companyname']);
+        $companyEntityFrom   = new Company();
+        $reflectionCompanyFromId = new \ReflectionProperty($companyEntityFrom, 'id');
+        $reflectionCompanyFromId->setValue($companyEntityFrom, $this->configFrom['id']);
+        $companyEntityFrom->setName($this->configFrom['companyname']);
 
-        $companyEntityTo = $this->createMock(Company::class);
-        $companyEntityTo->method('getId')
-            ->willReturn($this->configTo['id']);
-        $companyEntityTo->method('getName')
-            ->willReturn($this->configTo['companyname']);
-        $companyEntityTo->method('getProfileFields')
-            ->willReturn($this->configTo);
+        $companyEntityTo = new Company();
+        $reflectionCompanyToId = new \ReflectionProperty($companyEntityTo, 'id');
+        $reflectionCompanyToId->setValue($companyEntityTo, $this->configTo['id']);
+        $companyEntityTo->setName($this->configTo['companyname']);
+        $companyEntityTo->setFields($this->configTo);
 
         $this->mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($companyEntityFrom);
 
@@ -482,18 +479,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $event->setType('lead.updatelead');
         $lead          = new Lead()->setEmail('tester@mautic.org');
 
-        $leadEventLog = $this->createMock(LeadEventLog::class);
-        $leadEventLog
-            ->method('getLead')
-            ->willReturn($lead);
-        $leadEventLog
-            ->method('getId')
-            ->willReturn(6);
-        $leadEventLog
-            ->expects($this->once())
-            ->method('setIsScheduled')
-            ->with(false)
-            ->willReturn($leadEventLog);
+        $leadEventLog = new LeadEventLog();
+        $leadEventLog->setLead($lead);
+        $reflectionLeadEventLogId = new \ReflectionProperty($leadEventLog, 'id');
+        $reflectionLeadEventLogId->setValue($leadEventLog, 6);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
@@ -511,5 +500,6 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(1, $pendingEvent->getSuccessful());
         $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertFalse($leadEventLog->getIsScheduled());
     }
 }

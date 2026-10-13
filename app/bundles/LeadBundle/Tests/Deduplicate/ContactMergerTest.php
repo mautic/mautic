@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
@@ -123,294 +122,84 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     public function testMergeFieldDataWithLoserAsNewlyUpdated(): void
     {
-        $winner = $this->createMock(Lead::class);
-        $winner->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 1,
-                    'points' => 10,
-                    'email'  => 'winner@test.com',
-                ]
-            );
+        $winner = $this->createLeadWithCoreFields(1, [
+            'points' => ['value' => 10, 'type' => 'number'],
+            'email'  => ['value' => 'winner@test.com', 'type' => 'email'],
+        ]);
+        $winner->setDateModified(new \DateTime('-30 minutes'));
 
-        $loser = $this->createMock(Lead::class);
-        $loser->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 2,
-                    'points' => 20,
-                    'email'  => 'loser@test.com',
-                ]
-            );
+        $loser = $this->createLeadWithCoreFields(2, [
+            'points' => ['value' => 20, 'type' => 'number'],
+            'email'  => ['value' => 'loser@test.com', 'type' => 'email'],
+        ]);
+        $loser->setDateModified(new \DateTime());
 
-        $merger = $this->getMerger();
+        $this->getMerger()->mergeFieldData($winner, $loser);
 
-        $winnerDateModified = new \DateTime('-30 minutes');
-        $loserDateModified  = new \DateTime();
-        $winner->expects($this->exactly(1))
-            ->method('getDateModified')
-            ->willReturn($winnerDateModified);
-        $loser->expects($this->exactly(1))
-            ->method('getDateModified')
-            ->willReturn($loserDateModified);
-        $winner->expects($this->once())
-            ->method('getFieldValue')
-            ->with('email')
-            ->willReturn('winner@test.com');
-
-        $winner->expects($this->once())
-            ->method('getField')
-            ->with('email')
-            ->willReturn([
-                'value'         => 'winner@test.com',
-                'id'            => 22,
-                'label'         => 'Email',
-                'alias'         => 'email',
-                'type'          => 'email',
-                'group'         => 'core',
-                'object'        => 'lead',
-                'is_fixed'      => true,
-                'default_value' => null,
-            ]);
-
-        $winner->expects($this->exactly(3))
-            ->method('getId')
-            ->willReturn(1);
-
-        $loser->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(2);
-
-        // Loser values are newest so should be kept
-        // id and points should not be set addUpdatedField should only be called once for email
-        $winner->expects($this->once())
-            ->method('addUpdatedField')
-            ->with('email', 'loser@test.com');
-
-        $merger->mergeFieldData($winner, $loser);
+        // Loser values are newest so the loser's email should be kept; id and points are not merged
+        $this->assertSame(['email' => 'loser@test.com'], $winner->getUpdatedFields());
     }
 
     public function testMergeFieldDataWithWinnerAsNewlyUpdated(): void
     {
-        $winner = $this->createMock(Lead::class);
-        $winner->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 1,
-                    'points' => 10,
-                    'email'  => 'winner@test.com',
-                ]
-            );
+        $winner = $this->createLeadWithCoreFields(1, [
+            'points' => ['value' => 10, 'type' => 'number'],
+            'email'  => ['value' => 'winner@test.com', 'type' => 'email'],
+        ]);
+        $winner->setDateModified(new \DateTime());
 
-        $loser = $this->createMock(Lead::class);
-        $loser->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 2,
-                    'points' => 20,
-                    'email'  => 'loser@test.com',
-                ]
-            );
+        $loser = $this->createLeadWithCoreFields(2, [
+            'points' => ['value' => 20, 'type' => 'number'],
+            'email'  => ['value' => 'loser@test.com', 'type' => 'email'],
+        ]);
+        $loser->setDateModified(new \DateTime('-30 minutes'));
 
-        $merger = $this->getMerger();
+        $this->getMerger()->mergeFieldData($winner, $loser);
 
-        $winnerDateModified = new \DateTime();
-        $loserDateModified  = new \DateTime('-30 minutes');
-        $winner->expects($this->exactly(1))
-            ->method('getDateModified')
-            ->willReturn($winnerDateModified);
-
-        $winner->expects($this->once())
-            ->method('getField')
-            ->with('email')
-            ->willReturn([
-                'value'         => 'winner@test.com',
-                'id'            => 22,
-                'label'         => 'Email',
-                'alias'         => 'email',
-                'type'          => 'email',
-                'group'         => 'core',
-                'object'        => 'lead',
-                'is_fixed'      => true,
-                'default_value' => null,
-            ]);
-
-        $winner->expects($this->once())
-            ->method('getFieldValue')
-            ->with('email')
-            ->willReturn('winner@test.com');
-
-        $loser->expects($this->exactly(1))
-            ->method('getDateModified')
-            ->willReturn($loserDateModified);
-
-        $winner->expects($this->exactly(4))
-            ->method('getId')
-            ->willReturn(1);
-
-        $loser->expects($this->once())
-            ->method('getId');
-
-        // Winner values are newest so should be kept
-        // addUpdatedField should never be called as they aren't different values
-        $winner->expects($this->never())
-            ->method('addUpdatedField');
-
-        $merger->mergeFieldData($winner, $loser);
+        // Winner values are newest so nothing should be merged from the loser
+        $this->assertSame([], $winner->getUpdatedFields());
     }
 
     public function testMergeFieldDataWithLoserAsNewlyCreated(): void
     {
-        $winner = $this->createMock(Lead::class);
-        $winner->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 1,
-                    'points' => 10,
-                    'email'  => 'winner@test.com',
-                ]
-            );
+        $winner = $this->createLeadWithCoreFields(1, [
+            'points' => ['value' => 10, 'type' => 'number'],
+            'email'  => ['value' => 'winner@test.com', 'type' => 'email'],
+        ]);
+        $winner->setDateModified(new \DateTime('-30 minutes'));
 
-        $loser = $this->createMock(Lead::class);
-        $loser->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 2,
-                    'points' => 20,
-                    'email'  => 'loser@test.com',
-                ]
-            );
+        $loser = $this->createLeadWithCoreFields(2, [
+            'points' => ['value' => 20, 'type' => 'number'],
+            'email'  => ['value' => 'loser@test.com', 'type' => 'email'],
+        ]);
+        // Loser was never modified, only created, so its date added is used as the comparison date
+        $loser->setDateAdded(new \DateTime());
 
-        $merger = $this->getMerger();
+        $this->getMerger()->mergeFieldData($winner, $loser);
 
-        $winnerDateModified = new \DateTime('-30 minutes');
-        $loserDateModified  = new \DateTime();
-        $winner->expects($this->exactly(1))
-            ->method('getDateModified')
-            ->willReturn($winnerDateModified);
-
-        $winner->expects($this->once())
-            ->method('getField')
-            ->with('email')
-            ->willReturn([
-                'value'         => 'winner@test.com',
-                'id'            => 22,
-                'label'         => 'Email',
-                'alias'         => 'email',
-                'type'          => 'email',
-                'group'         => 'core',
-                'object'        => 'lead',
-                'is_fixed'      => true,
-                'default_value' => null,
-            ]);
-
-        $winner->expects($this->once())
-            ->method('getFieldValue')
-            ->with('email')
-            ->willReturn('winner@test.com');
-
-        $loser->expects($this->exactly(1))
-            ->method('getDateModified')
-            ->willReturn(null);
-        $loser->expects($this->once())
-            ->method('getDateAdded')
-            ->willReturn($loserDateModified);
-
-        $winner->expects($this->exactly(3))
-            ->method('getId')
-            ->willReturn(1);
-
-        $loser->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(2);
-
-        // Loser values are newest so should be kept
-        // id and points should not be set addUpdatedField should only be called once for email
-        $winner->expects($this->once())
-            ->method('addUpdatedField')
-            ->with('email', 'loser@test.com');
-
-        $merger->mergeFieldData($winner, $loser);
+        // Loser values are newest so the loser's email should be kept; id and points are not merged
+        $this->assertSame(['email' => 'loser@test.com'], $winner->getUpdatedFields());
     }
 
     public function testMergeFieldDataWithWinnerAsNewlyCreated(): void
     {
-        $winner = $this->createMock(Lead::class);
-        $winner->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 1,
-                    'points' => 10,
-                    'email'  => 'winner@test.com',
-                ]
-            );
+        $winner = $this->createLeadWithCoreFields(1, [
+            'points' => ['value' => 10, 'type' => 'number'],
+            'email'  => ['value' => 'winner@test.com', 'type' => 'email'],
+        ]);
+        // Winner was never modified, only created, so its date added is used as the comparison date
+        $winner->setDateAdded(new \DateTime());
 
-        $loser = $this->createMock(Lead::class);
-        $loser->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 2,
-                    'points' => 20,
-                    'email'  => 'loser@test.com',
-                ]
-            );
+        $loser = $this->createLeadWithCoreFields(2, [
+            'points' => ['value' => 20, 'type' => 'number'],
+            'email'  => ['value' => 'loser@test.com', 'type' => 'email'],
+        ]);
+        $loser->setDateModified(new \DateTime('-30 minutes'));
 
-        $merger = $this->getMerger();
+        $this->getMerger()->mergeFieldData($winner, $loser);
 
-        $winnerDateModified = new \DateTime();
-        $loserDateModified  = new \DateTime('-30 minutes');
-        $winner->expects($this->once())
-            ->method('getDateModified')
-            ->willReturn(null);
-        $winner->expects($this->once())
-            ->method('getDateAdded')
-            ->willReturn($winnerDateModified);
-
-        $winner->expects($this->once())
-            ->method('getField')
-            ->with('email')
-            ->willReturn([
-                'value'         => 'winner@test.com',
-                'id'            => 22,
-                'label'         => 'Email',
-                'alias'         => 'email',
-                'type'          => 'email',
-                'group'         => 'core',
-                'object'        => 'lead',
-                'is_fixed'      => true,
-                'default_value' => null,
-            ]);
-
-        $winner->expects($this->once())
-            ->method('getFieldValue')
-            ->with('email')
-            ->willReturn('winner@test.com');
-
-        $loser->expects($this->exactly(1))
-            ->method('getDateModified')
-            ->willReturn($loserDateModified);
-
-        $winner->expects($this->exactly(4))
-            ->method('getId')
-            ->willReturn(1);
-
-        $loser->expects($this->once())
-            ->method('getId');
-
-        // Winner values are newest so should be kept
-        // addUpdatedField should never be called as they aren't different values
-        $winner->expects($this->never())
-            ->method('addUpdatedField');
-
-        $merger->mergeFieldData($winner, $loser);
+        // Winner values are newest so nothing should be merged from the loser
+        $this->assertSame([], $winner->getUpdatedFields());
     }
 
     /**
@@ -596,15 +385,11 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     public function testFullMergeThrowsSameContactException(): void
     {
-        $winner = $this->createMock(Lead::class);
-        $winner->expects($this->once())
-            ->method('getId')
-            ->willReturn(1);
+        $winner = new Lead();
+        $winner->setId(1);
 
-        $loser = $this->createMock(Lead::class);
-        $loser->expects($this->once())
-            ->method('getId')
-            ->willReturn(1);
+        $loser = new Lead();
+        $loser->setId(1);
 
         $this->expectException(SameContactException::class);
 
@@ -613,100 +398,42 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     public function testFullMerge(): void
     {
-        $winner = $this->createMock(Lead::class);
-        $winner
-            ->method('getId')
-            ->willReturn(1);
-        $winner->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 1,
-                    'points' => 10,
-                    'email'  => 'winner@test.com',
-                ]
-            );
-        $winner->expects($this->exactly(1))
-            ->method('getDateModified')
-            ->willReturn(new \DateTime('-30 minutes'));
+        $winner = $this->createLeadWithCoreFields(1, [
+            'points' => ['value' => 10, 'type' => 'number'],
+            'email'  => ['value' => 'winner@test.com', 'type' => 'email'],
+        ]);
+        $winner->setDateModified(new \DateTime('-30 minutes'));
 
-        $loser = $this->createMock(Lead::class);
-        $loser
-            ->method('getId')
-            ->willReturn(2);
-        $loser->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'id'     => 2,
-                    'points' => 20,
-                    'email'  => 'loser@test.com',
-                ]
-            );
-        $loser->expects($this->exactly(1))
-            ->method('getDateModified')
-            ->willReturn(new \DateTime());
+        $loser = $this->createLeadWithCoreFields(2, [
+            'points' => ['value' => 20, 'type' => 'number'],
+            'email'  => ['value' => 'loser@test.com', 'type' => 'email'],
+        ]);
+        $loser->setDateModified(new \DateTime());
+        $loser->setPoints(100);
+
+        $ip = new IpAddress('1.2.3..4');
+        $loser->addIpAddress($ip);
 
         // updateMergeRecords
         $this->mergeRecordRepo->expects($this->once())
             ->method('moveMergeRecord')
             ->with(2, 1);
 
-        // mergeIpAddresses
-        $ip = new IpAddress('1.2.3..4');
-        $loser->expects($this->once())
-            ->method('getIpAddresses')
-            ->willReturn(new ArrayCollection([$ip]));
-        $winner->expects($this->once())
-            ->method('addIpAddress')
-            ->with($ip);
-
-        // mergeFieldData
-        $winner->expects($this->once())
-            ->method('getFieldValue')
-            ->with('email')
-            ->willReturn('winner@test.com');
-
-        $winner->expects($this->once())
-            ->method('getField')
-            ->with('email')
-            ->willReturn([
-                'value'         => 'winner@test.com',
-                'id'            => 22,
-                'label'         => 'Email',
-                'alias'         => 'email',
-                'type'          => 'email',
-                'group'         => 'core',
-                'object'        => 'lead',
-                'is_fixed'      => true,
-                'default_value' => null,
-            ]);
-
-        $winner->expects($this->once())
-            ->method('addUpdatedField')
-            ->with('email', 'loser@test.com');
-
-        // mergeOwners
-        $winner->expects($this->never())
-            ->method('setOwner');
-
-        // mergePoints
-        $loser->expects($this->once())
-            ->method('getPoints')
-            ->willReturn(100);
-        $winner->expects($this->once())
-            ->method('adjustPoints')
-            ->with(100);
-
         // mergeTags
-        $loser->expects($this->once())
-            ->method('getTags')
-            ->willReturn(new ArrayCollection());
         $this->leadModel->expects($this->once())
             ->method('modifyTags')
             ->with($winner, [], null, false);
 
         $this->getMerger()->merge($winner, $loser);
+
+        // mergeIpAddresses: the loser's IP is moved to the winner
+        $this->assertTrue($winner->getIpAddresses()->contains($ip));
+        // mergeFieldData: the loser's newer email is kept
+        $this->assertSame(['email' => 'loser@test.com'], $winner->getUpdatedFields());
+        // mergePoints: the loser's points are added to the winner
+        $this->assertSame(100, $winner->getPoints());
+        // mergeOwners: neither contact had an owner so the winner stays without one
+        $this->assertNull($winner->getOwner());
     }
 
     public function testMergeFieldWithEmptyFieldData(): void
@@ -853,6 +580,28 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->method('saveEntities');
 
         $this->getMerger()->mergeCompanies($winner, $loser);
+    }
+
+    /**
+     * @param array<string, array{value: mixed, type?: string, default_value?: mixed}> $fields
+     */
+    private function createLeadWithCoreFields(int $id, array $fields): Lead
+    {
+        $lead = new Lead();
+        $lead->setId($id);
+
+        $core = [];
+        foreach ($fields as $alias => $definition) {
+            $core[$alias] = [
+                'value'         => $definition['value'],
+                'alias'         => $alias,
+                'type'          => $definition['type'] ?? 'text',
+                'default_value' => $definition['default_value'] ?? null,
+            ];
+        }
+        $lead->setFields(['core' => $core]);
+
+        return $lead;
     }
 
     private function getCompany(int $id): Company

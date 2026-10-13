@@ -58,26 +58,31 @@ final class CompanyModelTest extends \PHPUnit\Framework\TestCase
     {
         $companyModel = $this->getCompanyModelForImport();
 
-        $duplicatedCompany = $this->createMock(Company::class);
-        $duplicatedCompany->method('getProfileFields')->willReturn(['companyfield'=> 'xxx']);
+        $duplicatedCompany = new Company();
+        $duplicatedCompany->setFields(['companyfield' => 'xxx']);
+        $reflectionCompanyId = new \ReflectionProperty($duplicatedCompany, 'id');
+        $reflectionCompanyId->setValue($duplicatedCompany, 1);
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
 
         ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);
-        $duplicatedCompany->expects($this->exactly(0))->method('addUpdatedField');
         $companyModel->importCompany([], [], null, false, true);
+
+        $this->assertCount(0, $duplicatedCompany->getUpdatedFields());
     }
 
     public function testImportCompanySkipIfExistsFalse(): void
     {
         $companyModel = $this->getCompanyModelForImport();
 
-        $duplicatedCompany = $this->createMock(Company::class);
-        $duplicatedCompany->method('getProfileFields')->willReturn(['companyfield'=> 'xxx']);
+        $duplicatedCompany = new Company();
+        $reflectionCompanyId = new \ReflectionProperty($duplicatedCompany, 'id');
+        $reflectionCompanyId->setValue($duplicatedCompany, 1);
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
 
         ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);
-        $duplicatedCompany->expects($this->once())->method('addUpdatedField');
         $companyModel->importCompany([], [], null, false, false);
+
+        $this->assertCount(1, $duplicatedCompany->getUpdatedFields());
     }
 
     public function testImportCompanyThrowsExceptionWhenCreateNewIsFalseAndCompanyNotFound(): void
@@ -125,14 +130,16 @@ final class CompanyModelTest extends \PHPUnit\Framework\TestCase
 
         $companyModel->method('getFieldData')->willReturn($data);
 
-        $duplicatedCompany = $this->createMock(Company::class);
-        $duplicatedCompany->method('getProfileFields')->willReturn($data);
+        $duplicatedCompany = new Company();
+        $reflectionCompanyId = new \ReflectionProperty($duplicatedCompany, 'id');
+        $reflectionCompanyId->setValue($duplicatedCompany, 1);
 
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
         ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);
 
-        $duplicatedCompany->expects($this->exactly(2))->method('addUpdatedField');
         $companyModel->importCompany([], [], null, false, false);
+
+        $this->assertCount(2, $duplicatedCompany->getUpdatedFields());
     }
 
     /**

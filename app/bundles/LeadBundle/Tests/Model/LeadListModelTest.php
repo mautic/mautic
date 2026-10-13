@@ -45,39 +45,21 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
 
         $filters4 = 'a:1:{i:0;a:7:{s:4:"glue";s:3:"and";s:5:"field";s:8:"leadlist";s:6:"object";s:4:"lead";s:4:"type";s:8:"leadlist";s:6:"filter";a:1:{i:0;i:3;}s:7:"display";N;s:8:"operator";s:2:"in";}}';
 
-        $mockEntity = $this->createMock(LeadList::class);
+        $mockEntity1 = new LeadList();
+        $mockEntity1->setFilters([]);
+        $mockEntity1->setId(1);
 
-        $mockEntity1 = clone $mockEntity;
-        $mockEntity1->expects($this->once())
-            ->method('getFilters')
-            ->willReturn([]);
-        $mockEntity1
-            ->method('getId')
-            ->willReturn(1);
+        $mockEntity2 = new LeadList();
+        $mockEntity2->setFilters(Serializer::decode($filters));
+        $mockEntity2->setId(2);
 
-        $mockEntity2 = clone $mockEntity;
-        $mockEntity2->expects($this->once())
-            ->method('getFilters')
-            ->willReturn(Serializer::decode($filters));
-        $mockEntity2
-            ->method('getId')
-            ->willReturn(2);
+        $mockEntity3 = new LeadList();
+        $mockEntity3->setFilters([]);
+        $mockEntity3->setId(3);
 
-        $mockEntity3 = clone $mockEntity;
-        $mockEntity3->expects($this->once())
-            ->method('getFilters')
-            ->willReturn([]);
-        $mockEntity3
-            ->method('getId')
-            ->willReturn(3);
-
-        $mockEntity4 = clone $mockEntity;
-        $mockEntity4->expects($this->once())
-            ->method('getFilters')
-            ->willReturn(Serializer::decode($filters4));
-        $mockEntity4
-            ->method('getId')
-            ->willReturn(4);
+        $mockEntity4 = new LeadList();
+        $mockEntity4->setFilters(Serializer::decode($filters4));
+        $mockEntity4->setId(4);
 
         $mockListModel->expects($this->once())
             ->method('getEntities')

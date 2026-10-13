@@ -126,11 +126,9 @@ final class SegmentSubscriberTest extends TestCase
             $this->createStub(TranslatorInterface::class)
         );
 
-        $segment            = $this->createMock(LeadList::class);
+        $segment            = new LeadList();
         $segment->deletedId = $segmentId;
-        $segment->expects($this->once())
-            ->method('getName')
-            ->willReturn($segmentName);
+        $segment->setName($segmentName);
 
         $event = $this->createMock(SegmentEvent::class);
         $event->expects($this->once())
@@ -161,12 +159,9 @@ final class SegmentSubscriberTest extends TestCase
             $this->createStub(TranslatorInterface::class)
         );
 
-        $segment            = $this->createMock(LeadList::class);
+        $segment            = new LeadList();
         $segment->deletedId = $segmentId;
-
-        $segment->expects($this->once())
-            ->method('getId')
-            ->willReturn($segmentId);
+        $segment->setId($segmentId);
 
         $event = $this->createMock(SegmentEvent::class);
         $event->expects($this->once())
@@ -214,10 +209,8 @@ final class SegmentSubscriberTest extends TestCase
             $this->createStub(TranslatorInterface::class)
         );
 
-        $segment = $this->createMock(LeadList::class);
-        $segment->expects($this->once())
-            ->method('getId')
-            ->willReturn($segmentId);
+        $segment = new LeadList();
+        $segment->setId($segmentId);
 
         $event = $this->createMock(SegmentEvent::class);
         $event->expects($this->once())

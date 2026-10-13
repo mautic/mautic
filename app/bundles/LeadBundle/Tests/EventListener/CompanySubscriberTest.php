@@ -92,11 +92,9 @@ final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             $companyModel,
         );
 
-        $company            = $this->createMock(Company::class);
+        $company            = new Company();
         $company->deletedId = $companyId;
-        $company->expects($this->once())
-            ->method('getPrimaryIdentifier')
-            ->willReturn($companyName);
+        $company->setName($companyName);
 
         $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())
@@ -142,10 +140,9 @@ final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(CompanyModel::class),
         );
 
-        $company = $this->createMock(Company::class);
-        $company->expects($this->once())
-            ->method('getId')
-            ->willReturn($companyId);
+        $company = new Company();
+        $reflectionCompanyId = new \ReflectionProperty($company, 'id');
+        $reflectionCompanyId->setValue($company, $companyId);
 
         $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())

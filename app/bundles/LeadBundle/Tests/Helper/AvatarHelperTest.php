@@ -17,17 +17,13 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
 final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&Lead
-     */
-    private MockObject $leadMock;
+    private Lead $leadMock;
 
     private AvatarHelper $avatarHelper;
 
@@ -60,7 +56,7 @@ final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         );
         $defaultAvatarHelperMock       = new DefaultAvatarHelper($assetsHelperMock);
         $gravatarHelperMock            = new GravatarHelper($defaultAvatarHelperMock, $this->createStub(CoreParametersHelper::class), $this->createStub(RequestStack::class));
-        $this->leadMock                = $this->createMock(Lead::class);
+        $this->leadMock                = new Lead();
         $this->avatarHelper            = new AvatarHelper($assetsHelperMock, $pathsHelperMock, $gravatarHelperMock, $defaultAvatarHelperMock);
     }
 
@@ -74,12 +70,9 @@ final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         $_SERVER['SERVER_NAME']     = 'localhost';
         $_SERVER['REQUEST_URI']     = 'localhost';
 
-        $this->leadMock->method('getPreferredProfileImage')
-            ->willReturn('gravatar');
-        $this->leadMock->method('getSocialCache')
-            ->willReturn([]);
-        $this->leadMock->method('getEmail')
-            ->willReturn('mautic@acquia.com');
+        $this->leadMock->setPreferredProfileImage('gravatar');
+        $this->leadMock->setSocialCache([]);
+        $this->leadMock->setEmail('mautic@acquia.com');
         $avatar = $this->avatarHelper->getAvatar($this->leadMock);
         $this->assertSame('https://www.gravatar.com/avatar/96f1b78c73c1ee806cf6a4168fe9bf77?s=250&d=http%3A%2F%2Flocalhost%2Fimages%2Favatar.png', $avatar, 'Gravatar image should be returned');
 
@@ -94,12 +87,9 @@ final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetAvatarWhenDefault(): void
     {
-        $this->leadMock->method('getPreferredProfileImage')
-            ->willReturn('gravatar');
-        $this->leadMock->method('getSocialCache')
-            ->willReturn([]);
-        $this->leadMock->method('getEmail')
-            ->willReturn('');
+        $this->leadMock->setPreferredProfileImage('gravatar');
+        $this->leadMock->setSocialCache([]);
+        $this->leadMock->setEmail('');
         $avatar = $this->avatarHelper->getAvatar($this->leadMock);
 
         $this->assertSame('http://localhost/images/avatar.png', $avatar, 'Default image image should be returned');

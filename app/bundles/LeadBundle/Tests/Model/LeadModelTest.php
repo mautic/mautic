@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -444,10 +443,9 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead = new Lead();
         $lead->setId(1);
         $lead->setFields(['all' => 'sth']);
-        $stageMock = $this->createMock(Stage::class);
-        $stageMock
-            ->method('getId')
-            ->willReturn(1);
+        $stageMock = new Stage();
+        $reflectionStageId = new \ReflectionProperty($stageMock, 'id');
+        $reflectionStageId->setValue($stageMock, 1);
         $data = ['stage' => $stageMock];
 
         $this->stagesChangeLogRepositoryMock->expects($this->once())
@@ -497,36 +495,11 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockGetLeadRepository();
 
-        $contact     = $this->createMock(Lead::class);
+        $contact     = new Lead();
+        $contact->setEmail('contact@example.com');
+        $contact->setNewlyCreated(true);
         $manipulator = new LeadManipulator('lead', 'import', 333);
-
-        $contact->expects($this->exactly(2))
-            ->method('getIpAddresses')
-            ->willReturn(new ArrayCollection());
-
-        $contact->expects($this->exactly(2))
-            ->method('isNewlyCreated')
-            ->willReturn(true);
-
-        $contact->expects($this->exactly(2))
-            ->method('getManipulator')
-            ->willReturn($manipulator);
-
-        $contact->expects($this->exactly(2))
-            ->method('getUpdatedFields')
-            ->willReturn([]);
-
-        $contact->expects($this->once())
-            ->method('addEventLog')
-            ->with($this->callback(function (LeadEventLog $leadEventLog) use ($contact): true {
-                $this->assertSame($contact, $leadEventLog->getLead());
-                $this->assertSame('identified_contact', $leadEventLog->getAction());
-                $this->assertSame('lead', $leadEventLog->getBundle());
-                $this->assertSame('import', $leadEventLog->getObject());
-                $this->assertSame(333, $leadEventLog->getObjectId());
-
-                return true;
-            }));
+        $contact->setManipulator($manipulator);
 
         $this->fieldModelMock->expects($this->exactly(1))
             ->method('getFieldListWithProperties')
@@ -538,6 +511,17 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->leadModel->saveEntity($contact);
         $this->leadModel->saveEntity($contact);
+
+        $eventLogReflection = new \ReflectionProperty($contact, 'eventLog');
+        $eventLogs          = $eventLogReflection->getValue($contact);
+        $this->assertCount(1, $eventLogs);
+
+        $leadEventLog = $eventLogs->first();
+        $this->assertSame($contact, $leadEventLog->getLead());
+        $this->assertSame('identified_contact', $leadEventLog->getAction());
+        $this->assertSame('lead', $leadEventLog->getBundle());
+        $this->assertSame('import', $leadEventLog->getObject());
+        $this->assertSame(333, $leadEventLog->getObjectId());
     }
 
     public function testImportHtmlFields(): void
