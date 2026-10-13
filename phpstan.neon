@@ -24,6 +24,12 @@ parameters:
         no_mixed_property: true
         no_mixed_caller: true
 
+    symplify:
+        naming: false
+        symfony: true
+        complexity: true
+        modern: false
+
     paths:
         - app/bundles
         - app/config
@@ -71,6 +77,57 @@ parameters:
         -
             identifier: argument.type
             path: app/bundles/CoreBundle/Controller/AjaxController.php
+
+        - identifier: symplify.forbiddenSwitch
+        # to be skipped
+        - identifier: symfony.formTypeClassName
+        - identifier: phpunit.noAssertFuncCallInTests
+
+        -
+            identifier: doctrine.noGetRepositoryOutsideService
+            paths:
+                - app/bundles/CoreBundle/Model/AbstractCommonModel.php
+
+        # valid calls
+        -
+            identifier: symplify.forbiddenStaticClassConstFetch
+            paths:
+                - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
+                - app/bundles/CoreBundle/Controller/CommonController.php
+                - app/bundles/CoreBundle/Controller/AjaxController.php
+
+        -
+            identifier: symplify.forbiddenFuncCall
+            path: app/bundles/CoreBundle/Helper/UrlHelper.php
+
+        # handle next
+        - identifier:  doctrine.noRepositoryCallInDataFixtures
+        # to be fixed
+        - identifier: doctrine.requireQueryBuilderOnRepository
+
+        -
+            identifier: symfony.noListenerWithoutContract
+            paths:
+                # used manually
+                - app/bundles/CoreBundle/EventListener/ConsoleErrorListener.php
+                - app/bundles/CoreBundle/EventListener/ConsoleTerminateListener.php
+                # seems unused
+                - app/bundles/ApiBundle/ApiPlatform/EventListener/MauticDenyAccessListener.php
+
+        -
+            identifier: symfony.noFindTaggedServiceIdsCall
+            path: app/bundles/CoreBundle/DependencyInjection/Compiler/ConfiguratorPass.php
+
+        -
+            identifier: symplify.noConstructorOverride
+            paths:
+                # allow for deprecations
+                - */Permissions/*
+                - app/bundles/CoreBundle/Loader/RouteLoader.php
+
+        -
+            identifier: symplify.forbiddenFuncCall
+            message: '#Function "(method_exists|property_exists|array_walk|curl_)(.*?)" cannot be used#'
 
         # page translation entity passed where concrete Page expected in builder tokens
         -
@@ -144,17 +201,8 @@ parameters:
                 - app/bundles/PageBundle/Tests/EventListener/PreferencePageTest.php
                 - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
 
-        # shared pre/post events, Campaign same-string collisions and TOKEN_REPLACEMENT reuse block single-argument dispatch here
-        -
-            identifier: mautic.singleArgumentDispatch
-            paths:
-                - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
-                - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
-                - app/bundles/FormBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
-                - app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
-                - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
-                - app/bundles/SmsBundle/Model/SmsModel.php
-                - plugins/MauticFocusBundle/Model/FocusModel.php
+        # shared pre/post events, Campaign same-string collisions and TOKEN_REPLACEMENT reuse block single-argument dispatch
+        - identifier: symfony.singleArgEventDispatch
 
         - identifier: missingType.generics
         # controllers - group missing parameter types to fix later
@@ -326,9 +374,7 @@ parameters:
         consoleApplicationLoader: app/console-application.php
 
 rules:
-    - Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
     - Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
-    - Symplify\PHPStanRules\Rules\Doctrine\NoStringTargetEntityRule
     - Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
     - Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
     - Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
@@ -339,17 +385,10 @@ rules:
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
     - Utils\PHPStan\Rule\NoPublicNonActionMethodInControllerRule
 
-    - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
-    - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
-    - Symplify\PHPStanRules\Rules\Symfony\NoNullableServiceInConstructorRule
-    - Symplify\PHPStanRules\Rules\Symfony\PreferInterfaceInConstructorRule
-    - Symplify\PHPStanRules\Rules\Complexity\NoPropertyToPropertyAssignRule
-
     - Utils\PHPStan\Rule\NoServicesInBundleConfigRule
     - Utils\PHPStan\Rule\NoServiceInMethodParameterRule
     - Utils\PHPStan\Rule\NoUnusedServiceAliasRule
     - Utils\PHPStan\Rule\NoParentConstructorForwardingRule
-    - Symplify\PHPStanRules\Rules\Symfony\NoServiceJugglingRule
     - Utils\PHPStan\Rule\NoUnusedServiceNameRule
     - Utils\PHPStan\Rule\NoClassNameServiceAliasRule
     - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoAutoconfiguredServiceTagRule
@@ -357,10 +396,8 @@ rules:
     - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoServiceSetterCallRule
     - Utils\PHPStan\Rule\NoServiceGetterRule
     - Utils\PHPStan\Rule\NullablePropertyGetterMustReturnNullableRule
-    - Symplify\PHPStanRules\Rules\Doctrine\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
-    - Symplify\PHPStanRules\Rules\RequireArrayShapeReturnRule
     - Utils\PHPStan\Rule\RepositoryMethodMustHaveReturnTypeRule
     - Utils\PHPStan\Rule\CollectionGetterMustReturnCollectionRule
     - Utils\PHPStan\Rule\CollectionReturnMustHaveGenericDocblockRule
