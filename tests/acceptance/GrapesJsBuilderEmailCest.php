@@ -2,116 +2,106 @@
 
 declare(strict_types=1);
 
+use Facebook\WebDriver\WebDriverKeys;
 use Page\Acceptance\EmailsPage;
-use Page\Acceptance\SegmentsPage;
-use Step\Acceptance\EmailStep;
+use Step\Acceptance\SegmentStep;
 
 final class GrapesJsBuilderEmailCest
 {
+    private const EDITED_CONTENT = 'GrapesJS email recovery content';
+
     public function _before(AcceptanceTester $I): void
     {
         $I->login();
     }
 
-    public function conflictingSegmentsBlockBuilderLaunch(AcceptanceTester $I): void
+    public function emailContentSurvivesValidationErrorAndRecovery(AcceptanceTester $I, SegmentStep $segment): void
     {
         $segmentName = 'Issue 17552 '.date('YmdHis');
-        $segmentAlias = 'issue-17552-'.date('YmdHis');
+        $emailName   = 'Issue 17552 recovery '.date('YmdHis');
 
-        $this->createSegment($I, $segmentName, $segmentAlias);
+        $segment->createAContactSegment($segmentName);
+        $I->waitForElementNotVisible('form[name="leadlist"]', AcceptanceTester::TIMEOUT);
 
-        $this->openSegmentEmailForm($I);
-
-        $I->fillField('emailform[subject]', 'Issue 17552');
-        $I->fillField('emailform[name]', 'Issue 17552');
-
+        $I->amOnPage('/s/emails/new');
+        $I->waitForElementVisible(EmailsPage::SELECT_SEGMENT_EMAIL, AcceptanceTester::TIMEOUT);
+        $I->click(EmailsPage::SELECT_SEGMENT_EMAIL);
+        $I->waitForElementVisible('form[name="emailform"]', AcceptanceTester::TIMEOUT);
+        $I->fillField(EmailsPage::SUBJECT_FIELD, $emailName);
+        $I->fillField('emailform[name]', $emailName);
         $this->selectConflictingSegments($I, $segmentName);
 
-        $this->assertSegmentConflictBlocksBuilderLaunch($I);
+        $this->openBuilder($I);
+        $this->editCanvasText($I);
+
+        $I->click('#btn-views-apply');
+        $I->waitForElementVisible('.gjs-mdl-dialog .panel-body', AcceptanceTester::TIMEOUT);
+        $I->see('excludedLists: The same segment cannot be excluded and included in the same time.', '.gjs-mdl-dialog .panel-body');
+        $I->see(
+            'Your builder content is preserved in this form, but has not been saved. Close the builder, correct the form errors, and save again.',
+            '.gjs-mdl-dialog .panel-body'
+        );
+
+        $I->click('.gjs-mdl-dialog .panel-footer button');
+        $I->waitForElementNotVisible('.gjs-mdl-dialog', AcceptanceTester::TIMEOUT);
+        $I->click('.gjs-pn-btn[title="Close"]');
+        $I->waitForElementNotVisible('.builder.builder-active', AcceptanceTester::TIMEOUT);
+        $html = (string) $I->executeJS("return document.querySelector('textarea.builder-html').value;");
+        $I->assertStringContainsString(self::EDITED_CONTENT, $html);
 
         $I->executeJS(
             <<<'JS'
-const excluded = document.querySelector('#emailform_excludedLists');
-
-mQuery(excluded)
+mQuery('#emailform_excludedLists')
     .val([])
     .trigger('change')
     .trigger('chosen:updated');
 JS
         );
-
-        $I->executeJS("document.querySelector('#emailform_buttons_builder').click();");
-
-        $I->waitForElementVisible('.builder.builder-active', AcceptanceTester::TIMEOUT);
-        $I->dontSeeElement('.email-builder-segment-conflict');
-    }
-
-    public function translationParentAllowsBuilderLaunchWithConflictingSegments(AcceptanceTester $I, EmailStep $email): void
-    {
-        $segmentName = 'Issue 17604 '.date('YmdHis');
-        $segmentAlias = 'issue-17604-'.date('YmdHis');
-        $parentName = 'Issue 17604 parent '.date('YmdHis');
-
-        $this->createSegment($I, $segmentName, $segmentAlias);
-
-        $email->createSegmentEmail($parentName);
-
-        $this->openSegmentEmailForm($I);
-
-        $I->fillField('emailform[subject]', 'Issue 17604 translation');
-        $I->fillField('emailform[name]', 'Issue 17604 translation');
-
-        $this->selectConflictingSegments($I, $segmentName);
-
-        $this->assertSegmentConflictBlocksBuilderLaunch($I, true);
-
-        $parentFound = $I->executeJS(
-            <<<'JS'
-const parentName = arguments[0];
-const parent = document.querySelector('#emailform_segmentTranslationParent');
-const option = Array.from(parent.options).find(
-    (item) => item.text.trim().startsWith(`${parentName} (`)
-);
-
-if (!option) {
-    return false;
-}
-
-mQuery(parent)
-    .val(option.value)
-    .trigger('change')
-    .trigger('chosen:updated');
-
-return true;
-JS,
-            [$parentName]
-        );
-
-        $I->assertTrue((bool) $parentFound);
-
-        $I->executeJS("document.querySelector('#emailform_buttons_builder').click();");
-
-        $I->waitForElementVisible('.builder.builder-active', AcceptanceTester::TIMEOUT);
-        $I->dontSeeElementInDOM('.email-builder-segment-conflict');
-        $I->dontSeeElementInDOM('.form-group.has-error #emailform_excludedLists');
-    }
-
-    private function createSegment(AcceptanceTester $I, string $segmentName, string $segmentAlias): void
-    {
-        $I->amOnPage('/s/segments/new');
-        $I->waitForElementVisible('form[name="leadlist"]');
-        $I->fillField('leadlist[name]', $segmentName);
-        $I->fillField('leadlist[alias]', $segmentAlias);
-        $I->click(SegmentsPage::$SAVE_AND_CLOSE_BUTTON);
-        $I->waitForElementNotVisible('form[name="leadlist"]', AcceptanceTester::TIMEOUT);
-    }
-
-    private function openSegmentEmailForm(AcceptanceTester $I): void
-    {
-        $I->amOnPage('/s/emails/new');
-        $I->waitForElementVisible(EmailsPage::SELECT_SEGMENT_EMAIL, AcceptanceTester::TIMEOUT);
-        $I->click(EmailsPage::SELECT_SEGMENT_EMAIL);
+        $I->click(EmailsPage::SAVE_AND_CLOSE);
+        $I->waitForText($emailName, AcceptanceTester::TIMEOUT, 'h1.page-header-title');
+        $I->waitForElementClickable(EmailsPage::EDIT_BUTTON, AcceptanceTester::TIMEOUT);
+        $I->click(EmailsPage::EDIT_BUTTON);
         $I->waitForElementVisible('form[name="emailform"]', AcceptanceTester::TIMEOUT);
+        $I->reloadPage();
+        $I->waitForElementVisible('form[name="emailform"]', AcceptanceTester::TIMEOUT);
+        $html = (string) $I->executeJS("return document.querySelector('textarea.builder-html').value;");
+        $I->assertStringContainsString(self::EDITED_CONTENT, $html);
+
+        $this->openBuilder($I);
+        $this->waitForCanvasContent($I);
+        $I->switchToIFrame('iframe.gjs-frame');
+        $I->see(self::EDITED_CONTENT);
+        $I->switchToIFrame();
+        $I->click('.gjs-pn-btn[title="Close"]');
+        $I->waitForElementNotVisible('.builder.builder-active', AcceptanceTester::TIMEOUT);
+    }
+
+    private function editCanvasText(AcceptanceTester $I): void
+    {
+        $this->waitForCanvasContent($I);
+        $I->switchToIFrame('iframe.gjs-frame');
+        $I->doubleClick('(//*[normalize-space(text()) and not(self::script) and not(self::style) and not(self::html) and not(self::head) and not(self::body)])[1]');
+        $I->waitForElementVisible('[contenteditable="true"]', AcceptanceTester::TIMEOUT);
+        $I->pressKey('[contenteditable="true"]', [WebDriverKeys::CONTROL, 'a']);
+        $I->pressKey('[contenteditable="true"]', self::EDITED_CONTENT);
+        $I->see(self::EDITED_CONTENT, '[contenteditable="true"]');
+        $I->switchToIFrame();
+    }
+
+    private function openBuilder(AcceptanceTester $I): void
+    {
+        $I->waitForJS("return typeof Mautic.launchBuilder === 'function' && Mautic.launchBuilder.toString().includes('builder-active') && document.querySelector('#emailform_buttons_builder') !== null;", AcceptanceTester::TIMEOUT);
+        $I->waitForJS("return document.querySelector('#emailform_buttons_builder').disabled === false;", AcceptanceTester::TIMEOUT);
+        $I->executeJS("document.querySelector('#emailform_buttons_builder').click();");
+        $I->waitForElementVisible('.builder.builder-active', AcceptanceTester::TIMEOUT);
+    }
+
+    private function waitForCanvasContent(AcceptanceTester $I): void
+    {
+        $I->waitForElementVisible('iframe.gjs-frame', AcceptanceTester::TIMEOUT);
+        $I->switchToIFrame('iframe.gjs-frame');
+        $I->waitForElementVisible('body', AcceptanceTester::TIMEOUT);
+        $I->switchToIFrame();
     }
 
     private function selectConflictingSegments(AcceptanceTester $I, string $segmentName): void
@@ -146,20 +136,5 @@ JS,
         );
 
         $I->assertTrue((bool) $segmentFound);
-    }
-
-    private function assertSegmentConflictBlocksBuilderLaunch(AcceptanceTester $I, bool $assertExcludedListError = false): void
-    {
-        $I->executeJS("document.querySelector('#emailform_buttons_builder').click();");
-
-        $I->waitForElementVisible('.email-builder-segment-conflict', AcceptanceTester::TIMEOUT);
-        $I->see(
-            'A segment cannot be both included and excluded. Fix the segment selections before opening the builder.',
-            '.email-builder-segment-conflict'
-        );
-        if ($assertExcludedListError) {
-            $I->seeElementInDOM('.form-group.has-error #emailform_excludedLists');
-        }
-        $I->dontSeeElement('.builder.builder-active');
     }
 }
