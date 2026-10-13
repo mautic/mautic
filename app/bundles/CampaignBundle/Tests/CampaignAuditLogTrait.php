@@ -8,6 +8,20 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
+<<<<<<< HEAD
+>>>>>>> db0f5e0b25 (fixup! static fixes)
+=======
+use Mautic\UserBundle\Entity\UserRepository;
+>>>>>>> 10d119716f (fixup! static fixes)
+=======
+use Mautic\UserBundle\Entity\UserRepository;
+>>>>>>> 5883e0783f (fixup! static fixes)
+=======
+use Mautic\UserBundle\Entity\UserRepository;
+>>>>>>> bc924d190c (fixup! static fixes)
+=======
+>>>>>>> fe192b6a90 (fixup! static fixes)
 
 trait CampaignAuditLogTrait
 {

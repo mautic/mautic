@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\MappedSuperclass]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
-class CommonEntity implements \Stringable
+abstract class CommonEntity implements \Stringable
 {
     /**
      * @var mixed[]

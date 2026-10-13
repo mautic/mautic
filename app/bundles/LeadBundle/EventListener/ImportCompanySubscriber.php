@@ -128,7 +128,7 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
         /** @var \Mautic\UserBundle\Entity\User|null $owner */
         $owner = ArrayHelper::pickValue('owner', $matchedFields);
 
-        return $owner ? $owner->getId() : null;
+        return $owner?->getId();
     }
 
     /**

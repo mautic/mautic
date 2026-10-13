@@ -24,6 +24,9 @@ parameters:
         no_mixed_property: true
         no_mixed_caller: true
 
+    symplify:
+        naming: false
+
     paths:
         - app/bundles
         - app/config
@@ -71,6 +74,24 @@ parameters:
         -
             identifier: argument.type
             path: app/bundles/CoreBundle/Controller/AjaxController.php
+
+        - identifier: symplify.forbiddenTrait
+        - identifier: symplify.forbiddenSwitch
+        # used extensively
+        - identifier: symplify.noDynamicName
+        - identifier: symplify.noReference
+        - identifier: symplify.forbiddenExtendOfNonAbstractClass
+        -
+            identifier: symplify.noDynamicName
+            path: */Entity/*
+        -
+            identifier: symplify.noConstructorOverride
+            # allow for deprecations
+            path: */Permissions/*
+
+        -
+            identifier: symplify.forbiddenFuncCall
+            message: '#Function "method_exists|curl_(.*?)" cannot be used#'
 
         # page translation entity passed where concrete Page expected in builder tokens
         -
