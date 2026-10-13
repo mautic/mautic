@@ -35,11 +35,8 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
         DynamicContentFilterEntryType::class,
         DynamicContentType::class,
         SearchSubscriber::class,
-        \MauticPlugin\MauticClearbitBundle\EventListener\LeadSubscriber::class,
-        \MauticPlugin\MauticClearbitBundle\Helper\LookupHelper::class,
         \MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber::class,
         \MauticPlugin\MauticFullContactBundle\Helper\LookupHelper::class,
-        'mautic.plugin.clearbit.lookup_helper',
         'mautic.plugin.fullcontact.lookup_helper',
 
         // requires a running Redis/Memcached server or an optional package
