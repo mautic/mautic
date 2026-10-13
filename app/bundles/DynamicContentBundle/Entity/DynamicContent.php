@@ -61,13 +61,11 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-/**
- * @use TranslationEntityTrait<DynamicContent>
- * @use VariantEntityTrait<DynamicContent>
- */
 class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
+    /** @use TranslationEntityTrait<DynamicContent> */
     use TranslationEntityTrait;
+    /** @use VariantEntityTrait<DynamicContent> */
     use VariantEntityTrait;
     use FiltersEntityTrait;
     use UuidTrait;

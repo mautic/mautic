@@ -111,6 +111,9 @@ trait VariantEntityTrait
         return $this;
     }
 
+    /**
+     * @return TEntity|null
+     */
     public function getVariantParent(): ?VariantEntityInterface
     {
         return $this->variantParent;

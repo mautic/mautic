@@ -77,6 +77,23 @@ parameters:
             identifier: argument.type
             path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
 
+        # shared translation/variant traits are typed against the concrete entity, interface-typed callers trip covariance
+        -
+            identifiers:
+                - offsetAssign.valueType
+                - argument.type
+                - assign.propertyType
+            paths:
+                - app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
+                - app/bundles/CoreBundle/Entity/VariantEntityTrait.php
+
+        # event-log API passes a LeadEventLog where the model expects an Event, kept as-is for now
+        -
+            identifiers:
+                - argument.type
+                - method.notFound
+            path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
+
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: symplify.noNullableServiceInConstructor
@@ -349,6 +366,7 @@ rules:
     - Utils\PHPStan\Rule\CollectionReturnMustHaveGenericDocblockRule
     - Utils\PHPStan\Rule\CollectionParamMustHaveGenericDocblockRule
     - Utils\PHPStan\Rule\CollectionPropertyMustHaveGenericDocblockRule
+    - Utils\PHPStan\Rule\GenericTraitUseMustHaveGenericDocblockRule
     - Utils\PHPStan\Rule\MockedMethodReturnMustMatchNativeTypeRule
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule

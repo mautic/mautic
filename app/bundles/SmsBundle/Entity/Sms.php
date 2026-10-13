@@ -57,17 +57,15 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-/**
- * @use TranslationEntityTrait<Sms>
- * @use VariantEntityTrait<Sms>
- */
 #[EntityEvent]
 #[MediaMaxAllowedSize]
 class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface, VariantEntityInterface
 {
     use UuidTrait;
     use ProjectTrait;
+    /** @use TranslationEntityTrait<Sms> */
     use TranslationEntityTrait;
+    /** @use VariantEntityTrait<Sms> */
     use VariantEntityTrait;
 
     public const string TABLE_NAME = 'sms_messages';

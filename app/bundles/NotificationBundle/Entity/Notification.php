@@ -52,6 +52,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Notification extends FormEntity implements UuidInterface, TranslationEntityInterface
 {
     use UuidTrait;
+    /** @use TranslationEntityTrait<Notification> */
     use TranslationEntityTrait;
 
     /**
