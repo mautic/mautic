@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mautic\PrivacyBundle\Form\Type;
+namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * @extends AbstractType<array<mixed>>
  */
-final class ConfigType extends AbstractType
+final class ConfigPrivacyType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -19,11 +18,11 @@ final class ConfigType extends AbstractType
             'gravatar_enabled',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.privacy.config.gravatar_enabled',
+                'label'      => 'mautic.core.config.form.gravatar_enabled',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.privacy.config.gravatar_enabled.tooltip',
+                    'tooltip' => 'mautic.core.config.form.gravatar_enabled.tooltip',
                 ],
                 'data'       => (bool) ($options['data']['gravatar_enabled'] ?? false),
             ]

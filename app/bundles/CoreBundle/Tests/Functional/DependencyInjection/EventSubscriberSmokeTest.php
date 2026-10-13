@@ -10,6 +10,7 @@ use Mautic\ApiBundle\EventListener\PreAuthorizationEventListener;
 use Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CoreBundle\EventListener\AssetsSubscriber;
+use Mautic\CoreBundle\EventListener\ConfigPrivacySubscriber;
 use Mautic\CoreBundle\EventListener\ConfigThemeSubscriber;
 use Mautic\CoreBundle\EventListener\CoreSubscriber;
 use Mautic\CoreBundle\EventListener\EnvironmentSubscriber;
@@ -146,6 +147,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
+            ConfigPrivacySubscriber::class,
             \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
             ConfigThemeSubscriber::class,
             \Mautic\EmailBundle\EventListener\ConfigSubscriber::class,
@@ -154,7 +156,6 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\MessengerBundle\EventListener\ConfigSubscriber::class,
             \Mautic\NotificationBundle\EventListener\ConfigSubscriber::class,
             \Mautic\PageBundle\EventListener\ConfigSubscriber::class,
-            \Mautic\PrivacyBundle\EventListener\ConfigSubscriber::class,
             \Mautic\ReportBundle\EventListener\ConfigSubscriber::class,
             \Mautic\SmsBundle\EventListener\ConfigSubscriber::class,
             \Mautic\UserBundle\EventListener\ConfigSubscriber::class,

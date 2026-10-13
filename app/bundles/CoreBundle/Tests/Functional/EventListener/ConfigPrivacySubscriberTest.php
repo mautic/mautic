@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mautic\PrivacyBundle\Tests\Functional;
+namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-final class PrivacyConfigTest extends MauticMysqlTestCase
+final class ConfigPrivacySubscriberTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
