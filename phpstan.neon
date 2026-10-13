@@ -385,9 +385,7 @@ parameters:
         consoleApplicationLoader: app/console-application.php
 
 rules:
-    - Symplify\PHPStanRules\Rules\Complexity\NoJustPropertyAssignRule
     - Utils\PHPStan\Rule\AbstractClassNameMustBeAbstractRule
-    - Symplify\PHPStanRules\Rules\Doctrine\NoStringTargetEntityRule
     - Utils\PHPStan\Rule\NoTablePrefixDefinitionInTestsRule
     - Utils\PHPStan\Rule\AutowireMethodNameMustMatchClassRule
     - Utils\PHPStan\Rule\NoGetModelWithStringInControllerRule
@@ -398,13 +396,10 @@ rules:
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
     - Utils\PHPStan\Rule\NoPublicNonActionMethodInControllerRule
 
-    - Symplify\PHPStanRules\Rules\Symfony\NoNullableServiceInConstructorRule
-
     - Utils\PHPStan\Rule\NoServicesInBundleConfigRule
     - Utils\PHPStan\Rule\NoServiceInMethodParameterRule
     - Utils\PHPStan\Rule\NoUnusedServiceAliasRule
     - Utils\PHPStan\Rule\NoParentConstructorForwardingRule
-    - Symplify\PHPStanRules\Rules\Symfony\NoServiceJugglingRule
     - Utils\PHPStan\Rule\NoUnusedServiceNameRule
     - Utils\PHPStan\Rule\NoClassNameServiceAliasRule
     - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoAutoconfiguredServiceTagRule
@@ -412,10 +407,8 @@ rules:
     - Symplify\PHPStanRules\Rules\Symfony\ConfigClosure\NoServiceSetterCallRule
     - Utils\PHPStan\Rule\NoServiceGetterRule
     - Utils\PHPStan\Rule\NullablePropertyGetterMustReturnNullableRule
-    - Symplify\PHPStanRules\Rules\Doctrine\NoReadonlyEntityClassRule
     - Utils\PHPStan\Rule\NoReadonlyApiParamRule
     - Utils\PHPStan\Rule\ModelMethodSingleParamMustHaveTypeRule
-    - Symplify\PHPStanRules\Rules\RequireArrayShapeReturnRule
     - Utils\PHPStan\Rule\RepositoryMethodMustHaveReturnTypeRule
     - Utils\PHPStan\Rule\CollectionGetterMustReturnCollectionRule
     - Utils\PHPStan\Rule\CollectionReturnMustHaveGenericDocblockRule
@@ -426,12 +419,7 @@ rules:
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
-<<<<<<< HEAD
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
-=======
-    # enable later, might not be needed
-    - Symplify\PHPStanRules\Rules\NoDuplicateNonRepeatableAttributeRule
->>>>>>> 8f37c4d6ed (closure)
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
