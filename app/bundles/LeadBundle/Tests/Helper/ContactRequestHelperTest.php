@@ -13,10 +13,13 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -55,6 +58,11 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $contactMerger;
 
+    /**
+     * @var MockObject&DeviceTrackingServiceInterface
+     */
+    private MockObject $deviceTrackingService;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -65,6 +73,7 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher               = $this->createMock(EventDispatcher::class);
         $this->trackedContact           = $this->createMock(Lead::class);
         $this->contactMerger            = $this->createMock(ContactMerger::class);
+        $this->deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
 
         $this->trackedContact->method('getId')
             ->willReturn(1);
@@ -161,8 +170,7 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
                 return $event;
             });
 
-        $this->contactTracker->method('getContactByTrackedDevice')
-            ->willReturn($anonymousContact);
+        $this->trackDevice($anonymousContact);
 
         $this->contactMerger->expects($this->once())
             ->method('merge')
@@ -183,8 +191,7 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateContact')
             ->willReturn([$foundContact, ['email' => 'john@example.com']]);
 
-        $this->contactTracker->method('getContactByTrackedDevice')
-            ->willReturn($anonymousContact);
+        $this->trackDevice($anonymousContact);
 
         $this->contactMerger->expects($this->once())
             ->method('merge')
@@ -209,8 +216,7 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateContact')
             ->willReturn([$foundContact, ['email' => 'john@example.com']]);
 
-        $this->contactTracker->method('getContactByTrackedDevice')
-            ->willReturn($identifiedContact);
+        $this->trackDevice($identifiedContact);
 
         $this->contactMerger->expects($this->never())
             ->method('merge');
@@ -218,6 +224,67 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $helper = $this->getContactRequestHelper($this->createRequestStack());
 
         $this->assertSame($foundContact, $helper->getContactFromQuery(['email' => 'john@example.com']));
+    }
+
+    public function testContactTrackedWithoutDeviceIsNotMergedIntoContactFoundByPubliclyUpdatableField(): void
+    {
+        $foundContact     = $this->createContact(2, false);
+        $anonymousContact = $this->createContact(3, true);
+
+        $this->leadModel->expects($this->once())
+            ->method('checkForDuplicateContact')
+            ->willReturn([$foundContact, ['email' => 'john@example.com']]);
+
+        // A contact selected through the legacy mtc_id fallback has no tracked device
+        $this->contactTracker->method('getContactByTrackedDevice')
+            ->willReturn($anonymousContact);
+
+        $this->deviceTrackingService->method('getTrackedDevice')
+            ->willReturn(null);
+
+        $this->contactMerger->expects($this->never())
+            ->method('merge');
+
+        $helper = $this->getContactRequestHelper($this->createRequestStack());
+
+        $this->assertSame($foundContact, $helper->getContactFromQuery(['email' => 'john@example.com']));
+    }
+
+    public function testContactIdentifiedBySocialProfileIsNotMergedIntoContactFoundByPubliclyUpdatableField(): void
+    {
+        $foundContact  = $this->createContact(2, false);
+        $socialContact = new Lead();
+        $socialContact->setId(3);
+
+        $repository = $this->createMock(LeadRepository::class);
+        $repository->method('getFieldValues')
+            ->with(3)
+            ->willReturn(['social' => ['twitter' => ['alias' => 'twitter', 'value' => 'johndoe']]]);
+
+        $this->leadModel->method('getRepository')
+            ->willReturn($repository);
+
+        $this->leadModel->expects($this->once())
+            ->method('checkForDuplicateContact')
+            ->willReturn([$foundContact, ['email' => 'john@example.com']]);
+
+        $this->trackDevice($socialContact);
+
+        $this->contactMerger->expects($this->never())
+            ->method('merge');
+
+        $helper = $this->getContactRequestHelper($this->createRequestStack());
+
+        $this->assertSame($foundContact, $helper->getContactFromQuery(['email' => 'john@example.com']));
+    }
+
+    private function trackDevice(Lead $contact): void
+    {
+        $device = new LeadDevice();
+        $device->setLead($contact);
+
+        $this->deviceTrackingService->method('getTrackedDevice')
+            ->willReturn($device);
     }
 
     /**
@@ -257,7 +324,8 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             $this->dispatcher,
             $this->contactMerger,
             $this->createStub(StatRepository::class),
-            $this->createStub(BotRatioHelper::class)
+            $this->createStub(BotRatioHelper::class),
+            $this->deviceTrackingService
         );
     }
 }
