@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
 use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -744,7 +745,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
     private function setLeadPermissions(User $user, array $permissions): void
     {
         $role = $user->getRole();
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\Role::class, $role);
+        $this->assertInstanceOf(Role::class, $role);
 
         $this->em->createQueryBuilder()
             ->delete(Permission::class, 'p')

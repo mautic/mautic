@@ -69,6 +69,9 @@ class LegacyEventDispatcher
                 $result = $this->dispatchCallback($settings, $log);
             }
 
+            // To know this log has been executed
+            $log->setIsExecuted(true);
+
             // If the new batch event was handled, the $log was already processed so only process legacy logs if false
             if (!$wasBatchProcessed) {
                 $this->dispatchExecutionEvent($config, $log, $result);

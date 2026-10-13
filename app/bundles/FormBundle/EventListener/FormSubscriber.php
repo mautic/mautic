@@ -3,8 +3,6 @@
 namespace Mautic\FormBundle\EventListener;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
@@ -12,6 +10,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event as Events;
+use Mautic\FormBundle\Exception\ResponseParsingException;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
@@ -243,7 +242,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
 
         try {
-            $client   = new Client(['timeout' => 15]);
+            $client   = new Client(['timeout' => 15, 'http_errors' => false]);
             $response = $client->post(
                 $config['post_url'],
                 [
@@ -255,8 +254,6 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             if ($redirect = $this->parseResponse($response, $matchedFields)) {
                 $event->setPostSubmitCallbackResponse('form.repost', new RedirectResponse($redirect));
             }
-        } catch (ClientException|ServerException $exception) {
-            $this->parseResponse($exception->getResponse(), $matchedFields);
         } catch (\Exception $exception) {
             if ($exception instanceof ValidationException) {
                 if ($violations = $exception->getViolations()) {
@@ -312,19 +309,10 @@ final readonly class FormSubscriber implements EventSubscriberInterface
      */
     private function parseResponse(Response $response, array $matchedFields = [])
     {
-        $body       = (string) $response->getBody();
+        $body       = $this->decodeBody((string) $response->getBody());
         $error      = false;
         $redirect   = false;
         $violations = [];
-
-        if ($json = json_decode($body, true)) {
-            $body = $json;
-        } else {
-            parse_str($body, $output);
-            if ([] !== $output) {
-                $body = $output;
-            }
-        }
 
         if (is_array($body)) {
             if (isset($body['error'])) {
@@ -332,34 +320,75 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             } elseif (isset($body['errors'])) {
                 $error = implode(', ', $body['errors']);
             } elseif (isset($body['violations'])) {
-                $error          = $this->translator->trans('mautic.form.action.repost.validation_failed');
-                $formViolations = $body['violations'];
-
-                // Ensure the violations match up to Mautic's
-                foreach ($formViolations as $field => $violation) {
-                    if (isset($matchedFields[$field])) {
-                        $violations[$matchedFields[$field]] = $violation;
-                    } else {
-                        $error .= ' '.$violation;
-                    }
-                }
+                $mapped     = $this->mapViolations($body['violations'], $matchedFields);
+                $error      = $mapped['error'];
+                $violations = $mapped['violations'];
             } elseif (isset($body['redirect'])) {
                 $redirect = $body['redirect'];
             }
         }
 
-        if (!$error && 200 !== $response->getStatusCode()) {
-            $error = (string) $response->getBody();
+        if (!$error && ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300)) {
+            $rawBody = (string) $response->getBody();
+            $error   = !empty($rawBody) ? $rawBody : sprintf(
+                'Repost endpoint returned HTTP %d',
+                $response->getStatusCode()
+            );
         }
 
-        if ($error || $violations) {
+        if ($violations) {
             $exception = (new ValidationException($error))
                 ->setViolations($violations);
 
             throw $exception;
         }
 
+        if ($error) {
+            throw new ResponseParsingException($error);
+        }
+
         return $redirect;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function decodeBody(string $raw)
+    {
+        if ($json = json_decode($raw, true)) {
+            return $json;
+        }
+
+        parse_str($raw, $output);
+
+        if ($output) {
+            return $output;
+        }
+
+        return $raw;
+    }
+
+    /**
+     * @param array<string, string> $formViolations
+     * @param array<string, string> $matchedFields
+     *
+     * @return array{error: string, violations: array<string, string>}
+     */
+    private function mapViolations(array $formViolations, array $matchedFields): array
+    {
+        $error      = $this->translator->trans('mautic.form.action.repost.validation_failed');
+        $violations = [];
+
+        // Ensure the violations match up to Mautic's field aliases
+        foreach ($formViolations as $field => $violation) {
+            if (isset($matchedFields[$field])) {
+                $violations[$matchedFields[$field]] = $violation;
+            } else {
+                $error .= ' '.$violation;
+            }
+        }
+
+        return ['error' => $error, 'violations' => $violations];
     }
 
     private function postToHtml(array $post): string
