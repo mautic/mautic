@@ -149,7 +149,7 @@ Mautic.leadOnLoad = function (container, response) {
     Mautic.initUniqueIdentifierFields();
 
     if (mQuery(container + ' .panel-companies').length) {
-        mQuery(container + ' .panel-companies .ri-check-line').tooltip({html: true});
+        mQuery(container + ' .panel-companies .ri-check-line').each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
     }
 
     // Adding behavior to be able to create new tags by pressing the `Enter` or `Escape` key
@@ -533,7 +533,7 @@ Mautic.reorderSegmentFilters = function() {
 
     const $tooltips = $filters.find("*[data-bs-toggle='tooltip']");
     $tooltips.each(function() {
-        mQuery(this).tooltip({html: true, container: 'body'});
+        mQuery(this).each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, container: 'body'}));
     });
 };
 
@@ -738,7 +738,7 @@ Mautic.segmentFilter = function() {
                     'fast',
                     function () {
                         // Remove existing tooltip
-                        mQuery('*[role="tooltip"]').tooltip('destroy');
+                        mQuery('*[role="tooltip"]').each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
                         mQuery(this).remove();
                         Mautic.reorderSegmentFilters();
                     }
@@ -858,7 +858,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
         selectedVal = 'select';
     }
 
-    mQuery('#leadfield_properties [data-bs-toggle="tooltip"]').tooltip('destroy');
+    mQuery('#leadfield_properties [data-bs-toggle="tooltip"]').each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
 
     if (mQuery('#field-templates .' + selectedVal).length) {
         mQuery('#leadfield_properties').html(
@@ -906,7 +906,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
             }, 500);
         });
 
-        mQuery('#leadfield_properties [data-bs-toggle="tooltip"]').tooltip();
+        mQuery('#leadfield_properties [data-bs-toggle="tooltip"]').each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element));
     } else if (!mQuery('#leadfield_properties .' + selectedVal).length) {
         mQuery('#leadfield_properties').html('');
     }
@@ -1000,7 +1000,7 @@ Mautic.updateLeadFieldOrderChoiceList = function () {
         if (response) {
             mQuery('#leadfield_order_container').html(response);
             Mautic.activateChosenSelect('#leadfield_order');
-            mQuery('label[for=leadfield_order]').tooltip({html: true});
+            mQuery('label[for=leadfield_order]').each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
         }
     });
 }
@@ -1235,7 +1235,7 @@ Mautic.leadNoteOnLoad = function (container, response) {
 
 Mautic.showSocialMediaImageModal = function(imgSrc) {
     mQuery('#socialImageModal img').attr('src', imgSrc);
-    mQuery('#socialImageModal').modal('show');
+    mQuery('#socialImageModal').each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
 };
 
 Mautic.leadImportOnLoad = function (container, response) {
@@ -1281,7 +1281,7 @@ Mautic.removeBounceStatus = function (el, dncId, channel) {
     mQuery(el).removeClass('ri-close-line').addClass('ri-loader-3-line ri-spin');
 
     Mautic.ajaxActionRequest('lead:removeBounceStatus', {'id': dncId, 'channel': channel}, function() {
-        mQuery('#bounceLabel' + dncId).tooltip('destroy');
+        mQuery('#bounceLabel' + dncId).each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
         mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
     });
 };
@@ -1550,7 +1550,7 @@ Mautic.leadBatchSubmit = function() {
 
     }
 
-    mQuery('#MauticSharedModal').modal('hide');
+    mQuery('#MauticSharedModal').each((index, element) => Mautic.hideModal(element));
 
     return false;
 };
@@ -1560,7 +1560,7 @@ Mautic.refreshFindReplaceList = function(response) {
 
     if (mQuery(modalTarget).length) {
         mQuery('body').removeClass('noscroll modal-open');
-        mQuery(modalTarget).modal('hide');
+        mQuery(modalTarget).each((index, element) => Mautic.hideModal(element));
         mQuery('.modal-backdrop').remove();
     }
 

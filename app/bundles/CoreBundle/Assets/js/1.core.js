@@ -51,12 +51,7 @@ mQuery(document).on('click', function (e) {
     // Check if the click is outside the popover and its trigger
     if (!target.closest('.popover').length && !target.closest('[data-bs-toggle="popover"]').length) {
         mQuery('[data-bs-toggle="popover"]').each(function () {
-            var $this = mQuery(this);
-            var popover = $this.data('bs.popover');
-            if (popover && popover.tip().hasClass('show')) {
-                $this.popover('hide');
-                popover.inState.click = false; // Reset the internal click state
-            }
+            bootstrap.Popover.getInstance(this)?.hide();
         });
     }
 });
@@ -69,23 +64,11 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
     Mautic.attachDismissHandlers();
 
     // Initialize popovers with custom configuration
-    mQuery('[data-bs-toggle="popover"]:not([data-quick-filter])').popover({
-        sanitize: false,
-        content: function() {
-            return mQuery(this).data('content');
-        }
-    });
+    mQuery('[data-bs-toggle="popover"]:not([data-quick-filter])').each((index, element) => bootstrap.Popover.getOrCreateInstance(element, {
+        sanitize: false
+    }));
     mQuery('[data-quick-filter]').popover(Mautic.getQuickFilterPopoverOptions());
 
-    // Handle popover shown event
-    mQuery('[data-bs-toggle="popover"]').on('shown.bs.popover', function () {
-        mQuery('.popover-body select').chosen({
-            allow_single_deselect: true,
-            disable_search_threshold: 10
-        });
-
-        mQuery('.popover-body [data-bs-toggle="tooltip"]').tooltip();
-    });
 });
 
 // Force stop the page loading bar when no more requests are being in progress
@@ -354,7 +337,7 @@ var Mautic = {
 
         Mousetrap.bind('?', function (e) {
             var modalWindow = mQuery('#keyboardShortcutsModal');
-            modalWindow.modal();
+            modalWindow.each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
         });
 
     },
@@ -828,7 +811,7 @@ var Mautic = {
             } else if (response.closeModal) {
                 if (typeof target !== "undefined") {
                     mQuery('body').removeClass('noscroll');
-                    mQuery(target).modal('hide');
+                    mQuery(target).each((index, element) => Mautic.hideModal(element));
                 }
             } else if (inDevMode) {
                 console.log(response);
@@ -1002,7 +985,7 @@ var Mautic = {
     clearNotification: function (id) {
         if (id) {
             mQuery("#notification" + id).fadeTo("fast", 0.01).slideUp("fast", function () {
-                mQuery(this).find("*[data-bs-toggle='tooltip']").tooltip('destroy');
+                mQuery(this).find("*[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
                 mQuery(this).remove();
 
                 if (!mQuery('#notifications .notification').length) {

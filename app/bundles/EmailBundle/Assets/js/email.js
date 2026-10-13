@@ -397,7 +397,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     }
 
     tabHolder.find('i').first().removeClass('ri-loader-3-line ri-spin').addClass('ri-add-line text-success');
-    newTab.find('a').tab('show');
+    newTab.find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
 
     firstInput.focus();
 
@@ -464,7 +464,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
 
     Mautic.initRemoveEvents(removeButton, mQuery);
 
-    newTab.find('a').tab('show');
+    newTab.find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
 
     return filterContainerId;
 };
@@ -606,9 +606,9 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             tabLink.remove();
             // if tabContainer is for variants, show the first one, if it is the DEC vertical list, show the second one
             if (tabContainer.hasClass('tabs-left') || $this.hasClass('remove-filter')) {
-                tabContainer.find('li').first().next().find('a').tab('show');
+                tabContainer.find('li').first().next().find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
             } else {
-                tabContainer.find('li').first().find('a').tab('show');
+                tabContainer.find('li').first().find('a').each((index, element) => bootstrap.Tab.getOrCreateInstance(element).show());
             }
 
             Mautic.updateDynamicContentDropdown();
