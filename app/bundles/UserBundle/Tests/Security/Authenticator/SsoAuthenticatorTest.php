@@ -373,10 +373,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->with($integration, ['sso_form'], false, null, true)
             ->willReturn($integrations);
 
-        $user = $this->createMock(User::class);
-        $user->expects($this->once())
-            ->method('getRoles')
-            ->willReturn([]);
+        $user = new User();
         $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($username)
@@ -418,7 +415,7 @@ final class SsoAuthenticatorTest extends TestCase
         $password          = 'pw';
         $integration       = 'integration';
         $csrfToken         = 'token';
-        $userRoles         = ['ROLE'];
+        $userRoles         = ['ROLE_USER'];
         $options           = ['post_only' => true];
         $failedMessage     = 'Failure';
         $httpUtils         = $this->createStub(HttpUtils::class);
@@ -438,10 +435,8 @@ final class SsoAuthenticatorTest extends TestCase
             ->with($integration, ['sso_form'], false, null, true)
             ->willReturn($integrations);
 
-        $user = $this->createMock(User::class);
-        $user->expects($this->once())
-            ->method('getRoles')
-            ->willReturn($userRoles);
+        $user = new User();
+        $user->setUsername($username);
         $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($username)

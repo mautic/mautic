@@ -215,7 +215,7 @@ final class ApiUserSubscriberTest extends TestCase
     public function testIfOauthAuthenticationAndIdentifierIsUserFromLoader(): void
     {
         $userIdentifier = 'The user';
-        $userRoles      = ['role' => 'test'];
+        $userRoles      = ['ROLE_USER'];
         $userBadge      = $this->createMock(UserBadge::class);
         $userBadge->expects($this->once())
             ->method('getUserLoader')
@@ -261,8 +261,8 @@ final class ApiUserSubscriberTest extends TestCase
             ->method('getPassport')
             ->willReturn($passport);
 
-        $user = $this->createMock(User::class);
-        $user->method('getRoles')->willReturn($userRoles);
+        $user = new User();
+        $user->setUsername('the-user');
 
         $userProvider = $this->createMock(UserProvider::class);
         $userProvider->expects($this->once())
@@ -287,7 +287,7 @@ final class ApiUserSubscriberTest extends TestCase
     public function testIfOauthAuthenticationAndIdentifierIsFromTokenPermisions(): void
     {
         $userIdentifier = 'The user';
-        $userRoles      = ['role' => 'test'];
+        $userRoles      = ['ROLE_USER'];
         $userBadge      = $this->createMock(UserBadge::class);
         $userBadge->expects($this->once())
             ->method('getUserLoader')
@@ -333,8 +333,8 @@ final class ApiUserSubscriberTest extends TestCase
             ->method('getPassport')
             ->willReturn($passport);
 
-        $user = $this->createMock(User::class);
-        $user->method('getRoles')->willReturn($userRoles);
+        $user = new User();
+        $user->setUsername('the-user');
 
         $userProvider = $this->createMock(UserProvider::class);
         $userProvider->expects($this->once())

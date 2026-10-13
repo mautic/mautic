@@ -48,13 +48,10 @@ final class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
         $auditLogModel->expects($this->once())
             ->method('writeToLog')
             ->with($log);
-        $user = $this->createMock(User::class);
-        $user->expects($this->once())
-            ->method('getId')
-            ->willReturn($userId);
-        $user->expects($this->once())
-            ->method('getUserIdentifier')
-            ->willReturn($userName);
+        $user = new User();
+        $userIdProperty = new \ReflectionProperty($user, 'id');
+        $userIdProperty->setValue($user, $userId);
+        $user->setUsername($userName);
         $event = $this->createMock(LoginEvent::class);
         $event->expects($this->exactly(2))
             ->method('getUser')
