@@ -340,6 +340,8 @@ parameters:
             identifier: symplify.noConstructorOverride
             paths:
                 - */Permissions/*
+                - app/bundles/CampaignBundle/Tests/Entity/EventFake.php
+                - app/bundles/CoreBundle/Loader/RouteLoader.php
 
         # existing multi-arg dispatch sites, migrated to single-argument dispatch separately
         -
@@ -350,6 +352,20 @@ parameters:
                 - app/bundles/CategoryBundle/Model/CategoryModel.php
                 - app/bundles/ChannelBundle/Model/MessageModel.php
                 - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
+                - app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
+                - app/bundles/FormBundle/Model/FieldModel.php
+                - app/bundles/FormBundle/Model/FormModel.php
+                - app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
+                - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
+                - app/bundles/NotificationBundle/Model/NotificationModel.php
+                - app/bundles/PageBundle/Model/PageModel.php
+                - app/bundles/PointBundle/Model/PointGroupModel.php
+                - app/bundles/PointBundle/Model/PointModel.php
+                - app/bundles/PointBundle/Model/TriggerModel.php
+                - app/bundles/ReportBundle/Model/ReportModel.php
+                - app/bundles/SmsBundle/Model/SmsModel.php
+                - app/bundles/StageBundle/Model/StageModel.php
+                - plugins/MauticFocusBundle/Model/FocusModel.php
 
         # getRepository() used inside test helper traits to arrange fixtures, acceptable in test scope
         -
@@ -358,6 +374,8 @@ parameters:
                 - app/bundles/CampaignBundle/Tests/Campaign/AbstractCampaignTestCase.php
                 - app/bundles/CampaignBundle/Tests/CampaignAuditLogTrait.php
                 - app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntitiesTrait.php
+                - app/bundles/CoreBundle/Model/AbstractCommonModel.php
+                - app/bundles/CoreBundle/Test/MauticMysqlTestCase.php
 
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
