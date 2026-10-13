@@ -8,14 +8,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Collection\RecipientCollection;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-#[AllowMockObjectsWithoutExpectations]
 final class SmsRecipientDTOTest extends TestCase
 {
-    private MockObject&Lead $lead;
+    private Lead $lead;
 
     private SmsRecipientDTO $dto1;
 
@@ -50,11 +47,11 @@ final class SmsRecipientDTOTest extends TestCase
 
     private function initData(): void
     {
-        $this->lead = $this->createMock(Lead::class);
-        $this->lead->method('getId')->willReturn(1);
+        $this->lead = new Lead();
+        $this->lead->setId(1);
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->method('getId')->willReturn(2);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
         $this->dto1 = new SmsRecipientDTO(
             $this->lead,
