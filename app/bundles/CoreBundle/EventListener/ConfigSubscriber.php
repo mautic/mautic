@@ -29,6 +29,7 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
         $coreParams = $event->getParametersFromConfig('MauticCoreBundle');
         unset($coreParams['theme']);
         unset($coreParams['theme_import_allowed_extensions']);
+        unset($coreParams['gravatar_enabled']);
         $event->addForm([
             'bundle'     => 'CoreBundle',
             'formType'   => ConfigType::class,
