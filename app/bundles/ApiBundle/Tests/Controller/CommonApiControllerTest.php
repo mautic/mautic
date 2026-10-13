@@ -305,10 +305,9 @@ final class CommonApiControllerTest extends CampaignTestAbstract
 
         $users = [];
         foreach ([3, 5, 4] as $userId) {
-            $user = $this->createMock(User::class);
-            $user
-                ->method('getId')
-                ->willReturn($userId);
+            $user     = new User();
+            $property = new \ReflectionProperty($user, 'id');
+            $property->setValue($user, $userId);
             $users[] = $user;
         }
 
