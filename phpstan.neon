@@ -72,13 +72,11 @@ parameters:
             identifier: argument.type
             path: app/bundles/CoreBundle/Controller/AjaxController.php
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         # page translation entity passed where concrete Page expected in builder tokens
         -
             identifier: argument.type
             path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
-=======
+
         # shared translation/variant traits are typed against the concrete entity, interface-typed callers trip covariance
         -
             identifiers:
@@ -95,10 +93,7 @@ parameters:
                 - argument.type
                 - method.notFound
             path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
->>>>>>> 3b19f60335 (ignore remaining mixed-caller type errors)
 
-=======
->>>>>>> a57e05d676 (type translation/variant trait generics and event-log fetch, drop ignores)
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
             identifier: symplify.noNullableServiceInConstructor

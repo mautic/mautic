@@ -19,14 +19,14 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
     private QueryBuilder $queryBuilder;
 
     /**
-     * @var EmailRepository|object
+     * @var EmailRepository
      */
-    private $repo;
+    private object $emailRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repo             = $this->configureRepository(Email::class);
+        $this->emailRepository             = $this->configureRepository(Email::class);
         $this->queryBuilder     = new QueryBuilder($this->connection);
         $subQueryBuilder        = new QueryBuilder($this->connection);
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
@@ -42,7 +42,7 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
             ->method('executeStatement')
             ->willReturn(1);
 
-        $this->repo->incrementRead(11, '21');
+        $this->emailRepository->incrementRead(11, '21');
         $generatedSql = $this->queryBuilder->getSQL();
 
         // Assert that the generated SQL matches our expectations
@@ -57,7 +57,7 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
             ->method('executeStatement')
             ->willReturn(1);
 
-        $this->repo->incrementRead(11, '21', true);
+        $this->emailRepository->incrementRead(11, '21', true);
         $generatedSql = $this->queryBuilder->getSQL();
 
         // Assert that the generated SQL matches our expectations
@@ -76,7 +76,7 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
                     1
                 );
 
-        $this->repo->incrementRead(45, '616');
+        $this->emailRepository->incrementRead(45, '616');
     }
 
     public function testUpCountWithFourErrors(): void
@@ -87,6 +87,6 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new DBALException());
 
         $this->expectException(DBALException::class);
-        $this->repo->incrementRead(45, '616');
+        $this->emailRepository->incrementRead(45, '616');
     }
 }
