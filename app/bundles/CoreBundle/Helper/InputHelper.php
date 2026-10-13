@@ -504,6 +504,24 @@ final class InputHelper
     }
 
     /**
+     * Removes script tags from HTML displayed inside the form builder.
+     *
+     * @return mixed|string
+     */
+    public static function remove_script_tags($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as &$val) {
+                $val = self::remove_script_tags($val);
+            }
+
+            return $value;
+        }
+
+        return preg_replace('/<\/?script\b[^>]*>/i', '', (string) $value);
+    }
+
+    /**
      * Converts UTF8 into Latin.
      */
     public static function transliterate($value): string|false

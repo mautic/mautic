@@ -66,6 +66,14 @@ final class InputHelperTest extends TestCase
         $this->assertSame('<p>Keep this content.</p>', InputHelper::html_without_forms($html));
     }
 
+    #[TestDox('The form builder filter removes script tags without removing script content')]
+    public function testRemoveScriptTagsKeepsScriptContent(): void
+    {
+        $html = '<script><script>alert(1);</script><p>Keep this content.</p>';
+
+        $this->assertSame('alert(1);<p>Keep this content.</p>', InputHelper::remove_script_tags($html));
+    }
+
     #[TestDox('The email returns value without double period')]
     public function testEmailFilterRemovesDoublePeriods(): void
     {

@@ -188,7 +188,7 @@
   <div {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
 {% set fieldText = inputRemoveFormTags(field.properties.text|default('')) %}
 {% if inBuilder %}
-  {{ showScriptTags(fieldText) }}
+  {{ showScriptTags(inputRemoveScriptTags(fieldText)) }}
 {% else %}
   {{ fieldText|raw }}
 {% endif %}
