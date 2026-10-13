@@ -15,7 +15,6 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\EventListener\CampaignSubscriber;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -35,7 +34,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerDecisionMatchesPlainTextUrlFilter(): void
     {
         $event = $this->createDecisionEvent(
-            $this->createHitMock('https://example.com/product/1234', null),
+            $this->createHit('https://example.com/product/1234', null),
             ['url' => 'product/123']
         );
 
@@ -47,7 +46,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerDecisionMatchesLegacyWildcardRefererFilter(): void
     {
         $event = $this->createDecisionEvent(
-            $this->createHitMock('https://example.com/page', 'https://ref.example.com/source/123'),
+            $this->createHit('https://example.com/page', 'https://ref.example.com/source/123'),
             ['referer' => '*source/123*']
         );
 
@@ -59,7 +58,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerDecisionReturnsFalseWhenUrlDoesNotMatch(): void
     {
         $event = $this->createDecisionEvent(
-            $this->createHitMock('https://example.com/product/1234', null),
+            $this->createHit('https://example.com/product/1234', null),
             ['url' => 'does-not-match']
         );
 
@@ -71,7 +70,7 @@ final class CampaignSubscriberTest extends TestCase
     public function testOnCampaignTriggerDecisionMatchesCommaSeparatedUrlFilters(): void
     {
         $event = $this->createDecisionEvent(
-            $this->createHitMock('https://example.com/product/1234', null),
+            $this->createHit('https://example.com/product/1234', null),
             ['url' => 'alpha,product/123,omega']
         );
 
@@ -80,12 +79,11 @@ final class CampaignSubscriberTest extends TestCase
         $this->assertTrue($event->wasDecisionApplicable());
     }
 
-    private function createHitMock(string $url, ?string $referer): Hit&MockObject
+    private function createHit(string $url, ?string $referer): Hit
     {
-        $hit = $this->createMock(Hit::class);
-        $hit->method('getUrl')->willReturn($url);
-        $hit->method('getReferer')->willReturn($referer);
-        $hit->method('getPage')->willReturn(null);
+        $hit = new Hit();
+        $hit->setUrl($url);
+        $hit->setReferer($referer);
 
         return $hit;
     }
@@ -93,7 +91,7 @@ final class CampaignSubscriberTest extends TestCase
     /**
      * @param array<string, string> $properties
      */
-    private function createDecisionEvent(Hit&MockObject $hit, array $properties): DecisionEvent
+    private function createDecisionEvent(Hit $hit, array $properties): DecisionEvent
     {
         $campaign = new Campaign();
         $campaign->setName('Test Campaign');

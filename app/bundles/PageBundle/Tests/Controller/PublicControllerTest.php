@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
@@ -63,13 +64,13 @@ final class PublicControllerTest extends TestCase
 
     private MockObject&RedirectModel $redirectModel;
 
-    private MockObject&Redirect $redirect;
+    private Redirect $redirect;
 
     private Request $request;
 
     private MockObject&IpLookupHelper $ipLookupHelper;
 
-    private MockObject&IpAddress $ipAddress;
+    private IpAddress $ipAddress;
 
     private MockObject&PageModel $pageModel;
 
@@ -84,9 +85,9 @@ final class PublicControllerTest extends TestCase
         $this->logger               = $this->createStub(LoggerInterface::class);
         $this->modelFactory         = $this->createStub(ModelFactory::class);
         $this->redirectModel        = $this->createMock(RedirectModel::class);
-        $this->redirect             = $this->createMock(Redirect::class);
+        $this->redirect             = new Redirect();
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
-        $this->ipAddress            = $this->createMock(IpAddress::class);
+        $this->ipAddress            = new IpAddress();
         $this->pageModel            = $this->createMock(PageModel::class);
         $this->contactRequestHelper = $this->createMock(ContactRequestHelper::class);
         $this->router               = $this->createMock(RouterInterface::class);
@@ -135,63 +136,35 @@ final class PublicControllerTest extends TestCase
         $this->assertSame('pageA', $this->getVariantContent(6, 3, 3));
     }
 
+    private function setEntityId(Page $page, int $id): void
+    {
+        $property = new \ReflectionProperty($page, 'id');
+        $property->setValue($page, $id);
+    }
+
     private function getVariantContent(int $aCount, int $bCount, int $cCount): string
     {
-        $pageEntityB = $this->createMock(Page::class);
-        $pageEntityB->method('getId')
-            ->willReturn(2);
-        $pageEntityB->method('isPublished')
-            ->willReturn(true);
-        $pageEntityB->method('getVariantHits')
-            ->willReturn($bCount);
-        $pageEntityB->method('getTranslations')
-            ->willReturn([]);
-        $pageEntityB->method('isTranslation')
-            ->willReturn(false);
-        $pageEntityB->method('getContent')
-            ->willReturn(null);
-        $pageEntityB->method('getCustomHtml')
-            ->willReturn('pageB');
-        $pageEntityB->method('getVariantSettings')
-            ->willReturn(['weight' => '25']);
+        $pageEntityA = new Page();
+        $this->setEntityId($pageEntityA, 1);
+        $pageEntityA->setVariantHits($aCount);
+        $pageEntityA->setCustomHtml('pageA');
 
-        $pageEntityC = $this->createMock(Page::class);
-        $pageEntityC->method('getId')
-            ->willReturn(3);
-        $pageEntityC->method('isPublished')
-            ->willReturn(true);
-        $pageEntityC->method('getVariantHits')
-            ->willReturn($cCount);
-        $pageEntityC->method('getTranslations')
-            ->willReturn([]);
-        $pageEntityC->method('isTranslation')
-            ->willReturn(false);
-        $pageEntityC->method('getContent')
-            ->willReturn(null);
-        $pageEntityC->method('getCustomHtml')
-            ->willReturn('pageC');
-        $pageEntityC->method('getVariantSettings')
-            ->willReturn(['weight' => '25']);
+        $pageEntityB = new Page();
+        $this->setEntityId($pageEntityB, 2);
+        $pageEntityB->setVariantParent($pageEntityA);
+        $pageEntityB->setVariantHits($bCount);
+        $pageEntityB->setCustomHtml('pageB');
+        $pageEntityB->setVariantSettings(['weight' => '25']);
 
-        $pageEntityA = $this->createMock(Page::class);
-        $pageEntityA->method('getId')
-            ->willReturn(1);
-        $pageEntityA->method('isPublished')
-            ->willReturn(true);
-        $pageEntityA->method('getVariants')
-            ->willReturn([$pageEntityA, [2 => $pageEntityB, 3 => $pageEntityC]]);
-        $pageEntityA->method('getVariantHits')
-            ->willReturn($aCount);
-        $pageEntityA->method('getTranslations')
-            ->willReturn([]);
-        $pageEntityA->method('isTranslation')
-            ->willReturn(false);
-        $pageEntityA->method('getContent')
-            ->willReturn(null);
-        $pageEntityA->method('getCustomHtml')
-            ->willReturn('pageA');
-        $pageEntityA->method('getVariantSettings')
-            ->willReturn(['weight' => '50']);
+        $pageEntityC = new Page();
+        $this->setEntityId($pageEntityC, 3);
+        $pageEntityC->setVariantParent($pageEntityA);
+        $pageEntityC->setVariantHits($cCount);
+        $pageEntityC->setCustomHtml('pageC');
+        $pageEntityC->setVariantSettings(['weight' => '25']);
+
+        $variantChildren = new \ReflectionProperty($pageEntityA, 'variantChildren');
+        $variantChildren->setValue($pageEntityA, new ArrayCollection([2 => $pageEntityB, 3 => $pageEntityC]));
 
         $pathsHelper = $this->createStub(PathsHelper::class);
         $assetHelper = new AssetsHelper(
@@ -267,22 +240,12 @@ final class PublicControllerTest extends TestCase
             ->with($redirectId)
             ->willReturn($this->redirect);
 
-        $this->redirect->expects($this->once())
-            ->method('isPublished')
-            ->with(false)
-            ->willReturn(true);
-
-        $this->redirect->expects($this->once())
-            ->method('getUrl')
-            ->willReturn($redirectUrl);
+        $this->redirect->setIsPublished(true);
+        $this->redirect->setUrl($redirectUrl);
 
         $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddress')
             ->willReturn($this->ipAddress);
-
-        $this->ipAddress->expects($this->once())
-            ->method('isTrackable')
-            ->willReturn(true);
 
         $getContactFromRequestCallback = function ($queryFields) use ($clickTrough): null {
             if (empty($queryFields)) {
@@ -346,22 +309,12 @@ final class PublicControllerTest extends TestCase
             ->with($redirectId)
             ->willReturn($this->redirect);
 
-        $this->redirect->expects($this->once())
-            ->method('isPublished')
-            ->with(false)
-            ->willReturn(true);
-
-        $this->redirect->expects($this->once())
-            ->method('getUrl')
-            ->willReturn($redirectUrl);
+        $this->redirect->setIsPublished(true);
+        $this->redirect->setUrl($redirectUrl);
 
         $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddress')
             ->willReturn($this->ipAddress);
-
-        $this->ipAddress->expects($this->once())
-            ->method('isTrackable')
-            ->willReturn(true);
 
         $getContactFromRequestCallback = function ($queryFields) use ($clickThrough): null {
             if (empty($queryFields)) {

@@ -58,11 +58,8 @@ final class PageHitValidatorTest extends TestCase
 
     public function testWhenStatusCodeIs404(): void
     {
-        $hitMock = $this->createMock(Hit::class);
-
-        $hitMock->expects($this->once())
-            ->method('getCode')
-            ->willReturn(404);
+        $hitMock = new Hit();
+        $hitMock->setCode(404);
 
         $this->coreParametersHelperMock->expects($this->once())
             ->method('get')
@@ -76,18 +73,12 @@ final class PageHitValidatorTest extends TestCase
 
     public function testWhenPageIsNotNull(): void
     {
-        $pageMock = $this->createMock(Page::class);
+        $pageMock = new Page();
         $pageMock->setTitle('TestPage');
 
-        $hitMock = $this->createMock(Hit::class);
-
-        $hitMock->expects($this->once())
-            ->method('getCode')
-            ->willReturn(200);
-
-        $hitMock->expects($this->once())
-            ->method('getPage')
-            ->willReturn($pageMock);
+        $hitMock = new Hit();
+        $hitMock->setCode(200);
+        $hitMock->setPage($pageMock);
 
         $this->coreParametersHelperMock->expects($this->once())
             ->method('get')
@@ -101,11 +92,8 @@ final class PageHitValidatorTest extends TestCase
 
     public function testWhenRequiredDataIsNull(): void
     {
-        $hitMock = $this->createMock(Hit::class);
-
-        $hitMock->expects($this->once())
-            ->method('getCode')
-            ->willReturn(200);
+        $hitMock = new Hit();
+        $hitMock->setCode(200);
 
         $this->coreParametersHelperMock->expects($this->once())
             ->method('get')

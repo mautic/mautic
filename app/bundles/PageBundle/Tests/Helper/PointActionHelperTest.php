@@ -21,17 +21,14 @@ final class PointActionHelperTest extends TestCase
      */
     private MockObject $hitRepository;
 
-    /**
-     * @var MockObject&Hit
-     */
-    private MockObject $eventDetails;
+    private Hit $eventDetails;
 
     protected function setUp(): void
     {
         $this->hitRepository = $this->createMock(HitRepository::class);
-        $this->eventDetails  = $this->createMock(Hit::class);
+        $this->eventDetails  = new Hit();
 
-        $this->eventDetails->method('getLead')->willReturn($this->createStub(Lead::class));
+        $this->eventDetails->setLead($this->createStub(Lead::class));
     }
 
     /**
@@ -40,7 +37,7 @@ final class PointActionHelperTest extends TestCase
     #[DataProvider('urlHitsActionDataProvider')]
     public function testValidateUrlPageHitsAction(array $action, bool $expectedResult): void
     {
-        $this->eventDetails->method('getUrl')->willReturn('https://example.com/ppk');
+        $this->eventDetails->setUrl('https://example.com/ppk');
         $this->hitRepository->method('getDwellTimesForUrl')->willReturn([
             'sum'     => 0,
             'min'     => 0,
@@ -148,7 +145,7 @@ final class PointActionHelperTest extends TestCase
     #[DataProvider('returnWithinActionDataProvider')]
     public function testValidateUrlReturnWithinAction(array $action, bool $expectedResult): void
     {
-        $this->eventDetails->method('getUrl')->willReturn('https://example.com/test/');
+        $this->eventDetails->setUrl('https://example.com/test/');
         $this->hitRepository->method('getDwellTimesForUrl')->willReturn([
             'sum'     => 0,
             'min'     => 0,
