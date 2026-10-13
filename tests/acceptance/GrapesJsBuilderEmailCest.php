@@ -9,6 +9,10 @@ use Step\Acceptance\SegmentStep;
 final class GrapesJsBuilderEmailCest
 {
     private const EDITED_CONTENT = 'GrapesJS email recovery content';
+    private const EMAIL_FORM = 'form[name="emailform"]';
+    private const VALIDATION_MODAL_BODY = '.gjs-mdl-dialog .panel-body';
+    private const ACTIVE_BUILDER = '.builder.builder-active';
+    private const EDITABLE_CONTENT = '[contenteditable="true"]';
 
     public function _before(AcceptanceTester $I): void
     {
@@ -26,7 +30,7 @@ final class GrapesJsBuilderEmailCest
         $I->amOnPage('/s/emails/new');
         $I->waitForElementVisible(EmailsPage::SELECT_SEGMENT_EMAIL, AcceptanceTester::TIMEOUT);
         $I->click(EmailsPage::SELECT_SEGMENT_EMAIL);
-        $I->waitForElementVisible('form[name="emailform"]', AcceptanceTester::TIMEOUT);
+        $I->waitForElementVisible(self::EMAIL_FORM, AcceptanceTester::TIMEOUT);
         $I->fillField(EmailsPage::SUBJECT_FIELD, $emailName);
         $I->fillField('emailform[name]', $emailName);
         $this->selectConflictingSegments($I, $segmentName);
@@ -35,17 +39,17 @@ final class GrapesJsBuilderEmailCest
         $this->editCanvasText($I);
 
         $I->click('#btn-views-apply');
-        $I->waitForElementVisible('.gjs-mdl-dialog .panel-body', AcceptanceTester::TIMEOUT);
-        $I->see('excludedLists: The same segment cannot be excluded and included in the same time.', '.gjs-mdl-dialog .panel-body');
+        $I->waitForElementVisible(self::VALIDATION_MODAL_BODY, AcceptanceTester::TIMEOUT);
+        $I->see('excludedLists: The same segment cannot be excluded and included in the same time.', self::VALIDATION_MODAL_BODY);
         $I->see(
             'Your builder content is preserved in this form, but has not been saved. Close the builder, correct the form errors, and save again.',
-            '.gjs-mdl-dialog .panel-body'
+            self::VALIDATION_MODAL_BODY
         );
 
         $I->click('.gjs-mdl-dialog .panel-footer button');
         $I->waitForElementNotVisible('.gjs-mdl-dialog', AcceptanceTester::TIMEOUT);
         $I->click('.gjs-pn-btn[title="Close"]');
-        $I->waitForElementNotVisible('.builder.builder-active', AcceptanceTester::TIMEOUT);
+        $I->waitForElementNotVisible(self::ACTIVE_BUILDER, AcceptanceTester::TIMEOUT);
         $html = (string) $I->executeJS("return document.querySelector('textarea.builder-html').value;");
         $I->assertStringContainsString(self::EDITED_CONTENT, $html);
 
@@ -61,9 +65,9 @@ JS
         $I->waitForText($emailName, AcceptanceTester::TIMEOUT, 'h1.page-header-title');
         $I->waitForElementClickable(EmailsPage::EDIT_BUTTON, AcceptanceTester::TIMEOUT);
         $I->click(EmailsPage::EDIT_BUTTON);
-        $I->waitForElementVisible('form[name="emailform"]', AcceptanceTester::TIMEOUT);
+        $I->waitForElementVisible(self::EMAIL_FORM, AcceptanceTester::TIMEOUT);
         $I->reloadPage();
-        $I->waitForElementVisible('form[name="emailform"]', AcceptanceTester::TIMEOUT);
+        $I->waitForElementVisible(self::EMAIL_FORM, AcceptanceTester::TIMEOUT);
         $html = (string) $I->executeJS("return document.querySelector('textarea.builder-html').value;");
         $I->assertStringContainsString(self::EDITED_CONTENT, $html);
 
@@ -73,7 +77,7 @@ JS
         $I->see(self::EDITED_CONTENT);
         $I->switchToIFrame();
         $I->click('.gjs-pn-btn[title="Close"]');
-        $I->waitForElementNotVisible('.builder.builder-active', AcceptanceTester::TIMEOUT);
+        $I->waitForElementNotVisible(self::ACTIVE_BUILDER, AcceptanceTester::TIMEOUT);
     }
 
     private function editCanvasText(AcceptanceTester $I): void
@@ -81,10 +85,10 @@ JS
         $this->waitForCanvasContent($I);
         $I->switchToIFrame('iframe.gjs-frame');
         $I->doubleClick('(//*[normalize-space(text()) and not(self::script) and not(self::style) and not(self::html) and not(self::head) and not(self::body)])[1]');
-        $I->waitForElementVisible('[contenteditable="true"]', AcceptanceTester::TIMEOUT);
-        $I->pressKey('[contenteditable="true"]', [WebDriverKeys::CONTROL, 'a']);
-        $I->pressKey('[contenteditable="true"]', self::EDITED_CONTENT);
-        $I->see(self::EDITED_CONTENT, '[contenteditable="true"]');
+        $I->waitForElementVisible(self::EDITABLE_CONTENT, AcceptanceTester::TIMEOUT);
+        $I->pressKey(self::EDITABLE_CONTENT, [WebDriverKeys::CONTROL, 'a']);
+        $I->pressKey(self::EDITABLE_CONTENT, self::EDITED_CONTENT);
+        $I->see(self::EDITED_CONTENT, self::EDITABLE_CONTENT);
         $I->switchToIFrame();
     }
 
@@ -93,7 +97,7 @@ JS
         $I->waitForJS("return typeof Mautic.launchBuilder === 'function' && Mautic.launchBuilder.toString().includes('builder-active') && document.querySelector('#emailform_buttons_builder') !== null;", AcceptanceTester::TIMEOUT);
         $I->waitForJS("return document.querySelector('#emailform_buttons_builder').disabled === false;", AcceptanceTester::TIMEOUT);
         $I->executeJS("document.querySelector('#emailform_buttons_builder').click();");
-        $I->waitForElementVisible('.builder.builder-active', AcceptanceTester::TIMEOUT);
+        $I->waitForElementVisible(self::ACTIVE_BUILDER, AcceptanceTester::TIMEOUT);
     }
 
     private function waitForCanvasContent(AcceptanceTester $I): void
