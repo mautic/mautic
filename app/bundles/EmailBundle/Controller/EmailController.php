@@ -120,10 +120,12 @@ final class EmailController extends FormController
 
         $filter = [
             'string' => $search,
-            'force'  => [
-                ['column' => 'e.variantParent,e.translationParent', 'expr' => 'isNull'],
-            ],
         ];
+        if (empty($search)) {
+            // Keep translation children grouped under their parent in the default list.
+            // An active search must still be able to find a specific translation.
+            $filter['force'][] = ['column' => 'e.translationParent', 'expr' => 'isNull'];
+        }
         if (!$permissions['email:emails:viewother']) {
             $filter['force'][] =
                 ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];

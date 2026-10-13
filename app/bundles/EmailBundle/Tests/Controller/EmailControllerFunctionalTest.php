@@ -481,12 +481,16 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($emailChild);
         $this->em->flush();
 
-        $crawler      = $this->client->request(Request::METHOD_GET, '/s/emails');
-        $iconNodes1   = $crawler->filter('.email-list .ri-translate.fs-14');
-        $this->assertGreaterThanOrEqual(2, $iconNodes1->count(), 'Translate icon not found in the email list rows.');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
 
-        $iconNodes2 = $crawler->filter('.email-list .ri-translate-2');
-        $this->assertGreaterThanOrEqual(1, $iconNodes2->count(), 'Translate icon not found in the email list rows.');
+        $this->assertCount(1, $crawler->filter("#row_email_{$emailGrandPah->getId()}"));
+        $this->assertCount(0, $crawler->filter("#row_email_{$emailParent->getId()}"));
+        $this->assertCount(0, $crawler->filter("#row_email_{$emailChild->getId()}"));
+        $this->assertCount(1, $crawler->filter('.email-list .ri-translate.fs-14'));
+        $this->assertCount(0, $crawler->filter('.email-list .ri-translate-2'));
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails?search=Email%20B');
+        $this->assertCount(1, $crawler->filter("#row_email_{$emailParent->getId()}"));
     }
 
     public static function provideHtmlForEmailTracking(): \Generator
