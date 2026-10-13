@@ -28,6 +28,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  * service belongs in the listener, not on the event. A service the event actually uses in its own
  * methods is left alone, as translating a label or checking a permission is the event's own work.
  *
+ * @see \Utils\PHPStan\Tests\Rule\NoServiceInEventConstructorRuleTest
+ *
  * @implements Rule<Class_>
  */
 final readonly class NoServiceInEventConstructorRule implements Rule
