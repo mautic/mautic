@@ -41,13 +41,7 @@ final class DetailsTypeTest extends TestCase
             ->method('getSupportedFeatures')
             ->willReturn([]);
 
-        $integration = $this->createMock(Integration::class);
-        $integration->method('getApiKeys')
-            ->willReturn([]);
-        $integration->expects($this->never())
-            ->method('getId');
-        $integration->expects($this->never())
-            ->method('getSupportedFeatures');
+        $integration = new Integration();
 
         $options['integration_object'] = $integrationObject;
         $options['data']               = $integration;
@@ -111,13 +105,7 @@ final class DetailsTypeTest extends TestCase
             ->method('getSupportedFeatures')
             ->willReturn([]);
 
-        $integration = $this->createMock(Integration::class);
-        $integration->method('getApiKeys')
-            ->willReturn([]);
-        $integration->expects($this->never())
-            ->method('getId');
-        $integration->expects($this->never())
-            ->method('getSupportedFeatures');
+        $integration = new Integration();
 
         $options['integration_object'] = $integrationObject;
         $options['data']               = $integration;
@@ -192,15 +180,12 @@ final class DetailsTypeTest extends TestCase
             ->method('getSupportedFeatures')
             ->willReturn(['non-configured']);
 
-        $integration = $this->createMock(Integration::class);
-        $integration->method('getApiKeys')
-            ->willReturn([]);
-        $integration->expects($this->once())
-            ->method('getId')
-            ->willReturn($integrationId);
-        $integration->expects($this->once())
-            ->method('getSupportedFeatures')
-            ->willReturn(['configured']);
+        $integration = new Integration();
+        if (null !== $integrationId) {
+            $idProperty = new \ReflectionProperty($integration, 'id');
+            $idProperty->setValue($integration, $integrationId);
+        }
+        $integration->setSupportedFeatures(['configured']);
 
         $options['integration_object'] = $integrationObject;
         $options['data']               = $integration;
@@ -274,13 +259,7 @@ final class DetailsTypeTest extends TestCase
         $integrationObject->expects($this->once())
             ->method('getSupportedFeatures');
 
-        $integration = $this->createMock(Integration::class);
-        $integration->method('getApiKeys')
-            ->willReturn([]);
-        $integration->expects($this->never())
-            ->method('getId');
-        $integration->expects($this->never())
-            ->method('getSupportedFeatures');
+        $integration = new Integration();
 
         $options['integration_object'] = $integrationObject;
         $options['data']               = $integration;
