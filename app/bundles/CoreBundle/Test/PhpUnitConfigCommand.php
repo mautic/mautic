@@ -128,7 +128,7 @@ final class PhpUnitConfigCommand extends Command
      *
      * @return array<string>[]
      */
-    private function extraChunks(array &$unit, array &$functional, array $extraChunks): array
+    private function extraChunks(array $unit, array $functional, array $extraChunks): array
     {
         $chunks = [];
 

@@ -273,7 +273,7 @@ final class ConfigController extends AbstractFormController
     /**
      * Merges default parameters from each subscribed bundle with the local (real) params.
      */
-    private function mergeParamsWithLocal(array &$forms, PathsHelper $pathsHelper): void
+    private function mergeParamsWithLocal(array $forms, PathsHelper $pathsHelper): void
     {
         $doNotChange     = $this->coreParametersHelper->get('mautic.security.restrictedConfigFields');
         $localConfigFile = $pathsHelper->getLocalConfigurationFile();

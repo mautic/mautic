@@ -241,7 +241,7 @@ final readonly class ImportHelper
     /**
      * @param array<string, string|array<mixed, mixed>> $input
      */
-    public function recursiveRemoveEmailaddress(array &$input): void
+    public function recursiveRemoveEmailaddress(array $input): void
     {
         foreach ($input as &$value) {
             if (is_string($value)) {

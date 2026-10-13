@@ -283,7 +283,7 @@ trait CustomFieldRepositoryTrait
     /**
      * Function to remove non custom field columns from an arrayed lead row.
      */
-    protected function removeNonFieldColumns(array &$r, array $fixedFields = []): void
+    protected function removeNonFieldColumns(array $r, array $fixedFields = []): void
     {
         $baseCols = $this->getBaseColumns($this->getClassName(), true);
         foreach ($baseCols as $c) {

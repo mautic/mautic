@@ -61,7 +61,7 @@ final class MessageQueueModel extends FormModel
      * @param mixed $messageQueue
      */
     public function processFrequencyRules(
-        array &$leads,
+        array $leads,
         $channel,
         $channelId,
         $campaignEventId = null,

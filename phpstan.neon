@@ -422,6 +422,7 @@ rules:
     - Utils\PHPStan\Rule\NoContainerGetRule
     - Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
+    - Utils\PHPStan\Rule\NoUselessReferenceParamRule
 
     - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
     - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule

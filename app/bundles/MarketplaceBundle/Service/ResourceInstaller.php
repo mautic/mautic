@@ -287,7 +287,7 @@ final readonly class ResourceInstaller implements ResourceInstallerInterface
      *
      * @param array<int, array<string, mixed>> $fileData
      */
-    private function prepareImportData(array &$fileData): void
+    private function prepareImportData(array $fileData): void
     {
         $entityTypes = ['campaign', 'campaign_event', 'email', 'lists', 'forms', 'form_field', 'page', 'asset'];
 
