@@ -138,7 +138,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
      */
-    public function createFromArray(string $className, array &$data): object
+    public function createFromArray(string $className, array $data): object
     {
         $entity        = new $className();
         $meta          = $this->getEntityManager()->getClassMetadata($className);
@@ -1745,7 +1745,7 @@ abstract class CommonRepository extends ServiceEntityRepository
         return [];
     }
 
-    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder &$queryBuilder, \stdClass $filter): Query\Expr\Func|string|false
+    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder $queryBuilder, \stdClass $filter): Query\Expr\Func|string|false
     {
         if ($ids = array_map(intval(...), explode(',', $filter->string))) {
             $parameterName = $this->generateRandomParameterName();

@@ -366,7 +366,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return mixed
      */
-    protected function prePopulateForm(&$entity, array $parameters, $action = 'edit')
+    protected function prePopulateForm($entity, array $parameters, $action = 'edit')
     {
     }
 

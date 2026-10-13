@@ -51,11 +51,6 @@ final class NeededReferenceParam
         $this->consume($dependency);
     }
 
-    public function passedToConstructor(array &$payload): void
-    {
-        new \ArrayObject($payload);
-    }
-
     /**
      * @return array<int, int>
      */

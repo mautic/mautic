@@ -464,6 +464,10 @@ services:
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
     -
+        class: Utils\PHPStan\Collector\ByReferenceParamCollector
+        tags:
+            - phpstan.collector
+    -
         class: Utils\PHPStan\Collector\ClassNameServiceAliasCollector
         tags:
             - phpstan.collector
