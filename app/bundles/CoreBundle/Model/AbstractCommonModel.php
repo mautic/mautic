@@ -153,6 +153,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
 
     /**
      * Retrieve entity based on id/alias slugs.
+     * @return T|null
      */
     public function getEntityBySlugs(string $slug): ?object
     {

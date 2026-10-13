@@ -32,6 +32,9 @@ final class ThemeHelper implements ThemeHelperInterface
      */
     private array $themesInfo = [];
 
+    /**
+     * @var array<\Mautic\CoreBundle\Configurator\Step\StepInterface>
+     */
     private array $steps = [];
 
     /**
