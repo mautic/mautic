@@ -341,6 +341,16 @@ parameters:
             paths:
                 - */Permissions/*
 
+        # existing multi-arg dispatch sites, migrated to single-argument dispatch separately
+        -
+            identifier: symfony.singleArgEventDispatch
+            paths:
+                - app/bundles/CampaignBundle/Executioner/Dispatcher/ConditionDispatcher.php
+                - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
+                - app/bundles/CategoryBundle/Model/CategoryModel.php
+                - app/bundles/ChannelBundle/Model/MessageModel.php
+                - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
+
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
         - vendor/lightsaml2/sp-bundle/src
