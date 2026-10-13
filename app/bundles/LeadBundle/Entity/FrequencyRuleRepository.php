@@ -175,18 +175,15 @@ final class FrequencyRuleRepository extends CommonRepository
                 ->andWhere('e.send_to_dnc = 0');
         }
 
-        switch ($defaultFrequencyTime) {
-            case 'MONTH':
-                $since = new \DateTime('-1 month', new \DateTimeZone('UTC'));
-                break;
-            case 'WEEK':
-                $since = new \DateTime('-1 week', new \DateTimeZone('UTC'));
-                break;
-            case 'DAY':
-                $since = new \DateTime('-1 day', new \DateTimeZone('UTC'));
-                break;
-            default:
-                return [];
+        $since = match ($defaultFrequencyTime) {
+            'MONTH' => new \DateTime('-1 month', new \DateTimeZone('UTC')),
+            'WEEK' => new \DateTime('-1 week', new \DateTimeZone('UTC')),
+            'DAY' => new \DateTime('-1 day', new \DateTimeZone('UTC')),
+            default => null,
+        };
+
+        if (! $since instanceof \DateTime) {
+            return [];
         }
 
         $query->andWhere('ch.'.$statSentColumn.' >= :frequencyTime')
