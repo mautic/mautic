@@ -116,14 +116,15 @@ final class WebhookModelTest extends TestCase
 
     public function testGetWebhookPayloadForQueueLoadedFromDatabase(): void
     {
-        $queueMock = $this->createMock(WebhookQueue::class);
-        $webhook   = new Webhook();
-        $event     = new Event();
+        $queue   = new WebhookQueue();
+        $webhook = new Webhook();
+        $event   = new Event();
         $event->setEventType('leads');
-        $queueMock->expects($this->once())->method('getPayload')->willReturn('{"the": "payload"}');
-        $queueMock->expects($this->once())->method('getEvent')->willReturn($event);
-        $queueMock->expects($this->once())->method('getDateAdded')->willReturn(new \DateTime('2018-04-10T15:04:57+00:00'));
-        $queueMock->expects($this->exactly(2))->method('getId')->willReturn('12');
+        $queue->setPayload('{"the": "payload"}');
+        $queue->setEvent($event);
+        $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
+        $queueIdProperty = new \ReflectionProperty($queue, 'id');
+        $queueIdProperty->setValue($queue, '12');
 
         $this->parametersHelperMock->expects($this->exactly(8))->method('get')
             ->willReturnCallback(function ($param): string|int|null {
@@ -139,11 +140,11 @@ final class WebhookModelTest extends TestCase
 
         $this->entityManagerMock->expects($this->once())
             ->method('detach')
-            ->with($queueMock);
+            ->with($queue);
 
         $this->webhookQueueRepository->expects($this->once())
             ->method('getEntities')
-            ->willReturn([$queueMock]);
+            ->willReturn([$queue]);
 
         $expectedPayload = [
             'leads' => [
