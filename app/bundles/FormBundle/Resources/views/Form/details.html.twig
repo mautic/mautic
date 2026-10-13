@@ -217,7 +217,7 @@
             {% if showActions %}
                 <!-- #actions-container -->
                 <div class="tab-pane active fade in bdr-w-0" id="actions-container">
-                    {% for group, groupActions show activeFormActions %}
+                    {% for group, groupActions in activeFormActions %}
                         <h5 class="fw-sb mb-xs">{{ group|title }}</h5>
                         <ul class="list-group">
                             {# @var \Mautic\FormBundle\Entity\Action $action #}
@@ -256,14 +256,14 @@
                 <h5 class="fw-sb mb-xs">{{ 'mautic.form.field'|trans }}</h5>
                 <ul class="list-group mb-xs">
                     {# @var \Mautic\FormBundle\Entity\Field $field #}
-                    {% for field show activeFormFields %}
+                    {% for field in activeFormFields %}
                       {% if not field.parent %}
                       <li class="list-group-item">
                           {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': field}) }}
                       </li>
                       {% endif %}
                       {# @var \Mautic\FormBundle\Entity\Field $field #}
-                      {% for fieldChild show activeFormFields %}
+                      {% for fieldChild in activeFormFields %}
                           {% if fieldChild.parent == field.id %}
                               <li class="list-group-item ml-20">
                                   {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': fieldChild}) }}
