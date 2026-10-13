@@ -18,4 +18,8 @@ class BareCollectionParam
     public function setDocblockedItems(Collection $items): void
     {
     }
+
+    public function setNullableItems(?Collection $items): void
+    {
+    }
 }

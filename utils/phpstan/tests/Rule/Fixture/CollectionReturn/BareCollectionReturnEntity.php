@@ -22,4 +22,9 @@ class BareCollectionReturnEntity
     {
         return $this->items;
     }
+
+    public function getNullableItems(): ?Collection
+    {
+        return $this->items;
+    }
 }

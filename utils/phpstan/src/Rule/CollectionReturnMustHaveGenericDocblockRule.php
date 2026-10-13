@@ -7,9 +7,13 @@ namespace Utils\PHPStan\Rule;
 use Doctrine\Common\Collections\Collection;
 use PhpParser\Node;
 use PhpParser\Node\Name;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -52,7 +56,9 @@ final class CollectionReturnMustHaveGenericDocblockRule implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        if (!$node->returnType instanceof Name || Collection::class !== $node->returnType->toString()) {
+        $returnType = $node->returnType instanceof NullableType ? $node->returnType->type : $node->returnType;
+
+        if (!$returnType instanceof Name || Collection::class !== $returnType->toString()) {
             return [];
         }
 
@@ -83,8 +89,29 @@ final class CollectionReturnMustHaveGenericDocblockRule implements Rule
         $phpDocNode = $this->phpDocParser->parse($tokenIterator);
 
         foreach ($phpDocNode->getReturnTagValues() as $returnTagValue) {
-            if ($returnTagValue->type instanceof GenericTypeNode) {
+            if ($this->isGenericType($returnTagValue->type)) {
                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isGenericType(TypeNode $typeNode): bool
+    {
+        if ($typeNode instanceof GenericTypeNode) {
+            return true;
+        }
+
+        if ($typeNode instanceof NullableTypeNode) {
+            return $this->isGenericType($typeNode->type);
+        }
+
+        if ($typeNode instanceof UnionTypeNode) {
+            foreach ($typeNode->types as $innerTypeNode) {
+                if ($this->isGenericType($innerTypeNode)) {
+                    return true;
+                }
             }
         }
 

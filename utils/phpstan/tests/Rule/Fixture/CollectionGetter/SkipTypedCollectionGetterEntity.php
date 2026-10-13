@@ -12,6 +12,9 @@ class SkipTypedCollectionGetterEntity
     #[ORM\ManyToMany(targetEntity: \stdClass::class)]
     private $ipAddresses;
 
+    #[ORM\OneToMany(targetEntity: \stdClass::class, mappedBy: 'owner')]
+    private $items;
+
     #[ORM\ManyToOne(targetEntity: \stdClass::class)]
     private $owner;
 
@@ -20,6 +23,11 @@ class SkipTypedCollectionGetterEntity
     public function getIpAddresses(): Collection
     {
         return $this->ipAddresses;
+    }
+
+    public function getItems(): ?Collection
+    {
+        return $this->items;
     }
 
     public function getOwner()

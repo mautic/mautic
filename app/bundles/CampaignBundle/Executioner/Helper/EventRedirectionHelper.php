@@ -26,9 +26,9 @@ final readonly class EventRedirectionHelper
      * Handle redirection for a deleted event and replace it in the event's collection.
      * If a redirection is found, returns the redirected event; otherwise returns the original event.
      *
-     * @param Event           $event  The event to check for redirection
-     * @param ?Collection     $events The collection containing the event
-     * @param int|string|null $key    The key of the event in the collection
+     * @param Event                    $event  The event to check for redirection
+     * @param ?Collection<int, Event>  $events The collection containing the event
+     * @param int|string|null          $key    The key of the event in the collection
      *
      * @return Event The redirected event if redirection was successful, or the original event if not
      */

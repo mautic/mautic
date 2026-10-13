@@ -7,11 +7,15 @@ namespace Utils\PHPStan\Rule;
 use Doctrine\Common\Collections\Collection;
 use PhpParser\Node;
 use PhpParser\Node\Name;
+use PhpParser\Node\NullableType;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -59,7 +63,9 @@ final class CollectionParamMustHaveGenericDocblockRule implements Rule
         $ruleErrors = [];
 
         foreach ($node->params as $param) {
-            if (!$param->type instanceof Name || Collection::class !== $param->type->toString()) {
+            $paramType = $param->type instanceof NullableType ? $param->type->type : $param->type;
+
+            if (!$paramType instanceof Name || Collection::class !== $paramType->toString()) {
                 continue;
             }
 
@@ -101,11 +107,32 @@ final class CollectionParamMustHaveGenericDocblockRule implements Rule
 
         $genericParamNames = [];
         foreach ($phpDocNode->getParamTagValues() as $paramTagValue) {
-            if ($paramTagValue instanceof ParamTagValueNode && $paramTagValue->type instanceof GenericTypeNode) {
+            if ($paramTagValue instanceof ParamTagValueNode && $this->isGenericType($paramTagValue->type)) {
                 $genericParamNames[] = ltrim($paramTagValue->parameterName, '$');
             }
         }
 
         return $genericParamNames;
+    }
+
+    private function isGenericType(TypeNode $type): bool
+    {
+        if ($type instanceof GenericTypeNode) {
+            return true;
+        }
+
+        if ($type instanceof NullableTypeNode) {
+            return $this->isGenericType($type->type);
+        }
+
+        if ($type instanceof UnionTypeNode) {
+            foreach ($type->types as $innerType) {
+                if ($this->isGenericType($innerType)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
