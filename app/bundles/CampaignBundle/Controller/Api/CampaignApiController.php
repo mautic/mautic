@@ -189,7 +189,7 @@ final class CampaignApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit')
     {
         $method = $this->requestStack->getCurrentRequest()->getMethod();
 

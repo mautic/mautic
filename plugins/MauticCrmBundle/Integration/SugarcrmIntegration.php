@@ -565,7 +565,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return true;
     }
 
-    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType): array
+    public function prepareRequest(string $url, array $parameters, string $method, array $settings, $authType): array
     {
         if ('oauth2' == $authType && empty($settings['authorize_session']) && isset($this->keys['access_token'])) {
             // Append the access token as the oauth-token header

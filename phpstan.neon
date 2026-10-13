@@ -376,6 +376,13 @@ rules:
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
     -
+        class: Utils\PHPStan\Rule\ParamTypeByVariableNameRule
+        tags:
+            - phpstan.rules.rule
+        arguments:
+            variableNameToType:
+                parameters: array
+    -
         class: Utils\PHPStan\Type\ConnectionQueryBuilderReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
