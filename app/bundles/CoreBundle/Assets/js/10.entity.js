@@ -350,9 +350,8 @@ Mautic.togglePublishStatus = function (event, el, model, id, extra, backdrop) {
             if (response.reload) {
                 Mautic.redirectWithBackdrop(window.location);
             } else if (response.statusHtml) {
-                const statusElement = mQuery(response.statusHtml);
-                element.replaceWith(statusElement);
-                statusElement.each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, container: 'body'}));
+                element.replaceWith(response.statusHtml);
+                element.each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, container: 'body'}));
             }
         },
         error: function (request, textStatus, errorThrown) {
