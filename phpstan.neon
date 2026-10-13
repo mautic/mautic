@@ -351,6 +351,14 @@ parameters:
                 - app/bundles/ChannelBundle/Model/MessageModel.php
                 - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
 
+        # getRepository() used inside test helper traits to arrange fixtures, acceptable in test scope
+        -
+            identifier: doctrine.noGetRepositoryOutsideService
+            paths:
+                - app/bundles/CampaignBundle/Tests/Campaign/AbstractCampaignTestCase.php
+                - app/bundles/CampaignBundle/Tests/CampaignAuditLogTrait.php
+                - app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntitiesTrait.php
+
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
         - vendor/lightsaml2/sp-bundle/src
