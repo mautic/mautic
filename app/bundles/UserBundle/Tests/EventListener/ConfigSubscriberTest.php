@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\EventListener;
 
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\EventListener\ConfigSubscriber;
 use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -28,7 +29,8 @@ final class ConfigSubscriberTest extends TestCase
         $clientFactory = $this->createStub(ClientFactoryInterface::class);
         $translator = $this->createStub(TranslatorInterface::class);
         $logger = $this->createStub(LoggerInterface::class);
-        $this->subscriber = new ConfigSubscriber($clientFactory, $translator, $logger);
+        $subjectIdRepository = $this->createStub(OidcSubjectIdRepository::class);
+        $this->subscriber = new ConfigSubscriber($clientFactory, $translator, $logger, $subjectIdRepository);
     }
 
     /**

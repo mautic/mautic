@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Form\Type;
 
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\ConfigType;
 use Mautic\UserBundle\Security\OIDC\ClientCredentials;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -37,44 +34,6 @@ final class OidcConfigTypeTest extends TestCase
         $this->createConfigForm()->onPreSubmit($event);
 
         $this->assertSame('notNull', $event->getData()['open_id_client_secret']);
-    }
-
-    public function testOnPostEventTruncatesTableWhenMappingFieldIsChanged(): void
-    {
-        $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query        = $this->createMock(AbstractQuery::class);
-        $form         = $this->createStub(FormInterface::class);
-        $event        = new PostSubmitEvent($form, ['open_id_mapping_field' => 'platform_sub']);
-
-        $subjectIdRepository->expects($this->once())
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-
-        $queryBuilder->expects($this->once())
-            ->method('delete')
-            ->willReturn($queryBuilder);
-
-        $queryBuilder->expects($this->once())
-            ->method('getQuery')
-            ->willReturn($query);
-
-        $query->expects($this->once())
-            ->method('execute');
-
-        $this->createConfigForm($subjectIdRepository)->onPostSubmit($event);
-    }
-
-    public function testOnPostEventDoesNotTruncatesTableWhenMappingFieldIsUnchanged(): void
-    {
-        $subjectIdRepository = $this->createMock(OidcSubjectIdRepository::class);
-        $form                = $this->createStub(FormInterface::class);
-        $event               = new PostSubmitEvent($form, ['open_id_mapping_field' => 'sub']);
-
-        $subjectIdRepository->expects($this->never())
-            ->method('createQueryBuilder');
-
-        $this->createConfigForm($subjectIdRepository)->onPostSubmit($event);
     }
 
     public function testBuildFormAddsFieldsWhenOpenIdIsEnabled(): void
@@ -124,7 +83,6 @@ final class OidcConfigTypeTest extends TestCase
             $coreParameterHelper,
             $this->createStub(TranslatorInterface::class),
             new ClientCredentials('https://example.com', 'client_id', 'client_secret', 'sub'),
-            $subjectIdRepository ?? $this->createStub(OidcSubjectIdRepository::class),
         );
     }
 }
