@@ -37,10 +37,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $modelMock;
 
-    /**
-     * @var MockObject&Email
-     */
-    private MockObject $emailMock;
+    private Email $email;
 
     private AjaxController $controller;
 
@@ -51,7 +48,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->sessionMock      = $this->createMock(Session::class);
         $containerMock          = $this->createMock(Container::class);
         $this->modelMock        = $this->createMock(EmailModel::class);
-        $this->emailMock        = $this->createMock(Email::class);
+        $this->email            = new Email();
         $requestStack           = new RequestStack();
 
         $this->controller = new AjaxController(
@@ -97,7 +94,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(5)
-            ->willReturn($this->emailMock);
+            ->willReturn($this->email);
 
         $this->modelMock->expects($this->never())
             ->method('sendEmailToLists');
@@ -124,9 +121,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
                 throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
-        $this->emailMock->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(false);
+        $this->email->setIsPublished(false);
 
         $request = new Request([], ['id' => 5, 'pending' => 100]);
         $request->setSession($this->sessionMock);
@@ -140,11 +135,11 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(5)
-            ->willReturn($this->emailMock);
+            ->willReturn($this->email);
 
         $this->modelMock->expects($this->once())
             ->method('sendEmailToLists')
-            ->with($this->emailMock, null, 50)
+            ->with($this->email, null, 50)
             ->willReturn([50, 0, []]);
         $matcher = $this->exactly(3);
 
@@ -169,9 +164,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
                 throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
-        $this->emailMock->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(true);
+        $this->email->setIsPublished(true);
 
         $request = new Request([], ['id' => 5, 'pending' => 100, 'batchlimit' => 50]);
         $request->setSession($this->sessionMock);

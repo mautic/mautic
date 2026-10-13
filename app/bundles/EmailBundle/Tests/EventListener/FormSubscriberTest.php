@@ -109,22 +109,19 @@ final class FormSubscriberTest extends TestCase
             ->method('getActionFeedback')
             ->willReturn($feedback = ['lead.create' => ['lead' => ['email' => 'foobar']]]);
 
+        $action = new Action();
+        $action->setProperties(['user_id' => 1, 'email' => 1]);
+
         $event->expects($this->once())
             ->method('getAction')
-            ->willReturn($action = $this->createMock(Action::class));
+            ->willReturn($action);
 
-        $action->expects($this->once())
-            ->method('getProperties')
-            ->willReturn(['user_id' => 1, 'email' => 1]);
+        $email = new Email();
 
         $this->emailModel->expects($this->once())
             ->method('getEntity')
             ->with(1)
-            ->willReturn($email = $this->createMock(Email::class));
-
-        $email->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(true);
+            ->willReturn($email);
 
         $this->emailModel->expects($this->once())
             ->method('sendEmailToUser');
@@ -152,26 +149,20 @@ final class FormSubscriberTest extends TestCase
             ->method('getActionFeedback')
             ->willReturn($feedback = ['lead.create' => ['lead' => ['email' => 'foobar']]]);
 
+        $action = new Action();
+        $action->setProperties(['email' => 1]);
+        $action->setForm($this->createStub(Form::class));
+
         $event->expects($this->exactly(2))
             ->method('getAction')
-            ->willReturn($action = $this->createMock(Action::class));
+            ->willReturn($action);
 
-        $action->expects($this->once())
-            ->method('getProperties')
-            ->willReturn(['email' => 1]);
-
-        $action->expects($this->once())
-            ->method('getForm')
-            ->willReturn($this->createStub(Form::class));
+        $email = new Email();
 
         $this->emailModel->expects($this->once())
             ->method('getEntity')
             ->with(1)
-            ->willReturn($email = $this->createMock(Email::class));
-
-        $email->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(true);
+            ->willReturn($email);
 
         $this->emailModel->expects($this->once())
             ->method('sendEmail');

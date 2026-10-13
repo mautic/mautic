@@ -36,11 +36,7 @@ final class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ['id' => 6],
         ];
 
-        $mockOwner = $this->createMock(User::class);
-
-        $mockOwner->expects($this->never()) // $config['to_owner'] is not set
-            ->method('getId')
-            ->willReturn(5);
+        $mockOwner = new User(); // $config['to_owner'] is not set, so getId is not used
 
         $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
@@ -59,11 +55,9 @@ final class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ['id' => 5],
         ];
 
-        $mockOwner = $this->createMock(User::class);
-
-        $mockOwner->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(5);
+        $mockOwner = new User();
+        $ownerId   = new \ReflectionProperty($mockOwner, 'id');
+        $ownerId->setValue($mockOwner, 5);
 
         $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
@@ -81,11 +75,9 @@ final class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ['id' => 6],
         ];
 
-        $mockOwner = $this->createMock(User::class);
-
-        $mockOwner->expects($this->once())
-            ->method('getId')
-            ->willReturn(6);
+        $mockOwner = new User();
+        $ownerId   = new \ReflectionProperty($mockOwner, 'id');
+        $ownerId->setValue($mockOwner, 6);
 
         $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }

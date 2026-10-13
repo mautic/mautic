@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Helper\EmailAddressHelper;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
@@ -145,44 +143,18 @@ BODY;
     public function testCreateReplyByHash(): void
     {
         $trackingHash = '@Stat#';
-        $stat         = $this->createMock(Stat::class);
         $contact      = $this->createStub(Lead::class);
+        $stat         = new Stat();
+        $stat->setLead($contact);
 
         $this->statRepo->expects($this->once())
             ->method('findOneBy')
             ->with(['trackingHash' => $trackingHash])
             ->willReturn($stat);
 
-        $stat->expects($this->once())
-            ->method('setIsRead')
-            ->with(true);
-
-        $stat->expects($this->once())
-            ->method('getDateRead')
-            ->willReturn(null);
-
-        $stat->expects($this->once())
-            ->method('setDateRead')
-            ->with($this->isInstanceOf(\DateTime::class));
-
-        $stat
-            ->method('getReplies')
-            ->willReturn(new ArrayCollection());
-
-        $stat->expects($this->once())
-            ->method('addReply')
-            ->willReturnCallback(function (EmailReply $emailReply) use ($stat): void {
-                $this->assertSame($stat, $emailReply->getStat());
-                $this->assertSame('api-msg1d', $emailReply->getMessageId());
-            });
-
         $this->emailStatModel->expects($this->once())
             ->method('saveEntity')
             ->with($this->isInstanceOf(Stat::class));
-
-        $stat->expects($this->exactly(2))
-            ->method('getLead')
-            ->willReturn($contact);
 
         $this->dispatcher->expects($this->once())
             ->method('hasListeners')
@@ -198,5 +170,14 @@ BODY;
             ->with($this->isInstanceOf(EmailReplyEvent::class));
 
         $this->processor->createReplyByHash($trackingHash, 'api-msg1d');
+
+        $this->assertTrue($stat->isRead());
+        $this->assertInstanceOf(\DateTime::class, $stat->getDateRead());
+
+        $replies = $stat->getReplies();
+        $this->assertCount(1, $replies);
+        $reply = $replies->first();
+        $this->assertSame($stat, $reply->getStat());
+        $this->assertSame('api-msg1d', $reply->getMessageId());
     }
 }

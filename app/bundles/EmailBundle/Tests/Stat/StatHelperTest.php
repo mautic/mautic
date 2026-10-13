@@ -27,27 +27,22 @@ final class StatHelperTest extends \PHPUnit\Framework\TestCase
 
         $statHelper = new StatHelper($emailStatmodel, $mockStatRepository);
 
-        $mockEmail = $this->createMock(Email::class);
-        $mockEmail->method('getId')
-            ->willReturn(15);
+        $mockEmail = new Email();
+        $mockEmail->setId(15);
 
         $counter = 1;
         while ($counter <= 5) {
-            $stat = $this->createMock(Stat::class);
+            $stat = new Stat();
 
-            $stat->method('getId')
-                ->willReturn((string) $counter);
+            $statId = new \ReflectionProperty($stat, 'id');
+            $statId->setValue($stat, (string) $counter);
 
-            $stat->method('getEmail')
-                ->willReturn($mockEmail);
+            $stat->setEmail($mockEmail);
 
-            $lead = $this->createMock(Lead::class);
+            $lead = new Lead();
+            $lead->setId($counter * 10);
 
-            $lead->method('getId')
-                ->willReturn($counter * 10);
-
-            $stat->method('getLead')
-                ->willReturn($lead);
+            $stat->setLead($lead);
 
             $emailAddress = "contact{$counter}@test.com";
             $statHelper->storeStat($stat, $emailAddress);

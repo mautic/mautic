@@ -35,13 +35,12 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'stat'    => 'abc123',
         ];
 
-        $sms = $this->createMock(Sms::class);
-        $sms->method('getId')
-            ->willReturn(1);
+        $sms = new Sms();
+        $smsId = new \ReflectionProperty($sms, 'id');
+        $smsId->setValue($sms, 1);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(2);
+        $lead = new Lead();
+        $lead->setId(2);
 
         $stat = new Stat();
         $stat->setSms($sms);
@@ -86,13 +85,12 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'stat'    => 'abc123',
         ];
 
-        $sms = $this->createMock(Sms::class);
-        $sms->method('getId')
-            ->willReturn(1);
+        $sms = new Sms();
+        $smsId = new \ReflectionProperty($sms, 'id');
+        $smsId->setValue($sms, 1);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(2);
+        $lead = new Lead();
+        $lead->setId(2);
 
         $stat = new Stat();
         $stat->setSms($sms);
@@ -120,9 +118,9 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'stat'    => 'abc123',
         ];
 
-        $sms = $this->createMock(Sms::class);
-        $sms->method('getId')
-            ->willReturn(1);
+        $sms = new Sms();
+        $smsId = new \ReflectionProperty($sms, 'id');
+        $smsId->setValue($sms, 1);
 
         $stat = new Stat();
         $stat->setSms($sms);
