@@ -24,10 +24,7 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $security;
 
-    /**
-     * @var MockObject&User
-     */
-    private MockObject $user;
+    private User $user;
 
     /**
      * @var MockObject&CommonRepository
@@ -49,7 +46,7 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
         $this->security      = $this->createMock(CorePermissions::class);
         $entityManager       = $this->createMock(EntityManager::class);
-        $this->user          = $this->createMock(User::class);
+        $this->user          = new User();
         $this->repository    = $this->createMock(CommonRepository::class);
         $this->statsEvent    = $this->createMock(StatsEvent::class);
         $this->subscirber    = $this->getMockBuilder(CommonStatsSubscriber::class)
@@ -68,9 +65,7 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         ReflectionHelper::setValue($this->subscirber, 'repositories', [$this->repository]);
         ReflectionHelper::setValue($this->subscirber, 'permissions', ['emails_stats' => ['lead' => 'lead:leads']]);
 
-        $this->user->expects($this->once())
-            ->method('getId')
-            ->willReturn(9);
+        (new \ReflectionProperty($this->user, 'id'))->setValue($this->user, 9);
         $matcher = $this->exactly(2);
 
         $this->security->expects($matcher)

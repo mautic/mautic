@@ -173,14 +173,12 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->method('isAdmin')
             ->willReturn(false);
 
-        $userMock = $this->createMock(User::class);
-        $userMock->expects($this->once())
-            ->method('getId')
-            ->willReturn($userId);
+        $user = new User();
+        (new \ReflectionProperty($user, 'id'))->setValue($user, $userId);
 
         $this->userHelperMock->expects($this->once())
             ->method('getUser')
-            ->willReturn($userMock);
+            ->willReturn($user);
 
         $this->security->expects($this->once())
             ->method('hasEntityAccess')
@@ -264,14 +262,12 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->method('isAdmin')
             ->willReturn(false);
 
-        $userMock = $this->createMock(User::class);
-        $userMock->expects($this->once())
-            ->method('getId')
-            ->willReturn($userId);
+        $user = new User();
+        (new \ReflectionProperty($user, 'id'))->setValue($user, $userId);
 
         $this->userHelperMock->expects($this->once())
             ->method('getUser')
-            ->willReturn($userMock);
+            ->willReturn($user);
 
         $this->security->expects($this->once())
             ->method('hasEntityAccess')

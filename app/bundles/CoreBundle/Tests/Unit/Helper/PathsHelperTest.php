@@ -156,9 +156,8 @@ final class PathsHelperTest extends TestCase
 
         /** @var UserHelper&MockObject $userHelper */
         $userHelper           = $this->createMock(UserHelper::class);
-        $user                 = $this->createMock(User::class);
-        $user->expects($this->once())->method('getId')
-            ->willReturn(1);
+        $user                 = new User();
+        (new \ReflectionProperty($user, 'id'))->setValue($user, 1);
         $userHelper->expects($this->once())->method('getUser')
             ->willReturn($user);
 
