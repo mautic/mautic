@@ -36,6 +36,9 @@ Mautic.getIpLookupFormConfig = function() {
 };
 
 Mautic.configOnLoad = function(container) {
+    // Expand the collapsed sections that contain validation errors so they are visible
+    mQuery(container + ' .accordion-wrapper').has('.has-error').collapse('show');
+
     document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
         const attributeName = radio.dataset.attributeToggle;
         const modifiedName = attributeName.replace('-', '_');
@@ -61,6 +64,5 @@ Mautic.configOnLoad = function(container) {
             }
         });
     });
-    Mautic.observeConfigTabs();
 };
 

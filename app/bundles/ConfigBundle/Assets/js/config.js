@@ -43,30 +43,6 @@ Mautic.parseUrlHashParameter = function(url) {
     return false;
 }
 
-Mautic.observeConfigTabs = function() {
-
-    if (!mQuery('#config_coreconfig_last_shown_tab').length) {
-        return;
-    }
-
-    var parameters = Mautic.parseQuery(window.location.search.substr(1));
-    if ('undefined' != typeof parameters['tab']) {
-        mQuery('#config_coreconfig_last_shown_tab').val(parameters['tab']);
-        mQuery('a[data-toggle="tab"]').each(function (i, tab) {
-            if (mQuery(tab).attr('href') == ('#' + parameters['tab'])) {
-                mQuery(tab).tab('show');
-            }
-        });
-    }
-
-    mQuery('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
-        var tab = Mautic.parseUrlHashParameter(e.target.href);
-        if (tab) {
-            mQuery('#config_coreconfig_last_shown_tab').val(tab);
-        }
-    });
-}
-
 Mautic.resetEmailsToNotification = function(obj) {
     const send_to_owner = obj.value;
     if (parseInt(send_to_owner, 10) === 1)
@@ -106,5 +82,3 @@ Mautic.showAnonymizeWarningMessage = function(anonymize_ip) {
         mQuery('.anonymize_ip_address').removeClass('hide');
     }
 };
-
-mQuery(Mautic.observeConfigTabs);
