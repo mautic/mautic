@@ -223,9 +223,8 @@ trait VariantEntityTrait
         return [$parent, $children];
     }
 
-    /**setParametersPairs
+    /**
      * Get an array of all IDs for parent/child variants and associated translations if applicable.
-     *
      * @return array<int,int|string>
      */
     public function getRelatedEntityIds(bool $publishedOnly = false): array
