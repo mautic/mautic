@@ -204,7 +204,7 @@ class TagRepository extends CommonRepository
      *
      * @param array<int>|int $tagIds
      *
-     * @return array<mixed>
+     * @return Tag[]
      */
     public function getTagById(array|int $tagIds): array
     {

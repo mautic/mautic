@@ -236,6 +236,7 @@ final class FieldType extends AbstractType
         $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue): array {
             $cleaningRules = [];
             $form          = $event->getForm();
+            /** @var array<string, mixed>|\Mautic\LeadBundle\Entity\LeadField $data */
             $data          = $event->getData();
             $type          = (is_array($data)) ? ($data['type'] ?? $type) : $data->getType();
             $constraints   = [];
@@ -688,8 +689,9 @@ final class FieldType extends AbstractType
             return;
         }
 
+        $root = $context->getRoot();
         /** @var LeadField $field */
-        $field = $context->getRoot()->getViewData();
+        $field = $root->getViewData();
 
         if (in_array($field->getType(), self::$fieldsWithNoLengthLimit)) {
             return;
