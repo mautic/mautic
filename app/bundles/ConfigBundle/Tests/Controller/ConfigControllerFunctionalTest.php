@@ -122,6 +122,19 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
+    public function testPostWithoutPageDoesNotSaveAnything(): void
+    {
+        $form   = $this->getConfigPageForm('pageconfig');
+        $values = $form->getPhpValues();
+        $values['config']['pageconfig']['google_analytics'] = 'ga-snippet';
+
+        $this->client->request(Request::METHOD_POST, '/s/config/edit', $values);
+        $this->assertResponseIsSuccessful();
+
+        $this->assertSame('/s/config/edit/coreconfig', $this->client->getRequest()->getPathInfo());
+        $this->assertArrayNotHasKey('google_analytics', $this->getConfigParameters());
+    }
+
     public function testSavingOnePageKeepsTheValuesOfOtherPages(): void
     {
         $googleAnalytics = 'ga-snippet';

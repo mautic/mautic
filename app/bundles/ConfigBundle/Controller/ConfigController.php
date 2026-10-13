@@ -54,7 +54,7 @@ final class ConfigController extends FormController
         // Each configuration tab is rendered as its own page so only one tab's fields are loaded at a time
         $tabs = array_keys(array_filter($formConfigs, fn (array $config): bool => !empty($config['parameters'])));
 
-        if (null === $activeTabId && 'POST' !== $request->getMethod()) {
+        if (null === $activeTabId) {
             // Keep the legacy ?tab= links working, otherwise open the general settings
             $legacyTab  = $request->query->get('tab');
             $defaultTab = in_array('coreconfig', $tabs, true) ? 'coreconfig' : ($tabs[0] ?? 'coreconfig');
@@ -64,13 +64,11 @@ final class ConfigController extends FormController
             ]));
         }
 
-        if (null !== $activeTabId) {
-            if (!in_array($activeTabId, $tabs, true)) {
-                return $this->notFound();
-            }
-
-            $formConfigs = [$activeTabId => $formConfigs[$activeTabId]];
+        if (!in_array($activeTabId, $tabs, true)) {
+            return $this->notFound();
         }
+
+        $formConfigs = [$activeTabId => $formConfigs[$activeTabId]];
 
         // Create the form
         $action = $this->generateUrl('mautic_config_edit', ['activeTabId' => $activeTabId]);
