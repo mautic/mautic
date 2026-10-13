@@ -738,7 +738,7 @@ Mautic.segmentFilter = function() {
                     'fast',
                     function () {
                         // Remove existing tooltip
-                        mQuery(this).find("*[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
+                        mQuery('*[role="tooltip"]').each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
                         mQuery(this).remove();
                         Mautic.reorderSegmentFilters();
                     }
