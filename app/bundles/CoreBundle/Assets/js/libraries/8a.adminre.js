@@ -272,7 +272,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     }
                 });
                 
-                $(document).on('mouseenter', '[data-bs-toggle="popover"][data-bs-trigger="hover"]', function() {
+                $(document).on('mouseenter', '[data-bs-toggle="popover"][data-trigger="hover"]', function() {
                     hideAllPopovers();
                 });
             },
@@ -711,14 +711,14 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     // default click event handler
                     if(e.type === "click") {
                         // toggle hide and show
-                        if($(target).hasClass("show")) {
+                        if($(target).hasClass("in")) {
                             // hide the submenu
                             $(target).collapse("hide");
                             $this.parent().removeClass("open");
                         } else {
                             // hide other showed target if parent is defined
                             if(!!parent) {
-                                $(parent+" .show").each(function () {
+                                $(parent+" .in").each(function () {
                                     $(this).collapse("hide");
                                     $(this).parent().removeClass("open");
                                 });
