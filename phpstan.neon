@@ -373,6 +373,7 @@ rules:
     - Utils\PHPStan\Rule\CollectionReturnMustHaveGenericDocblockRule
     - Utils\PHPStan\Rule\CollectionParamMustHaveGenericDocblockRule
     - Utils\PHPStan\Rule\CollectionPropertyMustHaveGenericDocblockRule
+    - Utils\PHPStan\Rule\GenericTraitUseMustHaveGenericDocblockRule
     - Utils\PHPStan\Rule\MockedMethodReturnMustMatchNativeTypeRule
     - Utils\PHPStan\Rule\BigIntIdParamMustBeIntOrStringRule
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
