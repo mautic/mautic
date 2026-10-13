@@ -1064,6 +1064,7 @@ class EmailRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $subQuery->expr()->and(
+                    $subQuery->expr()->eq('ll.lead_id', 'l.id'),
                     $subQuery->expr()->in('ll.leadlist_id', ':listIds'),
                     $subQuery->expr()->eq('ll.manually_removed', '0')
                 )
