@@ -154,6 +154,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\MessengerBundle\EventListener\ConfigSubscriber::class,
             \Mautic\NotificationBundle\EventListener\ConfigSubscriber::class,
             \Mautic\PageBundle\EventListener\ConfigSubscriber::class,
+            \Mautic\PrivacyBundle\EventListener\ConfigSubscriber::class,
             \Mautic\ReportBundle\EventListener\ConfigSubscriber::class,
             \Mautic\SmsBundle\EventListener\ConfigSubscriber::class,
             \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
