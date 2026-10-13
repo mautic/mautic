@@ -13,6 +13,8 @@ use Symfony\Component\BrowserKit\Cookie;
 
 final class ContactRequestHelperFunctionalTest extends MauticMysqlTestCase
 {
+    private const EMAIL = 'john@example.com';
+
     private const SERVER = [
         'HTTP_CLIENT_IP'  => '124.56.35.14',
         'HTTP_USER_AGENT' => 'Functional tester',
@@ -35,7 +37,7 @@ final class ContactRequestHelperFunctionalTest extends MauticMysqlTestCase
     public function testAnonymousVisitorIsMergedIntoContactIdentifiedByEmail(): void
     {
         $contact = new Lead();
-        $contact->setEmail('john@example.com');
+        $contact->setEmail(self::EMAIL);
         $this->em->persist($contact);
         $this->em->flush();
 
@@ -43,12 +45,12 @@ final class ContactRequestHelperFunctionalTest extends MauticMysqlTestCase
         $this->assertNotSame($contact->getId(), $visitor['id']);
 
         $this->track(['page_url' => 'https://example.com/two', 'mautic_device_id' => $visitor['device_id']]);
-        $identified = $this->track(['page_url' => 'https://example.com/three', 'mautic_device_id' => $visitor['device_id'], 'email' => 'john@example.com']);
+        $identified = $this->track(['page_url' => 'https://example.com/three', 'mautic_device_id' => $visitor['device_id'], 'email' => self::EMAIL]);
 
         $this->assertSame($contact->getId(), $identified['id']);
 
         $this->em->clear();
-        $this->assertNull($this->em->getRepository(Lead::class)->find($visitor['id']));
+        $this->assertNotInstanceOf(Lead::class, $this->em->getRepository(Lead::class)->find($visitor['id']));
 
         $hitUrls = array_map(
             fn (Hit $hit): string => $hit->getUrl(),
@@ -57,25 +59,26 @@ final class ContactRequestHelperFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(['https://example.com/one', 'https://example.com/two', 'https://example.com/three'], $hitUrls);
 
         $device = $this->em->getRepository(LeadDevice::class)->findOneBy(['trackingId' => $visitor['device_id']]);
+        $this->assertInstanceOf(LeadDevice::class, $device);
         $this->assertSame($contact->getId(), $device->getLead()->getId());
     }
 
     public function testContactSelectedByLegacyIdIsNotMerged(): void
     {
         $contact = new Lead();
-        $contact->setEmail('john@example.com');
+        $contact->setEmail(self::EMAIL);
         $anonymous = new Lead();
         $this->em->persist($contact);
         $this->em->persist($anonymous);
         $this->em->flush();
 
         $this->client->getCookieJar()->set(new Cookie('mautic_session_id', 'legacy'));
-        $identified = $this->track(['page_url' => 'https://example.com/', 'mtc_id' => $anonymous->getId(), 'email' => 'john@example.com']);
+        $identified = $this->track(['page_url' => 'https://example.com/', 'mtc_id' => $anonymous->getId(), 'email' => self::EMAIL]);
 
         $this->assertSame($contact->getId(), $identified['id']);
 
         $this->em->clear();
-        $this->assertNotNull($this->em->getRepository(Lead::class)->find($anonymous->getId()));
+        $this->assertInstanceOf(Lead::class, $this->em->getRepository(Lead::class)->find($anonymous->getId()));
     }
 
     /**

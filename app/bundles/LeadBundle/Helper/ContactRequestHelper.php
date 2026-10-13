@@ -11,6 +11,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Exception\ContactNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
@@ -40,8 +41,12 @@ class ContactRequestHelper
         private readonly ContactMerger $contactMerger,
         private readonly StatRepository $statRepository,
         private readonly BotRatioHelper $botRatioHelper,
-        private readonly DeviceTrackingServiceInterface $deviceTrackingService,
+        private readonly ?DeviceTrackingServiceInterface $deviceTrackingService = null,
+        private readonly ?LeadRepository $leadRepository = null,
     ) {
+        if (null === $deviceTrackingService || null === $leadRepository) {
+            trigger_deprecation('mautic/mautic', '7.2.2', 'Not passing $deviceTrackingService and $leadRepository to %s() is deprecated and they will be required in 8.0. Without them the tracked visitor is not merged into the identified contact.', __METHOD__);
+        }
     }
 
     public function getContactFromQuery(array $queryFields = []): ?Lead
@@ -146,11 +151,9 @@ class ContactRequestHelper
     /**
      * Identify a contact through a clickthrough URL.
      *
-     * @return Lead
-     *
      * @throws ContactNotFoundException
      */
-    private function getContactFromClickthrough(array $clickthrough)
+    private function getContactFromClickthrough(array $clickthrough): Lead
     {
         $event = new ContactIdentificationEvent($clickthrough);
         $this->eventDispatcher->dispatch($event, LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION);
@@ -205,12 +208,16 @@ class ContactRequestHelper
      */
     private function mergeWithTrackedContact(Lead $foundContact): Lead
     {
+        if (null === $this->deviceTrackingService || null === $this->leadRepository) {
+            return $foundContact;
+        }
+
         $trackedDevice  = $this->deviceTrackingService->getTrackedDevice();
         $trackedContact = $this->trackedContact ?? $trackedDevice?->getLead();
 
         if ($trackedContact && $trackedContact->getId() && !$trackedContact->hasFields()) {
             // isAnonymous() reads social profiles from the custom field values
-            $trackedContact->setFields($this->leadModel->getRepository()->getFieldValues($trackedContact->getId()));
+            $trackedContact->setFields($this->leadRepository->getFieldValues($trackedContact->getId()));
         }
 
         if ($trackedContact && $trackedContact->getId() && $trackedContact->isAnonymous()) {
