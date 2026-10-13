@@ -115,14 +115,14 @@ final class PointModelTest extends TestCase
             )
             ->willReturn(true);
 
-        $point = $this->createMock(Point::class);
-        $point->expects($this->exactly(2))->method('getRepeatable')->willReturn(true);
-        $point->expects($this->exactly(4))->method('getType')->willReturn($type);
-        $point->method('getId')->willReturn($pointId);
-        $point->method('getName')->willReturn($pointName);
-        $point->expects($this->once())->method('getProperties')->willReturn($pointProperties);
-        $point->method('getDelta')->willReturn($pointDelta);
-        $point->expects($this->once())->method('getGroup')->willReturn($pointGroup);
+        $point = new Point();
+        $point->setRepeatable(true);
+        $point->setType($type);
+        $pointIdProperty = new \ReflectionProperty($point, 'id');
+        $pointIdProperty->setValue($point, $pointId);
+        $point->setName($pointName);
+        $point->setProperties($pointProperties);
+        $point->setDelta($pointDelta);
 
         $this->pointRepositoryMock->expects($this->once())
             ->method('getPublishedByType')
