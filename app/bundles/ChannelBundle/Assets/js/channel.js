@@ -81,6 +81,11 @@ Mautic.setSendToDncStatus = function (id, selector, action) {
             }
         }, false, false, "GET");
     } else {
+        // Abort any pending request for this action before hiding
+        if (Mautic.ajaxActionXhr && Mautic.ajaxActionXhr[action]) {
+            Mautic.ajaxActionXhr[action].abort();
+            delete Mautic.ajaxActionXhr[action];
+        }
         statusElement.addClass('hide');
     }
 }

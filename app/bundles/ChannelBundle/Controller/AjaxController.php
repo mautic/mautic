@@ -51,17 +51,24 @@ final class AjaxController extends CommonAjaxController
         $objectId = $request->query->get('id');
 
         if ($objectId && $entity = $this->messageModel->getEntity($objectId)) {
+            if (!$this->security->hasEntityAccess('channel:messages:viewown', 'channel:messages:viewother', $entity->getCreatedBy())) {
+                return $this->sendJsonResponse($dataArray);
+            }
+
             foreach ($entity->getChannels() as $channel) {
                 if ('email' !== $channel->getChannel() || empty($channel->getChannelId())) {
                     continue;
                 }
 
-                if ($email = $this->emailModel->getEntity($channel->getChannelId())) {
-                    $yesOrNo = $email->getSendToDnc() ? 'yes' : 'no';
-
-                    $dataArray['sendToDncText']      = $this->translator->trans("mautic.core.form.{$yesOrNo}");
-                    $dataArray['sendToDncStatus']    = $email->getSendToDnc();
+                $email = $this->emailModel->getEntity($channel->getChannelId());
+                if (!$email || !$this->security->hasEntityAccess('email:emails:viewown', 'email:emails:viewother', $email->getCreatedBy())) {
+                    continue;
                 }
+
+                $yesOrNo = $email->getSendToDnc() ? 'yes' : 'no';
+
+                $dataArray['sendToDncText']      = $this->translator->trans("mautic.core.form.{$yesOrNo}");
+                $dataArray['sendToDncStatus']    = $email->getSendToDnc();
             }
         }
 
