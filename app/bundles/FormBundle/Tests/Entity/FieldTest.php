@@ -9,10 +9,8 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[AllowMockObjectsWithoutExpectations]
 final class FieldTest extends \PHPUnit\Framework\TestCase
 {
     public function testShowForConditionalFieldWithNoParent(): void
@@ -25,12 +23,12 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     {
         $parentFieldId = '55';
         $field         = new Field();
-        $parentField   = $this->createMock(Field::class);
+        $parentField   = new Field();
         $form          = new Form();
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
-        $parentField->method('getId')->willReturn($parentFieldId);
+        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, $parentFieldId);
 
         $this->assertFalse($field->showForConditionalField([]));
     }
@@ -40,14 +38,14 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
         $field            = new Field();
-        $parentField      = $this->createMock(Field::class);
+        $parentField      = new Field();
         $form             = new Form();
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'notIn', 'values' => []]);
-        $parentField->method('getId')->willReturn($parentFieldId);
-        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, $parentFieldId);
+        $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => 'value A'];
 
         $this->assertTrue($field->showForConditionalField($data));
@@ -58,14 +56,14 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
         $field            = new Field();
-        $parentField      = $this->createMock(Field::class);
+        $parentField      = new Field();
         $form             = new Form();
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'notIn', 'values' => [1]]);
-        $parentField->method('getId')->willReturn($parentFieldId);
-        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, $parentFieldId);
+        $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => 0];
 
         $this->assertTrue($field->showForConditionalField($data));
@@ -76,14 +74,14 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
         $field            = new Field();
-        $parentField      = $this->createMock(Field::class);
+        $parentField      = new Field();
         $form             = new Form();
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'notIn', 'values' => ['value A']]);
-        $parentField->method('getId')->willReturn($parentFieldId);
-        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, $parentFieldId);
+        $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => 'value A'];
 
         $this->assertFalse($field->showForConditionalField($data));
@@ -94,14 +92,14 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
         $field            = new Field();
-        $parentField      = $this->createMock(Field::class);
+        $parentField      = new Field();
         $form             = new Form();
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => '', 'any' => true, 'values' => ['value A']]);
-        $parentField->method('getId')->willReturn($parentFieldId);
-        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, $parentFieldId);
+        $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => 'value A'];
 
         $this->assertTrue($field->showForConditionalField($data));
@@ -112,14 +110,14 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
         $field            = new Field();
-        $parentField      = $this->createMock(Field::class);
+        $parentField      = new Field();
         $form             = new Form();
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => '', 'any' => true, 'values' => [1]]);
-        $parentField->method('getId')->willReturn($parentFieldId);
-        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, $parentFieldId);
+        $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => 0];
 
         $this->assertTrue($field->showForConditionalField($data));
@@ -130,14 +128,14 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
         $field            = new Field();
-        $parentField      = $this->createMock(Field::class);
+        $parentField      = new Field();
         $form             = new Form();
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'in', 'values' => ['value A']]);
-        $parentField->method('getId')->willReturn($parentFieldId);
-        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, $parentFieldId);
+        $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => ['value A']];
 
         $this->assertTrue($field->showForConditionalField($data));
@@ -148,14 +146,14 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
         $field            = new Field();
-        $parentField      = $this->createMock(Field::class);
+        $parentField      = new Field();
         $form             = new Form();
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'in', 'values' => ['value B']]);
-        $parentField->method('getId')->willReturn(55);
-        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, 55);
+        $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => ['value A']];
 
         $this->assertFalse($field->showForConditionalField($data));
@@ -166,14 +164,14 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
         $field            = new Field();
-        $parentField      = $this->createMock(Field::class);
+        $parentField      = new Field();
         $form             = new Form();
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'in', 'values' => ['0']]);
-        $parentField->method('getId')->willReturn($parentFieldId);
-        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, $parentFieldId);
+        $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => [0]];
 
         $this->assertTrue($field->showForConditionalField($data));
@@ -184,15 +182,15 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
         $field            = new Field();
-        $parentField      = $this->createMock(Field::class);
+        $parentField      = new Field();
         $form             = new Form();
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $specialValue = 'čé+äà>&"\'è';
         $field->setConditions(['expr' => 'in', 'values' => [InputHelper::clean($specialValue)]]);
-        $parentField->method('getId')->willReturn($parentFieldId);
-        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, $parentFieldId);
+        $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => [$specialValue]];
 
         $this->assertTrue($field->showForConditionalField($data));

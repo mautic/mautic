@@ -38,10 +38,10 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnDetermineSubmissionWinner(): void
     {
-        $parentMock       = $this->createMock(Page::class);
-        $childMock        = $this->createMock(Page::class);
-        $children         = [2 => $childMock];
-        $parameters       = ['parent' => $parentMock, 'children' => $children];
+        $parent           = new Page();
+        $child            = new Page();
+        $children         = [2 => $child];
+        $parameters       = ['parent' => $parent, 'children' => $children];
         $event            = new DetermineWinnerEvent($parameters);
         $startDate        = new \DateTime();
         $transSubmissions = 'submissions';
@@ -64,25 +64,11 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator->method('trans')
             ->willReturnOnConsecutiveCalls($transSubmissions, $transHits);
 
-        $parentMock
-            ->method('isPublished')
-            ->willReturn(true);
-
-        $childMock
-            ->method('isPublished')
-            ->willReturn(true);
-
-        $parentMock
-            ->method('getId')
-            ->willReturn(1);
-
-        $childMock
-            ->method('getId')
-            ->willReturn(2);
-
-        $parentMock->expects($this->once())
-            ->method('getVariantStartDate')
-            ->willReturn($startDate);
+        $parent->setIsPublished(true);
+        $child->setIsPublished(true);
+        (new \ReflectionProperty($parent, 'id'))->setValue($parent, 1);
+        (new \ReflectionProperty($child, 'id'))->setValue($child, 2);
+        $parent->setVariantStartDate($startDate);
 
         $this->submissionRepository->expects($this->once())
             ->method('getSubmissionCountsByPage')
