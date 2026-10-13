@@ -69,6 +69,16 @@ final class EmailController extends FormController
     private bool $invalidHtmlError = false;
 
     /**
+     * Keep translation children grouped in the default list while preserving search access.
+     *
+     * @return array<int, array<string, string>>
+     */
+    private function getEmailListForceFilters(string $search): array
+    {
+        return empty($search) ? [['column' => 'e.translationParent', 'expr' => 'isNull']] : [];
+    }
+
+    /**
      * @param int $page
      */
     public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, EmailSearchScopeProvider $emailSearchScopeProvider, $page = 1): Response
@@ -120,12 +130,8 @@ final class EmailController extends FormController
 
         $filter = [
             'string' => $search,
+            'force'  => $this->getEmailListForceFilters($search),
         ];
-        if (empty($search)) {
-            // Keep translation children grouped under their parent in the default list.
-            // An active search must still be able to find a specific translation.
-            $filter['force'][] = ['column' => 'e.translationParent', 'expr' => 'isNull'];
-        }
         if (!$permissions['email:emails:viewother']) {
             $filter['force'][] =
                 ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
