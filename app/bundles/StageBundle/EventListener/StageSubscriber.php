@@ -7,7 +7,6 @@ namespace Mautic\StageBundle\EventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\StageBundle\Event as Events;
-use Mautic\StageBundle\StageEvents;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class StageSubscriber
@@ -21,10 +20,8 @@ final readonly class StageSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[AsEventListener(
-        event: StageEvents::STAGE_POST_SAVE,
-    )]
-    public function onStagePostSave(Events\StageEvent $event): void
+    #[AsEventListener]
+    public function onStagePostSave(Events\StagePostSaveEvent $event): void
     {
         $stage = $event->getStage();
         if ($details = $event->getChanges()) {
@@ -43,10 +40,8 @@ final readonly class StageSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: StageEvents::STAGE_POST_DELETE,
-    )]
-    public function onStageDelete(Events\StageEvent $event): void
+    #[AsEventListener]
+    public function onStageDelete(Events\StagePostDeleteEvent $event): void
     {
         $stage = $event->getStage();
         $log   = [
