@@ -476,7 +476,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.startIconSpinOnEvent(event);
     });
 
-    mQuery(container + ' input[class=list-checkbox]').on('change', function () {
+    mQuery(container + ' input.list-checkbox').on('change', function () {
         var disabled = Mautic.batchActionPrecheck(container) ? false : true;
         var color    = (disabled) ? 'btn-ghost' : 'btn-info';
         var button   = container + ' th.col-actions .btn.dropdown-toggle';
