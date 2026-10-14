@@ -4,7 +4,7 @@
 {% if checkall is defined and checkall is not empty %}
 <th class="col-actions" {% if tooltip is defined and tooltip is not empty %} data-bs-toggle="tooltip" title="" data-bs-placement="top" data-bs-title="{{ tooltip|trans }}"{% endif %}>
     <div class="input-group input-group-sm">
-        <span class="input-group-text">
+        <span class="input-group-addon">
         {% include '@MauticCore/Components/checkbox.html.twig' with {
             items: [{ id: 'customcheckbox-one0', value: '1', className: 'checkall', attributes: { 'data-toggle': 'checkall', 'data-target': target } }]
         } only %}

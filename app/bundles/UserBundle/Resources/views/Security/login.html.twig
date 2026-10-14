@@ -21,14 +21,14 @@
 	<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
 		<div class="input-group mb-md">
 
-			<span class="input-group-text">
+			<span class="input-group-addon">
 				<i class="ri-user-6-fill"></i>
 			</span>
 			<label for="username" class="visually-hidden">{% trans %}mautic.user.auth.form.loginusername{% endtrans %}</label>
 			<input type="text" id="username" name="_username" class="form-control form-control-lg" value="{{ last_username|escape }}" required autofocus placeholder="{% trans %}mautic.user.auth.form.loginusername{% endtrans %}"/>
 		</div>
 		<div class="input-group mb-md">
-			<span class="input-group-text">
+			<span class="input-group-addon">
 				<i class="ri-key-2-line"></i>
 			</span>
 			<label for="password" class="visually-hidden">{% trans %}mautic.core.password{% endtrans %}:</label>
