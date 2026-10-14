@@ -61,36 +61,36 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-3">
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][0]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][0]) }}</label>
-                        </div>
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][1]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][1]) }}</label>
-                        </div>
+                        {% include '@MauticCore/Components/checkbox.html.twig' with {
+    items: [{ id: form['triggerRestrictedDaysOfWeek'][0].vars.id, name: form['triggerRestrictedDaysOfWeek'][0].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][0].vars.value, checked: form['triggerRestrictedDaysOfWeek'][0].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][0].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][0].vars.label }]
+} %}
+                        {% include '@MauticCore/Components/checkbox.html.twig' with {
+    items: [{ id: form['triggerRestrictedDaysOfWeek'][1].vars.id, name: form['triggerRestrictedDaysOfWeek'][1].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][1].vars.value, checked: form['triggerRestrictedDaysOfWeek'][1].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][1].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][1].vars.label }]
+} %}
                     </div>
                     <div class="col-sm-3">
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][2]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][2]) }}</label>
-                        </div>
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][3]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][3]) }}</label>
-                        </div>
+                        {% include '@MauticCore/Components/checkbox.html.twig' with {
+    items: [{ id: form['triggerRestrictedDaysOfWeek'][2].vars.id, name: form['triggerRestrictedDaysOfWeek'][2].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][2].vars.value, checked: form['triggerRestrictedDaysOfWeek'][2].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][2].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][2].vars.label }]
+} %}
+                        {% include '@MauticCore/Components/checkbox.html.twig' with {
+    items: [{ id: form['triggerRestrictedDaysOfWeek'][3].vars.id, name: form['triggerRestrictedDaysOfWeek'][3].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][3].vars.value, checked: form['triggerRestrictedDaysOfWeek'][3].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][3].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][3].vars.label }]
+} %}
                     </div>
                     <div class="col-sm-3">
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][4]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][4]) }}</label>
-                        </div>
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][5]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][5]) }}</label>
-                        </div>
+                        {% include '@MauticCore/Components/checkbox.html.twig' with {
+    items: [{ id: form['triggerRestrictedDaysOfWeek'][4].vars.id, name: form['triggerRestrictedDaysOfWeek'][4].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][4].vars.value, checked: form['triggerRestrictedDaysOfWeek'][4].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][4].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][4].vars.label }]
+} %}
+                        {% include '@MauticCore/Components/checkbox.html.twig' with {
+    items: [{ id: form['triggerRestrictedDaysOfWeek'][5].vars.id, name: form['triggerRestrictedDaysOfWeek'][5].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][5].vars.value, checked: form['triggerRestrictedDaysOfWeek'][5].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][5].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][5].vars.label }]
+} %}
                     </div>
                     <div class="col-sm-3">
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][6]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][6]) }}</label>
-                        </div>
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][7]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][7]) }}</label>
-                        </div>
+                        {% include '@MauticCore/Components/checkbox.html.twig' with {
+    items: [{ id: form['triggerRestrictedDaysOfWeek'][6].vars.id, name: form['triggerRestrictedDaysOfWeek'][6].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][6].vars.value, checked: form['triggerRestrictedDaysOfWeek'][6].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][6].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][6].vars.label }]
+} %}
+                        {% include '@MauticCore/Components/checkbox.html.twig' with {
+    items: [{ id: form['triggerRestrictedDaysOfWeek'][7].vars.id, name: form['triggerRestrictedDaysOfWeek'][7].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][7].vars.value, checked: form['triggerRestrictedDaysOfWeek'][7].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][7].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][7].vars.label }]
+} %}
                     </div>
                 </div>
             </div>

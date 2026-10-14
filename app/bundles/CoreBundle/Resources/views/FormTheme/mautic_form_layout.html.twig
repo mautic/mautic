@@ -85,12 +85,9 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% set feedbackClass = hasErrors is not empty ? ' has-error' : '' %}
 <div class="row">
     <div class="form-group col-xs-12{{ feedbackClass }}">
-        <div class="checkbox">
-            <label>
-                {{ form_widget(form) }}
-                {{ form.vars.label|trans }}
-            </label>
-        </div>
+        {% include '@MauticCore/Components/checkbox.html.twig' with {
+            items: [{ id: form.vars.id, name: form.vars.full_name, value: form.vars.value, checked: form.vars.checked, disabled: form.vars.disabled, label: form.vars.label, attributes: form.vars.attr }]
+        } %}
         {{ form_errors(form) }}
     </div>
 </div>
@@ -131,14 +128,11 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
         {{ form_label(form, label) }}
         <div class="choice-wrapper">
             {% if expanded and multiple %}
+            {% set checkboxItems = [] %}
             {% for child in form.children %}
-                <div class="checkbox">
-                    <label>
-                        {{ form_widget(child, {'attr': attr}) }}
-                        {{ child.vars.label|trans }}
-                    </label>
-                </div>
+                {% set checkboxItems = checkboxItems|merge([{ id: child.vars.id, name: child.vars.full_name, value: child.vars.value, checked: child.vars.checked, disabled: child.vars.disabled, label: child.vars.label, attributes: attr }]) %}
             {% endfor %}
+            {% include '@MauticCore/Components/checkbox.html.twig' with { items: checkboxItems } %}
             {% else %}
             {{ form_widget(form) }}
             {% endif %}

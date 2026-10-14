@@ -23,8 +23,9 @@
             <label class="control-label">{{ labelText }}</label>
         </div>
         <div id="category-1" class="text-left">
-            <input type="checkbox" id="lead_contact_frequency_rules_global_categories_1" name="lead_contact_frequency_rules[global_categories][]" autocomplete="false" value="1" checked="checked">
-            <label for="lead_contact_frequency_rules_global_categories_1">{{ 'mautic.core.category'|trans }}</label>
+            {% include '@MauticCore/Components/checkbox.html.twig' with {
+                items: [{ id: 'lead_contact_frequency_rules_global_categories_1', name: 'lead_contact_frequency_rules[global_categories][]', value: '1', checked: true, label: 'mautic.core.category' }]
+            } %}
         </div>
     </div>
 {% endif %}

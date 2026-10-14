@@ -28,12 +28,9 @@
           {% endif %}
           {% for child in form.children %}
               {% if child.vars.value not in builtin %}
-                <div class="checkbox" >
-                    <label>
-                        {{ form_widget(child, {'attr': attr}) }}
-                        {{ child.vars.label|trans }}
-                    </label>
-                </div>
+                {% include '@MauticCore/Components/checkbox.html.twig' with {
+                    items: [{ id: child.vars.id, name: child.vars.full_name, value: child.vars.value, checked: child.vars.checked, disabled: child.vars.disabled, label: child.vars.label, attributes: attr }]
+                } %}
               {% else %}
                   {{ child.isRendered() }}
                   <input type="hidden" id="{{ child.vars['id'] }}" name="{{ child.vars['full_name'] }}" value="{{ child.vars['value']|e }}" />

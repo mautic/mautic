@@ -46,7 +46,7 @@
                 {% endfor %}
             >
             {% if item_label %}
-            <label class="form-check-label" for="{{ item_id }}">
+            <label class="form-check-label" for="{{ item_id }}"{% for label_key, label_value in item.labelAttributes|default({}) %} {{ label_key }}="{{ label_value }}"{% endfor %}>
                 {{ item_label|trans }}
             </label>
             {% endif %}
