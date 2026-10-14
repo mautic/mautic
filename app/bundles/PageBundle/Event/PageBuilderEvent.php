@@ -12,7 +12,7 @@ final class PageBuilderEvent extends BuilderEvent
     /**
      * @return Page|null
      */
-    public function getPage()
+    public function getPage(): ?object
     {
         return $this->entity;
     }

@@ -348,10 +348,6 @@ class LeadModel extends FormModel
      */
     private function dispatchLeadEvent(string $action, Lead $entity, bool $isNew, bool $alreadyProcessedInBatch): ?LeadEvent
     {
-        if (!$entity instanceof Lead) {
-            throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
-        }
-
         $event = match ($action) {
             'pre_save'    => new LeadPreSaveEvent($entity, $isNew),
             'post_save'   => new LeadPostSaveEvent($entity, $isNew),
