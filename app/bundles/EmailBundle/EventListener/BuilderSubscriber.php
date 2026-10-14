@@ -151,7 +151,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
     {
         $idHash = $event->getIdHash();
         $lead   = $event->getLead();
-        /** @var Email|null $email */
         $email  = $event->getEmail();
 
         // Get email

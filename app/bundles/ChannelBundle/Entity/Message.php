@@ -180,10 +180,7 @@ class Message extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return ?\DateTimeInterface
-     */
-    public function getPublishUp()
+    public function getPublishUp(): ?\DateTimeInterface
     {
         return $this->publishUp;
     }
@@ -191,7 +188,7 @@ class Message extends FormEntity implements UuidInterface
     /**
      * @param ?\DateTime $publishUp
      */
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(?\DateTimeInterface $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -199,10 +196,7 @@ class Message extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return ?\DateTimeInterface
-     */
-    public function getPublishDown()
+    public function getPublishDown(): ?\DateTimeInterface
     {
         return $this->publishDown;
     }
@@ -210,7 +204,7 @@ class Message extends FormEntity implements UuidInterface
     /**
      * @param ?\DateTime $publishDown
      */
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(?\DateTimeInterface $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -218,18 +212,12 @@ class Message extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return ?Category
-     */
-    public function getCategory()
+    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }
 
-    /**
-     * @param ?Category $category
-     */
-    public function setCategory($category): static
+    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;

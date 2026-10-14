@@ -114,10 +114,7 @@ class DoNotContact
         return $this->id;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

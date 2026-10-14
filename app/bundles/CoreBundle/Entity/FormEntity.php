@@ -230,17 +230,14 @@ class FormEntity extends CommonEntity
     /**
      * @param \DateTime $dateAdded
      */
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(?\DateTimeInterface $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTimeInterface
     {
         return $this->dateAdded;
     }
@@ -248,7 +245,7 @@ class FormEntity extends CommonEntity
     /**
      * @param \DateTime $dateModified
      */
-    public function setDateModified($dateModified): static
+    public function setDateModified(?\DateTimeInterface $dateModified): static
     {
         $this->isChanged('dateModified', $dateModified);
         $this->dateModified = $dateModified;
@@ -256,10 +253,7 @@ class FormEntity extends CommonEntity
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateModified()
+    public function getDateModified(): ?\DateTimeInterface
     {
         return $this->dateModified;
     }
@@ -267,17 +261,14 @@ class FormEntity extends CommonEntity
     /**
      * @param \DateTime $checkedOut
      */
-    public function setCheckedOut($checkedOut): static
+    public function setCheckedOut(?\DateTimeInterface $checkedOut): static
     {
         $this->checkedOut = $checkedOut;
 
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getCheckedOut()
+    public function getCheckedOut(): ?\DateTimeInterface
     {
         return $this->checkedOut;
     }

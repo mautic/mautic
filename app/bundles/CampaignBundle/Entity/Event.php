@@ -661,18 +661,12 @@ class Event implements ChannelInterface, UuidInterface
         $this->parent = null;
     }
 
-    /**
-     * @return ?Event
-     */
-    public function getParent()
+    public function getParent(): ?self
     {
         return $this->parent;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getTriggerDate()
+    public function getTriggerDate(): ?\DateTimeInterface
     {
         return $this->triggerDate;
     }
@@ -698,10 +692,7 @@ class Event implements ChannelInterface, UuidInterface
         $this->triggerInterval = $triggerInterval;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getTriggerHour()
+    public function getTriggerHour(): ?\DateTimeInterface
     {
         return $this->triggerHour;
     }
@@ -868,10 +859,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Get the value of triggerRestrictedStartHour.
-     *
-     * @return \DateTimeInterface|null
      */
-    public function getTriggerRestrictedStartHour()
+    public function getTriggerRestrictedStartHour(): ?\DateTimeInterface
     {
         return $this->triggerRestrictedStartHour;
     }
@@ -892,10 +881,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Get the value of triggerRestrictedStopHour.
-     *
-     * @return \DateTimeInterface|null
      */
-    public function getTriggerRestrictedStopHour()
+    public function getTriggerRestrictedStopHour(): ?\DateTimeInterface
     {
         return $this->triggerRestrictedStopHour;
     }

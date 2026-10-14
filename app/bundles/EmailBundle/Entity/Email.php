@@ -588,15 +588,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->id;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }
 
-    public function setCategory($category): static
+    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -835,10 +832,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishDown()
+    public function getPublishDown(): ?\DateTimeInterface
     {
         if ($this->isSegmentEmail() && !$this->continueSending) {
             return null;
@@ -847,7 +841,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->publishDown;
     }
 
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(?\DateTimeInterface $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -855,15 +849,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishUp()
+    public function getPublishUp(): ?\DateTimeInterface
     {
         return $this->publishUp;
     }
 
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(?\DateTimeInterface $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -1026,10 +1017,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return Form|null
-     */
-    public function getUnsubscribeForm()
+    public function getUnsubscribeForm(): ?\Mautic\FormBundle\Entity\Form
     {
         return $this->unsubscribeForm;
     }
@@ -1041,10 +1029,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getPreferenceCenter()
+    public function getPreferenceCenter(): ?\Mautic\PageBundle\Entity\Page
     {
         return $this->preferenceCenter;
     }
@@ -1226,7 +1211,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function isBackgroundSending(): bool
     {
-        return $this->isPublished() && !empty($this->publishUp) && ($this->publishUp < new \DateTime());
+        return $this->isPublished() && $this->publishUp instanceof \DateTimeInterface && ($this->publishUp < new \DateTime());
     }
 
     public function isSegmentEmail(): bool
