@@ -104,8 +104,7 @@ phpstan.neon.dist
 /media/js/mautic-form.js
 /media/js/froogaloop.min.js
 /media/js/jquery.min.js
-/app/bundles/CoreBundle/Assets/js/98.component-runtime.js
-/app/bundles/CoreBundle/Assets/js/99.*.js
+/app/bundles/CoreBundle/Assets/js/99.animated-checkbox.js
 
 /plugins/*
 !/plugins/GrapesJsBuilderBundle

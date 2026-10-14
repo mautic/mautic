@@ -1,7 +1,38 @@
-import { drawStroke, emit, hover, mountComponent, press, springScale } from '@mautic/components';
+import { animate, hover, press, visualElementStore } from 'motion';
 
 type Checked = boolean | 'indeterminate';
 type Options = { checked?: Checked; disabled?: boolean; onCheckedChange?: (checked: Checked) => void };
+type JQueryLike = {
+  find(selector: string): JQueryLike;
+  addBack(selector: string): JQueryLike;
+  each(callback: (index: number, element: HTMLElement) => void): JQueryLike;
+  on(event: string, handler: (event: unknown, container: unknown) => void): JQueryLike;
+};
+
+declare const mQuery: (target: unknown) => JQueryLike;
+declare const Mautic: { animatedCheckbox?: unknown };
+
+const SELECTOR = '[data-component="animated-checkbox"]';
+const SPRING = { type: 'spring' as const, stiffness: 550, damping: 30, restSpeed: 10, reduceMotion: false };
+const controllers = new WeakMap<HTMLElement, AnimatedCheckbox>();
+
+function springScale(element: HTMLElement, scale: number) {
+  return animate(element, { scale }, SPRING);
+}
+
+function drawStroke(shape: SVGElement, on: boolean, fresh: boolean, delay = 0) {
+  const target = on ? 1 : 0;
+  const animation = animate(shape, {
+    pathLength: fresh ? [0, target] : target,
+    opacity: fresh ? [0, target] : target
+  }, { duration: 0.2, delay, ease: 'easeOut' });
+  if (fresh) {
+    const visual = visualElementStore.get(shape);
+    visual?.getValue('opacity')?.set(0);
+    visual?.getValue('pathLength')?.set(0);
+  }
+  return animation;
+}
 
 class AnimatedCheckbox {
   private readonly button: HTMLButtonElement;
@@ -35,7 +66,7 @@ class AnimatedCheckbox {
         this.render(true);
       }
       this.onCheckedChange?.(next);
-      emit(element, 'mautic:animated-checkbox:change', { checked: next });
+      element.dispatchEvent(new CustomEvent('mautic:animated-checkbox:change', { bubbles: true, detail: { checked: next } }));
     }, options);
     this.button.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') event.preventDefault();
@@ -124,4 +155,14 @@ class AnimatedCheckbox {
   }
 }
 
-mountComponent('AnimatedCheckbox', '[data-component="animated-checkbox"]', (element) => new AnimatedCheckbox(element));
+function mount(container: unknown): void {
+  mQuery(container).find(SELECTOR).addBack(SELECTOR).each((_, element) => {
+    if (!controllers.has(element)) controllers.set(element, new AnimatedCheckbox(element));
+  });
+}
+
+Mautic.animatedCheckbox = {
+  get: (element: HTMLElement) => controllers.get(element)
+};
+
+mQuery(document).on('mautic:onPageLoad:before', (_event, container) => mount(container));
