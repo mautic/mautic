@@ -13,7 +13,7 @@ parameters:
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
 
 		-
-			message: '#^Parameter \#1 \$key of method Mautic\\ApiBundle\\Controller\\FetchCommonApiController\<E of object\>\:\:setBatchError\(\) expects int, string given\.$#'
+			message: '#^Parameter \#1 \$key of method Mautic\\ApiBundle\\Controller\\FetchCommonApiController\<TEntity of object\>\:\:setBatchError\(\) expects int, string given\.$#'
 			identifier: argument.type
 			count: 4
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
@@ -1189,12 +1189,6 @@ parameters:
 			path: app/bundles/CoreBundle/Event/AbstractCustomRequestEvent.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:__construct\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addToken\(\) has parameter \$key with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2029,12 +2023,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Form/Type/DynamicContentType.php
 
 		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:resetVariants\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:resetVariants\(\) has parameter \$relatedIds with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2444,12 +2432,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:getMonitoredMailbox\(\) has parameter \$folderKey with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:resetVariants\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Model/EmailModel.php
@@ -3722,12 +3704,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:identifyCompany\(\) has parameter \$state with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:postSaveEntity\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
@@ -5239,19 +5215,7 @@ parameters:
 			path: app/bundles/PageBundle/Helper/TrackingHelper.php
 
 		-
-			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:generateSlug\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:getDeviceGranularityData\(\) has parameter \$filters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:resetVariants\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PageBundle/Model/PageModel.php
@@ -5978,12 +5942,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:populateCompanyData\(\) has parameter \$config with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:populateCompanyData\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
