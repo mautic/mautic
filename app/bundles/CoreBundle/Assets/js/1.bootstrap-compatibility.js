@@ -1184,6 +1184,7 @@ window.MauticInstallLegacyAffix = function (jQuery) {
                 mutation.addedNodes.forEach(function (node) {
                     if (Node.ELEMENT_NODE === node.nodeType) {
                         mirrorLegacyMarkup(node);
+                        initBootstrapPopovers(node);
                         window.MauticBootstrapLegacyExceptions.prepareMarkup(node);
                         prepareLegacyTabs(node);
                     }
@@ -1208,8 +1209,18 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         version: '5.3.8-router'
     });
 
+    function initBootstrapPopovers(container) {
+        if (!container || !container.querySelectorAll || !window.bootstrap || !window.bootstrap.Popover) {
+            return;
+        }
+        container.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (element) {
+            window.bootstrap.Popover.getOrCreateInstance(element);
+        });
+    }
+
     mirrorLegacyMarkup(document);
     bridgeJQueryPlugins();
+    initBootstrapPopovers(document);
     window.MauticBootstrapLegacyExceptions.prepareMarkup(document);
     prepareLegacyTabs(document);
     window.addEventListener('click', function (event) {
@@ -1223,6 +1234,7 @@ window.MauticInstallLegacyAffix = function (jQuery) {
     document.addEventListener('DOMContentLoaded', function () {
         mirrorLegacyMarkup(document);
         bridgeJQueryPlugins();
+        initBootstrapPopovers(document);
         window.MauticBootstrapLegacyExceptions.prepareMarkup(document);
         prepareLegacyTabs(document);
     });
