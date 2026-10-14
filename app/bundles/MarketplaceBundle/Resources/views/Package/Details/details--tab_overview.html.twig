@@ -1,7 +1,10 @@
-{% set description = latestVersion.extra.detailed_description|default(packageDetail.packageBase.description) %}
+{% set description = latestVersion.extra.detailed_description|default('')|marketplace_markdown %}
+{% if description is empty %}
+    {% set description = packageDetail.packageBase.description|marketplace_markdown %}
+{% endif %}
 {% if description %}
 <div class="panel panel-default mt-sm">
-    <div class="panel-body marketplace-description">{{ description|marketplace_markdown|purify }}</div>
+    <div class="panel-body marketplace-description">{{ description|purify }}</div>
 </div>
 {% endif %}
 {% if latestVersion.extra.expected_outcomes|default('') %}

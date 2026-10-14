@@ -37,11 +37,12 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($latestVersion, (string) $responseContent);
     }
 
-    public function testNonStringMarkdownMetadataDoesNotBreakDetailPage(): void
+    #[DataProvider('invalidDetailedDescriptions')]
+    public function testInvalidDetailedDescriptionFallsBackToBaseDescription(mixed $description): void
     {
         $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true, 512, JSON_THROW_ON_ERROR);
         foreach ($payload['package']['versions'] as &$version) {
-            $version['extra']['detailed_description'] = ['unexpected' => '<script>alert(1)</script>'];
+            $version['extra']['detailed_description'] = $description;
             $version['extra']['expected_outcomes'] = ['unexpected' => 'Invalid outcomes'];
         }
         unset($version);
@@ -49,9 +50,22 @@ final class DetailControllerTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/s/marketplace/detail/koco/mautic-recaptcha-bundle');
         $this->assertResponseIsSuccessful();
-        $this->assertSame('', trim($crawler->filter('.marketplace-description')->text()));
+        $this->assertSame($payload['package']['description'], trim($crawler->filter('.marketplace-description')->text()));
         $this->assertStringNotContainsString('Invalid outcomes', $crawler->text());
         $this->assertStringNotContainsString('<script>alert(1)</script>', (string) $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function invalidDetailedDescriptions(): iterable
+    {
+        yield 'array' => [['unexpected' => '<script>alert(1)</script>']];
+        yield 'boolean' => [true];
+        yield 'number' => [42];
+        yield 'null' => [null];
+        yield 'empty string' => [''];
+        yield 'whitespace' => [" \n\t"];
     }
 
     public function testRichPackageMetadataAndMarkdown(): void
