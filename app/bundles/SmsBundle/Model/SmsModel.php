@@ -89,6 +89,9 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
         return 'sms:smses';
     }
 
+    /**
+     * @param Sms $entity
+     */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
@@ -118,9 +121,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
 
             $this->smsRepository->saveEntity($entity, false);
 
-            if ($dispatchEvent) {
-                $this->dispatchEvent('post_save', $entity, $isNew, $event);
-            }
+            $this->dispatchEvent('post_save', $entity, $isNew, $event);
 
             if (0 === ++$i % $batchSize) {
                 $this->em->flush();

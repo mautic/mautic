@@ -7,8 +7,14 @@ namespace Mautic\ApiBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @template TEntity of object
+ */
 abstract class ApiEntityEvent extends CommonEvent
 {
+    /**
+     * @param TEntity $entity
+     */
     public function __construct(
         object $entity,
         private readonly array $entityRequestParameters,
@@ -18,9 +24,9 @@ abstract class ApiEntityEvent extends CommonEvent
     }
 
     /**
-     * @return object
+     * @return TEntity
      */
-    public function getEntity()
+    public function getEntity(): object
     {
         return $this->entity;
     }

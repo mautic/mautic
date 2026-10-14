@@ -324,6 +324,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    /**
+     * @param Form $entity
+     */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
@@ -555,6 +558,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    /**
+     * @param Form $entity
+     */
     public function deleteEntity(object $entity): void
     {
         /** @var Form $entity */

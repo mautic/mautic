@@ -290,9 +290,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
             $this->emailRepository->saveEntity($entity, false);
 
-            if ($dispatchEvent) {
-                $this->dispatchEvent('post_save', $entity, $isNew, $event);
-            }
+            $this->dispatchEvent('post_save', $entity, $isNew, $event);
 
             if (0 === ++$i % $batchSize) {
                 $this->em->flush();
@@ -2346,6 +2344,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * @param Email $entity
+     *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     protected function setCachedCount(object $entity): void

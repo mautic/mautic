@@ -82,9 +82,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
 
             $this->notificationRepository->saveEntity($entity, false);
 
-            if ($dispatchEvent) {
-                $this->dispatchEvent('post_save', $entity, $isNew, $event);
-            }
+            $this->dispatchEvent('post_save', $entity, $isNew, $event);
 
             if (0 === ++$i % $batchSize) {
                 $this->em->flush();
@@ -127,6 +125,9 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         return parent::getEntity($id);
     }
 
+    /**
+     * @param Notification $entity
+     */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);

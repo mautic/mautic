@@ -282,6 +282,7 @@ final class DashboardModel extends FormModel
 
     /**
      * Create/edit entity.
+     * @param Widget $entity
      *
      * @throws \Exception
      */

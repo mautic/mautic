@@ -89,6 +89,7 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
 
     /**
      * @param object      $entity
+     * @param Campaign    $entity
      * @param string|null $action
      * @param array       $options
      */
@@ -138,6 +139,9 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
         return $entities;
     }
 
+    /**
+     * @param Campaign $entity
+     */
     public function deleteEntity(object $entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
@@ -719,11 +723,9 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
     }
 
     /**
-     * @param Campaign $entity
-     * @param string   $root
      * @param Event[]  $events
      */
-    private function buildOrder(array $hierarchy, array &$events, object $entity, int|string $root = 'null', int $order = 1): void
+    private function buildOrder(array $hierarchy, array &$events, Campaign $entity, int|string $root = 'null', int $order = 1): void
     {
         $count = count($hierarchy);
         if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {

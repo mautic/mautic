@@ -140,6 +140,8 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Client $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     public function revokeAccess(object $entity): void

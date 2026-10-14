@@ -81,6 +81,8 @@ final class UserModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param User $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     public function saveEntity(object $entity, bool $unlock = true): void
