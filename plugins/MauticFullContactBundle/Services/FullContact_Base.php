@@ -11,7 +11,7 @@ use MauticPlugin\MauticFullContactBundle\Exception\NotImplementedException;
  * @author   Keith Casey <contrib@caseysoftware.com>
  * @license  http://www.apache.org/licenses/LICENSE-2.0 Apache
  */
-class FullContact_Base
+abstract class FullContact_Base
 {
     public const float REQUEST_LATENCY = 0.2;
 
