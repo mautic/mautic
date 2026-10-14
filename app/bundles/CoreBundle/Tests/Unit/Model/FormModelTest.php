@@ -73,7 +73,7 @@ final class FormModelTest extends TestCase
                 return $event;
             }
 
-            protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
+            protected function dispatchBatchEvent(string $action, array $entitiesBatchParams, ?Event $event = null): ?Event
             {
                 $this->actions[] = $action;
 

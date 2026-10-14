@@ -397,7 +397,7 @@ class FormModel extends AbstractCommonModel
      *
      * @param array<int, array<string, object|bool|null>>|array<int, array<string, mixed>> $entitiesBatchParams
      */
-    protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
+    protected function dispatchBatchEvent(string $action, array $entitiesBatchParams, ?Event $event = null): ?Event
     {
         return $event;
     }

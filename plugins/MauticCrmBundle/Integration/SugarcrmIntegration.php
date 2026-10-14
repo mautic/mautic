@@ -856,7 +856,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
      * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, $data, $formArea): void
     {
         if ('keys' == $formArea) {
             $builder->add('version', ButtonGroupType::class, [

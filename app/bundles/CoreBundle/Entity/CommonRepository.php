@@ -1745,7 +1745,7 @@ abstract class CommonRepository extends ServiceEntityRepository
         return [];
     }
 
-    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder &$queryBuilder, \stdClass $filter): Query\Expr\Func|string|false
+    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder $queryBuilder, \stdClass $filter): Query\Expr\Func|string|false
     {
         if ($ids = array_map(intval(...), explode(',', $filter->string))) {
             $parameterName = $this->generateRandomParameterName();

@@ -140,7 +140,7 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
      *
      * @param mixed[] $matchedFields
      */
-    private function handleValidateRequired(ImportValidateEvent $event, array &$matchedFields): void
+    private function handleValidateRequired(ImportValidateEvent $event, array $matchedFields): void
     {
         $requiredFields = $this->fieldList->getFieldList(false, false, [
             'isPublished' => true,

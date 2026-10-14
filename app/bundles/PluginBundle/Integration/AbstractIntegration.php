@@ -2007,7 +2007,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *                                   integration is called when adding an integration to events like point triggers,
      *                                   campaigns actions, forms actions, etc
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, $data, $formArea): void
     {
     }
 

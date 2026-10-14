@@ -422,6 +422,7 @@ rules:
     - Utils\PHPStan\Rule\NoContainerGetRule
     - Utils\PHPStan\Rule\ControllerMethodMustReturnResponseRule
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
+    - Utils\PHPStan\Rule\NoUselessReferenceParamRule
 
     - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
     - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
@@ -462,6 +463,10 @@ services:
         class: Utils\PHPStan\Type\ConnectionQueryBuilderReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: Utils\PHPStan\Collector\ByReferenceParamCollector
+        tags:
+            - phpstan.collector
     -
         class: Utils\PHPStan\Collector\ClassNameServiceAliasCollector
         tags:

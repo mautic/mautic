@@ -62,7 +62,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
      * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, $data, $formArea): void
     {
         $builder->add(
             'updateBlanks',

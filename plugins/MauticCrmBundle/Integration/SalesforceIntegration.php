@@ -496,7 +496,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -2308,7 +2308,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return $limit - count($currentContactList);
     }
 
-    private function checkLeadIsContact(array &$trackedContacts, string $email, $contactId, $leadFields): array|bool|null
+    private function checkLeadIsContact(array $trackedContacts, string $email, $contactId, $leadFields): array|bool|null
     {
         if (empty($trackedContacts[$email])) {
             // Check if there's an existing entry

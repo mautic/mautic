@@ -306,7 +306,7 @@ class LeadModel extends FormModel
         return $this->dispatchLeadEvent($action, $entity, $isNew, true);
     }
 
-    protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
+    protected function dispatchBatchEvent(string $action, array $entitiesBatchParams, ?Event $event = null): ?Event
     {
         if (count($entitiesBatchParams) < 1) {
             throw new MethodNotAllowedHttpException(['Lead'], 'For the batch operation the array must be used');
