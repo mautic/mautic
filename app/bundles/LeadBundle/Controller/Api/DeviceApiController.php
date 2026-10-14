@@ -54,9 +54,8 @@ final class DeviceApiController extends CommonApiController
      * @param LeadDevice           $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(object &$entity, $form, array $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
     {
         $lead = null;
         if (!empty($parameters['lead'])) {
