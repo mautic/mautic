@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 trait VariantEntityTrait
 {
     /**
-     * @var mixed
+     * @var Collection<int, TEntity>
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantChildren;
@@ -366,7 +366,7 @@ trait VariantEntityTrait
         }
 
         /** @var TranslationEntityInterface $parentTranslation */
-        /** @var ArrayCollection $childrenTranslations */
+        /** @var iterable<TranslationEntityInterface> $childrenTranslations */
         [$parentTranslation, $childrenTranslations] = $entity->getTranslations();
         if ($entity->getId() && $parentTranslation != $entity) {
             if (!$publishedOnly || $parentTranslation->isPublished()) {

@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -25,6 +26,7 @@ trait SortableListTrait
             'option_required'     => false,
             'constraint_callback' => new Callback(
                 function ($validateMe, ExecutionContextInterface $context) use ($listName): void {
+                    /** @var FormInterface $root */
                     $root = $context->getRoot();
                     $data = $root->getData();
                     if ((empty($data['properties']['syncList']) || empty($data['mappedField'])) && !count($data['properties'][$listName]['list'])) {

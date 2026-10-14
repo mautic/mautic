@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
@@ -141,6 +142,7 @@ trait FrequencyRuleTrait
 
         $this->leadLists    = $this->frequencyRuleLeadModel->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
+        /** @var LeadList $leadList */
         foreach ($this->leadLists as $leadList) {
             $data['lead_lists'][] = $leadList->getId();
         }

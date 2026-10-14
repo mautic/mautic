@@ -21,10 +21,8 @@ trait LeadAccessTrait
 
     /**
      * Determines if the user has access to the lead the note is for.
-     *
-     * @return Response|Lead
      */
-    protected function checkLeadAccess($leadId, $action, bool $isPlugin = false, $integration = '')
+    protected function checkLeadAccess($leadId, $action, bool $isPlugin = false, $integration = ''): Response|Lead
     {
         if (!$leadId instanceof Lead) {
             // make sure the user has view access to this lead
@@ -105,6 +103,7 @@ trait LeadAccessTrait
             return $this->notFound();
         }
 
+        /** @var Lead $lead */
         foreach ($leads as $lead) {
             if (!$this->security->hasEntityAccess(
                 'lead:leads:'.$action.'own',

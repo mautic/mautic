@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Event\CustomContentEvent;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\AbTest\EmailStatus;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -24,6 +25,7 @@ final class EmailDetailsRightColumnSubscriber implements EventSubscriberInterfac
     {
         if ($event->checkContext('@MauticEmail/Email/details.html.twig', 'right.section.start')) {
             $vars  = $event->getVars();
+            /** @var Email $email */
             $email = $vars['email'];
 
             $data = [
