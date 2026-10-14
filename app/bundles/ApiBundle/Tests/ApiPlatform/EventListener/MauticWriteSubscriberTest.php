@@ -66,7 +66,7 @@ final class MauticWriteSubscriberTest extends TestCase
         $this->mauticWriteSubscriber->addData($this->event);
 
         $this->assertNull($this->formEntity->getModifiedBy());
-        $this->assertNull($this->formEntity->getDateModified());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $this->formEntity->getDateModified());
     }
 
     public function testAddData(): void
