@@ -200,10 +200,7 @@ class Action implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return Form|null
-     */
-    public function getForm()
+    public function getForm(): ?\Mautic\FormBundle\Entity\Form
     {
         return $this->form;
     }

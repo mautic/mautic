@@ -134,10 +134,7 @@ class Monitoring extends FormEntity implements UuidInterface
     /**
      * Constraints for required fields.
      */
-    /**
-     * @return mixed
-     */
-    public function getCategory()
+    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }
@@ -218,10 +215,8 @@ class Monitoring extends FormEntity implements UuidInterface
 
     /**
      * Set the category id.
-     *
-     * @param \Mautic\CategoryBundle\Entity\Category|null $category
      */
-    public function setCategory($category): void
+    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): void
     {
         $this->isChanged('category', $category);
         $this->category = $category;

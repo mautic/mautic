@@ -347,13 +347,13 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         // Should not have been merged due to winner already having one
         $this->getMerger()->mergeOwners($winner, $loser);
-        $this->assertEquals($winnerOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
+        $this->assertSame($winnerOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
 
         $winner->setOwner();
         $this->getMerger()->mergeOwners($winner, $loser);
 
         // Should be set to loser owner since winner owner was null
-        $this->assertEquals($loserOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
+        $this->assertSame($loserOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
     }
 
     public function testMergePoints(): void

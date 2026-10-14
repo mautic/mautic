@@ -468,10 +468,7 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
     {
         return $this->ipAddress;
     }
@@ -530,10 +527,7 @@ class Hit
         return $this->browserLanguages;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -581,10 +575,7 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return ?Redirect
-     */
-    public function getRedirect()
+    public function getRedirect(): ?\Mautic\PageBundle\Entity\Redirect
     {
         return $this->redirect;
     }
@@ -621,10 +612,7 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return LeadDevice
-     */
-    public function getDeviceStat()
+    public function getDeviceStat(): ?\Mautic\LeadBundle\Entity\LeadDevice
     {
         return $this->device;
     }
