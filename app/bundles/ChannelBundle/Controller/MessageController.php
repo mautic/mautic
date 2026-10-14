@@ -3,6 +3,7 @@
 namespace Mautic\ChannelBundle\Controller;
 
 use Mautic\ChannelBundle\Entity\Channel;
+use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Helper\MessageSearchScopeProvider;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
@@ -115,6 +116,7 @@ final class MessageController extends AbstractStandardFormController
 
                 break;
             case 'view':
+                /** @var Message $message */
                 $message = $args['viewParameters']['item'];
 
                 // Init the date range filter form
@@ -149,6 +151,7 @@ final class MessageController extends AbstractStandardFormController
                     )->getContent(),
                 ];
 
+                /** @var Channel $channel */
                 foreach ($messageChannels as $channel) {
                     if ($channel->isEnabled() && isset($channels[$channel->getChannel()])) {
                         $chart->setDataset(
