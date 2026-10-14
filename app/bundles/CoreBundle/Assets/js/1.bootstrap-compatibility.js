@@ -581,7 +581,7 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         var prototype = window.bootstrap.Dropdown.prototype;
         var nativeMethod = prototype[method];
         prototype[method] = function () {
-            if (!this._element.hasAttribute('data-toggle')) {
+            if (!this._element.hasAttribute('data-toggle') && !this._element.hasAttribute('data-bs-toggle')) {
                 return nativeMethod.apply(this, arguments);
             }
             var trigger = jQuery(this._element);
