@@ -805,11 +805,28 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         }
     }
 
+    var bootstrapToggleValues = ['collapse', 'dropdown', 'modal', 'popover', 'tab', 'tooltip'];
+
     function mirrorBootstrapAttributes(element) {
+        var legacyToggle = element.getAttribute('data-toggle');
+        var isBootstrapToggle = bootstrapToggleValues.indexOf(legacyToggle) !== -1;
+
         dataAttributes.forEach(function (name) {
+            if ('toggle' === name && !isBootstrapToggle) {
+                var owned = mirroredAttributes.get(element) || {};
+                if (owned['data-bs-toggle'] !== undefined && owned['data-bs-toggle'] === element.getAttribute('data-bs-toggle')) {
+                    element.removeAttribute('data-bs-toggle');
+                    delete owned['data-bs-toggle'];
+                    mirroredAttributes.set(element, owned);
+                }
+                return;
+            }
+            if ('target' === name && !isBootstrapToggle) {
+                return;
+            }
             mirrorAttribute(element, 'data-' + name, 'data-bs-' + name);
         });
-        if ('collapse' === element.getAttribute('data-toggle')) {
+        if ('collapse' === legacyToggle) {
             mirrorParentAttribute(element);
         }
         if (element.hasAttribute('data-template')) {
