@@ -831,6 +831,7 @@ class LeadModel extends FormModel
 
     /**
      * Get a list of segments this lead belongs to.
+     * @return ? array<int, array<string, mixed>> : array<int, LeadList>
      */
     public function getLists(Lead $lead, bool $forLists = false, bool $arrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {

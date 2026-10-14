@@ -17,14 +17,14 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 trait FrequencyRuleTrait
 {
-    protected $leadLists;
+    /**
+     * @var array<LeadList>
+     */
+    protected array $leadLists = [];
 
     protected $dncChannels;
 
-    /**
-     * @var bool
-     */
-    protected $isPublicView = false;
+    protected bool $isPublicView = false;
 
     private \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel;
 
