@@ -17,7 +17,7 @@
                     <option value="{{ v|e }}" {% if roundMode == v %}selected="selected"{% endif %}>{{ l|trans }}</option>
                   {% endfor %}
                 </select>
-                <span class="input-group-text" data-bs-toggle="tooltip" data-bs-container="body" data-bs-placement="top" data-bs-html="true" data-bs-title="{{ 'mautic.lead.field.help.numberrounding'|trans }}">
+                <span class="input-group-addon" data-bs-toggle="tooltip" data-bs-container="body" data-bs-placement="top" data-bs-html="true" data-bs-title="{{ 'mautic.lead.field.help.numberrounding'|trans }}">
                     <i class="ri-question-line"></i>
                 </span>
             </div>
@@ -26,7 +26,7 @@
             <label class="form-label">{{ 'mautic.lead.field.form.properties.numberprecision'|trans }}</label>
             <div class="input-group">
                 <input autocomplete="false" name="leadfield[properties][scale]" class="form-control" value="{{ scale|purify }}" type="number" />
-                <span class="input-group-text" data-bs-toggle="tooltip" data-bs-container="body"
+                <span class="input-group-addon" data-bs-toggle="tooltip" data-bs-container="body"
                       data-bs-placement="top" data-bs-title="{{ 'mautic.lead.field.help.numberprecision'|trans }}">
                     <i class="ri-question-line"></i>
                 </span>
