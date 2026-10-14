@@ -132,7 +132,7 @@
                         <div class="checkbox-group">
                             {% for child in form.worksWithVersions %}
                                 {% include '@MauticCore/Components/checkbox.html.twig' with {
-                                    items: [{ id: child.vars.id, name: child.vars.full_name, value: child.vars.value, checked: child.vars.checked, disabled: child.vars.disabled, label: child.vars.label }]
+                                    items: [{ id: child.vars.id, name: child.vars.full_name, value: child.vars.value, checked: child.vars.checked, disabled: child.vars.disabled, label: child.vars.label, attributes: child.vars.attr }]
                                 } %}
                             {% endfor %}
                         </div>
