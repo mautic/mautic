@@ -24,7 +24,7 @@ use PHPStan\Type\UnionType;
  */
 final readonly class EntityParamMustHaveTypeRule implements Rule
 {
-    private const PARAM_NAME = 'entity';
+    private const string PARAM_NAME = 'entity';
 
     public function getNodeType(): string
     {

@@ -57,6 +57,8 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Role $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     public function saveEntity(object $entity, bool $unlock = true): void
@@ -99,6 +101,8 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Role $entity
+     *
      * @throws PreconditionRequiredHttpException
      */
     public function deleteEntity(object $entity): void

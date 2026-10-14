@@ -127,6 +127,9 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         return parent::getEntity($id);
     }
 
+    /**
+     * @param Notification $entity
+     */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);

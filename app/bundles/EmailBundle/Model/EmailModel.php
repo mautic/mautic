@@ -2346,6 +2346,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * @param Email $entity
+     *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     protected function setCachedCount(object $entity): void

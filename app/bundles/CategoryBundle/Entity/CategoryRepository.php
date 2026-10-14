@@ -137,8 +137,9 @@ final class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @param string $bundle
-     * @param string $alias
+     * @param string        $bundle
+     * @param string        $alias
+     * @param Category|null $entity
      */
     public function checkUniqueCategoryAlias($bundle, $alias, ?object $entity = null): int
     {
