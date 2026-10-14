@@ -84,7 +84,7 @@ final class ActionModel extends CommonFormModel
             ]
         );
         $dependents = [];
-        /** @var Action $entity */
+
         foreach ($entities as $entity) {
             $properties = $entity->getProperties();
             foreach ($properties as $property) {
@@ -144,7 +144,6 @@ final class ActionModel extends CommonFormModel
         );
         $dependents = [];
 
-        /** @var Action $entity */
         foreach ($entities as $entity) {
             $properties = $entity->getProperties();
             foreach ($properties as $property) {

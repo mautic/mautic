@@ -128,7 +128,9 @@ final class ContactObjectSubscriberTest extends TestCase
 
     public function testCreateContactsWithRightObject(): void
     {
-        $event = new InternalObjectCreateEvent(new Contact(), [['somefield' => 'somevalue']]);
+        $objectChangeDAOStub = $this->createStub(ObjectChangeDAO::class);
+
+        $event = new InternalObjectCreateEvent(new Contact(), [$objectChangeDAOStub]);
 
         $objectMapping = $this->createStub(ObjectMapping::class);
         $this->contactObjectHelper->expects($this->once())

@@ -273,6 +273,9 @@ final class MessageQueueModel extends FormModel
         return $counter;
     }
 
+    /**
+     * @param MessageQueue|mixed $message
+     */
     public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, bool $persist = false): void
     {
         if (!$message instanceof MessageQueue && $leadId && $channel && $channelId) {
@@ -284,7 +287,6 @@ final class MessageQueueModel extends FormModel
             return;
         }
 
-        /** @var MessageQueue $message */
         $message->setAttempts($message->getAttempts() + 1);
         $message->setLastAttempt(new \DateTime());
         $rescheduleTo = clone $message->getScheduledDate();

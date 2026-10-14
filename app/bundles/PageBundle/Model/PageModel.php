@@ -241,8 +241,8 @@ final class PageModel extends FormModel implements GlobalSearchInterface
             $entity->setSessionId('new_'.hash('sha1', uniqid(mt_rand())));
         } else {
             $entity = parent::getEntity($id);
-            if (null !== $entity) {
-                $entity->setSessionId($entity->getId());
+            if ($entity instanceof Page) {
+                $entity->setSessionId((string) $entity->getId());
             }
         }
 

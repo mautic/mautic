@@ -109,7 +109,7 @@ final class FieldModelFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $ids = [];
-        /** @var Field $field */
+
         foreach ($fields as $field) {
             $ids[] = $field->getId();
         }
