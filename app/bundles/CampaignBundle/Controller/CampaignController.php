@@ -858,6 +858,7 @@ final class CampaignController extends AbstractStandardFormController
 
     protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, bool $isClone = false): void
     {
+        /** @var Campaign $entity */
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
             $this->afterEntitySave($entity, $form, $action, false);
@@ -871,6 +872,7 @@ final class CampaignController extends AbstractStandardFormController
      */
     protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, bool $isClone = false): void
     {
+        /** @var Campaign $entity */
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
 
         if ($isPost) {
@@ -1277,7 +1279,9 @@ final class CampaignController extends AbstractStandardFormController
         // load existing events into session
         $campaignEvents = [];
 
+        /** @var Campaign $entity */
         $existingEvents = $entity->getEvents()->toArray();
+        /** @var Event $e */
         foreach ($existingEvents as $e) {
             // remove deleted events from existing events
             if (!empty($e->getDeleted())) {

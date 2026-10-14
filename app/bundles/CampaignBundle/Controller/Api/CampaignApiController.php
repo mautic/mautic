@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -485,6 +486,7 @@ final class CampaignApiController extends CommonApiController
                 );
             }
 
+            /** @var UploadedFile $uploadedFile */
             $uploadedFile = array_values($files)[0];
 
             if (!$uploadedFile->isValid()) {
