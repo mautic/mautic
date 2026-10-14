@@ -259,7 +259,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
