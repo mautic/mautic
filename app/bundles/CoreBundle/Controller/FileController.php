@@ -115,10 +115,8 @@ final class FileController extends AjaxController
 
     /**
      * Get the Media directory full file system path.
-     *
-     * @return string
      */
-    private function getMediaAbsolutePath(PathsHelper $pathsHelper): string|false
+    private function getMediaAbsolutePath(PathsHelper $pathsHelper): string
     {
         $mediaDir = realpath($pathsHelper->getSystemPath('images', true));
 
