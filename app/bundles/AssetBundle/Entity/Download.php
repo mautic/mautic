@@ -52,19 +52,13 @@ class Download
     #[Groups(['download:read', 'download:write'])]
     private $dateDownload;
 
-    /**
-     * @var Asset|null
-     */
     #[Groups(['download:read', 'download:write'])]
     #[ORM\ManyToOne(targetEntity: Asset::class)]
     #[ORM\JoinColumn(name: 'asset_id', onDelete: 'CASCADE')]
-    private $asset;
+    private ?Asset $asset = null;
 
-    /**
-     * @var IpAddress|null
-     */
     #[Groups(['download:read', 'download:write'])]
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]

@@ -197,17 +197,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $emailType = 'template';
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $publishUp;
+    private ?\DateTimeInterface $publishUp = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $publishDown;
+    private ?\DateTimeInterface $publishDown = null;
 
     /**
      * @var bool|null
@@ -233,11 +227,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $revision = 1;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['email:read', 'email:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<LeadList>
@@ -277,21 +268,15 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'download:read'])]
     private $variantReadCount = 0;
 
-    /**
-     * @var Form|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[ORM\ManyToOne(targetEntity: Form::class)]
     #[ORM\JoinColumn(name: 'unsubscribeform_id', onDelete: 'SET NULL')]
-    private $unsubscribeForm;
+    private ?Form $unsubscribeForm = null;
 
-    /**
-     * @var Page|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[ORM\ManyToOne(targetEntity: Page::class)]
     #[ORM\JoinColumn(name: 'preference_center_id', onDelete: 'SET NULL')]
-    private $preferenceCenter;
+    private ?Page $preferenceCenter = null;
 
     /**
      * @var ArrayCollection<Asset>

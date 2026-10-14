@@ -95,11 +95,8 @@ class Stage extends FormEntity implements UuidInterface
     #[ORM\OneToMany(targetEntity: LeadStageLog::class, mappedBy: 'stage', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['stage:read', 'stage:write'])]
-    private $category;
+    private ?Category $category = null;
 
     public function __clone()
     {

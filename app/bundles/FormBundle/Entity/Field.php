@@ -143,13 +143,10 @@ class Field implements UuidInterface
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $conditions = [];
 
-    /**
-     * @var Form|null
-     */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'fields')]
     #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
-    private $form;
+    private ?Form $form = null;
 
     /**
      * @var string|null

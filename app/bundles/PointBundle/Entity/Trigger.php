@@ -100,11 +100,8 @@ class Trigger extends FormEntity implements UuidInterface
     #[Groups(['trigger:read', 'trigger:write'])]
     private $triggerExistingLeads = false;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['trigger:read', 'trigger:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int, TriggerEvent>

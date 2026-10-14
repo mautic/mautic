@@ -320,7 +320,7 @@ final class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int $emailIds
      */
-    public function getOpenedRates($emailIds, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
+    public function getOpenedRates($emailIds, ?\DateTimeInterface $fromDate = null, ?\DateTime $toDate = null): array
     {
         $inIds = (!is_array($emailIds)) ? [$emailIds] : $emailIds;
 
@@ -548,7 +548,7 @@ final class StatRepository extends CommonRepository
      *
      * @param array $emailIds
      */
-    public function getSentCounts($emailIds = [], ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
+    public function getSentCounts($emailIds = [], ?\DateTimeInterface $fromDate = null, ?\DateTime $toDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')

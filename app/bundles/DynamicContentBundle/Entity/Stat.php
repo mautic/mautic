@@ -22,19 +22,13 @@ class Stat
      */
     private $id;
 
-    /**
-     * @var DynamicContent|null
-     */
     #[ORM\ManyToOne(targetEntity: DynamicContent::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'SET NULL')]
-    private $dynamicContent;
+    private ?DynamicContent $dynamicContent = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var \DateTimeInterface

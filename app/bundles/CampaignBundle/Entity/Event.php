@@ -125,12 +125,9 @@ class Event implements ChannelInterface, UuidInterface
     #[ORM\Column(type: 'array')]
     private $properties = [];
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\Column(name: 'trigger_date', type: 'datetime', nullable: true)]
-    private $triggerDate;
+    private ?\DateTimeInterface $triggerDate = null;
 
     /**
      * @var int|null
@@ -146,26 +143,17 @@ class Event implements ChannelInterface, UuidInterface
     #[ORM\Column(name: 'trigger_interval_unit', type: 'string', length: 1, nullable: true)]
     private $triggerIntervalUnit;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\Column(name: 'trigger_hour', type: 'time', nullable: true)]
-    private $triggerHour;
+    private ?\DateTimeInterface $triggerHour = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\Column(name: 'trigger_restricted_start_hour', type: 'time', nullable: true)]
-    private $triggerRestrictedStartHour;
+    private ?\DateTimeInterface $triggerRestrictedStartHour = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\Column(name: 'trigger_restricted_stop_hour', type: 'time', nullable: true)]
-    private $triggerRestrictedStopHour;
+    private ?\DateTimeInterface $triggerRestrictedStopHour = null;
 
     /**
      * @var array|null
@@ -201,13 +189,10 @@ class Event implements ChannelInterface, UuidInterface
     #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $children;
 
-    /**
-     * @var Event|null
-     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'children')]
     #[ORM\JoinColumn(name: 'parent_id')]
-    private $parent;
+    private ?Event $parent = null;
 
     /**
      * @var string|null

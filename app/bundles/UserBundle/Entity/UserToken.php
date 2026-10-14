@@ -34,10 +34,7 @@ class UserToken
      */
     private $secret;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $expiration;
+    private ?\DateTimeInterface $expiration = null;
 
     /**
      * @var bool

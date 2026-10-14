@@ -39,22 +39,16 @@ class TweetStat
     #[ORM\JoinColumn(name: 'tweet_id', onDelete: 'SET NULL')]
     private ?Tweet $tweet = null;
 
-    /**
-     * @var TheLead|null
-     */
     #[ORM\ManyToOne(targetEntity: TheLead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?TheLead $lead = null;
 
     /**
      * @var string
      */
     private $handle;
 
-    /**
-     * @var \DateTime|null
-     */
-    private $dateSent;
+    private ?\DateTime $dateSent = null;
 
     private ?bool $isFailed = false;
 

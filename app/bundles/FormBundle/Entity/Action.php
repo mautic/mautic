@@ -84,13 +84,10 @@ class Action implements UuidInterface
     #[Groups(['action:read', 'action:write', 'form:read'])]
     private $properties = [];
 
-    /**
-     * @var Form|null
-     */
     #[Groups(['action:read', 'action:write', 'form:read'])]
     #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'actions')]
     #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
-    private $form;
+    private ?Form $form = null;
 
     /**
      * @var array

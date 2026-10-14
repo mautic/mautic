@@ -72,23 +72,14 @@ class Message extends FormEntity implements UuidInterface
     #[Groups(['message:read', 'message:write'])]
     private $description;
 
-    /**
-     * @var ?\DateTimeInterface
-     */
     #[Groups(['message:read', 'message:write'])]
-    private $publishUp;
+    private ?\DateTimeInterface $publishUp = null;
 
-    /**
-     * @var ?\DateTimeInterface
-     */
     #[Groups(['message:read', 'message:write'])]
-    private $publishDown;
+    private ?\DateTimeInterface $publishDown = null;
 
-    /**
-     * @var ?Category
-     */
     #[Groups(['message:read', 'message:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int,Channel>
