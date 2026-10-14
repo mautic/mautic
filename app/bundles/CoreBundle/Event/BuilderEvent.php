@@ -19,18 +19,15 @@ class BuilderEvent extends Event
 
     protected string $tokenFilterTarget;
 
-    protected ?object $entity = null;
-
     /**
      * @param string|string[] $requested
      */
     public function __construct(
         protected TranslatorInterface $translator,
-        ?object $entity = null,
+        protected ?object $entity = null,
         protected string|array $requested = 'all',
         protected string $tokenFilter = '',
     ) {
-        $this->entity            = $entity;
         $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
         $this->tokenFilter       = ('label' === $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
