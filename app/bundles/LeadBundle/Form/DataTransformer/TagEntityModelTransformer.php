@@ -19,6 +19,9 @@ final class TagEntityModelTransformer implements DataTransformerInterface
     ) {
     }
 
+    /**
+     * @param array<mixed>|object|null $entity
+     */
     public function reverseTransform(mixed $entity): mixed
     {
         if (!$this->isArray) {

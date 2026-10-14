@@ -14,7 +14,24 @@ final class SomeClass
     {
     }
 
-    public function skipNativeType(\stdClass $entity): void
+    public function mixedNativeType(mixed $entity): void
+    {
+    }
+
+    public function scalarNativeType(int $entity): void
+    {
+    }
+
+    public function arrayNativeType(array $entity): void
+    {
+    }
+
+    /**
+     * a "@param" tag alone is not enough, a native type is required
+     *
+     * @param \stdClass $entity
+     */
+    public function paramTagOnly($entity): void
     {
     }
 
@@ -22,21 +39,19 @@ final class SomeClass
     {
     }
 
-    /**
-     * @param \stdClass $entity
-     */
-    public function skipParamTag($entity): void
+    public function skipClassType(\stdClass $entity): void
     {
     }
 
-    /**
-     * @param string $name
-     */
-    public function missingTypeWithOtherParamTag($name, $entity): void
+    public function skipUnionType(object|array $entity): void
     {
     }
 
-    public function skipOtherName($name): void
+    public function skipNullableObjectType(?object $entity): void
+    {
+    }
+
+    public function testMethodIsExempt(mixed $entity): void
     {
     }
 }

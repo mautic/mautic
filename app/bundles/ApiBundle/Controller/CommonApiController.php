@@ -342,11 +342,9 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
-     * @param object $entity
-     *
      * @return FormInterface<mixed>
      */
-    protected function createEntityForm($entity): FormInterface
+    protected function createEntityForm(object $entity): FormInterface
     {
         return $this->model->createForm(
             $entity,
@@ -445,13 +443,12 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Processes API Form.
      *
-     * @param object            $entity
      * @param array<mixed>|null $parameters
      * @param string            $method
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, ?array $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, object $entity, ?array $parameters = null, $method = 'PUT')
     {
         $categoryId = null;
 

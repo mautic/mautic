@@ -1160,7 +1160,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * If the $entity supports optimistic locking, entity's current version is set to the $form for a later comparison.
      *
-     * @param mixed $entity
+     * @param object $entity
      */
     protected function setOptimisticLockVersion($entity, FormInterface $form): void
     {
@@ -1175,7 +1175,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * If the $entity supports optimistic locking, entity's current version is compared to the value in the $form.
      *
-     * @param mixed $entity
+     * @param object $entity
      */
     protected function checkOptimisticLockVersion($entity, FormInterface $form, bool $isClone): bool
     {

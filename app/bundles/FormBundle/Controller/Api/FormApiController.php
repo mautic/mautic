@@ -352,7 +352,7 @@ final class FormApiController extends CommonApiController
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, ?array $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, object $entity, ?array $parameters = null, $method = 'PUT')
     {
         $parameters['postAction'] ??= 'return';
 

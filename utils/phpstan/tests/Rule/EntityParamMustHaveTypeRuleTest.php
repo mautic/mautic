@@ -15,23 +15,37 @@ final class EntityParamMustHaveTypeRuleTest extends RuleTestCase
 {
     protected function getRule(): Rule
     {
-        return new EntityParamMustHaveTypeRule(self::getContainer()->getByType(\PHPStan\Type\FileTypeMapper::class));
+        return new EntityParamMustHaveTypeRule();
     }
 
     public function testRule(): void
     {
+        $errorMessage = 'Param "$%s" of "%s()" must have a native object type hint ("object", a class, or a union that includes one), not just a "@param" tag.';
+
         $this->analyse([__DIR__.'/Fixture/EntityParamMustHaveType/SomeClass.php'], [
             [
-                'Param "$entity" of "missingType()" must have a type, either a native type or a "@param" tag.',
+                sprintf($errorMessage, 'entity', 'missingType'),
                 9,
             ],
             [
-                'Param "$Entity" of "missingTypeUpperCase()" must have a type, either a native type or a "@param" tag.',
+                sprintf($errorMessage, 'Entity', 'missingTypeUpperCase'),
                 13,
             ],
             [
-                'Param "$entity" of "missingTypeWithOtherParamTag()" must have a type, either a native type or a "@param" tag.',
-                35,
+                sprintf($errorMessage, 'entity', 'mixedNativeType'),
+                17,
+            ],
+            [
+                sprintf($errorMessage, 'entity', 'scalarNativeType'),
+                21,
+            ],
+            [
+                sprintf($errorMessage, 'entity', 'arrayNativeType'),
+                25,
+            ],
+            [
+                sprintf($errorMessage, 'entity', 'paramTagOnly'),
+                34,
             ],
         ]);
     }
