@@ -126,6 +126,9 @@ Mautic.initConfigUnsavedChangesGuard = function(container) {
     // Capture phase so the guard runs before the ajax link handlers
     document.addEventListener('click', Mautic.configLeaveGuard, true);
     globalThis.addEventListener('beforeunload', Mautic.configBeforeUnloadGuard);
+
+    // Saving, applying or cancelling may reload the whole page, which must not trigger the guard
+    form.on('submit', Mautic.removeConfigUnsavedChangesGuard);
 };
 
 Mautic.removeConfigUnsavedChangesGuard = function() {
