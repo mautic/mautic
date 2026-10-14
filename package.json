@@ -10,6 +10,7 @@
     }
   },
   "devDependencies": {
+    "esbuild": "0.28.1",
     "patch-package": "^8.0.1",
     "webpack-cli": "^5.1.4"
   },
@@ -68,7 +69,8 @@
     "multiselect": "^0.9.12",
     "shufflejs": "^5.4.1",
     "typeahead.js": "^0.11.1",
-    "vimeo-froogaloop2": "^0.1.1"
+    "vimeo-froogaloop2": "^0.1.1",
+    "motion": "12.43.0"
   },
   "scripts": {
     "build": "webpack --mode production  --config webpack.config.js",
