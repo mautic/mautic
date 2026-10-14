@@ -51,7 +51,7 @@ final class TriggerEventModel extends CommonFormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof TriggerEvent) {
             throw new MethodNotAllowedHttpException(['Trigger']);

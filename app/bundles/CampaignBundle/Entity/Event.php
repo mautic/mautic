@@ -861,10 +861,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Used by the API.
-     *
-     * @param array $contactLog
      */
-    public function setContactLog($contactLog): static
+    public function setContactLog(array $contactLog): static
     {
         $this->contactLog = $contactLog;
 

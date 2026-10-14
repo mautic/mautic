@@ -65,7 +65,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);
@@ -152,9 +152,8 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @param ?string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param array   $filter
      */
-    public function getStageLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], bool $canViewOthers = true): array
+    public function getStageLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

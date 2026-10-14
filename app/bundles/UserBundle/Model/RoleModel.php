@@ -80,7 +80,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
      *
      * @param array $rawPermissions (i.e. from request)
      */
-    public function setRolePermissions(Role $entity, $rawPermissions): void
+    public function setRolePermissions(Role $entity, array $rawPermissions): void
     {
         if (!is_array($rawPermissions)) {
             return;
@@ -115,7 +115,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);

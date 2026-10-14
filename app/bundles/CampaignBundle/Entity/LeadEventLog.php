@@ -358,7 +358,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     }
 
     /**
-     * @param mixed[] $metadata
+     * @param mixed[]|string $metadata
      */
     public function appendToMetadata($metadata): void
     {
@@ -371,7 +371,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     }
 
     /**
-     * @param mixed[] $metadata
+     * @param mixed[]|string $metadata
      */
     public function setMetadata($metadata): static
     {

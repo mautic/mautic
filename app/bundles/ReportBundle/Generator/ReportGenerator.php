@@ -48,7 +48,7 @@ final class ReportGenerator
      *
      * @return FormInterface<Report>
      */
-    public function getForm(Report $entity, $options): FormInterface
+    public function getForm(Report $entity, array $options): FormInterface
     {
         return $this->formFactory->createBuilder(ReportType::class, $entity, $options)->getForm();
     }

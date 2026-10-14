@@ -151,10 +151,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Determines if ajax content should be returned or direct content (page refresh).
-     *
-     * @param array $args
      */
-    protected function delegateView($args): Response
+    protected function delegateView(array $args): Response
     {
         $request = $this->getCurrentRequest();
         $bundle  = $request->query->get('bundle');
@@ -618,7 +616,7 @@ class CommonController extends AbstractController implements MauticController
     /**
      * @param array|\Iterator $toExport
      */
-    protected function exportResultsAs($toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
+    protected function exportResultsAs(iterable $toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
     {
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));

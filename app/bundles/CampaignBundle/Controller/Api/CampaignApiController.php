@@ -313,10 +313,8 @@ final class CampaignApiController extends CommonApiController
 
     /**
      * Change the array structure.
-     *
-     * @param array $events
      */
-    private function modifyCampaignEventArray($events): array
+    private function modifyCampaignEventArray(array $events): array
     {
         $updatedEvents = [];
 

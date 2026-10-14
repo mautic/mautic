@@ -661,7 +661,7 @@ class FieldModel extends FormModel
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         foreach ($entities as $entity) {
             $this->saveEntity($entity, $unlock);
@@ -794,11 +794,9 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param array $options
-     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
@@ -958,10 +956,8 @@ class FieldModel extends FormModel
 
     /**
      * Get the fields for a specific group.
-     *
-     * @param array $filters
      */
-    public function getGroupFields($group, $filters = ['isPublished' => true]): array
+    public function getGroupFields($group, array $filters = ['isPublished' => true]): array
     {
         $forceFilters = [
             [

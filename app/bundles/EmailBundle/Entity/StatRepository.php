@@ -545,10 +545,8 @@ final class StatRepository extends CommonRepository
 
     /**
      * Get sent counts based grouped by email Id.
-     *
-     * @param array $emailIds
      */
-    public function getSentCounts($emailIds = [], ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
+    public function getSentCounts(array $emailIds = [], ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')

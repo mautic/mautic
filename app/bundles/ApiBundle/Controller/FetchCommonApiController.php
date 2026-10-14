@@ -534,7 +534,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
      */
-    protected function prepareEntitiesForView($results): array
+    protected function prepareEntitiesForView(iterable $results): array
     {
         return $this->prepareEntityResultsToArray(
             $results,
@@ -550,7 +550,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
      */
-    protected function prepareEntityResultsToArray($results, $callback = null): array
+    protected function prepareEntityResultsToArray(iterable $results, $callback = null): array
     {
         if (is_array($results) && isset($results['count'])) {
             $totalCount = $results['count'];

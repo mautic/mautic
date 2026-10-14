@@ -19,8 +19,6 @@ final class StatsApiController extends CommonApiController
      * Lists stats for a database table.
      *
      * @param string $table
-     * @param array  $order
-     * @param array  $where
      */
     #[Route(
         path: '/api/stats/{table}',
@@ -28,7 +26,7 @@ final class StatsApiController extends CommonApiController
         defaults: ['table' => '', '_format' => 'json'],
         methods: ['GET']
     )]
-    public function listAction(Request $request, UserHelper $userHelper, $table = null, string $itemsName = 'stats', $order = [], $where = [], int $start = 0, int $limit = 100): Response
+    public function listAction(Request $request, UserHelper $userHelper, $table = null, string $itemsName = 'stats', array $order = [], array $where = [], int $start = 0, int $limit = 100): Response
     {
         $response = [];
         $where    = InputHelper::cleanArray(empty($where) ? $request->query->all()['where'] ?? [] : $where);

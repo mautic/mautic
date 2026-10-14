@@ -49,13 +49,11 @@ final class RedirectModel extends FormModel
     /**
      * Generate a Mautic redirect/passthrough URL.
      *
-     * @param array $clickthrough
-     *
      * @return string
      */
     public function generateRedirectUrl(
         Redirect $redirect,
-        $clickthrough = [],
+        array $clickthrough = [],
     ) {
         if ($this->dispatcher->hasListeners(RedirectGenerationEvent::class)) {
             $event = new RedirectGenerationEvent($redirect, $clickthrough);

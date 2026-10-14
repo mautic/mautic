@@ -232,10 +232,7 @@ class Stat
         return $this->sentDetails;
     }
 
-    /**
-     * @param array $sentDetails
-     */
-    public function setSentDetails($sentDetails): void
+    public function setSentDetails(array $sentDetails): void
     {
         $this->sentDetails = $sentDetails;
     }
@@ -277,10 +274,7 @@ class Stat
         return $this->tokens;
     }
 
-    /**
-     * @param array $tokens
-     */
-    public function setTokens($tokens): void
+    public function setTokens(array $tokens): void
     {
         $this->tokens = $tokens;
     }
