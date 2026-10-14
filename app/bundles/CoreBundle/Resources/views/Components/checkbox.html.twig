@@ -16,6 +16,9 @@
 
     {% for item in items %}
         {% set item_label = item.label|default('') %}
+        {% if item is defined and item.label is defined and item.label is null %}
+            {% set item_label = (item.name|default(name))|replace({'[': ' ', ']': ' ', '_': ' '})|trim|humanize %}
+        {% endif %}
         {% set item_value = item.value is defined ? item.value : loop.index0 %}
         {% set item_id = item.id|default(base_id ~ '-' ~ loop.index0 ~ '-' ~ item_value|replace({' ': '-', '.': '-', '_': '-', '[': '-', ']': ''})|lower) %}
         {% set item_name = item.name|default(name) %}
@@ -31,18 +34,27 @@
         {% endif %}
 
         <div class="{{ classes|join(' ') }}">
+            {% set input_classes = ['form-check-input'] %}
+            {% if item.className|default('') %}
+                {% set input_classes = input_classes|merge([item.className]) %}
+            {% endif %}
+            {% if item_attributes.class is defined and item_attributes.class is not empty %}
+                {% set input_classes = input_classes|merge([item_attributes.class]) %}
+            {% endif %}
             <input
-                class="form-check-input{{ item.className|default('') ? ' ' ~ item.className : '' }}"
+                class="{{ input_classes|join(' ')|escape }}"
                 type="checkbox"
-                name="{{ item_name }}"
-                id="{{ item_id }}"
-                value="{{ item_value }}"
-                {% if help_id %}aria-describedby="{{ help_id }}"{% endif %}
+                name="{{ item_name|escape }}"
+                id="{{ item_id|escape }}"
+                value="{{ item_value|escape }}"
+                {% if help_id %}aria-describedby="{{ help_id|escape }}"{% endif %}
                 {% if item.checked|default(false) %}checked{% endif %}
                 {% if item.disabled|default(false) %}disabled{% endif %}
                 {% if required %}required{% endif %}
                 {% for attr_key, attr_value in item_attributes %}
-                    {{ attr_key }}="{{ attr_value }}"
+                    {% if attr_key != 'class' and attr_value is not same as(false) and attr_value is not null %}
+                    {{ attr_key|escape }}="{{ attr_value|escape }}"
+                    {% endif %}
                 {% endfor %}
             >
             {% if item_label %}
