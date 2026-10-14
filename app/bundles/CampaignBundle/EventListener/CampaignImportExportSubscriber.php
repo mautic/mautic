@@ -370,7 +370,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      * @param array<string, mixed> $canvasSettings
      * @param array<int, int>      $eventIdMap
      */
-    private function updateCanvasNodes(array $canvasSettings, array $eventIdMap): void
+    private function updateCanvasNodes(array &$canvasSettings, array $eventIdMap): void
     {
         if (!isset($canvasSettings['nodes'])) {
             return;
@@ -388,7 +388,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      * @param array<string, mixed> $canvasSettings
      * @param array<int, int>      $eventIdMap
      */
-    private function updateCanvasConnections(array $canvasSettings, array $eventIdMap): void
+    private function updateCanvasConnections(array &$canvasSettings, array $eventIdMap): void
     {
         if (!isset($canvasSettings['connections'])) {
             return;
@@ -426,7 +426,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      * @param array<int, array<string, mixed>>     $dependencies
      * @param array<int, array<string, mixed>|int> $idMap
      */
-    private function updateDependencies(array $dependencies, array $idMap, string $key): void
+    private function updateDependencies(array &$dependencies, array $idMap, string $key): void
     {
         foreach ($dependencies as &$dependencyGroup) {
             foreach ($dependencyGroup as &$items) {
@@ -528,7 +528,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      * @param array<string, mixed>             $data
      * @param array<int, array<string, mixed>> $dependencies
      */
-    private function updateEvents(array $data, array $dependencies): void
+    private function updateEvents(array &$data, array $dependencies): void
     {
         if (empty($data[Event::ENTITY_NAME])) {
             return;
@@ -554,7 +554,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      * @param array<string, mixed>             $data
      * @param array<int, array<string, mixed>> $dependencies
      */
-    private function updateEmails(array $data, array $dependencies): void
+    private function updateEmails(array &$data, array $dependencies): void
     {
         if (empty($data[Email::ENTITY_NAME])) {
             return;
@@ -584,7 +584,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      * @param array<string, mixed>             $data
      * @param array<int, array<string, mixed>> $dependencies
      */
-    private function updateFormRelatedData(array $data, array $dependencies, string $entity): void
+    private function updateFormRelatedData(array &$data, array $dependencies, string $entity): void
     {
         if (empty($data[Form::ENTITY_NAME])) {
             return;

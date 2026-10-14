@@ -138,7 +138,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
      */
-    public function createFromArray(string $className, array $data): object
+    public function createFromArray(string $className, array &$data): object
     {
         $entity        = new $className();
         $meta          = $this->getEntityManager()->getClassMetadata($className);
@@ -1849,7 +1849,7 @@ abstract class CommonRepository extends ServiceEntityRepository
         return InputHelper::alphanum($sqlAttr, false, null, $allowedCharacters);
     }
 
-    private function convertOrmPropertiesToColumns(array $filters, array $properties): void
+    private function convertOrmPropertiesToColumns(array &$filters, array $properties): void
     {
         foreach ($filters as &$f) {
             if ($this->convertGroupedOrmPropertiesToColumns($f, $properties)) {
@@ -1876,7 +1876,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      * @param array<string, mixed> $filter
      * @param array<int, string>   $properties
      */
-    private function convertGroupedOrmPropertiesToColumns(array $filter, array $properties): bool
+    private function convertGroupedOrmPropertiesToColumns(array &$filter, array $properties): bool
     {
         if (!isset($filter['group']) || !is_array($filter['group'])) {
             return false;

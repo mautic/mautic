@@ -29,6 +29,7 @@ use PhpParser\Node\Stmt\Foreach_;
 use PhpParser\Node\Stmt\Function_;
 use PhpParser\Node\Stmt\Global_;
 use PhpParser\Node\Stmt\Static_;
+use PhpParser\Node\Stmt\Unset_;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
@@ -139,6 +140,13 @@ final readonly class ByReferenceParamAnalyzer
                     return null;
                 }
 
+                if ($node instanceof Unset_) {
+                    // unset($param[$k]) removes an element, a write the caller observes
+                    foreach ($node->vars as $var) {
+                        $this->markWrittenTarget($var);
+                    }
+                }
+
                 if ($node instanceof Assign || $node instanceof AssignOp) {
                     $this->markWrittenTarget($node->var);
                 }
@@ -156,6 +164,15 @@ final readonly class ByReferenceParamAnalyzer
                 }
 
                 if ($node instanceof Foreach_) {
+                    if ($node->byRef) {
+                        // foreach ($param as &$v) aliases the elements of $param into $v;
+                        // writing $v then mutates $param, so the reference is used
+                        $root = $this->rootVariableName($node->expr);
+                        if (null !== $root) {
+                            $this->markEscaped($root);
+                        }
+                    }
+
                     if (null !== $node->keyVar) {
                         $this->markWrittenTarget($node->keyVar);
                     }
@@ -296,8 +313,10 @@ final readonly class ByReferenceParamAnalyzer
 
             private function escapeIfCandidate(Expr $expr): void
             {
-                if ($expr instanceof Variable && is_string($expr->name)) {
-                    $this->markEscaped($expr->name);
+                // $param or an element reached from it, e.g. $param['a']['b'], both alias $param out
+                $name = $this->rootVariableName($expr);
+                if (null !== $name) {
+                    $this->markEscaped($name);
                 }
             }
 

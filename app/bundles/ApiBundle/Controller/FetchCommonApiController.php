@@ -603,7 +603,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * @param array<mixed> $where
      */
-    protected function sanitizeWhereClauseArrayFromRequest(array $where): void
+    protected function sanitizeWhereClauseArrayFromRequest(array &$where): void
     {
         foreach ($where as $key => $statement) {
             if (isset($statement['internal'])) {
@@ -619,7 +619,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      * @param TEntity|null                  $entity
      * @param array<TEntity|null>           $entities
      */
-    protected function setBatchError(int $key, string $msg, int $code, array &$errors, array $entities = [], ?object $entity = null): void
+    protected function setBatchError(int $key, string $msg, int $code, array &$errors, array &$entities = [], ?object $entity = null): void
     {
         unset($entities[$key]);
         if ($entity) {

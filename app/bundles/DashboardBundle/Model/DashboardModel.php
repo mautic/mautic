@@ -147,7 +147,7 @@ final class DashboardModel extends FormModel
      *
      * @param array<mixed>|Paginator<mixed> $widgets
      */
-    public function populateWidgetPreviews(array|Paginator $widgets): void
+    public function populateWidgetPreviews(array|Paginator &$widgets): void
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
@@ -162,7 +162,7 @@ final class DashboardModel extends FormModel
      * @param array $widgets
      * @param array $filter
      */
-    public function populateWidgetsContent($widgets, $filter = []): void
+    public function populateWidgetsContent(&$widgets, $filter = []): void
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {

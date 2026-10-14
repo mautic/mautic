@@ -51,6 +51,31 @@ final class NeededReferenceParam
         $this->consume($dependency);
     }
 
+    public function mutateViaForeach(array &$rows): void
+    {
+        foreach ($rows as &$row) {
+            $row['depth'] = 1;
+        }
+    }
+
+    public function removeViaUnset(array &$items): void
+    {
+        foreach ($items as $key => $item) {
+            if (isset($item['internal'])) {
+                unset($items[$key]);
+            }
+        }
+    }
+
+    public function recurseOnElementByRef(array &$tree): void
+    {
+        foreach ($tree as $key => $branch) {
+            if (isset($branch['children'])) {
+                $this->recurseOnElementByRef($tree[$key]['children']);
+            }
+        }
+    }
+
     /**
      * @return array<int, int>
      */

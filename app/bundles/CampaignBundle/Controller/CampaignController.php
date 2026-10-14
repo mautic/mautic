@@ -1363,7 +1363,7 @@ final class CampaignController extends AbstractStandardFormController
      * @param array<int|string, array<int|string, int|string>> $campaignLogCountsProcessed
      */
     private function processCampaignEvents(
-        array $events,
+        array &$events,
         bool $hasCampaignLeads,
         array $campaignLogCounts,
         array $campaignLogCountsProcessed,
@@ -1398,7 +1398,7 @@ final class CampaignController extends AbstractStandardFormController
      *
      * @return array<string, array<int, array<int|string, int|string>>>
      */
-    private function processCampaignEventsFromParentCondition(array $events): array
+    private function processCampaignEventsFromParentCondition(array &$events): array
     {
         $sortedEvents = [
             'decision'  => [],
@@ -1431,7 +1431,7 @@ final class CampaignController extends AbstractStandardFormController
     /**
      * @param array<int, array<string, mixed>> $events
      */
-    private function addSchedulingLabels(array $events): void
+    private function addSchedulingLabels(array &$events): void
     {
         foreach ($events as &$event) {
             $label = $this->getSchedulingLabel($event);
@@ -1483,7 +1483,7 @@ final class CampaignController extends AbstractStandardFormController
      *
      * @return array<int, array<int, string>>
      */
-    private function getCampaignLogCountsProcessed(array $campaignLogCounts): array
+    private function getCampaignLogCountsProcessed(array &$campaignLogCounts): array
     {
         $campaignLogCountsProcessed = [];
 

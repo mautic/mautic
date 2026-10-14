@@ -1216,7 +1216,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             $this->pushLeadDoNotContactByDate('email', $checkEmailsInSF, $sfObject, $params);
 
             // We're done
-            if ($checkEmailsInSF === []) {
+            if (!$checkEmailsInSF) {
                 break;
             }
 
@@ -2226,7 +2226,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function prepareMauticContactsToCreate(
         array &$mauticData,
-        array $checkEmailsInSF,
+        array &$checkEmailsInSF,
         array &$processedLeads,
         array $objectFields,
     ): void {
@@ -2521,7 +2521,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function pushLeadDoNotContactByDate($channel, $sfRecords, $sfObject, array $params = []): void
+    public function pushLeadDoNotContactByDate($channel, &$sfRecords, $sfObject, array $params = []): void
     {
         $filters            = [];
         $leadIds            = [];
@@ -2904,7 +2904,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      */
     private function prepareMauticCompaniesToCreate(
         array &$mauticData,
-        array $checkCompaniesInSF,
+        array &$checkCompaniesInSF,
         array &$processedCompanies,
         array $objectFields,
     ): void {
@@ -3003,7 +3003,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      * @throws ORMException
      * @throws \Exception
      */
-    private function getSalesforceAccountsByName(array $checkIdsInSF, string $requiredFieldString): array
+    private function getSalesforceAccountsByName(array &$checkIdsInSF, string $requiredFieldString): array
     {
         $searchForIds   = [];
         $searchForNames = [];

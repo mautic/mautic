@@ -393,7 +393,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function generateTextAttributes(array $button): string
+    private function generateTextAttributes(array &$button): string
     {
         $btnTextAttr = '';
         if (isset($button['btnTextAttr'])) {
