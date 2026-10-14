@@ -502,6 +502,7 @@ input[type=file] {@include outline();}
 input[type="checkbox"] {
   --mtc-checkbox-size: 14px;
   aspect-ratio: 1 / 1;
+  width: var(--mtc-checkbox-size);
   height: var(--mtc-checkbox-size);
   vertical-align: -3px;
   background-color: transparent;
