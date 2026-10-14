@@ -1129,3 +1129,17 @@
     | `Mautic\PointBundle\Entity\TriggerEvent` | `getChanges()` | `?array` |
     | `Mautic\ReportBundle\Entity\Report` | `getSettings()` | `?array` |
     | `Mautic\UserBundle\Entity\Role` | `getRawPermissions()` | `?array` |
+
+- Methods with a parameter named `$entity` now declare a native type on it instead of only a `@param` docblock: `object`, `object|array` (where an array is also accepted, e.g. `createForm()`), or `?object` (where the value may be null). If you extend one of these classes and override such a method with an untyped `$entity`, add the matching native type to the override, otherwise PHP fails with an incompatible-declaration error:
+
+    ```diff
+    -public function createForm($entity, $action = null, $options = []): FormInterface
+    +public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+
+    -protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    +protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    ```
+
+    Affected base classes include `Mautic\CoreBundle\Model\FormModel` (`createForm()`, `dispatchEvent()`, `setTimestamps()`, `unlockEntity()`, `getUserContactSubject()`), `Mautic\ApiBundle\Controller\CommonApiController` (`createEntityForm()`, `processForm()`, `prePopulateForm()`, `preSaveEntity()`, `processBatchForm()`, `saveEntity()`, `setCategory()`), `Mautic\ApiBundle\Controller\FetchCommonApiController` (`checkEntityAccess()`, now `?object`), `Mautic\CoreBundle\Controller\AbstractStandardFormController` and `AbstractFormController` (`afterEntityClone()`, `afterEntitySave()`, `afterFormProcessed()`, `beforeEntitySave()`, `beforeFormProcessed()`, `checkActionPermission()`, `setOptimisticLockVersion()`, `checkOptimisticLockVersion()`, `isLocked()`, `canEdit()`), `Mautic\CoreBundle\Entity\CommonRepository` (`checkUniqueAlias()`) and `Mautic\CoreBundle\Model\VariantModelTrait` (`resetVariants()`).
+
+- A few `$entity` parameters that never held an entity object were renamed to describe their real value: `Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer::transform()` and `Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer::reverseTransform()` now take `$value`, and `Mautic\CampaignBundle\EventListener\CampaignImportExportSubscriber::updateFormRelatedData()` / `getSubDependencies()` now take `$entityName`. Only callers that passed these by name (named arguments) are affected.
