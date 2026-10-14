@@ -310,6 +310,7 @@ final class OrderExecutionerTest extends TestCase
                         $this->assertSame(Contact::NAME, $event->getObject()->getName());
 
                         $createdObjectMappings = [];
+                        /** @var ObjectChangeDAO $createObject */
                         foreach ($event->getCreateObjects() as $createObject) {
                             $objectMapping = new ObjectMapping();
                             $objectMapping->setIntegration($createObject->getIntegration());
@@ -327,6 +328,7 @@ final class OrderExecutionerTest extends TestCase
                         $this->assertSame(Company::NAME, $event->getObject()->getName());
 
                         $createdObjectMappings = [];
+                        /** @var ObjectChangeDAO $createObject */
                         foreach ($event->getCreateObjects() as $createObject) {
                             $objectMapping = new ObjectMapping();
                             $objectMapping->setIntegration($createObject->getIntegration());

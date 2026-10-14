@@ -53,6 +53,7 @@ final class TokenPersistenceTest extends TestCase
         ];
 
         $factory      = new RawTokenFactory();
+        /** @var RawToken $tokenFromApi */
         $tokenFromApi = $factory([
             'access_token'  => $accessToken,
             'refresh_token' => $refreshToken,
@@ -191,6 +192,7 @@ final class TokenPersistenceTest extends TestCase
         ];
 
         $factory      = new RawTokenFactory();
+        /** @var RawToken $tokenFromApi */
         $tokenFromApi = $factory([
             'access_token'  => $accessToken,
             'refresh_token' => $refreshToken,
@@ -218,6 +220,7 @@ final class TokenPersistenceTest extends TestCase
         ];
 
         $factory      = new RawTokenFactory();
+        /** @var RawToken $tokenFromApi */
         $tokenFromApi = $factory([
             'access_token'  => $accessToken,
             'refresh_token' => $refreshToken,
@@ -246,6 +249,7 @@ final class TokenPersistenceTest extends TestCase
         ];
 
         $factory      = new RawTokenFactory();
+        /** @var RawToken $tokenFromApi */
         $tokenFromApi = $factory([
             'access_token'  => $accessToken,
             'refresh_token' => $refreshToken,
