@@ -267,7 +267,7 @@ final class DashboardModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');

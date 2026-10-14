@@ -522,7 +522,7 @@ final class EmailController extends AbstractStandardFormController
         EmailConfig $emailConfig,
         EmailModel $model,
         ThemeHelper $themeHelper,
-        $entity = null,
+        ?object $entity = null,
     ): Response {
         if (!$entity instanceof Email) {
             $entity = $model->getEntity();

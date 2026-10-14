@@ -9,14 +9,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class ApiEntityEvent extends CommonEvent
 {
-    /**
-     * @param object $entity
-     */
     public function __construct(
-        protected $entity,
+        object $entity,
         private readonly array $entityRequestParameters,
         private readonly Request $request,
     ) {
+        $this->entity = $entity;
     }
 
     /**

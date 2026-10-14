@@ -81,7 +81,7 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -112,7 +112,7 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);

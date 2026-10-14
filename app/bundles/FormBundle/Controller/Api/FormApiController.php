@@ -144,7 +144,7 @@ final class FormApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit'): Response|array|null
+    protected function preSaveEntity(object &$entity, $form, array $parameters, $action = 'edit'): Response|array|null
     {
         $method = $this->getCurrentRequest()->getMethod();
         $isNew  = false;
@@ -334,7 +334,7 @@ final class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createFieldEntityForm($entity): FormInterface
+    protected function createFieldEntityForm(object|array $entity): FormInterface
     {
         return $this->fieldModel->createForm(
             $entity,

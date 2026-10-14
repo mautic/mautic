@@ -525,7 +525,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @param Lead|\Mautic\LeadBundle\Entity\Company $entity
      */
-    public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
+    public function saveSyncedData(object $entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
         $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(
             $this->getName(),

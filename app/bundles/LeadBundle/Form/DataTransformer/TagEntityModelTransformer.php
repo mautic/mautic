@@ -20,24 +20,24 @@ final class TagEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param array<mixed>|object|null $entity
+     * @param array<mixed>|object|null $value
      */
-    public function reverseTransform(mixed $entity): mixed
+    public function reverseTransform(mixed $value): mixed
     {
         if (!$this->isArray) {
-            if (null === $entity || !is_object($entity)) {
+            if (null === $value || !is_object($value)) {
                 return null;
             }
 
-            return $entity->getTag();
+            return $value->getTag();
         }
 
-        if (!is_array($entity) && !$entity instanceof PersistentCollection) {
+        if (!is_array($value) && !$value instanceof PersistentCollection) {
             return [];
         }
 
         $return = [];
-        foreach ($entity as $e) {
+        foreach ($value as $e) {
             $return[] = $e->getTag();
         }
 
