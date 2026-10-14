@@ -1,5 +1,4 @@
-import { animate, hover, press, visualElementStore } from 'motion';
-import { emit, register } from './lifecycle';
+import { drawStroke, emit, hover, mountComponent, press, springScale } from '@mautic/components';
 
 type Checked = boolean | 'indeterminate';
 type Options = { checked?: Checked; disabled?: boolean; onCheckedChange?: (checked: Checked) => void };
@@ -14,8 +13,8 @@ class AnimatedCheckbox {
   private readonly defaultChecked: Checked;
   private controlled: boolean;
   private onCheckedChange?: Options['onCheckedChange'];
-  private animation?: ReturnType<typeof animate>;
-  private stroke?: ReturnType<typeof animate>;
+  private animation?: ReturnType<typeof springScale>;
+  private stroke?: ReturnType<typeof drawStroke>;
   private lastDrawn?: Checked;
   private hovered = false;
   private pressing = false;
@@ -109,21 +108,12 @@ class AnimatedCheckbox {
       shape.setAttribute('opacity', '0');
       this.indicator.replaceChildren(shape);
     }
-    const target = this.checked ? 1 : 0;
-    this.stroke = animate(shape, {
-      pathLength: fresh ? [0, target] : target,
-      opacity: fresh ? [0, target] : target
-    }, { duration: .2, delay: this.checked === true ? .2 : 0, ease: 'easeOut' });
-    if (fresh) {
-      const visual = visualElementStore.get(shape);
-      visual?.getValue('opacity')?.set(0);
-      visual?.getValue('pathLength')?.set(0);
-    }
+    this.stroke = drawStroke(shape, Boolean(this.checked), fresh, this.checked === true ? 0.2 : 0);
     this.lastDrawn = this.checked;
   }
 
   private scale(): void {
-    this.animation = animate(this.button, { scale: this.pressing ? .95 : this.hovered ? 1.05 : 1 }, { type: 'spring', stiffness: 550, damping: 30, restSpeed: 10, reduceMotion: false });
+    this.animation = springScale(this.button, this.pressing ? 0.95 : this.hovered ? 1.05 : 1);
   }
 
   destroy(): void {
@@ -134,4 +124,4 @@ class AnimatedCheckbox {
   }
 }
 
-register('AnimatedCheckbox', '[data-component="animated-checkbox"]', (element) => new AnimatedCheckbox(element));
+mountComponent('AnimatedCheckbox', '[data-component="animated-checkbox"]', (element) => new AnimatedCheckbox(element));
