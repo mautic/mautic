@@ -211,7 +211,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $fields->add($formField);
 
-        (new \ReflectionProperty($formEntity, 'fields'))->setValue($formEntity, $fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -236,7 +236,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $fields->add($formField);
 
-        (new \ReflectionProperty($formEntity, 'fields'))->setValue($formEntity, $fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -260,7 +260,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $fields->add($formField);
 
-        (new \ReflectionProperty($formEntity, 'fields'))->setValue($formEntity, $fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -289,7 +289,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $contactField->setType('boolean');
         $contactField->setProperties($options);
 
-        (new \ReflectionProperty($formEntity, 'fields'))->setValue($formEntity, $fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -318,7 +318,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $contactField->setType('boolean');
         $contactField->setProperties($options);
 
-        (new \ReflectionProperty($formEntity, 'fields'))->setValue($formEntity, $fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -394,7 +394,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $fields->add($formField);
 
-        (new \ReflectionProperty($formEntity, 'fields'))->setValue($formEntity, $fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -433,7 +433,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $contactField = new LeadField();
         $contactField->setType($type);
 
-        (new \ReflectionProperty($formEntity, 'fields'))->setValue($formEntity, $fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')

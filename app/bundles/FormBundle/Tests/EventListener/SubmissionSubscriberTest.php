@@ -60,7 +60,7 @@ final class SubmissionSubscriberTest extends TestCase
     private function submissionForForm(int $formId): Submission
     {
         $form = new Form();
-        (new \ReflectionProperty($form, 'id'))->setValue($form, $formId);
+        new \ReflectionProperty($form, 'id')->setValue($form, $formId);
 
         $submission = new Submission();
         $submission->setForm($form);

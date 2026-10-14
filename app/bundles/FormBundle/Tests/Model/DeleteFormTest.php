@@ -49,7 +49,7 @@ final class DeleteFormTest extends \PHPUnit\Framework\TestCase
         $dispatcher            = $this->createMock(EventDispatcher::class);
         $formRepository        = $this->createMock(FormRepository::class);
         $form                  = new Form();
-        (new \ReflectionProperty($form, 'id'))->setValue($form, 1);
+        new \ReflectionProperty($form, 'id')->setValue($form, 1);
         $mappedObjectCollector = $this->createStub(MappedObjectCollectorInterface::class);
         $formModel             = new FormModel(
             $requestStack,

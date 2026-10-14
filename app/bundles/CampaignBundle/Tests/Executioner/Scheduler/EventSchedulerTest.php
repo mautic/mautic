@@ -138,7 +138,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated(): void
     {
         $campaign = new Campaign();
-        (new \ReflectionProperty($campaign, 'id'))->setValue($campaign, 1);
+        new \ReflectionProperty($campaign, 'id')->setValue($campaign, 1);
 
         $event = new Event();
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
@@ -147,7 +147,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $event->setTriggerHour('1970-01-01 09:00:00');
         $event->setTriggerRestrictedDaysOfWeek([]);
         $event->setCampaign($campaign);
-        (new \ReflectionProperty($event, 'id'))->setValue($event, 1);
+        new \ReflectionProperty($event, 'id')->setValue($event, 1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00', new \DateTimeZone('America/New_York'));
@@ -177,7 +177,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     public function testEventIsRescheduledForRelativeTimeIfAppropriate(): void
     {
         $campaign = new Campaign();
-        (new \ReflectionProperty($campaign, 'id'))->setValue($campaign, 1);
+        new \ReflectionProperty($campaign, 'id')->setValue($campaign, 1);
 
         $event = new Event();
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
@@ -186,7 +186,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $event->setTriggerHour('1970-01-01 11:00:00');
         $event->setTriggerRestrictedDaysOfWeek([]);
         $event->setCampaign($campaign);
-        (new \ReflectionProperty($event, 'id'))->setValue($event, 1);
+        new \ReflectionProperty($event, 'id')->setValue($event, 1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00');
@@ -217,7 +217,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated(): void
     {
         $campaign = new Campaign();
-        (new \ReflectionProperty($campaign, 'id'))->setValue($campaign, 1);
+        new \ReflectionProperty($campaign, 'id')->setValue($campaign, 1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00', new \DateTimeZone('America/New_York'));
@@ -237,7 +237,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $event->setTriggerRestrictedDaysOfWeek([$dow]);
         $event->setCampaign($campaign);
         $event->setTriggerIntervalUnit('d');
-        (new \ReflectionProperty($event, 'id'))->setValue($event, 1);
+        new \ReflectionProperty($event, 'id')->setValue($event, 1);
 
         $contact = new Lead();
         $contact->setId(1);

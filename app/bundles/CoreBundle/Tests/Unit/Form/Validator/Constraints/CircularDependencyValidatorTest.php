@@ -100,15 +100,15 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $leadList1 = new LeadList();
-        (new \ReflectionProperty($leadList1, 'id'))->setValue($leadList1, 1);
+        new \ReflectionProperty($leadList1, 'id')->setValue($leadList1, 1);
         $leadList1->setFilters($filters);
 
         $leadList2 = new LeadList();
-        (new \ReflectionProperty($leadList2, 'id'))->setValue($leadList2, 2);
+        new \ReflectionProperty($leadList2, 'id')->setValue($leadList2, 2);
         $leadList2->setFilters($filters2);
 
         $leadList3 = new LeadList();
-        (new \ReflectionProperty($leadList3, 'id'))->setValue($leadList3, 3);
+        new \ReflectionProperty($leadList3, 'id')->setValue($leadList3, 3);
         $leadList3->setFilters($filters3);
 
         $entities = [

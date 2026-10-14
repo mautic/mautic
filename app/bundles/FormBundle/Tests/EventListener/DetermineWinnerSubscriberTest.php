@@ -66,8 +66,8 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $parent->setIsPublished(true);
         $child->setIsPublished(true);
-        (new \ReflectionProperty($parent, 'id'))->setValue($parent, 1);
-        (new \ReflectionProperty($child, 'id'))->setValue($child, 2);
+        new \ReflectionProperty($parent, 'id')->setValue($parent, 1);
+        new \ReflectionProperty($child, 'id')->setValue($child, 2);
         $parent->setVariantStartDate($startDate);
 
         $this->submissionRepository->expects($this->once())

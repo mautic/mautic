@@ -77,7 +77,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     {
         $decision = new Event();
         $decision->setEventType(Event::TYPE_DECISION);
-        (new \ReflectionProperty($decision, 'id'))->setValue($decision, 1);
+        new \ReflectionProperty($decision, 'id')->setValue($decision, 1);
         $campaign = new Campaign();
         $campaign->addEvent(0, $decision);
 
@@ -96,10 +96,10 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     {
         $decision = new Event();
         $decision->setEventType(Event::TYPE_DECISION);
-        (new \ReflectionProperty($decision, 'id'))->setValue($decision, 1);
+        new \ReflectionProperty($decision, 'id')->setValue($decision, 1);
         $campaign = new Campaign();
         $campaign->addEvent(0, $decision);
-        (new \ReflectionProperty($campaign, 'id'))->setValue($campaign, 1);
+        new \ReflectionProperty($campaign, 'id')->setValue($campaign, 1);
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
@@ -154,7 +154,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     {
         $campaign = new Campaign();
         $campaign->setIsPublished(true);
-        (new \ReflectionProperty($campaign, 'id'))->setValue($campaign, 1);
+        new \ReflectionProperty($campaign, 'id')->setValue($campaign, 1);
 
         $decision = new Event();
         $decision->setCampaign($campaign);

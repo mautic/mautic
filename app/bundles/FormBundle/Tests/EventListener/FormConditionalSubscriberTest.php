@@ -47,9 +47,9 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
         $childId     = 'new_child_id';
         $form        = new Form();
 
-        (new \ReflectionProperty($parentField, 'id'))->setValue($parentField, $parentId);
+        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentId);
         $parentField->setSessionId($parentId);
-        (new \ReflectionProperty($childField, 'id'))->setValue($childField, $childId);
+        new \ReflectionProperty($childField, 'id')->setValue($childField, $childId);
         $childField->setSessionId($childId);
         $childField->setParent($parentId);
 
@@ -76,7 +76,7 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
         $childId     = 456;
         $form        = new Form();
 
-        (new \ReflectionProperty($childField, 'id'))->setValue($childField, $childId);
+        new \ReflectionProperty($childField, 'id')->setValue($childField, $childId);
         $childField->setSessionId($childId);
         $childField->setParent((string) $parentId);
 

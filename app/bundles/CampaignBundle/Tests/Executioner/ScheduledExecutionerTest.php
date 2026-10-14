@@ -90,14 +90,14 @@ final class ScheduledExecutionerTest extends TestCase
         $campaign->setIsPublished(true);
 
         $event = new Event();
-        (new \ReflectionProperty($event, 'id'))->setValue($event, 1);
+        new \ReflectionProperty($event, 'id')->setValue($event, 1);
         $event->setCampaign($campaign);
 
         $lead = new Lead();
         $lead->setId(1);
 
         $log1 = new LeadEventLog();
-        (new \ReflectionProperty($log1, 'id'))->setValue($log1, 1);
+        new \ReflectionProperty($log1, 'id')->setValue($log1, 1);
         $log1->setEvent($event);
         $log1->setCampaign($campaign);
         $log1->setLead($lead);
@@ -105,7 +105,7 @@ final class ScheduledExecutionerTest extends TestCase
         $log1->setRotation(9);
 
         $log2 = new LeadEventLog();
-        (new \ReflectionProperty($log2, 'id'))->setValue($log2, 2);
+        new \ReflectionProperty($log2, 'id')->setValue($log2, 2);
         $log2->setEvent($event);
         $log2->setCampaign($campaign);
         $log2->setLead($lead);
@@ -149,14 +149,14 @@ final class ScheduledExecutionerTest extends TestCase
         $campaign->setIsPublished(false);
 
         $event = new Event();
-        (new \ReflectionProperty($event, 'id'))->setValue($event, 1);
+        new \ReflectionProperty($event, 'id')->setValue($event, 1);
         $event->setCampaign($campaign);
 
         $lead = new Lead();
         $lead->setId(3);
 
         $log1 = new LeadEventLog();
-        (new \ReflectionProperty($log1, 'id'))->setValue($log1, 1);
+        new \ReflectionProperty($log1, 'id')->setValue($log1, 1);
         $log1->setEvent($event);
         $log1->setCampaign($campaign);
         $log1->setLead($lead);
@@ -164,7 +164,7 @@ final class ScheduledExecutionerTest extends TestCase
         $log1->setRotation(15);
 
         $log2 = new LeadEventLog();
-        (new \ReflectionProperty($log2, 'id'))->setValue($log2, 2);
+        new \ReflectionProperty($log2, 'id')->setValue($log2, 2);
         $log2->setEvent($event);
         $log2->setCampaign($campaign);
         $log2->setLead($lead);

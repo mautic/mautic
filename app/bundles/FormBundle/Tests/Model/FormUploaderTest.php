@@ -33,18 +33,18 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $file1Mock                = $this->createStub(UploadedFile::class);
         $file2Mock                = $this->createStub(UploadedFile::class);
         $form1                    = new Form();
-        (new \ReflectionProperty($form1, 'id'))->setValue($form1, $this->formId1);
+        new \ReflectionProperty($form1, 'id')->setValue($form1, $this->formId1);
 
         $field1 = new Field();
-        (new \ReflectionProperty($field1, 'id'))->setValue($field1, 'fieldId1');
+        new \ReflectionProperty($field1, 'id')->setValue($field1, 'fieldId1');
         $field1->setForm($form1);
         $field1->setAlias('file1');
 
         $form2 = new Form();
-        (new \ReflectionProperty($form2, 'id'))->setValue($form2, $this->formId2);
+        new \ReflectionProperty($form2, 'id')->setValue($form2, $this->formId2);
 
         $field2 = new Field();
-        (new \ReflectionProperty($field2, 'id'))->setValue($field2, 'fieldId2');
+        new \ReflectionProperty($field2, 'id')->setValue($field2, 'fieldId2');
         $field2->setForm($form2);
         $field2->setAlias('file2');
 
@@ -102,18 +102,18 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $file1Mock                = $this->createStub(UploadedFile::class);
         $file2Mock                = $this->createStub(UploadedFile::class);
         $form1                    = new Form();
-        (new \ReflectionProperty($form1, 'id'))->setValue($form1, $this->formId1);
+        new \ReflectionProperty($form1, 'id')->setValue($form1, $this->formId1);
 
         $field1 = new Field();
-        (new \ReflectionProperty($field1, 'id'))->setValue($field1, 'fieldId1');
+        new \ReflectionProperty($field1, 'id')->setValue($field1, 'fieldId1');
         $field1->setForm($form1);
         $field1->setAlias('file1');
 
         $form2 = new Form();
-        (new \ReflectionProperty($form2, 'id'))->setValue($form2, $this->formId2);
+        new \ReflectionProperty($form2, 'id')->setValue($form2, $this->formId2);
 
         $field2 = new Field();
-        (new \ReflectionProperty($field2, 'id'))->setValue($field2, 'fieldId2');
+        new \ReflectionProperty($field2, 'id')->setValue($field2, 'fieldId2');
         $field2->setForm($form2);
         $field2->setAlias('file2');
 
@@ -199,10 +199,10 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->uploadDir);
 
         $form = new Form();
-        (new \ReflectionProperty($form, 'id'))->setValue($form, $this->formId1);
+        new \ReflectionProperty($form, 'id')->setValue($form, $this->formId1);
 
         $field = new Field();
-        (new \ReflectionProperty($field, 'id'))->setValue($field, 'fieldId1');
+        new \ReflectionProperty($field, 'id')->setValue($field, 'fieldId1');
         $field->setForm($form);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
@@ -230,10 +230,10 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
 
         $form = new Form();
-        (new \ReflectionProperty($form, 'id'))->setValue($form, $this->formId1);
+        new \ReflectionProperty($form, 'id')->setValue($form, $this->formId1);
 
         $field = new Field();
-        (new \ReflectionProperty($field, 'id'))->setValue($field, 'fieldId1');
+        new \ReflectionProperty($field, 'id')->setValue($field, 'fieldId1');
         $field->setForm($form);
         $field->setType('file');
 
@@ -256,13 +256,13 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
             ->with('form_upload_dir')
             ->willReturn($this->uploadDir);
 
-        (new \ReflectionProperty($form, 'id'))->setValue($form, $this->formId1);
+        new \ReflectionProperty($form, 'id')->setValue($form, $this->formId1);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
         $formUploader->deleteFilesOfForm($form);
 
         // emulate Doctrine wiping the id after deletion, leaving only deletedId
-        (new \ReflectionProperty($form, 'id'))->setValue($form, null);
+        new \ReflectionProperty($form, 'id')->setValue($form, null);
         $form->deletedId = $this->formId1;
 
         $formUploader->deleteFilesOfForm($form);

@@ -174,7 +174,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturn(false);
 
         $user = new User();
-        (new \ReflectionProperty($user, 'id'))->setValue($user, $userId);
+        new \ReflectionProperty($user, 'id')->setValue($user, $userId);
 
         $this->userHelperMock->expects($this->once())
             ->method('getUser')
@@ -263,7 +263,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturn(false);
 
         $user = new User();
-        (new \ReflectionProperty($user, 'id'))->setValue($user, $userId);
+        new \ReflectionProperty($user, 'id')->setValue($user, $userId);
 
         $this->userHelperMock->expects($this->once())
             ->method('getUser')

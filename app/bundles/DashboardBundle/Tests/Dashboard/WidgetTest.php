@@ -43,7 +43,7 @@ final class WidgetTest extends TestCase
         $this->userHelper     = $this->createMock(UserHelper::class);
 
         $this->user = new User();
-        (new \ReflectionProperty($this->user, 'id'))->setValue($this->user, self::USER_ID);
+        new \ReflectionProperty($this->user, 'id')->setValue($this->user, self::USER_ID);
 
         $this->widget = new Widget(
             $this->dashboardModel,
@@ -56,7 +56,7 @@ final class WidgetTest extends TestCase
     {
         $widgetId = 2;
         $widget   = new WidgetEntity();
-        (new \ReflectionProperty($widget, 'id'))->setValue($widget, $widgetId);
+        new \ReflectionProperty($widget, 'id')->setValue($widget, $widgetId);
         $widget->setCreatedBy(self::USER_ID);
         $filter = [
             'dateFrom' => new \DateTime(),
@@ -116,7 +116,7 @@ final class WidgetTest extends TestCase
     {
         $widgetId = 2;
         $widget   = new WidgetEntity();
-        (new \ReflectionProperty($widget, 'id'))->setValue($widget, $widgetId);
+        new \ReflectionProperty($widget, 'id')->setValue($widget, $widgetId);
         $widget->setCreatedBy(self::USER_ID + 1);
 
         $this->dashboardModel->expects($this->once())
