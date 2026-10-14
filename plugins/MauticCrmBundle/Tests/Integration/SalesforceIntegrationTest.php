@@ -928,7 +928,6 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $integration = new Integration();
         $integration->setIsPublished(true)
             ->setName('Salesforce')
-            ->setPlugin('MauticCrmBundle')
             ->setApiKeys(
                 [
                     'access_token' => '123',
