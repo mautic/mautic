@@ -704,7 +704,7 @@ final class ListController extends AbstractStandardFormController
                 LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
             )) {
                 $this->throwAccessDenied();
-            } elseif ($this->listModel->isLocked($lead)) {
+            } elseif ($this->leadModel->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
                 $function = ('remove' == $action) ? 'removeLead' : 'addLead';

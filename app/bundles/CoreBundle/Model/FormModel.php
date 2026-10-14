@@ -17,9 +17,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
- * @template T of object
+ * @template TEntity of object
  *
- * @extends AbstractCommonModel<T>
+ * @extends AbstractCommonModel<TEntity>
  */
 class FormModel extends AbstractCommonModel
 {
@@ -38,6 +38,7 @@ class FormModel extends AbstractCommonModel
     }
 
     /**
+     * @param TEntity $entity
      * Lock an entity to prevent multiple people from editing.
      */
     public function lockEntity(object $entity): void
@@ -55,6 +56,7 @@ class FormModel extends AbstractCommonModel
 
     /**
      * Check to see if the entity is locked.
+     * @param TEntity $entity
      */
     public function isLocked(object $entity): bool
     {
@@ -88,6 +90,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Unlock an entity that prevents multiple people from editing.
      *
+     * @param TEntity $entity
      * @param mixed  $extra  Can be used by model to determine what to unlock
      */
     public function unlockEntity(object $entity, $extra = null): void
@@ -108,7 +111,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Create/edit entity.
      *
-     * @param T $entity
+     * @param TEntity $entity
      */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
@@ -123,7 +126,7 @@ class FormModel extends AbstractCommonModel
     }
 
     /**
-     * @param T $entity
+     * @param TEntity $entity
      * Create/edit entity then detach to preserve RAM.
      */
     public function saveAndDetachEntity(object $entity, bool $unlock = true): void
@@ -136,7 +139,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Save an array of entities.
      *
-     * @param iterable<T> $entities
+     * @param iterable<TEntity> $entities
      */
     public function saveEntities($entities, bool $unlock = true): void
     {
@@ -183,6 +186,7 @@ class FormModel extends AbstractCommonModel
 
     /**
      * Determines if an entity is new or not.
+     * @param TEntity $entity
      */
     public function isNewEntity(object $entity): bool
     {
@@ -200,6 +204,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Toggles entity publish status.
      *
+     * @param TEntity $entity
      * @return bool Force browser refresh
      */
     public function togglePublishStatus(object $entity): bool
@@ -238,6 +243,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Set timestamps and user ids.
      *
+     * @param TEntity $entity
      * @param bool   $isNew
      */
     public function setTimestamps(object &$entity, $isNew, bool $unlock = true): void
@@ -275,6 +281,9 @@ class FormModel extends AbstractCommonModel
         }
     }
 
+    /**
+     * @param TEntity $entity
+     */
     private function setModifiedData(object $entity): void
     {
         if (method_exists($entity, 'setDateModified') && method_exists($entity, 'getDateModified') && !$entity->getDateModified()) {
@@ -292,6 +301,9 @@ class FormModel extends AbstractCommonModel
         }
     }
 
+    /**
+     * @param TEntity $entity
+     */
     public function deleteEntity(object $entity): void
     {
         // take note of ID before doctrine wipes it out
@@ -356,7 +368,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Creates the appropriate form per the model.
      *
-     * @param object      $entity
+     * @param TEntity      $entity
      * @param string|null $action
      * @param array       $options
      *
@@ -402,6 +414,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Set default subject for user contact form.
      *
+     * @param TEntity $entity
      * @param string $subject
      */
     public function getUserContactSubject($subject, object $entity): string
