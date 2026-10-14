@@ -10,17 +10,13 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
-use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Entity\Stat;
 use Mautic\DynamicContentBundle\Entity\StatRepository;
-use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -208,47 +204,6 @@ final class DynamicContentModel extends FormModel implements AjaxLookupModelInte
         $this->statRepository->saveEntity($stat);
 
         return $stat;
-    }
-
-    /**
-     * @param DynamicContent $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof DynamicContent) {
-            throw new MethodNotAllowedHttpException(['Dynamic Content']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = DynamicContentEvents::PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = DynamicContentEvents::POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = DynamicContentEvents::PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = DynamicContentEvents::POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new DynamicContentEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**
