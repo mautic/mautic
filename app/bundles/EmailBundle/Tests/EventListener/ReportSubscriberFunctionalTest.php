@@ -266,6 +266,59 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         ], $result['data']);
     }
 
+    public function testEmailReportFilteredByDncColumnWithGraphs(): void
+    {
+        $emails = [
+            $this->createEmail('Email 1'),
+            $this->createEmail('Email 2'),
+        ];
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+        ];
+        $this->em->flush();
+
+        $this->emulateEmailSend($emails[0], $contacts);
+        $this->emulateEmailSend($emails[1], $contacts);
+
+        $this->createDnc($contacts[0], 'email', $emails[0]->getId(), DoNotContact::UNSUBSCRIBED);
+        $this->em->flush();
+
+        $report = new Report();
+        $report->setName('Email filtered by DNC column');
+        $report->setSource('emails');
+        $report->setColumns(['e.id', 'e.name', 'unsubscribed']);
+        $report->setFilters([
+            [
+                'column'    => 'unsubscribed',
+                'glue'      => 'and',
+                'dynamic'   => null,
+                'condition' => 'gt',
+                'value'     => '0',
+            ],
+        ]);
+        $report->setGraphs([
+            'mautic.email.graph.pie.read.ingored.unsubscribed.bounced',
+            'mautic.email.graph.pie.sent.read.clicked.unsubscribed',
+            'mautic.email.table.most.emails.clicks',
+        ]);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertSame([
+            [
+                'e_id'         => (string) $emails[0]->getId(),
+                'e_name'       => 'Email 1',
+                'unsubscribed' => '1',
+            ],
+        ], $result['data']);
+    }
+
     private function createDnc(Lead $contact, string $channel, int $channelId, int $reason): void
     {
         $dnc = new DoNotContact();
