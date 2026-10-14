@@ -68,7 +68,7 @@ parameters:
         -
             identifiers:
                 - doctrine.noEntityMocking
-                - phpunit.noDocumentMocking
+#                - phpunit.noDocumentMocking
                 - phpunit.noMockObjectAndRealObjectProperty
                 - method.notFound
                 - symplify.forbiddenFuncCall
