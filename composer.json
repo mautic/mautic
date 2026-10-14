@@ -181,7 +181,7 @@
     "npx-patch-package": "npx patch-package",
     "gjs-build": "npm ci --prefix plugins/GrapesJsBuilderBundle --prefer-offline --no-audit && npm run build --prefix plugins/GrapesJsBuilderBundle",
     "gjs-build-safe": "@php build/gjs_build.php",
-    "components-build": "node app/bundles/CoreBundle/Assets/components/build.mjs",
+    "components-build": "npx webpack --config webpack.components.config.js",
     "asset-map:clean": "php -r 'if (is_dir(\"assets/build\")) { $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(\"assets/build\", FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST); foreach ($it as $file) { $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname()); } rmdir(\"assets/build\"); }'",
     "sass:build": [
       "@asset-map:clean",
