@@ -10,11 +10,11 @@
     {%- set itemId = (item.id ?? _self.generate_id(item.title))|trim -%}
     {%- set padding_inline = item.padding_inline ?? true -%}
         <li class="panel">
-            <a role="button" id="heading{{- itemId -}}" class="accordion-heading collapsed" data-bs-toggle="collapse" data-bs-parent="#accordion" href="#collapse{{- itemId -}}" aria-expanded="false" aria-controls="collapse{{- itemId -}}">
+            <a role="button" id="heading{{- itemId -}}" class="accordion-heading collapsed" data-bs-toggle="collapse" href="#collapse{{- itemId -}}" aria-expanded="false" aria-controls="collapse{{- itemId -}}">
                 <i class="ri-arrow-down-s-line accordion-arrow"></i>
                 <span class="accordion-title">{{ item.title|trans }}</span>
             </a>
-            <div id="collapse{{- itemId -}}" class="collapse accordion-wrapper" role="tabpanel" aria-labelledby="heading{{- itemId -}}">
+            <div id="collapse{{- itemId -}}" class="collapse accordion-wrapper" data-bs-parent="#accordion" role="tabpanel" aria-labelledby="heading{{- itemId -}}">
                 <div class="accordion-content{% if not padding_inline %} accordion-content--slim{% endif %}">
                     {{- item.content|raw -}}
                 </div>
