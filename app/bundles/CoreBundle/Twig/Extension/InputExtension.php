@@ -17,8 +17,6 @@ final class InputExtension extends AbstractExtension
             new TwigFunction('inputAlphanum', InputHelper::alphanum(...)),
             new TwigFunction('inputTransliterate', InputHelper::transliterate(...)),
             new TwigFunction('inputClean', InputHelper::clean(...)),
-            new TwigFunction('inputRemoveFormTags', InputHelper::remove_form_tags(...)),
-            new TwigFunction('inputRemoveScriptTags', InputHelper::remove_script_tags(...)),
         ];
     }
 }

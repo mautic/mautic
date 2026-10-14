@@ -111,7 +111,7 @@ final class FieldType extends AbstractType
                     $labelAttributesText = 'mautic.form.field.form.header_attributes';
 
                     // Allow html
-                    $cleanMasks['properties'] = 'html_without_forms';
+                    $cleanMasks['properties'] = 'html';
                     break;
                 case 'freehtml':
                     $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addMappedFieldList      = $addSaveResult      = $addBehaviorFields      = false;
@@ -120,7 +120,7 @@ final class FieldType extends AbstractType
                     $inputAttributesText = 'mautic.form.field.form.freehtml_attributes';
                     $labelAttributesText = 'mautic.form.field.form.header_attributes';
                     // Allow html
-                    $cleanMasks['properties'] = 'html_without_forms';
+                    $cleanMasks['properties'] = 'html';
                     break;
                 case 'button':
                     $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;

@@ -21,6 +21,8 @@ final class FieldTemplateTest extends MauticMysqlTestCase
 
     private const FREE_HTML_FIELD_TEMPLATE = '@MauticForm/Field/freehtml.html.twig';
 
+    private const FREE_TEXT_FIELD_TEMPLATE = '@MauticForm/Field/freetext.html.twig';
+
     public function testFieldTemplateRendersWithCssClasses(): void
     {
         $html = $this->renderTextField($this->createField('50%'));
@@ -100,7 +102,7 @@ final class FieldTemplateTest extends MauticMysqlTestCase
         $this->assertCount(1, $crawler->filter('input[type="radio"][value="0"][checked]'), $crawler->html());
     }
 
-    public function testFreeHtmlFieldTemplateRemovesNestedFormTags(): void
+    public function testFreeHtmlFieldBuilderPurifiesStoredMarkup(): void
     {
         $field = new Field();
         $field->setType('freehtml');
@@ -108,13 +110,34 @@ final class FieldTemplateTest extends MauticMysqlTestCase
         $field->setAlias('test_free_html');
         $field->setOrder(1);
         $field->setProperties([
-            'text' => '<form action="https://example.com/submit"><p>Keep this content.</p></form>',
+            'text' => $this->unsafeStoredMarkup(),
         ]);
 
-        $html = $this->renderFreeHtmlField($field);
+        $html = $this->renderFreeHtmlField($field, true);
 
         $this->assertStringContainsString('<p>Keep this content.</p>', $html);
-        $this->assertStringNotContainsString('<form action="https://example.com/submit">', $html);
+        $this->assertStringNotContainsString('<form', strtolower($html));
+        $this->assertStringNotContainsString('<script', strtolower($html));
+        $this->assertStringNotContainsString('onerror', strtolower($html));
+        $this->assertStringNotContainsString('javascript:', strtolower($html));
+    }
+
+    public function testFreeTextFieldBuilderPurifiesStoredMarkup(): void
+    {
+        $field = new Field();
+        $field->setType('freetext');
+        $field->setLabel(self::FIELD_LABEL);
+        $field->setAlias('test_free_text');
+        $field->setOrder(1);
+        $field->setProperties(['text' => $this->unsafeStoredMarkup()]);
+
+        $html = $this->renderFreeTextField($field, true);
+
+        $this->assertStringContainsString('<p>Keep this content.</p>', $html);
+        $this->assertStringNotContainsString('<form', strtolower($html));
+        $this->assertStringNotContainsString('<script', strtolower($html));
+        $this->assertStringNotContainsString('onerror', strtolower($html));
+        $this->assertStringNotContainsString('javascript:', strtolower($html));
     }
 
     private function createField(?string $fieldWidth = null): Field
@@ -181,7 +204,7 @@ final class FieldTemplateTest extends MauticMysqlTestCase
         ]);
     }
 
-    private function renderFreeHtmlField(Field $field): string
+    private function renderFreeHtmlField(Field $field, bool $inBuilder = false): string
     {
         $twig     = $this->getContainer()->get(Environment::class);
         $template = $twig->load(self::FREE_HTML_FIELD_TEMPLATE);
@@ -192,7 +215,29 @@ final class FieldTemplateTest extends MauticMysqlTestCase
             'id'        => 'test_id',
             'formName'  => 'test_form',
             'formId'    => 'test_form_id',
-            'inBuilder' => false,
+            'inBuilder' => $inBuilder,
         ]);
+    }
+
+    private function renderFreeTextField(Field $field, bool $inBuilder = false): string
+    {
+        $twig     = $this->getContainer()->get(Environment::class);
+        $template = $twig->load(self::FREE_TEXT_FIELD_TEMPLATE);
+
+        return $template->render([
+            'field'     => $field,
+            'fields'    => [],
+            'id'        => 'test_id',
+            'formName'  => 'test_form',
+            'formId'    => 'test_form_id',
+            'inBuilder' => $inBuilder,
+        ]);
+    }
+
+    private function unsafeStoredMarkup(): string
+    {
+        return '<form title="1 > 0"><p>Keep this content.</p></form>'
+            .'<script type="application/json">{"markup":"<img src=x onerror=alert(1)>"}</script>'
+            .'<p onclick="alert(1)">Safe text</p><a href="javascript:alert(1)">Link</a>';
     }
 }

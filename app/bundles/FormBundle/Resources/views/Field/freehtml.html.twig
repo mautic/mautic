@@ -186,11 +186,10 @@
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
   {% if field.showLabel %}<h3 {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify_allow_target_blank }}</h3>{% endif %}
   <div {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-{% set fieldText = inputRemoveFormTags(field.properties.text|default('')) %}
-{% if inBuilder %}
-  {{ showScriptTags(inputRemoveScriptTags(fieldText)) }}
+{% if inBuilder|default(false) %}
+  {{ field.properties.text|default('')|purify_builder_preview }}
 {% else %}
-  {{ fieldText|raw }}
+  {{ field.properties.text|default('')|raw }}
 {% endif %}
   </div>
 </div>
