@@ -135,7 +135,7 @@ final class ContactObjectSubscriberTest extends TestCase
         $objectMapping = $this->createStub(ObjectMapping::class);
         $this->contactObjectHelper->expects($this->once())
             ->method('create')
-            ->with([['somefield' => 'somevalue']])
+            ->with([$objectChangeDAOStub])
             ->willReturn([$objectMapping]);
 
         $this->subscriber->createContacts($event);
