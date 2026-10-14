@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Mautic\PageBundle\Entity\Page;
 
 /**
  * @extends CommonRepository<Submission>
@@ -51,6 +52,7 @@ final class SubmissionRepository extends CommonRepository
      */
     public function getEntities(array $args = []): iterable
     {
+        /** @var Form $form */
         $form = $args['form'];
 
         // DBAL
@@ -215,6 +217,7 @@ final class SubmissionRepository extends CommonRepository
      */
     public function getEntitiesByPage(array $args = []): array
     {
+        /** @var Page $activePage */
         $activePage = $args['activePage'];
 
         $dq = $this->getEntityManager()->getConnection()->createQueryBuilder();
