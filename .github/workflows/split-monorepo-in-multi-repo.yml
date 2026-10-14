@@ -92,6 +92,9 @@ jobs:
                     - theme-mono
                     - theme-capture
                     - theme-multi-step
+                # GrapesJS tags are published by publish-grapesjs-package.yml.
+                exclude:
+                    - config: ${{ github.event_name != 'push' && 'plugin-grapesjs' || '' }}
 
         name: Sync commits into mautic/${{ matrix.config }}
         steps:
