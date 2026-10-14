@@ -2,10 +2,8 @@
 
 namespace Mautic\CategoryBundle\Model;
 
-use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
-use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CategoryBundle\Event\CategoryTypeEntityEvent;
 use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
@@ -13,7 +11,6 @@ use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -119,45 +116,6 @@ final class CategoryModel extends FormModel implements AjaxLookupModelInterface
         }
 
         return parent::getEntity($id);
-    }
-
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Category) {
-            throw new MethodNotAllowedHttpException(['Category']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = CategoryEvents::CATEGORY_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = CategoryEvents::CATEGORY_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = CategoryEvents::CATEGORY_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = CategoryEvents::CATEGORY_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new CategoryEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**

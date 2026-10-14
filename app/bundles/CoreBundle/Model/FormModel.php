@@ -6,6 +6,10 @@ use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreDelete;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -379,7 +383,27 @@ class FormModel extends AbstractCommonModel
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
-        // ...
+        $eventClass = match ($action) {
+            'pre_save'    => EntityPreSave::class,
+            'post_save'   => EntityPostSave::class,
+            'pre_delete'  => EntityPreDelete::class,
+            'post_delete' => EntityPostDelete::class,
+            default       => null,
+        };
+
+        if (null === $eventClass) {
+            return null;
+        }
+
+        if (!$event instanceof $eventClass) {
+            $event = new $eventClass($entity, $isNew);
+        }
+
+        if (!$this->dispatcher->hasListeners($eventClass)) {
+            return null;
+        }
+
+        $this->dispatcher->dispatch($event);
 
         return $event;
     }

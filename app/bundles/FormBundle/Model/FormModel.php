@@ -22,7 +22,6 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Event\FormBuilderEvent;
-use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\Form\Type\FormType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -40,7 +39,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 
 /**
@@ -126,45 +124,6 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         return $entity;
-    }
-
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Form) {
-            throw new MethodNotAllowedHttpException(['Form']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = FormEvents::FORM_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = FormEvents::FORM_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = FormEvents::FORM_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = FormEvents::FORM_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new FormEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     public function setFields(Form $entity, $sessionFields): void

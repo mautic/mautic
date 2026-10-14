@@ -14,14 +14,11 @@ use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\Entity\Stat;
 use Mautic\NotificationBundle\Entity\StatRepository;
-use Mautic\NotificationBundle\Event\NotificationEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
-use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -148,45 +145,6 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         $stat->setSourceId($sourceId);
 
         $this->statRepository->saveEntity($stat);
-    }
-
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Notification) {
-            throw new MethodNotAllowedHttpException(['Notification']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = NotificationEvents::NOTIFICATION_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = NotificationEvents::NOTIFICATION_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = NotificationEvents::NOTIFICATION_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = NotificationEvents::NOTIFICATION_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new NotificationEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**
