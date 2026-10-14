@@ -382,7 +382,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             'post_save'         => EmailPostSaveEvent::class,
             'pre_delete'        => EmailPreDeleteEvent::class,
             'post_delete'       => EmailPostDeleteEvent::class,
-            'on_toggle_publish' => EmailOnTogglePublishEvent::class,
+            // 'on_toggle_publish' => EmailOnTogglePublishEvent::class,
             default             => null,
         };
 
