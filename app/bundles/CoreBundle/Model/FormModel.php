@@ -389,10 +389,10 @@ class FormModel extends AbstractCommonModel
     /**
      * Dispatches events for child classes.
      *
+     * @param "pre_save"|"post_save"|"pre_delete"|"post_delete" $action
      * @param TEntity $entity
-     * @param string $action
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false): ?AbstractEntityEvent
+    protected function dispatchEvent(string $action, &$entity, bool $isNew = false): ?AbstractEntityEvent
     {
         $eventClass = match ($action) {
             'pre_save'    => EntityPreSave::class,
