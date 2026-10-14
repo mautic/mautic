@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
@@ -203,6 +204,77 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
                 'click_to_open_rate'  => '100.0%',
             ],
         ], $result['data']);
+    }
+
+    public function testEmailReportWithDncColumns(): void
+    {
+        $emails = [
+            $this->createEmail('Email 1'),
+            $this->createEmail('Email 2'),
+        ];
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+            $this->createContact('test3@example.com'),
+        ];
+        $this->em->flush();
+
+        $this->emulateEmailSend($emails[0], $contacts);
+        $this->emulateEmailSend($emails[1], $contacts);
+
+        $this->createDnc($contacts[0], 'email', $emails[0]->getId(), DoNotContact::UNSUBSCRIBED);
+        $this->createDnc($contacts[1], 'email', $emails[0]->getId(), DoNotContact::BOUNCED);
+        $this->createDnc($contacts[2], 'email', $emails[1]->getId(), DoNotContact::BOUNCED);
+        // Entries of other channels with the same channel ID must not be counted.
+        $this->createDnc($contacts[2], 'sms', $emails[0]->getId(), DoNotContact::UNSUBSCRIBED);
+        $this->createDnc($contacts[0], 'sms', $emails[1]->getId(), DoNotContact::BOUNCED);
+        $this->em->flush();
+
+        $report = new Report();
+        $report->setName('Email with DNC columns');
+        $report->setSource('emails');
+        $report->setColumns(['e.id', 'e.name', 'unsubscribed', 'unsubscribed_ratio', 'bounced', 'bounced_ratio']);
+        $report->setGraphs([
+            'mautic.email.graph.pie.read.ingored.unsubscribed.bounced',
+            'mautic.email.graph.pie.sent.read.clicked.unsubscribed',
+        ]);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertSame([
+            [
+                'e_id'               => (string) $emails[0]->getId(),
+                'e_name'             => 'Email 1',
+                'unsubscribed'       => '1',
+                'unsubscribed_ratio' => '33.3%',
+                'bounced'            => '1',
+                'bounced_ratio'      => '33.3%',
+            ],
+            [
+                'e_id'               => (string) $emails[1]->getId(),
+                'e_name'             => 'Email 2',
+                'unsubscribed'       => '0',
+                'unsubscribed_ratio' => '0.0%',
+                'bounced'            => '1',
+                'bounced_ratio'      => '33.3%',
+            ],
+        ], $result['data']);
+    }
+
+    private function createDnc(Lead $contact, string $channel, int $channelId, int $reason): void
+    {
+        $dnc = new DoNotContact();
+        $dnc->setLead($contact);
+        $dnc->setChannel($channel);
+        $dnc->setChannelId($channelId);
+        $dnc->setReason($reason);
+        $dnc->setDateAdded(new \DateTime());
+        $this->em->persist($dnc);
     }
 
     private function createContact(string $email): Lead

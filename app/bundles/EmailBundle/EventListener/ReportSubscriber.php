@@ -36,6 +36,8 @@ class ReportSubscriber implements EventSubscriberInterface
 
     public const DNC_PREFIX           = 'dnc';
 
+    public const DNC_COUNT_PREFIX     = 'dnc_count';
+
     public const CLICK_PREFIX         = 'cut';
 
     public const TRACKABLE_PREFIX     = 'tr';
@@ -49,26 +51,26 @@ class ReportSubscriber implements EventSubscriberInterface
             'alias'   => 'unsubscribed',
             'label'   => 'mautic.email.report.unsubscribed',
             'type'    => 'string',
-            'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.self::DNC_PREFIX.'.id IS NOT NULL AND '.self::DNC_PREFIX.'.channel_id='.self::EMAILS_PREFIX.'.id AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+            'formula' => 'IFNULL('.self::DNC_COUNT_PREFIX.'.unsubscribed, 0)',
         ],
         'unsubscribed_ratio' => [
             'alias'   => 'unsubscribed_ratio',
             'label'   => 'mautic.email.report.unsubscribed_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.self::DNC_PREFIX.'.id IS NOT NULL AND '.self::DNC_PREFIX.'.channel_id='.self::EMAILS_PREFIX.'.id AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' , 1, 0))/'.self::EMAILS_PREFIX.'.sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed/'.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
             'suffix'  => '%',
         ],
         'bounced' => [
             'alias'   => 'bounced',
             'label'   => 'mautic.email.report.bounced',
             'type'    => 'string',
-            'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.self::DNC_PREFIX.'.id IS NOT NULL AND '.self::DNC_PREFIX.'.channel_id='.self::EMAILS_PREFIX.'.id AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+            'formula' => 'IFNULL('.self::DNC_COUNT_PREFIX.'.bounced, 0)',
         ],
         'bounced_ratio' => [
             'alias'   => 'bounced_ratio',
             'label'   => 'mautic.email.report.bounced_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.self::DNC_PREFIX.'.id IS NOT NULL AND '.self::DNC_PREFIX.'.channel_id='.self::EMAILS_PREFIX.'.id AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0))/'.self::EMAILS_PREFIX.'.sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.bounced/'.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
             'suffix'  => '%',
         ],
     ];
@@ -373,7 +375,16 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 if ($useDncColumns) {
-                    $this->addDNCTableForEmails($qb);
+                    $qbdnc = $this->db->createQueryBuilder();
+                    $qbdnc->select(
+                        'dnc2.channel_id',
+                        'SUM(IF(dnc2.reason = '.DoNotContact::UNSUBSCRIBED.', 1, 0)) AS unsubscribed',
+                        'SUM(IF(dnc2.reason = '.DoNotContact::BOUNCED.', 1, 0)) AS bounced'
+                    )
+                        ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc2')
+                        ->where('dnc2.channel = \'email\'')
+                        ->groupBy('dnc2.channel_id');
+                    $qb->leftJoin(self::EMAILS_PREFIX, sprintf('(%s)', $qbdnc->getSQL()), self::DNC_COUNT_PREFIX, 'e.id = dnc_count.channel_id');
                 }
 
                 if ($useClickThroughColumns) {
