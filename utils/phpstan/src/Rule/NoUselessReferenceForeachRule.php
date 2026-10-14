@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Rule;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\ArrayDimFetch;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\Foreach_;
+use PhpParser\NodeFinder;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
@@ -52,6 +54,12 @@ final class NoUselessReferenceForeachRule implements Rule
             return [];
         }
 
+        // when the value is itself walked by a nested foreach, the reference is a deliberate "step into the
+        // collection" idiom; leave it alone, it turns live the moment the nested loop takes the value by reference
+        if ($this->isWalkedByNestedForeach($valueVar->name, $node->stmts)) {
+            return [];
+        }
+
         $uselessByName = $this->byReferenceParamAnalyzer->analyse([$valueVar->name], $node->stmts, $scope);
         if (true !== ($uselessByName[$valueVar->name] ?? false)) {
             return [];
@@ -66,5 +74,24 @@ final class NoUselessReferenceForeachRule implements Rule
                 ->line($valueVar->getStartLine())
                 ->build(),
         ];
+    }
+
+    /**
+     * @param Node\Stmt[] $stmts
+     */
+    private function isWalkedByNestedForeach(string $valueName, array $stmts): bool
+    {
+        foreach ((new NodeFinder())->findInstanceOf($stmts, Foreach_::class) as $nestedForeach) {
+            $expr = $nestedForeach->expr;
+            while ($expr instanceof ArrayDimFetch) {
+                $expr = $expr->var;
+            }
+
+            if ($expr instanceof Variable && $expr->name === $valueName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

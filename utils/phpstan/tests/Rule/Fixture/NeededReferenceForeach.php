@@ -70,6 +70,22 @@ final class NeededReferenceForeach
     }
 
     /**
+     * @param array<array<array<string, mixed>>> $groups
+     */
+    public function valueWalkedByNestedForeach(array $groups): void
+    {
+        foreach ($groups as &$group) {
+            foreach ($group as $items) {
+                foreach ($items as &$item) {
+                    $item['seen'] = true;
+                }
+                unset($item);
+            }
+        }
+        unset($group);
+    }
+
+    /**
      * @param array<int> $accumulators
      */
     public function capturedByReference(array $accumulators): void
