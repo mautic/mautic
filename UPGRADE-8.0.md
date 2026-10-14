@@ -963,6 +963,13 @@
 - `Mautic\CoreBundle\Entity\CommonRepository` and `Mautic\CoreBundle\Event\CommonEvent` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
 - `Mautic\CoreBundle\Entity\CommonEntity` and `MauticPlugin\MauticFullContactBundle\Services\FullContact_Base` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
 - All class and interface constants now declare a native type (PHP 8.3 typed class constants), e.g. `public const string NAME = ...`. If a plugin class overrides one of them, add a compatible type to the overriding constant, otherwise PHP fails with "Type of X::NAME must be compatible with Y::NAME". `AbstractMauticMigration::TABLE_NAME` is `?string`, so migrations declare `protected const string TABLE_NAME`.
+- Base entity properties now declare native types. A plugin entity that redeclares either property without a compatible type causes a PHP fatal error. Add the matching type to the overriding property:
+
+    | Class | Property | Type |
+    | --- | --- | --- |
+    | `CoreBundle\Entity\CommonEntity` | `$changes` | `array` |
+    | `CoreBundle\Entity\FormEntity` | `$new` | `bool` |
+
 - `Mautic\DashboardBundle\Entity\Widget::getParams()` and `::getTemplateData()` now declare a native `array` return type instead of a `@return array` docblock. If a plugin class extends `Widget` and overrides either method, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::getParams() must be compatible with Widget::getParams(): array".
 - Methods in Core and shared base classes, interfaces and traits that documented `@return array` now declare a native return type. If a plugin class implements one of these interfaces or overrides one of these methods, add a compatible return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with Y::method(): array". The return type is `array` unless noted:
 
@@ -1079,6 +1086,24 @@
     | `StageBundle\Entity\Stage` | `setCategory()` | `?Category` |
 
     `ContactIdentificationEvent::getIdentifier()` now returns `?string` and `ListPreProcessListEvent::getResult()` returns `?bool`.
+
+- Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `PluginBundle\Integration\AbstractIntegration` | `makeRequest()` (`$parameters`) | `array` |
+    | `PluginBundle\Integration\AbstractIntegration` | `prepareRequest()` (`$parameters`) | `array` |
+    | `ApiBundle\Controller\CommonApiController` | `prePopulateForm()` (`$parameters`) | `array` |
+    | `ApiBundle\Controller\CommonApiController` | `preSaveEntity()` (`$parameters`) | `array` |
+    | `ApiBundle\Controller\CommonApiController` | `processForm()` (`$parameters`) | `?array` |
+    | `ApiBundle\Controller\CommonApiController` | `processBatchForm()` (`$params`) | `?array` |
+    | `ApiBundle\Controller\FetchCommonApiController` | `getBatchEntities()` (`$parameters`) | `array` |
+    | `CoreBundle\Entity\CommonRepository` | `parseSearchFilters()` (`&$parameters`) | `array` |
+    | `PluginBundle\Helper\oAuthHelper` | `getAuthorizationHeader()` (`$parameters`) | `array` |
+    | `FormBundle\Entity\Field` | `setCustomParameters()` (`$customParameters`) | `array` |
+    | `LeadBundle\Segment\Query\QueryBuilder` | `setParametersPairs()` (`$parameters`, `$filterParameters`) | `array\|string`, `array\|string\|bool\|null` |
+    | `LeadBundle\Controller\FrequencyRuleTrait` | `getFrequencyRuleForm()` (`&$viewParameters`) | `array` |
+    | `LeadBundle\Controller\Api\CustomFieldsApiControllerTrait` | `setCustomFieldValues()` (`$parameters`) | `array` |
 
 - Methods in `Mautic\PluginBundle\Integration\AbstractIntegration`, `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` and `MauticPlugin\MauticSocialBundle\Integration\SocialIntegration` that documented `@return array` now declare a native `array` return type. Most third-party integrations extend one of these classes, so if yours overrides one of the methods below, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with AbstractIntegration::method(): array":
 
