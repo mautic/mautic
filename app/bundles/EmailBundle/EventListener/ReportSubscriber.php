@@ -375,15 +375,18 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 if ($useDncColumns) {
+                    // Group by the non-nullable emails.id instead of the nullable lead_donotcontact.channel_id,
+                    // so MySQL ONLY_FULL_GROUP_BY detects that the counts depend on e.id.
                     $qbdnc = $this->db->createQueryBuilder();
                     $qbdnc->select(
-                        'dnc2.channel_id',
+                        'e2.id AS channel_id',
                         'SUM(IF(dnc2.reason = '.DoNotContact::UNSUBSCRIBED.', 1, 0)) AS unsubscribed',
                         'SUM(IF(dnc2.reason = '.DoNotContact::BOUNCED.', 1, 0)) AS bounced'
                     )
                         ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc2')
+                        ->innerJoin('dnc2', MAUTIC_TABLE_PREFIX.'emails', 'e2', 'e2.id = dnc2.channel_id')
                         ->where('dnc2.channel = \'email\'')
-                        ->groupBy('dnc2.channel_id');
+                        ->groupBy('e2.id');
                     $qb->leftJoin(self::EMAILS_PREFIX, sprintf('(%s)', $qbdnc->getSQL()), self::DNC_COUNT_PREFIX, 'e.id = dnc_count.channel_id');
                 }
 

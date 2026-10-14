@@ -244,7 +244,21 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         ], $result['data']);
     }
 
-    public function testEmailReportWithDncColumns(): void
+    /**
+     * @return iterable<string, array{string[]}>
+     */
+    public static function dncColumnsGroupByProvider(): iterable
+    {
+        yield 'default grouping' => [[]];
+        yield 'grouped by email ID' => [['e.id']];
+    }
+
+    /**
+     * @dataProvider dncColumnsGroupByProvider
+     *
+     * @param string[] $groupBy
+     */
+    public function testEmailReportWithDncColumns(array $groupBy): void
     {
         $emails = [
             $this->createEmail('Email 1'),
@@ -272,6 +286,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $report->setName('Email with DNC columns');
         $report->setSource('emails');
         $report->setColumns(['e.id', 'e.name', 'unsubscribed', 'unsubscribed_ratio', 'bounced', 'bounced_ratio']);
+        $report->setGroupBy($groupBy);
         $report->setGraphs([
             'mautic.email.graph.pie.read.ingored.unsubscribed.bounced',
             'mautic.email.graph.pie.sent.read.clicked.unsubscribed',
