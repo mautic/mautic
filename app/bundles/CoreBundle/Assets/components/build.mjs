@@ -11,7 +11,7 @@ const runtimeGlobal = {
   }
 };
 
-const shared = { bundle: true, format: 'iife', target: 'es2019', minify: true, legalComments: 'eof' };
+const shared = { absWorkingDir: import.meta.dirname, bundle: true, format: 'iife', target: 'es2019', minify: true, legalComments: 'eof' };
 
 await build({ ...shared, entryPoints: ['src/runtime-global.ts'], outfile: '../js/98.component-runtime.js', bundle: true });
 
