@@ -206,6 +206,44 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         ], $result['data']);
     }
 
+    public function testEmailReportClickThroughIgnoresOtherChannels(): void
+    {
+        $email    = $this->createEmail('Email 1');
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+        ];
+        $this->em->flush();
+
+        $emailTrackable = $this->createTrackable('https://example.com/1', $email->getId());
+        // SMS trackable with the same channel ID as the email.
+        $smsTrackable = $this->createTrackable('https://example.com/2', $email->getId(), 0, 0, 'sms');
+        $this->em->flush();
+
+        $this->emulateEmailSend($email, $contacts);
+
+        $this->emulateLinkClick($email, $emailTrackable, $contacts[0]);
+        $this->emulateLinkClick($email, $smsTrackable, $contacts[1], 1, 'sms');
+        $this->em->flush();
+
+        $report = new Report();
+        $report->setName('Email click through without other channels');
+        $report->setSource('emails');
+        $report->setColumns(['e.id', 'click_through_count', 'click_through_rate']);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertSame([
+            [
+                'e_id'                => (string) $email->getId(),
+                'click_through_count' => '1',
+                'click_through_rate'  => '50.0%',
+            ],
+        ], $result['data']);
+    }
+
     public function testEmailReportWithDncColumns(): void
     {
         $emails = [
@@ -354,7 +392,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         return $email;
     }
 
-    private function createTrackable(string $url, int $channelId, int $hits = 0, int $uniqueHits = 0): Trackable
+    private function createTrackable(string $url, int $channelId, int $hits = 0, int $uniqueHits = 0, string $channel = 'email'): Trackable
     {
         $redirect = new Redirect();
         $redirect->setRedirectId(uniqid());
@@ -365,7 +403,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $trackable = new Trackable();
         $trackable->setChannelId($channelId);
-        $trackable->setChannel('email');
+        $trackable->setChannel($channel);
         $trackable->setHits($hits);
         $trackable->setUniqueHits($uniqueHits);
         $trackable->setRedirect($redirect);
@@ -413,7 +451,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
     }
 
-    private function emulateLinkClick(Email $email, Trackable $trackable, Lead $lead, int $count = 1): void
+    private function emulateLinkClick(Email $email, Trackable $trackable, Lead $lead, int $count = 1, string $source = 'email'): void
     {
         $trackable->setHits($trackable->getHits() + $count);
         $trackable->setUniqueHits($trackable->getUniqueHits() + 1);
@@ -435,7 +473,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
             $pageHit->setCode(200);
             $pageHit->setUrl($redirect->getUrl());
             $pageHit->setTrackingId($redirect->getRedirectId());
-            $pageHit->setSource('email');
+            $pageHit->setSource($source);
             $pageHit->setSourceId($email->getId());
             $this->em->persist($pageHit);
         }

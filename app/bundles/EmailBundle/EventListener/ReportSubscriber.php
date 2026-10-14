@@ -394,6 +394,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     )
                         ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
                         ->innerJoin('ph', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 'cut.redirect_id = ph.redirect_id AND cut.channel_id = ph.source_id')
+                        ->where('cut.channel = \'email\' AND ph.source = \'email\'')
                         ->groupBy('cut.channel_id');
                     $qb->leftJoin(self::EMAILS_PREFIX, sprintf('(%s)', $qbct->getSQL()), self::CLICK_THROUGH_PREFIX, 'e.id = ct.channel_id');
                 }
