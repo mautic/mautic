@@ -116,7 +116,7 @@ Mautic.leadOnLoad = function (container, response) {
     if (mQuery('.lead-avatar-panel').length) {
         mQuery('.lead-avatar-panel .avatar-collapser a.arrow').on('click', function() {
             setTimeout(function() {
-                var status = (mQuery('#lead-avatar-block').hasClass('in') ? 'expanded' : 'collapsed');
+                var status = (mQuery('#lead-avatar-block').hasClass('show') ? 'expanded' : 'collapsed');
                 document.cookie = 'mautic_lead_avatar_panel=' + status + '; path=/; max-age=' + (30 * 24 * 60 * 60) + '; SameSite=Strict';
             }, 500);
         });
