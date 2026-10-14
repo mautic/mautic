@@ -2587,6 +2587,16 @@ input[type="checkbox"] {
   }
 }
 
+input[type="checkbox"] {
+  line-height: normal;
+
+  &[disabled],
+  &.disabled,
+  fieldset[disabled] & {
+    cursor: $cursor-disabled;
+  }
+}
+
 input[type="file"] {
   display: block;
 }
@@ -2602,8 +2612,7 @@ select[size] {
 }
 
 input[type="file"]:focus,
-input[type="radio"]:focus,
-input[type="checkbox"]:focus {
+input[type="radio"]:focus {
   @include tab-focus;
 }
 
