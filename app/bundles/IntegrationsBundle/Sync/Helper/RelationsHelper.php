@@ -8,6 +8,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\InternalIdNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
@@ -97,6 +98,7 @@ final class RelationsHelper
     {
         $relationObject->setRelObjectInternalId($relObjectId);
         $objectDAO      = $syncReport->getObject($relationObject->getObjectName(), $relationObject->getObjectIntegrationId());
+        /** @var ReferenceValueDAO $referenceValue */
         $referenceValue = $objectDAO->getField($relationObject->getRelFieldName())->getValue()->getNormalizedValue();
         $referenceValue->setType($relInternalType);
         $referenceValue->setValue($relObjectId);

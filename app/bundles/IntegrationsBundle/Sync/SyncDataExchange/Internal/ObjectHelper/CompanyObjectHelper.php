@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
@@ -199,6 +200,7 @@ final class CompanyObjectHelper implements ObjectHelperInterface
 
         foreach ($fields as $col => $val) {
             // Use andWhere because Mautic treats conflicting unique identifiers as different objects
+            /** @var QueryBuilder $q */
             $q = $q->{$this->repository->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col);
             $q->setParameter($col, $val);
         }
