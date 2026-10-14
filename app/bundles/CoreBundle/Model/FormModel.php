@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Model;
 use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
+use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
 use Mautic\CoreBundle\Event\EntityPostDelete;
 use Mautic\CoreBundle\Event\EntityPostSave;
@@ -391,7 +392,7 @@ class FormModel extends AbstractCommonModel
      * @param TEntity $entity
      * @param string $action
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false): ?AbstractEntityEvent
     {
         $eventClass = match ($action) {
             'pre_save'    => EntityPreSave::class,
@@ -405,13 +406,11 @@ class FormModel extends AbstractCommonModel
             return null;
         }
 
-        if (!$event instanceof $eventClass) {
-            $event = new $eventClass($entity, $isNew);
-        }
-
         if (!$this->dispatcher->hasListeners($eventClass)) {
             return null;
         }
+
+        $event = new $eventClass($entity, $isNew);
 
         $this->dispatcher->dispatch($event);
 
