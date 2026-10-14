@@ -37,6 +37,23 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($latestVersion, (string) $responseContent);
     }
 
+    public function testNonStringMarkdownMetadataDoesNotBreakDetailPage(): void
+    {
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true, 512, JSON_THROW_ON_ERROR);
+        foreach ($payload['package']['versions'] as &$version) {
+            $version['extra']['detailed_description'] = ['unexpected' => '<script>alert(1)</script>'];
+            $version['extra']['expected_outcomes'] = ['unexpected' => 'Invalid outcomes'];
+        }
+        unset($version);
+        $this->getClientMockHandler()->append(new Response(200, [], json_encode($payload, JSON_THROW_ON_ERROR)));
+
+        $crawler = $this->client->request('GET', '/s/marketplace/detail/koco/mautic-recaptcha-bundle');
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('', trim($crawler->filter('.marketplace-description')->text()));
+        $this->assertStringNotContainsString('Invalid outcomes', $crawler->text());
+        $this->assertStringNotContainsString('<script>alert(1)</script>', (string) $this->client->getResponse()->getContent());
+    }
+
     public function testRichPackageMetadataAndMarkdown(): void
     {
         $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true, 512, JSON_THROW_ON_ERROR);

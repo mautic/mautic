@@ -15,14 +15,18 @@ final class MarkdownExtension extends AbstractExtension
         return [new TwigFilter('marketplace_markdown', $this->render(...))];
     }
 
-    public function render(?string $markdown): string
+    public function render(mixed $markdown): string
     {
+        if (!is_string($markdown) || '' === trim($markdown)) {
+            return '';
+        }
+
         $converter = new GithubFlavoredMarkdownConverter([
             'html_input'         => 'strip',
             'allow_unsafe_links' => false,
             'max_nesting_level'  => 20,
         ]);
 
-        return (string) $converter->convert($markdown ?? '');
+        return (string) $converter->convert($markdown);
     }
 }

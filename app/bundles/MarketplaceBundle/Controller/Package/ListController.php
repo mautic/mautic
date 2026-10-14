@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Controller\Package;
 
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\MarketplaceBundle\DTO\PackageSearch;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
@@ -48,7 +47,7 @@ final class ListController extends CommonController
         $request = $this->getCurrentRequest();
         $session = $request->getSession();
         $rawSearch = $request->get('search', $session->get('mautic.marketplace.package.filter', ''));
-        $search    = is_string($rawSearch) ? InputHelper::clean($rawSearch) : '';
+        $search    = is_string($rawSearch) ? trim($rawSearch) : '';
         $session->set('mautic.marketplace.package.filter', $search);
 
         $filter = new PackageSearch($search);

@@ -212,6 +212,28 @@ final class ListControllerTest extends MauticMysqlTestCase
         $this->assertCount(0, $handler);
     }
 
+    public function testSearchCharactersSurviveSessionAndPagination(): void
+    {
+        $query  = 'Q&A "<script>alert(1)</script>"';
+        $search = $query.' type:mautic-theme';
+        $body   = file_get_contents(__DIR__.'/../../ApiResponse/list_theme.json');
+
+        foreach ([['search' => $search, 'limit' => 1], []] as $parameters) {
+            $this->queuePackageResponse(['page' => '1', 'limit' => '1', 'query' => $query, 'type' => 'mautic-theme'], $body);
+            $crawler = $this->client->request('GET', '/s/marketplace', $parameters);
+            $this->assertResponseIsSuccessful();
+            $this->assertSame($search, $crawler->filter('#list-search')->attr('value'));
+            $this->assertStringNotContainsString('<script>alert(1)</script>', (string) $this->client->getResponse()->getContent());
+        }
+
+        $pageLink = $crawler->filter('a[href*="/marketplace/2?"]')->first()->attr('href');
+        $this->queuePackageResponse(['page' => '2', 'limit' => '1', 'query' => $query, 'type' => 'mautic-theme'], $body);
+        $crawler = $this->client->request('GET', $pageLink);
+        $this->assertResponseIsSuccessful();
+        $this->assertSame($search, $crawler->filter('#list-search')->attr('value'));
+        $this->assertCount(0, $this->getClientMockHandler());
+    }
+
     public function testArraySearchDoesNotBreakSubsequentVisits(): void
     {
         foreach ([['search' => ['type:mautic-theme'], 'limit' => 10], []] as $parameters) {
