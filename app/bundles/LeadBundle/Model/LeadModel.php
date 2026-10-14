@@ -294,6 +294,8 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @param Lead $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

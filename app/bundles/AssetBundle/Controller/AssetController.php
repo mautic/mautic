@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
@@ -291,6 +292,8 @@ final class AssetController extends AbstractStandardFormController
 
     /**
      * Generates new form and processes post data.
+     *
+     * @param Asset $entity
      */
     public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null): Response
     {

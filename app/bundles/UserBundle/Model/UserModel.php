@@ -121,6 +121,9 @@ final class UserModel extends FormModel implements GlobalSearchInterface
         return $entity->getPassword();
     }
 
+    /**
+     * @param User $entity
+     */
     public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof User) {
@@ -167,6 +170,8 @@ final class UserModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param User $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

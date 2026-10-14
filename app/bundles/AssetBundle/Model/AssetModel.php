@@ -313,6 +313,9 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
         return 'getTitle';
     }
 
+    /**
+     * @param Asset $entity
+     */
     public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Asset) {
@@ -339,6 +342,8 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Asset $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

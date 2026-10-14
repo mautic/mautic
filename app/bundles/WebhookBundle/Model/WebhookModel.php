@@ -586,6 +586,8 @@ final class WebhookModel extends FormModel
     }
 
     /**
+     * @param Webhook $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?SymfonyEvent $event = null): ?SymfonyEvent

@@ -92,6 +92,8 @@ final class PointGroupModel extends CommonFormModel implements GlobalSearchInter
     }
 
     /**
+     * @param Group $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

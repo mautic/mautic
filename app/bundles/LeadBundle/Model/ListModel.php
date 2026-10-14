@@ -216,6 +216,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param LeadList    $entity
      * @param string|null $action
      * @param array       $options
      *
@@ -252,6 +253,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param LeadList $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

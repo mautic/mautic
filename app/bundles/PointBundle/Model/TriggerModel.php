@@ -80,6 +80,8 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
     }
 
     /**
+     * @param Trigger $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, $action = null, $options = []): FormInterface
@@ -191,6 +193,8 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
     }
 
     /**
+     * @param Trigger $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

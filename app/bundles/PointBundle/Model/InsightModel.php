@@ -50,6 +50,7 @@ final class InsightModel extends CommonFormModel
     }
 
     /**
+     * @param PointInsight         $entity
      * @param array<string, mixed> $options
      *
      * @throws MethodNotAllowedHttpException

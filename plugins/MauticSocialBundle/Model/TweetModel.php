@@ -162,6 +162,8 @@ final class TweetModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param Tweet $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

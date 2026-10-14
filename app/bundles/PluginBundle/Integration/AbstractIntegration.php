@@ -1561,6 +1561,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Match Company data with integration fields.
+     *
+     * @param Lead|array $entity
      */
     public function populateCompanyData($entity, $config = []): array
     {

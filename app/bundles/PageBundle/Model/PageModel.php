@@ -215,6 +215,9 @@ final class PageModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
+    /**
+     * @param Page $entity
+     */
     public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Page) {
@@ -250,6 +253,8 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Page $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
@@ -330,6 +335,8 @@ final class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Generates slug string.
+     *
+     * @param Page $entity
      */
     public function generateSlug($entity): string
     {

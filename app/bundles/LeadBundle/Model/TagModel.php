@@ -117,6 +117,8 @@ class TagModel extends FormModel
     }
 
     /**
+     * @param Tag $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

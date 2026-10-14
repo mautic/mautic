@@ -259,7 +259,7 @@ final class EmailApiController extends CommonApiController
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, ?array $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, object $entity, ?array $parameters = null, $method = 'PUT')
     {
         if (array_key_exists('sendToDnc', $parameters)
             && !$this->security->isGranted('email:emails:sendtodnc')) {

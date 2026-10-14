@@ -78,6 +78,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Modify the cloned entity prior to sending through editAction.
      *
+     * @param object $entity
+     *
      * @return array<int, mixed> of arguments for editAction
      */
     protected function afterEntityClone($newEntity, $entity): array
@@ -87,6 +89,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
+     *
+     * @param object $entity
      */
     protected function afterEntitySave($entity, Form $form, $action, $pass = null): void
     {
@@ -94,6 +98,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Called after the form is validated on POST.
+     *
+     * @param object $entity
      */
     protected function afterFormProcessed($isValid, $entity, Form $form, $action, bool $isClone = false): void
     {
@@ -173,6 +179,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Modify entity prior to persisting or perform custom validation on the form.
      *
+     * @param object $entity
+     *
      * @return mixed Whatever is returned will be passed into afterEntitySave; pass false to fail validation
      */
     protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, bool $isClone = false): bool
@@ -182,12 +190,16 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * Do anything necessary before the form is checked for POST and processed.
+     *
+     * @param object $entity
      */
     protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, bool $isClone = false): void
     {
     }
 
     /**
+     * @param object|null $entity
+     *
      * @return bool|mixed
      */
     protected function checkActionPermission($action, $entity = null, $objectId = null)
@@ -1148,7 +1160,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * If the $entity supports optimistic locking, entity's current version is set to the $form for a later comparison.
      *
-     * @param mixed $entity
+     * @param object $entity
      */
     protected function setOptimisticLockVersion($entity, FormInterface $form): void
     {
@@ -1163,7 +1175,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * If the $entity supports optimistic locking, entity's current version is compared to the value in the $form.
      *
-     * @param mixed $entity
+     * @param object $entity
      */
     protected function checkOptimisticLockVersion($entity, FormInterface $form, bool $isClone): bool
     {

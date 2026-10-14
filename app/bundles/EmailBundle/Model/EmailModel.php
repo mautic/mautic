@@ -314,6 +314,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * @param Email       $entity
      * @param string|null $action
      * @param array       $options
      *
@@ -369,6 +370,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * @param Email $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
@@ -2343,6 +2346,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * @param object $entity
+     *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     protected function setCachedCount(mixed $entity): void

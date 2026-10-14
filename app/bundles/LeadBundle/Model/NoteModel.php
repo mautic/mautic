@@ -63,6 +63,7 @@ final class NoteModel extends FormModel
     }
 
     /**
+     * @param LeadNote    $entity
      * @param string|null $action
      * @param array       $options
      */
@@ -80,6 +81,8 @@ final class NoteModel extends FormModel
     }
 
     /**
+     * @param LeadNote $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
