@@ -1282,19 +1282,20 @@ final class CampaignController extends AbstractStandardFormController
         // load existing events into session
         $campaignEvents = [];
 
+        /** @var Event[] $existingEvents */
         $existingEvents = $entity->getEvents()->toArray();
-        /** @var Event $e */
-        foreach ($existingEvents as $e) {
+
+        foreach ($existingEvents as $existingEvent) {
             // remove deleted events from existing events
-            if (!empty($e->getDeleted())) {
+            if (!empty($existingEvent->getDeleted())) {
                 continue;
             }
-            $event = $e->convertToArray();
+            $event = $existingEvent->convertToArray();
             if ($isClone) {
-                $id          = $e->getTempId();
+                $id          = $existingEvent->getTempId();
                 $event['id'] = $id;
             } else {
-                $id = $e->getId();
+                $id = $existingEvent->getId();
             }
 
             unset($event['campaign']);
@@ -1307,7 +1308,7 @@ final class CampaignController extends AbstractStandardFormController
                 $event['label'] = $label;
             }
 
-            $event['isRedirectTarget'] = $e->isRedirectTarget();
+            $event['isRedirectTarget'] = $existingEvent->isRedirectTarget();
 
             $campaignEvents[$id] = $event;
         }

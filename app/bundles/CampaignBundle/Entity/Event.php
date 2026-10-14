@@ -231,7 +231,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Used by API to house contact specific logs.
      *
-     * @var array
+     * @var iterable<LeadEventLog>
      */
     #[Groups(['event:read', 'event:write'])]
     private $contactLog = [];
@@ -843,7 +843,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Used by the API.
      *
-     * @return LeadEventLog[]|Collection|static
+     * @return LeadEventLog[]|Collection<int, LeadEventLog>
      */
     public function getContactLog(?Contact $contact = null)
     {
@@ -862,7 +862,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Used by the API.
      *
-     * @param array $contactLog
+     * @param LeadEventLog[] $contactLog
      */
     public function setContactLog($contactLog): static
     {

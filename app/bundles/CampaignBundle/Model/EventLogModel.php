@@ -120,7 +120,6 @@ final class EventLogModel extends AbstractCommonModel
         $logs    = $event->getContactLog($contact);
         $created = false;
         if (count($logs)) {
-            /** @var LeadEventLog $log */
             $log = $logs[0];
             if ($log->getDateTriggered()) {
                 return $this->translator->trans(
