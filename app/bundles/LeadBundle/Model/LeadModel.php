@@ -299,12 +299,12 @@ class LeadModel extends FormModel
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
     {
-        return $this->dispatchLeadEvent($action, $entity, $isNew, false);
+        return $this->dispatchEvent($action, $entity, $isNew, false);
     }
 
     protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
-        return $this->dispatchLeadEvent($action, $entity, $isNew, true);
+        return $this->dispatchEvent($action, $entity, $isNew, true);
     }
 
     protected function dispatchBatchEvent(string $action, array $entitiesBatchParams, ?Event $event = null): ?Event
