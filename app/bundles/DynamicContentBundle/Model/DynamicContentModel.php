@@ -182,8 +182,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
     /**
      * @param PageDisplayEvent|EmailSendEvent|string $source
+     * @param array<string, mixed>                   $sourceData
      */
-    public function createStatEntry(DynamicContent $dynamicContent, Lead|array $lead, $source = null): ?Stat
+    public function createStatEntry(DynamicContent $dynamicContent, Lead|array $lead, $source = null, array $sourceData = []): ?Stat
     {
         if (empty($lead)
             || ($lead instanceof Lead && !$lead->getId())
@@ -217,6 +218,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
                 $stat->setSourceId($source->getPage()->getId());
             }
             $stat->setTokenPlacement($tokenPlacement);
+        } elseif ([] !== $sourceData) {
+            // Handle 3rd party website requests
+            $stat->setSourceData($sourceData);
+            $stat->setTokenPlacement('body');
         }
 
         $stat->setSentDetails($detail);

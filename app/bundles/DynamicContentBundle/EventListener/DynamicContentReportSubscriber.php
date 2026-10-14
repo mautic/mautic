@@ -115,6 +115,11 @@ final readonly class DynamicContentReportSubscriber implements EventSubscriberIn
                     $this->translator->trans('mautic.dynamicContent.report.body'),
                 ),
             ],
+            $statPrefix.'source_data_uri' => [
+                'label'   => 'mautic.dynamicContent.report.source_uri',
+                'type'    => 'string',
+                'alias'   => 'dwc_stat_source_data_uri',
+            ],
         ];
 
         // Email columns

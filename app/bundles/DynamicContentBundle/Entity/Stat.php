@@ -66,6 +66,11 @@ class Stat
 
     private string $tokenPlacement = 'body';
 
+    /**
+     * @var array<string, mixed>
+     */
+    private array $sourceData = [];
+
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -114,6 +119,10 @@ class Stat
         $builder->addNullableField('lastSent', 'datetime', 'last_sent');
 
         $builder->addNullableField('sentDetails', 'array', 'sent_details');
+
+        $builder->createField('sourceData', 'json')
+            ->columnName('source_data')
+            ->build();
     }
 
     /**
@@ -130,6 +139,7 @@ class Stat
                     'sentCount',
                     'lastSent',
                     'sourceId',
+                    'sourceData',
                     'lead',
                     'dynamicContent',
                 ]
@@ -314,5 +324,21 @@ class Stat
     public function setTokenPlacement(string $tokenPlacement): void
     {
         $this->tokenPlacement = $tokenPlacement;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getSourceData(): array
+    {
+        return $this->sourceData;
+    }
+
+    /**
+     * @param array<string, mixed> $sourceData
+     */
+    public function setSourceData(array $sourceData): void
+    {
+        $this->sourceData = $sourceData;
     }
 }
