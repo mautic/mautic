@@ -856,6 +856,9 @@ final class CampaignController extends AbstractStandardFormController
         }
     }
 
+    /**
+     * @param Campaign $entity
+     */
     protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, bool $isClone = false): void
     {
         if (!$isValid) {
@@ -868,6 +871,8 @@ final class CampaignController extends AbstractStandardFormController
 
     /**
      * This method is called before and after form is submitted.
+     *
+     * @param Campaign $entity
      */
     protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, bool $isClone = false): void
     {
@@ -1270,6 +1275,8 @@ final class CampaignController extends AbstractStandardFormController
     }
 
     /**
+     * @param Campaign $entity
+     *
      * @return array{}
      */
     protected function prepareCampaignEventsForEdit($entity, $objectId, bool $isClone = false): array

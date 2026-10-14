@@ -156,6 +156,8 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
     }
 
     /**
+     * @param Campaign $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?\Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event

@@ -20,6 +20,7 @@ class BuilderEvent extends Event
     protected string $tokenFilterTarget;
 
     /**
+     * @param object|null     $entity
      * @param string|string[] $requested
      */
     public function __construct(

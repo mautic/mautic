@@ -79,6 +79,9 @@ final class FieldApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
+    /**
+     * @param object $entity
+     */
     protected function saveEntity($entity, int $statusCode): int
     {
         try {

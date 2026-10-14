@@ -223,6 +223,8 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
     }
 
     /**
+     * @param Message $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

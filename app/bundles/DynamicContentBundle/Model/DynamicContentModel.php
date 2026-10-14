@@ -111,8 +111,9 @@ final class DynamicContentModel extends FormModel implements AjaxLookupModelInte
     }
 
     /**
-     * @param string|null $action
-     * @param array       $options
+     * @param DynamicContent $entity
+     * @param string|null    $action
+     * @param array          $options
      *
      * @throws \InvalidArgumentException
      */
@@ -207,6 +208,8 @@ final class DynamicContentModel extends FormModel implements AjaxLookupModelInte
     }
 
     /**
+     * @param DynamicContent $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

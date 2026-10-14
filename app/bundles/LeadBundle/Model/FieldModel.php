@@ -794,7 +794,8 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param array $options
+     * @param LeadField $entity
+     * @param array     $options
      *
      * @throws MethodNotAllowedHttpException
      */
@@ -852,6 +853,8 @@ class FieldModel extends FormModel
     }
 
     /**
+     * @param LeadField $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

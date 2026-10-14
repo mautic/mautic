@@ -342,6 +342,8 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
+     * @param object $entity
+     *
      * @return FormInterface<mixed>
      */
     protected function createEntityForm($entity): FormInterface
@@ -362,6 +364,7 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before populating the form.
      *
+     * @param object $entity
      * @param string $action
      *
      * @return mixed
@@ -395,6 +398,7 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
+     * @param object             $entity
      * @param mixed[][]          $errors
      * @param array<object|null> $entities
      */
@@ -441,6 +445,7 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Processes API Form.
      *
+     * @param object            $entity
      * @param array<mixed>|null $parameters
      * @param string            $method
      *
@@ -605,6 +610,9 @@ class CommonApiController extends FetchCommonApiController
         return $this->handleView($view);
     }
 
+    /**
+     * @param object $entity
+     */
     protected function saveEntity($entity, int $statusCode): int
     {
         $this->model->saveEntity($entity);

@@ -151,6 +151,8 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     }
 
     /**
+     * @param Notification $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

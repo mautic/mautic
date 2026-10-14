@@ -127,6 +127,8 @@ final class FieldModel extends CommonFormModel
     }
 
     /**
+     * @param Field $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

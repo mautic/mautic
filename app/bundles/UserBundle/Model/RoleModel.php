@@ -115,6 +115,9 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
+    /**
+     * @param Role $entity
+     */
     public function createForm($entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Role) {
@@ -151,6 +154,8 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Role $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

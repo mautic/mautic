@@ -57,7 +57,8 @@ final class DeviceModel extends FormModel
     }
 
     /**
-     * @param array $options
+     * @param LeadDevice $entity
+     * @param array      $options
      */
     public function createForm($entity, $action = null, $options = []): FormInterface
     {
@@ -73,6 +74,8 @@ final class DeviceModel extends FormModel
     }
 
     /**
+     * @param LeadDevice $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

@@ -130,6 +130,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
     }
 
     /**
+     * @param Sms     $entity
      * @param mixed[] $options
      *
      * @throws MethodNotAllowedHttpException
@@ -400,6 +401,8 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
     }
 
     /**
+     * @param Sms $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

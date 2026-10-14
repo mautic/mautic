@@ -94,6 +94,7 @@ final class CategoryModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param Category    $entity
      * @param string|null $action
      * @param array       $options
      */
@@ -122,6 +123,8 @@ final class CategoryModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param Category $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event

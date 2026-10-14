@@ -330,6 +330,8 @@ final class FormApiController extends CommonApiController
     /**
      * Creates the form instance.
      *
+     * @param array<string, mixed> $entity
+     *
      * @return FormInterface<mixed>
      */
     protected function createFieldEntityForm($entity): FormInterface

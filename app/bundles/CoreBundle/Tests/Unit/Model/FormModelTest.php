@@ -66,6 +66,9 @@ final class FormModelTest extends TestCase
              */
             private array $actions = [];
 
+            /**
+             * @param object $entity
+             */
             protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
             {
                 $this->actions[] = $action;

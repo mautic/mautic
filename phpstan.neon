@@ -461,6 +461,10 @@ services:
             variableNameToType:
                 parameters: array
     -
+        class: Utils\PHPStan\Rule\EntityParamMustHaveTypeRule
+        tags:
+            - phpstan.rules.rule
+    -
         class: Utils\PHPStan\Type\ConnectionQueryBuilderReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension

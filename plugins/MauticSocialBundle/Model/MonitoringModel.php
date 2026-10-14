@@ -74,6 +74,8 @@ final class MonitoringModel extends FormModel
     }
 
     /**
+     * @param Monitoring $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
