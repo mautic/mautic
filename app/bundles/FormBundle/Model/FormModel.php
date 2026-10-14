@@ -98,7 +98,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @param Form|array<string, mixed> $entity
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);

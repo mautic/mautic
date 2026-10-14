@@ -319,7 +319,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Asset|array<string, mixed> $entity
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);

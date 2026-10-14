@@ -122,7 +122,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Role|array<string, mixed> $entity
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);

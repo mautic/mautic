@@ -64,7 +64,7 @@ final class PointGroupModel extends CommonFormModel implements GlobalSearchInter
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Group) {
             throw new MethodNotAllowedHttpException(['Group']);
