@@ -848,7 +848,7 @@ EMAIL;
         $crawler = $this->client->submit($form);
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $errorContainer = $crawler->filter('form[name="lead"] .has-error .help-block');
+        $errorContainer = $crawler->filter('form[name="lead"] .has-error .form-text');
         $this->assertCount(1, $errorContainer);
         $this->assertSame('This field must be unique.', $errorContainer->text(null, true));
     }
