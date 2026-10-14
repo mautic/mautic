@@ -23,7 +23,7 @@ Mautic.dwcGenerator = (function() {
 
     // Determine the active tab (plugin or HTML)
     const getActiveTabType = () => {
-        const activePane = document.querySelector('.tab-pane.active.in') || document.querySelector('.tab-pane.active');
+        const activePane = document.querySelector('.tab-pane.active.show') || document.querySelector('.tab-pane.active');
         if (!activePane) return 'plugin'; // Default to 'plugin' if none found
         return activePane.id === 'dwc--generator-plugins' ? 'plugin' : 'html';
     };
