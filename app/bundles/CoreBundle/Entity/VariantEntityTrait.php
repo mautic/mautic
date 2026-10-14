@@ -41,11 +41,8 @@ trait VariantEntityTrait
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_AB_WEIGHT, 'enableAbTest' => false];
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantStartDate;
+    private ?\DateTime $variantStartDate = null;
 
     protected static function addVariantMetadata(ClassMetadataBuilder $builder, string $entityClass): void
     {
@@ -152,12 +149,12 @@ trait VariantEntityTrait
         return $this->variantSettings ?? [];
     }
 
-    public function getVariantStartDate(): mixed
+    public function getVariantStartDate(): ?\DateTime
     {
         return $this->variantStartDate;
     }
 
-    public function setVariantStartDate(mixed $variantStartDate): static
+    public function setVariantStartDate(?\DateTime $variantStartDate): static
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('variantStartDate', $variantStartDate);

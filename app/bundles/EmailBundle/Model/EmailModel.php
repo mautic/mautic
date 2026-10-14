@@ -355,7 +355,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return Paginator|array<string, int|object>
+     * @return Paginator<Email>|array<string, int|Email>
      */
     public function getEntities(array $args = []): iterable
     {
@@ -1038,7 +1038,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead lists.
      *
-     * @param array    $lists
+     * @param LeadList[]|null $lists
      * @param int|null $limit
      * @param int|null $batch        True to process and batch all pending leads
      * @param int      $minContactId
@@ -1048,7 +1048,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function sendEmailToLists(
         Email $email,
-        $lists = null,
+        ?array $lists = null,
         $limit = null,
         $batch = null,
         ?OutputInterface $output = null,
@@ -1099,7 +1099,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $progress = new ProgressBar($output, $totalLeadCount);
         }
 
-        /** @var LeadList $list */
         foreach ($lists as $list) {
             if (!$batch && null !== $limit && $limit <= 0) {
                 // Hit the max for this batch
@@ -2262,7 +2261,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         );
 
         $ids = [];
-        /** @var Email $entity */
+
         foreach ($entities as $entity) {
             $ids[] = $entity->getId();
         }
