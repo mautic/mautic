@@ -53,7 +53,7 @@ mQuery(document).on('click', function (e) {
         mQuery('[data-bs-toggle="popover"]').each(function () {
             var $this = mQuery(this);
             var popover = $this.data('bs.popover');
-            if (popover && popover.tip().hasClass('in')) {
+            if (popover && popover.tip().hasClass('show')) {
                 $this.popover('hide');
                 popover.inState.click = false; // Reset the internal click state
             }
