@@ -565,10 +565,6 @@ input[type="checkbox"] {
   }
 }
 
-.form-check-input[type="checkbox"] {
-  border-radius: clamp(2px, var(--border-radius-sm), 4px);
-}
-
 // time input (3 select boxes hh:mm:ss)
 .time-input {
   select {
