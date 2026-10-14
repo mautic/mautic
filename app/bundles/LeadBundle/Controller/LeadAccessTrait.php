@@ -103,7 +103,6 @@ trait LeadAccessTrait
             return $this->notFound();
         }
 
-        /** @var Lead $lead */
         foreach ($leads as $lead) {
             if (!$this->security->hasEntityAccess(
                 'lead:leads:'.$action.'own',

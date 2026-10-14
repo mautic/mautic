@@ -106,16 +106,6 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array<mixed> $args
-     *
-     * @return array<int, \Mautic\LeadBundle\Entity\LeadList>|\Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\LeadBundle\Entity\LeadList>
-     */
-    public function getEntities(array $args = []): iterable
-    {
-        return parent::getEntities($args);
-    }
-
-    /**
      * Returns the repository for the table that houses the leads associated with a list.
      */
     public function getPermissionBase(): string

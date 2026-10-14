@@ -142,7 +142,7 @@ trait FrequencyRuleTrait
 
         $this->leadLists    = $this->frequencyRuleLeadModel->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
-        /** @var LeadList $leadList */
+
         foreach ($this->leadLists as $leadList) {
             $data['lead_lists'][] = $leadList->getId();
         }
