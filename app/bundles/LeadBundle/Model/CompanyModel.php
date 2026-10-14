@@ -23,12 +23,8 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
 use Mautic\LeadBundle\Event\CompanyPostMergeEvent;
-use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
-use Mautic\LeadBundle\Event\CompanyPreDeleteEvent;
 use Mautic\LeadBundle\Event\CompanyPreMergeEvent;
-use Mautic\LeadBundle\Event\CompanyPreSaveEvent;
 use Mautic\LeadBundle\Event\CompanySoftDeleteEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
@@ -41,7 +37,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends CommonFormModel<Company>
@@ -600,34 +595,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         return $results;
-    }
-
-    /**
-     * @param Company $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Company) {
-            throw new MethodNotAllowedHttpException(['Email']);
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new CompanyPreSaveEvent($entity, $isNew),
-            'post_save'   => new CompanyPostSaveEvent($entity, $isNew),
-            'pre_delete'  => new CompanyPreDeleteEvent($entity, $isNew),
-            'post_delete' => new CompanyPostDeleteEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
-            return null;
-        }
-
-        $this->dispatcher->dispatch($event);
-
-        return $event;
     }
 
     /**

@@ -8,15 +8,10 @@ use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\UserRepository;
-use Mautic\UserBundle\Event\PostDeleteRoleEvent;
-use Mautic\UserBundle\Event\PostSaveRoleEvent;
-use Mautic\UserBundle\Event\PreDeleteRoleEvent;
-use Mautic\UserBundle\Event\PreSaveRoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -157,35 +152,4 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
         return $clone;
     }
 
-    /**
-     * @param Role $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Role) {
-            throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new PreSaveRoleEvent($entity, $isNew),
-            'post_save'   => new PostSaveRoleEvent($entity, $isNew),
-            'pre_delete'  => new PreDeleteRoleEvent($entity, $isNew),
-            'post_delete' => new PostDeleteRoleEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (!$event instanceof Event) {
-            return null;
-        }
-
-        if ($this->dispatcher->hasListeners($event::class)) {
-            $this->dispatcher->dispatch($event);
-
-            return $event;
-        }
-
-        return null;
-    }
 }

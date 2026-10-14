@@ -20,7 +20,6 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\PointRepository;
 use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
-use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\Form\Type\PointType;
 use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
@@ -105,47 +104,6 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
         }
 
         return parent::getEntity($id);
-    }
-
-    /**
-     * @param Point $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Point) {
-            throw new MethodNotAllowedHttpException(['Point']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = PointEvents::POINT_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = PointEvents::POINT_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = PointEvents::POINT_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = PointEvents::POINT_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new PointEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**
