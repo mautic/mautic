@@ -344,11 +344,9 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $entity
-     *
      * @throws MethodNotAllowedHttpException
      */
-    private function dispatchLeadEvent(string $action, object $entity, bool $isNew, bool $alreadyProcessedInBatch): ?LeadEvent
+    private function dispatchLeadEvent(string $action, Lead $entity, bool $isNew, bool $alreadyProcessedInBatch): ?LeadEvent
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
