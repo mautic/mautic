@@ -31,8 +31,3 @@ node_modules/*
 phpstan*.neon
 rector.php
 tests/*
-vendor/babdev/*
-vendor/liip/*
-vendor/symfony/browser-kit/*
-vendor/symfony/web-profiler-bundle/*
-vendor/webfactory/*
