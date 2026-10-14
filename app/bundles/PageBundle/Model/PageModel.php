@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Query;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
-use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -50,10 +49,8 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
-use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Form\Type\PageType;
-use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
@@ -64,7 +61,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<Page>
@@ -251,47 +247,6 @@ final class PageModel extends FormModel implements GlobalSearchInterface
         }
 
         return $entity;
-    }
-
-    /**
-     * @param Page $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
-    {
-        if (!$entity instanceof Page) {
-            throw new MethodNotAllowedHttpException(['Page']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = PageEvents::PAGE_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = PageEvents::PAGE_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = PageEvents::PAGE_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = PageEvents::PAGE_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new PageEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**
